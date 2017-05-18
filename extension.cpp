@@ -51,7 +51,6 @@ PHPX_EXTENSION
 
     extension->onStart = [extension]() noexcept
     {
-        cout << extension->name << "startup" << endl;
         extension->registerConstant("CPP_EXT_VERSION", 1002);
 
         Class *c = new Class("myClass");

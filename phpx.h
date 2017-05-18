@@ -1909,11 +1909,6 @@ protected:
 public:
     Extension(const char*name, const char *version);
 
-    ~Extension()
-    {
-        free((void*) module.functions);
-    }
-
     void checkStartupStatus()
     {
         if (!this->started)
@@ -1925,9 +1920,6 @@ public:
     bool registerClass(Class *c)
     {
         this->checkStartupStatus();
-        /**
-         * 激活类
-         */
         c->activate();
         class_map[c->getName()] = c;
         return true;
@@ -1995,9 +1987,9 @@ public:
         this->checkStartupStatus();
         zend_constant c;
         ZVAL_LONG(&c.value, v);
-        c.flags = CONST_CS;
+        c.flags = CONST_CS | CONST_PERSISTENT;
         c.name = zend_string_init(name, strlen(name), c.flags);
-        c.module_number = 0;
+        c.module_number = module.module_number;
         return zend_register_constant(&c);
     }
 
@@ -2006,7 +1998,7 @@ public:
         this->checkStartupStatus();
         zend_constant c;
         ZVAL_LONG(&c.value, v);
-        c.flags = CONST_CS;
+        c.flags = CONST_CS | CONST_PERSISTENT;
         c.name = zend_string_init(name, strlen(name), c.flags);
         c.module_number = module.module_number;
         return zend_register_constant(&c);
@@ -2024,7 +2016,7 @@ public:
         {
             ZVAL_FALSE(&c.value);
         }
-        c.flags = CONST_CS;
+        c.flags = CONST_CS | CONST_PERSISTENT;
         c.name = zend_string_init(name, strlen(name), c.flags);
         c.module_number = module.module_number;
         return zend_register_constant(&c);
@@ -2035,7 +2027,7 @@ public:
         this->checkStartupStatus();
         zend_constant c;
         ZVAL_DOUBLE(&c.value, v);
-        c.flags = CONST_CS;
+        c.flags = CONST_CS | CONST_PERSISTENT;
         c.name = zend_string_init(name, strlen(name), c.flags);
         c.module_number = module.module_number;
         return zend_register_constant(&c);
@@ -2046,7 +2038,7 @@ public:
         this->checkStartupStatus();
         zend_constant c;
         ZVAL_DOUBLE(&c.value, v);
-        c.flags = CONST_CS;
+        c.flags = CONST_CS | CONST_PERSISTENT;
         c.name = zend_string_init(name, strlen(name), c.flags);
         c.module_number = module.module_number;
         return zend_register_constant(&c);
@@ -2057,7 +2049,7 @@ public:
         this->checkStartupStatus();
         zend_constant c;
         ZVAL_STRING(&c.value, (char* )v);
-        c.flags = CONST_CS;
+        c.flags = CONST_CS | CONST_PERSISTENT;
         c.name = zend_string_init(name, strlen(name), c.flags);
         c.module_number = module.module_number;
         return zend_register_constant(&c);
@@ -2068,7 +2060,7 @@ public:
         this->checkStartupStatus();
         zend_constant c;
         ZVAL_STRINGL(&c.value, (char * )v.c_str(), v.length());
-        c.flags = CONST_CS;
+        c.flags = CONST_CS | CONST_PERSISTENT;
         c.name = zend_string_init(name, strlen(name), c.flags);
         c.module_number = module.module_number;
         return zend_register_constant(&c);
