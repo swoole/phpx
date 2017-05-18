@@ -45,7 +45,7 @@ PHPX_METHOD(myClass, test)
     retval = 1234;
 }
 
-PHPX_EXTENSION
+PHPX_EXTENSION()
 {
     Extension *extension = new Extension("cpp_ext", "0.0.1");
 

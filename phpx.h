@@ -1558,7 +1558,7 @@ Object create(const char *name)
 #define PHPX_NAME(n)      #n, n
 #define PHPX_FUNCTION(c)  void c(Args &args, Variant &retval)
 #define PHPX_METHOD(c, m) void c##_##m(Object &_this, Args &args, Variant &retval)
-#define PHPX_EXTENSION    extern "C" { Extension* get_module(); } Extension* get_module()
+#define PHPX_EXTENSION()    extern "C" { Extension* get_module(); } Extension* get_module()
 
 typedef void (*function_t)(Args &, Variant &retval);
 typedef void (*resource_dtor)(zend_resource *);
