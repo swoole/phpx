@@ -1907,19 +1907,29 @@ protected:
     };
 
 public:
+
+    enum StartupStatus
+    {
+        BEFORE_START, AFTER_START,
+    };
+
     Extension(const char*name, const char *version);
 
-    void checkStartupStatus()
+    void checkStartupStatus(enum StartupStatus status, const char *func)
     {
-        if (!this->started)
+        if (status == AFTER_START && !this->started)
         {
-            zend_error(E_CORE_ERROR, "PHP-API: must be called after startup.");
+            zend_error(E_CORE_ERROR, "php::%s must be called after startup.", func);
+        }
+        else if (status == BEFORE_START && !this->started)
+        {
+            zend_error(E_CORE_ERROR, "php::%s must be called before startup.", func);
         }
     }
 
     bool registerClass(Class *c)
     {
-        this->checkStartupStatus();
+        this->checkStartupStatus(AFTER_START, __func__);
         c->activate();
         class_map[c->getName()] = c;
         return true;
@@ -1927,6 +1937,7 @@ public:
 
     bool registerFunction(const char *name, function_t func)
     {
+        this->checkStartupStatus(BEFORE_START, __func__);
         if (module.functions == NULL)
         {
             module.functions = (const _zend_function_entry*) calloc(16, sizeof(zend_function_entry));
@@ -1969,7 +1980,7 @@ public:
 
     bool registerResource(const char *name, resource_dtor dtor)
     {
-        this->checkStartupStatus();
+        this->checkStartupStatus(AFTER_START, __func__);
         Resource *res = new Resource;
         int type = zend_register_list_destructors_ex(dtor, NULL, name, 0);
         if (type < 0)
@@ -1984,7 +1995,7 @@ public:
 
     bool registerConstant(const char *name, long v)
     {
-        this->checkStartupStatus();
+        this->checkStartupStatus(AFTER_START, __func__);
         zend_constant c;
         ZVAL_LONG(&c.value, v);
         c.flags = CONST_CS | CONST_PERSISTENT;
@@ -1995,7 +2006,7 @@ public:
 
     bool registerConstant(const char *name, int v)
     {
-        this->checkStartupStatus();
+        this->checkStartupStatus(AFTER_START, __func__);
         zend_constant c;
         ZVAL_LONG(&c.value, v);
         c.flags = CONST_CS | CONST_PERSISTENT;
@@ -2006,7 +2017,7 @@ public:
 
     bool registerConstant(const char *name, bool v)
     {
-        this->checkStartupStatus();
+        this->checkStartupStatus(AFTER_START, __func__);
         zend_constant c;
         if (v)
         {
@@ -2024,7 +2035,7 @@ public:
 
     bool registerConstant(const char *name, double v)
     {
-        this->checkStartupStatus();
+        this->checkStartupStatus(AFTER_START, __func__);
         zend_constant c;
         ZVAL_DOUBLE(&c.value, v);
         c.flags = CONST_CS | CONST_PERSISTENT;
@@ -2035,7 +2046,7 @@ public:
 
     bool registerConstant(const char *name, float v)
     {
-        this->checkStartupStatus();
+        this->checkStartupStatus(AFTER_START, __func__);
         zend_constant c;
         ZVAL_DOUBLE(&c.value, v);
         c.flags = CONST_CS | CONST_PERSISTENT;
@@ -2046,7 +2057,7 @@ public:
 
     bool registerConstant(const char *name, const char *v)
     {
-        this->checkStartupStatus();
+        this->checkStartupStatus(AFTER_START, __func__);
         zend_constant c;
         ZVAL_STRING(&c.value, (char* )v);
         c.flags = CONST_CS | CONST_PERSISTENT;
@@ -2057,7 +2068,7 @@ public:
 
     bool registerConstant(const char *name, string &v)
     {
-        this->checkStartupStatus();
+        this->checkStartupStatus(AFTER_START, __func__);
         zend_constant c;
         ZVAL_STRINGL(&c.value, (char * )v.c_str(), v.length());
         c.flags = CONST_CS | CONST_PERSISTENT;
@@ -2068,7 +2079,7 @@ public:
 
     bool registerConstant(const char *name, Variant &v)
     {
-        this->checkStartupStatus();
+        this->checkStartupStatus(AFTER_START, __func__);
         zend_constant c;
         ZVAL_COPY(&c.value, v.ptr());
         c.flags = CONST_CS;

@@ -1,7 +1,7 @@
 <?php
 echo "hello world\n";
 
-cpp_ext_test(1234, 42.33, "jjj");
-cpp_ext_test2(["abc"]);
-myClass::test();
+var_dump(cpp_ext_test(1234, 42.33, "jjj"));
+var_dump(cpp_ext_test2(["abc"]));
+var_dump(myClass::test());
 

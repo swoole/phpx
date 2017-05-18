@@ -42,7 +42,7 @@ PHPX_FUNCTION(cpp_ext_test2)
 PHPX_METHOD(myClass, test)
 {
     cout << "myClass::test" << endl;
-    retval = 1234;
+    retval = 1234.56;
 }
 
 PHPX_EXTENSION()
@@ -51,6 +51,7 @@ PHPX_EXTENSION()
 
     extension->onStart = [extension]() noexcept
     {
+        extension->registerFunction(PHPX_NAME(cpp_ext_test));
         extension->registerConstant("CPP_EXT_VERSION", 1002);
 
         Class *c = new Class("myClass");
@@ -73,7 +74,7 @@ PHPX_EXTENSION()
 //        cout << extension->name << "afterRequest" << endl;
 //    };
 
-    extension->registerFunction(PHPX_NAME(cpp_ext_test));
+
     extension->registerFunction(PHPX_NAME(cpp_ext_test2));
 
     return extension;
