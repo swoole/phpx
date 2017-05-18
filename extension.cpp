@@ -36,9 +36,13 @@ PHPX_FUNCTION(cpp_ext_test2)
     {
         cout << args[i].type() << endl;
     }
-    retval = 1234;
-    php::echo("argc=%d\n", args.count());
-    php::error(E_WARNING, "extension warning.");
+    auto v1 = args[0];
+    Array arr(v1);
+    arr.set(1, "efg");
+
+    retval.copy(arr);
+    //php::echo("argc=%d\n", args.count());
+    //php::error(E_WARNING, "extension warning.");
 }
 
 PHPX_METHOD(myClass, test)

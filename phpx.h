@@ -544,8 +544,9 @@ public:
     {
         add_assoc_bool(ptr(), key, v ? 1 : 0);
     }
-    void set(int i, Variant &v)
+    void set(int i, Variant v)
     {
+        v.addRef();
         add_index_zval(ptr(), (zend_ulong) i, v.ptr());
     }
     //-------------------------------------------
