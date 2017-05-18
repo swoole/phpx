@@ -1,5 +1,11 @@
 # php-x
  C++ wrapper for Zend API
+ 
+## Requirements
+
+- PHP 7.0 or later
+- Linux/MacOS
+- GCC 4.8 or later
 
 ## Build
 ```shell
