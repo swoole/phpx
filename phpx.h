@@ -53,7 +53,7 @@ extern "C"
 
 using namespace std;
 
-namespace PHP
+namespace php
 {
 struct Resource
 {
