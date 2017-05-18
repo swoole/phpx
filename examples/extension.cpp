@@ -14,7 +14,7 @@
   +----------------------------------------------------------------------+
 */
 
-#include "phpx.h"
+#include "../include/phpx.h"
 
 #include <iostream>
 
