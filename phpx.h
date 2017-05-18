@@ -1029,10 +1029,33 @@ Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, V
     args.append(v19.ptr());
     args.append(v20.ptr());
     return _call(NULL, _func.ptr(), args);
-}/*generator*/
+}
+/*generator*/
+
 void var_dump(Variant &v)
 {
     php_var_dump(v.ptr(), PHPX_VAR_DUMP_LEVEL);
+}
+
+void error(int level, const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    php_verror(NULL, "", level, format, args);
+    va_end(args);
+}
+
+void echo(const char *format, ...)
+{
+    va_list args;
+    char *buffer;
+    size_t size;
+
+    va_start(args, format);
+    size = vspprintf(&buffer, 0, format, args);
+    PHPWRITE(buffer, size);
+    efree(buffer);
+    va_end(args);
 }
 
 static inline zend_class_entry *getClassEntry(const char *name)
@@ -1921,7 +1944,7 @@ public:
         {
             zend_error(E_CORE_ERROR, "php::%s must be called after startup.", func);
         }
-        else if (status == BEFORE_START && !this->started)
+        else if (status == BEFORE_START && this->started)
         {
             zend_error(E_CORE_ERROR, "php::%s must be called before startup.", func);
         }

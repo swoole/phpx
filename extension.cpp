@@ -37,6 +37,8 @@ PHPX_FUNCTION(cpp_ext_test2)
         cout << args[i].type() << endl;
     }
     retval = 1234;
+    php::echo("argc=%d\n", args.count());
+    php::error(E_WARNING, "extension warning.");
 }
 
 PHPX_METHOD(myClass, test)
@@ -51,7 +53,6 @@ PHPX_EXTENSION()
 
     extension->onStart = [extension]() noexcept
     {
-        extension->registerFunction(PHPX_NAME(cpp_ext_test));
         extension->registerConstant("CPP_EXT_VERSION", 1002);
 
         Class *c = new Class("myClass");
@@ -74,7 +75,7 @@ PHPX_EXTENSION()
 //        cout << extension->name << "afterRequest" << endl;
 //    };
 
-
+    extension->registerFunction(PHPX_NAME(cpp_ext_test));
     extension->registerFunction(PHPX_NAME(cpp_ext_test2));
 
     return extension;
