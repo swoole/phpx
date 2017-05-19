@@ -1,4 +1,4 @@
-# php-x
+# PHP-X
  C++ wrapper for Zend API
  
 ## Requirements
