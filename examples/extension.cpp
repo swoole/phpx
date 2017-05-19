@@ -16,7 +16,7 @@
 
 #include "phpx.h"
 
-#include <swoole.h>
+#include <Server.h>
 #include <iostream>
 
 using namespace php;
@@ -72,6 +72,19 @@ void string_dtor(zend_resource *res)
     delete s;
 }
 
+int test_get_length(swProtocol *protocol, swConnection *conn, char *data, uint32_t length)
+{
+    printf("cpp, size=%d\n", length);
+    return 100;
+}
+
+int dispatch_function(swServer *serv, swConnection *conn, swEventData *data)
+{
+    int worker_id = rand() % serv->worker_num;
+    printf("cpp, dst_worker_id=%d, type=%d, size=%d\n", worker_id, data->info.type, data->info.len);
+    return worker_id;
+}
+
 PHPX_EXTENSION()
 {
     Extension *extension = new Extension("cpp_ext", "0.0.1");
@@ -86,7 +99,8 @@ PHPX_EXTENSION()
         c->addMethod("pset", myClass_pset);
         extension->registerClass(c);
 
-        swoole_add_function("test", (void*) string_dtor);
+        swoole_add_function("test_get_length", (void *) test_get_length);
+        swoole_add_function("my_dispatch_function", (void *) dispatch_function);
 
         extension->registerResource("ResourceString", string_dtor);
     };
