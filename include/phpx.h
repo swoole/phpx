@@ -1083,7 +1083,7 @@ void throwException(const char *name, const char *message, int code = 0)
     zend_throw_exception(ce, message, code TSRMLS_CC);
 }
 
-Variant getGlobalVariant(const char *name)
+Variant global(const char *name)
 {
     zend_string *key = zend_string_init(name, strlen(name), 0);
     zval *var = zend_hash_find_ind(&EG(symbol_table), key);
