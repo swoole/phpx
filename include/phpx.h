@@ -55,6 +55,28 @@ using namespace std;
 
 namespace php
 {
+
+void error(int level, const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    php_verror(NULL, "", level, format, args);
+    va_end(args);
+}
+
+void echo(const char *format, ...)
+{
+    va_list args;
+    char *buffer;
+    size_t size;
+
+    va_start(args, format);
+    size = vspprintf(&buffer, 0, format, args);
+    PHPWRITE(buffer, size);
+    efree(buffer);
+    va_end(args);
+}
+
 struct Resource
 {
     const char *name;
@@ -284,14 +306,20 @@ public:
     {
         if (!isResource())
         {
-            php_error_docref(NULL, E_WARNING, "Variant is not a resource type.");
-            return NULL;
+            error(E_WARNING, "This variant is not a resource type.");
+            return nullptr;
         }
-        void *_ptr = NULL;
+        void *_ptr = nullptr;
         Resource *_c = resource_map[name];
+        if (_c == nullptr)
+        {
+            error(E_WARNING, "The %s type of resource is undefined.", name);
+            return nullptr;
+        }
         if ((_ptr = zend_fetch_resource(Z_RES_P(ptr()), name, _c->type)) == NULL)
         {
-            return NULL;
+            error(E_WARNING, "The %s type of resource is undefined.", name);
+            return nullptr;
         }
         return static_cast<T *>(_ptr);
     }
@@ -306,6 +334,11 @@ protected:
         memset(&val, 0, sizeof(val));
     }
 };
+
+void var_dump(Variant &v)
+{
+    php_var_dump(v.ptr(), PHPX_VAR_DUMP_LEVEL);
+}
 
 class String
 {
@@ -1032,32 +1065,6 @@ Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, V
     return _call(NULL, _func.ptr(), args);
 }
 /*generator*/
-
-void var_dump(Variant &v)
-{
-    php_var_dump(v.ptr(), PHPX_VAR_DUMP_LEVEL);
-}
-
-void error(int level, const char *format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    php_verror(NULL, "", level, format, args);
-    va_end(args);
-}
-
-void echo(const char *format, ...)
-{
-    va_list args;
-    char *buffer;
-    size_t size;
-
-    va_start(args, format);
-    size = vspprintf(&buffer, 0, format, args);
-    PHPWRITE(buffer, size);
-    efree(buffer);
-    va_end(args);
-}
 
 static inline zend_class_entry *getClassEntry(const char *name)
 {
@@ -2205,6 +2212,7 @@ Variant newResource(const char *name, T *v)
     Resource *_c = resource_map[name];
     if (!_c)
     {
+        error(E_WARNING, "%s type of resource is undefined.", name);
         return nullptr;
     }
     zend_resource *res = zend_register_resource(static_cast<void*>(v), _c->type);

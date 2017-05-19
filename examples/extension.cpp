@@ -51,6 +51,24 @@ PHPX_METHOD(myClass, test)
     retval = 1234.56;
 }
 
+PHPX_METHOD(myClass, pget)
+{
+    auto str = _this.get("resource").toResource<String>("ResourceString");
+    cout << "ResourceString: " << str->length() << endl;
+}
+
+PHPX_METHOD(myClass, pset)
+{
+    auto res = newResource("ResourceString", new String("hello world"));
+    _this.set("resource", res);
+}
+
+void string_dtor(zend_resource *res)
+{
+    String *s = static_cast<String *>(res->ptr);
+    delete s;
+}
+
 PHPX_EXTENSION()
 {
     Extension *extension = new Extension("cpp_ext", "0.0.1");
@@ -61,7 +79,11 @@ PHPX_EXTENSION()
 
         Class *c = new Class("myClass");
         c->addMethod("test", myClass_test, STATIC);
+        c->addMethod("pget", myClass_pget);
+        c->addMethod("pset", myClass_pset);
         extension->registerClass(c);
+
+        extension->registerResource("ResourceString", string_dtor);
     };
 
 //    extension->onShutdown = [extension]() noexcept
