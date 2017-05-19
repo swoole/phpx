@@ -14,8 +14,9 @@
   +----------------------------------------------------------------------+
 */
 
-#include "../include/phpx.h"
+#include "phpx.h"
 
+#include <swoole.h>
 #include <iostream>
 
 using namespace php;
@@ -40,7 +41,7 @@ PHPX_FUNCTION(cpp_ext_test2)
     Array arr(v1);
     arr.set(1, "efg");
 
-    retval.copy(arr);
+    retval = arr;
     //php::echo("argc=%d\n", args.count());
     //php::error(E_WARNING, "extension warning.");
 }
@@ -53,8 +54,10 @@ PHPX_METHOD(myClass, test)
 
 PHPX_METHOD(myClass, pget)
 {
-    auto str = _this.get("resource").toResource<String>("ResourceString");
+    auto res = _this.get("resource");
+    auto str = res.toResource<String>("ResourceString");
     cout << "ResourceString: " << str->length() << endl;
+    retval = res;
 }
 
 PHPX_METHOD(myClass, pset)
@@ -82,6 +85,8 @@ PHPX_EXTENSION()
         c->addMethod("pget", myClass_pget);
         c->addMethod("pset", myClass_pset);
         extension->registerClass(c);
+
+        swoole_add_function("test", (void*) string_dtor);
 
         extension->registerResource("ResourceString", string_dtor);
     };
