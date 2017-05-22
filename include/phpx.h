@@ -1799,7 +1799,7 @@ public:
         propertys.push_back(p);
         return true;
     }
-    bool addMethod(const char *name, method_t method, int flags = PUBLIC)
+`    bool addMethod(const char *name, method_t method, int flags = PUBLIC, ArgInfo *info = nullptr)
     {
         if (activated)
         {
@@ -1813,6 +1813,7 @@ public:
         m.flags = flags;
         m.method = method;
         m.name = name;
+        m.info = info;
         methods.push_back(m);
         return false;
     }
@@ -1831,8 +1832,16 @@ public:
         {
             _methods[i].fname = methods[i].name.c_str();
             _methods[i].handler = _exec_method;
-            _methods[i].arg_info = NULL;
-            _methods[i].num_args = (uint32_t) (sizeof(void*) / sizeof(struct _zend_internal_arg_info) - 1);
+            if (methods[i].info)
+            {
+                _methods[i].arg_info = methods[i].info->get();
+                _methods[i].num_args = methods[i].info->count();
+            }
+            else
+            {
+                _methods[i].arg_info = nullptr;
+                _methods[i].num_args = 0;
+            }
             _methods[i].flags = methods[i].flags;
             method_map[class_name][methods[i].name] = methods[i].method;
         }
@@ -2081,7 +2090,7 @@ public:
         return true;
     }
 
-    bool registerFunction(const char *name, function_t func)
+    bool registerFunction(const char *name, function_t func, ArgInfo *info = nullptr)
     {
         this->checkStartupStatus(BEFORE_START, __func__);
         if (module.functions == NULL)
@@ -2114,8 +2123,16 @@ public:
 
         function_array[function_count + 1].fname = NULL;
         function_array[function_count + 1].handler = NULL;
-        function_array[function_count + 1].arg_info = NULL;
-        function_array[function_count + 1].num_args = 0;
+        if (info)
+        {
+            function_array[function_count + 1].arg_info = info->get();
+            function_array[function_count + 1].num_args = info->count();
+        }
+        else
+        {
+            function_array[function_count + 1].arg_info = NULL;
+            function_array[function_count + 1].num_args = 0;
+        }
         function_array[function_count + 1].flags = 0;
 
         function_map[name] = func;
