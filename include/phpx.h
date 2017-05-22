@@ -359,6 +359,10 @@ public:
     {
         value = zend_string_init(str.c_str(), str.length(), 0);
     }
+    ~String()
+    {
+        zend_string_free(value);
+    }
     size_t length()
     {
         return value->len;
@@ -366,10 +370,6 @@ public:
     char* c_str()
     {
         return value->val;
-    }
-    ~String()
-    {
-        zend_string_free(value);
     }
     void extend(size_t new_size)
     {
@@ -686,6 +686,54 @@ public:
 private:
     int argc;
     zval *argv[PHPX_MAX_ARGC];
+};
+
+class ArgInfo
+{
+public:
+    ArgInfo(int required_num, bool return_reference = false)
+    {
+        this->required_num = required_num;
+        this->return_reference = return_reference;
+        this->info = nullptr;
+    }
+    void add(const char *name, const char *class_name = nullptr, int type_hint = 0, bool pass_by_reference = false,
+            bool allow_null = false, bool variadic = false)
+    {
+        zend_internal_arg_info val =
+        { name, class_name, (zend_uchar)type_hint, pass_by_reference, allow_null, variadic, };
+        list.push_back(val);
+    }
+    zend_internal_arg_info* get()
+    {
+        if (info != nullptr)
+        {
+            return info;
+        }
+        zend_internal_arg_info *_info = (zend_internal_arg_info*) calloc(list.size() + 1,
+                sizeof(zend_internal_arg_info));
+        if (_info == nullptr)
+        {
+            return nullptr;
+        }
+        _info[0].name = (const char*) (zend_uintptr_t) (required_num);
+        _info[0].pass_by_reference = return_reference;
+        for (int i = 1; i <= list.size(); i++)
+        {
+            memcpy(&_info[i], &list[i - 1], sizeof(zend_internal_arg_info));
+        }
+        info = _info;
+        return _info;
+    }
+    int count()
+    {
+        return list.size();
+    }
+protected:
+    int required_num;
+    bool return_reference;
+    zend_internal_arg_info *info;
+    vector<zend_internal_arg_info> list;
 };
 
 static inline Variant _call(zval *object, zval *func, Array &args)
@@ -1628,8 +1676,6 @@ static void _exec_method(zend_execute_data *data, zval *return_value)
     func(_this, args, _retval);
 }
 
-typedef struct _zend_internal_arg_info ArgInfo;
-
 Variant constant(const char *name)
 {
     zend_string *_name = zend_string_init(name, strlen(name), 0);
@@ -1658,15 +1704,16 @@ enum ClassFlags
     CLONE = ZEND_ACC_CLONE,
 };
 
+struct Method
+{
+    string name;
+    int flags;
+    method_t method;
+    ArgInfo *info;
+};
+
 class Class
 {
-    struct Method
-    {
-        string name;
-        int flags;
-        method_t method;
-    };
-
     struct Property
     {
         string name;
@@ -1716,6 +1763,15 @@ public:
         }
         printf("name%s\n", name);
         interfaces[name] = interface_ce;
+        return true;
+    }
+    bool implements(zend_class_entry *interface_ce)
+    {
+        if (activated)
+        {
+            return false;
+        }
+        interfaces[interface_ce->name->val] = interface_ce;
         return true;
     }
     bool addConstant(const char *name, Variant v)
@@ -1896,7 +1952,73 @@ protected:
     vector<Constant> constants;
 };
 
+class Interface
+{
+public:
+    Interface(const char *name)
+    {
+        this->name = name;
+        INIT_CLASS_ENTRY_EX(_ce, name, strlen(name), NULL);
+        ce = NULL;
+    }
+    bool addMethod(const char *name, ArgInfo *info)
+    {
+        if (activated)
+        {
+            return false;
+        }
+        Method m;
+        m.flags = 0;
+        m.method = nullptr;
+        m.name = name;
+        m.info = info;
+        methods.push_back(m);
+        return false;
+    }
+    string getName()
+    {
+        return name;
+    }
+    bool activate()
+    {
+        if (activated)
+        {
+            return false;
+        }
+        /**
+         * register methods
+         */
+        int n = methods.size();
+        zend_function_entry *_methods = (zend_function_entry *) ecalloc(n + 1, sizeof(zend_function_entry));
+        for (int i = 0; i < n; i++)
+        {
+            _methods[i].fname = methods[i].name.c_str();
+            _methods[i].handler = nullptr;
+            _methods[i].arg_info = methods[i].info->get();
+            _methods[i].num_args = (uint32_t) methods[i].info->count();
+            _methods[i].flags = ZEND_ACC_PUBLIC | ZEND_ACC_ABSTRACT;
+        }
+        memset(&_methods[n], 0, sizeof(zend_function_entry));
+        _ce.info.internal.builtin_functions = _methods;
+        ce = zend_register_internal_interface(&_ce TSRMLS_CC);
+        efree(_methods);
+        if (ce == nullptr)
+        {
+            return false;
+        }
+        activated = true;
+        return true;
+    }
+protected:
+    bool activated = false;
+    string name;
+    zend_class_entry _ce;
+    zend_class_entry *ce;
+    vector<Method> methods;
+};
+
 static unordered_map<string, Class*> class_map;
+static unordered_map<string, Interface*> interface_map;
 
 int extension_startup(int type, int module_number);
 int extension_shutdown(int type, int module_number);
@@ -1951,12 +2073,20 @@ public:
         return true;
     }
 
+    bool registerInterface(Interface *i)
+    {
+        this->checkStartupStatus(AFTER_START, __func__);
+        i->activate();
+        interface_map[i->getName()] = i;
+        return true;
+    }
+
     bool registerFunction(const char *name, function_t func)
     {
         this->checkStartupStatus(BEFORE_START, __func__);
         if (module.functions == NULL)
         {
-            module.functions = (const _zend_function_entry*) calloc(16, sizeof(zend_function_entry));
+            module.functions = (const zend_function_entry*) calloc(16, sizeof(zend_function_entry));
             if (module.functions == NULL)
             {
                 return false;
@@ -1971,10 +2101,10 @@ public:
             {
                 return false;
             }
-            module.functions = (const _zend_function_entry*) new_array;
+            module.functions = (const zend_function_entry*) new_array;
         }
 
-        struct _zend_function_entry *function_array = (struct _zend_function_entry *) module.functions;
+        zend_function_entry *function_array = (zend_function_entry *) module.functions;
         function_array[function_count].fname = name;
 
         function_array[function_count].handler = _exec_function;
@@ -2104,6 +2234,44 @@ public:
         return zend_register_constant(&c);
     }
 
+    bool require(const char *name, const char *version = nullptr)
+    {
+        this->checkStartupStatus(BEFORE_START, __func__);
+        if (module.deps == NULL)
+        {
+            module.deps = (const zend_module_dep*) calloc(16, sizeof(zend_module_dep));
+            if (module.deps == NULL)
+            {
+                return false;
+            }
+            deps_array_size = 16;
+        }
+        else if (deps_count + 1 == deps_array_size)
+        {
+            deps_array_size *= 2;
+            void* new_array = realloc((void*) module.deps, deps_array_size * sizeof(zend_module_dep));
+            if (new_array == NULL)
+            {
+                return false;
+            }
+            module.deps = (const zend_module_dep*) new_array;
+        }
+
+        zend_module_dep *deps_array = (zend_module_dep *) module.deps;
+        deps_array[deps_count].name = name;
+        deps_array[deps_count].rel = NULL;
+        deps_array[deps_count].version = version;
+        deps_array[deps_count].type = MODULE_DEP_REQUIRED;
+
+        deps_array[deps_count + 1].name = NULL;
+        deps_array[deps_count + 1].rel = NULL;
+        deps_array[deps_count + 1].version = NULL;
+        deps_array[deps_count + 1].type = 0;
+
+        deps_count++;
+        return true;
+    }
+
     string name;
     string version;
     bool started = false;
@@ -2116,6 +2284,8 @@ public:
 protected:
     int function_count = 0;
     int function_array_size = 0;
+    int deps_count = 0;
+    int deps_array_size = 0;
 };
 
 static unordered_map<string, Extension*> _name_to_extension;

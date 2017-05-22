@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include "phpx.h"
+#include <ext/spl/spl_iterators.h>
 #include <Server.h>
 
 using namespace std;
@@ -39,21 +40,24 @@ PHPX_EXTENSION()
     Extension *ext = new Extension("test", "0.0.1");
     ext->registerFunction(PHPX_NAME(cpp_hello_world));
     ext->registerFunction(PHPX_NAME(cpp_test));
-    ext->registerConstant("CPP_CONSTANTS_INT", 1234);
+    //depends swoole extension
+    ext->require("swoole");
 
     ext->onStart = [ext]
     {
         swoole_add_function("test_get_length", (void *) test_get_length);
         swoole_add_function("my_dispatch_function", (void *) dispatch_function);
 
-        Array array;
-        array.append("127.0.0.1");
-        array.append(6379);
+        ext->registerConstant("CPP_CONSTANTS_INT", 1234);
 
-        ext->registerConstant("CPP_CONSTANTS_ARRAY", array);
+//        Array array;
+//        array.append("127.0.0.1");
+//        array.append(6379);
 
-        string str("test");
-        ext->registerConstant("CPP_CONSTANTS_STRING", str);
+//        ext->registerConstant("CPP_CONSTANTS_ARRAY", array);
+
+//        string str("test");
+//        ext->registerConstant("CPP_CONSTANTS_STRING", str);
 
         Class *c = new Class("CppClass");
         /**
@@ -71,7 +75,7 @@ PHPX_EXTENSION()
         /**
          * 实现接口
          */
-        c->implements("Countable");
+        c->implements(spl_ce_Countable);
         c->addMethod("count", CppClass_count);
         /**
          * 添加默认属性
@@ -85,16 +89,16 @@ PHPX_EXTENSION()
          * 注册类
          */
         ext->registerClass(c);
-        /**
-         * 读取全局变量
-         */
-        Variant server = global("_SERVER");
-        if (server.isArray())
-        {
-            Variant shell = Array(server)["SHELL"];
-            var_dump(shell);
-        }
+
+        ArgInfo *argInfo = new ArgInfo(1);
+        argInfo->add("name");
+
+        Interface *i = new Interface("CppInterface");
+        i->addMethod("getName", argInfo);
+        ext->registerInterface(i);
     };
+
+    return ext;
 }
 
 void testRedis()
@@ -155,6 +159,17 @@ void cpp_hello_world(Args &args, Variant &retval)
     Array arr(retval);
     arr.set("key", "key");
     arr.set("value", 12345);
+
+    /**
+     * 读取全局变量
+     */
+    Variant server = global("_SERVER");
+    var_dump(server);
+    if (server.isArray())
+    {
+        Variant shell = Array(server)["SHELL"];
+        var_dump(shell);
+    }
 }
 
 /**
