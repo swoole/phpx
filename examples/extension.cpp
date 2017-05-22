@@ -106,5 +106,15 @@ PHPX_EXTENSION()
     extension->registerFunction(PHPX_NAME(cpp_ext_test));
     extension->registerFunction(PHPX_NAME(cpp_ext_test2));
 
+    extension->info(
+    {
+        "cpp_ext support", "enabled"
+    },
+    {
+        { "author", "Rango" },
+        { "version", extension->version },
+        { "date", "2017-05-22" },
+    });
+
     return extension;
 }

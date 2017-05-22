@@ -2030,6 +2030,7 @@ static unordered_map<string, Class*> class_map;
 static unordered_map<string, Interface*> interface_map;
 
 int extension_startup(int type, int module_number);
+void extension_info(zend_module_entry *module);
 int extension_shutdown(int type, int module_number);
 int extension_before_request(int type, int module_number);
 int extension_after_request(int type, int module_number);
@@ -2048,7 +2049,7 @@ protected:
     extension_shutdown,  //MSHUTDOWN
     extension_before_request, //RINIT
     extension_after_request, //RSHUTDOWN
-    NULL, //MINFO
+    extension_info, //MINFO
     NULL, //version
     STANDARD_MODULE_PROPERTIES,
     };
@@ -2289,6 +2290,12 @@ public:
         return true;
     }
 
+    void info(vector<string> header, vector<vector<string> > body)
+    {
+        this->header = header;
+        this->body = body;
+    }
+
     string name;
     string version;
     bool started = false;
@@ -2297,6 +2304,9 @@ public:
     std::function<void(void)> onShutdown = nullptr;
     std::function<void(void)> onBeforeRequest = nullptr;
     std::function<void(void)> onAfterRequest = nullptr;
+
+    vector<string> header;
+    vector<vector<string> > body;
 
 protected:
     int function_count = 0;
@@ -2340,6 +2350,46 @@ int extension_startup(int type, int module_number)
     }
     ZEND_HASH_FOREACH_END();
     return SUCCESS;
+}
+
+void extension_info(zend_module_entry *module)
+{
+    Extension *extension = _module_number_to_extension[module->module_number];
+    if (extension->header.size() > 0 && extension->body.size() > 0)
+    {
+        php_info_print_table_start();
+        auto header = extension->header;
+        int size = header.size();
+        switch (size)
+        {
+        case 2:
+            php_info_print_table_header(size, header[0].c_str(), header[1].c_str());
+            break;
+        case 3:
+            php_info_print_table_header(size, header[0].c_str(), header[1].c_str(), header[2].c_str());
+            break;
+        default:
+            error(E_WARNING, "invalid info header size.");
+            return;
+        }
+        for (auto row : extension->body)
+        {
+            size = row.size();
+            switch (size)
+            {
+            case 2:
+                php_info_print_table_row(size, row[0].c_str(), row[1].c_str());
+                break;
+            case 3:
+                php_info_print_table_row(size, row[0].c_str(), row[1].c_str(), row[2].c_str());
+                break;
+            default:
+                error(E_WARNING, "invalid info row size.");
+                return;
+            }
+        }
+        php_info_print_table_end();
+    }
 }
 
 int extension_shutdown(int type, int module_number)
