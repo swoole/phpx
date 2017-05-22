@@ -1799,7 +1799,7 @@ public:
         propertys.push_back(p);
         return true;
     }
-`    bool addMethod(const char *name, method_t method, int flags = PUBLIC, ArgInfo *info = nullptr)
+    bool addMethod(const char *name, method_t method, int flags = PUBLIC, ArgInfo *info = nullptr)
     {
         if (activated)
         {
