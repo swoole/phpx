@@ -189,6 +189,10 @@ public:
     {
         ZVAL_BOOL(ptr(), v);
     }
+    void operator =(Variant v)
+    {
+        copy(v);
+    }
     inline zval *ptr(void)
     {
         if (reference)
@@ -1126,23 +1130,10 @@ public:
         Variant _func(func);
         return _call(ptr(), _func.ptr(), args);
     }
-    /**
-     * call php function with 0 params.
-     */
-    Variant call(Variant &func)
-    {
-        return _call(ptr(), func.ptr());
-    }
-    Variant call(const char *func)
-    {
-        Variant _func(func);
-        return _call(ptr(), _func.ptr());
-    }
     Variant exec(const char *func)
     {
         Variant _func(func);
-        Array args;
-        return _call(ptr(), _func.ptr(), args);
+        return _call(ptr(), _func.ptr());
     }
     /*generator*/
     Variant exec(const char *func, Variant v1)
@@ -1906,12 +1897,6 @@ protected:
 };
 
 static unordered_map<string, Class*> class_map;
-
-zend_module_entry* get_zend_module_entry(int module_number)
-{
-
-    return NULL;
-}
 
 int extension_startup(int type, int module_number);
 int extension_shutdown(int type, int module_number);
