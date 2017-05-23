@@ -297,6 +297,11 @@ public:
     {
         ZVAL_STRINGL(ptr(), str, size);
     }
+    Variant* dup()
+    {
+        Variant *v = new Variant(ptr());
+        return v;
+    }
     inline int length()
     {
         if (!isString())
@@ -787,11 +792,18 @@ Variant call(Variant &func, Array &args)
     return _call(NULL, func.ptr(), args);
 }
 
+Variant call(Variant &func)
+{
+    func.addRef();
+    return _call(nullptr, func.ptr());
+}
+
 Variant call(const char *func, Array &args)
 {
     Variant _func(func);
     return _call(NULL, _func.ptr(), args);
 }
+
 Variant exec(const char *func)
 {
     Variant _func(func);
@@ -1176,18 +1188,12 @@ public:
     Object(zval *v) :
             Variant(v)
     {
-        if (Z_TYPE_P(v) != IS_OBJECT)
-        {
-            error(E_ERROR, "parameter 1 must be zend_object.");
-        }
+
     }
     Object(zval *v, bool ref) :
             Variant(v, ref)
     {
-        if (Z_TYPE_P(v) != IS_OBJECT)
-        {
-            error(E_ERROR, "parameter 1 must be zend_object.");
-        }
+
     }
     Object() :
             Variant()
@@ -2482,6 +2488,7 @@ Object newObject(const char *name)
     }
     object = Object(&zobject);
     Array args;
+    object.addRef();
     object.call("__construct", args);
     return object;
 }
