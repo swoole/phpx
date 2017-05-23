@@ -359,9 +359,21 @@ public:
     {
         value = zend_string_init(str.c_str(), str.length(), 0);
     }
+    String(Variant &v)
+    {
+        if (v.type() != IS_STRING)
+        {
+            error(E_ERROR, "parameter 1 must be zend_string.");
+        }
+        value = Z_STR_P(v.ptr());
+        free_memory = false;
+    }
     ~String()
     {
-        zend_string_free(value);
+        if (free_memory)
+        {
+            zend_string_free(value);
+        }
     }
     size_t length()
     {
@@ -384,6 +396,7 @@ public:
         return value;
     }
 protected:
+    bool free_memory = true;
     zend_string *value;
 };
 
@@ -483,7 +496,7 @@ public:
         }
         else if (Z_TYPE_P(v) != IS_ARRAY)
         {
-            php_error_docref(NULL, E_ERROR, "cpp moudle array construct args must be zend array");
+            error(E_ERROR, "parameter 1 must be zend_array.");
         }
     }
     Array(Variant &v)
@@ -496,7 +509,7 @@ public:
         }
         else if (!v.isArray())
         {
-            php_error_docref(NULL, E_ERROR, "cpp moudle array construct args must be zend array");
+            error(E_ERROR, "parameter 1 must be zend_array.");
         }
     }
     void append(Variant v)
@@ -1152,17 +1165,29 @@ public:
     Object(Variant &v) :
             Variant()
     {
-        memcpy(&val, v.ptr(), sizeof(val));
-        zval_add_ref(&val);
+        if (!v.isObject())
+        {
+            error(E_ERROR, "parameter 1 must be zend_object.");
+        }
+        ref_val = v.ptr();
+        reference = true;
+        zval_add_ref(ref_val);
     }
     Object(zval *v) :
             Variant(v)
     {
+        if (Z_TYPE_P(v) != IS_OBJECT)
+        {
+            error(E_ERROR, "parameter 1 must be zend_object.");
+        }
     }
     Object(zval *v, bool ref) :
             Variant(v, ref)
     {
-
+        if (Z_TYPE_P(v) != IS_OBJECT)
+        {
+            error(E_ERROR, "parameter 1 must be zend_object.");
+        }
     }
     Object() :
             Variant()
