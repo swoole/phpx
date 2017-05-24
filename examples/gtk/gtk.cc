@@ -29,6 +29,8 @@ struct PHP_Gtk_Application
     GtkWidget *main_window;
 };
 
+static vector<Variant *> callbacks;
+
 void PHP_Gtk_callback(GtkApplication* app, gpointer user_data)
 {
     Variant v = *(Variant *) user_data;
@@ -86,6 +88,7 @@ PHPX_METHOD(GtkApplication, find)
         Object widget = newObject("Gtk\\Widget");
         auto res = newResource<GtkWidget>("GtkWidget", window);
         widget.set("resource", res);
+
         retval = widget;
     }
 }
@@ -93,13 +96,32 @@ PHPX_METHOD(GtkApplication, find)
 PHPX_METHOD(GtkApplication, quit)
 {
     gtk_main_quit();
+    for (int i = 0; i < callbacks.size(); i++)
+    {
+        auto callback = callbacks[i];
+        delete callbacks[i];
+    }
 }
 
 PHPX_METHOD(GtkWidget, on)
 {
     GtkWidget *widget = _this.get("resource").toResource<GtkWidget>("GtkWidget");
-    auto callback = args[1];
-    g_signal_connect(widget, args[0].toCString(), G_CALLBACK (PHP_Gtk_callback), callback.dup());
+    auto callback = args[1].dup();
+    g_signal_connect(widget, args[0].toCString(), G_CALLBACK (PHP_Gtk_callback), callback);
+    callbacks.push_back(callback);
+}
+
+PHPX_METHOD(GtkWidget, getText)
+{
+    GtkWidget *widget = _this.get("resource").toResource<GtkWidget>("GtkWidget");
+    auto text = gtk_entry_get_text((GtkEntry *)widget);
+    retval = text;
+}
+
+PHPX_METHOD(GtkWidget, setText)
+{
+    GtkWidget *widget = _this.get("resource").toResource<GtkWidget>("GtkWidget");
+    gtk_entry_set_text((GtkEntry *) widget, args[0].toCString());
 }
 
 void GtkApplication_dtor(zend_resource *res)
@@ -129,6 +151,12 @@ PHPX_EXTENSION()
 
         Class *widget = new Class("Gtk\\Widget");
         widget->addMethod("on", GtkWidget_on);
+        widget->addMethod("getText", GtkWidget_getText);
+
+        auto argInfo = new ArgInfo(1);
+        argInfo->add("text", nullptr, IS_STRING);
+        widget->addMethod("setText", GtkWidget_setText, PUBLIC, argInfo);
+
         ext->registerClass(widget);
 
         ext->registerResource("GtkApplication", GtkApplication_dtor);
@@ -146,4 +174,3 @@ PHPX_EXTENSION()
 
     return ext;
 }
-
