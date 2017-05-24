@@ -37,6 +37,13 @@ void PHP_Gtk_callback(GtkApplication* app, gpointer user_data)
     call(v);
 }
 
+void on_main_window_destroy(GtkApplication* app, gpointer user_data)
+{
+    Variant v = *(Variant *) user_data;
+    Object o(v);
+    o.exec("quit");
+}
+
 PHPX_METHOD(GtkApplication, construct)
 {
     if (args.count() < 2)
@@ -63,6 +70,7 @@ PHPX_METHOD(GtkApplication, construct)
         error(E_ERROR, "main window[id=%s] is not eixsts.", args[1].toCString());
         return;
     }
+    g_signal_connect (window, "destroy", G_CALLBACK(on_main_window_destroy), _this.dup());
 
     PHP_Gtk_Application *app = new PHP_Gtk_Application;
     app->builder = builder;
@@ -88,7 +96,6 @@ PHPX_METHOD(GtkApplication, find)
         Object widget = newObject("Gtk\\Widget");
         auto res = newResource<GtkWidget>("GtkWidget", window);
         widget.set("resource", res);
-
         retval = widget;
     }
 }
@@ -114,8 +121,9 @@ PHPX_METHOD(GtkWidget, on)
 PHPX_METHOD(GtkWidget, getText)
 {
     GtkWidget *widget = _this.get("resource").toResource<GtkWidget>("GtkWidget");
-    auto text = gtk_entry_get_text((GtkEntry *)widget);
-    retval = text;
+    auto text = gtk_entry_get_text((GtkEntry *) widget);
+    auto length = gtk_entry_get_text_length((GtkEntry *) widget);
+    retval = Variant(text, length);
 }
 
 PHPX_METHOD(GtkWidget, setText)
