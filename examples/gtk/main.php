@@ -8,7 +8,8 @@ $app->find("button1")->on("clicked", function () use ($app) {
 $app->find('button3')->on('clicked', function() use ($app) {
     $input = $app->find("entry1");
     $text = $input->getText();
-    echo "btn3 clicked. text=$text\n";
+var_dump($text);
+    $app->find('label1')->setText("Value=$text");
 });
 
 $app->find('button4')->on('clicked', function() use ($app) {

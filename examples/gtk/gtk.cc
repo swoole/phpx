@@ -51,9 +51,10 @@ PHPX_METHOD(GtkApplication, construct)
         error(E_ERROR, "invalid parameters.");
         return;
     }
+
     int argc = 0;
     char *argv[] =
-    { "phpx-gtk" };
+    { (char *) "phpx-gtk" };
     gtk_init(&argc, ( char ***)&argv);
 
     GtkBuilder *builder = gtk_builder_new();
@@ -70,7 +71,10 @@ PHPX_METHOD(GtkApplication, construct)
         error(E_ERROR, "main window[id=%s] is not eixsts.", args[1].toCString());
         return;
     }
-    g_signal_connect (window, "destroy", G_CALLBACK(on_main_window_destroy), _this.dup());
+
+    auto app_object = _this.dup();
+    g_signal_connect(window, "destroy", G_CALLBACK(on_main_window_destroy), app_object);
+    callbacks.push_back(app_object);
 
     PHP_Gtk_Application *app = new PHP_Gtk_Application;
     app->builder = builder;
@@ -90,14 +94,33 @@ PHPX_METHOD(GtkApplication, run)
 PHPX_METHOD(GtkApplication, find)
 {
     PHP_Gtk_Application *app = _this.get("app").toResource<PHP_Gtk_Application>("GtkApplication");
-    GtkWidget *window = GTK_WIDGET(gtk_builder_get_object(app->builder, args[0].toCString()));
-    if (window != nullptr)
+    GObject *gobject = gtk_builder_get_object(app->builder, args[0].toCString());
+    if (gobject == nullptr)
     {
-        Object widget = newObject("Gtk\\Widget");
-        auto res = newResource<GtkWidget>("GtkWidget", window);
-        widget.set("resource", res);
-        retval = widget;
+        retval = false;
+        return;
     }
+
+    String type(G_OBJECT_TYPE_NAME(gobject));
+    const char *className;
+
+    if (type.equals("GtkEntry"))
+    {
+        className = "Gtk\\Entry";
+    }
+    else if (type.equals("GtkLabel"))
+    {
+        className = "Gtk\\Label";
+    }
+    else
+    {
+        className = "Gtk\\Widget";
+    }
+
+    Object widget = newObject(className);
+    auto res = newResource<GObject>("GObject", gobject);
+    widget.set("resource", res);
+    retval = widget;
 }
 
 PHPX_METHOD(GtkApplication, quit)
@@ -112,24 +135,35 @@ PHPX_METHOD(GtkApplication, quit)
 
 PHPX_METHOD(GtkWidget, on)
 {
-    GtkWidget *widget = _this.get("resource").toResource<GtkWidget>("GtkWidget");
+    GObject *object = _this.get("resource").toResource<GObject>("GObject");
     auto callback = args[1].dup();
-    g_signal_connect(widget, args[0].toCString(), G_CALLBACK (PHP_Gtk_callback), callback);
+    g_signal_connect(object, args[0].toCString(), G_CALLBACK (PHP_Gtk_callback), callback);
     callbacks.push_back(callback);
 }
 
-PHPX_METHOD(GtkWidget, getText)
+PHPX_METHOD(GtkEntry, getText)
 {
-    GtkWidget *widget = _this.get("resource").toResource<GtkWidget>("GtkWidget");
-    auto text = gtk_entry_get_text((GtkEntry *) widget);
-    auto length = gtk_entry_get_text_length((GtkEntry *) widget);
-    retval = Variant(text, length);
+    GtkEntry *entry = GTK_ENTRY(_this.get("resource").toResource<GObject>("GObject"));
+    auto text = gtk_entry_get_text(entry);
+    retval = Variant(text);
 }
 
-PHPX_METHOD(GtkWidget, setText)
+PHPX_METHOD(GtkEntry, setText)
 {
-    GtkWidget *widget = _this.get("resource").toResource<GtkWidget>("GtkWidget");
-    gtk_entry_set_text((GtkEntry *) widget, args[0].toCString());
+    GtkEntry *entry = GTK_ENTRY(_this.get("resource").toResource<GObject>("GObject"));
+    gtk_entry_set_text(entry, args[0].toCString());
+}
+
+PHPX_METHOD(GtkLabel, getText)
+{
+    GtkLabel *label = GTK_LABEL(_this.get("resource").toResource<GObject>("GObject"));
+    retval = Variant(gtk_label_get_text(label));
+}
+
+PHPX_METHOD(GtkLabel, setText)
+{
+    GtkLabel *label = GTK_LABEL(_this.get("resource").toResource<GObject>("GObject"));
+    gtk_label_set_text(label, args[0].toCString());
 }
 
 void GtkApplication_dtor(zend_resource *res)
@@ -138,9 +172,9 @@ void GtkApplication_dtor(zend_resource *res)
     delete app;
 }
 
-void GtkWidget_dtor(zend_resource *res)
+void GObject_dtor(zend_resource *res)
 {
-    GtkWidget *w = static_cast<GtkWidget*>(res->ptr);
+    GObject *o = static_cast<GObject*>(res->ptr);
 }
 
 PHPX_EXTENSION()
@@ -151,24 +185,42 @@ PHPX_EXTENSION()
     {
         Class *c = new Class("Gtk\\Application");
 
+        /**
+         * Gtk\\Application
+         */
         c->addMethod("__construct", GtkApplication_construct, CONSTRUCT);
         c->addMethod("find", GtkApplication_find);
         c->addMethod("run", GtkApplication_run);
         c->addMethod("quit", GtkApplication_quit);
         ext->registerClass(c);
-
-        Class *widget = new Class("Gtk\\Widget");
-        widget->addMethod("on", GtkWidget_on);
-        widget->addMethod("getText", GtkWidget_getText);
+        /**
+         * Gtk\\Widget
+         */
+        Class *widget_class = new Class("Gtk\\Widget");
+        widget_class->addMethod("on", GtkWidget_on);
+        ext->registerClass(widget_class);
+        /**
+         * Gtk\\Entry
+         */
+        Class *entry_class = new Class("Gtk\\Entry");
+        entry_class->extends(widget_class);
+        entry_class->addMethod("getText", GtkEntry_getText);
 
         auto argInfo = new ArgInfo(1);
         argInfo->add("text", nullptr, IS_STRING);
-        widget->addMethod("setText", GtkWidget_setText, PUBLIC, argInfo);
-
-        ext->registerClass(widget);
+        entry_class->addMethod("setText", GtkEntry_setText, PUBLIC, argInfo);
+        ext->registerClass(entry_class);
+        /**
+         * Gtk\\Label
+         */
+        Class *Label_class = new Class("Gtk\\Label");
+        Label_class->extends(widget_class);
+        Label_class->addMethod("getText", GtkLabel_getText);
+        Label_class->addMethod("setText", GtkLabel_setText, PUBLIC, argInfo);
+        ext->registerClass(Label_class);
 
         ext->registerResource("GtkApplication", GtkApplication_dtor);
-        ext->registerResource("GtkWidget", GtkWidget_dtor);
+        ext->registerResource("GObject", GObject_dtor);
     };
 
     ext->info(

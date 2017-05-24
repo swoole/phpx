@@ -392,6 +392,26 @@ public:
     {
         value = zend_string_extend(value, new_size, 0);
     }
+    bool equals(const char *str)
+    {
+        return memcmp(str, value->val, value->len) == 0;
+    }
+    bool equals(string &str)
+    {
+        if (str.length() != value->len)
+        {
+            return false;
+        }
+        return memcmp(str.c_str(), value->val, value->len) == 0;
+    }
+    bool equals(String &str)
+    {
+        if (str.length() != value->len)
+        {
+            return false;
+        }
+        return memcmp(str.c_str(), value->val, value->len) == 0;
+    }
     void tolower()
     {
         zend_str_tolower(value->val, value->len);
@@ -789,6 +809,7 @@ static inline Variant _call(zval *object, zval *func)
 
 Variant call(Variant &func, Array &args)
 {
+    func.addRef();
     return _call(NULL, func.ptr(), args);
 }
 
@@ -1777,6 +1798,16 @@ public:
         parent_ce = getClassEntry(_parent_class);
         return parent_ce != NULL;
     }
+    bool extends(Class *parent)
+    {
+        if (activated)
+        {
+            return false;
+        }
+        parent_class_name = parent->getName();
+        parent_ce = parent->ptr();
+        return parent_ce != NULL;
+    }
     bool implements(const char *name)
     {
         if (activated)
@@ -1792,7 +1823,6 @@ public:
         {
             return false;
         }
-        printf("name%s\n", name);
         interfaces[name] = interface_ce;
         return true;
     }
@@ -1880,7 +1910,7 @@ public:
         _ce.info.internal.builtin_functions = _methods;
         if (parent_ce)
         {
-            ce = zend_register_internal_class_ex(ce, parent_ce);
+            ce = zend_register_internal_class_ex(&_ce, parent_ce);
         }
         else
         {
@@ -1942,6 +1972,10 @@ public:
     string getName()
     {
         return class_name;
+    }
+    zend_class_entry* ptr()
+    {
+        return ce;
     }
     Variant getStaticProperty(string p_name)
     {
