@@ -1,6 +1,9 @@
 <?php
 $app = new Gtk\Application("test.glade", "window1");
 
+$app->setTitle("Power by PHP-X.");
+$r = $app->setIcon(__DIR__.'/weixin.jpg');
+
 $app->find("button1")->on("clicked", function () use ($app) {
     $app->quit();
 });
@@ -8,7 +11,6 @@ $app->find("button1")->on("clicked", function () use ($app) {
 $app->find('button3')->on('clicked', function() use ($app) {
     $input = $app->find("entry1");
     $text = $input->getText();
-var_dump($text);
     $app->find('label1')->setText("Value=$text");
 });
 

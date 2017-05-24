@@ -26,7 +26,7 @@ using namespace std;
 struct PHP_Gtk_Application
 {
     GtkBuilder *builder;
-    GtkWidget *main_window;
+    GtkWindow *main_window;
 };
 
 static vector<Variant *> callbacks;
@@ -53,19 +53,16 @@ PHPX_METHOD(GtkApplication, construct)
     }
 
     int argc = 0;
-    char *argv[] =
-    { (char *) "phpx-gtk" };
-    gtk_init(&argc, ( char ***)&argv);
+    gtk_init(&argc, NULL);
 
-    GtkBuilder *builder = gtk_builder_new();
-
-    if (gtk_builder_add_from_file(builder, args[0].toCString(), NULL) < 0)
+    GtkBuilder *builder = gtk_builder_new_from_file(args[0].toCString());
+    if (builder == nullptr)
     {
         error(E_ERROR, "invalid parameters.");
         return;
     }
 
-    GtkWidget *window = GTK_WIDGET(gtk_builder_get_object(builder, args[1].toCString()));
+    GtkWindow *window = GTK_WINDOW(gtk_builder_get_object(builder, args[1].toCString()));
     if (window == nullptr)
     {
         error(E_ERROR, "main window[id=%s] is not eixsts.", args[1].toCString());
@@ -87,8 +84,30 @@ PHPX_METHOD(GtkApplication, run)
 {
     //g_object_unref(builder);
     PHP_Gtk_Application *app = _this.get("app").toResource<PHP_Gtk_Application>("GtkApplication");
-    gtk_widget_show(app->main_window);
+    gtk_widget_show(GTK_WIDGET(app->main_window));
     gtk_main();
+}
+
+PHPX_METHOD(GtkApplication, setTitle)
+{
+    PHP_Gtk_Application *app = _this.get("app").toResource<PHP_Gtk_Application>("GtkApplication");
+    gtk_window_set_title(app->main_window, args[0].toCString());
+}
+
+PHPX_METHOD(GtkApplication, setIcon)
+{
+    PHP_Gtk_Application *app = _this.get("app").toResource<PHP_Gtk_Application>("GtkApplication");
+    GError *error = NULL;
+    auto file = args[0].toCString();
+    if (gtk_window_set_icon_from_file(app->main_window, file, &error))
+    {
+        retval = true;
+    }
+    else
+    {
+        retval = false;
+        php::error(E_WARNING, "%s [%d]", error->message, error->code);
+    }
 }
 
 PHPX_METHOD(GtkApplication, find)
@@ -191,6 +210,8 @@ PHPX_EXTENSION()
         c->addMethod("__construct", GtkApplication_construct, CONSTRUCT);
         c->addMethod("find", GtkApplication_find);
         c->addMethod("run", GtkApplication_run);
+        c->addMethod("setTitle", GtkApplication_setTitle);
+        c->addMethod("setIcon", GtkApplication_setIcon);
         c->addMethod("quit", GtkApplication_quit);
         ext->registerClass(c);
         /**
