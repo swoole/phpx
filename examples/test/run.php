@@ -40,10 +40,10 @@ function test2()
   return new Test();
 }
 
-function php_hello_world($a, $b, $c, $d)
+function php_hello_world($a, $b)
 {
    $b = 1236 +  $b;
-   return 3.1415926;
+   return 3.1415926 + $b * 102;
 }
 
 $r = cpp_test(1234, 456, 789);
@@ -100,8 +100,9 @@ if (in_array('ext', $options))
   $s = microtime(true);
   for($i =0; $i< $n; $i++)
   {
+      $ret = max(1234, 5675, 9999);
       //$ret = swoole_strerror(11);
-      $ret = swoole_version("abc", 1234, 459.55, "hello");
+      //$ret = swoole_version("abc", 1234, 459.55, "hello");
       //$ret = str_pad("i", 1, "p", STR_PAD_BOTH);
   }
   $use = (microtime(true) - $s);

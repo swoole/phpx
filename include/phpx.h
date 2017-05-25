@@ -332,6 +332,43 @@ public:
         }
         return static_cast<T *>(_ptr);
     }
+    bool equals(Variant &v, bool strict = false)
+    {
+        if (strict)
+        {
+            if (fast_is_identical_function(v.ptr(), ptr()))
+            {
+                return true;
+            }
+        }
+        else
+        {
+            if (v.isInt())
+            {
+                if (fast_equal_check_long(v.ptr(), ptr()))
+                {
+                    return true;
+                }
+
+            }
+            else if (v.isString())
+            {
+                if (fast_equal_check_string(v.ptr(), ptr()))
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (fast_equal_check_function(v.ptr(), ptr()))
+                {
+                    return true;
+
+                }
+            }
+        }
+        return false;
+    }
 protected:
     bool reference;
     zval *ref_val;
@@ -676,6 +713,28 @@ public:
     bool empty()
     {
         return Z_ARRVAL_P(ptr())->nNumOfElements == 0;
+    }
+    Variant search(Variant &_other_var, bool strict = false)
+    {
+        for (auto i = this->begin(); i == this->end(); i++)
+        {
+            if (i.value().equals(_other_var, strict))
+            {
+                return i.key();
+            }
+        }
+        return false;
+    }
+    bool contains(Variant &_other_var, bool strict = false)
+    {
+        for (auto i = this->begin(); i == this->end(); i++)
+        {
+            if (i.value().equals(_other_var, strict))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 };
 
