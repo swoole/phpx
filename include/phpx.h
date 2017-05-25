@@ -2103,7 +2103,7 @@ Object newObject(const char *name, Variant v1)
     zend_class_entry *ce = getClassEntry(name);
     if (ce == NULL)
     {
-        php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
+        error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
     zval zobject;
@@ -2125,7 +2125,7 @@ Object newObject(const char *name, Variant v1, Variant v2)
     zend_class_entry *ce = getClassEntry(name);
     if (ce == NULL)
     {
-        php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
+        error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
     zval zobject;
@@ -2149,7 +2149,7 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3)
     zend_class_entry *ce = getClassEntry(name);
     if (ce == NULL)
     {
-        php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
+        error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
     zval zobject;
@@ -2175,7 +2175,7 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v
     zend_class_entry *ce = getClassEntry(name);
     if (ce == NULL)
     {
-        php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
+        error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
     zval zobject;
@@ -2203,7 +2203,7 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v
     zend_class_entry *ce = getClassEntry(name);
     if (ce == NULL)
     {
-        php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
+        error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
     zval zobject;
@@ -2233,7 +2233,7 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v
     zend_class_entry *ce = getClassEntry(name);
     if (ce == NULL)
     {
-        php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
+        error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
     zval zobject;
@@ -2265,7 +2265,7 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v
     zend_class_entry *ce = getClassEntry(name);
     if (ce == NULL)
     {
-        php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
+        error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
     zval zobject;
@@ -2299,7 +2299,7 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v
     zend_class_entry *ce = getClassEntry(name);
     if (ce == NULL)
     {
-        php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
+        error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
     zval zobject;
@@ -2335,7 +2335,7 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v
     zend_class_entry *ce = getClassEntry(name);
     if (ce == NULL)
     {
-        php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
+        error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
     zval zobject;
@@ -2373,7 +2373,7 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v
     zend_class_entry *ce = getClassEntry(name);
     if (ce == NULL)
     {
-        php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
+        error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
     zval zobject;
