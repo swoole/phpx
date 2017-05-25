@@ -985,6 +985,7 @@ public:
         if (!v.isObject())
         {
             error(E_ERROR, "parameter 1 must be zend_object.");
+            return;
         }
         ref_val = v.ptr();
         reference = true;
