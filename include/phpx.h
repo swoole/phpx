@@ -349,7 +349,6 @@ public:
                 {
                     return true;
                 }
-
             }
             else if (v.isString())
             {
