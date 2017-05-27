@@ -302,7 +302,7 @@ public:
         Variant *v = new Variant(ptr());
         return v;
     }
-    inline int length()
+    inline size_t length()
     {
         if (!isString())
         {
@@ -715,7 +715,7 @@ public:
     }
     Variant search(Variant &_other_var, bool strict = false)
     {
-        for (auto i = this->begin(); i == this->end(); i++)
+        for (auto i = this->begin(); i != this->end(); i++)
         {
             if (i.value().equals(_other_var, strict))
             {
@@ -726,7 +726,7 @@ public:
     }
     bool contains(Variant &_other_var, bool strict = false)
     {
-        for (auto i = this->begin(); i == this->end(); i++)
+        for (auto i = this->begin(); i != this->end(); i++)
         {
             if (i.value().equals(_other_var, strict))
             {
@@ -821,7 +821,7 @@ public:
         info = _info;
         return _info;
     }
-    int count()
+    size_t count()
     {
         return list.size();
     }
@@ -856,9 +856,8 @@ static inline Variant _call(zval *object, zval *func, Array &args)
 static inline Variant _call(zval *object, zval *func)
 {
     Variant retval = false;
-    zval params[0];
     zval _retval;
-    if (call_user_function(EG(function_table), object, func, &_retval, 0, params) == 0)
+    if (call_user_function(EG(function_table), object, func, &_retval, 0, NULL) == 0)
     {
         retval = Variant(&_retval);
     }
@@ -1308,7 +1307,7 @@ Object create(const char *name)
 #define PHPX_NAME(n)      #n, n
 #define PHPX_FUNCTION(c)  void c(Args &args, Variant &retval)
 #define PHPX_METHOD(c, m) void c##_##m(Object &_this, Args &args, Variant &retval)
-#define PHPX_EXTENSION()    extern "C" { Extension* get_module(); } Extension* get_module()
+#define PHPX_EXTENSION()    extern "C" { ZEND_DLEXPORT Extension* get_module(); } ZEND_DLEXPORT Extension* get_module()
 
 typedef void (*function_t)(Args &, Variant &retval);
 typedef void (*resource_dtor)(zend_resource *);
@@ -2023,7 +2022,6 @@ Extension::Extension(const char *name, const char *version)
 int extension_startup(int type, int module_number)
 {
     zend_module_entry *module;
-    int i;
     void *ptr;
     ZEND_HASH_FOREACH_PTR(&module_registry, ptr)
     {
@@ -2039,7 +2037,6 @@ int extension_startup(int type, int module_number)
             _module_number_to_extension[module_number] = extension;
             break;
         }
-        i++;
     }
     ZEND_HASH_FOREACH_END();
     return SUCCESS;
@@ -2052,7 +2049,7 @@ void extension_info(zend_module_entry *module)
     {
         php_info_print_table_start();
         auto header = extension->header;
-        int size = header.size();
+        size_t size = header.size();
         switch (size)
         {
         case 2:
