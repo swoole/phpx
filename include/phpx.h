@@ -1538,7 +1538,7 @@ static unordered_map<string, unordered_map<string, method_t> > method_map;
 
 static void _exec_function(zend_execute_data *data, zval *return_value)
 {
-    const char *name = data->func->common.function_name->val;
+    string name(data->func->common.function_name->val, data->func->common.function_name->len);
     function_t func = function_map[name];
     Args args;
 
@@ -1556,8 +1556,8 @@ static void _exec_function(zend_execute_data *data, zval *return_value)
 
 static void _exec_method(zend_execute_data *data, zval *return_value)
 {
-    const char *method_name = data->func->common.function_name->val;
-    const char *class_name = data->func->common.scope->name->val;
+    string class_name(data->func->common.scope->name->val, data->func->common.scope->name->len);
+    string method_name(data->func->common.function_name->val, data->func->common.function_name->len);
 
     method_t func = method_map[class_name][method_name];
     Args args;
