@@ -16,7 +16,7 @@
 
 #include "embed.h"
 
-#include <swoole.h>
+//#include <swoole.h>
 #include <iostream>
 
 using namespace php;
@@ -46,7 +46,22 @@ int main(int argc, char * argv[])
     auto ret2 = obj.exec("getName");
     cout << ret2.toString() << endl;
 
-    swoole_add_function("test", (void*) test);
+    Array arr;
+    arr.append(1234);
+    arr.append(1234.02);
+    arr.append(1234.03);
+    arr.append(1234.04);
+    arr.append("1234.05");
+    var_dump(arr);
+
+    Array arr2 = arr.slice(0, 2);
+    var_dump(arr2);
+
+    String s1 = "hello world";
+    String s2 = s1.substr(0, 5);
+    cout << "s2=" << s2.c_str() << endl;
+
+//    swoole_add_function("test", (void*) test);
 
     return 0;
 }

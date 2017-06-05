@@ -448,17 +448,82 @@ public:
         }
         return memcmp(str.c_str(), value->val, value->len) == 0;
     }
-    bool equals(String &str)
+    bool equals(String &str, bool ci = false)
     {
         if (str.length() != value->len)
         {
             return false;
+        }
+        if (ci)
+        {
+            return zend_binary_strcasecmp(str.c_str(), str.length(), value->val, value->len) == 0;
         }
         return memcmp(str.c_str(), value->val, value->len) == 0;
     }
     void tolower()
     {
         zend_str_tolower(value->val, value->len);
+    }
+    String substr(off_t _offset, long _length = -1)
+    {
+        if ((_length < 0 && (size_t) (-_length) > this->length()))
+        {
+            return "";
+        }
+        else if (_length > (zend_long) this->length())
+        {
+            _length = this->length();
+        }
+
+        if (_offset > (zend_long) this->length())
+        {
+            return "";
+        }
+        else if (_offset < 0 && -_offset > this->length())
+        {
+            _offset = 0;
+        }
+
+        if (_length < 0 && (_length + (zend_long) this->length() - _offset) < 0)
+        {
+            return "";
+        }
+
+        /* if "from" position is negative, count start position from the end
+         * of the string
+         */
+        if (_offset < 0)
+        {
+            _offset = (zend_long) this->length() + _offset;
+            if (_offset < 0)
+            {
+                _offset = 0;
+            }
+        }
+
+        /* if "length" position is negative, set it to the length
+         * needed to stop that many chars from the end of the string
+         */
+        if (_length < 0)
+        {
+            _length = ((zend_long) this->length() - _offset) + _length;
+            if (_length < 0)
+            {
+                _length = 0;
+            }
+        }
+
+        if (_offset > (zend_long) this->length())
+        {
+            return "";
+        }
+
+        if ((_offset + _length) > (zend_long) this->length())
+        {
+            _length = this->length() - _offset;
+        }
+
+        return String(value->val + _offset, _length);
     }
     zend_string* ptr()
     {
@@ -781,6 +846,102 @@ public:
     bool sort()
     {
         return zend_hash_sort(Z_ARRVAL_P(ptr()), array_data_compare, 1) == SUCCESS;
+    }
+    Array slice(off_t offset, long length = -1, bool preserve_keys = false)
+    {
+        size_t num_in = count();
+
+        if (offset > num_in)
+        {
+            return Array();
+        }
+        else if (offset < 0 && (offset = (num_in + offset)) < 0)
+        {
+            offset = 0;
+        }
+
+        if (length < 0)
+        {
+            length = num_in - offset + length;
+        }
+        else if (((zend_ulong) offset + (zend_ulong) length) > (unsigned) num_in)
+        {
+            length = num_in - offset;
+        }
+
+        if (length <= 0)
+        {
+            return Array();
+        }
+
+        zend_string *string_key;
+        zend_ulong num_key;
+        zval *entry;
+
+        zval return_value;
+        array_init_size(&return_value, (uint32_t ) length);
+
+        /* Start at the beginning and go until we hit offset */
+        int pos = 0;
+        if (!preserve_keys && (Z_ARRVAL_P(this->ptr())->u.flags & HASH_FLAG_PACKED))
+        {
+            zend_hash_real_init(Z_ARRVAL_P(&return_value), 1);
+            ZEND_HASH_FILL_PACKED(Z_ARRVAL_P(&return_value))
+            {
+                ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(this->ptr()), entry)
+                {
+                    pos++;
+                    if (pos <= offset)
+                    {
+                        continue;
+                    }
+                    if (pos > offset + length)
+                    {
+                        break;
+                    }
+                    ZEND_HASH_FILL_ADD(entry);
+                    zval_add_ref(entry);
+                }
+                ZEND_HASH_FOREACH_END();
+            }
+            ZEND_HASH_FILL_END();
+        }
+        else
+        {
+            ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(this->ptr()), num_key, string_key, entry)
+            {
+                pos++;
+                if (pos <= offset)
+                {
+                    continue;
+                }
+                if (pos > offset + length)
+                {
+                    break;
+                }
+
+                if (string_key)
+                {
+                    entry = zend_hash_add_new(Z_ARRVAL_P(&return_value), string_key, entry);
+                }
+                else
+                {
+                    if (preserve_keys)
+                    {
+                        entry = zend_hash_index_add_new(Z_ARRVAL_P(&return_value), num_key, entry);
+                    }
+                    else
+                    {
+                        entry = zend_hash_next_index_insert_new(Z_ARRVAL_P(&return_value), entry);
+                    }
+                }
+                zval_add_ref(entry);
+            }
+            ZEND_HASH_FOREACH_END();
+        }
+        Array retval(&return_value);
+        retval.addRef();
+        return retval;
     }
 };
 
