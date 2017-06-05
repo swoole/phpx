@@ -959,7 +959,7 @@ public:
     {
         if (argc == arg_list_size)
         {
-            int _new_size = arg_list_size * 2;
+            int _new_size = arg_list_size == 0 ? PHPX_MAX_ARGC : arg_list_size * 2;
             zval** _new_ptr = (zval**) ecalloc(_new_size, sizeof(zval*));
             if (_new_ptr == nullptr)
             {
