@@ -208,6 +208,14 @@ public:
     {
         zval_add_ref(ptr());
     }
+    inline void delRef()
+    {
+        zval_delref_p(ptr());
+    }
+    inline int getRefCount()
+    {
+        return GC_REFCOUNT(Z_COUNTED_P(ptr()));
+    }
     inline int type()
     {
         return Z_TYPE_P(ptr());
@@ -538,6 +546,37 @@ private:
     zend_ulong _index;
 };
 
+static int array_data_compare(const void *a, const void *b)
+{
+    Bucket *f;
+    Bucket *s;
+    zval result;
+    zval *first;
+    zval *second;
+
+    f = (Bucket *) a;
+    s = (Bucket *) b;
+
+    first = &f->val;
+    second = &s->val;
+
+    if (UNEXPECTED(Z_TYPE_P(first) == IS_INDIRECT))
+    {
+        first = Z_INDIRECT_P(first);
+    }
+    if (UNEXPECTED(Z_TYPE_P(second) == IS_INDIRECT))
+    {
+        second = Z_INDIRECT_P(second);
+    }
+    if (compare_function(&result, first, second) == FAILURE)
+    {
+        return 0;
+    }
+
+    ZEND_ASSERT(Z_TYPE(result) == IS_LONG);
+    return Z_LVAL(result);
+}
+
 class Array: public Variant
 {
 public:
@@ -705,13 +744,13 @@ public:
     {
         return ArrayIterator(Z_ARRVAL_P(ptr())->arData + Z_ARRVAL_P(ptr())->nNumUsed);
     }
-    size_t count()
+    inline size_t count()
     {
-        return Z_ARRVAL_P(ptr())->nNumOfElements;
+        return zend_hash_num_elements(Z_ARRVAL_P(ptr()));
     }
     bool empty()
     {
-        return Z_ARRVAL_P(ptr())->nNumOfElements == 0;
+        return count() == 0;
     }
     Variant search(Variant &_other_var, bool strict = false)
     {
@@ -734,6 +773,14 @@ public:
             }
         }
         return false;
+    }
+    void merge(Array &source, bool overwrite = false)
+    {
+        zend_hash_merge(Z_ARRVAL_P(ptr()), Z_ARRVAL_P(source.ptr()), zval_add_ref, overwrite);
+    }
+    bool sort()
+    {
+        return zend_hash_sort(Z_ARRVAL_P(ptr()), array_data_compare, 1) == SUCCESS;
     }
 };
 
@@ -1305,6 +1352,7 @@ Object create(const char *name)
 }
 
 #define PHPX_NAME(n)      #n, n
+#define PHPX_MNAME(c,m)   c##_##m
 #define PHPX_FUNCTION(c)  void c(Args &args, Variant &retval)
 #define PHPX_METHOD(c, m) void c##_##m(Object &_this, Args &args, Variant &retval)
 #define PHPX_EXTENSION()    extern "C" { ZEND_DLEXPORT Extension* get_module(); } ZEND_DLEXPORT Extension* get_module()
@@ -1381,6 +1429,18 @@ enum ClassFlags
     CONSTRUCT = ZEND_ACC_CTOR,
     DESTRUCT = ZEND_ACC_DTOR,
     CLONE = ZEND_ACC_CLONE,
+};
+
+enum SortFlags
+{
+    SORT_REGULAR = 0,
+    SORT_NUMERIC = 1,
+    SORT_STRING = 2,
+    SORT_DESC = 3,
+    SORT_ASC = 4,
+    SORT_LOCALE_STRING = 5,
+    SORT_NATURAL = 6,
+    SORT_FLAG_CASE = 8,
 };
 
 struct Method
