@@ -464,7 +464,7 @@ public:
     {
         zend_str_tolower(value->val, value->len);
     }
-    String substr(off_t _offset, long _length = -1)
+    String substr(long _offset, long _length = -1)
     {
         if ((_length < 0 && (size_t) (-_length) > this->length()))
         {
@@ -847,7 +847,7 @@ public:
     {
         return zend_hash_sort(Z_ARRVAL_P(ptr()), array_data_compare, 1) == SUCCESS;
     }
-    Array slice(off_t offset, long length = -1, bool preserve_keys = false)
+    Array slice(long offset, long length = -1, bool preserve_keys = false)
     {
         size_t num_in = count();
 
@@ -945,6 +945,9 @@ public:
     }
 };
 
+static int arg_list_size = 0;
+static zval **arg_list = nullptr;
+
 class Args
 {
 public:
@@ -954,8 +957,18 @@ public:
     }
     void append(zval *v)
     {
-        assert(argc < PHPX_MAX_ARGC);
-        argv[argc++] = v;
+        if (argc == arg_list_size)
+        {
+            int _new_size = arg_list_size * 2;
+            zval** _new_ptr = (zval**) ecalloc(_new_size, sizeof(zval*));
+            if (_new_ptr == nullptr)
+            {
+                return;
+            }
+            arg_list = _new_ptr;
+            arg_list_size = _new_size;
+        }
+        arg_list[argc++] = v;
     }
     size_t count()
     {
@@ -974,7 +987,7 @@ public:
         Array array;
         for (int i = 0; i < argc; i++)
         {
-            array.append(Variant(argv[i]));
+            array.append(Variant(arg_list[i]));
         }
         array.addRef();
         return array;
@@ -985,11 +998,10 @@ public:
         {
             return Variant(nullptr);
         }
-        return Variant(argv[i], true);
+        return Variant(arg_list[i], true);
     }
 private:
     int argc;
-    zval *argv[PHPX_MAX_ARGC];
 };
 
 class ArgInfo
