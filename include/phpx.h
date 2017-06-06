@@ -47,6 +47,7 @@ extern "C"
 #include <string>
 #include <vector>
 #include <functional>
+#include <map>
 
 #define PHPX_MAX_ARGC        10
 #define PHPX_VAR_DUMP_LEVEL  10
@@ -1505,13 +1506,19 @@ Object create(const char *name)
 typedef void (*function_t)(Args &, Variant &retval);
 typedef void (*resource_dtor)(zend_resource *);
 typedef void (*method_t)(Object &, Args &, Variant &retval);
-static unordered_map<string, function_t> function_map;
-static unordered_map<string, unordered_map<string, method_t> > method_map;
+struct strCmp
+{  
+    bool operator()( const char * s1, const char * s2 ) const  
+    {  
+        return strcmp( s1, s2 ) < 0;  
+    }  
+};
+static map<const char *, map<const char *, method_t,strCmp> ,strCmp> method_map;
+static map<const char *, function_t,strCmp> function_map;
 
 static void _exec_function(zend_execute_data *data, zval *return_value)
 {
-    string name(data->func->common.function_name->val, data->func->common.function_name->len);
-    function_t func = function_map[name];
+    function_t func = function_map[(const char *)data->func->common.function_name->val];
     Args args;
 
     zval *param_ptr = ZEND_CALL_ARG(EG(current_execute_data), 1);
@@ -1526,12 +1533,10 @@ static void _exec_function(zend_execute_data *data, zval *return_value)
     func(args, _retval);
 }
 
-static void _exec_method(zend_execute_data *data, zval *return_value)
+static inline void _exec_method(zend_execute_data *data, zval *return_value)
 {
-    string class_name(data->func->common.scope->name->val, data->func->common.scope->name->len);
-    string method_name(data->func->common.function_name->val, data->func->common.function_name->len);
 
-    method_t func = method_map[class_name][method_name];
+    method_t func = method_map[(const char *)data->func->common.scope->name->val][(const char *)data->func->common.function_name->val];
     Args args;
 
     Object _this(&data->This, true);
@@ -1736,7 +1741,7 @@ public:
                 _methods[i].num_args = 0;
             }
             _methods[i].flags = methods[i].flags;
-            method_map[class_name][methods[i].name] = methods[i].method;
+            method_map[class_name.c_str()][methods[i].name.c_str()] = methods[i].method;
         }
         memset(&_methods[n], 0, sizeof(zend_function_entry));
         _ce.info.internal.builtin_functions = _methods;
