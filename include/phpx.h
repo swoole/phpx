@@ -161,34 +161,6 @@ public:
             zval_ptr_dtor(&val);
         }
     }
-    void operator =(int v)
-    {
-        ZVAL_LONG(ptr(), (long )v);
-    }
-    void operator =(long v)
-    {
-        ZVAL_LONG(ptr(), v);
-    }
-    void operator =(string &str)
-    {
-        ZVAL_STRINGL(ptr(), str.c_str(), str.length());
-    }
-    void operator =(const char *str)
-    {
-        ZVAL_STRING(ptr(), str);
-    }
-    void operator =(double v)
-    {
-        ZVAL_DOUBLE(ptr(), v);
-    }
-    void operator =(float v)
-    {
-        ZVAL_DOUBLE(ptr(), (double )v);
-    }
-    void operator =(bool v)
-    {
-        ZVAL_BOOL(ptr(), v);
-    }
     void operator =(Variant v)
     {
         copy(v);
