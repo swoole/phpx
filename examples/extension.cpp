@@ -53,16 +53,13 @@ PHPX_METHOD(myClass, test)
 
 PHPX_METHOD(myClass, pget)
 {
-    auto res = _this.get("resource");
-    auto str = res.toResource<String>("ResourceString");
+    String *str = _this.oGet<String>("resource", "ResourceString");
     cout << "ResourceString: " << str->length() << endl;
-    retval = res;
 }
 
 PHPX_METHOD(myClass, pset)
 {
-    auto res = newResource("ResourceString", new String("hello world"));
-    _this.set("resource", res);
+    _this.oSet("resource", "ResourceString", new String("hello world"));
 }
 
 void string_dtor(zend_resource *res)
@@ -80,9 +77,9 @@ PHPX_EXTENSION()
         extension->registerConstant("CPP_EXT_VERSION", 1002);
 
         Class *c = new Class("myClass");
-        c->addMethod("test", myClass_test, STATIC);
-        c->addMethod("pget", myClass_pget);
-        c->addMethod("pset", myClass_pset);
+        c->addMethod(PHPX_ME(myClass, test), STATIC);
+        c->addMethod(PHPX_ME(myClass, pget));
+        c->addMethod(PHPX_ME(myClass, pset));
         extension->registerClass(c);
 
         extension->registerResource("ResourceString", string_dtor);
@@ -103,8 +100,8 @@ PHPX_EXTENSION()
 //        cout << extension->name << "afterRequest" << endl;
 //    };
 
-    extension->registerFunction(PHPX_NAME(cpp_ext_test));
-    extension->registerFunction(PHPX_NAME(cpp_ext_test2));
+    extension->registerFunction(PHPX_FN(cpp_ext_test));
+    extension->registerFunction(PHPX_FN(cpp_ext_test2));
 
     extension->info(
     {

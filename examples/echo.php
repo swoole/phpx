@@ -5,4 +5,5 @@ var_dump(myClass::test());
 
 $o = new myClass;
 $o->pset();
+var_dump($o);
 var_dump($o->pget());

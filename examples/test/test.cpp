@@ -39,9 +39,9 @@ int dispatch_function(swServer *serv, swConnection *conn, swEventData *data);
 PHPX_EXTENSION()
 {
     Extension *ext = new Extension("test", "0.0.1");
-    ext->registerFunction(PHPX_NAME(cpp_hello_world));
-    ext->registerFunction(PHPX_NAME(cpp_hello_world2));
-    ext->registerFunction(PHPX_NAME(cpp_test));
+    ext->registerFunction(PHPX_FN(cpp_hello_world));
+    ext->registerFunction(PHPX_FN(cpp_hello_world2));
+    ext->registerFunction(PHPX_FN(cpp_test));
     //depends swoole extension
     ext->require("swoole");
 
@@ -69,11 +69,11 @@ PHPX_EXTENSION()
         /**
          * 普通方法
          */
-        c->addMethod("test2", CppClass_test2);
+        c->addMethod(PHPX_ME(CppClass, test2));
         /**
          * 静态方法
          */
-        c->addMethod("test", CppClass_test, STATIC);
+        c->addMethod(PHPX_ME(CppClass, test), STATIC);
         /**
          * 实现接口
          */

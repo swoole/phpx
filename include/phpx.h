@@ -361,6 +361,19 @@ protected:
     }
 };
 
+template<typename T>
+Variant newResource(const char *name, T *v)
+{
+    Resource *_c = resource_map[name];
+    if (!_c)
+    {
+        error(E_WARNING, "%s type of resource is undefined.", name);
+        return nullptr;
+    }
+    zend_resource *res = zend_register_resource(static_cast<void*>(v), _c->type);
+    return Variant(res);
+}
+
 void var_dump(Variant &v)
 {
     php_var_dump(v.ptr(), PHPX_VAR_DUMP_LEVEL);
@@ -1450,6 +1463,18 @@ public:
     {
         zend_update_property_bool(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v ? 1 : 0);
     }
+    template<class T>
+    inline T* oGet(const char *key, const char *resource_name)
+    {
+        Variant p = this->get(key);
+        return p.toResource<T>(resource_name);
+    }
+    template<class T>
+    inline void oSet(const char *key, const char *resource_name, T *ptr)
+    {
+        Variant res = newResource<T>(resource_name, ptr);
+        this->set(key, res);
+    }
     string getClassName()
     {
         return string(Z_OBJCE_P(ptr())->name->val, Z_OBJCE_P(ptr())->name->len);
@@ -1505,11 +1530,11 @@ Object create(const char *name)
     return object;
 }
 
-#define PHPX_NAME(n)      #n, n
-#define PHPX_MNAME(c,m)   c##_##m
-#define PHPX_FUNCTION(c)  void c(Args &args, Variant &retval)
-#define PHPX_METHOD(c, m) void c##_##m(Object &_this, Args &args, Variant &retval)
-#define PHPX_EXTENSION()    extern "C" { ZEND_DLEXPORT Extension* get_module(); } ZEND_DLEXPORT Extension* get_module()
+#define PHPX_FN(n)              #n, n
+#define PHPX_ME(c,m)            #m, c##_##m
+#define PHPX_FUNCTION(c)        void c(Args &args, Variant &retval)
+#define PHPX_METHOD(c, m)       void c##_##m(Object &_this, Args &args, Variant &retval)
+#define PHPX_EXTENSION()        extern "C" { ZEND_DLEXPORT Extension* get_module(); } ZEND_DLEXPORT Extension* get_module()
 
 typedef void (*function_t)(Args &, Variant &retval);
 typedef void (*resource_dtor)(zend_resource *);
@@ -2333,19 +2358,6 @@ int extension_after_request(int type, int module_number)
     }
 
     return SUCCESS;
-}
-
-template<typename T>
-Variant newResource(const char *name, T *v)
-{
-    Resource *_c = resource_map[name];
-    if (!_c)
-    {
-        error(E_WARNING, "%s type of resource is undefined.", name);
-        return nullptr;
-    }
-    zend_resource *res = zend_register_resource(static_cast<void*>(v), _c->type);
-    return Variant(res);
 }
 
 Object newObject(const char *name)
