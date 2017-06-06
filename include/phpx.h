@@ -928,30 +928,26 @@ public:
     {
         argc = 0;
     }
-    void append(zval *v)
+    inline void append(zval *v)
     {
-        if (argc == arg_list_size)
+        if (UNEXPECTED(argc == arg_list_size))
         {
-            int _new_size = arg_list_size == 0 ? PHPX_MAX_ARGC : arg_list_size * 2;
-            zval** _new_ptr = (zval**) ecalloc(_new_size, sizeof(zval*));
-            if (_new_ptr == nullptr)
+            if (UNEXPECTED(!extend()))
             {
                 return;
             }
-            arg_list = _new_ptr;
-            arg_list_size = _new_size;
         }
         arg_list[argc++] = v;
     }
-    size_t count()
+    inline size_t count()
     {
         return argc;
     }
-    bool exists(int i)
+    inline bool exists(int i)
     {
         return i < argc;
     }
-    bool empty()
+    inline bool empty()
     {
         return argc == 0;
     }
@@ -965,15 +961,27 @@ public:
         array.addRef();
         return array;
     }
-    Variant operator [](int i)
+    inline Variant operator [](int i)
     {
-        if (i >= argc)
+        if (UNEXPECTED(i >= argc))
         {
             return Variant(nullptr);
         }
         return Variant(arg_list[i], true);
     }
 private:
+    bool extend()
+    {
+        int _new_size = arg_list_size == 0 ? PHPX_MAX_ARGC : arg_list_size * 2;
+        zval** _new_ptr = (zval**) ecalloc(_new_size, sizeof(zval*));
+        if (UNEXPECTED(_new_ptr == nullptr))
+        {
+            return false;
+        }
+        arg_list = _new_ptr;
+        arg_list_size = _new_size;
+        return true;
+    }
     int argc;
 };
 
@@ -1533,9 +1541,8 @@ static void _exec_function(zend_execute_data *data, zval *return_value)
     func(args, _retval);
 }
 
-static inline void _exec_method(zend_execute_data *data, zval *return_value)
+static void _exec_method(zend_execute_data *data, zval *return_value)
 {
-
     method_t func = method_map[(const char *)data->func->common.scope->name->val][(const char *)data->func->common.function_name->val];
     Args args;
 
