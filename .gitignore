@@ -33,3 +33,8 @@
 /.cproject
 /.project
 /.idea
+/cmake_install.cmake
+/CMakeCache.txt
+/Makefile
+/phpx.cbp
+/install_manifest.txt

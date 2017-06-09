@@ -14,7 +14,7 @@
   +----------------------------------------------------------------------+
 */
 
-#include "embed.h"
+#include "phpx_embed.h"
 
 //#include <swoole.h>
 #include <iostream>
