@@ -190,6 +190,10 @@ public:
     {
         ZVAL_BOOL(ptr(), v);
     }
+    void operator =(nullptr_t _null)
+    {
+        ZVAL_NULL(ptr());
+    }
     void operator =(Variant v)
     {
         copy(v);
@@ -256,6 +260,10 @@ public:
     inline bool isReference()
     {
         return Z_TYPE_P(ptr()) == IS_REFERENCE;
+    }
+    inline bool isImmutable()
+    {
+        return Z_TYPE_FLAGS_P(ptr()) & IS_TYPE_IMMUTABLE;
     }
     inline string toString()
     {
@@ -691,6 +699,10 @@ public:
             error(E_ERROR, "parameter 1 must be zend_array.");
         }
     }
+    void separate()
+    {
+        SEPARATE_ARRAY(ptr());
+    }
     void append(Variant v)
     {
         v.addRef();
@@ -1008,7 +1020,12 @@ public:
         {
             return Variant(nullptr);
         }
-        return Variant(arg_list[i], true);
+        zval *value = arg_list[i];
+        if (Z_TYPE_P(value) == IS_REFERENCE)
+        {
+            value = static_cast<zval *>(Z_REFVAL_P(value));
+        }
+        return Variant(value, true);
     }
 private:
     bool extend()
@@ -2083,19 +2100,19 @@ public:
         function_array[function_count].arg_info = NULL;
         function_array[function_count].num_args = 0;
         function_array[function_count].flags = 0;
-
-        function_array[function_count + 1].fname = NULL;
-        function_array[function_count + 1].handler = NULL;
         if (info)
         {
-            function_array[function_count + 1].arg_info = info->get();
-            function_array[function_count + 1].num_args = info->count();
+            function_array[function_count].arg_info = info->get();
+            function_array[function_count].num_args = info->count();
         }
         else
         {
-            function_array[function_count + 1].arg_info = NULL;
-            function_array[function_count + 1].num_args = 0;
+            function_array[function_count].arg_info = NULL;
+            function_array[function_count].num_args = 0;
         }
+
+        function_array[function_count + 1].fname = NULL;
+        function_array[function_count + 1].handler = NULL;
         function_array[function_count + 1].flags = 0;
 
         function_map[name] = func;

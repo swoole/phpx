@@ -26,7 +26,9 @@ using namespace php;
 
 void cpp_hello_world(Args &args, Variant &retval);
 PHPX_FUNCTION(cpp_hello_world2);
-void cpp_test(Args &params, Variant &retval);
+PHPX_FUNCTION(cpp_test);
+PHPX_FUNCTION(cpp_test2);
+PHPX_FUNCTION(cpp_test3);
 void CppClass_construct(Object &_this, Args &args, Variant &retval);
 
 void CppClass_test(Object &_this, Args &args, Variant &retval);
@@ -36,12 +38,30 @@ void CppClass_count(Object &_this, Args &args, Variant &retval);
 int test_get_length(swProtocol *protocol, swConnection *conn, char *data, uint32_t length);
 int dispatch_function(swServer *serv, swConnection *conn, swEventData *data);
 
+PHPX_FUNCTION(cpp_test3)
+{
+    auto a = args[0];
+    cout << "type=" << a.type() << endl;
+    a = 456;
+}
+
 PHPX_EXTENSION()
 {
     Extension *ext = new Extension("test", "0.0.1");
     ext->registerFunction(PHPX_FN(cpp_hello_world));
     ext->registerFunction(PHPX_FN(cpp_hello_world2));
     ext->registerFunction(PHPX_FN(cpp_test));
+
+    ArgInfo *info = new ArgInfo(1);
+    info->add("array", nullptr, IS_ARRAY, true);
+
+    ext->registerFunction(PHPX_FN(cpp_test2), info);
+
+    ArgInfo *info3 = new ArgInfo(1);
+    info3->add("num", nullptr, IS_LONG, true);
+
+    ext->registerFunction(PHPX_FN(cpp_test3), info3);
+
     //depends swoole extension
     ext->require("swoole");
 
@@ -296,6 +316,18 @@ PHPX_FUNCTION(cpp_test)
     {
         cout << "return value=" << _retval.toString() << endl;
     }
+}
+
+PHPX_FUNCTION(cpp_test2)
+{
+    auto a = args[0];
+    cout << "type=" << a.type() << endl;
+    Array arg_0(a);
+    arg_0.set("append", true);
+
+    Array arr(a);
+    arr.set("layout", "middle");
+    var_dump(arr);
 }
 
 int test_get_length(swProtocol *protocol, swConnection *conn, char *data, uint32_t length)
