@@ -393,7 +393,7 @@ Variant newResource(const char *name, T *v)
     return Variant(res);
 }
 
-void var_dump(Variant &v)
+static inline void var_dump(Variant &v)
 {
     php_var_dump(v.ptr(), PHPX_VAR_DUMP_LEVEL);
 }
@@ -618,36 +618,7 @@ private:
     zend_ulong _index;
 };
 
-static int array_data_compare(const void *a, const void *b)
-{
-    Bucket *f;
-    Bucket *s;
-    zval result;
-    zval *first;
-    zval *second;
-
-    f = (Bucket *) a;
-    s = (Bucket *) b;
-
-    first = &f->val;
-    second = &s->val;
-
-    if (UNEXPECTED(Z_TYPE_P(first) == IS_INDIRECT))
-    {
-        first = Z_INDIRECT_P(first);
-    }
-    if (UNEXPECTED(Z_TYPE_P(second) == IS_INDIRECT))
-    {
-        second = Z_INDIRECT_P(second);
-    }
-    if (compare_function(&result, first, second) == FAILURE)
-    {
-        return 0;
-    }
-
-    ZEND_ASSERT(Z_TYPE(result) == IS_LONG);
-    return Z_LVAL(result);
-}
+extern int array_data_compare(const void *a, const void *b);
 
 class Array: public Variant
 {
@@ -1648,195 +1619,17 @@ class Class
     };
 
 public:
-    Class(const char *name)
-    {
-        class_name = name;
-        INIT_CLASS_ENTRY_EX(_ce, name, strlen(name), NULL);
-        parent_ce = NULL;
-        ce = NULL;
-        activated = false;
-    }
-    bool extends(const char *_parent_class)
-    {
-        if (activated)
-        {
-            return false;
-        }
-        parent_class_name = _parent_class;
-        parent_ce = getClassEntry(_parent_class);
-        return parent_ce != NULL;
-    }
-    bool extends(Class *parent)
-    {
-        if (activated)
-        {
-            return false;
-        }
-        parent_class_name = parent->getName();
-        parent_ce = parent->ptr();
-        return parent_ce != NULL;
-    }
-    bool implements(const char *name)
-    {
-        if (activated)
-        {
-            return false;
-        }
-        if (interfaces.find(name) != interfaces.end())
-        {
-            return false;
-        }
-        zend_class_entry *interface_ce = getClassEntry(name);
-        if (interface_ce == NULL)
-        {
-            return false;
-        }
-        interfaces[name] = interface_ce;
-        return true;
-    }
-    bool implements(zend_class_entry *interface_ce)
-    {
-        if (activated)
-        {
-            return false;
-        }
-        interfaces[interface_ce->name->val] = interface_ce;
-        return true;
-    }
-    bool addConstant(const char *name, Variant v)
-    {
-        if (activated)
-        {
-            return false;
-        }
-        Constant c;
-        c.name = name;
-        ZVAL_COPY(&c.value, v.ptr());
-        constants.push_back(c);
-        return true;
-    }
-    bool addProperty(const char *name, Variant v, int flags = PUBLIC)
-    {
-        if (activated)
-        {
-            return false;
-        }
-        Property p;
-        p.name = name;
-        ZVAL_COPY(&p.value, v.ptr());
-        p.flags = flags;
-        propertys.push_back(p);
-        return true;
-    }
-    bool addMethod(const char *name, method_t method, int flags = PUBLIC, ArgInfo *info = nullptr)
-    {
-        if (activated)
-        {
-            return false;
-        }
-        if ((flags & CONSTRUCT) || (flags & DESTRUCT) || !(flags & ZEND_ACC_PPP_MASK))
-        {
-            flags |= PUBLIC;
-        }
-        Method m;
-        m.flags = flags;
-        m.method = method;
-        m.name = name;
-        m.info = info;
-        methods.push_back(m);
-        return false;
-    }
-    bool activate()
-    {
-        if (activated)
-        {
-            return false;
-        }
-        /**
-         * register methods
-         */
-        int n = methods.size();
-        zend_function_entry *_methods = (zend_function_entry *) ecalloc(n + 1, sizeof(zend_function_entry));
-        for (int i = 0; i < n; i++)
-        {
-            _methods[i].fname = methods[i].name.c_str();
-            _methods[i].handler = _exec_method;
-            if (methods[i].info)
-            {
-                _methods[i].arg_info = methods[i].info->get();
-                _methods[i].num_args = methods[i].info->count();
-            }
-            else
-            {
-                _methods[i].arg_info = nullptr;
-                _methods[i].num_args = 0;
-            }
-            _methods[i].flags = methods[i].flags;
-            method_map[class_name.c_str()][methods[i].name.c_str()] = methods[i].method;
-        }
-        memset(&_methods[n], 0, sizeof(zend_function_entry));
-        _ce.info.internal.builtin_functions = _methods;
-        if (parent_ce)
-        {
-            ce = zend_register_internal_class_ex(&_ce, parent_ce);
-        }
-        else
-        {
-            ce = zend_register_internal_class(&_ce TSRMLS_CC);
-        }
-        efree(_methods);
-        if (ce == NULL)
-        {
-            return false;
-        }
-        /**
-         * implements interface
-         */
-        for (auto i = interfaces.begin(); i != interfaces.end(); i++)
-        {
-            zend_do_implement_interface(ce, interfaces[i->first]);
-        }
-        /**
-         * register property
-         */
-        for (int i = 0; i != propertys.size(); i++)
-        {
-            Property p = propertys[i];
-            zval_add_ref(&p.value);
-            zend_declare_property(ce, p.name.c_str(), p.name.length(), &p.value, p.flags);
-        }
-        /**
-         * register constant
-         */
-        for (int i = 0; i != constants.size(); i++)
-        {
-            if (Z_TYPE(constants[i].value) == IS_STRING)
-            {
-                zend_declare_class_constant_stringl(ce, constants[i].name.c_str(), constants[i].name.length(),
-                        Z_STRVAL(constants[i].value), Z_STRLEN(constants[i].value));
-            }
-            else
-            {
-                zend_declare_class_constant(ce, constants[i].name.c_str(), constants[i].name.length(),
-                        &constants[i].value);
-            }
-        }
-        activated = true;
-        return true;
-    }
-    bool alias(const char *alias_name)
-    {
-        if (!activated)
-        {
-            php_error_docref(NULL, E_WARNING, "Please execute alias method after activate.");
-            return false;
-        }
-        if (zend_register_class_alias_ex(alias_name, strlen(alias_name), ce) < 0)
-        {
-            return false;
-        }
-        return true;
-    }
+    Class(const char *name);
+    bool extends(const char *_parent_class);
+    bool extends(Class *parent);
+    bool implements(const char *name);
+    bool implements(zend_class_entry *interface_ce);
+    bool addConstant(const char *name, Variant v);
+    bool addProperty(const char *name, Variant v, int flags = PUBLIC);
+    bool addMethod(const char *name, method_t method, int flags = PUBLIC, ArgInfo *info = nullptr);
+    bool activate();
+    bool alias(const char *alias_name);
+
     string getName()
     {
         return class_name;
