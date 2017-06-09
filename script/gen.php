@@ -17,7 +17,7 @@ $maxArgc = $match[1];
 $out = '';
 for ($i = 1; $i <= $maxArgc; $i++)
 {
-    $out .= "\n".'Variant exec(const char *func, ';
+    $out .= "\n".'static Variant exec(const char *func, ';
     $list = [];
     for ($j = 1; $j <= $i; $j++)
     {
@@ -59,7 +59,7 @@ $exec_method_code = $out."\n".SPACE_4;
 $out = '';
 for ($i = 1; $i <= $maxArgc; $i++)
 {
-    $out .= "\nObject newObject(const char *name, ";
+    $out .= "\nstatic Object newObject(const char *name, ";
     $list = [];
     for ($j = 1; $j <= $i; $j++)
     {
