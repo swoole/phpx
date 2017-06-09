@@ -24,11 +24,6 @@ execute_process(COMMAND php-config --ldflags
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
 
-#set(PHP_EXTENSION_DIR)
-#execute_process(OUTPUT_VARIABLE ${PHP_EXTENSION_DIR}
-#        COMMAND php-config --extension-dir
-#        )
-
 link_directories(${PHP_LDFLAGS})
 
 include_directories(include)

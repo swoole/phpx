@@ -431,23 +431,23 @@ public:
             zend_string_free(value);
         }
     }
-    size_t length()
+    inline size_t length()
     {
         return value->len;
     }
-    char* c_str()
+    inline char* c_str()
     {
         return value->val;
     }
-    void extend(size_t new_size)
+    inline void extend(size_t new_size)
     {
         value = zend_string_extend(value, new_size, 0);
     }
-    bool equals(const char *str)
+    inline bool equals(const char *str)
     {
         return memcmp(str, value->val, value->len) == 0;
     }
-    bool equals(string &str)
+    inline bool equals(string &str)
     {
         if (str.length() != value->len)
         {
@@ -467,72 +467,12 @@ public:
         }
         return memcmp(str.c_str(), value->val, value->len) == 0;
     }
-    void tolower()
+    inline void tolower()
     {
         zend_str_tolower(value->val, value->len);
     }
-    String substr(long _offset, long _length = -1)
-    {
-        if ((_length < 0 && (size_t) (-_length) > this->length()))
-        {
-            return "";
-        }
-        else if (_length > (zend_long) this->length())
-        {
-            _length = this->length();
-        }
-
-        if (_offset > (zend_long) this->length())
-        {
-            return "";
-        }
-        else if (_offset < 0 && -_offset > this->length())
-        {
-            _offset = 0;
-        }
-
-        if (_length < 0 && (_length + (zend_long) this->length() - _offset) < 0)
-        {
-            return "";
-        }
-
-        /* if "from" position is negative, count start position from the end
-         * of the string
-         */
-        if (_offset < 0)
-        {
-            _offset = (zend_long) this->length() + _offset;
-            if (_offset < 0)
-            {
-                _offset = 0;
-            }
-        }
-
-        /* if "length" position is negative, set it to the length
-         * needed to stop that many chars from the end of the string
-         */
-        if (_length < 0)
-        {
-            _length = ((zend_long) this->length() - _offset) + _length;
-            if (_length < 0)
-            {
-                _length = 0;
-            }
-        }
-
-        if (_offset > (zend_long) this->length())
-        {
-            return "";
-        }
-
-        if ((_offset + _length) > (zend_long) this->length())
-        {
-            _length = this->length() - _offset;
-        }
-
-        return String(value->val + _offset, _length);
-    }
-    zend_string* ptr()
+    String substr(long _offset, long _length = -1);
+    inline zend_string* ptr()
     {
         return value;
     }
@@ -829,102 +769,7 @@ public:
     {
         return zend_hash_sort(Z_ARRVAL_P(ptr()), array_data_compare, 1) == SUCCESS;
     }
-    Array slice(long offset, long length = -1, bool preserve_keys = false)
-    {
-        size_t num_in = count();
-
-        if (offset > num_in)
-        {
-            return Array();
-        }
-        else if (offset < 0 && (offset = (num_in + offset)) < 0)
-        {
-            offset = 0;
-        }
-
-        if (length < 0)
-        {
-            length = num_in - offset + length;
-        }
-        else if (((zend_ulong) offset + (zend_ulong) length) > (unsigned) num_in)
-        {
-            length = num_in - offset;
-        }
-
-        if (length <= 0)
-        {
-            return Array();
-        }
-
-        zend_string *string_key;
-        zend_ulong num_key;
-        zval *entry;
-
-        zval return_value;
-        array_init_size(&return_value, (uint32_t ) length);
-
-        /* Start at the beginning and go until we hit offset */
-        int pos = 0;
-        if (!preserve_keys && (Z_ARRVAL_P(this->ptr())->u.flags & HASH_FLAG_PACKED))
-        {
-            zend_hash_real_init(Z_ARRVAL_P(&return_value), 1);
-            ZEND_HASH_FILL_PACKED(Z_ARRVAL_P(&return_value))
-            {
-                ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(this->ptr()), entry)
-                {
-                    pos++;
-                    if (pos <= offset)
-                    {
-                        continue;
-                    }
-                    if (pos > offset + length)
-                    {
-                        break;
-                    }
-                    ZEND_HASH_FILL_ADD(entry);
-                    zval_add_ref(entry);
-                }
-                ZEND_HASH_FOREACH_END();
-            }
-            ZEND_HASH_FILL_END();
-        }
-        else
-        {
-            ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(this->ptr()), num_key, string_key, entry)
-            {
-                pos++;
-                if (pos <= offset)
-                {
-                    continue;
-                }
-                if (pos > offset + length)
-                {
-                    break;
-                }
-
-                if (string_key)
-                {
-                    entry = zend_hash_add_new(Z_ARRVAL_P(&return_value), string_key, entry);
-                }
-                else
-                {
-                    if (preserve_keys)
-                    {
-                        entry = zend_hash_index_add_new(Z_ARRVAL_P(&return_value), num_key, entry);
-                    }
-                    else
-                    {
-                        entry = zend_hash_next_index_insert_new(Z_ARRVAL_P(&return_value), entry);
-                    }
-                }
-                zval_add_ref(entry);
-            }
-            ZEND_HASH_FOREACH_END();
-        }
-        Array retval(&return_value);
-        retval.addRef();
-        return retval;
-    }
+    Array slice(long offset, long length = -1, bool preserve_keys = false);
 };
 
 extern int arg_list_size;
@@ -1817,56 +1662,7 @@ public:
         return true;
     }
 
-    bool registerFunction(const char *name, function_t func, ArgInfo *info = nullptr)
-    {
-        this->checkStartupStatus(BEFORE_START, __func__);
-        if (module.functions == NULL)
-        {
-            module.functions = (const zend_function_entry*) calloc(16, sizeof(zend_function_entry));
-            if (module.functions == NULL)
-            {
-                return false;
-            }
-            function_array_size = 16;
-        }
-        else if (function_count + 1 == function_array_size)
-        {
-            function_array_size *= 2;
-            void* new_array = realloc((void*) module.functions, function_array_size * sizeof(zend_function_entry));
-            if (new_array == NULL)
-            {
-                return false;
-            }
-            module.functions = (const zend_function_entry*) new_array;
-        }
-
-        zend_function_entry *function_array = (zend_function_entry *) module.functions;
-        function_array[function_count].fname = name;
-
-        function_array[function_count].handler = _exec_function;
-        function_array[function_count].arg_info = NULL;
-        function_array[function_count].num_args = 0;
-        function_array[function_count].flags = 0;
-        if (info)
-        {
-            function_array[function_count].arg_info = info->get();
-            function_array[function_count].num_args = info->count();
-        }
-        else
-        {
-            function_array[function_count].arg_info = NULL;
-            function_array[function_count].num_args = 0;
-        }
-
-        function_array[function_count + 1].fname = NULL;
-        function_array[function_count + 1].handler = NULL;
-        function_array[function_count + 1].flags = 0;
-
-        function_map[name] = func;
-
-        function_count ++;
-        return true;
-    }
+    bool registerFunction(const char *name, function_t func, ArgInfo *info = nullptr);
 
     bool registerResource(const char *name, resource_dtor dtor)
     {
@@ -1978,43 +1774,7 @@ public:
         return zend_register_constant(&c);
     }
 
-    bool require(const char *name, const char *version = nullptr)
-    {
-        this->checkStartupStatus(BEFORE_START, __func__);
-        if (module.deps == NULL)
-        {
-            module.deps = (const zend_module_dep*) calloc(16, sizeof(zend_module_dep));
-            if (module.deps == NULL)
-            {
-                return false;
-            }
-            deps_array_size = 16;
-        }
-        else if (deps_count + 1 == deps_array_size)
-        {
-            deps_array_size *= 2;
-            void* new_array = realloc((void*) module.deps, deps_array_size * sizeof(zend_module_dep));
-            if (new_array == NULL)
-            {
-                return false;
-            }
-            module.deps = (const zend_module_dep*) new_array;
-        }
-
-        zend_module_dep *deps_array = (zend_module_dep *) module.deps;
-        deps_array[deps_count].name = name;
-        deps_array[deps_count].rel = NULL;
-        deps_array[deps_count].version = version;
-        deps_array[deps_count].type = MODULE_DEP_REQUIRED;
-
-        deps_array[deps_count + 1].name = NULL;
-        deps_array[deps_count + 1].rel = NULL;
-        deps_array[deps_count + 1].version = NULL;
-        deps_array[deps_count + 1].type = 0;
-
-        deps_count++;
-        return true;
-    }
+    bool require(const char *name, const char *version = nullptr);
 
     void info(vector<string> header, vector<vector<string> > body)
     {
