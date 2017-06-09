@@ -4,7 +4,7 @@
 ## Requirements
 
 - PHP 7.0 or later
-- Linux/MacOS
+- Linux/MacOS/Windows
 - GCC 4.8 or later
 
 ## Build libphpx.so
