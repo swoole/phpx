@@ -7,9 +7,17 @@
 - Linux/MacOS
 - GCC 4.8 or later
 
-## Build
+## Build libphpx.so
 ```shell
-make
+cmake .
+make -j 4
+sudo make install
+```
+
+## Build extension
+```shell
+cd examples/cpp_ext
+make 
 sudo make install
 ```
 
