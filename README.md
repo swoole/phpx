@@ -1,5 +1,7 @@
 # PHP-X
- C++ wrapper for Zend API
+C++ wrapper for Zend API
+
+![PHP-X](logo.png)
  
 ## Requirements
 
