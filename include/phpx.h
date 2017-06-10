@@ -332,6 +332,50 @@ public:
         }
         return static_cast<T *>(_ptr);
     }
+    bool operator ==(Variant &v)
+    {
+        return equals(v);
+    }
+    bool operator ==(bool v)
+    {
+        Variant _tmp(v);
+        return equals(_tmp);
+    }
+    bool operator ==(int v)
+    {
+        Variant _tmp(v);
+        return equals(_tmp);
+    }
+    bool operator ==(long v)
+    {
+        Variant _tmp(v);
+        return equals(_tmp);
+    }
+    bool operator ==(float v)
+    {
+        Variant _tmp(v);
+        return equals(_tmp);
+    }
+    bool operator ==(double v)
+    {
+        Variant _tmp(v);
+        return equals(_tmp);
+    }
+    bool operator ==(nullptr_t v)
+    {
+        Variant _tmp(v);
+        return equals(_tmp);
+    }
+    bool operator ==(string &v)
+    {
+        Variant _tmp(v);
+        return equals(_tmp);
+    }
+    bool operator ==(const char *v)
+    {
+        Variant _tmp(v);
+        return equals(_tmp);
+    }
     bool equals(Variant &v, bool strict = false)
     {
         if (strict)
@@ -454,6 +498,10 @@ public:
             return false;
         }
         return memcmp(str.c_str(), value->val, value->len) == 0;
+    }
+    inline bool operator ==(String &v)
+    {
+        return equals(v);
     }
     bool equals(String &str, bool ci = false)
     {
@@ -1387,11 +1435,11 @@ typedef void (*resource_dtor)(zend_resource *);
 typedef void (*method_t)(Object &, Args &, Variant &retval);
 
 struct strCmp
-{  
-    bool operator()( const char * s1, const char * s2 ) const  
-    {  
-        return strcmp( s1, s2 ) < 0;  
-    }  
+{
+    bool operator()( const char * s1, const char * s2 ) const
+    {
+        return strcmp( s1, s2 ) < 0;
+    }
 };
 
 extern map<const char *, map<const char *, method_t, strCmp>, strCmp> method_map;

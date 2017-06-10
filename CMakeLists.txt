@@ -29,6 +29,12 @@ link_directories(${PHP_LDFLAGS})
 include_directories(include)
 include_directories(BEFORE ${PHP_INCLUDE_DIR} ${PHP_INCLUDE_DIR}/Zend ${PHP_INCLUDE_DIR}/main ${PHP_INCLUDE_DIR}/TSRM)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+IF (APPLE)
+    SET(CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+    message(${CMAKE_SHARED_LINKER_FLAGS})
+ENDIF ()
+
 #libary
 add_library(phpx SHARED ${DIR_SRCS})
 
