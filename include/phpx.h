@@ -39,8 +39,8 @@ extern "C"
 #include <ext/date/php_date.h>
 #include <ext/standard/url.h>
 #include <ext/standard/info.h>
-#include <ext/standard/php_array.h>
-#include "ext/standard/php_var.h"
+#include <ext/standard/html.h>
+#include <ext/standard/php_standard.h>
 }
 
 #include <unordered_map>
@@ -412,6 +412,8 @@ public:
         }
         return false;
     }
+    Variant serialize();
+    Variant unserialize();
 protected:
     bool reference;
     zval *ref_val;
@@ -444,6 +446,19 @@ static inline void var_dump(Variant &v)
 
 Variant ini_get(string varname);
 
+static inline int version_compare(string s1, string s2)
+{
+	return php_version_compare(s1.c_str(), s2.c_str());
+}
+
+//static inline int crc32()
+//{
+//	PHP_CRC32_CTX ctx;
+//	PHP_CRC32Init(&ctx);
+//}
+
+//number_format(double )
+
 class String
 {
 public:
@@ -458,6 +473,18 @@ public:
     String(string &str)
     {
         value = zend_string_init(str.c_str(), str.length(), 0);
+    }
+    String(zend_string *str)
+    {
+        value = str;
+    }
+    String(zval *str, bool ref = false)
+    {
+        value = Z_STR_P(str);
+        if (ref)
+        {
+        	free_memory = false;
+        }
     }
     String(Variant &v)
     {
@@ -482,6 +509,10 @@ public:
     inline char* c_str()
     {
         return value->val;
+    }
+    inline int hashCode()
+    {
+    	return value->h;
     }
     inline void extend(size_t new_size)
     {
@@ -515,11 +546,39 @@ public:
         }
         return memcmp(str.c_str(), value->val, value->len) == 0;
     }
+    inline String trim(String &what, int mode = 0)
+	{
+		return php_trim(value, (char *) what.c_str(), what.length(), mode);
+	}
     inline void tolower()
     {
         zend_str_tolower(value->val, value->len);
     }
+    inline String base64Encode(bool raw = false)
+    {
+		return php_base64_decode_ex((const unsigned char *) value->val, value->len, raw);
+    }
+
+	inline String escape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, string charset = SG(default_charset))
+	{
+		return php_escape_html_entities((unsigned char *) value->val,
+				value->len, 0, flags, (char *) charset.c_str());
+	}
+
+	inline String unescape(int flags, string charset)
+	{
+		return php_unescape_html_entities((unsigned char *) value->val,
+				value->len, 1, flags, (char *) charset.c_str());
+	}
+
+	Variant split(String &delim, int limit = -1);
     String substr(long _offset, long _length = -1);
+    void stripTags(String &allow, bool allow_tag_spaces = false);
+    String addSlashes();
+    void stripSlashes();
+    String basename(String &suffix);
+    String dirname();
+
     inline zend_string* ptr()
     {
         return value;
@@ -607,6 +666,7 @@ private:
 };
 
 extern int array_data_compare(const void *a, const void *b);
+String md5(int bits = 32);
 
 class Array: public Variant
 {
@@ -808,6 +868,13 @@ public:
             }
         }
         return false;
+    }
+    String join(String &delim)
+    {
+    	Variant retval;
+    	php_implode(delim.ptr(), ptr(), retval.ptr());
+    	retval.addRef();
+    	return retval.ptr();
     }
     void merge(Array &source, bool overwrite = false)
     {

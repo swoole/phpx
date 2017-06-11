@@ -84,4 +84,39 @@ String String::substr(long _offset, long _length)
     return String(value->val + _offset, _length);
 }
 
+Variant String::split(String &delim, int limit)
+{
+	Variant retval;
+	php_explode(delim.ptr(), value, retval.ptr(), limit);
+	retval.addRef();
+	return retval;
+}
+
+void String::stripTags(String &allow, bool allow_tag_spaces)
+{
+	int state;
+	value->len = php_strip_tags_ex(this->c_str(), this->length(), &state, allow.c_str(), allow.length(), allow_tag_spaces);
+}
+
+String String::addSlashes()
+{
+	return php_addslashes(value, false);
+}
+
+String String::basename(String &suffix)
+{
+	return php_basename(this->c_str(), this->length(), suffix.c_str(), suffix.length());
+}
+
+String String::dirname()
+{
+	size_t n = php_dirname(this->c_str(), this->length());
+	return String(this->c_str(), n);
+}
+
+void String::stripSlashes()
+{
+	php_stripslashes(value);
+}
+
 }

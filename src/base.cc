@@ -37,6 +37,19 @@ Variant ini_get(string varname)
     char* str = zend_ini_string((char *) varname.c_str(), (uint) varname.length(), 0);
     return Variant(str);
 }
+
+String md5(String &data, int bits)
+{
+	unsigned char digest[32] = {0};
+    PHP_MD5_CTX ctx;
+    PHP_MD5Init(&ctx);
+    PHP_MD5Update(&ctx, data.c_str(), data.length());
+    PHP_MD5Final(digest, &ctx);
+    char *des;
+    make_digest_ex(des, digest, bits);
+    return des;
+}
+
 void error(int level, const char *format, ...)
 {
     va_list args;
