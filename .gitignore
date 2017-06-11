@@ -39,3 +39,8 @@
 /phpx.cbp
 /install_manifest.txt
 /examples/embed/embed
+.DS_Store
+CMakeFiles/
+examples/gtk/gtk.so.dSYM/
+examples/gtk/gtk.so.dSYM/
+examples/test/test.so.dSYM/
