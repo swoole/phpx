@@ -6,23 +6,31 @@ file(GLOB_RECURSE HEADER_FILES include/*.h)
 
 set(CMAKE_BUILD_TYPE Release)
 
-#execute_process(COMMAND php-config --includes
+if (DEFINED PHP_CONFIG_DIR)
+  set(PHP_CONFIG_DIR "${PHP_CONFIG_DIR}/")
+else()
+  set(PHP_CONFIG_DIR "")
+endif()
+
+#execute_process(COMMAND ${PHP_CONFIG_DIR}/php-config --includes
 #        RESULT_VARIABLE PHP_INCLUDE
 #        )
 
-execute_process(COMMAND php-config --include-dir
+execute_process(COMMAND ${PHP_CONFIG_DIR}/php-config --include-dir
         OUTPUT_VARIABLE PHP_INCLUDE_DIR
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
 
-execute_process(COMMAND php-config --libs
+execute_process(COMMAND ${PHP_CONFIG_DIR}/php-config --libs
         OUTPUT_VARIABLE PHP_LIBS
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
-execute_process(COMMAND php-config --ldflags
+execute_process(COMMAND ${PHP_CONFIG_DIR}/php-config --ldflags
         OUTPUT_VARIABLE ${PHP_LDFLAGS}
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
+
+message("XX: ${PHP_INCLUDE_DIR}")
 
 link_directories(${PHP_LDFLAGS})
 
