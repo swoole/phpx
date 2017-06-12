@@ -38,15 +38,15 @@ include_directories(include)
 include_directories(BEFORE ${PHP_INCLUDE_DIR} ${PHP_INCLUDE_DIR}/Zend ${PHP_INCLUDE_DIR}/main ${PHP_INCLUDE_DIR}/TSRM)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-IF (APPLE)
+if (APPLE)
     SET(CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
     message(${CMAKE_SHARED_LINKER_FLAGS})
-ENDIF ()
+endif ()
 
 #libary
 add_library(phpx SHARED ${DIR_SRCS})
 
 #install
-INSTALL(CODE "MESSAGE(\"Are you run command using root user?\")")
-INSTALL(TARGETS phpx LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
-INSTALL(FILES ${HEADER_FILES} DESTINATION include)
+install(CODE "MESSAGE(\"Are you run command using root user?\")")
+install(TARGETS phpx LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
+install(FILES ${HEADER_FILES} DESTINATION include)

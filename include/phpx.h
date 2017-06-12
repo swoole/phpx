@@ -666,7 +666,10 @@ private:
 };
 
 extern int array_data_compare(const void *a, const void *b);
-String md5(int bits = 32);
+extern String md5(String data, bool raw_output = false);
+extern String sha1(String data, bool raw_output = false);
+extern String crc32(String data, bool raw_output = false);
+extern String hash(String algo, String data, bool raw_output = false);
 
 class Array: public Variant
 {
@@ -947,7 +950,7 @@ private:
     bool extend()
     {
         int _new_size = arg_list_size == 0 ? PHPX_MAX_ARGC : arg_list_size * 2;
-        zval** _new_ptr = (zval**) ecalloc(_new_size, sizeof(zval*));
+        zval** _new_ptr = (zval**) calloc(_new_size, sizeof(zval*));
         if (UNEXPECTED(_new_ptr == nullptr))
         {
             return false;

@@ -27,9 +27,18 @@ void test()
     cout << "hello world" << endl;
 }
 
+void md5test()
+{
+    echo("hash=%s\n", php::md5("hello world").c_str());
+}
+
 int main(int argc, char * argv[])
 {
     php::VM vm(argc, argv);
+
+    md5test();
+    return 0;
+
     vm.eval("echo 'Hello World!';");
     vm.include("embed.php");
 
