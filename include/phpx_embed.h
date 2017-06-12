@@ -38,7 +38,7 @@ public:
     {
         php_embed_shutdown();
     }
-    void eval(char *script)
+    void eval(const char *script)
     {
         string s(script);
         eval(s);

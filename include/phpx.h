@@ -49,6 +49,8 @@ extern "C"
 #include <functional>
 #include <map>
 
+typedef unsigned char uchar;
+
 #define PHPX_MAX_ARGC        10
 #define PHPX_VAR_DUMP_LEVEL  10
 
@@ -176,6 +178,11 @@ public:
     void operator =(nullptr_t _null)
     {
         ZVAL_NULL(ptr());
+    }
+    void operator =(zval *v)
+    {
+        memcpy(&val, v, sizeof(zval));
+        zval_add_ref(&val);
     }
     void operator =(Variant v)
     {
@@ -670,6 +677,7 @@ extern String md5(String data, bool raw_output = false);
 extern String sha1(String data, bool raw_output = false);
 extern String crc32(String data, bool raw_output = false);
 extern String hash(String algo, String data, bool raw_output = false);
+extern String hash_hmac(String algo, String data, String key, bool raw_output = false);
 
 class Array: public Variant
 {
@@ -1025,8 +1033,8 @@ static inline Variant _call(zval *object, zval *func, Array &args)
     zval _retval;
     if (call_user_function(EG(function_table), object, func, &_retval, args.count(), params) == 0)
     {
-        retval = Variant(&_retval);
-        retval.addRef();
+        retval = &_retval;
+        zval_delref_p(&_retval);
     }
     return retval;
 }
@@ -1037,7 +1045,8 @@ static inline Variant _call(zval *object, zval *func)
     zval _retval;
     if (call_user_function(EG(function_table), object, func, &_retval, 0, NULL) == 0)
     {
-        retval = Variant(&_retval);
+        retval = &_retval;
+        zval_delref_p(&_retval);
     }
     return retval;
 }
