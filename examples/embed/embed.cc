@@ -37,11 +37,28 @@ void md5test()
          php::exec("hash_hmac", "ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").toCString());
 }
 
+void jsontest()
+{
+    Array arr;
+    arr.append(1234);
+    arr.append(1234.02);
+    arr.append(1234.03);
+    arr.append(1234.04);
+    arr.append("1234.05");
+
+    Variant json = arr.jsonEncode();
+    Variant arr2 = json.jsonDecode();
+
+    echo("json=%s", json.toCString());
+    var_dump(arr2);
+}
+
 int main(int argc, char * argv[])
 {
     php::VM vm(argc, argv);
 
-    md5test();
+    jsontest();
+    //md5test();
     return 0;
 
     vm.eval("echo 'Hello World!';");

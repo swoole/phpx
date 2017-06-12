@@ -37,10 +37,12 @@ extern "C"
 #include "zend_inheritance.h"
 
 #include <ext/date/php_date.h>
+#include <ext/json/php_json.h>
 #include <ext/standard/url.h>
 #include <ext/standard/info.h>
 #include <ext/standard/html.h>
 #include <ext/standard/php_standard.h>
+
 }
 
 #include <unordered_map>
@@ -107,6 +109,11 @@ public:
     {
         init();
         ZVAL_STRINGL(&val, str.c_str(), str.length());
+    }
+    Variant(zend_string *str)
+    {
+        init();
+        ZVAL_STR(&val, str);
     }
     Variant(double v)
     {
@@ -419,6 +426,8 @@ public:
         }
         return false;
     }
+    Variant jsonEncode(zend_long options = 0, zend_long depth = PHP_JSON_PARSER_DEFAULT_DEPTH);
+    Variant jsonDecode(zend_long options = 0, zend_long depth = PHP_JSON_PARSER_DEFAULT_DEPTH);
     Variant serialize();
     Variant unserialize();
 protected:
@@ -1018,58 +1027,28 @@ protected:
     vector<zend_internal_arg_info> list;
 };
 
-static inline Variant _call(zval *object, zval *func, Array &args)
-{
-    Variant retval = false;
-    if (args.count() > PHPX_MAX_ARGC)
-    {
-        return retval;
-    }
-    zval params[PHPX_MAX_ARGC];
-    for (int i = 0; i < args.count(); i++)
-    {
-        ZVAL_COPY_VALUE(&params[i], args[i].ptr());
-    }
-    zval _retval;
-    if (call_user_function(EG(function_table), object, func, &_retval, args.count(), params) == 0)
-    {
-        retval = &_retval;
-        zval_delref_p(&_retval);
-    }
-    return retval;
-}
+extern Variant _call(zval *object, zval *func, Array &args);
+extern Variant _call(zval *object, zval *func);
 
-static inline Variant _call(zval *object, zval *func)
-{
-    Variant retval = false;
-    zval _retval;
-    if (call_user_function(EG(function_table), object, func, &_retval, 0, NULL) == 0)
-    {
-        retval = &_retval;
-        zval_delref_p(&_retval);
-    }
-    return retval;
-}
-
-static Variant call(Variant &func, Array &args)
+static inline Variant call(Variant &func, Array &args)
 {
     func.addRef();
     return _call(NULL, func.ptr(), args);
 }
 
-static Variant call(Variant &func)
+static inline Variant call(Variant &func)
 {
     func.addRef();
     return _call(nullptr, func.ptr());
 }
 
-static Variant call(const char *func, Array &args)
+static inline Variant call(const char *func, Array &args)
 {
     Variant _func(func);
     return _call(NULL, _func.ptr(), args);
 }
 
-static Variant exec(const char *func)
+static inline Variant exec(const char *func)
 {
     Variant _func(func);
     Array args;
