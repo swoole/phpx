@@ -12,25 +12,25 @@ else()
   set(PHP_CONFIG_DIR "")
 endif()
 
-#execute_process(COMMAND ${PHP_CONFIG_DIR}/php-config --includes
+#execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --includes
 #        RESULT_VARIABLE PHP_INCLUDE
 #        )
 
-execute_process(COMMAND ${PHP_CONFIG_DIR}/php-config --include-dir
+execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --include-dir
         OUTPUT_VARIABLE PHP_INCLUDE_DIR
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
 
-execute_process(COMMAND ${PHP_CONFIG_DIR}/php-config --libs
+execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --libs
         OUTPUT_VARIABLE PHP_LIBS
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
-execute_process(COMMAND ${PHP_CONFIG_DIR}/php-config --ldflags
+execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --ldflags
         OUTPUT_VARIABLE ${PHP_LDFLAGS}
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
 
-message("XX: ${PHP_INCLUDE_DIR}")
+message("PHP_INCLUDE_DIR: ${PHP_INCLUDE_DIR}")
 
 link_directories(${PHP_LDFLAGS})
 
