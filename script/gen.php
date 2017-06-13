@@ -25,9 +25,10 @@ for ($i = 1; $i <= $maxArgc; $i++)
     }
     $out .= implode(', ', $list);
     $out .= ")\n{\n";
-    $out .= SPACE_4 . "Variant _func(func);\n" . SPACE_4 . "Array args;\n";
+    $out .= SPACE_4 . "Variant _func(func);\n" . SPACE_4 . "Args args;\n";
     for ($j = 1; $j <= $i; $j++)
     {
+    	$out .= SPACE_4 . "v" . ($j) . ".addRef();\n";
         $out .= SPACE_4 . "args.append(v" . ($j) . ".ptr());\n";
     }
     $out .= SPACE_4 . "return _call(NULL, _func.ptr(), args);\n}";
@@ -46,9 +47,10 @@ for ($i = 1; $i <= $maxArgc; $i++)
     }
     $out .= implode(', ', $list);
     $out .= ")\n" . SPACE_4 . "{\n";
-    $out .= SPACE_8 . "Variant _func(func);\n" . SPACE_8 . "Array args;\n";
+    $out .= SPACE_8 . "Variant _func(func);\n" . SPACE_8 . "Args args;\n";
     for ($j = 1; $j <= $i; $j++)
     {
+    	$out .= SPACE_8. "v" . ($j) . ".addRef();\n";
         $out .= SPACE_8 . "args.append(v" . ($j) . ".ptr());\n";
     }
     $out .= SPACE_8 . "return _call(ptr(), _func.ptr(), args);\n" . SPACE_4 . "}";

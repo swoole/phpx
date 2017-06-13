@@ -57,8 +57,8 @@ int main(int argc, char * argv[])
 {
     php::VM vm(argc, argv);
 
-    jsontest();
-    //md5test();
+//    jsontest();
+    md5test();
     return 0;
 
     vm.eval("echo 'Hello World!';");

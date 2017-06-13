@@ -216,7 +216,12 @@ public:
     }
     inline int getRefCount()
     {
-        return GC_REFCOUNT(Z_COUNTED_P(ptr()));
+        zend_refcounted *counted = Z_COUNTED_P(ptr());
+        if (!counted)
+        {
+            return 0;
+        }
+        return GC_REFCOUNT(counted);
     }
     inline int type()
     {
@@ -1027,13 +1032,18 @@ protected:
     vector<zend_internal_arg_info> list;
 };
 
-extern Variant _call(zval *object, zval *func, Array &args);
+extern Variant _call(zval *object, zval *func, Args &args);
 extern Variant _call(zval *object, zval *func);
 
 static inline Variant call(Variant &func, Array &args)
 {
     func.addRef();
-    return _call(NULL, func.ptr(), args);
+    Args _args;
+    for (int i = 0; i < args.count(); i++)
+    {
+        _args.append(args[i].ptr());
+    }
+    return _call(NULL, func.ptr(), _args);
 }
 
 static inline Variant call(Variant &func)
@@ -1045,128 +1055,188 @@ static inline Variant call(Variant &func)
 static inline Variant call(const char *func, Array &args)
 {
     Variant _func(func);
-    return _call(NULL, _func.ptr(), args);
+    Args _args;
+    for (int i = 0; i < args.count(); i++)
+    {
+        _args.append(args[i].ptr());
+    }
+    return _call(NULL, _func.ptr(), _args);
 }
 
 static inline Variant exec(const char *func)
 {
     Variant _func(func);
-    Array args;
+    Args args;
     return _call(NULL, _func.ptr(), args);
 }
 /*generator*/
 static Variant exec(const char *func, Variant v1)
 {
     Variant _func(func);
-    Array args;
+    Args args;
+    v1.addRef();
     args.append(v1.ptr());
     return _call(NULL, _func.ptr(), args);
 }
 static Variant exec(const char *func, Variant v1, Variant v2)
 {
     Variant _func(func);
-    Array args;
+    Args args;
+    v1.addRef();
     args.append(v1.ptr());
+    v2.addRef();
     args.append(v2.ptr());
     return _call(NULL, _func.ptr(), args);
 }
 static Variant exec(const char *func, Variant v1, Variant v2, Variant v3)
 {
     Variant _func(func);
-    Array args;
+    Args args;
+    v1.addRef();
     args.append(v1.ptr());
+    v2.addRef();
     args.append(v2.ptr());
+    v3.addRef();
     args.append(v3.ptr());
     return _call(NULL, _func.ptr(), args);
 }
 static Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4)
 {
     Variant _func(func);
-    Array args;
+    Args args;
+    v1.addRef();
     args.append(v1.ptr());
+    v2.addRef();
     args.append(v2.ptr());
+    v3.addRef();
     args.append(v3.ptr());
+    v4.addRef();
     args.append(v4.ptr());
     return _call(NULL, _func.ptr(), args);
 }
 static Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5)
 {
     Variant _func(func);
-    Array args;
+    Args args;
+    v1.addRef();
     args.append(v1.ptr());
+    v2.addRef();
     args.append(v2.ptr());
+    v3.addRef();
     args.append(v3.ptr());
+    v4.addRef();
     args.append(v4.ptr());
+    v5.addRef();
     args.append(v5.ptr());
     return _call(NULL, _func.ptr(), args);
 }
 static Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6)
 {
     Variant _func(func);
-    Array args;
+    Args args;
+    v1.addRef();
     args.append(v1.ptr());
+    v2.addRef();
     args.append(v2.ptr());
+    v3.addRef();
     args.append(v3.ptr());
+    v4.addRef();
     args.append(v4.ptr());
+    v5.addRef();
     args.append(v5.ptr());
+    v6.addRef();
     args.append(v6.ptr());
     return _call(NULL, _func.ptr(), args);
 }
 static Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7)
 {
     Variant _func(func);
-    Array args;
+    Args args;
+    v1.addRef();
     args.append(v1.ptr());
+    v2.addRef();
     args.append(v2.ptr());
+    v3.addRef();
     args.append(v3.ptr());
+    v4.addRef();
     args.append(v4.ptr());
+    v5.addRef();
     args.append(v5.ptr());
+    v6.addRef();
     args.append(v6.ptr());
+    v7.addRef();
     args.append(v7.ptr());
     return _call(NULL, _func.ptr(), args);
 }
 static Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8)
 {
     Variant _func(func);
-    Array args;
+    Args args;
+    v1.addRef();
     args.append(v1.ptr());
+    v2.addRef();
     args.append(v2.ptr());
+    v3.addRef();
     args.append(v3.ptr());
+    v4.addRef();
     args.append(v4.ptr());
+    v5.addRef();
     args.append(v5.ptr());
+    v6.addRef();
     args.append(v6.ptr());
+    v7.addRef();
     args.append(v7.ptr());
+    v8.addRef();
     args.append(v8.ptr());
     return _call(NULL, _func.ptr(), args);
 }
 static Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8, Variant v9)
 {
     Variant _func(func);
-    Array args;
+    Args args;
+    v1.addRef();
     args.append(v1.ptr());
+    v2.addRef();
     args.append(v2.ptr());
+    v3.addRef();
     args.append(v3.ptr());
+    v4.addRef();
     args.append(v4.ptr());
+    v5.addRef();
     args.append(v5.ptr());
+    v6.addRef();
     args.append(v6.ptr());
+    v7.addRef();
     args.append(v7.ptr());
+    v8.addRef();
     args.append(v8.ptr());
+    v9.addRef();
     args.append(v9.ptr());
     return _call(NULL, _func.ptr(), args);
 }
 static Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8, Variant v9, Variant v10)
 {
     Variant _func(func);
-    Array args;
+    Args args;
+    v1.addRef();
     args.append(v1.ptr());
+    v2.addRef();
     args.append(v2.ptr());
+    v3.addRef();
     args.append(v3.ptr());
+    v4.addRef();
     args.append(v4.ptr());
+    v5.addRef();
     args.append(v5.ptr());
+    v6.addRef();
     args.append(v6.ptr());
+    v7.addRef();
     args.append(v7.ptr());
+    v8.addRef();
     args.append(v8.ptr());
+    v9.addRef();
     args.append(v9.ptr());
+    v10.addRef();
     args.append(v10.ptr());
     return _call(NULL, _func.ptr(), args);
 }/*generator*/
@@ -1231,12 +1301,22 @@ public:
     }
     Variant call(Variant &func, Array &args)
     {
-        return _call(ptr(), func.ptr(), args);
+        Args _args;
+        for (int i = 0; i < args.count(); i++)
+        {
+            _args.append(args[i].ptr());
+        }
+        return _call(ptr(), func.ptr(), _args);
     }
     Variant call(const char *func, Array &args)
     {
         Variant _func(func);
-        return _call(ptr(), _func.ptr(), args);
+        Args _args;
+        for (int i = 0; i < args.count(); i++)
+        {
+            _args.append(args[i].ptr());
+        }
+        return _call(ptr(), _func.ptr(), _args);
     }
     Variant exec(const char *func)
     {
@@ -1247,115 +1327,170 @@ public:
     Variant exec(const char *func, Variant v1)
     {
         Variant _func(func);
-        Array args;
+        Args args;
+        v1.addRef();
         args.append(v1.ptr());
         return _call(ptr(), _func.ptr(), args);
     }
     Variant exec(const char *func, Variant v1, Variant v2)
     {
         Variant _func(func);
-        Array args;
+        Args args;
+        v1.addRef();
         args.append(v1.ptr());
+        v2.addRef();
         args.append(v2.ptr());
         return _call(ptr(), _func.ptr(), args);
     }
     Variant exec(const char *func, Variant v1, Variant v2, Variant v3)
     {
         Variant _func(func);
-        Array args;
+        Args args;
+        v1.addRef();
         args.append(v1.ptr());
+        v2.addRef();
         args.append(v2.ptr());
+        v3.addRef();
         args.append(v3.ptr());
         return _call(ptr(), _func.ptr(), args);
     }
     Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4)
     {
         Variant _func(func);
-        Array args;
+        Args args;
+        v1.addRef();
         args.append(v1.ptr());
+        v2.addRef();
         args.append(v2.ptr());
+        v3.addRef();
         args.append(v3.ptr());
+        v4.addRef();
         args.append(v4.ptr());
         return _call(ptr(), _func.ptr(), args);
     }
     Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5)
     {
         Variant _func(func);
-        Array args;
+        Args args;
+        v1.addRef();
         args.append(v1.ptr());
+        v2.addRef();
         args.append(v2.ptr());
+        v3.addRef();
         args.append(v3.ptr());
+        v4.addRef();
         args.append(v4.ptr());
+        v5.addRef();
         args.append(v5.ptr());
         return _call(ptr(), _func.ptr(), args);
     }
     Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6)
     {
         Variant _func(func);
-        Array args;
+        Args args;
+        v1.addRef();
         args.append(v1.ptr());
+        v2.addRef();
         args.append(v2.ptr());
+        v3.addRef();
         args.append(v3.ptr());
+        v4.addRef();
         args.append(v4.ptr());
+        v5.addRef();
         args.append(v5.ptr());
+        v6.addRef();
         args.append(v6.ptr());
         return _call(ptr(), _func.ptr(), args);
     }
     Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7)
     {
         Variant _func(func);
-        Array args;
+        Args args;
+        v1.addRef();
         args.append(v1.ptr());
+        v2.addRef();
         args.append(v2.ptr());
+        v3.addRef();
         args.append(v3.ptr());
+        v4.addRef();
         args.append(v4.ptr());
+        v5.addRef();
         args.append(v5.ptr());
+        v6.addRef();
         args.append(v6.ptr());
+        v7.addRef();
         args.append(v7.ptr());
         return _call(ptr(), _func.ptr(), args);
     }
     Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8)
     {
         Variant _func(func);
-        Array args;
+        Args args;
+        v1.addRef();
         args.append(v1.ptr());
+        v2.addRef();
         args.append(v2.ptr());
+        v3.addRef();
         args.append(v3.ptr());
+        v4.addRef();
         args.append(v4.ptr());
+        v5.addRef();
         args.append(v5.ptr());
+        v6.addRef();
         args.append(v6.ptr());
+        v7.addRef();
         args.append(v7.ptr());
+        v8.addRef();
         args.append(v8.ptr());
         return _call(ptr(), _func.ptr(), args);
     }
     Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8, Variant v9)
     {
         Variant _func(func);
-        Array args;
+        Args args;
+        v1.addRef();
         args.append(v1.ptr());
+        v2.addRef();
         args.append(v2.ptr());
+        v3.addRef();
         args.append(v3.ptr());
+        v4.addRef();
         args.append(v4.ptr());
+        v5.addRef();
         args.append(v5.ptr());
+        v6.addRef();
         args.append(v6.ptr());
+        v7.addRef();
         args.append(v7.ptr());
+        v8.addRef();
         args.append(v8.ptr());
+        v9.addRef();
         args.append(v9.ptr());
         return _call(ptr(), _func.ptr(), args);
     }
     Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8, Variant v9, Variant v10)
     {
         Variant _func(func);
-        Array args;
+        Args args;
+        v1.addRef();
         args.append(v1.ptr());
+        v2.addRef();
         args.append(v2.ptr());
+        v3.addRef();
         args.append(v3.ptr());
+        v4.addRef();
         args.append(v4.ptr());
+        v5.addRef();
         args.append(v5.ptr());
+        v6.addRef();
         args.append(v6.ptr());
+        v7.addRef();
         args.append(v7.ptr());
+        v8.addRef();
         args.append(v8.ptr());
+        v9.addRef();
         args.append(v9.ptr());
+        v10.addRef();
         args.append(v10.ptr());
         return _call(ptr(), _func.ptr(), args);
     }
