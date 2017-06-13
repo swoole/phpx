@@ -29,12 +29,12 @@ void test()
 
 void md5test()
 {
-    echo("[0]hash=%s\n", php::md5("hello world").c_str());
-    echo("[0]hash_hmac=%s\n", hash_hmac("ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").c_str());
+//    echo("[0]hash=%s\n", php::md5("hello world").c_str());
+//    echo("[0]hash_hmac=%s\n", hash_hmac("ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").c_str());
 
     echo("[1]hash=%s\n", php::exec("md5", "hello world").toCString());
-    echo("[1]hash_hmac=%s\n",
-         php::exec("hash_hmac", "ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").toCString());
+//    echo("[1]hash_hmac=%s\n",
+//         php::exec("hash_hmac", "ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").toCString());
 }
 
 void jsontest()

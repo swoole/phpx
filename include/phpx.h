@@ -189,11 +189,11 @@ public:
     void operator =(zval *v)
     {
         memcpy(&val, v, sizeof(zval));
-        zval_add_ref(&val);
     }
-    void operator =(Variant v)
+    void operator =(Variant &v)
     {
-        copy(v);
+        ZVAL_COPY_VALUE(ptr(), v.ptr());
+        v.addRef();
     }
     inline zval *ptr(void)
     {
@@ -306,15 +306,6 @@ public:
             convert_to_boolean(ptr());
         }
         return Z_TYPE_P(ptr()) == IS_TRUE;
-    }
-    void copy(Variant &v)
-    {
-        ZVAL_COPY_VALUE(ptr(), v.ptr());
-        addRef();
-    }
-    void copy(char *str, size_t size)
-    {
-        ZVAL_STRINGL(ptr(), str, size);
     }
     Variant* dup()
     {
@@ -1589,12 +1580,10 @@ static Object create(const char *name, Array &args)
         php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    zval zobject;
-    if (object_init_ex(&zobject, ce) == FAILURE)
+    if (object_init_ex(object.ptr(), ce) == FAILURE)
     {
         return object;
     }
-    object = Object(&zobject);
     object.call("__construct", args);
     return object;
 }
@@ -1608,12 +1597,10 @@ static Object create(const char *name)
         php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    zval zobject;
-    if (object_init_ex(&zobject, ce) == FAILURE)
+    if (object_init_ex(object.ptr(), ce) == FAILURE)
     {
         return object;
     }
-    object = Object(&zobject);
     return object;
 }
 
@@ -1939,12 +1926,10 @@ static Object newObject(const char *name)
         php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    zval zobject;
-    if (object_init_ex(&zobject, ce) == FAILURE)
+    if (object_init_ex(object.ptr(), ce) == FAILURE)
     {
         return object;
     }
-    object = Object(&zobject);
     Array args;
     object.addRef();
     object.call("__construct", args);
@@ -1961,12 +1946,10 @@ static Object newObject(const char *name, Variant v1)
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    zval zobject;
-    if (object_init_ex(&zobject, ce) == FAILURE)
+    if (object_init_ex(object.ptr(), ce) == FAILURE)
     {
         return object;
     }
-    object = Object(&zobject);
     Array args;
     v1.addRef();
     args.append(v1.ptr());
@@ -1983,12 +1966,10 @@ static Object newObject(const char *name, Variant v1, Variant v2)
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    zval zobject;
-    if (object_init_ex(&zobject, ce) == FAILURE)
+    if (object_init_ex(object.ptr(), ce) == FAILURE)
     {
         return object;
     }
-    object = Object(&zobject);
     Array args;
     v1.addRef();
     args.append(v1.ptr());
@@ -2007,12 +1988,10 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3)
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    zval zobject;
-    if (object_init_ex(&zobject, ce) == FAILURE)
+    if (object_init_ex(object.ptr(), ce) == FAILURE)
     {
         return object;
     }
-    object = Object(&zobject);
     Array args;
     v1.addRef();
     args.append(v1.ptr());
@@ -2033,12 +2012,10 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Va
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    zval zobject;
-    if (object_init_ex(&zobject, ce) == FAILURE)
+    if (object_init_ex(object.ptr(), ce) == FAILURE)
     {
         return object;
     }
-    object = Object(&zobject);
     Array args;
     v1.addRef();
     args.append(v1.ptr());
@@ -2061,12 +2038,10 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Va
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    zval zobject;
-    if (object_init_ex(&zobject, ce) == FAILURE)
+    if (object_init_ex(object.ptr(), ce) == FAILURE)
     {
         return object;
     }
-    object = Object(&zobject);
     Array args;
     v1.addRef();
     args.append(v1.ptr());
@@ -2091,12 +2066,10 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Va
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    zval zobject;
-    if (object_init_ex(&zobject, ce) == FAILURE)
+    if (object_init_ex(object.ptr(), ce) == FAILURE)
     {
         return object;
     }
-    object = Object(&zobject);
     Array args;
     v1.addRef();
     args.append(v1.ptr());
@@ -2123,12 +2096,10 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Va
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    zval zobject;
-    if (object_init_ex(&zobject, ce) == FAILURE)
+    if (object_init_ex(object.ptr(), ce) == FAILURE)
     {
         return object;
     }
-    object = Object(&zobject);
     Array args;
     v1.addRef();
     args.append(v1.ptr());
@@ -2157,12 +2128,10 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Va
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    zval zobject;
-    if (object_init_ex(&zobject, ce) == FAILURE)
+    if (object_init_ex(object.ptr(), ce) == FAILURE)
     {
         return object;
     }
-    object = Object(&zobject);
     Array args;
     v1.addRef();
     args.append(v1.ptr());
@@ -2193,12 +2162,10 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Va
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    zval zobject;
-    if (object_init_ex(&zobject, ce) == FAILURE)
+    if (object_init_ex(object.ptr(), ce) == FAILURE)
     {
         return object;
     }
-    object = Object(&zobject);
     Array args;
     v1.addRef();
     args.append(v1.ptr());
@@ -2231,12 +2198,10 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Va
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    zval zobject;
-    if (object_init_ex(&zobject, ce) == FAILURE)
+    if (object_init_ex(object.ptr(), ce) == FAILURE)
     {
         return object;
     }
-    object = Object(&zobject);
     Array args;
     v1.addRef();
     args.append(v1.ptr());

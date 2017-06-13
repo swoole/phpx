@@ -77,12 +77,10 @@ for ($i = 1; $i <= $maxArgc; $i++)
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    zval zobject;
-    if (object_init_ex(&zobject, ce) == FAILURE)
+    if (object_init_ex(object.ptr(), ce) == FAILURE)
     {
         return object;
     }
-    object = Object(&zobject);
     Array args;\n
 CODE;
     for ($j = 1; $j <= $i; $j++)

@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.5)
 aux_source_directory(src DIR_SRCS)
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 
-#set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Release)
 
 if (DEFINED PHP_CONFIG_DIR)
   set(PHP_CONFIG_DIR "${PHP_CONFIG_DIR}/")

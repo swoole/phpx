@@ -196,20 +196,16 @@ void _exec_method(zend_execute_data *data, zval *return_value)
 
 Variant _call(zval *object, zval *func, Args &args)
 {
-    Variant _retval;
-    if (args.count() > PHPX_MAX_ARGC)
-    {
-        return nullptr;
-    }
+    Variant retval;
     zval params[PHPX_MAX_ARGC];
     for (int i = 0; i < args.count(); i++)
     {
         ZVAL_COPY_VALUE(&params[i], args[i].ptr());
     }
-    if (call_user_function(EG(function_table), object, func, _retval.ptr(), args.count(), params) == SUCCESS)
+    if (call_user_function(EG(function_table), object, func, retval.ptr(), args.count(), params) == SUCCESS)
     {
-        _retval.addRef();
-        return _retval;
+        retval.addRef();
+        return retval;
     }
     else
     {
@@ -219,14 +215,16 @@ Variant _call(zval *object, zval *func, Args &args)
 
 Variant _call(zval *object, zval *func)
 {
-   Variant retval = false;
-   zval _retval;
-   if (call_user_function(EG(function_table), object, func, &_retval, 0, NULL) == 0)
-   {
-       retval = &_retval;
-       zval_delref_p(&_retval);
-   }
-   return retval;
+    Variant retval = false;
+    if (call_user_function(EG(function_table), object, func, retval.ptr(), 0, NULL) == 0)
+    {
+        retval.addRef();
+        return retval;
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 }
