@@ -190,7 +190,7 @@ public:
     {
         memcpy(&val, v, sizeof(zval));
     }
-    void operator =(Variant &v)
+    void operator =(Variant v)
     {
         ZVAL_COPY_VALUE(ptr(), v.ptr());
         v.addRef();
@@ -1061,174 +1061,119 @@ static inline Variant exec(const char *func)
     return _call(NULL, _func.ptr(), args);
 }
 /*generator*/
-static Variant exec(const char *func, Variant v1)
+static Variant exec(const char *func, const Variant &v1)
 {
     Variant _func(func);
     Args args;
-    v1.addRef();
-    args.append(v1.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
     return _call(NULL, _func.ptr(), args);
 }
-static Variant exec(const char *func, Variant v1, Variant v2)
+static Variant exec(const char *func, const Variant &v1, const Variant &v2)
 {
     Variant _func(func);
     Args args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
     return _call(NULL, _func.ptr(), args);
 }
-static Variant exec(const char *func, Variant v1, Variant v2, Variant v3)
+static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3)
 {
     Variant _func(func);
     Args args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
     return _call(NULL, _func.ptr(), args);
 }
-static Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4)
+static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4)
 {
     Variant _func(func);
     Args args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
-    v4.addRef();
-    args.append(v4.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
+    args.append(const_cast<Variant &>(v4).ptr());
     return _call(NULL, _func.ptr(), args);
 }
-static Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5)
+static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5)
 {
     Variant _func(func);
     Args args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
-    v4.addRef();
-    args.append(v4.ptr());
-    v5.addRef();
-    args.append(v5.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
+    args.append(const_cast<Variant &>(v4).ptr());
+    args.append(const_cast<Variant &>(v5).ptr());
     return _call(NULL, _func.ptr(), args);
 }
-static Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6)
+static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6)
 {
     Variant _func(func);
     Args args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
-    v4.addRef();
-    args.append(v4.ptr());
-    v5.addRef();
-    args.append(v5.ptr());
-    v6.addRef();
-    args.append(v6.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
+    args.append(const_cast<Variant &>(v4).ptr());
+    args.append(const_cast<Variant &>(v5).ptr());
+    args.append(const_cast<Variant &>(v6).ptr());
     return _call(NULL, _func.ptr(), args);
 }
-static Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7)
+static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7)
 {
     Variant _func(func);
     Args args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
-    v4.addRef();
-    args.append(v4.ptr());
-    v5.addRef();
-    args.append(v5.ptr());
-    v6.addRef();
-    args.append(v6.ptr());
-    v7.addRef();
-    args.append(v7.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
+    args.append(const_cast<Variant &>(v4).ptr());
+    args.append(const_cast<Variant &>(v5).ptr());
+    args.append(const_cast<Variant &>(v6).ptr());
+    args.append(const_cast<Variant &>(v7).ptr());
     return _call(NULL, _func.ptr(), args);
 }
-static Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8)
+static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8)
 {
     Variant _func(func);
     Args args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
-    v4.addRef();
-    args.append(v4.ptr());
-    v5.addRef();
-    args.append(v5.ptr());
-    v6.addRef();
-    args.append(v6.ptr());
-    v7.addRef();
-    args.append(v7.ptr());
-    v8.addRef();
-    args.append(v8.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
+    args.append(const_cast<Variant &>(v4).ptr());
+    args.append(const_cast<Variant &>(v5).ptr());
+    args.append(const_cast<Variant &>(v6).ptr());
+    args.append(const_cast<Variant &>(v7).ptr());
+    args.append(const_cast<Variant &>(v8).ptr());
     return _call(NULL, _func.ptr(), args);
 }
-static Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8, Variant v9)
+static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9)
 {
     Variant _func(func);
     Args args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
-    v4.addRef();
-    args.append(v4.ptr());
-    v5.addRef();
-    args.append(v5.ptr());
-    v6.addRef();
-    args.append(v6.ptr());
-    v7.addRef();
-    args.append(v7.ptr());
-    v8.addRef();
-    args.append(v8.ptr());
-    v9.addRef();
-    args.append(v9.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
+    args.append(const_cast<Variant &>(v4).ptr());
+    args.append(const_cast<Variant &>(v5).ptr());
+    args.append(const_cast<Variant &>(v6).ptr());
+    args.append(const_cast<Variant &>(v7).ptr());
+    args.append(const_cast<Variant &>(v8).ptr());
+    args.append(const_cast<Variant &>(v9).ptr());
     return _call(NULL, _func.ptr(), args);
 }
-static Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8, Variant v9, Variant v10)
+static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10)
 {
     Variant _func(func);
     Args args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
-    v4.addRef();
-    args.append(v4.ptr());
-    v5.addRef();
-    args.append(v5.ptr());
-    v6.addRef();
-    args.append(v6.ptr());
-    v7.addRef();
-    args.append(v7.ptr());
-    v8.addRef();
-    args.append(v8.ptr());
-    v9.addRef();
-    args.append(v9.ptr());
-    v10.addRef();
-    args.append(v10.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
+    args.append(const_cast<Variant &>(v4).ptr());
+    args.append(const_cast<Variant &>(v5).ptr());
+    args.append(const_cast<Variant &>(v6).ptr());
+    args.append(const_cast<Variant &>(v7).ptr());
+    args.append(const_cast<Variant &>(v8).ptr());
+    args.append(const_cast<Variant &>(v9).ptr());
+    args.append(const_cast<Variant &>(v10).ptr());
     return _call(NULL, _func.ptr(), args);
 }/*generator*/
 
@@ -1315,174 +1260,119 @@ public:
         return _call(ptr(), _func.ptr());
     }
     /*generator*/
-    Variant exec(const char *func, Variant v1)
+    Variant exec(const char *func, const Variant &v1)
     {
         Variant _func(func);
         Args args;
-        v1.addRef();
-        args.append(v1.ptr());
+        args.append(const_cast<Variant &>(v1).ptr());
         return _call(ptr(), _func.ptr(), args);
     }
-    Variant exec(const char *func, Variant v1, Variant v2)
+    Variant exec(const char *func, const Variant &v1, const Variant &v2)
     {
         Variant _func(func);
         Args args;
-        v1.addRef();
-        args.append(v1.ptr());
-        v2.addRef();
-        args.append(v2.ptr());
+        args.append(const_cast<Variant &>(v1).ptr());
+        args.append(const_cast<Variant &>(v2).ptr());
         return _call(ptr(), _func.ptr(), args);
     }
-    Variant exec(const char *func, Variant v1, Variant v2, Variant v3)
+    Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3)
     {
         Variant _func(func);
         Args args;
-        v1.addRef();
-        args.append(v1.ptr());
-        v2.addRef();
-        args.append(v2.ptr());
-        v3.addRef();
-        args.append(v3.ptr());
+        args.append(const_cast<Variant &>(v1).ptr());
+        args.append(const_cast<Variant &>(v2).ptr());
+        args.append(const_cast<Variant &>(v3).ptr());
         return _call(ptr(), _func.ptr(), args);
     }
-    Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4)
+    Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4)
     {
         Variant _func(func);
         Args args;
-        v1.addRef();
-        args.append(v1.ptr());
-        v2.addRef();
-        args.append(v2.ptr());
-        v3.addRef();
-        args.append(v3.ptr());
-        v4.addRef();
-        args.append(v4.ptr());
+        args.append(const_cast<Variant &>(v1).ptr());
+        args.append(const_cast<Variant &>(v2).ptr());
+        args.append(const_cast<Variant &>(v3).ptr());
+        args.append(const_cast<Variant &>(v4).ptr());
         return _call(ptr(), _func.ptr(), args);
     }
-    Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5)
+    Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5)
     {
         Variant _func(func);
         Args args;
-        v1.addRef();
-        args.append(v1.ptr());
-        v2.addRef();
-        args.append(v2.ptr());
-        v3.addRef();
-        args.append(v3.ptr());
-        v4.addRef();
-        args.append(v4.ptr());
-        v5.addRef();
-        args.append(v5.ptr());
+        args.append(const_cast<Variant &>(v1).ptr());
+        args.append(const_cast<Variant &>(v2).ptr());
+        args.append(const_cast<Variant &>(v3).ptr());
+        args.append(const_cast<Variant &>(v4).ptr());
+        args.append(const_cast<Variant &>(v5).ptr());
         return _call(ptr(), _func.ptr(), args);
     }
-    Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6)
+    Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6)
     {
         Variant _func(func);
         Args args;
-        v1.addRef();
-        args.append(v1.ptr());
-        v2.addRef();
-        args.append(v2.ptr());
-        v3.addRef();
-        args.append(v3.ptr());
-        v4.addRef();
-        args.append(v4.ptr());
-        v5.addRef();
-        args.append(v5.ptr());
-        v6.addRef();
-        args.append(v6.ptr());
+        args.append(const_cast<Variant &>(v1).ptr());
+        args.append(const_cast<Variant &>(v2).ptr());
+        args.append(const_cast<Variant &>(v3).ptr());
+        args.append(const_cast<Variant &>(v4).ptr());
+        args.append(const_cast<Variant &>(v5).ptr());
+        args.append(const_cast<Variant &>(v6).ptr());
         return _call(ptr(), _func.ptr(), args);
     }
-    Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7)
+    Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7)
     {
         Variant _func(func);
         Args args;
-        v1.addRef();
-        args.append(v1.ptr());
-        v2.addRef();
-        args.append(v2.ptr());
-        v3.addRef();
-        args.append(v3.ptr());
-        v4.addRef();
-        args.append(v4.ptr());
-        v5.addRef();
-        args.append(v5.ptr());
-        v6.addRef();
-        args.append(v6.ptr());
-        v7.addRef();
-        args.append(v7.ptr());
+        args.append(const_cast<Variant &>(v1).ptr());
+        args.append(const_cast<Variant &>(v2).ptr());
+        args.append(const_cast<Variant &>(v3).ptr());
+        args.append(const_cast<Variant &>(v4).ptr());
+        args.append(const_cast<Variant &>(v5).ptr());
+        args.append(const_cast<Variant &>(v6).ptr());
+        args.append(const_cast<Variant &>(v7).ptr());
         return _call(ptr(), _func.ptr(), args);
     }
-    Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8)
+    Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8)
     {
         Variant _func(func);
         Args args;
-        v1.addRef();
-        args.append(v1.ptr());
-        v2.addRef();
-        args.append(v2.ptr());
-        v3.addRef();
-        args.append(v3.ptr());
-        v4.addRef();
-        args.append(v4.ptr());
-        v5.addRef();
-        args.append(v5.ptr());
-        v6.addRef();
-        args.append(v6.ptr());
-        v7.addRef();
-        args.append(v7.ptr());
-        v8.addRef();
-        args.append(v8.ptr());
+        args.append(const_cast<Variant &>(v1).ptr());
+        args.append(const_cast<Variant &>(v2).ptr());
+        args.append(const_cast<Variant &>(v3).ptr());
+        args.append(const_cast<Variant &>(v4).ptr());
+        args.append(const_cast<Variant &>(v5).ptr());
+        args.append(const_cast<Variant &>(v6).ptr());
+        args.append(const_cast<Variant &>(v7).ptr());
+        args.append(const_cast<Variant &>(v8).ptr());
         return _call(ptr(), _func.ptr(), args);
     }
-    Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8, Variant v9)
+    Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9)
     {
         Variant _func(func);
         Args args;
-        v1.addRef();
-        args.append(v1.ptr());
-        v2.addRef();
-        args.append(v2.ptr());
-        v3.addRef();
-        args.append(v3.ptr());
-        v4.addRef();
-        args.append(v4.ptr());
-        v5.addRef();
-        args.append(v5.ptr());
-        v6.addRef();
-        args.append(v6.ptr());
-        v7.addRef();
-        args.append(v7.ptr());
-        v8.addRef();
-        args.append(v8.ptr());
-        v9.addRef();
-        args.append(v9.ptr());
+        args.append(const_cast<Variant &>(v1).ptr());
+        args.append(const_cast<Variant &>(v2).ptr());
+        args.append(const_cast<Variant &>(v3).ptr());
+        args.append(const_cast<Variant &>(v4).ptr());
+        args.append(const_cast<Variant &>(v5).ptr());
+        args.append(const_cast<Variant &>(v6).ptr());
+        args.append(const_cast<Variant &>(v7).ptr());
+        args.append(const_cast<Variant &>(v8).ptr());
+        args.append(const_cast<Variant &>(v9).ptr());
         return _call(ptr(), _func.ptr(), args);
     }
-    Variant exec(const char *func, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8, Variant v9, Variant v10)
+    Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10)
     {
         Variant _func(func);
         Args args;
-        v1.addRef();
-        args.append(v1.ptr());
-        v2.addRef();
-        args.append(v2.ptr());
-        v3.addRef();
-        args.append(v3.ptr());
-        v4.addRef();
-        args.append(v4.ptr());
-        v5.addRef();
-        args.append(v5.ptr());
-        v6.addRef();
-        args.append(v6.ptr());
-        v7.addRef();
-        args.append(v7.ptr());
-        v8.addRef();
-        args.append(v8.ptr());
-        v9.addRef();
-        args.append(v9.ptr());
-        v10.addRef();
-        args.append(v10.ptr());
+        args.append(const_cast<Variant &>(v1).ptr());
+        args.append(const_cast<Variant &>(v2).ptr());
+        args.append(const_cast<Variant &>(v3).ptr());
+        args.append(const_cast<Variant &>(v4).ptr());
+        args.append(const_cast<Variant &>(v5).ptr());
+        args.append(const_cast<Variant &>(v6).ptr());
+        args.append(const_cast<Variant &>(v7).ptr());
+        args.append(const_cast<Variant &>(v8).ptr());
+        args.append(const_cast<Variant &>(v9).ptr());
+        args.append(const_cast<Variant &>(v10).ptr());
         return _call(ptr(), _func.ptr(), args);
     }
     /*generator*/
