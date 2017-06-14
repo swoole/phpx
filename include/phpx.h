@@ -1028,7 +1028,6 @@ extern Variant _call(zval *object, zval *func);
 
 static inline Variant call(Variant &func, Array &args)
 {
-    func.addRef();
     Args _args;
     for (int i = 0; i < args.count(); i++)
     {
@@ -1039,7 +1038,6 @@ static inline Variant call(Variant &func, Array &args)
 
 static inline Variant call(Variant &func)
 {
-    func.addRef();
     return _call(nullptr, func.ptr());
 }
 
@@ -1061,121 +1059,17 @@ static inline Variant exec(const char *func)
     return _call(NULL, _func.ptr(), args);
 }
 /*generator*/
-static Variant exec(const char *func, const Variant &v1)
-{
-    Variant _func(func);
-    Args args;
-    args.append(const_cast<Variant &>(v1).ptr());
-    return _call(NULL, _func.ptr(), args);
-}
-static Variant exec(const char *func, const Variant &v1, const Variant &v2)
-{
-    Variant _func(func);
-    Args args;
-    args.append(const_cast<Variant &>(v1).ptr());
-    args.append(const_cast<Variant &>(v2).ptr());
-    return _call(NULL, _func.ptr(), args);
-}
-static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3)
-{
-    Variant _func(func);
-    Args args;
-    args.append(const_cast<Variant &>(v1).ptr());
-    args.append(const_cast<Variant &>(v2).ptr());
-    args.append(const_cast<Variant &>(v3).ptr());
-    return _call(NULL, _func.ptr(), args);
-}
-static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4)
-{
-    Variant _func(func);
-    Args args;
-    args.append(const_cast<Variant &>(v1).ptr());
-    args.append(const_cast<Variant &>(v2).ptr());
-    args.append(const_cast<Variant &>(v3).ptr());
-    args.append(const_cast<Variant &>(v4).ptr());
-    return _call(NULL, _func.ptr(), args);
-}
-static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5)
-{
-    Variant _func(func);
-    Args args;
-    args.append(const_cast<Variant &>(v1).ptr());
-    args.append(const_cast<Variant &>(v2).ptr());
-    args.append(const_cast<Variant &>(v3).ptr());
-    args.append(const_cast<Variant &>(v4).ptr());
-    args.append(const_cast<Variant &>(v5).ptr());
-    return _call(NULL, _func.ptr(), args);
-}
-static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6)
-{
-    Variant _func(func);
-    Args args;
-    args.append(const_cast<Variant &>(v1).ptr());
-    args.append(const_cast<Variant &>(v2).ptr());
-    args.append(const_cast<Variant &>(v3).ptr());
-    args.append(const_cast<Variant &>(v4).ptr());
-    args.append(const_cast<Variant &>(v5).ptr());
-    args.append(const_cast<Variant &>(v6).ptr());
-    return _call(NULL, _func.ptr(), args);
-}
-static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7)
-{
-    Variant _func(func);
-    Args args;
-    args.append(const_cast<Variant &>(v1).ptr());
-    args.append(const_cast<Variant &>(v2).ptr());
-    args.append(const_cast<Variant &>(v3).ptr());
-    args.append(const_cast<Variant &>(v4).ptr());
-    args.append(const_cast<Variant &>(v5).ptr());
-    args.append(const_cast<Variant &>(v6).ptr());
-    args.append(const_cast<Variant &>(v7).ptr());
-    return _call(NULL, _func.ptr(), args);
-}
-static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8)
-{
-    Variant _func(func);
-    Args args;
-    args.append(const_cast<Variant &>(v1).ptr());
-    args.append(const_cast<Variant &>(v2).ptr());
-    args.append(const_cast<Variant &>(v3).ptr());
-    args.append(const_cast<Variant &>(v4).ptr());
-    args.append(const_cast<Variant &>(v5).ptr());
-    args.append(const_cast<Variant &>(v6).ptr());
-    args.append(const_cast<Variant &>(v7).ptr());
-    args.append(const_cast<Variant &>(v8).ptr());
-    return _call(NULL, _func.ptr(), args);
-}
-static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9)
-{
-    Variant _func(func);
-    Args args;
-    args.append(const_cast<Variant &>(v1).ptr());
-    args.append(const_cast<Variant &>(v2).ptr());
-    args.append(const_cast<Variant &>(v3).ptr());
-    args.append(const_cast<Variant &>(v4).ptr());
-    args.append(const_cast<Variant &>(v5).ptr());
-    args.append(const_cast<Variant &>(v6).ptr());
-    args.append(const_cast<Variant &>(v7).ptr());
-    args.append(const_cast<Variant &>(v8).ptr());
-    args.append(const_cast<Variant &>(v9).ptr());
-    return _call(NULL, _func.ptr(), args);
-}
-static Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10)
-{
-    Variant _func(func);
-    Args args;
-    args.append(const_cast<Variant &>(v1).ptr());
-    args.append(const_cast<Variant &>(v2).ptr());
-    args.append(const_cast<Variant &>(v3).ptr());
-    args.append(const_cast<Variant &>(v4).ptr());
-    args.append(const_cast<Variant &>(v5).ptr());
-    args.append(const_cast<Variant &>(v6).ptr());
-    args.append(const_cast<Variant &>(v7).ptr());
-    args.append(const_cast<Variant &>(v8).ptr());
-    args.append(const_cast<Variant &>(v9).ptr());
-    args.append(const_cast<Variant &>(v10).ptr());
-    return _call(NULL, _func.ptr(), args);
-}/*generator*/
+extern Variant exec(const char *func, const Variant &v1);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10);
+/*generator*/
 
 static inline zend_class_entry *getClassEntry(const char *name)
 {
@@ -1393,41 +1287,40 @@ public:
         return retval;
     }
 
-    void set(const char *name, Variant &v)
+    inline void set(const char *name, Variant &v)
     {
         zend_update_property(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v.ptr());
     }
-
-    void set(const char *name, Array &v)
+    inline void set(const char *name, Array &v)
     {
         v.addRef();
         zend_update_property(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v.ptr());
     }
-    void set(const char *name, string &v)
+    inline void set(const char *name, string &v)
     {
         zend_update_property_stringl(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v.c_str(), v.length());
     }
-    void set(const char *name, string v)
+    inline void set(const char *name, string v)
     {
         zend_update_property_stringl(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v.c_str(), v.length());
     }
-    void set(const char *name, const char *v)
+    inline void set(const char *name, const char *v)
     {
         zend_update_property_string(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v);
     }
-    void set(const char *name, long v)
+    inline void set(const char *name, long v)
     {
         zend_update_property_long(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v);
     }
-    void set(const char *name, double v)
+    inline void set(const char *name, double v)
     {
         zend_update_property_double(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v);
     }
-    void set(const char *name, float v)
+    inline void set(const char *name, float v)
     {
         zend_update_property_double(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), (double) v);
     }
-    void set(const char *name, bool v)
+    inline void set(const char *name, bool v)
     {
         zend_update_property_bool(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v ? 1 : 0);
     }
@@ -1443,19 +1336,19 @@ public:
         Variant res = newResource<T>(resource_name, ptr);
         this->set(key, res);
     }
-    string getClassName()
+    inline string getClassName()
     {
         return string(Z_OBJCE_P(ptr())->name->val, Z_OBJCE_P(ptr())->name->len);
     }
-    uint32_t getId()
+    inline uint32_t getId()
     {
         return Z_OBJ_HANDLE(*ptr());
     }
-    bool methodExists(const char *name)
+    inline bool methodExists(const char *name)
     {
         return zend_hash_str_exists(&Z_OBJCE_P(ptr())->function_table, name, strlen(name));
     }
-    bool propertyExists(const char *name)
+    inline bool propertyExists(const char *name)
     {
         return zend_hash_str_exists(&Z_OBJCE_P(ptr())->properties_info, name, strlen(name));
     }
@@ -1821,7 +1714,6 @@ static Object newObject(const char *name)
         return object;
     }
     Array args;
-    object.addRef();
     object.call("__construct", args);
     return object;
 }
@@ -1843,7 +1735,6 @@ static Object newObject(const char *name, Variant v1)
     Array args;
     v1.addRef();
     args.append(v1.ptr());
-    object.addRef();
     object.call("__construct", args);
     return object;
 }
@@ -1865,7 +1756,6 @@ static Object newObject(const char *name, Variant v1, Variant v2)
     args.append(v1.ptr());
     v2.addRef();
     args.append(v2.ptr());
-    object.addRef();
     object.call("__construct", args);
     return object;
 }
@@ -1889,7 +1779,6 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3)
     args.append(v2.ptr());
     v3.addRef();
     args.append(v3.ptr());
-    object.addRef();
     object.call("__construct", args);
     return object;
 }
@@ -1915,7 +1804,6 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Va
     args.append(v3.ptr());
     v4.addRef();
     args.append(v4.ptr());
-    object.addRef();
     object.call("__construct", args);
     return object;
 }
@@ -1943,7 +1831,6 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Va
     args.append(v4.ptr());
     v5.addRef();
     args.append(v5.ptr());
-    object.addRef();
     object.call("__construct", args);
     return object;
 }
@@ -1973,7 +1860,6 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Va
     args.append(v5.ptr());
     v6.addRef();
     args.append(v6.ptr());
-    object.addRef();
     object.call("__construct", args);
     return object;
 }
@@ -2005,7 +1891,6 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Va
     args.append(v6.ptr());
     v7.addRef();
     args.append(v7.ptr());
-    object.addRef();
     object.call("__construct", args);
     return object;
 }
@@ -2039,7 +1924,6 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Va
     args.append(v7.ptr());
     v8.addRef();
     args.append(v8.ptr());
-    object.addRef();
     object.call("__construct", args);
     return object;
 }
@@ -2075,7 +1959,6 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Va
     args.append(v8.ptr());
     v9.addRef();
     args.append(v9.ptr());
-    object.addRef();
     object.call("__construct", args);
     return object;
 }
@@ -2113,7 +1996,6 @@ static Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Va
     args.append(v9.ptr());
     v10.addRef();
     args.append(v10.ptr());
-    object.addRef();
     object.call("__construct", args);
     return object;
 }
