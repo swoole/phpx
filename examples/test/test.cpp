@@ -177,8 +177,10 @@ void cpp_hello_world(Args &args, Variant &retval)
 
 PHPX_FUNCTION(cpp_hello_world2)
 {
-    printf("SWOOLE_BASE=%ld\n", php::constant("SWOOLE_BASE").toInt());
-    printf("swoole_table::TYPE_INT=%ld\n", php::constant("swoole_table::TYPE_INT").toInt());
+    echo("SWOOLE_BASE=%ld\n", php::constant("SWOOLE_BASE").toInt());
+    echo("swoole_table::TYPE_INT=%ld\n", php::constant("swoole_table::TYPE_INT").toInt());
+    int value = ini_get("session.gc_maxlifetime");
+    echo("ini[session.gc_maxlifetime=%d]\n", value);
 
     Variant argv = args.toArray();
     var_dump(argv);

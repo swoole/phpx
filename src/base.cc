@@ -32,12 +32,6 @@ unordered_map<int, Extension*> _module_number_to_extension;
 int arg_list_size = 0;
 zval **arg_list = nullptr;
 
-Variant ini_get(string varname)
-{
-    char* str = zend_ini_string((char *) varname.c_str(), (uint) varname.length(), 0);
-    return Variant(str);
-}
-
 void error(int level, const char *format, ...)
 {
     va_list args;
@@ -57,6 +51,11 @@ void echo(const char *format, ...)
     PHPWRITE(buffer, size);
     efree(buffer);
     va_end(args);
+}
+
+String number_format(double num, int decimals, char dec_point, char thousands_sep)
+{
+    return _php_math_number_format(num, decimals, dec_point, thousands_sep);
 }
 
 int extension_startup(int type, int module_number)

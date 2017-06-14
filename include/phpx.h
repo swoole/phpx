@@ -456,20 +456,15 @@ static inline void var_dump(Variant &v)
     php_var_dump(v.ptr(), PHPX_VAR_DUMP_LEVEL);
 }
 
-Variant ini_get(string varname);
+static inline bool is_callable(const Variant &fn)
+{
+    return zend_is_callable(const_cast<Variant &>(fn).ptr(), 0, nullptr);
+}
 
 static inline int version_compare(string s1, string s2)
 {
 	return php_version_compare(s1.c_str(), s2.c_str());
 }
-
-//static inline int crc32()
-//{
-//	PHP_CRC32_CTX ctx;
-//	PHP_CRC32Init(&ctx);
-//}
-
-//number_format(double )
 
 class String
 {
@@ -477,6 +472,33 @@ public:
     String(const char *str)
     {
         value = zend_string_init(str, strlen(str), 0);
+    }
+    String(int v)
+    {
+        value = zend_long_to_str(v);
+    }
+    String(long v)
+    {
+        value = zend_long_to_str(v);
+    }
+    String(float v)
+    {
+        value = zend_strpprintf(0, "%.*G", (int) EG(precision), v);
+    }
+    String(double v)
+    {
+        value = zend_strpprintf(0, "%.*G", (int) EG(precision), v);
+    }
+    String(bool v)
+    {
+        if (v)
+        {
+            value = zend_string_init("1", 1, 0);
+        }
+        else
+        {
+            value = zend_string_init("0", 1, 0);
+        }
     }
     String(const char *str, size_t len)
     {
@@ -514,6 +536,22 @@ public:
             zend_string_free(value);
         }
     }
+    operator int()
+    {
+        return ZEND_STRTOL(ZSTR_VAL(value), nullptr, 10);
+    }
+    operator long()
+    {
+        return ZEND_STRTOL(ZSTR_VAL(value), nullptr, 10);
+    }
+    operator double()
+    {
+        return zend_strtod(ZSTR_VAL(value), nullptr);
+    }
+    operator float()
+    {
+        return zend_strtod(ZSTR_VAL(value), nullptr);
+    }
     inline size_t length()
     {
         return value->len;
@@ -545,6 +583,14 @@ public:
     inline bool operator ==(String &v)
     {
         return equals(v);
+    }
+    inline static String format(const char *format, ...)
+    {
+        va_list args;
+        va_start(args, format);
+        zend_string *s = vstrpprintf(0, format, args);
+        va_end(args);
+        return s;
     }
     bool equals(String &str, bool ci = false)
     {
@@ -599,6 +645,16 @@ protected:
     bool free_memory = true;
     zend_string *value;
 };
+
+static inline String ini_get(String varname)
+{
+    char *value = zend_ini_string((char *) varname.c_str(), (uint) varname.length(), 0);
+    if (!value)
+    {
+        return "";
+    }
+    return value;
+}
 
 class ArrayIterator
 {
@@ -1203,6 +1259,10 @@ public:
     {
         zend_update_property_string(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v);
     }
+    inline void set(const char *name, int v)
+    {
+        zend_update_property_long(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v);
+    }
     inline void set(const char *name, long v)
     {
         zend_update_property_long(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v);
@@ -1305,6 +1365,8 @@ extern map<const char *, function_t, strCmp> function_map;
 
 extern void _exec_function(zend_execute_data *data, zval *return_value);
 extern void _exec_method(zend_execute_data *data, zval *return_value);
+
+String number_format(double num, int decimals = 0, char dec_point = '.', char thousands_sep = ',');
 
 static Variant constant(const char *name)
 {

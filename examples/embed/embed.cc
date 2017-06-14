@@ -77,7 +77,9 @@ int main(int argc, char * argv[])
 {
     php::VM vm(argc, argv);
 
-    testRedis();
+    cout << "ENV:" << ini_get("output_buffering") << endl;
+
+//    testRedis();
 //    jsontest();
     md5test();
     return 0;
