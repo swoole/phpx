@@ -40,6 +40,23 @@ void md5test()
             php::exec("hash_hmac", "ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").toCString());
 }
 
+void testRedis()
+{
+    cout << "=====================Test Redis==================\n";
+    Object redis = php::newObject("redis");
+    auto ret1 = redis.exec("connect", "127.0.0.1", 6379);
+    //connect success
+    if (ret1.toBool())
+    {
+        auto ret2 = redis.exec("get", "key");
+        printf("value=%s\n", ret2.toCString());
+    }
+    else
+    {
+        cout << "connect to redis server failed." << endl;
+    }
+}
+
 void jsontest()
 {
     Array arr;
@@ -60,6 +77,7 @@ int main(int argc, char * argv[])
 {
     php::VM vm(argc, argv);
 
+    testRedis();
 //    jsontest();
     md5test();
     return 0;
