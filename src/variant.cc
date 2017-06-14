@@ -23,6 +23,43 @@ using namespace std;
 namespace php
 {
 
+bool Variant::equals(Variant &v, bool strict)
+{
+    if (strict)
+    {
+        if (fast_is_identical_function(v.ptr(), ptr()))
+        {
+            return true;
+        }
+    }
+    else
+    {
+        if (v.isInt())
+        {
+            if (fast_equal_check_long(v.ptr(), ptr()))
+            {
+                return true;
+            }
+        }
+        else if (v.isString())
+        {
+            if (fast_equal_check_string(v.ptr(), ptr()))
+            {
+                return true;
+            }
+        }
+        else
+        {
+            if (fast_equal_check_function(v.ptr(), ptr()))
+            {
+                return true;
+
+            }
+        }
+    }
+    return false;
+}
+
 Variant Variant::serialize()
 {
     smart_str serialized_data = { 0 };

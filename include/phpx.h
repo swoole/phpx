@@ -386,42 +386,7 @@ public:
         Variant _tmp(v);
         return equals(_tmp);
     }
-    bool equals(Variant &v, bool strict = false)
-    {
-        if (strict)
-        {
-            if (fast_is_identical_function(v.ptr(), ptr()))
-            {
-                return true;
-            }
-        }
-        else
-        {
-            if (v.isInt())
-            {
-                if (fast_equal_check_long(v.ptr(), ptr()))
-                {
-                    return true;
-                }
-            }
-            else if (v.isString())
-            {
-                if (fast_equal_check_string(v.ptr(), ptr()))
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                if (fast_equal_check_function(v.ptr(), ptr()))
-                {
-                    return true;
-
-                }
-            }
-        }
-        return false;
-    }
+    bool equals(Variant &v, bool strict = false);
     Variant jsonEncode(zend_long options = 0, zend_long depth = PHP_JSON_PARSER_DEFAULT_DEPTH);
     Variant jsonDecode(zend_long options = 0, zend_long depth = PHP_JSON_PARSER_DEFAULT_DEPTH);
     Variant serialize();
@@ -491,14 +456,7 @@ public:
     }
     String(bool v)
     {
-        if (v)
-        {
-            value = zend_string_init("1", 1, 0);
-        }
-        else
-        {
-            value = zend_string_init("0", 1, 0);
-        }
+        value = zend_string_init(v ? "1" : "0", 1, 0);
     }
     String(const char *str, size_t len)
     {
