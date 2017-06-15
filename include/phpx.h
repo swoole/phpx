@@ -1116,17 +1116,16 @@ static Variant global(const char *name)
 class Object: public Variant
 {
 public:
-    Object(Variant &v) :
+    Object(const Variant &v) :
             Variant()
     {
-        if (!v.isObject())
+        if (!const_cast<Variant &>(v).isObject())
         {
             error(E_ERROR, "parameter 1 must be zend_object.");
             return;
         }
-        ref_val = v.ptr();
+        ref_val = const_cast<Variant &>(v).ptr();
         reference = true;
-        zval_add_ref(ref_val);
     }
     Object(zval *v) :
             Variant(v)

@@ -29,6 +29,7 @@ PHPX_FUNCTION(cpp_hello_world2);
 PHPX_FUNCTION(cpp_test);
 PHPX_FUNCTION(cpp_test2);
 PHPX_FUNCTION(cpp_test3);
+PHPX_FUNCTION(cpp_test4);
 void CppClass_construct(Object &_this, Args &args, Variant &retval);
 
 void CppClass_test(Object &_this, Args &args, Variant &retval);
@@ -43,6 +44,12 @@ PHPX_FUNCTION(cpp_test3)
     auto a = args[0];
     cout << "type=" << a.type() << endl;
     a = 456;
+}
+
+PHPX_FUNCTION(cpp_test4)
+{
+    Object a = args[0];
+    var_dump(a);
 }
 
 PHPX_EXTENSION()
@@ -61,6 +68,7 @@ PHPX_EXTENSION()
     info3->add("num", nullptr, IS_LONG, true);
 
     ext->registerFunction(PHPX_FN(cpp_test3), info3);
+    ext->registerFunction(PHPX_FN(cpp_test4));
 
     //depends swoole extension
     ext->require("swoole");
