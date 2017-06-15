@@ -76,8 +76,8 @@ void jsontest()
 int main(int argc, char * argv[])
 {
     php::VM vm(argc, argv);
-
-    cout << "ENV:" << ini_get("output_buffering") << endl;
+    String value = ini_get("output_buffering");
+    cout << "ENV:" << value.toInt() << endl;
 
 //    testRedis();
 //    jsontest();

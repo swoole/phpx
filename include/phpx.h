@@ -712,15 +712,15 @@ public:
             error(E_ERROR, "parameter 1 must be zend_array.");
         }
     }
-    Array(Variant &v)
+    Array(const Variant &v)
     {
-        ref_val = v.ptr();
+        ref_val = const_cast<Variant &>(v).ptr();
         reference = true;
-        if (v.isNull())
+        if (const_cast<Variant &>(v).isNull())
         {
             array_init(ref_val);
         }
-        else if (!v.isArray())
+        else if (!const_cast<Variant &>(v).isArray())
         {
             error(E_ERROR, "parameter 1 must be zend_array.");
         }
@@ -779,9 +779,10 @@ public:
         add_next_index_zval(ptr(), &array);
     }
     //------------------assoc-array------------------
-    void set(const char *key, Variant &v)
+    void set(const char *key, const Variant &v)
     {
-        add_assoc_zval(ptr(), key, v.ptr());
+        const_cast<Variant &>(v).addRef();
+        add_assoc_zval(ptr(), key, const_cast<Variant &>(v).ptr());
     }
     void set(const char *key, int v)
     {
@@ -811,10 +812,11 @@ public:
     {
         add_assoc_bool(ptr(), key, v ? 1 : 0);
     }
-    void set(int i, Variant v)
+    //------------------index-array------------------
+    void set(int i, const Variant & v)
     {
-        v.addRef();
-        add_index_zval(ptr(), (zend_ulong) i, v.ptr());
+        const_cast<Variant &>(v).addRef();
+        add_index_zval(ptr(), (zend_ulong) i, const_cast<Variant &>(v).ptr());
     }
     //-------------------------------------------
     Variant operator [](int i)
