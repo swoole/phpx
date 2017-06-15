@@ -79,6 +79,12 @@ int main(int argc, char * argv[])
     String value = ini_get("output_buffering");
     cout << "ENV:" << value.toInt() << endl;
 
+    Array url_params;
+    url_params.set("name", "rango");
+    url_params.set("value", 1234);
+    auto url_query = http_build_query(url_params);
+    var_dump(url_query);
+
 //    testRedis();
 //    jsontest();
     md5test();

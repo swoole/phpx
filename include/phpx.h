@@ -41,6 +41,7 @@ extern "C"
 #include <ext/standard/url.h>
 #include <ext/standard/info.h>
 #include <ext/standard/html.h>
+#include <ext/standard/php_http.h>
 #include <ext/standard/php_standard.h>
 
 }
@@ -729,10 +730,10 @@ public:
     {
         SEPARATE_ARRAY(ptr());
     }
-    void append(Variant v)
+    void append(const Variant &v)
     {
-        v.addRef();
-        add_next_index_zval(ptr(), v.ptr());
+        const_cast<Variant &>(v).addRef();
+        add_next_index_zval(ptr(), const_cast<Variant &>(v).ptr());
     }
     void append(const char *str)
     {
@@ -1318,6 +1319,8 @@ extern void _exec_function(zend_execute_data *data, zval *return_value);
 extern void _exec_method(zend_execute_data *data, zval *return_value);
 
 String number_format(double num, int decimals = 0, char dec_point = '.', char thousands_sep = ',');
+Variant http_build_query(const Variant &data, const char* prefix = nullptr, const char* arg_sep = nullptr,
+        int enc_type = PHP_QUERY_RFC1738);
 
 static Variant constant(const char *name)
 {

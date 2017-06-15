@@ -30,6 +30,7 @@ PHPX_FUNCTION(cpp_test);
 PHPX_FUNCTION(cpp_test2);
 PHPX_FUNCTION(cpp_test3);
 PHPX_FUNCTION(cpp_test4);
+PHPX_FUNCTION(cpp_test5);
 void CppClass_construct(Object &_this, Args &args, Variant &retval);
 
 void CppClass_test(Object &_this, Args &args, Variant &retval);
@@ -52,6 +53,18 @@ PHPX_FUNCTION(cpp_test4)
     var_dump(a);
 }
 
+PHPX_FUNCTION(cpp_test5)
+{
+    Object a = args[0];
+    Array array;
+    array.append(a);
+    array.append(true);
+    php::exec("dump", array);
+
+    auto v = a.get("name");
+    var_dump(v);
+}
+
 PHPX_EXTENSION()
 {
     Extension *ext = new Extension("test", "0.0.1");
@@ -69,6 +82,7 @@ PHPX_EXTENSION()
 
     ext->registerFunction(PHPX_FN(cpp_test3), info3);
     ext->registerFunction(PHPX_FN(cpp_test4));
+    ext->registerFunction(PHPX_FN(cpp_test5));
 
     //depends swoole extension
     ext->require("swoole");
