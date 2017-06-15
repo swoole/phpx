@@ -494,19 +494,11 @@ public:
             zend_string_free(value);
         }
     }
-    operator int()
+    inline long toInt()
     {
         return ZEND_STRTOL(ZSTR_VAL(value), nullptr, 10);
     }
-    operator long()
-    {
-        return ZEND_STRTOL(ZSTR_VAL(value), nullptr, 10);
-    }
-    operator double()
-    {
-        return zend_strtod(ZSTR_VAL(value), nullptr);
-    }
-    operator float()
+    inline double toFloat()
     {
         return zend_strtod(ZSTR_VAL(value), nullptr);
     }
