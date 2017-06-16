@@ -82,6 +82,14 @@ int main(int argc, char * argv[])
     Array url_params;
     url_params.set("name", "rango");
     url_params.set("value", 1234);
+
+    Array _arg_list;
+    Object redis = php::newObject("redis");
+    _arg_list.append(redis);
+
+    Variant func = "var_dump";
+    php::call(func, _arg_list);
+
     auto url_query = http_build_query(url_params);
     var_dump(url_query);
 

@@ -191,10 +191,10 @@ public:
     {
         memcpy(&val, v, sizeof(zval));
     }
-    void operator =(Variant v)
+    void operator =(const Variant &v)
     {
-        ZVAL_COPY_VALUE(ptr(), v.ptr());
-        v.addRef();
+        ZVAL_COPY_VALUE(ptr(), const_cast<Variant &>(v).ptr());
+        const_cast<Variant &>(v).addRef();
     }
     inline zval *ptr(void)
     {
