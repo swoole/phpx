@@ -116,7 +116,7 @@ for ($i = 1; $i <= $maxArgc; $i++)
     {
         return object;
     }
-    Array args;\n
+    Args args;\n
 CODE;
     for ($j = 1; $j <= $i; $j++)
     {

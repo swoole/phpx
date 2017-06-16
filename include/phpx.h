@@ -914,6 +914,7 @@ public:
 
 extern int arg_list_size;
 extern zval **arg_list;
+extern zval *tmp_zval_list;
 
 class Args
 {
@@ -942,7 +943,10 @@ public:
                 return;
             }
         }
-        arg_list[argc++] = const_cast<Variant &>(v).ptr();
+        int index = argc++;
+        arg_list[index] = &tmp_zval_list[index];
+        memcpy(&tmp_zval_list[index], const_cast<Variant &>(v).ptr(), sizeof(zval));
+        zval_add_ref(arg_list[index]);
     }
     inline size_t count()
     {
@@ -988,7 +992,14 @@ private:
         {
             return false;
         }
+        zval* _new_zval_ptr = (zval*) calloc(_new_size, sizeof(zval));
+        if (UNEXPECTED(_new_zval_ptr == nullptr))
+        {
+            free(_new_ptr);
+            return false;
+        }
         arg_list = _new_ptr;
+        tmp_zval_list = _new_zval_ptr;
         arg_list_size = _new_size;
         return true;
     }
@@ -1046,15 +1057,15 @@ protected:
 extern Variant _call(zval *object, zval *func, Args &args);
 extern Variant _call(zval *object, zval *func);
 
-static inline Variant call(Variant &func)
+static inline Variant call(const Variant &func)
 {
-    return _call(nullptr, func.ptr());
+    return _call(nullptr, const_cast<Variant &>(func).ptr());
 }
 
-static inline Variant call(Variant &func, Args &args)
+static inline Variant call(const Variant &func, Args &args)
 {
-    func.addRef();
-    return _call(NULL, func.ptr(), args);
+    const_cast<Variant &>(func).addRef();
+    return _call(NULL, const_cast<Variant &>(func).ptr(), args);
 }
 
 static inline Variant exec(const char *func)
@@ -1133,24 +1144,14 @@ public:
     {
 
     }
-    Variant call(Variant &func, Array &args)
+    Variant call(Variant &func, Args &args)
     {
-        Args _args;
-        for (int i = 0; i < args.count(); i++)
-        {
-            _args.append(args[i].ptr());
-        }
-        return _call(ptr(), func.ptr(), _args);
+        return _call(ptr(), func.ptr(), args);
     }
-    Variant call(const char *func, Array &args)
+    Variant call(const char *func, Args &args)
     {
         Variant _func(func);
-        Args _args;
-        for (int i = 0; i < args.count(); i++)
-        {
-            _args.append(args[i].ptr());
-        }
-        return _call(ptr(), _func.ptr(), _args);
+        return _call(ptr(), _func.ptr(), args);
     }
     Variant exec(const char *func)
     {
@@ -1257,7 +1258,7 @@ public:
     }
 };
 
-static Object create(const char *name, Array &args)
+static Object create(const char *name, Args &args)
 {
     zend_class_entry *ce = getClassEntry(name);
     Object object;

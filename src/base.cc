@@ -31,6 +31,7 @@ unordered_map<int, Extension*> _module_number_to_extension;
 
 int arg_list_size = 0;
 zval **arg_list = nullptr;
+zval *tmp_zval_list = nullptr;
 
 void error(int level, const char *format, ...)
 {

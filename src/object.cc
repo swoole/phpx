@@ -39,7 +39,7 @@ Object newObject(const char *name)
     {
         return object;
     }
-    Array args;
+    Args args;
     object.call("__construct", args);
     return object;
 }
@@ -185,7 +185,7 @@ Object newObject(const char *name, const Variant &v1)
     {
         return object;
     }
-    Array args;
+    Args args;
     args.append(const_cast<Variant &>(v1).ptr());
     object.call("__construct", args);
     return object;
@@ -204,7 +204,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2)
     {
         return object;
     }
-    Array args;
+    Args args;
     args.append(const_cast<Variant &>(v1).ptr());
     args.append(const_cast<Variant &>(v2).ptr());
     object.call("__construct", args);
@@ -224,7 +224,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     {
         return object;
     }
-    Array args;
+    Args args;
     args.append(const_cast<Variant &>(v1).ptr());
     args.append(const_cast<Variant &>(v2).ptr());
     args.append(const_cast<Variant &>(v3).ptr());
@@ -245,7 +245,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     {
         return object;
     }
-    Array args;
+    Args args;
     args.append(const_cast<Variant &>(v1).ptr());
     args.append(const_cast<Variant &>(v2).ptr());
     args.append(const_cast<Variant &>(v3).ptr());
@@ -267,7 +267,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     {
         return object;
     }
-    Array args;
+    Args args;
     args.append(const_cast<Variant &>(v1).ptr());
     args.append(const_cast<Variant &>(v2).ptr());
     args.append(const_cast<Variant &>(v3).ptr());
@@ -290,7 +290,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     {
         return object;
     }
-    Array args;
+    Args args;
     args.append(const_cast<Variant &>(v1).ptr());
     args.append(const_cast<Variant &>(v2).ptr());
     args.append(const_cast<Variant &>(v3).ptr());
@@ -314,7 +314,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     {
         return object;
     }
-    Array args;
+    Args args;
     args.append(const_cast<Variant &>(v1).ptr());
     args.append(const_cast<Variant &>(v2).ptr());
     args.append(const_cast<Variant &>(v3).ptr());
@@ -339,7 +339,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     {
         return object;
     }
-    Array args;
+    Args args;
     args.append(const_cast<Variant &>(v1).ptr());
     args.append(const_cast<Variant &>(v2).ptr());
     args.append(const_cast<Variant &>(v3).ptr());
@@ -365,7 +365,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     {
         return object;
     }
-    Array args;
+    Args args;
     args.append(const_cast<Variant &>(v1).ptr());
     args.append(const_cast<Variant &>(v2).ptr());
     args.append(const_cast<Variant &>(v3).ptr());
@@ -392,7 +392,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     {
         return object;
     }
-    Array args;
+    Args args;
     args.append(const_cast<Variant &>(v1).ptr());
     args.append(const_cast<Variant &>(v2).ptr());
     args.append(const_cast<Variant &>(v3).ptr());

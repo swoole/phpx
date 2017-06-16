@@ -224,6 +224,7 @@ PHPX_FUNCTION(cpp_hello_world2)
 
 PHPX_FUNCTION(cpp_test)
 {
+    echo("=====================[01]=======================\n");
     printf("key[0] = %s\n", args[0].toCString());
     printf("key[1] = %ld\n", args[1].toInt());
     printf("key[2] = %f\n", args[2].toFloat());
@@ -231,10 +232,12 @@ PHPX_FUNCTION(cpp_test)
     {
         printf("key[3] = %s\n", args[3].toCString());
     }
+    echo("=====================[02]=======================\n");
     /**
      * 调用PHP代码中的test2函数
      */
-    Array array;
+    Args array;
+    array.append(Variant(0));
     array.append(1234);
     array.append(1234.56);
     array.append(Variant());
@@ -259,6 +262,7 @@ PHPX_FUNCTION(cpp_test)
      */
     else if (_retval.isObject())
     {
+        echo("=====================[03]=======================\n");
         //把变量转为对象
         Object obj(_retval);
 
@@ -278,10 +282,12 @@ PHPX_FUNCTION(cpp_test)
         {
             cout << "property [test] exists\n";
         }
-        Array args2;
+
+        Args args2;
         args2.append("Get");
         args2.append("POST");
-        args2.append(array);
+        Variant _array = array.toArray();
+        args2.append(_array);
 
         Array map;
         map.set("myname", "rango");
