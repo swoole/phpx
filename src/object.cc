@@ -172,7 +172,7 @@ Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, con
 /*generator-1*/
 
 /*generator*/
-Object newObject(const char *name, Variant v1)
+Object newObject(const char *name, const Variant &v1)
 {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
@@ -186,13 +186,12 @@ Object newObject(const char *name, Variant v1)
         return object;
     }
     Array args;
-    v1.addRef();
-    args.append(v1.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
     object.call("__construct", args);
     return object;
 }
 
-Object newObject(const char *name, Variant v1, Variant v2)
+Object newObject(const char *name, const Variant &v1, const Variant &v2)
 {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
@@ -206,15 +205,13 @@ Object newObject(const char *name, Variant v1, Variant v2)
         return object;
     }
     Array args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
     object.call("__construct", args);
     return object;
 }
 
-Object newObject(const char *name, Variant v1, Variant v2, Variant v3)
+Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3)
 {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
@@ -228,17 +225,14 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3)
         return object;
     }
     Array args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
     object.call("__construct", args);
     return object;
 }
 
-Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v4)
+Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4)
 {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
@@ -252,19 +246,15 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v
         return object;
     }
     Array args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
-    v4.addRef();
-    args.append(v4.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
+    args.append(const_cast<Variant &>(v4).ptr());
     object.call("__construct", args);
     return object;
 }
 
-Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5)
+Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5)
 {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
@@ -278,21 +268,16 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v
         return object;
     }
     Array args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
-    v4.addRef();
-    args.append(v4.ptr());
-    v5.addRef();
-    args.append(v5.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
+    args.append(const_cast<Variant &>(v4).ptr());
+    args.append(const_cast<Variant &>(v5).ptr());
     object.call("__construct", args);
     return object;
 }
 
-Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6)
+Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6)
 {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
@@ -306,23 +291,17 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v
         return object;
     }
     Array args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
-    v4.addRef();
-    args.append(v4.ptr());
-    v5.addRef();
-    args.append(v5.ptr());
-    v6.addRef();
-    args.append(v6.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
+    args.append(const_cast<Variant &>(v4).ptr());
+    args.append(const_cast<Variant &>(v5).ptr());
+    args.append(const_cast<Variant &>(v6).ptr());
     object.call("__construct", args);
     return object;
 }
 
-Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7)
+Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7)
 {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
@@ -336,25 +315,18 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v
         return object;
     }
     Array args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
-    v4.addRef();
-    args.append(v4.ptr());
-    v5.addRef();
-    args.append(v5.ptr());
-    v6.addRef();
-    args.append(v6.ptr());
-    v7.addRef();
-    args.append(v7.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
+    args.append(const_cast<Variant &>(v4).ptr());
+    args.append(const_cast<Variant &>(v5).ptr());
+    args.append(const_cast<Variant &>(v6).ptr());
+    args.append(const_cast<Variant &>(v7).ptr());
     object.call("__construct", args);
     return object;
 }
 
-Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8)
+Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8)
 {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
@@ -368,27 +340,19 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v
         return object;
     }
     Array args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
-    v4.addRef();
-    args.append(v4.ptr());
-    v5.addRef();
-    args.append(v5.ptr());
-    v6.addRef();
-    args.append(v6.ptr());
-    v7.addRef();
-    args.append(v7.ptr());
-    v8.addRef();
-    args.append(v8.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
+    args.append(const_cast<Variant &>(v4).ptr());
+    args.append(const_cast<Variant &>(v5).ptr());
+    args.append(const_cast<Variant &>(v6).ptr());
+    args.append(const_cast<Variant &>(v7).ptr());
+    args.append(const_cast<Variant &>(v8).ptr());
     object.call("__construct", args);
     return object;
 }
 
-Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8, Variant v9)
+Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9)
 {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
@@ -402,29 +366,20 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v
         return object;
     }
     Array args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
-    v4.addRef();
-    args.append(v4.ptr());
-    v5.addRef();
-    args.append(v5.ptr());
-    v6.addRef();
-    args.append(v6.ptr());
-    v7.addRef();
-    args.append(v7.ptr());
-    v8.addRef();
-    args.append(v8.ptr());
-    v9.addRef();
-    args.append(v9.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
+    args.append(const_cast<Variant &>(v4).ptr());
+    args.append(const_cast<Variant &>(v5).ptr());
+    args.append(const_cast<Variant &>(v6).ptr());
+    args.append(const_cast<Variant &>(v7).ptr());
+    args.append(const_cast<Variant &>(v8).ptr());
+    args.append(const_cast<Variant &>(v9).ptr());
     object.call("__construct", args);
     return object;
 }
 
-Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8, Variant v9, Variant v10)
+Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10)
 {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
@@ -438,26 +393,16 @@ Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v
         return object;
     }
     Array args;
-    v1.addRef();
-    args.append(v1.ptr());
-    v2.addRef();
-    args.append(v2.ptr());
-    v3.addRef();
-    args.append(v3.ptr());
-    v4.addRef();
-    args.append(v4.ptr());
-    v5.addRef();
-    args.append(v5.ptr());
-    v6.addRef();
-    args.append(v6.ptr());
-    v7.addRef();
-    args.append(v7.ptr());
-    v8.addRef();
-    args.append(v8.ptr());
-    v9.addRef();
-    args.append(v9.ptr());
-    v10.addRef();
-    args.append(v10.ptr());
+    args.append(const_cast<Variant &>(v1).ptr());
+    args.append(const_cast<Variant &>(v2).ptr());
+    args.append(const_cast<Variant &>(v3).ptr());
+    args.append(const_cast<Variant &>(v4).ptr());
+    args.append(const_cast<Variant &>(v5).ptr());
+    args.append(const_cast<Variant &>(v6).ptr());
+    args.append(const_cast<Variant &>(v7).ptr());
+    args.append(const_cast<Variant &>(v8).ptr());
+    args.append(const_cast<Variant &>(v9).ptr());
+    args.append(const_cast<Variant &>(v10).ptr());
     object.call("__construct", args);
     return object;
 }

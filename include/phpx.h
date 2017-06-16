@@ -1614,16 +1614,16 @@ extern unordered_map<int, Extension*> _module_number_to_extension;
 extern Object newObject(const char *name);
 
 /*generator*/
-extern Object newObject(const char *name, Variant v1);
-extern Object newObject(const char *name, Variant v1, Variant v2);
-extern Object newObject(const char *name, Variant v1, Variant v2, Variant v3);
-extern Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v4);
-extern Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5);
-extern Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6);
-extern Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7);
-extern Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8);
-extern Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8, Variant v9);
-extern Object newObject(const char *name, Variant v1, Variant v2, Variant v3, Variant v4, Variant v5, Variant v6, Variant v7, Variant v8, Variant v9, Variant v10);
+extern Object newObject(const char *name, const Variant &v1);
+extern Object newObject(const char *name, const Variant &v1, const Variant &v2);
+extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3);
+extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4);
+extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5);
+extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6);
+extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7);
+extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8);
+extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9);
+extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10);
 /*generator*/
 
 //namespace end
