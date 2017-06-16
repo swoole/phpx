@@ -97,7 +97,7 @@ for ($i = 1; $i <= $maxArgc; $i++)
     $list = [];
     for ($j = 1; $j <= $i; $j++)
     {
-        $list[] = 'Variant v' . $j;
+        $list[] = 'const Variant &v' . $j;
     }
     $func_define .= implode(', ', $list).")";
     
@@ -120,8 +120,8 @@ for ($i = 1; $i <= $maxArgc; $i++)
 CODE;
     for ($j = 1; $j <= $i; $j++)
     {
-    	$code.= SPACE_4 . "v" . ($j) . ".addRef();\n";
-    	$code.= SPACE_4 . "args.append(v" . ($j) . ".ptr());\n";
+    	//$code.= SPACE_4 . "v" . ($j) . ".addRef();\n";
+    	$code.= SPACE_4 . "args.append(const_cast<Variant &>(v" . ($j) . ").ptr());\n";
     }
     //$out .= SPACE_4 . "object.addRef();\n";
     $code.= SPACE_4 . "object.call(\"__construct\", args);\n";

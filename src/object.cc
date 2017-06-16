@@ -32,7 +32,7 @@ Object newObject(const char *name)
     zend_class_entry *ce = getClassEntry(name);
     if (ce == NULL)
     {
-        php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
+        error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
     if (object_init_ex(object.ptr(), ce) == FAILURE)

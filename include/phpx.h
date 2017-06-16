@@ -933,6 +933,17 @@ public:
         }
         arg_list[argc++] = v;
     }
+    inline void append(const Variant &v)
+    {
+        if (UNEXPECTED(argc == arg_list_size))
+        {
+            if (UNEXPECTED(!extend()))
+            {
+                return;
+            }
+        }
+        arg_list[argc++] = const_cast<Variant &>(v).ptr();
+    }
     inline size_t count()
     {
         return argc;
@@ -1035,30 +1046,15 @@ protected:
 extern Variant _call(zval *object, zval *func, Args &args);
 extern Variant _call(zval *object, zval *func);
 
-static inline Variant call(Variant &func, Array &args)
-{
-    Args _args;
-    for (int i = 0; i < args.count(); i++)
-    {
-        _args.append(args[i].ptr());
-    }
-    return _call(NULL, func.ptr(), _args);
-}
-
 static inline Variant call(Variant &func)
 {
     return _call(nullptr, func.ptr());
 }
 
-static inline Variant call(const char *func, Array &args)
+static inline Variant call(Variant &func, Args &args)
 {
-    Variant _func(func);
-    Args _args;
-    for (int i = 0; i < args.count(); i++)
-    {
-        _args.append(args[i].ptr());
-    }
-    return _call(NULL, _func.ptr(), _args);
+    func.addRef();
+    return _call(NULL, func.ptr(), args);
 }
 
 static inline Variant exec(const char *func)
@@ -1190,9 +1186,9 @@ public:
         return retval;
     }
 
-    inline void set(const char *name, Variant &v)
+    inline void set(const char *name, const Variant &v)
     {
-        zend_update_property(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v.ptr());
+        zend_update_property(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), const_cast<Variant &>(v).ptr());
     }
     inline void set(const char *name, Array &v)
     {
