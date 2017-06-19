@@ -129,15 +129,12 @@ bool Class::addMethod(const char *name, method_t method, int flags, ArgInfo *inf
 
 bool Class::alias(const char *alias_name)
 {
-    if (!activated)
+    if (activated)
     {
-        php_error_docref(NULL, E_WARNING, "Please execute alias method after activate.");
+        error(E_WARNING, "Please execute alias method before activate.");
         return false;
     }
-    if (zend_register_class_alias_ex(alias_name, strlen(alias_name), ce) < 0)
-    {
-        return false;
-    }
+    aliases.push_back(alias_name);
     return true;
 }
 
@@ -213,6 +210,14 @@ bool Class::activate()
         else
         {
             zend_declare_class_constant(ce, constants[i].name.c_str(), constants[i].name.length(), &constants[i].value);
+        }
+    }
+    for (int i = 0; i < aliases.size(); i++)
+    {
+        string alias = aliases[i];
+        if (zend_register_class_alias_ex(alias.c_str(), alias.length(), ce) < 0)
+        {
+            return false;
         }
     }
     activated = true;

@@ -26,12 +26,9 @@ unordered_map<string, Class*> class_map;
 unordered_map<string, Interface*> interface_map;
 map<const char *, map<const char *, method_t, strCmp>, strCmp> method_map;
 map<const char *, function_t, strCmp> function_map;
+map<int, void *> object_array;
 unordered_map<string, Extension*> _name_to_extension;
 unordered_map<int, Extension*> _module_number_to_extension;
-
-int arg_list_size = 0;
-zval **arg_list = nullptr;
-zval *tmp_zval_list = nullptr;
 
 void error(int level, const char *format, ...)
 {

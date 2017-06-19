@@ -43,6 +43,7 @@ extern "C"
 #include <ext/standard/html.h>
 #include <ext/standard/php_http.h>
 #include <ext/standard/php_standard.h>
+#include <ext/spl/php_spl.h>
 
 }
 
@@ -72,6 +73,7 @@ struct Resource
 };
 
 extern unordered_map<string, Resource *> resource_map;
+extern map<int, void *> object_array;
 
 class Variant
 {
@@ -392,6 +394,7 @@ public:
     Variant jsonDecode(zend_long options = 0, zend_long depth = PHP_JSON_PARSER_DEFAULT_DEPTH);
     Variant serialize();
     Variant unserialize();
+    bool isCallable();
 protected:
     bool reference;
     zval *ref_val;
@@ -780,38 +783,42 @@ public:
         add_next_index_zval(ptr(), &array);
     }
     //------------------assoc-array------------------
-    void set(const char *key, const Variant &v)
+    inline void set(const char *key, const Variant &v)
     {
         const_cast<Variant &>(v).addRef();
         add_assoc_zval(ptr(), key, const_cast<Variant &>(v).ptr());
     }
-    void set(const char *key, int v)
+    inline void set(const char *key, int v)
     {
         add_assoc_long(ptr(), key, (long) v);
     }
-    void set(const char *key, long v)
+    inline void set(const char *key, long v)
     {
         add_assoc_long(ptr(), key, v);
     }
-    void set(const char *key, const char *v)
+    inline void set(const char *key, const char *v)
     {
         add_assoc_string(ptr(), key, (char * )v);
     }
-    void set(const char *key, string &v)
+    inline void set(const char *key, string &v)
     {
         add_assoc_stringl(ptr(), key, (char* )v.c_str(), v.length());
     }
-    void set(const char *key, double v)
+    inline void set(const char *key, double v)
     {
         add_assoc_double(ptr(), key, v);
     }
-    void set(const char *key, float v)
+    inline void set(const char *key, float v)
     {
         add_assoc_double(ptr(), key, (double ) v);
     }
-    void set(const char *key, bool v)
+    inline void set(const char *key, bool v)
     {
         add_assoc_bool(ptr(), key, v ? 1 : 0);
+    }
+    inline void set(const String &s, const Variant & v)
+    {
+        set(const_cast<String &>(s).c_str(), v);
     }
     //------------------index-array------------------
     void set(int i, const Variant & v)
@@ -912,31 +919,35 @@ public:
     Array slice(long offset, long length = -1, bool preserve_keys = false);
 };
 
-extern int arg_list_size;
-extern zval **arg_list;
-extern zval *tmp_zval_list;
 
 class Args
 {
 public:
-    Args()
+    ~Args()
     {
-        argc = 0;
+        if (ptr_list)
+        {
+            efree(ptr_list);
+        }
+        if (zval_list)
+        {
+            efree(zval_list);
+        }
     }
     inline void append(zval *v)
     {
-        if (UNEXPECTED(argc == arg_list_size))
+        if (UNEXPECTED(argc == size))
         {
             if (UNEXPECTED(!extend()))
             {
                 return;
             }
         }
-        arg_list[argc++] = v;
+        ptr_list[argc++] = v;
     }
     inline void append(const Variant &v)
     {
-        if (UNEXPECTED(argc == arg_list_size))
+        if (UNEXPECTED(argc == size))
         {
             if (UNEXPECTED(!extend()))
             {
@@ -944,9 +955,9 @@ public:
             }
         }
         int index = argc++;
-        arg_list[index] = &tmp_zval_list[index];
-        memcpy(&tmp_zval_list[index], const_cast<Variant &>(v).ptr(), sizeof(zval));
-        zval_add_ref(arg_list[index]);
+        ptr_list[index] = &zval_list[index];
+        memcpy(&zval_list[index], const_cast<Variant &>(v).ptr(), sizeof(zval));
+        zval_add_ref(ptr_list[index]);
     }
     inline size_t count()
     {
@@ -965,7 +976,7 @@ public:
         Array array;
         for (int i = 0; i < argc; i++)
         {
-            array.append(Variant(arg_list[i]));
+            array.append(Variant(ptr_list[i]));
         }
         array.addRef();
         return array;
@@ -976,7 +987,7 @@ public:
         {
             return Variant(nullptr);
         }
-        zval *value = arg_list[i];
+        zval *value = ptr_list[i];
         if (Z_TYPE_P(value) == IS_REFERENCE)
         {
             value = static_cast<zval *>(Z_REFVAL_P(value));
@@ -986,24 +997,27 @@ public:
 private:
     bool extend()
     {
-        int _new_size = arg_list_size == 0 ? PHPX_MAX_ARGC : arg_list_size * 2;
-        zval** _new_ptr = (zval**) calloc(_new_size, sizeof(zval*));
+        int _new_size = size == 0 ? PHPX_MAX_ARGC : size * 2;
+        zval** _new_ptr = (zval**) ecalloc(_new_size, sizeof(zval*));
         if (UNEXPECTED(_new_ptr == nullptr))
         {
             return false;
         }
-        zval* _new_zval_ptr = (zval*) calloc(_new_size, sizeof(zval));
+        zval* _new_zval_ptr = (zval*) ecalloc(_new_size, sizeof(zval));
         if (UNEXPECTED(_new_zval_ptr == nullptr))
         {
-            free(_new_ptr);
+            efree(_new_ptr);
             return false;
         }
-        arg_list = _new_ptr;
-        tmp_zval_list = _new_zval_ptr;
-        arg_list_size = _new_size;
+        ptr_list = _new_ptr;
+        zval_list = _new_zval_ptr;
+        size = _new_size;
         return true;
     }
-    int argc;
+    int argc = 0;
+    int size = 0;
+    zval **ptr_list = nullptr;
+    zval *zval_list = nullptr;
 };
 
 class ArgInfo
@@ -1064,8 +1078,17 @@ static inline Variant call(const Variant &func)
 
 static inline Variant call(const Variant &func, Args &args)
 {
-    const_cast<Variant &>(func).addRef();
     return _call(NULL, const_cast<Variant &>(func).ptr(), args);
+}
+
+static inline Variant call(const Variant &func, Array &args)
+{
+    Args _args;
+    for (int i = 0; i < args.count(); i++)
+    {
+        _args.append(args[i].ptr());
+    }
+    return _call(NULL, const_cast<Variant &>(func).ptr(), _args);
 }
 
 static inline Variant exec(const char *func)
@@ -1144,20 +1167,21 @@ public:
     {
 
     }
-    Variant call(Variant &func, Args &args)
+    inline Variant call(Variant &func, Args &args)
     {
         return _call(ptr(), func.ptr(), args);
     }
-    Variant call(const char *func, Args &args)
+    inline Variant call(const char *func, Args &args)
     {
         Variant _func(func);
         return _call(ptr(), _func.ptr(), args);
     }
-    Variant exec(const char *func)
+    inline Variant exec(const char *func)
     {
         Variant _func(func);
         return _call(ptr(), _func.ptr());
     }
+
     /*generator*/
     Variant exec(const char *func, const Variant &v1);
     Variant exec(const char *func, const Variant &v1, const Variant &v2);
@@ -1170,7 +1194,8 @@ public:
     Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9);
     Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10);
     /*generator*/
-    Variant get(const char *name)
+
+    inline Variant get(const char *name)
     {
         Variant retval;
         zval rv;
@@ -1183,7 +1208,6 @@ public:
         {
             ZVAL_COPY_VALUE(retval.ptr(), member_p);
         }
-        retval.addRef();
         return retval;
     }
 
@@ -1240,6 +1264,30 @@ public:
         Variant res = newResource<T>(resource_name, ptr);
         this->set(key, res);
     }
+    template<class T>
+    inline T* oPtr(const char *key, const char *resource_name)
+    {
+        Variant p = this->get(key);
+        return p.toResource<T>(resource_name);
+    }
+    template<class T>
+    inline void store(T *ptr)
+    {
+        if (ptr == nullptr)
+        {
+            object_array.erase(getId());
+            delete ptr;
+        }
+        else
+        {
+            object_array[getId()] = ptr;
+        }
+    }
+    template<class T>
+    inline T* fetch()
+    {
+        return static_cast<T*>(object_array[this->getId()]);
+    }
     inline string getClassName()
     {
         return string(Z_OBJCE_P(ptr())->name->val, Z_OBJCE_P(ptr())->name->len);
@@ -1247,6 +1295,10 @@ public:
     inline uint32_t getId()
     {
         return Z_OBJ_HANDLE(*ptr());
+    }
+    String hash()
+    {
+        return php_spl_object_hash(ptr());
     }
     inline bool methodExists(const char *name)
     {
@@ -1449,6 +1501,7 @@ protected:
     vector<Method> methods;
     vector<Property> propertys;
     vector<Constant> constants;
+    vector<string> aliases;
 };
 
 class Interface
@@ -1569,13 +1622,12 @@ public:
     bool registerInterface(Interface *i);
     bool registerFunction(const char *name, function_t func, ArgInfo *info = nullptr);
     bool registerResource(const char *name, resource_dtor dtor);
-    bool registerConstant(const char *name, long v);
-    bool registerConstant(const char *name, int v);
-    bool registerConstant(const char *name, bool v);
-    bool registerConstant(const char *name, double v);
-    bool registerConstant(const char *name, float v);
-    bool registerConstant(const char *name, const char *v);
-    bool registerConstant(const char *name, string &v);
+    void registerConstant(const char *name, long v);
+    void registerConstant(const char *name, int v);
+    void registerConstant(const char *name, bool v);
+    void registerConstant(const char *name, double v);
+    void registerConstant(const char *name, float v);
+    void registerConstant(const char *name, string &v);
     bool registerConstant(const char *name, Variant &v);
 
     bool require(const char *name, const char *version = nullptr);

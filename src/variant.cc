@@ -130,4 +130,9 @@ Variant Variant::jsonDecode(zend_long options, zend_long depth)
     return retval;
 }
 
+bool Variant::isCallable()
+{
+    return zend_is_callable(ptr(), 0, nullptr);
+}
+
 }

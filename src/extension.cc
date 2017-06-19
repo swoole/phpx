@@ -99,99 +99,48 @@ bool Extension::registerResource(const char *name, resource_dtor dtor)
     return true;
 }
 
-bool Extension::registerConstant(const char *name, long v)
+void Extension::registerConstant(const char *name, long v)
 {
-    this->checkStartupStatus(AFTER_START, __func__);
-    zend_constant c;
-    ZVAL_LONG(&c.value, v);
-    c.flags = CONST_CS | CONST_PERSISTENT;
-    c.name = zend_string_init(name, strlen(name), c.flags);
-    c.module_number = module.module_number;
-    return zend_register_constant(&c);
+    zend_register_long_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
-bool Extension::registerConstant(const char *name, int v)
+void Extension::registerConstant(const char *name, int v)
 {
-    this->checkStartupStatus(AFTER_START, __func__);
-    zend_constant c;
-    ZVAL_LONG(&c.value, v);
-    c.flags = CONST_CS | CONST_PERSISTENT;
-    c.name = zend_string_init(name, strlen(name), c.flags);
-    c.module_number = module.module_number;
-    return zend_register_constant(&c);
+    zend_register_long_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
-bool Extension::registerConstant(const char *name, bool v)
+void Extension::registerConstant(const char *name, bool v)
 {
-    this->checkStartupStatus(AFTER_START, __func__);
-    zend_constant c;
-    if (v)
-    {
-        ZVAL_TRUE(&c.value);
-    }
-    else
-    {
-        ZVAL_FALSE(&c.value);
-    }
-    c.flags = CONST_CS | CONST_PERSISTENT;
-    c.name = zend_string_init(name, strlen(name), c.flags);
-    c.module_number = module.module_number;
-    return zend_register_constant(&c);
+    zend_register_bool_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
-bool Extension::registerConstant(const char *name, double v)
+void Extension::registerConstant(const char *name, double v)
 {
-    this->checkStartupStatus(AFTER_START, __func__);
-    zend_constant c;
-    ZVAL_DOUBLE(&c.value, v);
-    c.flags = CONST_CS | CONST_PERSISTENT;
-    c.name = zend_string_init(name, strlen(name), c.flags);
-    c.module_number = module.module_number;
-    return zend_register_constant(&c);
+    zend_register_double_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
-bool Extension::registerConstant(const char *name, float v)
+void Extension::registerConstant(const char *name, float v)
 {
-    this->checkStartupStatus(AFTER_START, __func__);
-    zend_constant c;
-    ZVAL_DOUBLE(&c.value, v);
-    c.flags = CONST_CS | CONST_PERSISTENT;
-    c.name = zend_string_init(name, strlen(name), c.flags);
-    c.module_number = module.module_number;
-    return zend_register_constant(&c);
+    zend_register_double_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
-bool Extension::registerConstant(const char *name, const char *v)
+void Extension::registerConstant(const char *name, string &v)
 {
     this->checkStartupStatus(AFTER_START, __func__);
-    zend_constant c;
-    ZVAL_STRING(&c.value, (char* )v);
-    c.flags = CONST_CS | CONST_PERSISTENT;
-    c.name = zend_string_init(name, strlen(name), c.flags);
-    c.module_number = module.module_number;
-    return zend_register_constant(&c);
-}
-
-bool Extension::registerConstant(const char *name, string &v)
-{
-    this->checkStartupStatus(AFTER_START, __func__);
-    zend_constant c;
-    ZVAL_STRINGL(&c.value, (char * )v.c_str(), v.length());
-    c.flags = CONST_CS | CONST_PERSISTENT;
-    c.name = zend_string_init(name, strlen(name), c.flags);
-    c.module_number = module.module_number;
-    return zend_register_constant(&c);
+    zend_register_stringl_constant(name, strlen(name), (char *) v.c_str(), v.length(),
+            CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
 bool Extension::registerConstant(const char *name, Variant &v)
 {
     this->checkStartupStatus(AFTER_START, __func__);
-    zend_constant c;
-    ZVAL_COPY(&c.value, v.ptr());
-    c.flags = CONST_CS;
-    c.name = zend_string_init(name, strlen(name), c.flags);
-    c.module_number = module.module_number;
-    return zend_register_constant(&c);
+    zend_constant *c = new zend_constant;
+    ZVAL_COPY(&c->value, v.ptr());
+    v.addRef();
+    c->flags = CONST_CS;
+    c->name = zend_string_init(name, strlen(name), c->flags);
+    c->module_number = module.module_number;
+    return zend_register_constant(c);
 }
 
 bool Extension::registerFunction(const char *name, function_t func, ArgInfo *info)
