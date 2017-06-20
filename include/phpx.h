@@ -270,6 +270,26 @@ public:
     {
         return Z_TYPE_FLAGS_P(ptr()) & IS_TYPE_IMMUTABLE;
     }
+    inline bool isEmpty()
+    {
+        switch(type())
+        {
+        case IS_UNDEF:
+        case IS_NULL:
+        case IS_FALSE:
+            return true;
+        case IS_LONG:
+            return toInt() == 0;
+        case IS_DOUBLE:
+            return toFloat() == 0.0;
+        case IS_STRING:
+            return length() == 0;
+        case IS_ARRAY:
+            return Z_ARRVAL_P(ptr())->nNumOfElements == 0;
+        default:
+            return true;
+        }
+    }
     inline string toString()
     {
         if (!isString())
@@ -821,45 +841,53 @@ public:
         set(const_cast<String &>(s).c_str(), v);
     }
     //------------------index-array------------------
-    void set(int i, const Variant & v)
+    inline void set(int i, const Variant & v)
     {
         const_cast<Variant &>(v).addRef();
         add_index_zval(ptr(), (zend_ulong) i, const_cast<Variant &>(v).ptr());
     }
     //-------------------------------------------
-    Variant operator [](int i)
-    {
-        zval *ret = zend_hash_index_find(Z_ARRVAL_P(ptr()), (zend_ulong) i);
-        if (ret == NULL)
-        {
-            return Variant(nullptr);
-        }
-        return Variant(ret);
-    }
-    Variant operator [](const char *key)
+    inline Variant get(const char *key)
     {
         zval *ret = zend_hash_str_find(Z_ARRVAL_P(ptr()), key, strlen(key));
         if (ret == NULL)
         {
-            return Variant(nullptr);
+            return nullptr;
         }
-        return Variant(ret);
+        return ret;
     }
-    bool remove(const char *key)
+    inline Variant get(int i)
+    {
+        zval *ret = zend_hash_index_find(Z_ARRVAL_P(ptr()), (zend_ulong) i);
+        if (ret == NULL)
+        {
+            return nullptr;
+        }
+        return ret;
+    }
+    inline Variant operator [](int i)
+    {
+        return get(i);
+    }
+    inline Variant operator [](const char *key)
+    {
+        return get(key);
+    }
+    inline bool remove(const char *key)
     {
         String _key(key);
         bool ret = zend_hash_del(Z_ARRVAL_P(ptr()),  _key.ptr()) == SUCCESS;
         return ret;
     }
-    void clean()
+    inline void clean()
     {
         zend_hash_clean(Z_ARRVAL_P(ptr()));
     }
-    bool exists(const char *key)
+    inline bool exists(const char *key)
     {
         return zend_hash_str_exists(Z_ARRVAL_P(ptr()), key, strlen(key));
     }
-    bool exists(string &key)
+    inline bool exists(string &key)
     {
         return zend_hash_str_exists(Z_ARRVAL_P(ptr()), key.c_str(), key.length());
     }
@@ -1176,6 +1204,27 @@ public:
         Variant _func(func);
         return _call(ptr(), _func.ptr(), args);
     }
+    inline Variant callParentMethod(const char *func)
+    {
+        Variant retval;
+        zend_call_method_with_0_params(ptr(), Z_OBJCE_P(ptr())->parent, NULL, func, retval.ptr());
+        return retval;
+    }
+    inline Variant callParentMethod(const char *func, const Variant &v1)
+    {
+        Variant retval;
+        zend_call_method_with_1_params(ptr(), Z_OBJCE_P(ptr())->parent, NULL, func, retval.ptr(),
+                const_cast<Variant &>(v1).ptr());
+        return retval;
+    }
+    inline Variant callParentMethod(const char *func, const Variant &v1, const Variant &v2)
+    {
+        Variant retval;
+        echo("%p\n", Z_OBJCE_P(ptr())->parent);
+        zend_call_method_with_2_params(ptr(), Z_OBJCE_P(ptr())->parent, NULL, func, retval.ptr(),
+                const_cast<Variant &>(v1).ptr(), const_cast<Variant &>(v2).ptr());
+        return retval;
+    }
     inline Variant exec(const char *func)
     {
         Variant _func(func);
@@ -1210,7 +1259,6 @@ public:
         }
         return retval;
     }
-
     inline void set(const char *name, const Variant &v)
     {
         zend_update_property(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), const_cast<Variant &>(v).ptr());

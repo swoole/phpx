@@ -44,6 +44,7 @@ void testRedis()
 {
     cout << "=====================Test Redis==================\n";
     Object redis = php::newObject("redis");
+    var_dump(redis);
     auto ret1 = redis.exec("connect", "127.0.0.1", 6379);
     //connect success
     if (ret1.toBool())
@@ -79,6 +80,15 @@ int main(int argc, char * argv[])
     String value = ini_get("output_buffering");
     cout << "ENV:" << value.toInt() << endl;
 
+
+    testRedis();
+
+    vm.include("index.php");
+    auto o = newObject("test");
+
+    var_dump(o);
+    return 0;
+
     Array url_params;
     url_params.set("name", "rango");
     url_params.set("value", 1234);
@@ -93,7 +103,7 @@ int main(int argc, char * argv[])
     auto url_query = http_build_query(url_params);
     var_dump(url_query);
 
-//    testRedis();
+
 //    jsontest();
     md5test();
     return 0;
