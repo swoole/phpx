@@ -840,11 +840,24 @@ public:
     {
         set(const_cast<String &>(s).c_str(), v);
     }
+    inline void del(const char *key)
+    {
+        zend_hash_str_del(Z_ARRVAL_P(ptr()), key, strlen(key));
+    }
+    inline void del(const String &key)
+    {
+        const char* s = const_cast<String &>(key).c_str();
+        zend_hash_str_del(Z_ARRVAL_P(ptr()), s, strlen(s));
+    }
     //------------------index-array------------------
     inline void set(int i, const Variant & v)
     {
         const_cast<Variant &>(v).addRef();
         add_index_zval(ptr(), (zend_ulong) i, const_cast<Variant &>(v).ptr());
+    }
+    inline void del(int i)
+    {
+        zend_hash_index_del(Z_ARRVAL_P(ptr()), (zend_ulong) i);
     }
     //-------------------------------------------
     inline Variant get(const char *key)
