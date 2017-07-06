@@ -1158,7 +1158,9 @@ static void throwException(const char *name, const char *message, int code = 0)
 static Variant global(const char *name)
 {
     zend_string *key = zend_string_init(name, strlen(name), 0);
+    zend_is_auto_global(key);
     zval *var = zend_hash_find_ind(&EG(symbol_table), key);
+    zend_string_free(var);
     if (!var)
     {
         return false;
