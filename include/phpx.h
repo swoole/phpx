@@ -515,7 +515,7 @@ public:
     {
         if (free_memory)
         {
-            zend_string_free(value);
+            zend_string_release(value);
         }
     }
     inline long toInt()
