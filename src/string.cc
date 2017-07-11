@@ -84,9 +84,9 @@ String String::substr(long _offset, long _length)
     return String(value->val + _offset, _length);
 }
 
-Variant String::split(String &delim, int limit)
+Variant String::split(String &delim, long limit)
 {
-	Variant retval;
+	Array retval;
 	php_explode(delim.ptr(), value, retval.ptr(), limit);
 	retval.addRef();
 	return retval;

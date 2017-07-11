@@ -515,7 +515,7 @@ public:
     {
         if (free_memory)
         {
-            zend_string_free(value);
+            zend_string_release(value);
         }
     }
     inline long toInt()
@@ -603,7 +603,7 @@ public:
 				value->len, 1, flags, (char *) charset.c_str());
 	}
 
-	Variant split(String &delim, int limit = -1);
+	Variant split(String &delim, long = ZEND_LONG_MAX);
     String substr(long _offset, long _length = -1);
     void stripTags(String &allow, bool allow_tag_spaces = false);
     String addSlashes();
