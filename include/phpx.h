@@ -1280,7 +1280,6 @@ public:
     }
     inline void set(const char *name, Array &v)
     {
-        v.addRef();
         zend_update_property(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v.ptr());
     }
     inline void set(const char *name, string &v)
