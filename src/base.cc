@@ -67,6 +67,7 @@ int extension_startup(int type, int module_number)
         {
             Extension *extension = _name_to_extension[module->name];
             extension->started = true;
+            extension->registerIniEntries(module_number);
             if (extension->onStart)
             {
                 extension->onStart();
@@ -126,6 +127,7 @@ int extension_shutdown(int type, int module_number)
     {
         extension->onShutdown();
     }
+    extension->unregisterIniEntries(module_number);
     _name_to_extension.erase(extension->name);
     _module_number_to_extension.erase(module_number);
     delete extension;

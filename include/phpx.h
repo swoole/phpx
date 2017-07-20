@@ -1641,6 +1641,9 @@ extern int extension_after_request(int type, int module_number);
 
 class Extension
 {
+    friend int extension_startup(int type, int module_number);
+    friend int extension_shutdown(int type, int module_number);
+
 protected:
     zend_module_entry module =
     {
@@ -1657,6 +1660,16 @@ protected:
     NULL, //version
     STANDARD_MODULE_PROPERTIES,
     };
+
+    // INI
+    struct IniEntry {
+        std::string name;
+        std::string default_value;
+        int modifiable;
+    };
+
+    void registerIniEntries(int module_number);
+    void unregisterIniEntries(int module_number);
 
 public:
 
@@ -1699,6 +1712,16 @@ public:
         this->body = body;
     }
 
+    // modifiable can be one of these:PHP_INI_SYSTEM/PHP_INI_PERDIR/PHP_INI_USER/PHP_INI_ALL
+    void addIniEntry(const char* name, const char* default_value = "", int modifiable = PHP_INI_ALL)
+    {
+        IniEntry entry;
+        entry.name = name;
+        entry.default_value = default_value;
+        entry.modifiable = modifiable;
+        ini_entries.push_back(entry);
+    }
+
     string name;
     string version;
     bool started = false;
@@ -1716,6 +1739,8 @@ protected:
     int function_array_size = 0;
     int deps_count = 0;
     int deps_array_size = 0;
+
+    std::vector<IniEntry> ini_entries;
 };
 
 extern unordered_map<string, Extension*> _name_to_extension;
