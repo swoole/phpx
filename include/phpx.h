@@ -515,7 +515,7 @@ public:
     {
         if (free_memory)
         {
-            zend_string_free(value);
+            zend_string_release(value);
         }
     }
     inline long toInt()
@@ -603,7 +603,7 @@ public:
 				value->len, 1, flags, (char *) charset.c_str());
 	}
 
-	Variant split(String &delim, int limit = -1);
+	Variant split(String &delim, long = ZEND_LONG_MAX);
     String substr(long _offset, long _length = -1);
     void stripTags(String &allow, bool allow_tag_spaces = false);
     String addSlashes();
@@ -651,15 +651,14 @@ public:
     }
     void operator ++(int i)
     {
-        while (1)
+        while (++_ptr != pe)
         {
-            _ptr++;
             _val = &_ptr->val;
             if (_val && Z_TYPE_P(_val) == IS_INDIRECT)
             {
                 _val = Z_INDIRECT_P(_val);
             }
-            if (UNEXPECTED(Z_TYPE_P(_val) == IS_UNDEF) && pe != _ptr)
+            if (UNEXPECTED(Z_TYPE_P(_val) == IS_UNDEF))
             {
                 continue;
             }
@@ -840,11 +839,24 @@ public:
     {
         set(const_cast<String &>(s).c_str(), v);
     }
+    inline void del(const char *key)
+    {
+        zend_hash_str_del(Z_ARRVAL_P(ptr()), key, strlen(key));
+    }
+    inline void del(const String &key)
+    {
+        const char* s = const_cast<String &>(key).c_str();
+        zend_hash_str_del(Z_ARRVAL_P(ptr()), s, strlen(s));
+    }
     //------------------index-array------------------
     inline void set(int i, const Variant & v)
     {
         const_cast<Variant &>(v).addRef();
         add_index_zval(ptr(), (zend_ulong) i, const_cast<Variant &>(v).ptr());
+    }
+    inline void del(int i)
+    {
+        zend_hash_index_del(Z_ARRVAL_P(ptr()), (zend_ulong) i);
     }
     //-------------------------------------------
     inline Variant get(const char *key)
@@ -1160,7 +1172,7 @@ static Variant global(const char *name)
     zend_string *key = zend_string_init(name, strlen(name), 0);
     zend_is_auto_global(key);
     zval *var = zend_hash_find_ind(&EG(symbol_table), key);
-    zend_string_free(var);
+    zend_string_free(key);
     if (!var)
     {
         return false;
@@ -1267,7 +1279,6 @@ public:
     }
     inline void set(const char *name, Array &v)
     {
-        v.addRef();
         zend_update_property(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v.ptr());
     }
     inline void set(const char *name, string &v)
