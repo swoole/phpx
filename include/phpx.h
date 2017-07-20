@@ -651,15 +651,14 @@ public:
     }
     void operator ++(int i)
     {
-        while (1)
+        while (++_ptr != pe)
         {
-            _ptr++;
             _val = &_ptr->val;
             if (_val && Z_TYPE_P(_val) == IS_INDIRECT)
             {
                 _val = Z_INDIRECT_P(_val);
             }
-            if (UNEXPECTED(Z_TYPE_P(_val) == IS_UNDEF) && pe != _ptr)
+            if (UNEXPECTED(Z_TYPE_P(_val) == IS_UNDEF))
             {
                 continue;
             }
