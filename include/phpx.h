@@ -1172,7 +1172,7 @@ static Variant global(const char *name)
     zend_string *key = zend_string_init(name, strlen(name), 0);
     zend_is_auto_global(key);
     zval *var = zend_hash_find_ind(&EG(symbol_table), key);
-    zend_string_free(var);
+    zend_string_free(key);
     if (!var)
     {
         return false;
@@ -1279,7 +1279,6 @@ public:
     }
     inline void set(const char *name, Array &v)
     {
-        v.addRef();
         zend_update_property(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v.ptr());
     }
     inline void set(const char *name, string &v)
