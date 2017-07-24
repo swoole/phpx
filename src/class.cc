@@ -194,8 +194,14 @@ bool Class::activate()
     for (int i = 0; i != propertys.size(); i++)
     {
         Property p = propertys[i];
-        zval_add_ref(&p.value);
-        zend_declare_property(ce, p.name.c_str(), p.name.length(), &p.value, p.flags);
+        if (Z_TYPE(p.value) == IS_STRING)
+        {
+            zend_declare_property_stringl(ce, p.name.c_str(), p.name.length(), Z_STRVAL(p.value), Z_STRLEN(p.value), p.flags);
+        }
+        else
+        {
+            zend_declare_property(ce, p.name.c_str(), p.name.length(), &p.value, p.flags);
+        }
     }
     /**
      * register constant
