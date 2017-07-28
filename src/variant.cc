@@ -69,7 +69,6 @@ Variant Variant::serialize()
     PHP_VAR_SERIALIZE_DESTROY(var_hash);
     Variant retval(serialized_data.s->val, serialized_data.s->len);
     smart_str_free(&serialized_data);
-    retval.addRef();
     return retval;
 }
 
@@ -83,7 +82,6 @@ Variant Variant::unserialize()
     size_t length = Z_STRLEN_P(ptr());
     if (php_var_unserialize(retval.ptr(), (const uchar **) &data, (const uchar *) data + length, &var_hash))
     {
-        retval.addRef();
         return retval;
     }
     else
@@ -126,7 +124,6 @@ Variant Variant::jsonDecode(zend_long options, zend_long depth)
     options |= PHP_JSON_OBJECT_AS_ARRAY;
     Variant retval;
     php_json_decode_ex(retval.ptr(), Z_STRVAL_P(ptr()), Z_STRLEN_P(ptr()), options, depth);
-    retval.addRef();
     return retval;
 }
 

@@ -34,7 +34,6 @@ static vector<Variant *> callbacks;
 void PHP_Gtk_callback(GtkApplication* app, gpointer user_data)
 {
     Variant v = *(Variant *) user_data;
-    v.addRef();
     call(v);
 }
 
