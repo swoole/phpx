@@ -343,13 +343,9 @@ public:
         }
         return Z_TYPE_P(ptr()) == IS_TRUE;
     }
-    Variant dup()
+    Variant* dup()
     {
-        zval dupv;
-        memcpy(&dupv, ptr(), sizeof(dupv));
-        zval_copy_ctor_func(&dupv);
-        zval_delref_p(&dupv);
-        return Variant(&dupv);
+        return new Variant(this);
     }
     inline size_t length()
     {
