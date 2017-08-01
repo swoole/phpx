@@ -205,7 +205,6 @@ Variant _call(zval *object, zval *func, Args &args)
     }
     if (call_user_function(EG(function_table), object, func, retval.ptr(), args.count(), params) == SUCCESS)
     {
-        retval.addRef();
         return retval;
     }
     else
@@ -219,7 +218,6 @@ Variant _call(zval *object, zval *func)
     Variant retval = false;
     if (call_user_function(EG(function_table), object, func, retval.ptr(), 0, NULL) == 0)
     {
-        retval.addRef();
         return retval;
     }
     else

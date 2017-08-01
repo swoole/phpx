@@ -90,7 +90,6 @@ Variant String::split(String &delim, long limit)
 {
 	Array retval;
 	php_explode(delim.ptr(), value, retval.ptr(), limit);
-	retval.addRef();
 	return retval;
 }
 

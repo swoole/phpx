@@ -135,68 +135,81 @@ public:
         init();
         ZVAL_BOOL(&val, v);
     }
-    Variant(zval *v)
+    Variant(zval *v, bool ref = false)
     {
-        reference = false;
-        ref_val = NULL;
-        memcpy(&val, v, sizeof(zval));
-        zval_add_ref(&val);
-    }
-    Variant(zval *v, bool ref)
-    {
-        ref_val = v;
+        init();
         reference = ref;
+        if (reference) {
+            ref_val = v;
+        } else {
+            memcpy(&val, v, sizeof(zval));
+            zval_add_ref(&val);
+        }
     }
     Variant(zend_resource *res)
     {
         init();
         ZVAL_RES(ptr(), res);
     }
+    Variant(const Variant& v)
+    {
+        init();
+        ZVAL_COPY_VALUE(ptr(), const_cast<Variant &>(v).ptr());
+        const_cast<Variant &>(v).addRef();
+    }
     ~Variant()
     {
-        if (!reference)
-        {
-            zval_ptr_dtor(&val);
-        }
+        destroy();
     }
     void operator =(int v)
     {
+        destroy();
         ZVAL_LONG(ptr(), (long )v);
     }
     void operator =(long v)
     {
+        destroy();
         ZVAL_LONG(ptr(), v);
     }
     void operator =(string &str)
     {
+        destroy();
         ZVAL_STRINGL(ptr(), str.c_str(), str.length());
     }
     void operator =(const char *str)
     {
+        destroy();
         ZVAL_STRING(ptr(), str);
     }
     void operator =(double v)
     {
+        destroy();
         ZVAL_DOUBLE(ptr(), v);
     }
     void operator =(float v)
     {
+        destroy();
         ZVAL_DOUBLE(ptr(), (double )v);
     }
     void operator =(bool v)
     {
+        destroy();
         ZVAL_BOOL(ptr(), v);
     }
     void operator =(nullptr_t _null)
     {
+        destroy();
         ZVAL_NULL(ptr());
     }
     void operator =(zval *v)
     {
+        destroy();
         memcpy(&val, v, sizeof(zval));
+        zval_add_ref(&val);
     }
     void operator =(const Variant &v)
     {
+        destroy();
         ZVAL_COPY_VALUE(ptr(), const_cast<Variant &>(v).ptr());
         const_cast<Variant &>(v).addRef();
     }
@@ -334,8 +347,7 @@ public:
     }
     Variant* dup()
     {
-        Variant *v = new Variant(ptr());
-        return v;
+        return new Variant(this);
     }
     inline size_t length()
     {
@@ -411,6 +423,10 @@ public:
         Variant _tmp(v);
         return equals(_tmp);
     }
+    bool isZvalRef() const
+    {
+        return reference;
+    }
     bool equals(Variant &v, bool strict = false);
     Variant jsonEncode(zend_long options = 0, zend_long depth = PHP_JSON_PARSER_DEFAULT_DEPTH);
     Variant jsonDecode(zend_long options = 0, zend_long depth = PHP_JSON_PARSER_DEFAULT_DEPTH);
@@ -426,6 +442,14 @@ protected:
         reference = false;
         ref_val = NULL;
         memset(&val, 0, sizeof(val));
+    }
+    void destroy()
+    {
+        if (!reference)
+        {
+            zval_ptr_dtor(&val);
+        }
+        init();
     }
 };
 
@@ -726,26 +750,30 @@ public:
     Array(zval *v) :
             Variant(v)
     {
-        ref_val = v;
-        reference = true;
-        if (Z_TYPE_P(v) == IS_NULL)
+        if (isNull())
         {
-            array_init(v);
+            array_init(ptr());
         }
-        else if (Z_TYPE_P(v) != IS_ARRAY)
+        else if (!isArray())
         {
             error(E_ERROR, "parameter 1 must be zend_array.");
         }
     }
     Array(const Variant &v)
     {
-        ref_val = const_cast<Variant &>(v).ptr();
-        reference = true;
-        if (const_cast<Variant &>(v).isNull())
-        {
-            array_init(ref_val);
+        reference = v.isZvalRef();
+
+        if (reference) {
+            ref_val = const_cast<Variant &>(v).ptr();
+        } else {
+            memcpy(&val, const_cast<Variant &>(v).ptr(), sizeof(val));
+            addRef();
         }
-        else if (!const_cast<Variant &>(v).isArray())
+        if (isNull())
+        {
+            array_init(ptr());
+        }
+        else if (!isArray())
         {
             error(E_ERROR, "parameter 1 must be zend_array.");
         }
@@ -945,10 +973,10 @@ public:
     }
     String join(String &delim)
     {
-    	Variant retval;
-    	php_implode(delim.ptr(), ptr(), retval.ptr());
-    	retval.addRef();
-    	return retval.ptr();
+        Variant retval;
+        php_implode(delim.ptr(), ptr(), retval.ptr());
+        retval.addRef();
+        return retval.ptr();
     }
     void merge(Array &source, bool overwrite = false)
     {
@@ -1020,7 +1048,6 @@ public:
         {
             array.append(Variant(ptr_list[i]));
         }
-        array.addRef();
         return array;
     }
     inline Variant operator [](int i)

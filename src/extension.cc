@@ -138,7 +138,6 @@ bool Extension::registerConstant(const char *name, Variant &v)
     this->checkStartupStatus(AFTER_START, __func__);
     zend_constant *c = new zend_constant;
     ZVAL_COPY(&c->value, v.ptr());
-    v.addRef();
     c->flags = CONST_CS;
     c->name = zend_string_init(name, strlen(name), c->flags);
     c->module_number = module.module_number;

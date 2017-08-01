@@ -147,7 +147,6 @@ Array Array::slice(long offset, long length, bool preserve_keys)
         ZEND_HASH_FOREACH_END();
     }
     Array retval(&return_value);
-    retval.addRef();
     return retval;
 }
 
