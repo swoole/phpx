@@ -748,6 +748,10 @@ public:
     Array(zval *v) :
             Variant(v)
     {
+        if (isReference())
+        {
+            zend_unwrap_reference(&val);
+        }
         if (isNull())
         {
             array_init(ptr());
@@ -761,10 +765,15 @@ public:
     {
         reference = v.isZvalRef();
 
+        zval* zv = const_cast<Variant &>(v).ptr();
+        if (Z_TYPE_P(zv) == IS_REFERENCE)
+        {
+            zv = Z_REFVAL_P(zv);
+        }
         if (reference) {
-            ref_val = const_cast<Variant &>(v).ptr();
+            ref_val = zv;
         } else {
-            memcpy(&val, const_cast<Variant &>(v).ptr(), sizeof(val));
+            memcpy(&val, zv, sizeof(*zv));
             addRef();
         }
         if (isNull())
