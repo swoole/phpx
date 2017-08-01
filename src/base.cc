@@ -1,12 +1,14 @@
 /*
   +----------------------------------------------------------------------+
-  | PHP-X                                                               |
+  | PHP-X                                                                |
   +----------------------------------------------------------------------+
-  | This source file is subject to version 2.0 of the Apache license,    |
+  | Copyright (c) 2016-2017 The Swoole Group                             |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.0 of the GPL license,       |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | http://www.apache.org/licenses/LICENSE-2.0.html                      |
-  | If you did not receive a copy of the Apache2.0 license and are unable|
+  | http://www.gnu.org/licenses/                                         |
+  | If you did not receive a copy of the GPL3.0 license and are unable   |
   | to obtain it through the world-wide-web, please send a note to       |
   | license@swoole.com so we can mail you a copy immediately.            |
   +----------------------------------------------------------------------+
@@ -67,6 +69,7 @@ int extension_startup(int type, int module_number)
         {
             Extension *extension = _name_to_extension[module->name];
             extension->started = true;
+            extension->registerIniEntries(module_number);
             if (extension->onStart)
             {
                 extension->onStart();
@@ -126,6 +129,7 @@ int extension_shutdown(int type, int module_number)
     {
         extension->onShutdown();
     }
+    extension->unregisterIniEntries(module_number);
     _name_to_extension.erase(extension->name);
     _module_number_to_extension.erase(module_number);
     delete extension;
@@ -201,7 +205,6 @@ Variant _call(zval *object, zval *func, Args &args)
     }
     if (call_user_function(EG(function_table), object, func, retval.ptr(), args.count(), params) == SUCCESS)
     {
-        retval.addRef();
         return retval;
     }
     else
@@ -215,7 +218,6 @@ Variant _call(zval *object, zval *func)
     Variant retval = false;
     if (call_user_function(EG(function_table), object, func, retval.ptr(), 0, NULL) == 0)
     {
-        retval.addRef();
         return retval;
     }
     else

@@ -1,12 +1,14 @@
 /*
   +----------------------------------------------------------------------+
-  | PHP-X                                                               |
+  | PHP-X                                                                |
   +----------------------------------------------------------------------+
-  | This source file is subject to version 2.0 of the Apache license,    |
+  | Copyright (c) 2016-2017 The Swoole Group                             |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.0 of the GPL license,       |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | http://www.apache.org/licenses/LICENSE-2.0.html                      |
-  | If you did not receive a copy of the Apache2.0 license and are unable|
+  | http://www.gnu.org/licenses/                                         |
+  | If you did not receive a copy of the GPL3.0 license and are unable   |
   | to obtain it through the world-wide-web, please send a note to       |
   | license@swoole.com so we can mail you a copy immediately.            |
   +----------------------------------------------------------------------+

@@ -1,12 +1,14 @@
 /*
   +----------------------------------------------------------------------+
-  | PHP-X                                                               |
+  | PHP-X                                                                |
   +----------------------------------------------------------------------+
-  | This source file is subject to version 2.0 of the Apache license,    |
+  | Copyright (c) 2016-2017 The Swoole Group                             |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.0 of the GPL license,       |
   | that is bundled with this package in the file LICENSE, and is        |
   | available through the world-wide-web at the following url:           |
-  | http://www.apache.org/licenses/LICENSE-2.0.html                      |
-  | If you did not receive a copy of the Apache2.0 license and are unable|
+  | http://www.gnu.org/licenses/                                         |
+  | If you did not receive a copy of the GPL3.0 license and are unable   |
   | to obtain it through the world-wide-web, please send a note to       |
   | license@swoole.com so we can mail you a copy immediately.            |
   +----------------------------------------------------------------------+
@@ -136,7 +138,6 @@ bool Extension::registerConstant(const char *name, Variant &v)
     this->checkStartupStatus(AFTER_START, __func__);
     zend_constant *c = new zend_constant;
     ZVAL_COPY(&c->value, v.ptr());
-    v.addRef();
     c->flags = CONST_CS;
     c->name = zend_string_init(name, strlen(name), c->flags);
     c->module_number = module.module_number;
@@ -192,6 +193,41 @@ bool Extension::registerFunction(const char *name, function_t func, ArgInfo *inf
 
     function_count++;
     return true;
+}
+
+void Extension::registerIniEntries(int module_number) {
+    if (!ini_entries.size()) {
+        return;
+    }
+
+    zend_ini_entry_def* entry_defs = new zend_ini_entry_def[ini_entries.size() + 1];
+
+    for (auto i = 0; i < ini_entries.size(); ++i) {
+        IniEntry& entry = ini_entries[i];
+        zend_ini_entry_def def = {
+                entry.name.c_str(), // name
+                NULL,   // on_modify
+                NULL,   // mh_arg1
+                NULL,   // mh_arg2
+                NULL,   // mh_arg3
+                entry.default_value.c_str(), // value
+                NULL,   // displayer
+                entry.modifiable, // modifiable
+                (uint)entry.name.size(), // name_length
+                (uint)entry.default_value.size(), // value_length
+        };
+        entry_defs[i] = def;
+    }
+    memset(entry_defs + ini_entries.size(), 0, sizeof(*entry_defs));
+
+    zend_register_ini_entries(entry_defs, module_number);
+    delete []entry_defs;
+}
+
+void Extension::unregisterIniEntries(int module_number) {
+    if (ini_entries.size()) {
+        zend_unregister_ini_entries(module_number);
+    }
 }
 
 }
