@@ -35,6 +35,7 @@ extern "C"
 #include "zend_exceptions.h"
 #include "zend_variables.h"
 #include "zend_inheritance.h"
+#include "zend_operators.h"
 
 #include <ext/date/php_date.h>
 #include <ext/json/php_json.h>
