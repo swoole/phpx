@@ -16,7 +16,7 @@ notifications:
   email: team@swoole.com
 
 before_script:
-    - phpize && ./configure && make clean && make
+    - cmake . && make -j install
 
 script:
     - exit 0
