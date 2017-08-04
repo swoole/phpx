@@ -1,8 +1,8 @@
 language: php 
 
 compiler:
-  - gcc
-  - clang
+  - g++
+  - clang++
 
 os:
   - linux
