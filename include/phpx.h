@@ -35,7 +35,6 @@ extern "C"
 #include "zend_exceptions.h"
 #include "zend_variables.h"
 #include "zend_inheritance.h"
-#include "zend_operators.h"
 
 #include <ext/date/php_date.h>
 #include <ext/json/php_json.h>
@@ -751,7 +750,8 @@ public:
     {
         if (isReference())
         {
-            zend_unwrap_reference(&val);
+            zval_delref_p(&val);
+            ZVAL_COPY(&val, Z_REFVAL_P(&val));
         }
         if (isNull())
         {
