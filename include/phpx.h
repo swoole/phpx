@@ -139,9 +139,12 @@ public:
     {
         init();
         reference = ref;
-        if (reference) {
+        if (reference)
+        {
             ref_val = v;
-        } else {
+        }
+        else
+        {
             memcpy(&val, v, sizeof(zval));
             zval_add_ref(&val);
         }
@@ -448,8 +451,8 @@ protected:
         if (!reference)
         {
             zval_ptr_dtor(&val);
+            init();
         }
-        init();
     }
 };
 
