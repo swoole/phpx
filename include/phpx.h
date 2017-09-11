@@ -139,9 +139,12 @@ public:
     {
         init();
         reference = ref;
-        if (reference) {
+        if (reference)
+        {
             ref_val = v;
-        } else {
+        }
+        else
+        {
             memcpy(&val, v, sizeof(zval));
             zval_add_ref(&val);
         }
@@ -448,8 +451,8 @@ protected:
         if (!reference)
         {
             zval_ptr_dtor(&val);
+            init();
         }
-        init();
     }
 };
 
@@ -604,7 +607,7 @@ public:
         }
         return memcmp(str.c_str(), value->val, value->len) == 0;
     }
-    inline String trim(String &what, int mode = 0)
+    inline String trim(String &what, int mode = 3)
 	{
 		return php_trim(value, (char *) what.c_str(), what.length(), mode);
 	}
@@ -750,6 +753,11 @@ public:
     Array(zval *v) :
             Variant(v)
     {
+        if (isReference())
+        {
+            zval_delref_p(&val);
+            ZVAL_COPY(&val, Z_REFVAL_P(&val));
+        }
         if (isNull())
         {
             array_init(ptr());
@@ -763,10 +771,15 @@ public:
     {
         reference = v.isZvalRef();
 
+        zval* zv = const_cast<Variant &>(v).ptr();
+        if (Z_TYPE_P(zv) == IS_REFERENCE)
+        {
+            zv = Z_REFVAL_P(zv);
+        }
         if (reference) {
-            ref_val = const_cast<Variant &>(v).ptr();
+            ref_val = zv;
         } else {
-            memcpy(&val, const_cast<Variant &>(v).ptr(), sizeof(val));
+            memcpy(&val, zv, sizeof(*zv));
             addRef();
         }
         if (isNull())

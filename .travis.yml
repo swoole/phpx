@@ -1,0 +1,24 @@
+language: php 
+
+compiler:
+  - g++
+  - clang++
+
+os:
+  - linux
+#  - osx
+
+php:
+  - 7.0
+  - 7.1
+
+notifications:
+  email: team@swoole.com
+
+before_script:
+    - cmake . && make
+
+script:
+    - exit 0
+
+
