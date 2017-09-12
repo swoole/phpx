@@ -118,7 +118,8 @@ String String::addSlashes()
     Variant ret = exec("addslashes", param_str);
     if (ret.isString())
     {
-        return String(ret.toCString(), ret.length());
+        ret.addRef();
+        return String(ret.ptr());
     }
     return String("");
 }
@@ -132,7 +133,8 @@ String String::basename(String &suffix)
     Variant ret = exec("basename", param_path, param_suffix);
     if (ret.isString())
     {
-        return String(ret.toCString(), ret.length());
+        ret.addRef();
+        return String(ret.ptr());
     }
     return String("");
 }
@@ -145,7 +147,8 @@ String String::dirname()
     Variant ret = exec("dirname", param_path);
     if (ret.isString())
     {
-        return String(ret.toCString(), ret.length());
+        ret.addRef();
+        return String(ret.ptr());
     }
     return String("");
 }
