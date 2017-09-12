@@ -55,7 +55,16 @@ void echo(const char *format, ...)
 
 String number_format(double num, int decimals, char dec_point, char thousands_sep)
 {
-    return _php_math_number_format(num, decimals, dec_point, thousands_sep);
+    Variant param_num(num);
+    Variant param_decimals(decimals);
+    Variant param_dec_point(&dec_point, 1);
+    Variant param_thousands_sep(&thousands_sep, 1);
+
+    Variant retval = exec("number_format", param_num, param_decimals, param_dec_point, param_thousands_sep);
+    if (retval.isString()) {
+        return String(retval.toCString(), retval.length());
+    }
+    return String("");
 }
 
 int extension_startup(int type, int module_number)
