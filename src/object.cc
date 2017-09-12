@@ -18,13 +18,6 @@
 
 #include "phpx.h"
 
-extern "C"
-{
-#include <ext/hash/php_hash.h>
-}
-
-using namespace std;
-
 namespace php
 {
 

@@ -88,36 +88,83 @@ String String::substr(long _offset, long _length)
 
 Variant String::split(String &delim, long limit)
 {
-	Array retval;
-	php_explode(delim.ptr(), value, retval.ptr(), limit);
-	return retval;
+    Variant param_delim(delim.c_str(), delim.length());
+    zend_string_addref(value);
+    Variant param_str(value);
+    Variant param_limit(limit);
+    return exec("explode", param_delim, param_str, param_limit);
 }
 
-void String::stripTags(String &allow, bool allow_tag_spaces)
+void String::stripTags(String &allow)
 {
-	int state;
-	value->len = php_strip_tags_ex(this->c_str(), this->length(), &state, allow.c_str(), allow.length(), allow_tag_spaces);
+    zend_string_addref(value);
+    Variant param_str(value);
+    Variant param_allow(allow.c_str(), allow.length());
+
+    Variant ret = exec("strip_tags", param_str, param_allow);
+    if (ret.isString())
+    {
+        zend_string_release(value);
+        ret.addRef();
+        value = Z_STR_P(ret.ptr());
+    }
 }
 
 String String::addSlashes()
 {
-	return php_addslashes(value, false);
+    zend_string_addref(value);
+    Variant param_str(value);
+
+    Variant ret = exec("addslashes", param_str);
+    if (ret.isString())
+    {
+        ret.addRef();
+        return String(ret.ptr());
+    }
+    return String("");
 }
 
 String String::basename(String &suffix)
 {
-	return php_basename(this->c_str(), this->length(), suffix.c_str(), suffix.length());
+    zend_string_addref(value);
+    Variant param_path(value);
+    Variant param_suffix(suffix.c_str(), suffix.length());
+
+    Variant ret = exec("basename", param_path, param_suffix);
+    if (ret.isString())
+    {
+        ret.addRef();
+        return String(ret.ptr());
+    }
+    return String("");
 }
 
 String String::dirname()
 {
-	size_t n = php_dirname(this->c_str(), this->length());
-	return String(this->c_str(), n);
+    zend_string_addref(value);
+    Variant param_path(value);
+
+    Variant ret = exec("dirname", param_path);
+    if (ret.isString())
+    {
+        ret.addRef();
+        return String(ret.ptr());
+    }
+    return String("");
 }
 
 void String::stripSlashes()
 {
-	php_stripslashes(value);
+    zend_string_addref(value);
+    Variant param_str(value);
+
+    Variant ret = exec("stripcslashes", param_str);
+    if (ret.isString())
+    {
+        zend_string_release(value);
+        ret.addRef();
+        value = Z_STR_P(ret.ptr());
+    }
 }
 
 }

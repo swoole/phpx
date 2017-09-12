@@ -350,7 +350,7 @@ public:
     }
     Variant* dup()
     {
-        return new Variant(this);
+        return new Variant(*this);
     }
     inline size_t length()
     {
@@ -456,6 +456,19 @@ protected:
     }
 };
 
+/*generator*/
+extern Variant exec(const char *func, const Variant &v1);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9);
+extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10);
+/*generator*/
+
 template<typename T>
 Variant newResource(const char *name, T *v)
 {
@@ -467,11 +480,6 @@ Variant newResource(const char *name, T *v)
     }
     zend_resource *res = zend_register_resource(static_cast<void*>(v), _c->type);
     return Variant(res);
-}
-
-static inline void var_dump(Variant &v)
-{
-    php_var_dump(v.ptr(), PHPX_VAR_DUMP_LEVEL);
 }
 
 static inline bool is_callable(const Variant &fn)
@@ -609,32 +617,79 @@ public:
     }
     inline String trim(String &what, int mode = 3)
 	{
-		return php_trim(value, (char *) what.c_str(), what.length(), mode);
+        Variant retval;
+        zend_string_addref(value);
+        Variant param_str(value);
+        Variant param_chrs(what.c_str(), what.length());
+        if (mode == 1)
+        {
+            retval = exec("ltrim", param_str, param_chrs);
+        } else if (mode == 2)
+        {
+            retval = exec("rtrim", param_str, param_chrs);
+        } else
+        {
+            retval = exec("trim", param_str, param_chrs);
+        }
+		if (retval.isString())
+		{
+		    retval.addRef();
+		    return String(retval.ptr());
+		}
+		return String(what.c_str(), what.length());
 	}
     inline void tolower()
     {
         zend_str_tolower(value->val, value->len);
     }
-    inline String base64Encode(bool raw = false)
+    inline String base64Encode()
     {
-		return php_base64_decode_ex((const unsigned char *) value->val, value->len, raw);
+        zend_string_addref(value);
+        Variant param_str(value);
+        Variant retval = exec("base64_encode", param_str);
+        if (retval.isString())
+        {
+            retval.addRef();
+            return String(retval.ptr());
+        }
+		return String("");
     }
 
 	inline String escape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, string charset = SG(default_charset))
 	{
-		return php_escape_html_entities((unsigned char *) value->val,
-				value->len, 0, flags, (char *) charset.c_str());
+	    zend_string_addref(value);
+	    Variant param_str(value);
+	    Variant param_flags(flags);
+	    Variant param_charset(charset.c_str());
+
+	    Variant retval = exec("htmlentities", param_str, param_flags, param_charset);
+	    if (retval.isString())
+	    {
+	        retval.addRef();
+	        return String(retval.ptr());
+	    }
+	    return String("");
 	}
 
-	inline String unescape(int flags, string charset)
+	inline String unescape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, string charset = SG(default_charset))
 	{
-		return php_unescape_html_entities((unsigned char *) value->val,
-				value->len, 1, flags, (char *) charset.c_str());
+        zend_string_addref(value);
+        Variant param_str(value);
+        Variant param_flags(flags);
+        Variant param_charset(charset.c_str());
+
+        Variant retval = exec("html_entity_decode", param_str, param_flags, param_charset);
+        if (retval.isString())
+        {
+            retval.addRef();
+            return String(retval.ptr());
+        }
+        return String("");
 	}
 
 	Variant split(String &delim, long = ZEND_LONG_MAX);
     String substr(long _offset, long _length = -1);
-    void stripTags(String &allow, bool allow_tag_spaces = false);
+    void stripTags(String &allow);
     String addSlashes();
     void stripSlashes();
     String basename(String &suffix);
@@ -738,7 +793,7 @@ private:
 extern int array_data_compare(const void *a, const void *b);
 extern String md5(String data, bool raw_output = false);
 extern String sha1(String data, bool raw_output = false);
-extern String crc32(String data, bool raw_output = false);
+extern int crc32(String data);
 extern String hash(String algo, String data, bool raw_output = false);
 extern String hash_hmac(String algo, String data, String key, bool raw_output = false);
 
@@ -986,10 +1041,14 @@ public:
     }
     String join(String &delim)
     {
-        Variant retval;
-        php_implode(delim.ptr(), ptr(), retval.ptr());
-        retval.addRef();
-        return retval.ptr();
+        zend_string_addref(delim.ptr());
+        Variant param_delim(delim.ptr());
+        Variant retval = exec("implode", param_delim, *this);
+        if (retval.isString())
+        {
+            return String(retval.toCString(), retval.length());
+        }
+        return String("");
     }
     void merge(Array &source, bool overwrite = false)
     {
@@ -1179,18 +1238,11 @@ static inline Variant exec(const char *func)
     Args args;
     return _call(NULL, _func.ptr(), args);
 }
-/*generator*/
-extern Variant exec(const char *func, const Variant &v1);
-extern Variant exec(const char *func, const Variant &v1, const Variant &v2);
-extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3);
-extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4);
-extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5);
-extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6);
-extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7);
-extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8);
-extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9);
-extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10);
-/*generator*/
+
+static inline void var_dump(Variant &v)
+{
+    exec("var_dump", v);
+}
 
 static inline zend_class_entry *getClassEntry(const char *name)
 {
@@ -1471,7 +1523,7 @@ extern void _exec_function(zend_execute_data *data, zval *return_value);
 extern void _exec_method(zend_execute_data *data, zval *return_value);
 
 String number_format(double num, int decimals = 0, char dec_point = '.', char thousands_sep = ',');
-Variant http_build_query(const Variant &data, const char* prefix = nullptr, const char* arg_sep = nullptr,
+Variant http_build_query(const Variant &data, const char* prefix = "", const char* arg_sep = "&",
         int enc_type = PHP_QUERY_RFC1738);
 
 static Variant constant(const char *name)
