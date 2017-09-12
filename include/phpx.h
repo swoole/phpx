@@ -738,7 +738,7 @@ private:
 extern int array_data_compare(const void *a, const void *b);
 extern String md5(String data, bool raw_output = false);
 extern String sha1(String data, bool raw_output = false);
-extern String crc32(String data, bool raw_output = false);
+extern int crc32(String data);
 extern String hash(String algo, String data, bool raw_output = false);
 extern String hash_hmac(String algo, String data, String key, bool raw_output = false);
 
