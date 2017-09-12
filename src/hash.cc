@@ -27,7 +27,8 @@ String md5(String data, bool raw_output)
     Variant param_raw_output(raw_output);
 
     Variant retval = exec("md5", param_str, param_raw_output);
-    if (retval.isString()) {
+    if (retval.isString())
+    {
         return String(retval.toCString(), retval.length());
     }
     return String("");
@@ -39,7 +40,8 @@ String sha1(String data, bool raw_output)
     Variant param_raw_output(raw_output);
 
     Variant retval = exec("sha1", param_str, param_raw_output);
-    if (retval.isString()) {
+    if (retval.isString())
+    {
         return String(retval.toCString(), retval.length());
     }
     return String("");
@@ -60,7 +62,8 @@ String hash(String algo, String data, bool raw_output)
     Variant param_raw_output(raw_output);
 
     Variant retval = exec("hash", param_algo, param_str, param_raw_output);
-    if (retval.isString()) {
+    if (retval.isString())
+    {
         return String(retval.toCString(), retval.length());
     }
     return String("");
@@ -74,7 +77,8 @@ String hash_hmac(String algo, String data, String key, bool raw_output)
     Variant param_raw_output(raw_output);
 
     Variant retval = exec("hash_hmac", param_algo, param_str, param_key, param_raw_output);
-    if (retval.isString()) {
+    if (retval.isString())
+    {
         return String(retval.toCString(), retval.length());
     }
     return String("");

@@ -61,7 +61,8 @@ String number_format(double num, int decimals, char dec_point, char thousands_se
     Variant param_thousands_sep(&thousands_sep, 1);
 
     Variant retval = exec("number_format", param_num, param_decimals, param_dec_point, param_thousands_sep);
-    if (retval.isString()) {
+    if (retval.isString())
+    {
         return String(retval.toCString(), retval.length());
     }
     return String("");

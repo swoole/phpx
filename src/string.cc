@@ -102,7 +102,8 @@ void String::stripTags(String &allow)
     Variant param_allow(allow.c_str(), allow.length());
 
     Variant ret = exec("strip_tags", param_str, param_allow);
-    if (ret.isString()) {
+    if (ret.isString())
+    {
         zend_string_release(value);
         ret.addRef();
         value = Z_STR_P(ret.ptr());
@@ -115,7 +116,8 @@ String String::addSlashes()
     Variant param_str(value);
 
     Variant ret = exec("addslashes", param_str);
-    if (ret.isString()) {
+    if (ret.isString())
+    {
         return String(ret.toCString(), ret.length());
     }
     return String("");
@@ -128,7 +130,8 @@ String String::basename(String &suffix)
     Variant param_suffix(suffix.c_str(), suffix.length());
 
     Variant ret = exec("basename", param_path, param_suffix);
-    if (ret.isString()) {
+    if (ret.isString())
+    {
         return String(ret.toCString(), ret.length());
     }
     return String("");
@@ -140,7 +143,8 @@ String String::dirname()
     Variant param_path(value);
 
     Variant ret = exec("dirname", param_path);
-    if (ret.isString()) {
+    if (ret.isString())
+    {
         return String(ret.toCString(), ret.length());
     }
     return String("");
@@ -152,7 +156,8 @@ void String::stripSlashes()
     Variant param_str(value);
 
     Variant ret = exec("stripcslashes", param_str);
-    if (ret.isString()) {
+    if (ret.isString())
+    {
         zend_string_release(value);
         ret.addRef();
         value = Z_STR_P(ret.ptr());

@@ -621,14 +621,18 @@ public:
         zend_string_addref(value);
         Variant param_str(value);
         Variant param_chrs(what.c_str(), what.length());
-        if (mode == 1) {
+        if (mode == 1)
+        {
             retval = exec("ltrim", param_str, param_chrs);
-        } else if (mode == 2) {
+        } else if (mode == 2)
+        {
             retval = exec("rtrim", param_str, param_chrs);
-        } else {
+        } else
+        {
             retval = exec("trim", param_str, param_chrs);
         }
-		if (retval.isString()) {
+		if (retval.isString())
+		{
 		    retval.addRef();
 		    return String(retval.ptr());
 		}
@@ -643,7 +647,8 @@ public:
         zend_string_addref(value);
         Variant param_str(value);
         Variant retval = exec("base64_encode", param_str);
-        if (retval.isString()) {
+        if (retval.isString())
+        {
             retval.addRef();
             return String(retval.ptr());
         }
@@ -1039,7 +1044,8 @@ public:
         zend_string_addref(delim.ptr());
         Variant param_delim(delim.ptr());
         Variant retval = exec("implode", param_delim, *this);
-        if (retval.isString()) {
+        if (retval.isString())
+        {
             return String(retval.toCString(), retval.length());
         }
         return String("");
