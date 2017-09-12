@@ -25,9 +25,6 @@ namespace php
 
 Variant http_build_query(const Variant &data, const char* prefix, const char* arg_sep, int enc_type)
 {
-    smart_str formstr =
-    { 0 };
-
     Variant &_data = const_cast<Variant &>(data);
     if (!_data.isArray() && !_data.isObject())
     {
@@ -35,24 +32,12 @@ Variant http_build_query(const Variant &data, const char* prefix, const char* ar
         return false;
     }
 
-    size_t prefix_len = prefix != nullptr ? strlen(prefix) : 0;
-    if (php_url_encode_hash_ex(HASH_OF(_data.ptr()), &formstr, prefix, prefix_len, NULL, 0, NULL, 0,
-            (_data.isObject() ? _data.ptr() : NULL), (char *) arg_sep, enc_type) == FAILURE)
-    {
-        if (formstr.s)
-        {
-            smart_str_free(&formstr);
-        }
-        return false;
-    }
+    Variant param_prefix(prefix);
+    Variant param_arg_sep(arg_sep);
+    Variant param_enc_type(enc_type);
 
-    if (!formstr.s)
-    {
-        return "";
-    }
-
-    smart_str_0(&formstr);
-    return formstr.s;
+    Variant retval = exec("http_build_query", _data, param_prefix, param_arg_sep, param_enc_type);
+    return retval;
 }
 
 }

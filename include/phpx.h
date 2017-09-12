@@ -634,7 +634,7 @@ public:
 
 	Variant split(String &delim, long = ZEND_LONG_MAX);
     String substr(long _offset, long _length = -1);
-    void stripTags(String &allow, bool allow_tag_spaces = false);
+    void stripTags(String &allow);
     String addSlashes();
     void stripSlashes();
     String basename(String &suffix);
@@ -1471,7 +1471,7 @@ extern void _exec_function(zend_execute_data *data, zval *return_value);
 extern void _exec_method(zend_execute_data *data, zval *return_value);
 
 String number_format(double num, int decimals = 0, char dec_point = '.', char thousands_sep = ',');
-Variant http_build_query(const Variant &data, const char* prefix = nullptr, const char* arg_sep = nullptr,
+Variant http_build_query(const Variant &data, const char* prefix = "", const char* arg_sep = "&",
         int enc_type = PHP_QUERY_RFC1738);
 
 static Variant constant(const char *name)
