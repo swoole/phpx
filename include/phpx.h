@@ -350,7 +350,7 @@ public:
     }
     Variant* dup()
     {
-        return new Variant(this);
+        return new Variant(*this);
     }
     inline size_t length()
     {
