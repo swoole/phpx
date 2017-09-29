@@ -1539,7 +1539,7 @@ class Class
 
 public:
     Class(const char *name);
-    bool extends(const char *_parent_class);
+    bool extends(const zend_class_entry *_parent_class);
     bool extends(Class *parent);
     bool implements(const char *name);
     bool implements(zend_class_entry *interface_ce);

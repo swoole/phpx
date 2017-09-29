@@ -32,7 +32,7 @@ Class::Class(const char *name)
     activated = false;
 }
 
-bool Class::extends(const char *_parent_class)
+bool Class::extends(const zend_class_entry *_parent_class)
 {
     if (activated)
     {
