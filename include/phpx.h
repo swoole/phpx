@@ -350,7 +350,7 @@ public:
     }
     Variant* dup()
     {
-        return new Variant(this);
+        return new Variant(*this);
     }
     inline size_t length()
     {
@@ -609,7 +609,7 @@ public:
         }
         return memcmp(str.c_str(), value->val, value->len) == 0;
     }
-    inline String trim(String &what, int mode = 0)
+    inline String trim(String &what, int mode = 3)
 	{
 		return php_trim(value, (char *) what.c_str(), what.length(), mode);
 	}
