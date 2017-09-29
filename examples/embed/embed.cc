@@ -83,7 +83,7 @@ int main(int argc, char * argv[])
 
     testRedis();
 
-    vm.include("index.php");
+    include("index.php");
     auto o = newObject("test");
 
     var_dump(o);

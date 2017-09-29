@@ -479,6 +479,8 @@ static inline bool is_callable(const Variant &fn)
     return zend_is_callable(const_cast<Variant &>(fn).ptr(), 0, nullptr);
 }
 
+Variant include(string file);
+
 static inline int version_compare(string s1, string s2)
 {
 	return php_version_compare(s1.c_str(), s2.c_str());
@@ -1539,7 +1541,7 @@ class Class
 
 public:
     Class(const char *name);
-    bool extends(const zend_class_entry *_parent_class);
+    bool extends(zend_class_entry *_parent_class);
     bool extends(Class *parent);
     bool implements(const char *name);
     bool implements(zend_class_entry *interface_ce);

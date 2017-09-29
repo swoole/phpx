@@ -32,14 +32,14 @@ Class::Class(const char *name)
     activated = false;
 }
 
-bool Class::extends(const zend_class_entry *_parent_class)
+bool Class::extends(zend_class_entry *_parent_class)
 {
     if (activated)
     {
         return false;
     }
-    parent_class_name = _parent_class;
-    parent_ce = getClassEntry(_parent_class);
+    parent_class_name = string(_parent_class->name->val, _parent_class->name->len);
+    parent_ce = _parent_class;
     return parent_ce != NULL;
 }
 
