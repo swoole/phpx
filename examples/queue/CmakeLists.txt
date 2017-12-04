@@ -1,0 +1,61 @@
+#project
+project(queue)
+cmake_minimum_required(VERSION 2.8)
+aux_source_directory(. DIR_SRCS)
+file(GLOB_RECURSE HEADER_FILES include/*.h)
+set(CMAKE_BUILD_TYPE Debug)
+
+if (DEFINED PHP_CONFIG_DIR)
+  set(PHP_CONFIG_DIR "${PHP_CONFIG_DIR}/")
+else()
+  set(PHP_CONFIG_DIR "")
+endif()
+
+#execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --includes
+#        OUTPUT_VARIABLE PHP_INCLUDE
+#        OUTPUT_STRIP_TRAILING_WHITESPACE
+#        )
+
+execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --include-dir
+        OUTPUT_VARIABLE PHP_INCLUDE_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+
+execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --libs
+        OUTPUT_VARIABLE PHP_LIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --ldflags
+        OUTPUT_VARIABLE ${PHP_LDFLAGS}
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+
+execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --extension-dir
+        OUTPUT_VARIABLE PHP_EXTENSION_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+
+message("PHP_INCLUDE: ${PHP_INCLUDE}")
+message("PHP_INCLUDE_DIR: ${PHP_INCLUDE_DIR}")
+message("PHP_EXTENSION_DIR: ${PHP_EXTENSION_DIR}")
+
+link_directories(${PHP_LDFLAGS})
+
+include_directories(BEFORE ${PHP_INCLUDE_DIR} ${PHP_INCLUDE_DIR}/Zend ${PHP_INCLUDE_DIR}/main ${PHP_INCLUDE_DIR}/TSRM)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+#苹果用户
+if (APPLE)
+    SET(CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+    message(${CMAKE_SHARED_LINKER_FLAGS})
+endif ()
+
+#libary
+add_library(queue SHARED ${DIR_SRCS})
+target_link_libraries(queue phpx)
+
+#修改名称
+set_target_properties(queue PROPERTIES PREFIX "")
+
+#install
+install(TARGETS queue DESTINATION ${PHP_EXTENSION_DIR})
