@@ -167,6 +167,11 @@ void _exec_function(zend_execute_data *data, zval *return_value)
     zval *param_ptr = ZEND_CALL_ARG(EG(current_execute_data), 1);
     int arg_count = ZEND_CALL_NUM_ARGS(EG(current_execute_data));
 
+    if(_check_args_num(data, arg_count) == FAILURE)
+    {
+        return;
+    }
+
     while (arg_count-- > 0)
     {
         args.append(param_ptr);
@@ -186,6 +191,11 @@ void _exec_method(zend_execute_data *data, zval *return_value)
     zval *param_ptr = ZEND_CALL_ARG(EG(current_execute_data), 1);
     int arg_count = ZEND_CALL_NUM_ARGS(EG(current_execute_data));
 
+    if(_check_args_num(data, arg_count) == FAILURE)
+    {
+        return;
+    }
+
     while (arg_count-- > 0)
     {
         args.append(param_ptr);
@@ -194,6 +204,26 @@ void _exec_method(zend_execute_data *data, zval *return_value)
     Variant _retval(return_value, true);
     func(_this, args, _retval);
 }
+
+ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int num_args)
+{
+    uint32_t min_num_args = data->func->common.required_num_args;
+    uint32_t max_num_args = data->func->common.num_args;
+
+    if (num_args < min_num_args || (num_args > max_num_args && max_num_args > 0)) 
+    {
+        #if PHP_MAJOR_VERSION >= 7 && PHP_MINOR_VERSION == 0
+        zend_wrong_paramers_count_error(num_args, min_num_args, max_num_args);
+        #else
+        zend_wrong_parameters_count_error(num_args, min_num_args, max_num_args);
+        #endif
+
+        return FAILURE;
+    }
+
+    return SUCCESS;
+}
+
 
 Variant _call(zval *object, zval *func, Args &args)
 {
