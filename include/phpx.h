@@ -1152,11 +1152,11 @@ public:
                 char *_s = (char *) emalloc(_l + 2);
                 _s[0] = '?';
                 _s[_l + 1] = 0;
-                type = (zend_type) strdup(_s);
+                type = (zend_type) _s;
             }
             else
             {
-                type = (zend_type) strdup(class_name);
+                type = (zend_type) estrdup(class_name);
             }
         }
         else
