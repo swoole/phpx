@@ -1471,6 +1471,8 @@ extern map<const char *, function_t, strCmp> function_map;
 
 extern void _exec_function(zend_execute_data *data, zval *return_value);
 extern void _exec_method(zend_execute_data *data, zval *return_value);
+extern ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int arg_count);
+
 
 String number_format(double num, int decimals = 0, char dec_point = '.', char thousands_sep = ',');
 Variant http_build_query(const Variant &data, const char* prefix = nullptr, const char* arg_sep = nullptr,
