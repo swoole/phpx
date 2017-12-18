@@ -37,6 +37,7 @@ extern "C"
 #include "zend_exceptions.h"
 #include "zend_variables.h"
 #include "zend_inheritance.h"
+#include "zend_types.h"
 
 #include <ext/date/php_date.h>
 #include <ext/json/php_json.h>
@@ -284,10 +285,12 @@ public:
     {
         return Z_TYPE_P(ptr()) == IS_REFERENCE;
     }
+#ifdef IS_TYPE_IMMUTABLE
     inline bool isImmutable()
     {
         return Z_TYPE_FLAGS_P(ptr()) & IS_TYPE_IMMUTABLE;
     }
+#endif
     inline bool isEmpty()
     {
         switch(type())
@@ -630,8 +633,12 @@ public:
 
 	inline String unescape(int flags, string charset)
 	{
+#if PHP_VERSION_ID < 70200
 		return php_unescape_html_entities((unsigned char *) value->val,
 				value->len, 1, flags, (char *) charset.c_str());
+#else
+		return php_unescape_html_entities(value, 1, flags, (char *) charset.c_str());
+#endif
 	}
 
 	Variant split(String &delim, long = ZEND_LONG_MAX);
@@ -778,9 +785,12 @@ public:
         {
             zv = Z_REFVAL_P(zv);
         }
-        if (reference) {
+        if (reference)
+        {
             ref_val = zv;
-        } else {
+        }
+        else
+        {
             memcpy(&val, zv, sizeof(*zv));
             addRef();
         }
@@ -792,6 +802,9 @@ public:
         {
             error(E_ERROR, "parameter 1 must be zend_array.");
         }
+#ifdef HT_ALLOW_COW_VIOLATION
+        HT_ALLOW_COW_VIOLATION(Z_ARRVAL_P(ptr()));
+#endif
     }
     void separate()
     {
@@ -1113,11 +1126,49 @@ public:
         this->return_reference = return_reference;
         this->info = nullptr;
     }
+#if PHP_VERSION_ID >= 70200
+    ~ArgInfo()
+    {
+        for (int i = 1; i <= list.size(); i++)
+        {
+            if (ZEND_TYPE_IS_CLASS(info[i].type))
+            {
+                efree((void* )info[i].type);
+            }
+        }
+    }
+#endif
+
     void add(const char *name, const char *class_name = nullptr, int type_hint = 0, bool pass_by_reference = false,
             bool allow_null = false, bool variadic = false)
     {
+#if PHP_VERSION_ID >= 70200
+        zend_type type;
+        if (class_name)
+        {
+            if (allow_null)
+            {
+                int _l = strlen(class_name);
+                char *_s = (char *) emalloc(_l + 2);
+                _s[0] = '?';
+                _s[_l + 1] = 0;
+                type = (zend_type) strdup(_s);
+            }
+            else
+            {
+                type = (zend_type) strdup(class_name);
+            }
+        }
+        else
+        {
+            type = ZEND_TYPE_ENCODE(type_hint, allow_null);
+        }
+        zend_internal_arg_info val =
+        { name, type, pass_by_reference, variadic, };
+#else
         zend_internal_arg_info val =
         { name, class_name, (zend_uchar)type_hint, pass_by_reference, allow_null, variadic, };
+#endif
         list.push_back(val);
     }
     zend_internal_arg_info* get()
@@ -1471,8 +1522,6 @@ extern map<const char *, function_t, strCmp> function_map;
 
 extern void _exec_function(zend_execute_data *data, zval *return_value);
 extern void _exec_method(zend_execute_data *data, zval *return_value);
-extern ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int arg_count);
-
 
 String number_format(double num, int decimals = 0, char dec_point = '.', char thousands_sep = ',');
 Variant http_build_query(const Variant &data, const char* prefix = nullptr, const char* arg_sep = nullptr,
@@ -1503,7 +1552,9 @@ enum ClassFlags
     PRIVATE = ZEND_ACC_PRIVATE,
     CONSTRUCT = ZEND_ACC_CTOR,
     DESTRUCT = ZEND_ACC_DTOR,
+#ifdef ZEND_ACC_CLONE
     CLONE = ZEND_ACC_CLONE,
+#endif
 };
 
 enum SortFlags

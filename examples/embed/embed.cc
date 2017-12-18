@@ -80,6 +80,12 @@ int main(int argc, char * argv[])
     String value = ini_get("output_buffering");
     cout << "ENV:" << value.toInt() << endl;
 
+    Variant a = 1;
+    Variant b = 2;
+
+
+    auto c = a;
+
 
     testRedis();
 

@@ -95,8 +95,7 @@ Variant String::split(String &delim, long limit)
 
 void String::stripTags(String &allow, bool allow_tag_spaces)
 {
-	int state;
-	value->len = php_strip_tags_ex(this->c_str(), this->length(), &state, allow.c_str(), allow.length(), allow_tag_spaces);
+	value->len = php_strip_tags_ex(this->c_str(), this->length(), nullptr, allow.c_str(), allow.length(), allow_tag_spaces);
 }
 
 String String::addSlashes()
