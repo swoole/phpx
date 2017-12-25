@@ -167,7 +167,7 @@ static inline ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int num_
     if (num_args < min_num_args || (num_args > max_num_args && max_num_args > 0))
     {
 #if PHP_MINOR_VERSION == 0
-        zend_wrong_parameters_count_error(num_args, min_num_args, max_num_args);
+        zend_wrong_paramers_count_error(num_args, min_num_args, max_num_args);
 #elif PHP_MINOR_VERSION == 1
         zend_wrong_parameters_count_error(num_args, min_num_args, max_num_args);
 #else
