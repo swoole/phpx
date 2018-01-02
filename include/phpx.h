@@ -61,7 +61,10 @@ typedef unsigned char uchar;
 #define PHPX_MAX_ARGC        10
 #define PHPX_VAR_DUMP_LEVEL  10
 
-using namespace std;
+using std::string;
+using std::unordered_map;
+using std::map;
+using std::vector;
 
 namespace php
 {
