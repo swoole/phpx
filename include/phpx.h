@@ -360,11 +360,18 @@ public:
     }
     inline size_t length()
     {
-        if (!isString())
+        if (isString())
         {
-            convert_to_string(ptr());
+            return Z_STRLEN_P(ptr());
         }
-        return Z_STRLEN_P(ptr());
+        else if (isArray())
+        {
+            return zend_hash_num_elements(Z_ARRVAL_P(ptr()));
+        }
+        else
+        {
+            return 0;
+        }
     }
     template<class T>
     T* toResource(const char *name)
@@ -571,9 +578,9 @@ public:
     {
         return value->val;
     }
-    inline int hashCode()
+    inline uint64_t hashCode()
     {
-    	return value->h;
+        return zend_string_hash_val(value);
     }
     inline void extend(size_t new_size)
     {
