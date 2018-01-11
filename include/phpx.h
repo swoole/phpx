@@ -61,11 +61,6 @@ typedef unsigned char uchar;
 #define PHPX_MAX_ARGC        10
 #define PHPX_VAR_DUMP_LEVEL  10
 
-using std::string;
-using std::unordered_map;
-using std::map;
-using std::vector;
-
 namespace php
 {
 
@@ -78,8 +73,8 @@ struct Resource
     int type;
 };
 
-extern unordered_map<string, Resource *> resource_map;
-extern map<int, void *> object_array;
+extern std::unordered_map<std::string, Resource *> resource_map;
+extern std::map<int, void *> object_array;
 
 class Variant
 {
@@ -114,7 +109,7 @@ public:
         init();
         ZVAL_STRINGL(&val, str, len);
     }
-    Variant(string &str)
+    Variant(std::string &str)
     {
         init();
         ZVAL_STRINGL(&val, str.c_str(), str.length());
@@ -178,7 +173,7 @@ public:
         destroy();
         ZVAL_LONG(ptr(), v);
     }
-    void operator =(string &str)
+    void operator =(std::string &str)
     {
         destroy();
         ZVAL_STRINGL(ptr(), str.c_str(), str.length());
@@ -314,13 +309,13 @@ public:
             return true;
         }
     }
-    inline string toString()
+    inline std::string toString()
     {
         if (!isString())
         {
             convert_to_string(ptr());
         }
-        return string(Z_STRVAL_P(ptr()), Z_STRLEN_P(ptr()));
+        return std::string(Z_STRVAL_P(ptr()), Z_STRLEN_P(ptr()));
     }
     inline char* toCString()
     {
@@ -429,7 +424,7 @@ public:
         Variant _tmp(v);
         return equals(_tmp);
     }
-    bool operator ==(string &v)
+    bool operator ==(std::string &v)
     {
         Variant _tmp(v);
         return equals(_tmp);
@@ -492,9 +487,9 @@ static inline bool is_callable(const Variant &fn)
     return zend_is_callable(const_cast<Variant &>(fn).ptr(), 0, nullptr);
 }
 
-Variant include(string file);
+Variant include(std::string file);
 
-static inline int version_compare(string s1, string s2)
+static inline int version_compare(std::string s1, std::string s2)
 {
 	return php_version_compare(s1.c_str(), s2.c_str());
 }
@@ -530,7 +525,7 @@ public:
     {
         value = zend_string_init(str, len, 0);
     }
-    String(string &str)
+    String(std::string &str)
     {
         value = zend_string_init(str.c_str(), str.length(), 0);
     }
@@ -590,7 +585,7 @@ public:
     {
         return memcmp(str, value->val, value->len) == 0;
     }
-    inline bool equals(string &str)
+    inline bool equals(std::string &str)
     {
         if (str.length() != value->len)
         {
@@ -635,13 +630,13 @@ public:
 		return php_base64_decode_ex((const unsigned char *) value->val, value->len, raw);
     }
 
-	inline String escape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, string charset = SG(default_charset))
+	inline String escape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, std::string charset = SG(default_charset))
 	{
 		return php_escape_html_entities((unsigned char *) value->val,
 				value->len, 0, flags, (char *) charset.c_str());
 	}
 
-	inline String unescape(int flags, string charset)
+	inline String unescape(int flags, std::string charset)
 	{
 #if PHP_VERSION_ID < 70200
 		return php_unescape_html_entities((unsigned char *) value->val,
@@ -829,7 +824,7 @@ public:
     {
         add_next_index_string(ptr(), str);
     }
-    void append(string &str)
+    void append(std::string &str)
     {
         add_next_index_stringl(ptr(), str.c_str(), str.length());
     }
@@ -887,7 +882,7 @@ public:
     {
         add_assoc_string(ptr(), key, (char * )v);
     }
-    inline void set(const char *key, string &v)
+    inline void set(const char *key, std::string &v)
     {
         add_assoc_stringl(ptr(), key, (char* )v.c_str(), v.length());
     }
@@ -967,7 +962,7 @@ public:
     {
         return zend_hash_str_exists(Z_ARRVAL_P(ptr()), key, strlen(key));
     }
-    inline bool exists(string &key)
+    inline bool exists(std::string &key)
     {
         return zend_hash_str_exists(Z_ARRVAL_P(ptr()), key.c_str(), key.length());
     }
@@ -1210,7 +1205,7 @@ protected:
     int required_num;
     bool return_reference;
     zend_internal_arg_info *info;
-    vector<zend_internal_arg_info> list;
+    std::vector<zend_internal_arg_info> list;
 };
 
 extern Variant _call(zval *object, zval *func, Args &args);
@@ -1386,11 +1381,11 @@ public:
     {
         zend_update_property(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v.ptr());
     }
-    inline void set(const char *name, string &v)
+    inline void set(const char *name, std::string &v)
     {
         zend_update_property_stringl(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v.c_str(), v.length());
     }
-    inline void set(const char *name, string v)
+    inline void set(const char *name, std::string v)
     {
         zend_update_property_stringl(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v.c_str(), v.length());
     }
@@ -1454,9 +1449,9 @@ public:
     {
         return static_cast<T*>(object_array[this->getId()]);
     }
-    inline string getClassName()
+    inline std::string getClassName()
     {
-        return string(Z_OBJCE_P(ptr())->name->val, Z_OBJCE_P(ptr())->name->len);
+        return std::string(Z_OBJCE_P(ptr())->name->val, Z_OBJCE_P(ptr())->name->len);
     }
     inline uint32_t getId()
     {
@@ -1527,8 +1522,8 @@ struct strCmp
     }
 };
 
-extern map<const char *, map<const char *, method_t, strCmp>, strCmp> method_map;
-extern map<const char *, function_t, strCmp> function_map;
+extern std::map<const char *, std::map<const char *, method_t, strCmp>, strCmp> method_map;
+extern std::map<const char *, function_t, strCmp> function_map;
 
 extern void _exec_function(zend_execute_data *data, zval *return_value);
 extern void _exec_method(zend_execute_data *data, zval *return_value);
@@ -1581,7 +1576,7 @@ enum SortFlags
 
 struct Method
 {
-    string name;
+    std::string name;
     int flags;
     method_t method;
     ArgInfo *info;
@@ -1591,14 +1586,14 @@ class Class
 {
     struct Property
     {
-        string name;
+        std::string name;
         zval value;
         int flags;
     };
 
     struct Constant
     {
-        string name;
+        std::string name;
         zval value;
     };
 
@@ -1614,7 +1609,7 @@ public:
     bool activate();
     bool alias(const char *alias_name);
 
-    string getName()
+    std::string getName()
     {
         return class_name;
     }
@@ -1622,7 +1617,7 @@ public:
     {
         return ce;
     }
-    Variant getStaticProperty(string p_name)
+    Variant getStaticProperty(std::string p_name)
     {
         if (!activated)
         {
@@ -1630,7 +1625,7 @@ public:
         }
         return Variant(zend_read_static_property(ce, p_name.c_str(), p_name.length(), 1));
     }
-    bool setStaticProperty(string p_name, Variant value)
+    bool setStaticProperty(std::string p_name, Variant value)
     {
         if (!activated)
         {
@@ -1639,7 +1634,7 @@ public:
         value.addRef();
         return zend_update_static_property(ce, p_name.c_str(), p_name.length(), value.ptr()) == SUCCESS;
     }
-    static Variant get(const char *name, string p_name)
+    static Variant get(const char *name, std::string p_name)
     {
         zend_class_entry *_tmp_ce = getClassEntry(name);
         if (!_tmp_ce)
@@ -1648,7 +1643,7 @@ public:
         }
         return Variant(zend_read_static_property(_tmp_ce, p_name.c_str(), p_name.length(), 1));
     }
-    static bool set(const char *name, string p_name, Variant value)
+    static bool set(const char *name, std::string p_name, Variant value)
     {
         zend_class_entry *_tmp_ce = getClassEntry(name);
         if (!_tmp_ce)
@@ -1660,16 +1655,16 @@ public:
     }
 protected:
     bool activated;
-    string class_name;
-    string parent_class_name;
+    std::string class_name;
+    std::string parent_class_name;
     zend_class_entry *parent_ce;
     zend_class_entry _ce;
     zend_class_entry *ce;
-    unordered_map<string, zend_class_entry *> interfaces;
-    vector<Method> methods;
-    vector<Property> propertys;
-    vector<Constant> constants;
-    vector<string> aliases;
+    std::unordered_map<std::string, zend_class_entry *> interfaces;
+    std::vector<Method> methods;
+    std::vector<Property> propertys;
+    std::vector<Constant> constants;
+    std::vector<std::string> aliases;
 };
 
 class Interface
@@ -1695,7 +1690,7 @@ public:
         methods.push_back(m);
         return false;
     }
-    inline string getName()
+    inline std::string getName()
     {
         return name;
     }
@@ -1731,14 +1726,14 @@ public:
     }
 protected:
     bool activated = false;
-    string name;
+    std::string name;
     zend_class_entry _ce;
     zend_class_entry *ce;
-    vector<Method> methods;
+    std::vector<Method> methods;
 };
 
-extern unordered_map<string, Class*> class_map;
-extern unordered_map<string, Interface*> interface_map;
+extern std::unordered_map<std::string, Class*> class_map;
+extern std::unordered_map<std::string, Interface*> interface_map;
 
 extern int extension_startup(int type, int module_number);
 extern void extension_info(zend_module_entry *module);
@@ -1808,12 +1803,12 @@ public:
     void registerConstant(const char *name, bool v);
     void registerConstant(const char *name, double v);
     void registerConstant(const char *name, float v);
-    void registerConstant(const char *name, string &v);
+    void registerConstant(const char *name, std::string &v);
     bool registerConstant(const char *name, Variant &v);
 
     bool require(const char *name, const char *version = nullptr);
 
-    void info(vector<string> header, vector<vector<string> > body)
+    void info(std::vector<std::string> header, std::vector<std::vector<std::string> > body)
     {
         this->header = header;
         this->body = body;
@@ -1829,8 +1824,8 @@ public:
         ini_entries.push_back(entry);
     }
 
-    string name;
-    string version;
+    std::string name;
+    std::string version;
     bool started = false;
 
     std::function<void(void)> onStart = nullptr;
@@ -1838,8 +1833,8 @@ public:
     std::function<void(void)> onBeforeRequest = nullptr;
     std::function<void(void)> onAfterRequest = nullptr;
 
-    vector<string> header;
-    vector<vector<string> > body;
+    std::vector<std::string> header;
+    std::vector<std::vector<std::string> > body;
 
 protected:
     int function_count = 0;
@@ -1850,8 +1845,8 @@ protected:
     std::vector<IniEntry> ini_entries;
 };
 
-extern unordered_map<string, Extension*> _name_to_extension;
-extern unordered_map<int, Extension*> _module_number_to_extension;
+extern std::unordered_map<std::string, Extension*> _name_to_extension;
+extern std::unordered_map<int, Extension*> _module_number_to_extension;
 
 extern Object newObject(const char *name);
 
