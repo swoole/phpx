@@ -84,7 +84,7 @@ public:
         init();
         ZVAL_NULL(&val);
     }
-    Variant(nullptr_t v)
+    Variant(std::nullptr_t v)
     {
         init();
         ZVAL_NULL(&val);
@@ -198,7 +198,7 @@ public:
         destroy();
         ZVAL_BOOL(ptr(), v);
     }
-    void operator =(nullptr_t _null)
+    void operator =(std::nullptr_t _null)
     {
         destroy();
         ZVAL_NULL(ptr());
@@ -419,7 +419,7 @@ public:
         Variant _tmp(v);
         return equals(_tmp);
     }
-    bool operator ==(nullptr_t v)
+    bool operator ==(std::nullptr_t v)
     {
         Variant _tmp(v);
         return equals(_tmp);
