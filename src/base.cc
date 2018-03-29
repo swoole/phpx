@@ -40,6 +40,19 @@ void error(int level, const char *format, ...)
     va_end(args);
 }
 
+Variant constant(const char *name)
+{
+    zend_string *_name = zend_string_init(name, strlen(name), 0);
+    zval *val = zend_get_constant_ex(_name, NULL, ZEND_FETCH_CLASS_SILENT);
+    zend_string_free(_name);
+    if (val == NULL)
+    {
+        return nullptr;
+    }
+    Variant retval(val);
+    return retval;
+}
+
 void echo(const char *format, ...)
 {
     va_list args;
@@ -51,6 +64,161 @@ void echo(const char *format, ...)
     PHPWRITE(buffer, size);
     efree(buffer);
     va_end(args);
+}
+
+static int validate_constant_array(HashTable *ht) /* {{{ */
+{
+    int ret = 1;
+    zval *val;
+
+    ht->u.v.nApplyCount++;
+    ZEND_HASH_FOREACH_VAL_IND(ht, val)
+    {
+        ZVAL_DEREF(val);
+        if (Z_REFCOUNTED_P(val))
+        {
+            if (Z_TYPE_P(val) == IS_ARRAY)
+            {
+                if (Z_REFCOUNTED_P(val))
+                {
+                    if (Z_ARRVAL_P(val)->u.v.nApplyCount > 0)
+                    {
+                        zend_error(E_WARNING, "Constants cannot be recursive arrays");
+                        ret = 0;
+                        break;
+                    }
+                    else if (!validate_constant_array(Z_ARRVAL_P(val)))
+                    {
+                        ret = 0;
+                        break;
+                    }
+                }
+            }
+            else if (Z_TYPE_P(val) != IS_STRING && Z_TYPE_P(val) != IS_RESOURCE)
+            {
+                zend_error(E_WARNING, "Constants may only evaluate to scalar values or arrays");
+                ret = 0;
+                break;
+            }
+        }
+    }
+    ZEND_HASH_FOREACH_END();
+    ht->u.v.nApplyCount--;
+    return ret;
+}
+
+static void copy_constant_array(zval *dst, zval *src) /* {{{ */
+{
+    zend_string *key;
+    zend_ulong idx;
+    zval *new_val, *val;
+
+    array_init_size(dst, zend_hash_num_elements(Z_ARRVAL_P(src)));
+    ZEND_HASH_FOREACH_KEY_VAL_IND(Z_ARRVAL_P(src), idx, key, val)
+    {
+        /* constant arrays can't contain references */
+        ZVAL_DEREF(val);
+        if (key)
+        {
+            new_val = zend_hash_add_new(Z_ARRVAL_P(dst), key, val);
+        }
+        else
+        {
+            new_val = zend_hash_index_add_new(Z_ARRVAL_P(dst), idx, val);
+        }
+        if (Z_TYPE_P(val) == IS_ARRAY)
+        {
+            if (Z_REFCOUNTED_P(val))
+            {
+                copy_constant_array(new_val, val);
+            }
+        }
+        else if (Z_REFCOUNTED_P(val))
+        {
+            Z_ADDREF_P(val);
+        }
+    }
+    ZEND_HASH_FOREACH_END();
+}
+
+bool define(const char *name, const Variant &v, bool case_sensitive)
+{
+    size_t len = strlen(name);
+    zval *val = const_cast<Variant &>(v).ptr(), val_free;
+    zend_constant c;
+
+    /* class constant, check if there is name and make sure class is valid & exists */
+    if (zend_memnstr(name, "::", sizeof("::") - 1, name + len))
+    {
+        zend_error(E_WARNING, "Class constants cannot be defined or redefined");
+        return false;
+    }
+
+    ZVAL_UNDEF(&val_free);
+
+    repeat: switch (Z_TYPE_P(val))
+    {
+    case IS_LONG:
+    case IS_DOUBLE:
+    case IS_STRING:
+    case IS_FALSE:
+    case IS_TRUE:
+    case IS_NULL:
+    case IS_RESOURCE:
+        break;
+    case IS_ARRAY:
+        if (Z_REFCOUNTED_P(val))
+        {
+            if (!validate_constant_array(Z_ARRVAL_P(val)))
+            {
+                return false;
+            }
+            else
+            {
+                copy_constant_array(&c.value, val);
+                goto register_constant;
+            }
+        }
+        break;
+    case IS_OBJECT:
+        if (Z_TYPE(val_free) == IS_UNDEF)
+        {
+            if (Z_OBJ_HT_P(val)->get)
+            {
+                zval rv;
+                val = Z_OBJ_HT_P(val)->get(val, &rv);
+                ZVAL_COPY_VALUE(&val_free, val);
+                goto repeat;
+            }
+            else if (Z_OBJ_HT_P(val)->cast_object)
+            {
+                if (Z_OBJ_HT_P(val)->cast_object(val, &val_free, IS_STRING) == SUCCESS)
+                {
+                    val = &val_free;
+                    break;
+                }
+            }
+        }
+        /* no break */
+    default:
+        zend_error(E_WARNING, "Constants may only evaluate to scalar values or arrays");
+        zval_ptr_dtor(&val_free);
+        return false;
+    }
+
+    ZVAL_COPY(&c.value, val);
+    zval_ptr_dtor(&val_free);
+    register_constant: c.flags = case_sensitive ? CONST_CS : 0; /* non persistent */
+    c.name = zend_string_init(name, len, 0);
+    c.module_number = PHP_USER_CONSTANT;
+    if (zend_register_constant(&c) == SUCCESS)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 String number_format(double num, int decimals, char dec_point, char thousands_sep)

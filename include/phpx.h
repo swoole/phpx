@@ -1532,18 +1532,8 @@ String number_format(double num, int decimals = 0, char dec_point = '.', char th
 Variant http_build_query(const Variant &data, const char* prefix = nullptr, const char* arg_sep = nullptr,
         int enc_type = PHP_QUERY_RFC1738);
 
-static Variant constant(const char *name)
-{
-    zend_string *_name = zend_string_init(name, strlen(name), 0);
-    zval *val = zend_get_constant_ex(_name, NULL, ZEND_FETCH_CLASS_SILENT);
-    zend_string_free(_name);
-    if (val == NULL)
-    {
-        return nullptr;
-    }
-    Variant retval(val);
-    return retval;
-}
+extern Variant constant(const char *name);
+extern bool define(const char *name, const Variant &v, bool case_sensitive = true);
 
 enum ClassFlags
 {
@@ -1806,7 +1796,6 @@ public:
     void registerConstant(const char *name, const char *v);
     void registerConstant(const char *name, const char *v, size_t len);
     void registerConstant(const char *name, std::string &v);
-    bool registerConstant(const char *name, Variant &v);
 
     bool require(const char *name, const char *version = nullptr);
 
