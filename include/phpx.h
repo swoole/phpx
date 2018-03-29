@@ -1803,6 +1803,8 @@ public:
     void registerConstant(const char *name, bool v);
     void registerConstant(const char *name, double v);
     void registerConstant(const char *name, float v);
+    void registerConstant(const char *name, const char *v);
+    void registerConstant(const char *name, const char *v, size_t len);
     void registerConstant(const char *name, std::string &v);
     bool registerConstant(const char *name, Variant &v);
 
