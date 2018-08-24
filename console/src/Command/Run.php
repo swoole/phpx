@@ -13,7 +13,7 @@ class Run extends \Symfony\Component\Console\Command\Command
     {
         $this
             ->setName('run')
-            ->setDescription('run phpx project.')
+            ->setDescription('Run phpx project')
             ->setHelp('This command allows you to run phpx project...');
     }
 

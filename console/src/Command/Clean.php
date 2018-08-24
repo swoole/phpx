@@ -13,7 +13,7 @@ class Clean extends \Symfony\Component\Console\Command\Command
     {
         $this
             ->setName('clean')
-            ->setDescription('clean object files.')
+            ->setDescription('Clean object files')
             ->setHelp('This command allows you to clean object files...');
     }
 

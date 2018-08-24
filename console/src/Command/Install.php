@@ -12,7 +12,7 @@ class Install extends \Symfony\Component\Console\Command\Command
     {
         $this
             ->setName('install')
-            ->setDescription('install phpx project.')
+            ->setDescription('Install phpx project')
             ->setHelp('Install binary file to system path.');
         $this->addOption('prefix', null,InputOption::VALUE_OPTIONAL, 'prefix of path.', '/usr/local');
     }

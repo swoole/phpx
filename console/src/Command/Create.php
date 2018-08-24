@@ -13,7 +13,7 @@ class Create extends \Symfony\Component\Console\Command\Command
     {
         $this
             ->setName('create')
-            ->setDescription('create a phpx project.')
+            ->setDescription('Create a phpx project')
             ->setHelp('This command allows you to create a phpx project...');
         $this->addArgument('project_name', InputArgument::REQUIRED, 'project_name');
     }
