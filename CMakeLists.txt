@@ -29,6 +29,7 @@ execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --ldflags
         OUTPUT_VARIABLE ${PHP_LDFLAGS}
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
+execute_process(COMMAND /usr/bin/env php -c console/php.ini script/pack.php)
 
 message("PHP_INCLUDE_DIR: ${PHP_INCLUDE_DIR}")
 
@@ -47,6 +48,7 @@ endif ()
 add_library(phpx SHARED ${DIR_SRCS})
 
 #install
+install(PROGRAMS bin/phpx DESTINATION bin)
 install(CODE "MESSAGE(\"Are you run command using root user?\")")
 install(TARGETS phpx LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 install(FILES ${HEADER_FILES} DESTINATION include)

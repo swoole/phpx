@@ -46,3 +46,4 @@ examples/test/test.so.dSYM/
 console/vendor
 console/test
 console/composer.lock
+bin/phpx
