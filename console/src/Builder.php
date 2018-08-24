@@ -11,8 +11,11 @@ class Builder
 
     protected $root;
     protected $cxxflags = '-g';
+    protected $ldflags = '';
     protected $exts = array('.cc', '.cpp', '.c');
     protected $projectName;
+    protected $target;
+    protected $installTargetDir;
 
     const DIR_SRC = 'src';
     const DIR_INCLUDE = 'include';
@@ -39,6 +42,10 @@ class Builder
             throw  new RuntimeException("no project.name option in config.ini\n");
         }
         $this->projectName = $config['project']['name'];
+        $this->cxxflags .= ' ' . $config['build']['cxxflags'];
+        $this->ldflags .= ' ' . $config['build']['ldflags'];
+        $this->target = $config['build']['target'];
+        $this->installTargetDir = $config['install']['target'];
     }
 
     function make()
@@ -85,7 +92,7 @@ class Builder
             if (is_file($objectFile) and filemtime($objectFile) >= filemtime($file)) {
                 continue;
             }
-            $this->exec(self::COMPILER . " {$this->cxxflags} -I./include -c $file -std=c++11 -fPIC -o " . $objectFile);
+            $this->exec(self::COMPILER . " {$this->cxxflags} -fPIC -I./include -c $file -std=c++11 -o " . $objectFile);
         }
     }
 
@@ -100,15 +107,17 @@ class Builder
     public function link()
     {
         $objects = implode(' ', $this->objects);
-        $this->exec(self::COMPILER . " $objects -lphpx -L./lib -o " . self::DIR_BIN . "/{$this->projectName}");
+        if (!is_dir(dirname($this->target))) {
+            mkdir(dirname($this->target));
+        }
+        $this->exec(self::COMPILER . " $objects {$this->ldflags} -L./lib -o {$this->target}");
     }
 
-    function install($prefix = '/usr/local')
+    function install()
     {
-        $binFile = self::DIR_BIN . '/' . $this->projectName;
-        if (!is_file($binFile)) {
+        if (!is_file($this->target)) {
             $this->make();
         }
-        $this->exec("cp $binFile " . $prefix . '/bin/' . $this->projectName);
+        $this->exec("cp $this->target " .$this->installTargetDir.'/'.basename($this->target));
     }
 }

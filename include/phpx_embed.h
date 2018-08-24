@@ -42,10 +42,10 @@ public:
     }
     void eval(const char *script)
     {
-        string s(script);
+        std::string s(script);
         eval(s);
     }
-    void eval(string &script)
+    void eval(std::string &script)
     {
         zend_first_try
         {
@@ -57,13 +57,13 @@ public:
         }
         zend_end_try();
     }
-    inline Variant include(string file)
+    inline Variant include(std::string file)
     {
-        return php::include(file);
+        return include(file);
     }
     int exit_status;
 private:
-    string program_name;
+    std::string program_name;
 };
 }
 
