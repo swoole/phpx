@@ -14,12 +14,12 @@ class Build extends \Symfony\Component\Console\Command\Command
             ->setName('build')
             ->setDescription('Build phpx project')
             ->setHelp('This command allows you to build phpx project...');
-        $this->addOption('debug', 'd', InputOption::VALUE_NONE, "enable debug info");
+        $this->addOption('debug', 'd', InputOption::VALUE_NONE, "Compile to debug version");
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $builder = new Builder($input->getOption('debug'));
+        $builder = new Builder($input->getOption('debug'), $input->getOption('verbose'));
         $builder->make();
     }
 }

@@ -25,11 +25,13 @@ class Builder
 
     const COMPILER = 'c++';
 
-    protected $debug = false;
+    protected $debug;
+    protected $verbose;
 
-    function __construct($debug = false)
+    function __construct($debug = false, $verbose = false)
     {
         $this->debug = $debug;
+        $this->verbose = $verbose;
         $this->root = getcwd() . '/';
         if (!is_dir($this->root . self::DIR_SRC)) {
             throw  new RuntimeException("no src dir\n");
@@ -92,13 +94,18 @@ class Builder
             if (is_file($objectFile) and filemtime($objectFile) >= filemtime($file)) {
                 continue;
             }
-            $this->exec(self::COMPILER . " {$this->cxxflags} -fPIC -I./include -c $file -std=c++11 -o " . $objectFile);
+            if ($this->debug) {
+                $compilation_optimization = '-O0';
+            } else {
+                $compilation_optimization = '-O2';
+            }
+            $this->exec(self::COMPILER . " {$this->cxxflags} {$compilation_optimization} -fPIC -I./include -c $file -std=c++11 -o " . $objectFile);
         }
     }
 
     public function exec($cmd)
     {
-        if ($this->debug) {
+        if ($this->verbose) {
             echo $cmd."\n";
         }
         shell_exec($cmd);
