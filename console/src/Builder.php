@@ -2,12 +2,13 @@
 
 namespace phpx;
 
+use Swoole\Upload;
 use Symfony\Component\Console\Exception\RuntimeException;
 
 class Builder
 {
-    private $objects;
-    private $files;
+    private $objects = [];
+    private $files = [];
 
     protected $root;
     protected $cxxflags = '-g';
@@ -41,7 +42,7 @@ class Builder
             throw  new RuntimeException("no src dir\n");
         }
         if (!is_file($this->configFile)) {
-            throw  new RuntimeException("no config.ini\n");
+            throw  new RuntimeException("no config.ini[{$this->configFile}]\n");
         }
         $config = parse_ini_file($this->configFile, true);
         if (empty($config['project']['name'])) {
@@ -60,7 +61,12 @@ class Builder
         $this->link();
     }
 
-    function getFileList($dir)
+    function getTarget()
+    {
+        return $this->target;
+    }
+
+    static function getFileList($dir, $exts, array &$result)
     {
         $files = scandir($dir);
         foreach ($files as $file) {
@@ -68,20 +74,19 @@ class Builder
                 continue;
             }
             if (is_dir($dir . '/' . $file)) {
-                $this->getFileList($dir . '/' . $file);
+                self::getFileList($dir . '/' . $file, $exts, $result);
             } else {
-                //扩展名必须为规定的
-                if (!in_array(strstr($file, '.'), $this->exts)) {
+                if (!in_array('.' . Upload::getFileExt($file), $exts)) {
                     continue;
                 }
-                $this->files[] = $dir . '/' . $file;
+                $result[] = $dir . '/' . $file;
             }
         }
     }
 
     function compile()
     {
-        $this->getFileList($this->root . self::DIR_SRC);
+        self::getFileList($this->root . self::DIR_SRC, $this->exts, $this->files);
 
         if (empty($this->files)) {
             throw  new RuntimeException("no src files \n");
@@ -122,6 +127,15 @@ class Builder
             @mkdir(dirname($this->target));
         }
         $this->exec(self::COMPILER . " $objects {$this->ldflags} -L./lib -o {$this->target}");
+    }
+
+    function clean()
+    {
+        $objects = [];
+        self::getFileList($this->root . self::DIR_BUILD, ['.o'], $objects);
+        foreach ($objects as $f) {
+            unlink($f);
+        }
     }
 
     function install()

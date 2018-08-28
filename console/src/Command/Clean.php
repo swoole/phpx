@@ -19,6 +19,7 @@ class Clean extends \Symfony\Component\Console\Command\Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        shell_exec('rm -rf '.Builder::DIR_BUILD.'/*');
+        $builder = new Builder();
+        $builder->clean();
     }
 }

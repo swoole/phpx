@@ -22,6 +22,6 @@ class Run extends \Symfony\Component\Console\Command\Command
         $builder = new Builder();
         $builder->make();
         $output->write("<info>make success!</info>\nrun\n".str_repeat('=', 80)."\n");
-        echo shell_exec('./bin/main');
+        echo shell_exec($builder->getTarget());
     }
 }
