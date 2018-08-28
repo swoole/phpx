@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+echo "build phpx tool...\n";
 /**
  * 打包 phpx 命令行工具
  */
@@ -26,3 +27,4 @@ if (!is_dir(dirname($execFile))) {
 file_put_contents($execFile, $new . $sign . substr($bin, 20));
 unlink('phpx.phar');
 shell_exec('chmod a+x ' . $execFile);
+echo "build success.\n";
