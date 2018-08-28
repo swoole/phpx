@@ -28,18 +28,22 @@ class Builder
     protected $debug;
     protected $verbose;
 
+    protected $configFile;
+
     function __construct($debug = false, $verbose = false)
     {
         $this->debug = $debug;
         $this->verbose = $verbose;
         $this->root = getcwd() . '/';
+        $this->configFile = $this->root . self::DIR_BUILD . '/config.ini';
+
         if (!is_dir($this->root . self::DIR_SRC)) {
             throw  new RuntimeException("no src dir\n");
         }
-        if (!is_file($this->root . 'config.ini')) {
+        if (!is_file($this->configFile)) {
             throw  new RuntimeException("no config.ini\n");
         }
-        $config = parse_ini_file($this->root . 'config.ini', true);
+        $config = parse_ini_file($this->configFile, true);
         if (empty($config['project']['name'])) {
             throw  new RuntimeException("no project.name option in config.ini\n");
         }
@@ -115,7 +119,7 @@ class Builder
     {
         $objects = implode(' ', $this->objects);
         if (!is_dir(dirname($this->target))) {
-            mkdir(dirname($this->target));
+            @mkdir(dirname($this->target));
         }
         $this->exec(self::COMPILER . " $objects {$this->ldflags} -L./lib -o {$this->target}");
     }

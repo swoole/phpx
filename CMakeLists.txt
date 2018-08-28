@@ -29,6 +29,7 @@ execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --ldflags
         OUTPUT_VARIABLE ${PHP_LDFLAGS}
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
+
 execute_process(COMMAND /usr/bin/env php -c console/php.ini script/pack.php)
 
 message("PHP_INCLUDE_DIR: ${PHP_INCLUDE_DIR}")

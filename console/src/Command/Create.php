@@ -44,6 +44,7 @@ class Create extends \Symfony\Component\Console\Command\Command
         $php_libs = trim(`php-config --libs`);
         $php_ldflags = trim(`php-config --ldflags`);
         $php_extension_dir = trim(`php-config --extension-dir`);
+        $configFile = $path . '/' . Builder::DIR_BUILD . '/config.ini';
 
         if ($bin) {
             $ini = <<<CODE
@@ -55,7 +56,7 @@ target="bin/{$project_name}"
 ldflags = "{$php_ldflags} {$php_libs} -lphp7 -lphpx"
 cxxflags = "{$php_include}"
 CODE;
-            file_put_contents($path . '/config.ini', $ini);
+            file_put_contents($configFile, $ini);
 
             $src = <<<HTML
 #include "phpx_embed.h"
@@ -86,7 +87,7 @@ cxxflags = "-fPIC {$php_include}"
 [install]
 target="$php_extension_dir"
 HTML;
-            file_put_contents($path . '/config.ini', $ini);
+            file_put_contents($configFile, $ini);
 
             $date = date('Y-m-d');
             $src = <<<HTML
