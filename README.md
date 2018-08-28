@@ -1,6 +1,6 @@
 # PHP-X
 
-[![Build Status](https://api.travis-ci.org/swoole/PHP-X.svg)](https://travis-ci.org/swoole/PHP-X)
+[![Build Status](https://api.travis-ci.org/swoole/PHP-X.svg)](https://travis-ci.org/swoole/phpx)
 [![License](https://img.shields.io/badge/license-GPL3.0-blue.svg)](LICENSE)
 
 C++ wrapper for Zend API
