@@ -12,6 +12,7 @@ class Builder
 
     protected $root;
     protected $cxxflags = '-g';
+    protected $cflags = '-g';
     protected $ldflags = '';
     protected $exts = array('.cc', '.cpp', '.c');
     protected $projectName;
@@ -24,10 +25,16 @@ class Builder
     const DIR_BIN = 'bin';
     const DIR_BUILD = '.build';
 
-    const COMPILER = 'c++';
+    const CXX = 'c++';
+    const CC = 'cc';
 
     protected $debug;
     protected $verbose;
+    /**
+     * static or shared
+     * @var int
+     */
+    protected $type;
 
     protected $configFile;
 
@@ -36,29 +43,32 @@ class Builder
         $this->debug = $debug;
         $this->verbose = $verbose;
         $this->root = getcwd() . '/';
-        $this->configFile = $this->root . self::DIR_BUILD . '/config.ini';
+        $this->configFile = $this->root . '/.config.json';
 
         if (!is_dir($this->root . self::DIR_SRC)) {
             throw  new RuntimeException("no src dir\n");
         }
         if (!is_file($this->configFile)) {
-            throw  new RuntimeException("no config.ini[{$this->configFile}]\n");
+            throw  new RuntimeException("no .config.json[{$this->configFile}]\n");
         }
-        $config = parse_ini_file($this->configFile, true);
+        $config = json_decode(file_get_contents($this->configFile), true);
         if (empty($config['project']['name'])) {
-            throw  new RuntimeException("no project.name option in config.ini\n");
+            throw  new RuntimeException("no project.name option in config.json\n");
         }
         $this->projectName = $config['project']['name'];
         $this->cxxflags .= ' ' . $config['build']['cxxflags'];
+        $this->cflags .= ' ' . $config['build']['cflags'];
         $this->ldflags .= ' ' . $config['build']['ldflags'];
         $this->target = $config['build']['target'];
         $this->installTargetDir = $config['install']['target'];
+        $this->type = $config['build']['type'];
     }
 
     function make()
     {
-        $this->compile();
-        $this->link();
+        if ($this->compile()) {
+            $this->link();
+        }
     }
 
     function getTarget()
@@ -84,6 +94,10 @@ class Builder
         }
     }
 
+    /**
+     * 编译源代码
+     * @return bool
+     */
     function compile()
     {
         self::getFileList($this->root . self::DIR_SRC, $this->exts, $this->files);
@@ -104,20 +118,37 @@ class Builder
                 continue;
             }
             if ($this->debug) {
-                $compilation_optimization = '-O0';
+                $compile_option = '-O0';
             } else {
-                $compilation_optimization = '-O2';
+                $compile_option = '-O2';
             }
-            $this->exec(self::COMPILER . " {$this->cxxflags} {$compilation_optimization} -fPIC -I./include -c $file -std=c++11 -o " . $objectFile);
+            if ($this->type = 'shared') {
+                $compile_option .= ' -fPIC';
+            }
+            if (Upload::getFileExt($file) == 'c') {
+                $result = $this->exec(self::CC . " -I./include -c $file -o $objectFile {$compile_option} {$this->cflags}");
+            } else {
+                $result = $this->exec(self::CXX . " -I./include -c $file -o $objectFile {$compile_option} {$this->cxxflags}");
+            }
+            if ($result === false) {
+                return false;
+            }
         }
+        return true;
     }
 
     public function exec($cmd)
     {
         if ($this->verbose) {
-            echo $cmd."\n";
+            echo $cmd . "\n";
         }
-        shell_exec($cmd);
+        $handle = popen($cmd, "r");
+        $status = pclose($handle);
+        if ($status != 0) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public function link()
@@ -126,7 +157,11 @@ class Builder
         if (!is_dir(dirname($this->target))) {
             @mkdir(dirname($this->target));
         }
-        $this->exec(self::COMPILER . " $objects {$this->ldflags} -L./lib -o {$this->target}");
+        $link_option = '';
+        if ($this->type == 'shared') {
+            $link_option .= ' -shared';
+        }
+        $this->exec(self::CXX . " $objects {$this->ldflags} $link_option -L./lib -o {$this->target}");
     }
 
     function clean()

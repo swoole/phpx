@@ -8,8 +8,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Command\Command;
 
-class Create extends \Symfony\Component\Console\Command\Command
+class Create extends Command
 {
     protected function configure()
     {
@@ -44,20 +45,21 @@ class Create extends \Symfony\Component\Console\Command\Command
         $php_libs = trim(`php-config --libs`);
         $php_ldflags = trim(`php-config --ldflags`);
         $php_extension_dir = trim(`php-config --extension-dir`);
-        $configFile = $path . '/' . Builder::DIR_BUILD . '/config.ini';
+        $configFile = $path . '/.config.json';
 
         if ($bin) {
-            $ini = <<<CODE
-[project]
-name = "{$project_name}"
-
-[build]
-target="bin/{$project_name}"
-ldflags = "{$php_ldflags} {$php_libs} -lphp7 -lphpx"
-cxxflags = "{$php_include}"
-CODE;
-            file_put_contents($configFile, $ini);
-
+            $conf['project']['name'] = $project_name;
+            $conf['build'] = [
+                'target' => "bin/{$project_name}",
+                'ldflags' => "-shared {$php_ldflags} {$php_libs} -lphp7 -lphpx",
+                'cxxflags' => "-std=c++11 -fPIC {$php_include}",
+                'cflags' => "-fPIC {$php_include}",
+                'type' => 'shared',
+            ];
+            $conf['install'] = [
+                'target' => $php_extension_dir,
+            ];
+            file_put_contents($configFile, json_encode($conf, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
             $src = <<<HTML
 #include "phpx_embed.h"
 #include <iostream>
@@ -75,19 +77,18 @@ int main(int argc, char * argv[])
 HTML;
             file_put_contents($path . '/src/main.cpp', $src);
         } else {
-            $ini = <<<HTML
-[project]
-name = "{$project_name}"
-
-[build]
-target="lib/{$project_name}.so"
-ldflags = "-shared {$php_ldflags} {$php_libs} -lphpx"
-cxxflags = "-fPIC {$php_include}"
-
-[install]
-target="$php_extension_dir"
-HTML;
-            file_put_contents($configFile, $ini);
+            $conf['project']['name'] = $project_name;
+            $conf['build'] = [
+                'target' => "lib/{$project_name}.so",
+                'ldflags' => "-shared {$php_ldflags} {$php_libs} -lphpx",
+                'cxxflags' => "-std=c++11 -fPIC {$php_include}",
+                'cflags' => "-fPIC {$php_include}",
+                'type' => 'shared',
+            ];
+            $conf['install'] = [
+                'target' => $php_extension_dir,
+            ];
+            file_put_contents($configFile, json_encode($conf, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
             $date = date('Y-m-d');
             $src = <<<HTML
