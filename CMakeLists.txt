@@ -30,15 +30,14 @@ execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --ldflags
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
 
-execute_process(COMMAND sh build.sh)
-
 message("PHP_INCLUDE_DIR: ${PHP_INCLUDE_DIR}")
 
 link_directories(${PHP_LDFLAGS})
 
 include_directories(include)
-include_directories(BEFORE ${PHP_INCLUDE_DIR} ${PHP_INCLUDE_DIR}/Zend ${PHP_INCLUDE_DIR}/main ${PHP_INCLUDE_DIR}/TSRM)
+include_directories(${PHP_INCLUDE_DIR} ${PHP_INCLUDE_DIR}/Zend ${PHP_INCLUDE_DIR}/main ${PHP_INCLUDE_DIR}/TSRM BEFORE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
 if (APPLE)
     SET(CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
@@ -49,7 +48,6 @@ endif ()
 add_library(phpx SHARED ${DIR_SRCS})
 
 #install
-install(PROGRAMS bin/phpx DESTINATION bin)
 install(CODE "MESSAGE(\"Are you run command using root user?\")")
 install(TARGETS phpx LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 install(FILES ${HEADER_FILES} DESTINATION include)
