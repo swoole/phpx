@@ -311,43 +311,34 @@ public:
     }
     inline std::string toString()
     {
-        if (!isString())
-        {
-            convert_to_string(ptr());
-        }
-        return std::string(Z_STRVAL_P(ptr()), Z_STRLEN_P(ptr()));
+        zend_string *str = zval_get_string(ptr());
+        std::string retval = std::string(ZSTR_VAL(str), ZSTR_LEN(str));
+        zend_string_release(str);
+        return retval;
     }
+    /**
+     * [Unsafe Operation]
+     */
     inline char* toCString()
     {
-        if (!isString())
+        if (str_val)
         {
-            convert_to_string(ptr());
+            zend_string_release(str_val);
         }
-        return Z_STRVAL_P(ptr());
+        str_val = zval_get_string(ptr());
+        return ZSTR_VAL(str_val);
     }
     inline long toInt()
     {
-        if (!isInt())
-        {
-            convert_to_long(ptr());
-        }
-        return Z_LVAL_P(ptr());
+        return zval_get_long(ptr());
     }
     inline double toFloat()
     {
-        if (!isFloat())
-        {
-            convert_to_double(ptr());
-        }
-        return Z_DVAL_P(ptr());
+        return zval_get_double(ptr());
     }
     inline bool toBool()
     {
-        if (!isBool())
-        {
-            convert_to_boolean(ptr());
-        }
-        return Z_TYPE_P(ptr()) == IS_TRUE;
+        return zval_is_true(ptr());
     }
     Variant* dup()
     {
@@ -447,11 +438,13 @@ public:
 protected:
     bool reference;
     zval *ref_val;
+    zend_string *str_val;
     zval val;
     inline void init()
     {
         reference = false;
-        ref_val = NULL;
+        ref_val = nullptr;
+        str_val = nullptr;
         memset(&val, 0, sizeof(val));
     }
     void destroy()
@@ -460,6 +453,10 @@ protected:
         {
             zval_ptr_dtor(&val);
             init();
+        }
+        if (str_val)
+        {
+            zend_string_release(str_val);
         }
     }
 };
@@ -503,11 +500,11 @@ public:
     }
     String(int v)
     {
-        value = zend_long_to_str(v);
+        value = zend_long_to_str((zend_long) v);
     }
     String(long v)
     {
-        value = zend_long_to_str(v);
+        value = zend_long_to_str((zend_long) v);
     }
     String(float v)
     {
@@ -543,12 +540,7 @@ public:
     }
     String(Variant &v)
     {
-        if (v.type() != IS_STRING)
-        {
-            error(E_ERROR, "parameter 1 must be zend_string.");
-        }
-        value = Z_STR_P(v.ptr());
-        free_memory = false;
+        value = zval_get_string(v.ptr());
     }
     ~String()
     {
@@ -671,6 +663,19 @@ static inline String ini_get(String varname)
         return "";
     }
     return value;
+}
+
+static inline Variant get_cfg_name(String varname)
+{
+    zval *retval = cfg_get_entry(varname.c_str(), (uint32_t) varname.length());
+    if (retval)
+    {
+        return retval;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 class ArrayIterator
