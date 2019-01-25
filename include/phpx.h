@@ -173,7 +173,7 @@ public:
         destroy();
         ZVAL_LONG(ptr(), v);
     }
-    void operator =(std::string &str)
+    void operator =(const std::string &str)
     {
         destroy();
         ZVAL_STRINGL(ptr(), str.c_str(), str.length());
@@ -696,32 +696,12 @@ public:
         _val = &_ptr->val;
         _index = _ptr->h;
         pe = _pe;
+        skipUndefBucket();
     }
     void operator ++(int i)
     {
-        while (++_ptr != pe)
-        {
-            _val = &_ptr->val;
-            if (_val && Z_TYPE_P(_val) == IS_INDIRECT)
-            {
-                _val = Z_INDIRECT_P(_val);
-            }
-            if (UNEXPECTED(Z_TYPE_P(_val) == IS_UNDEF))
-            {
-                continue;
-            }
-            if (_ptr->key)
-            {
-                _key = _ptr->key;
-                _index = 0;
-            }
-            else
-            {
-                _index = _ptr->h;
-                _key = NULL;
-            }
-            break;
-        }
+        ++_ptr;
+        skipUndefBucket();
     }
     bool operator !=(ArrayIterator b)
     {
@@ -747,6 +727,34 @@ public:
         return _ptr;
     }
 private:
+    void skipUndefBucket()
+    {
+        while (_ptr != pe)
+        {
+            _val = &_ptr->val;
+            if (_val && Z_TYPE_P(_val) == IS_INDIRECT)
+            {
+                _val = Z_INDIRECT_P(_val);
+            }
+            if (UNEXPECTED(Z_TYPE_P(_val) == IS_UNDEF))
+            {
+                ++_ptr;
+                continue;
+            }
+            if (_ptr->key)
+            {
+                _key = _ptr->key;
+                _index = 0;
+            }
+            else
+            {
+                _index = _ptr->h;
+                _key = NULL;
+            }
+            break;
+        }
+    }
+
     zval *_val;
     zend_string *_key;
     Bucket *_ptr;
