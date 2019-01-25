@@ -381,6 +381,19 @@ public:
         }
         return static_cast<T *>(_ptr);
     }
+    Variant toReference()
+    {
+        if (isReference())
+        {
+            return this;
+        }
+        zval zref;
+        addRef();
+        ZVAL_NEW_REF(&zref, ptr());
+        zval_delref_p(&zref);
+        Variant ret(&zref, false);
+        return ret;
+    }
     bool operator ==(Variant &v)
     {
         return equals(v);
@@ -1103,10 +1116,6 @@ public:
             return Variant(nullptr);
         }
         zval *value = ptr_list[i];
-        if (Z_TYPE_P(value) == IS_REFERENCE)
-        {
-            value = static_cast<zval *>(Z_REFVAL_P(value));
-        }
         return Variant(value, true);
     }
 private:
