@@ -394,6 +394,16 @@ public:
         Variant ret(&zref, false);
         return ret;
     }
+    Variant referenceTo()
+    {
+        if (!isReference())
+        {
+            return *this;
+        }
+        zval zv;
+        ZVAL_COPY_VALUE(&zv, Z_REFVAL_P(ptr()));
+        return Variant(&zv, false);
+    }
     bool operator ==(Variant &v)
     {
         return equals(v);
