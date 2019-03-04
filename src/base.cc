@@ -220,9 +220,13 @@ bool define(const char *name, const Variant &v, bool case_sensitive)
 
     ZVAL_COPY(&c.value, val);
     zval_ptr_dtor(&val_free);
+    #if PHP_MINOR_VERSION < 3
     register_constant: c.flags = case_sensitive ? CONST_CS : 0; /* non persistent */
-    c.name = zend_string_init(name, len, 0);
     c.module_number = PHP_USER_CONSTANT;
+    #else
+    register_constant: ZEND_CONSTANT_SET_FLAGS(&c, case_sensitive ? CONST_CS : 0, ZEND_CONSTANT_MODULE_NUMBER(&c));
+    #endif
+    c.name = zend_string_init(name, len, 0);
     if (zend_register_constant(&c) == SUCCESS)
     {
         return true;
