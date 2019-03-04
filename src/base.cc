@@ -354,8 +354,10 @@ static inline ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int num_
         zend_wrong_paramers_count_error(num_args, min_num_args, max_num_args);
 #elif PHP_MINOR_VERSION == 1
         zend_wrong_parameters_count_error(num_args, min_num_args, max_num_args);
-#else
+#elif PHP_MINOR_VERSION == 2
         zend_wrong_parameters_count_error(1, num_args, min_num_args, max_num_args);
+#else 
+        zend_wrong_parameters_count_error(min_num_args, max_num_args);
 #endif
         return FAILURE;
     }
