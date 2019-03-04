@@ -100,7 +100,11 @@ void String::stripTags(String &allow, bool allow_tag_spaces)
 
 String String::addSlashes()
 {
-	return php_addslashes(value, false);
+    #if PHP_MINOR_VERSION < 3
+	    return php_addslashes(value, false);
+    #else
+        return php_addslashes(value);
+    #endif
 }
 
 String String::basename(String &suffix)
