@@ -223,7 +223,11 @@ bool Class::activate()
     for (int i = 0; i < aliases.size(); i++)
     {
         string alias = aliases[i];
+        #if PHP_MINOR_VERSION < 3
         if (zend_register_class_alias_ex(alias.c_str(), alias.length(), ce) < 0)
+        #else
+        if (zend_register_class_alias_ex(alias.c_str(), alias.length(), ce, ce->type != ZEND_USER_CLASS) < 0)
+        #endif
         {
             return false;
         }
