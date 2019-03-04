@@ -211,9 +211,15 @@ void Extension::registerIniEntries(int module_number) {
                 entry.default_value.c_str(), // value
                 NULL,   // displayer
 
+                #if PHP_MINOR_VERSION < 3
+                entry.modifiable, // modifiable
+                (uint)entry.name.size(), // name_length
+                (uint)entry.default_value.size(), // value_length 
+                #else
                 (uint32_t) entry.default_value.size(), // value_length
                 (uint16_t) entry.name.size(), // name_length
                 (uint8_t)  entry.modifiable, // modifiable
+                #endif
         };
         entry_defs[i] = def;
     }
