@@ -210,9 +210,10 @@ void Extension::registerIniEntries(int module_number) {
                 NULL,   // mh_arg3
                 entry.default_value.c_str(), // value
                 NULL,   // displayer
-                entry.modifiable, // modifiable
-                (uint)entry.name.size(), // name_length
-                (uint)entry.default_value.size(), // value_length
+
+                (uint32_t) entry.default_value.size(), // value_length
+                (uint16_t) entry.name.size(), // name_length
+                (uint8_t)  entry.modifiable, // modifiable
         };
         entry_defs[i] = def;
     }
