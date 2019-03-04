@@ -72,9 +72,9 @@ static int validate_constant_array(HashTable *ht) /* {{{ */
     zval *val;
 
     #if PHP_MINOR_VERSION < 3
-    ht->u.v.nApplyCount++;
+        ht->u.v.nApplyCount++;
     #else
-    ht->u.v._unused++;
+        ht->u.v._unused++;
     #endif
     ZEND_HASH_FOREACH_VAL_IND(ht, val)
     {
@@ -86,9 +86,9 @@ static int validate_constant_array(HashTable *ht) /* {{{ */
                 if (Z_REFCOUNTED_P(val))
                 {
                     #if PHP_MINOR_VERSION < 3
-                    if (Z_ARRVAL_P(val)->u.v.nApplyCount > 0)
+                        if (Z_ARRVAL_P(val)->u.v.nApplyCount > 0)
                     #else
-                    if (Z_ARRVAL_P(val)->u.v._unused > 0)
+                        if (Z_ARRVAL_P(val)->u.v._unused > 0)
                     #endif
                     {
                         zend_error(E_WARNING, "Constants cannot be recursive arrays");
@@ -112,9 +112,9 @@ static int validate_constant_array(HashTable *ht) /* {{{ */
     }
     ZEND_HASH_FOREACH_END();
     #if PHP_MINOR_VERSION < 3
-    ht->u.v.nApplyCount--;
+        ht->u.v.nApplyCount--;
     #else
-    ht->u.v._unused--;
+        ht->u.v._unused--;
     #endif
     return ret;
 }
@@ -221,10 +221,10 @@ bool define(const char *name, const Variant &v, bool case_sensitive)
     ZVAL_COPY(&c.value, val);
     zval_ptr_dtor(&val_free);
     #if PHP_MINOR_VERSION < 3
-    register_constant: c.flags = case_sensitive ? CONST_CS : 0; /* non persistent */
-    c.module_number = PHP_USER_CONSTANT;
+        register_constant: c.flags = case_sensitive ? CONST_CS : 0; /* non persistent */
+        c.module_number = PHP_USER_CONSTANT;
     #else
-    register_constant: ZEND_CONSTANT_SET_FLAGS(&c, case_sensitive ? CONST_CS : 0, ZEND_CONSTANT_MODULE_NUMBER(&c));
+        register_constant: ZEND_CONSTANT_SET_FLAGS(&c, case_sensitive ? CONST_CS : 0, ZEND_CONSTANT_MODULE_NUMBER(&c));
     #endif
     c.name = zend_string_init(name, len, 0);
     if (zend_register_constant(&c) == SUCCESS)
