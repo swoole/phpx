@@ -66,6 +66,7 @@ void echo(const char *format, ...)
     va_end(args);
 }
 
+#if  PHP_VERSION_ID < 70300
 static int validate_constant_array(HashTable *ht) /* {{{ */
 {
     int ret = 1;
@@ -106,6 +107,48 @@ static int validate_constant_array(HashTable *ht) /* {{{ */
     ht->u.v.nApplyCount--;
     return ret;
 }
+#else
+static int validate_constant_array(HashTable *ht)
+{
+    int ret = 1;
+    zval *val;
+
+    GC_PROTECT_RECURSION(ht);
+    ZEND_HASH_FOREACH_VAL_IND(ht, val)
+    {
+        ZVAL_DEREF(val);
+        if (Z_REFCOUNTED_P(val))
+        {
+            if (Z_TYPE_P(val) == IS_ARRAY)
+            {
+                if (Z_REFCOUNTED_P(val))
+                {
+                    if (Z_IS_RECURSIVE_P(val))
+                    {
+                        zend_error(E_WARNING, "Constants cannot be recursive arrays");
+                        ret = 0;
+                        break;
+                    }
+                    else if (!validate_constant_array(Z_ARRVAL_P(val)))
+                    {
+                        ret = 0;
+                        break;
+                    }
+                }
+            }
+            else if (Z_TYPE_P(val) != IS_STRING && Z_TYPE_P(val) != IS_RESOURCE)
+            {
+                zend_error(E_WARNING, "Constants may only evaluate to scalar values, arrays or resources");
+                ret = 0;
+                break;
+            }
+        }
+    }
+    ZEND_HASH_FOREACH_END();
+    GC_UNPROTECT_RECURSION(ht);
+    return ret;
+}
+#endif
 
 static void copy_constant_array(zval *dst, zval *src) /* {{{ */
 {
@@ -208,9 +251,12 @@ bool define(const char *name, const Variant &v, bool case_sensitive)
 
     ZVAL_COPY(&c.value, val);
     zval_ptr_dtor(&val_free);
-    register_constant: c.flags = case_sensitive ? CONST_CS : 0; /* non persistent */
-    c.name = zend_string_init(name, len, 0);
+    register_constant:
+#if  PHP_VERSION_ID < 70300
+    c.flags = case_sensitive ? CONST_CS : 0; /* non persistent */
     c.module_number = PHP_USER_CONSTANT;
+#endif
+    c.name = zend_string_init(name, len, 0);
     if (zend_register_constant(&c) == SUCCESS)
     {
         return true;
@@ -338,8 +384,10 @@ static inline ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int num_
         zend_wrong_paramers_count_error(num_args, min_num_args, max_num_args);
 #elif PHP_MINOR_VERSION == 1
         zend_wrong_parameters_count_error(num_args, min_num_args, max_num_args);
-#else
+#elif PHP_MINOR_VERSION == 2
         zend_wrong_parameters_count_error(1, num_args, min_num_args, max_num_args);
+#else
+        zend_wrong_parameters_count_error(min_num_args, max_num_args);
 #endif
         return FAILURE;
     }
