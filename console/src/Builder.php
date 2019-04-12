@@ -19,6 +19,7 @@ class Builder
     protected $projectType;
     protected $target;
     protected $installTargetDir;
+    protected $phpRoot;
 
     const DIR_SRC = 'src';
     const DIR_INCLUDE = 'include';
@@ -37,7 +38,6 @@ class Builder
     protected $debug;
     protected $verbose;
 
-
     protected $configFile;
     protected $config;
 
@@ -46,6 +46,7 @@ class Builder
         $this->debug = $debug;
         $this->verbose = $verbose;
         $this->root = getcwd() . '/';
+        $this->phpRoot = trim(`php-config --prefix`);
 
         $this->loadConfig();
         $this->projectName = $this->getConfigValue('project', 'name');
@@ -53,10 +54,14 @@ class Builder
         $this->cxxflags .= ' ' . $this->getConfigValue('build', 'cxxflags');
         $this->cflags .= ' ' . $this->getConfigValue('build', 'cflags');
         $this->ldflags .= ' ' . $this->getConfigValue('build', 'ldflags');
-        $this->target = $this->root . '/lib/' . $this->projectName . '.so';
+
         if ($this->isExtension()) {
             $php_extension_dir = trim(`php-config --extension-dir`);
             $this->installTargetDir = $php_extension_dir;
+            $this->target = $this->root . '/lib/' . $this->projectName . '.so';
+        } else {
+            $this->installTargetDir = $this->phpRoot . '/bin';
+            $this->target = $this->root . '/bin/' . $this->projectName;
         }
     }
 
@@ -226,18 +231,24 @@ class Builder
         if (!is_dir(dirname($this->target))) {
             @mkdir(dirname($this->target));
         }
-        $link_option = '';
+
+        $link_option = ' -L./lib';
         $libs = trim(`php-config --libs`);
         $ldflags = trim(`php-config --ldflags`);
+
+        /**
+         * PHP 的 library 路径
+         */
+        $link_option .= ' -L' . $this->phpRoot . '/lib';
 
         if ($this->isExtension()) {
             $link_option .= ' -shared';
             $libs .= " ".self::PHPX_LFLAGS;
         } else {
-            $libs .= " ".self::PHPX_LFLAGS;
+            $libs .= " ".self::PHPX_LFLAGS.' -lphp7';
         }
 
-        $this->exec(self::CXX . " $objects {$ldflags} {$libs} {$this->ldflags} {$link_option} -L./lib -o {$this->target}");
+        $this->exec(self::CXX . " $objects {$ldflags} {$libs} {$this->ldflags} {$link_option} -o {$this->target}");
     }
 
     function clean()
