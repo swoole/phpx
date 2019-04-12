@@ -47,3 +47,6 @@ console/vendor
 console/test
 console/composer.lock
 bin/phpx
+/build/
+
+\.settings/
