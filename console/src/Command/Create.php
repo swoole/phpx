@@ -41,24 +41,26 @@ class Create extends Command
         mkdir($path . '/' . Builder::DIR_LIBRARY);
         mkdir($path . '/' . Builder::DIR_BUILD);
 
-        $php_include = trim(`php-config --includes`);
-        $php_libs = trim(`php-config --libs`);
-        $php_ldflags = trim(`php-config --ldflags`);
-        $php_extension_dir = trim(`php-config --extension-dir`);
+//        $php_include = trim(`php-config --includes`);
+//        $php_libs = trim(`php-config --libs`);
+//        $php_ldflags = trim(`php-config --ldflags`);
+//        $php_extension_dir = trim(`php-config --extension-dir`);
         $configFile = $path . '/.config.json';
 
+        $conf['project']['name'] = $project_name;
+        $conf['build'] = [
+            'ldflags' => "",
+            'cxxflags' => "",
+            'cflags' => "",
+            'c_std' => '',
+            'cxx_std' => '',
+        ];
+        $conf['install'] = [
+            'target' => '',
+        ];
+
         if ($bin) {
-            $conf['project']['name'] = $project_name;
-            $conf['build'] = [
-                'target' => "bin/{$project_name}",
-                'ldflags' => "-shared {$php_ldflags} {$php_libs} -lphp7 -lphpx",
-                'cxxflags' => "-std=c++11 -fPIC {$php_include}",
-                'cflags' => "-fPIC {$php_include}",
-                'type' => 'shared',
-            ];
-            $conf['install'] = [
-                'target' => $php_extension_dir,
-            ];
+            $conf['project']['type'] = 'bin';
             file_put_contents($configFile, json_encode($conf, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
             $src = <<<HTML
 #include "phpx_embed.h"
@@ -77,18 +79,10 @@ int main(int argc, char * argv[])
 HTML;
             file_put_contents($path . '/src/main.cpp', $src);
         } else {
-            $conf['project']['name'] = $project_name;
-            $conf['build'] = [
-                'target' => "lib/{$project_name}.so",
-                'ldflags' => "-shared {$php_ldflags} {$php_libs} -lphpx",
-                'cxxflags' => "-std=c++11 -fPIC {$php_include}",
-                'cflags' => "-fPIC {$php_include}",
-                'type' => 'shared',
-            ];
-            $conf['install'] = [
-                'target' => $php_extension_dir,
-            ];
+            $conf['project']['type'] = 'ext';
             file_put_contents($configFile, json_encode($conf, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+
+            $project_name_upper = strtoupper($project_name);
 
             $date = date('Y-m-d');
             $src = <<<HTML
@@ -109,7 +103,7 @@ PHPX_EXTENSION()
     Extension *extension = new Extension("{$project_name}", "0.0.1");
 
     extension->onStart = [extension]() noexcept {
-        extension->registerConstant("QUEUE_VERSION", 1001);
+        extension->registerConstant("{$project_name_upper}_VERSION", 10001);
     };
 
     //extension->onShutdown = [extension]() noexcept {

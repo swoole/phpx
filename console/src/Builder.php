@@ -16,6 +16,7 @@ class Builder
     protected $ldflags = '';
     protected $exts = array('.cc', '.cpp', '.c');
     protected $projectName;
+    protected $projectType;
     protected $target;
     protected $installTargetDir;
 
@@ -28,40 +29,35 @@ class Builder
     const CXX = 'c++';
     const CC = 'cc';
 
+    const CC_STD = '';
+    const CXX_STD = 'c++11';
+
+    const PHPX_LFLAGS = '-lphpx';
+
     protected $debug;
     protected $verbose;
-    /**
-     * static or shared
-     * @var int
-     */
-    protected $type;
+
 
     protected $configFile;
+    protected $config;
 
     function __construct($debug = false, $verbose = false)
     {
         $this->debug = $debug;
         $this->verbose = $verbose;
         $this->root = getcwd() . '/';
-        $this->configFile = $this->root . '/.config.json';
 
-        if (!is_dir($this->root . self::DIR_SRC)) {
-            throw  new RuntimeException("no src dir\n");
+        $this->loadConfig();
+        $this->projectName = $this->getConfigValue('project', 'name');
+        $this->projectType = $this->getConfigValue('project', 'type');
+        $this->cxxflags .= ' ' . $this->getConfigValue('build', 'cxxflags');
+        $this->cflags .= ' ' . $this->getConfigValue('build', 'cflags');
+        $this->ldflags .= ' ' . $this->getConfigValue('build', 'ldflags');
+        $this->target = $this->root . '/lib/' . $this->projectName . '.so';
+        if ($this->isExtension()) {
+            $php_extension_dir = trim(`php-config --extension-dir`);
+            $this->installTargetDir = $php_extension_dir;
         }
-        if (!is_file($this->configFile)) {
-            throw  new RuntimeException("no .config.json[{$this->configFile}]\n");
-        }
-        $config = json_decode(file_get_contents($this->configFile), true);
-        if (empty($config['project']['name'])) {
-            throw  new RuntimeException("no project.name option in config.json\n");
-        }
-        $this->projectName = $config['project']['name'];
-        $this->cxxflags .= ' ' . $config['build']['cxxflags'];
-        $this->cflags .= ' ' . $config['build']['cflags'];
-        $this->ldflags .= ' ' . $config['build']['ldflags'];
-        $this->target = $config['build']['target'];
-        $this->installTargetDir = $config['install']['target'];
-        $this->type = $config['build']['type'];
     }
 
     function make()
@@ -94,6 +90,16 @@ class Builder
         }
     }
 
+    function isExtension()
+    {
+        return $this->projectType == 'ext';
+    }
+
+    function isEmbedBinary()
+    {
+        return $this->projectType == 'bin';
+    }
+
     /**
      * 编译源代码
      * @return bool
@@ -113,28 +119,91 @@ class Builder
                 mkdir(dirname($objectFile), 0777, true);
             }
             $this->objects[] = $objectFile;
-            //源文件的修改时间晚于目标文件，无需编译
+            /**
+             * 源文件的修改时间晚于目标文件，无需编译
+             */
             if (is_file($objectFile) and filemtime($objectFile) >= filemtime($file)) {
                 continue;
             }
+            /**
+             * TODO 头文件依赖分析，头文件修改时需要更新所有 include 它的源文件
+             */
             if ($this->debug) {
                 $compile_option = '-O0';
             } else {
                 $compile_option = '-O2';
             }
-            if ($this->type = 'shared') {
+            if ($this->isExtension()) {
                 $compile_option .= ' -fPIC';
             }
+            /**
+             * include 路径
+             */
+            $php_include = trim(`php-config --includes`);
+            /**
+             * C 源文件
+             */
             if (Upload::getFileExt($file) == 'c') {
-                $result = $this->exec(self::CC . " -I./include -c $file -o $objectFile {$compile_option} {$this->cflags}");
-            } else {
-                $result = $this->exec(self::CXX . " -I./include -c $file -o $objectFile {$compile_option} {$this->cxxflags}");
+                $std = $this->getConfigValue('build', 'c_std');
+                if ($std) {
+                    $compile_option .= '-std=' . $std . ' ';
+                }
+                $result = $this->exec(self::CC . " $php_include -I./include -c $file -o $objectFile {$compile_option} {$this->cflags}");
+            } /**
+             * C++ 源代码
+             */
+            else {
+                $std = $this->getConfigValue('build', 'cxx_std');
+                if ($std) {
+                    $compile_option .= ' -std=' . $std . ' ';
+                } else {
+                    $compile_option .= ' -std=' . self::CXX_STD . ' ';
+                }
+                $result = $this->exec(self::CXX . " $php_include -I./include -c $file -o $objectFile {$compile_option} {$this->cxxflags}");
             }
             if ($result === false) {
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * 加载配置文件
+     */
+    protected function loadConfig()
+    {
+        $this->configFile = $this->root . '/.config.json';
+        if (!is_dir($this->root . self::DIR_SRC)) {
+            throw  new RuntimeException("no src dir\n");
+        }
+        if (!is_file($this->configFile)) {
+            throw  new RuntimeException("no .config.json[{$this->configFile}]\n");
+        }
+        $config = json_decode(file_get_contents($this->configFile), true);
+        if (empty($config['project']['name'])) {
+            throw  new RuntimeException("no project.name option in config.json\n");
+        }
+
+        $this->config = $config;
+    }
+
+    /**
+     * 获取配置名称
+     * @param $type
+     * @param null $key
+     * @return bool
+     */
+    public function getConfigValue($type, $key = null)
+    {
+        if (!array_key_exists($type, $this->config)) {
+            return false;
+        }
+        if ($key) {
+            return array_key_exists($key, $this->config[$type]) ? $this->config[$type][$key] : false;
+        } else {
+            return $this->config[$type];
+        }
     }
 
     public function exec($cmd)
@@ -158,10 +227,17 @@ class Builder
             @mkdir(dirname($this->target));
         }
         $link_option = '';
-        if ($this->type == 'shared') {
+        $libs = trim(`php-config --libs`);
+        $ldflags = trim(`php-config --ldflags`);
+
+        if ($this->isExtension()) {
             $link_option .= ' -shared';
+            $libs .= " ".self::PHPX_LFLAGS;
+        } else {
+            $libs .= " ".self::PHPX_LFLAGS;
         }
-        $this->exec(self::CXX . " $objects {$this->ldflags} $link_option -L./lib -o {$this->target}");
+
+        $this->exec(self::CXX . " $objects {$ldflags} {$libs} {$this->ldflags} {$link_option} -L./lib -o {$this->target}");
     }
 
     function clean()
