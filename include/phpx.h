@@ -1665,9 +1665,9 @@ public:
         }
         return Variant(zend_read_static_property(_tmp_ce, p_name.c_str(), p_name.length(), 1));
     }
-    static bool set(const char *name, std::string p_name, Variant value)
+    static bool set(const char *class_name, std::string p_name, Variant value)
     {
-        zend_class_entry *_tmp_ce = getClassEntry(name);
+        zend_class_entry *_tmp_ce = getClassEntry(class_name);
         if (!_tmp_ce)
         {
             return false;
