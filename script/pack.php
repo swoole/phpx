@@ -1,7 +1,13 @@
 #!/usr/bin/env php
 <?php
 echo "start build phpx tool...\r\n";
-ini_set('phar.readonly', 'Off');
+/**
+ * -d phar.readonly=off
+ */
+if (ini_get('phar.readonly') == '1') {
+    echo "\033[31mNeed to set phar.readonly=Off..\033[0m\r\n";
+    exit;
+}
 if(!extension_loaded('zlib')) {
     echo "\033[31mzlib extension not found..\033[0m\r\n";
     exit;
