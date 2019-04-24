@@ -243,9 +243,15 @@ class Builder
 
         if ($this->isExtension()) {
             $link_option .= ' -shared';
-            $libs .= " ".self::PHPX_LFLAGS;
+            $libs .= " " . self::PHPX_LFLAGS;
+            /**
+             * MacOS 需要增加连接参数
+             */
+            if (strcasecmp(PHP_OS, "Darwin") === 0) {
+                $link_option .= " -undefined dynamic_lookup";
+            }
         } else {
-            $libs .= " ".self::PHPX_LFLAGS.' -lphp7';
+            $libs .= " " . self::PHPX_LFLAGS . ' -lphp7';
         }
 
         $this->exec(self::CXX . " $objects {$ldflags} {$libs} {$this->ldflags} {$link_option} -o {$this->target}");
