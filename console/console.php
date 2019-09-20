@@ -13,4 +13,7 @@ $application->add(new phpx\Command\Build());
 $application->add(new phpx\Command\Run());
 $application->add(new phpx\Command\Clean());
 $application->add(new phpx\Command\Install());
+$application->add(new phpx\Command\StartWeb());
+$application->add(new phpx\Command\Stop());
+$application->add(new phpx\Command\Reload());
 $application->run();
