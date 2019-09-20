@@ -12,6 +12,12 @@ C++ wrapper for Zend API
 - PHP 7.0 or later
 - Linux/MacOS/Windows
 - GCC 4.8 or later
+- Composer
+
+## Build phpx (bin)
+```shell
+./build.sh
+```
 
 ## Build libphpx.so
 ```shell

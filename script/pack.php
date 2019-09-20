@@ -1,6 +1,18 @@
 #!/usr/bin/env php
 <?php
-echo "build phpx tool...\n";
+echo "start build phpx tool...\r\n";
+/**
+ * -d phar.readonly=off
+ */
+if (ini_get('phar.readonly') == '1') {
+    echo "\033[31mNeed to set phar.readonly=Off..\033[0m\r\n";
+    exit;
+}
+if(!extension_loaded('zlib')) {
+    echo "\033[31mzlib extension not found..\033[0m\r\n";
+    exit;
+}
+
 /**
  * 打包 phpx 命令行工具
  */
@@ -27,4 +39,4 @@ if (!is_dir(dirname($execFile))) {
 file_put_contents($execFile, $new . $sign . substr($bin, 20));
 unlink('phpx.phar');
 shell_exec('chmod a+x ' . $execFile);
-echo "build success.\n";
+echo "phpx tool build success.\n";

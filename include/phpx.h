@@ -173,7 +173,7 @@ public:
         destroy();
         ZVAL_LONG(ptr(), v);
     }
-    void operator =(std::string &str)
+    void operator =(const std::string &str)
     {
         destroy();
         ZVAL_STRINGL(ptr(), str.c_str(), str.length());
@@ -380,6 +380,29 @@ public:
             return nullptr;
         }
         return static_cast<T *>(_ptr);
+    }
+    Variant toReference()
+    {
+        if (isReference())
+        {
+            return this;
+        }
+        zval zref;
+        addRef();
+        ZVAL_NEW_REF(&zref, ptr());
+        zval_delref_p(&zref);
+        Variant ret(&zref, false);
+        return ret;
+    }
+    Variant referenceTo()
+    {
+        if (!isReference())
+        {
+            return *this;
+        }
+        zval zv;
+        ZVAL_COPY_VALUE(&zv, Z_REFVAL_P(ptr()));
+        return Variant(&zv, false);
     }
     bool operator ==(Variant &v)
     {
@@ -696,32 +719,12 @@ public:
         _val = &_ptr->val;
         _index = _ptr->h;
         pe = _pe;
+        skipUndefBucket();
     }
     void operator ++(int i)
     {
-        while (++_ptr != pe)
-        {
-            _val = &_ptr->val;
-            if (_val && Z_TYPE_P(_val) == IS_INDIRECT)
-            {
-                _val = Z_INDIRECT_P(_val);
-            }
-            if (UNEXPECTED(Z_TYPE_P(_val) == IS_UNDEF))
-            {
-                continue;
-            }
-            if (_ptr->key)
-            {
-                _key = _ptr->key;
-                _index = 0;
-            }
-            else
-            {
-                _index = _ptr->h;
-                _key = NULL;
-            }
-            break;
-        }
+        ++_ptr;
+        skipUndefBucket();
     }
     bool operator !=(ArrayIterator b)
     {
@@ -747,6 +750,34 @@ public:
         return _ptr;
     }
 private:
+    void skipUndefBucket()
+    {
+        while (_ptr != pe)
+        {
+            _val = &_ptr->val;
+            if (_val && Z_TYPE_P(_val) == IS_INDIRECT)
+            {
+                _val = Z_INDIRECT_P(_val);
+            }
+            if (UNEXPECTED(Z_TYPE_P(_val) == IS_UNDEF))
+            {
+                ++_ptr;
+                continue;
+            }
+            if (_ptr->key)
+            {
+                _key = _ptr->key;
+                _index = 0;
+            }
+            else
+            {
+                _index = _ptr->h;
+                _key = NULL;
+            }
+            break;
+        }
+    }
+
     zval *_val;
     zend_string *_key;
     Bucket *_ptr;
@@ -1095,10 +1126,6 @@ public:
             return Variant(nullptr);
         }
         zval *value = ptr_list[i];
-        if (Z_TYPE_P(value) == IS_REFERENCE)
-        {
-            value = static_cast<zval *>(Z_REFVAL_P(value));
-        }
         return Variant(value, true);
     }
 private:
@@ -1638,9 +1665,9 @@ public:
         }
         return Variant(zend_read_static_property(_tmp_ce, p_name.c_str(), p_name.length(), 1));
     }
-    static bool set(const char *name, std::string p_name, Variant value)
+    static bool set(const char *class_name, std::string p_name, Variant value)
     {
-        zend_class_entry *_tmp_ce = getClassEntry(name);
+        zend_class_entry *_tmp_ce = getClassEntry(class_name);
         if (!_tmp_ce)
         {
             return false;
