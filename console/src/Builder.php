@@ -233,7 +233,7 @@ class Builder
         }
 
         $link_option = ' -L./lib';
-        $libs = trim(`php-config --libs`);
+        $libs = self::PHPX_LFLAGS;
         $ldflags = trim(`php-config --ldflags`);
 
         /**
@@ -243,7 +243,6 @@ class Builder
 
         if ($this->isExtension()) {
             $link_option .= ' -shared';
-            $libs .= " " . self::PHPX_LFLAGS;
             /**
              * MacOS 需要增加连接参数
              */
@@ -251,7 +250,7 @@ class Builder
                 $link_option .= " -undefined dynamic_lookup";
             }
         } else {
-            $libs .= " " . self::PHPX_LFLAGS . ' -lphp7';
+            $libs .= ' -lphp7';
         }
 
         $this->exec(self::CXX . " $objects {$ldflags} {$libs} {$this->ldflags} {$link_option} -o {$this->target}");
