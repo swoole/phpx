@@ -19,8 +19,8 @@ $config = array(
 );
 $ttl = 3;
 $time = 5;
-$db_name = __DIR__."/xxxxdb/test6";
-$r = new RocksDB($db_name, $config['options'], $config['readoptions'], $config['writeoptions']);
+$db_name = "./db";
+$r = new RocksDB($db_name,$config['options'],$config['readoptions'],$config['writeoptions']);
 
 // $res = $r->get("7Lfu2yqkPa_0");
 // echo "get {$key} res:".var_export($res,1)."\n";
@@ -54,9 +54,9 @@ $val = "111";
 // echo "get {$key} res:".var_export($res,1)."\n";
 // $res = $r->delete($key);
 // echo "delete {$key} res:".var_export($res,1)."\n";
-$res = $r->merge($key, "v1");
+$res = $r->merge($key,"v1");
 echo "get {$key} res:".$r->get($key)."\n";
-$res = $r->merge($key, "v2");
+$res = $r->merge($key,"v2");
 echo "get {$key} res:".$r->get($key)."\n";
-$res = $r->merge($key, "v3");
+$res = $r->merge($key,"v3");
 echo "get {$key} res:".$r->get($key)."\n";
