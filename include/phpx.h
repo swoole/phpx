@@ -176,6 +176,11 @@ public:
         destroy();
         ZVAL_STRINGL(ptr(), str.c_str(), str.length());
     }
+    void operator =(zend_string *str)
+    {
+        destroy();
+        ZVAL_STR(ptr(), str);
+    }
     void operator =(const char *str)
     {
         destroy();
