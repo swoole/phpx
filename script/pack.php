@@ -8,7 +8,11 @@ if (ini_get('phar.readonly') == '1') {
     echo "\033[31mNeed to set phar.readonly=Off..\033[0m\r\n";
     exit;
 }
-if(!extension_loaded('zlib')) {
+$compressFiles = true;
+if ($argv[1] == '--disable-gz') {
+    $compressFiles = false;
+}
+if ($compressFiles and !extension_loaded('zlib')) {
     echo "\033[31mzlib extension not found..\033[0m\r\n";
     exit;
 }
@@ -19,7 +23,9 @@ if(!extension_loaded('zlib')) {
 $phar = new Phar('phpx.phar');
 $phar->setSignatureAlgorithm(\Phar::SHA1);
 $phar->buildFromDirectory(dirname(__DIR__) . '/console', '/\.php$/');
-$phar->compressFiles(Phar::GZ);
+if ($compressFiles) {
+    $phar->compressFiles(Phar::GZ);
+}
 $phar->stopBuffering();
 $phar->setStub($phar->createDefaultStub('console.php'));
 /**

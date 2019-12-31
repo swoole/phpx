@@ -39,9 +39,9 @@ message("PHP_INCLUDE: ${PHP_INCLUDE}")
 message("PHP_INCLUDE_DIR: ${PHP_INCLUDE_DIR}")
 message("PHP_EXTENSION_DIR: ${PHP_EXTENSION_DIR}")
 
-link_directories(${PHP_LDFLAGS})
+link_directories(${PHP_LDFLAGS} /usr/local/lib)
 
-include_directories(BEFORE ${PHP_INCLUDE_DIR} ${PHP_INCLUDE_DIR}/Zend ${PHP_INCLUDE_DIR}/main ${PHP_INCLUDE_DIR}/TSRM)
+include_directories(BEFORE /usr/local/include ${PHP_INCLUDE_DIR} ${PHP_INCLUDE_DIR}/Zend ${PHP_INCLUDE_DIR}/main ${PHP_INCLUDE_DIR}/TSRM)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 #苹果用户
