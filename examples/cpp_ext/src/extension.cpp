@@ -82,6 +82,10 @@ PHPX_EXTENSION()
         c->addMethod(PHPX_ME(myClass, pset));
         extension->registerClass(c);
 
+        Interface *i = new Interface("myInterface");
+        i->addMethod("test", nullptr);
+        extension->registerInterface(i);
+
         extension->registerResource("ResourceString", string_dtor);
     };
 

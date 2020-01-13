@@ -1707,6 +1707,11 @@ public:
         {
             return false;
         }
+        if (info == nullptr)
+        {
+            error(E_WARNING, "interface[%s] method must set arg info", name);
+            return false;
+        }
         Method m;
         m.flags = 0;
         m.method = nullptr;
