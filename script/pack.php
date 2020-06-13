@@ -9,7 +9,7 @@ if (ini_get('phar.readonly') == '1') {
     exit;
 }
 $compressFiles = true;
-if ($argv[1] == '--disable-gz') {
+if (isset($argv[1]) && $argv[1] == '--disable-gz') {
     $compressFiles = false;
 }
 if ($compressFiles and !extension_loaded('zlib')) {
