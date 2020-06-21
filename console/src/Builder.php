@@ -55,6 +55,12 @@ class Builder
         $this->cflags .= ' ' . $this->getConfigValue('build', 'cflags');
         $this->ldflags .= ' ' . $this->getConfigValue('build', 'ldflags');
 
+        if ($dir = getenv('PHPX_DIR')) {
+            $this->cxxflags .= ' -I'.$dir.'/include';
+            $this->cflags .= ' -I'.$dir.'/include';
+            $this->ldflags .= ' -L' .$dir.'/lib';
+        }
+
         if ($this->isExtension()) {
             $php_extension_dir = trim(`php-config --extension-dir`);
             $this->installTargetDir = $php_extension_dir;
