@@ -388,7 +388,7 @@ public:
     {
         if (isReference())
         {
-            return this;
+            return *this;
         }
         zval zref;
         addRef();
