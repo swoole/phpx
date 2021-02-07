@@ -26,6 +26,7 @@ Class::Class(const char *name) {
     parent_ce = NULL;
     ce = NULL;
     activated = false;
+    functions = nullptr;
 }
 
 bool Class::extends(zend_class_entry *_parent_class) {

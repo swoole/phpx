@@ -25,3 +25,7 @@ class MyClass {
         
     }
 }
+
+interface MyInterface {
+    public function test(int $a, string $b) : bool;
+}

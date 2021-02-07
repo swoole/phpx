@@ -82,9 +82,9 @@ PHPX_EXTENSION() {
 
         extension->registerClass(c);
 
-        //        Interface *i = new Interface("myInterface");
-        //        i->addMethod("test", nullptr);
-        //        extension->registerInterface(i);
+        Interface *i = new Interface("MyInterface");
+        i->registerFunctions(class_MyInterface_methods);
+        extension->registerInterface(i);
 
         extension->registerResource("ResourceString", string_dtor);
     };

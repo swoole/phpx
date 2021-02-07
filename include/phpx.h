@@ -1490,6 +1490,9 @@ class Interface {
     inline std::string getName() {
         return name;
     }
+    void registerFunctions(const zend_function_entry *_functions) {
+        functions = _functions;
+    }
     bool activate() {
         if (activated) {
             return false;
@@ -1508,7 +1511,7 @@ class Interface {
     std::string name;
     zend_class_entry _ce;
     zend_class_entry *ce;
-    zend_function_entry *functions;
+    const zend_function_entry *functions;
 };
 
 extern std::unordered_map<std::string, Class *> class_map;
