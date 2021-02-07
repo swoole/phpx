@@ -16,6 +16,14 @@
 
 #include "phpx.h"
 
+BEGIN_EXTERN_C()
+#if PHP_VERSION_ID < 80000
+#include "extension_legacy_arginfo.h"
+#else
+#include "extension_arginfo.h"
+#endif
+END_EXTERN_C()
+
 #include <iostream>
 
 using namespace php;
@@ -45,21 +53,24 @@ PHPX_FUNCTION(cpp_ext_test2)
     //php::error(E_WARNING, "extension warning.");
 }
 
-PHPX_METHOD(myClass, test)
+PHPX_METHOD(MyClass, test)
 {
-    cout << "myClass::test" << endl;
+    cout << "MyClass::test" << endl;
     retval = 1234.56;
 }
 
-PHPX_METHOD(myClass, pget)
+PHPX_METHOD(MyClass, pget)
 {
     String *str = _this.oGet<String>("resource", "ResourceString");
-    cout << "ResourceString: " << str->length() << endl;
+    cout << "[GET] ResourceString: " << str->length() << endl;
+    retval = Variant("hello xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 }
 
-PHPX_METHOD(myClass, pset)
+PHPX_METHOD(MyClass, pset)
 {
-    _this.oSet("resource", "ResourceString", new String("hello world"));
+    String *str = new String("hello world");
+    _this.oSet("resource", "ResourceString", str);
+    cout << "[SET] ResourceString: " << str->length() << endl;
 }
 
 void string_dtor(zend_resource *res)
@@ -70,21 +81,20 @@ void string_dtor(zend_resource *res)
 
 PHPX_EXTENSION()
 {
-    Extension *extension = new Extension("cpp_ext", "0.0.1");
+    Extension *extension = new Extension("cpp_ext", "1.0.2");
 
     extension->onStart = [extension]() noexcept
     {
-        extension->registerConstant("CPP_EXT_VERSION", 1002);
+        extension->registerConstant("CPP_EXT_VERSION", 10002);
 
-        Class *c = new Class("myClass");
-        c->addMethod(PHPX_ME(myClass, test), STATIC);
-        c->addMethod(PHPX_ME(myClass, pget));
-        c->addMethod(PHPX_ME(myClass, pset));
+        Class *c = new Class("MyClass");
+        c->registerFunctions(class_MyClass_methods);
+
         extension->registerClass(c);
 
-        Interface *i = new Interface("myInterface");
-        i->addMethod("test", nullptr);
-        extension->registerInterface(i);
+//        Interface *i = new Interface("myInterface");
+//        i->addMethod("test", nullptr);
+//        extension->registerInterface(i);
 
         extension->registerResource("ResourceString", string_dtor);
     };
@@ -104,8 +114,8 @@ PHPX_EXTENSION()
 //        cout << extension->name << "afterRequest" << endl;
 //    };
 
-    extension->registerFunction(PHPX_FN(cpp_ext_test));
-    extension->registerFunction(PHPX_FN(cpp_ext_test2));
+
+    extension->registerFunctions(ext_functions);
 
     extension->info(
     {
@@ -114,7 +124,7 @@ PHPX_EXTENSION()
     {
         { "author", "Rango" },
         { "version", extension->version },
-        { "date", "2017-05-22" },
+        { "date", "2021-02-05" },
     });
 
     return extension;

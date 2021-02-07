@@ -121,46 +121,20 @@ void Extension::registerConstant(const char *name, string &v) {
         name, strlen(name), (char *) v.c_str(), v.length(), CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
-bool Extension::registerFunction(const char *name, function_t func, const zend_internal_arg_info arg_info[], size_t arg_count) {
-    this->checkStartupStatus(BEFORE_START, __func__);
-    if (module.functions == NULL) {
-        module.functions = (const zend_function_entry *) calloc(16, sizeof(zend_function_entry));
-        if (module.functions == NULL) {
+bool Extension::registerFunctions(const zend_function_entry *_functions) {
+    checkStartupStatus(BEFORE_START, __func__);
+    functions = copy_function_entries(_functions);
+    zend_function_entry *ptr = functions;
+
+    while (ptr->fname) {
+        ptr->handler = _exec_function;
+        if (function_map.find(ptr->fname) == function_map.end()) {
+            error(E_ERROR, "No function named %s", ptr->fname);
             return false;
         }
-        function_array_size = 16;
-    } else if (function_count + 1 == function_array_size) {
-        function_array_size *= 2;
-        void *new_array = realloc((void *) module.functions, function_array_size * sizeof(zend_function_entry));
-        if (new_array == NULL) {
-            return false;
-        }
-        module.functions = (const zend_function_entry *) new_array;
+        ptr++;
     }
-
-    zend_function_entry *function_array = (zend_function_entry *) module.functions;
-    function_array[function_count].fname = name;
-
-    function_array[function_count].handler = _exec_function;
-    function_array[function_count].arg_info = NULL;
-    function_array[function_count].num_args = 0;
-    function_array[function_count].flags = 0;
-
-    if (arg_info) {
-        function_array[function_count].arg_info = arg_info;
-        function_array[function_count].num_args = arg_count;
-    } else {
-        function_array[function_count].arg_info = NULL;
-        function_array[function_count].num_args = 0;
-    }
-
-    function_array[function_count + 1].fname = NULL;
-    function_array[function_count + 1].handler = NULL;
-    function_array[function_count + 1].flags = 0;
-
-    function_map[name] = func;
-
-    function_count++;
+    module.functions = functions;
     return true;
 }
 

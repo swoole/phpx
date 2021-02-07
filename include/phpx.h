@@ -63,10 +63,6 @@ typedef unsigned char uchar;
 typedef int zend_result;
 #endif
 
-#ifndef ARRAY_SIZE
-#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
-#endif
-
 namespace php {
 
 void error(int level, const char *format, ...);
@@ -1088,7 +1084,7 @@ class Object : public Variant {
     inline Variant callParentMethod(const char *func, const Variant &v1) {
         Variant retval;
         zend_call_method_with_1_params(
-                object(), parent_ce(), NULL, func, retval.ptr(), const_cast<Variant &>(v1).ptr());
+            object(), parent_ce(), NULL, func, retval.ptr(), const_cast<Variant &>(v1).ptr());
         return retval;
     }
     inline Variant callParentMethod(const char *func, const Variant &v1, const Variant &v2) {
@@ -1278,19 +1274,13 @@ static Object create(const char *name) {
     return object;
 }
 
-#define PHPX_FN(n) #n, n
-#define PHPX_ME(c, m) #m, c##_##m
-#define PHPX_FUNCTION(c) void c(Args &args, Variant &retval)
-#define PHPX_METHOD(c, m) void c##_##m(Object &_this, Args &args, Variant &retval)
+typedef void (*resource_dtor)(zend_resource *);
+
 #define PHPX_EXTENSION()                                                                                               \
     extern "C" {                                                                                                       \
     ZEND_DLEXPORT Extension *get_module();                                                                             \
     }                                                                                                                  \
     ZEND_DLEXPORT Extension *get_module()
-
-typedef void (*function_t)(Args &, Variant &retval);
-typedef void (*resource_dtor)(zend_resource *);
-typedef void (*method_t)(Object &, Args &, Variant &retval);
 
 struct strCmp {
     bool operator()(const char *s1, const char *s2) const {
@@ -1298,11 +1288,81 @@ struct strCmp {
     }
 };
 
-extern std::map<const char *, std::map<const char *, method_t, strCmp>, strCmp> method_map;
-extern std::map<const char *, function_t, strCmp> function_map;
+class Function;
+class Method;
+
+extern std::map<const char *, std::map<const char *, Method *, strCmp>, strCmp> method_map;
+extern std::map<const char *, Function *, strCmp> function_map;
+
+#define PHPX_FN(n) #n, n
+#define PHPX_ME(c, m) #m, c##_##m
+#define PHPX_ME_WITH_ARGINFO(c, m)   #m, c##_##m, arginfo_class_##c_##m, ARRAY_SIZE(arginfo_class_##c_##m)-1
+
+class Function {
+  private:
+    const char *name_;
+  public:
+    Function(const char *name) {
+        name_ = name;
+    }
+    virtual ~Function() { };
+    virtual void exec(Args &, Variant &) = 0;
+};
+
+#define PHPX_FUNCTION(func)  class phpx_function_##func : Function { \
+  public:\
+    void exec(Args &, Variant &retval); \
+    phpx_function_##func(const char *name) : Function(name) { function_map[name] = this; }\
+    ~phpx_function_##func() {}\
+}; \
+static phpx_function_##func f_##func(#func); \
+PHP_FUNCTION(func) { } \
+void phpx_function_##func::exec(Args &args, Variant &retval)
+
+class Method {
+  private:
+    const char *class_;
+    const char *name_;
+  public:
+    Method(const char *_class, const char *_name) {
+        name_ = _name;
+        class_ = _class;
+    }
+    virtual ~Method() { };
+    virtual void exec(Object &, Args &, Variant &) = 0;
+};
+
+#define PHPX_METHOD(class_, method)  class phpx_method_##class_##_##method : Method { \
+  public:\
+    void exec(Object &_this, Args &, Variant &retval); \
+    phpx_method_##class_##_##method(const char *_class, const char *_name) : Method(_class, _name) { method_map[_class][_name] = this; }\
+    ~phpx_method_##class_##_##method() {}\
+}; \
+static phpx_method_##class_##_##method m_##class_##_##method(#class_, #method); \
+PHP_METHOD(class_, method) { } \
+void phpx_method_##class_##_##method::exec(Object &_this, Args &args, Variant &retval)
 
 extern void _exec_function(zend_execute_data *data, zval *return_value);
 extern void _exec_method(zend_execute_data *data, zval *return_value);
+
+static zend_function_entry *copy_function_entries (const zend_function_entry *_functions) {
+    const zend_function_entry *ptr = _functions;
+    size_t count = 0;
+    while (ptr->fname) {
+        count ++;
+        ptr++;
+    }
+    zend_function_entry *functions = new zend_function_entry[count + 1];
+
+    int i = 0;
+    ptr = _functions;
+    while (ptr->fname) {
+        functions[i] = *ptr;
+        i++;
+        ptr++;
+    }
+    return functions;
+}
 
 String number_format(double num, int decimals = 0, char dec_point = '.', char thousands_sep = ',');
 Variant http_build_query(const Variant &data,
@@ -1346,14 +1406,6 @@ enum SortFlags {
     SORT_FLAG_CASE = 8,
 };
 
-struct Method {
-    std::string name;
-    int flags;
-    method_t method;
-    const zend_internal_arg_info *info;
-    size_t num_args;
-};
-
 class Class {
     struct Property {
         std::string name;
@@ -1374,7 +1426,7 @@ class Class {
     bool implements(zend_class_entry *interface_ce);
     bool addConstant(const char *name, Variant v);
     bool addProperty(const char *name, Variant v, int flags);
-    bool addMethod(const char *name, method_t method, int flags, const zend_internal_arg_info *arg_info, size_t arg_count);
+    bool registerFunctions(const zend_function_entry *functions);
     bool activate();
     bool alias(const char *alias_name);
 
@@ -1421,7 +1473,7 @@ class Class {
     zend_class_entry _ce;
     zend_class_entry *ce;
     std::unordered_map<std::string, zend_class_entry *> interfaces;
-    std::vector<Method> methods;
+    zend_function_entry *functions;
     std::vector<Property> propertys;
     std::vector<Constant> constants;
     std::vector<std::string> aliases;
@@ -1433,22 +1485,7 @@ class Interface {
         this->name = name;
         INIT_CLASS_ENTRY_EX(_ce, name, strlen(name), NULL);
         ce = NULL;
-    }
-    bool addMethod(const char *name, const zend_internal_arg_info *info) {
-        if (activated) {
-            return false;
-        }
-        if (info == nullptr) {
-            error(E_WARNING, "interface[%s] method must set arg info", name);
-            return false;
-        }
-        Method m;
-        m.flags = 0;
-        m.method = nullptr;
-        m.name = name;
-        m.info = info;
-        methods.push_back(m);
-        return false;
+        functions = nullptr;
     }
     inline std::string getName() {
         return name;
@@ -1457,22 +1494,8 @@ class Interface {
         if (activated) {
             return false;
         }
-        /**
-         * register methods
-         */
-        int n = methods.size();
-        zend_function_entry *_methods = (zend_function_entry *) ecalloc(n + 1, sizeof(zend_function_entry));
-        for (int i = 0; i < n; i++) {
-            _methods[i].fname = methods[i].name.c_str();
-            _methods[i].handler = nullptr;
-            _methods[i].arg_info = methods[i].info;
-            _methods[i].num_args = methods[i].num_args;
-            _methods[i].flags = ZEND_ACC_PUBLIC | ZEND_ACC_ABSTRACT;
-        }
-        memset(&_methods[n], 0, sizeof(zend_function_entry));
-        _ce.info.internal.builtin_functions = _methods;
+        _ce.info.internal.builtin_functions = functions;
         ce = zend_register_internal_interface(&_ce TSRMLS_CC);
-        efree(_methods);
         if (ce == nullptr) {
             return false;
         }
@@ -1485,7 +1508,7 @@ class Interface {
     std::string name;
     zend_class_entry _ce;
     zend_class_entry *ce;
-    std::vector<Method> methods;
+    zend_function_entry *functions;
 };
 
 extern std::unordered_map<std::string, Class *> class_map;
@@ -1546,7 +1569,6 @@ class Extension {
     bool registerClass(Class *c);
     bool registerInterface(Interface *i);
     bool registerFunctions(const zend_function_entry *functions);
-    bool registerFunction(const char *name, function_t func, const zend_internal_arg_info arg_info[], size_t arg_count);
     bool registerResource(const char *name, resource_dtor dtor);
     void registerConstant(const char *name, long v);
     void registerConstant(const char *name, int v);
@@ -1591,6 +1613,7 @@ class Extension {
     int deps_count = 0;
     int deps_array_size = 0;
 
+    zend_function_entry *functions;
     std::vector<IniEntry> ini_entries;
 };
 

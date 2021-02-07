@@ -92,21 +92,23 @@ bool Class::addProperty(const char *name, Variant v, int flags) {
     return true;
 }
 
-bool Class::addMethod(const char *name, method_t method, int flags, const zend_internal_arg_info *arg_info, size_t arg_count) {
-    if (activated) {
-        return false;
+bool Class::registerFunctions(const zend_function_entry *_functions) {
+    functions = copy_function_entries(_functions);
+    zend_function_entry *ptr = functions;
+    while (ptr->fname) {
+        ptr->handler = _exec_method;
+        auto iter1 = method_map.find(class_name.c_str());
+        if (iter1 == method_map.end()) {
+            return false;
+        }
+        auto iter2 = iter1->second.find(ptr->fname);
+        if (iter2 == iter1->second.end()) {
+            error(E_ERROR, "No function named %s", ptr->fname);
+            return false;
+        }
+        ptr++;
     }
-    if ((flags & CONSTRUCT) || (flags & DESTRUCT) || !(flags & ZEND_ACC_PPP_MASK)) {
-        flags |= PUBLIC;
-    }
-    Method m;
-    m.flags = flags;
-    m.method = method;
-    m.name = name;
-    m.info = arg_info;
-    m.num_args = arg_count;
-    methods.push_back(m);
-    return false;
+    return true;
 }
 
 bool Class::alias(const char *alias_name) {
@@ -125,29 +127,12 @@ bool Class::activate() {
     /**
      * register methods
      */
-    int n = methods.size();
-    zend_function_entry *_methods = (zend_function_entry *) ecalloc(n + 1, sizeof(zend_function_entry));
-    for (int i = 0; i < n; i++) {
-        _methods[i].fname = methods[i].name.c_str();
-        _methods[i].handler = _exec_method;
-        if (methods[i].info) {
-            _methods[i].arg_info = methods[i].info;
-            _methods[i].num_args = methods[i].num_args;
-        } else {
-            _methods[i].arg_info = nullptr;
-            _methods[i].num_args = 0;
-        }
-        _methods[i].flags = methods[i].flags;
-        method_map[class_name.c_str()][methods[i].name.c_str()] = methods[i].method;
-    }
-    memset(&_methods[n], 0, sizeof(zend_function_entry));
-    _ce.info.internal.builtin_functions = _methods;
+    _ce.info.internal.builtin_functions = functions;
     if (parent_ce) {
         ce = zend_register_internal_class_ex(&_ce, parent_ce);
     } else {
         ce = zend_register_internal_class(&_ce TSRMLS_CC);
     }
-    efree(_methods);
     if (ce == NULL) {
         return false;
     }

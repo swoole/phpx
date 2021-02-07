@@ -105,13 +105,18 @@ class Builder
         return $this->projectType == 'bin';
     }
 
+    private function getSourceDir()
+    {
+        return $this->root . self::DIR_SRC;
+    }
+
     /**
      * 编译源代码
      * @return bool
      */
     function compile()
     {
-        self::getFileList($this->root . self::DIR_SRC, $this->exts, $this->files);
+        self::getFileList($this->getSourceDir(), $this->exts, $this->files);
 
         if (empty($this->files)) {
             throw  new RuntimeException("no src files \n");
@@ -270,6 +275,6 @@ class Builder
         if (!is_file($this->target)) {
             $this->make();
         }
-        $this->exec("cp $this->target " .$this->installTargetDir.'/'.basename($this->target));
+        $this->exec("cp $this->target " . $this->installTargetDir . '/' . basename($this->target));
     }
 }

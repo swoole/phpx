@@ -19,12 +19,11 @@
 using namespace std;
 
 namespace php {
-
 unordered_map<string, Resource *> resource_map;
 unordered_map<string, Class *> class_map;
 unordered_map<string, Interface *> interface_map;
-map<const char *, map<const char *, method_t, strCmp>, strCmp> method_map;
-map<const char *, function_t, strCmp> function_map;
+map<const char *, map<const char *, Method *, strCmp>, strCmp> method_map;
+map<const char *, Function *, strCmp> function_map;
 map<int, void *> object_array;
 unordered_map<string, Extension *> _name_to_extension;
 unordered_map<int, Extension *> _module_number_to_extension;
@@ -333,7 +332,7 @@ static inline ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int num_
 }
 
 void _exec_function(zend_execute_data *data, zval *return_value) {
-    function_t func = function_map[(const char *) data->func->common.function_name->val];
+    Function *func = function_map[(const char *) data->func->common.function_name->val];
     Args args;
 
     zval *param_ptr = ZEND_CALL_ARG(EG(current_execute_data), 1);
@@ -348,11 +347,11 @@ void _exec_function(zend_execute_data *data, zval *return_value) {
         param_ptr++;
     }
     Variant _retval(return_value, true);
-    func(args, _retval);
+    func->exec(args, _retval);
 }
 
 void _exec_method(zend_execute_data *data, zval *return_value) {
-    method_t func = method_map[(const char *) data->func->common.scope->name->val]
+    Method *me = method_map[(const char *) data->func->common.scope->name->val]
                               [(const char *) data->func->common.function_name->val];
     Args args;
 
@@ -370,7 +369,7 @@ void _exec_method(zend_execute_data *data, zval *return_value) {
         param_ptr++;
     }
     Variant _retval(return_value, true);
-    func(_this, args, _retval);
+    me->exec(_this, args, _retval);
 }
 
 Variant _call(zval *object, zval *func, Args &args) {
