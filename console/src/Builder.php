@@ -158,6 +158,16 @@ class Builder
              */
             $php_include = trim(`php-config --includes`);
             /**
+             * 使用 pkg-config
+             */
+            if ($this->getConfigValue('build', 'packages')) {
+                $pkgs = $this->getConfigValue('build', 'packages');
+                foreach($pkgs as $pkg) {
+                    $compile_option .= ' ';
+                    $compile_option .= trim(`pkg-config --cflags {$pkg}`);
+                }
+            }
+            /**
              * C 源文件
              */
             if (Upload::getFileExt($file) == 'c') {
@@ -275,6 +285,17 @@ class Builder
             }
         } else {
             $libs .= ' -lphp7';
+        }
+
+        /**
+         * 使用 pkg-config
+         */
+        if ($this->getConfigValue('build', 'packages')) {
+            $pkgs = $this->getConfigValue('build', 'packages');
+            foreach($pkgs as $pkg) {
+                $link_option .= ' ';
+                $link_option .= trim(`pkg-config --libs {$pkg}`);
+            }
         }
 
         $this->exec(self::CXX . " $objects {$ldflags} {$libs} {$this->ldflags} {$link_option} -o {$this->target}");
