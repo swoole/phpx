@@ -26,7 +26,7 @@ extern "C" {
 #include "php_streams.h"
 #include "php_network.h"
 
-#if PHP_MAJOR_VERSION < 7
+#if PHP_VERSION_ID < 70200
 #error "only supports PHP7 or later."
 #endif
 
@@ -56,6 +56,16 @@ typedef unsigned char uchar;
 
 #define PHPX_MAX_ARGC 10
 #define PHPX_VAR_DUMP_LEVEL 10
+
+#if PHP_VERSION_ID >= 80000
+#define TSRMLS_CC
+#else
+typedef int zend_result;
+#endif
+
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
+#endif
 
 namespace php {
 
@@ -635,7 +645,11 @@ class ArrayIterator {
     zend_ulong _index;
 };
 
+#if PHP_VERSION_ID >= 80000
+extern int array_data_compare(Bucket *f, Bucket *s);
+#else
 extern int array_data_compare(const void *a, const void *b);
+#endif
 extern String md5(String data, bool raw_output = false);
 extern String sha1(String data, bool raw_output = false);
 extern String crc32(String data, bool raw_output = false);
@@ -842,7 +856,12 @@ class Array : public Variant {
         zend_hash_merge(Z_ARRVAL_P(ptr()), Z_ARRVAL_P(source.ptr()), zval_add_ref, overwrite);
     }
     bool sort() {
+#if PHP_VERSION_ID >= 80000
+        zend_hash_sort(Z_ARRVAL_P(ptr()), array_data_compare, 1);
+        return true;
+#else
         return zend_hash_sort(Z_ARRVAL_P(ptr()), array_data_compare, 1) == SUCCESS;
+#endif
     }
     Array slice(long offset, long length = -1, bool preserve_keys = false);
 };
@@ -921,90 +940,6 @@ class Args {
     int size = 0;
     zval **ptr_list = nullptr;
     zval *zval_list = nullptr;
-};
-
-class ArgInfo {
-  public:
-    ArgInfo(int required_num, bool return_reference = false) {
-        this->required_num = required_num;
-        this->return_reference = return_reference;
-        this->info = nullptr;
-    }
-#if PHP_VERSION_ID >= 70200
-    ~ArgInfo() {
-        for (int i = 1; i <= list.size(); i++) {
-            if (ZEND_TYPE_IS_CLASS(info[i].type)) {
-                efree((void *) info[i].type);
-            }
-        }
-    }
-#endif
-
-    void add(const char *name,
-             const char *class_name = nullptr,
-             int type_hint = 0,
-             bool pass_by_reference = false,
-             bool allow_null = false,
-             bool variadic = false) {
-#if PHP_VERSION_ID >= 70200
-        zend_type type;
-        if (class_name) {
-            if (allow_null) {
-                int _l = strlen(class_name);
-                char *_s = (char *) emalloc(_l + 2);
-                _s[0] = '?';
-                _s[_l + 1] = 0;
-                type = (zend_type) _s;
-            } else {
-                type = (zend_type) estrdup(class_name);
-            }
-        } else {
-            type = ZEND_TYPE_ENCODE(type_hint, allow_null);
-        }
-        zend_internal_arg_info val = {
-            name,
-            type,
-            pass_by_reference,
-            variadic,
-        };
-#else
-        zend_internal_arg_info val = {
-            name,
-            class_name,
-            (zend_uchar) type_hint,
-            pass_by_reference,
-            allow_null,
-            variadic,
-        };
-#endif
-        list.push_back(val);
-    }
-    zend_internal_arg_info *get() {
-        if (info != nullptr) {
-            return info;
-        }
-        zend_internal_arg_info *_info =
-            (zend_internal_arg_info *) calloc(list.size() + 1, sizeof(zend_internal_arg_info));
-        if (_info == nullptr) {
-            return nullptr;
-        }
-        _info[0].name = (const char *) (zend_uintptr_t)(required_num);
-        _info[0].pass_by_reference = return_reference;
-        for (int i = 1; i <= list.size(); i++) {
-            memcpy(&_info[i], &list[i - 1], sizeof(zend_internal_arg_info));
-        }
-        info = _info;
-        return _info;
-    }
-    size_t count() {
-        return list.size();
-    }
-
-  protected:
-    int required_num;
-    bool return_reference;
-    zend_internal_arg_info *info;
-    std::vector<zend_internal_arg_info> list;
 };
 
 extern Variant _call(zval *object, zval *func, Args &args);
@@ -1130,22 +1065,36 @@ class Object : public Variant {
         Variant _func(func);
         return _call(ptr(), _func.ptr(), args);
     }
+#if PHP_VERSION_ID >= 80000
+    zend_object *object() {
+        return Z_OBJ_P(ptr());
+    }
+#else
+    zval *object() {
+        return ptr();
+    }
+#endif
+    zend_class_entry *parent_ce() {
+        return Z_OBJCE_P(ptr())->parent;
+    }
+    zend_class_entry *ce() {
+        return Z_OBJCE_P(ptr());
+    }
     inline Variant callParentMethod(const char *func) {
         Variant retval;
-        zend_call_method_with_0_params(ptr(), Z_OBJCE_P(ptr())->parent, NULL, func, retval.ptr());
+        zend_call_method_with_0_params(object(), parent_ce(), NULL, func, retval.ptr());
         return retval;
     }
     inline Variant callParentMethod(const char *func, const Variant &v1) {
         Variant retval;
         zend_call_method_with_1_params(
-            ptr(), Z_OBJCE_P(ptr())->parent, NULL, func, retval.ptr(), const_cast<Variant &>(v1).ptr());
+                object(), parent_ce(), NULL, func, retval.ptr(), const_cast<Variant &>(v1).ptr());
         return retval;
     }
     inline Variant callParentMethod(const char *func, const Variant &v1, const Variant &v2) {
         Variant retval;
-        echo("%p\n", Z_OBJCE_P(ptr())->parent);
-        zend_call_method_with_2_params(ptr(),
-                                       Z_OBJCE_P(ptr())->parent,
+        zend_call_method_with_2_params(object(),
+                                       parent_ce(),
                                        NULL,
                                        func,
                                        retval.ptr(),
@@ -1219,7 +1168,7 @@ class Object : public Variant {
     inline Variant get(const char *name) {
         Variant retval;
         zval rv;
-        zval *member_p = zend_read_property(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), 0, &rv);
+        zval *member_p = zend_read_property(ce(), object(), name, strlen(name), 0, &rv);
         if (member_p != &rv) {
             ZVAL_COPY(retval.ptr(), member_p);
         } else {
@@ -1228,34 +1177,34 @@ class Object : public Variant {
         return retval;
     }
     inline void set(const char *name, const Variant &v) {
-        zend_update_property(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), const_cast<Variant &>(v).ptr());
+        zend_update_property(ce(), object(), name, strlen(name), const_cast<Variant &>(v).ptr());
     }
     inline void set(const char *name, Array &v) {
-        zend_update_property(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v.ptr());
+        zend_update_property(ce(), object(), name, strlen(name), v.ptr());
     }
     inline void set(const char *name, std::string &v) {
-        zend_update_property_stringl(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v.c_str(), v.length());
+        zend_update_property_stringl(ce(), object(), name, strlen(name), v.c_str(), v.length());
     }
     inline void set(const char *name, std::string v) {
-        zend_update_property_stringl(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v.c_str(), v.length());
+        zend_update_property_stringl(ce(), object(), name, strlen(name), v.c_str(), v.length());
     }
     inline void set(const char *name, const char *v) {
-        zend_update_property_string(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v);
+        zend_update_property_string(ce(), object(), name, strlen(name), v);
     }
     inline void set(const char *name, int v) {
-        zend_update_property_long(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v);
+        zend_update_property_long(ce(), object(), name, strlen(name), v);
     }
     inline void set(const char *name, long v) {
-        zend_update_property_long(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v);
+        zend_update_property_long(ce(), object(), name, strlen(name), v);
     }
     inline void set(const char *name, double v) {
-        zend_update_property_double(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v);
+        zend_update_property_double(ce(), object(), name, strlen(name), v);
     }
     inline void set(const char *name, float v) {
-        zend_update_property_double(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), (double) v);
+        zend_update_property_double(ce(), object(), name, strlen(name), (double) v);
     }
     inline void set(const char *name, bool v) {
-        zend_update_property_bool(Z_OBJCE_P(ptr()), ptr(), name, strlen(name), v ? 1 : 0);
+        zend_update_property_bool(ce(), object(), name, strlen(name), v ? 1 : 0);
     }
     template <class T>
     inline T *oGet(const char *key, const char *resource_name) {
@@ -1374,9 +1323,15 @@ enum ClassFlags {
     PROTECTED = ZEND_ACC_PROTECTED,
     PRIVATE = ZEND_ACC_PRIVATE,
     CONSTRUCT = ZEND_ACC_CTOR,
+#ifdef ZEND_ACC_DTOR
     DESTRUCT = ZEND_ACC_DTOR,
+#else
+    DESTRUCT = 0,
+#endif
 #ifdef ZEND_ACC_CLONE
     CLONE = ZEND_ACC_CLONE,
+#else
+    CLONE = 0,
 #endif
 };
 
@@ -1395,7 +1350,8 @@ struct Method {
     std::string name;
     int flags;
     method_t method;
-    ArgInfo *info;
+    const zend_internal_arg_info *info;
+    size_t num_args;
 };
 
 class Class {
@@ -1417,8 +1373,8 @@ class Class {
     bool implements(const char *name);
     bool implements(zend_class_entry *interface_ce);
     bool addConstant(const char *name, Variant v);
-    bool addProperty(const char *name, Variant v, int flags = PUBLIC);
-    bool addMethod(const char *name, method_t method, int flags = PUBLIC, ArgInfo *info = nullptr);
+    bool addProperty(const char *name, Variant v, int flags);
+    bool addMethod(const char *name, method_t method, int flags, const zend_internal_arg_info *arg_info, size_t arg_count);
     bool activate();
     bool alias(const char *alias_name);
 
@@ -1478,7 +1434,7 @@ class Interface {
         INIT_CLASS_ENTRY_EX(_ce, name, strlen(name), NULL);
         ce = NULL;
     }
-    bool addMethod(const char *name, ArgInfo *info) {
+    bool addMethod(const char *name, const zend_internal_arg_info *info) {
         if (activated) {
             return false;
         }
@@ -1509,8 +1465,8 @@ class Interface {
         for (int i = 0; i < n; i++) {
             _methods[i].fname = methods[i].name.c_str();
             _methods[i].handler = nullptr;
-            _methods[i].arg_info = methods[i].info->get();
-            _methods[i].num_args = (uint32_t) methods[i].info->count();
+            _methods[i].arg_info = methods[i].info;
+            _methods[i].num_args = methods[i].num_args;
             _methods[i].flags = ZEND_ACC_PUBLIC | ZEND_ACC_ABSTRACT;
         }
         memset(&_methods[n], 0, sizeof(zend_function_entry));
@@ -1535,15 +1491,15 @@ class Interface {
 extern std::unordered_map<std::string, Class *> class_map;
 extern std::unordered_map<std::string, Interface *> interface_map;
 
-extern int extension_startup(int type, int module_number);
+extern zend_result extension_startup(int type, int module_number);
 extern void extension_info(zend_module_entry *module);
-extern int extension_shutdown(int type, int module_number);
-extern int extension_before_request(int type, int module_number);
-extern int extension_after_request(int type, int module_number);
+extern zend_result extension_shutdown(int type, int module_number);
+extern zend_result extension_before_request(int type, int module_number);
+extern zend_result extension_after_request(int type, int module_number);
 
 class Extension {
-    friend int extension_startup(int type, int module_number);
-    friend int extension_shutdown(int type, int module_number);
+    friend zend_result extension_startup(int type, int module_number);
+    friend zend_result extension_shutdown(int type, int module_number);
 
   protected:
     zend_module_entry module = {
@@ -1589,7 +1545,8 @@ class Extension {
 
     bool registerClass(Class *c);
     bool registerInterface(Interface *i);
-    bool registerFunction(const char *name, function_t func, ArgInfo *info = nullptr);
+    bool registerFunctions(const zend_function_entry *functions);
+    bool registerFunction(const char *name, function_t func, const zend_internal_arg_info arg_info[], size_t arg_count);
     bool registerResource(const char *name, resource_dtor dtor);
     void registerConstant(const char *name, long v);
     void registerConstant(const char *name, int v);
