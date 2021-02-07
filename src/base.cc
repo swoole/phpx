@@ -347,7 +347,7 @@ void _exec_function(zend_execute_data *data, zval *return_value) {
         param_ptr++;
     }
     Variant _retval(return_value, true);
-    func->exec(args, _retval);
+    func->impl(args, _retval);
 }
 
 void _exec_method(zend_execute_data *data, zval *return_value) {
@@ -369,7 +369,7 @@ void _exec_method(zend_execute_data *data, zval *return_value) {
         param_ptr++;
     }
     Variant _retval(return_value, true);
-    me->exec(_this, args, _retval);
+    me->impl(_this, args, _retval);
 }
 
 Variant _call(zval *object, zval *func, Args &args) {

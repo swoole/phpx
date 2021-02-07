@@ -1306,18 +1306,18 @@ class Function {
         name_ = name;
     }
     virtual ~Function() { };
-    virtual void exec(Args &, Variant &) = 0;
+    virtual void impl(Args &, Variant &) = 0;
 };
 
 #define PHPX_FUNCTION(func)  class phpx_function_##func : Function { \
   public:\
-    void exec(Args &, Variant &retval); \
+    void impl(Args &, Variant &retval); \
     phpx_function_##func(const char *name) : Function(name) { function_map[name] = this; }\
     ~phpx_function_##func() {}\
 }; \
 static phpx_function_##func f_##func(#func); \
 PHP_FUNCTION(func) { } \
-void phpx_function_##func::exec(Args &args, Variant &retval)
+void phpx_function_##func::impl(Args &args, Variant &retval)
 
 class Method {
   private:
@@ -1329,18 +1329,18 @@ class Method {
         class_ = _class;
     }
     virtual ~Method() { };
-    virtual void exec(Object &, Args &, Variant &) = 0;
+    virtual void impl(Object &, Args &, Variant &) = 0;
 };
 
 #define PHPX_METHOD(class_, method)  class phpx_method_##class_##_##method : Method { \
   public:\
-    void exec(Object &_this, Args &, Variant &retval); \
+    void impl(Object &_this, Args &, Variant &retval); \
     phpx_method_##class_##_##method(const char *_class, const char *_name) : Method(_class, _name) { method_map[_class][_name] = this; }\
     ~phpx_method_##class_##_##method() {}\
 }; \
 static phpx_method_##class_##_##method m_##class_##_##method(#class_, #method); \
 PHP_METHOD(class_, method) { } \
-void phpx_method_##class_##_##method::exec(Object &_this, Args &args, Variant &retval)
+void phpx_method_##class_##_##method::impl(Object &_this, Args &args, Variant &retval)
 
 extern void _exec_function(zend_execute_data *data, zval *return_value);
 extern void _exec_method(zend_execute_data *data, zval *return_value);

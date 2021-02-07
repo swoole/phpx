@@ -29,19 +29,15 @@ END_EXTERN_C()
 using namespace php;
 using namespace std;
 
-PHPX_FUNCTION(cpp_ext_test)
-{
-    for (int i = 0; i < args.count(); i++)
-    {
+PHPX_FUNCTION(cpp_ext_test) {
+    for (int i = 0; i < args.count(); i++) {
         cout << args[i].type() << endl;
     }
     retval = 1234;
 }
 
-PHPX_FUNCTION(cpp_ext_test2)
-{
-    for (int i = 0; i < args.count(); i++)
-    {
+PHPX_FUNCTION(cpp_ext_test2) {
+    for (int i = 0; i < args.count(); i++) {
         cout << args[i].type() << endl;
     }
     auto v1 = args[0];
@@ -49,42 +45,36 @@ PHPX_FUNCTION(cpp_ext_test2)
     arr.set(1, "efg");
 
     retval = arr;
-    //php::echo("argc=%d\n", args.count());
-    //php::error(E_WARNING, "extension warning.");
+    // php::echo("argc=%d\n", args.count());
+    // php::error(E_WARNING, "extension warning.");
 }
 
-PHPX_METHOD(MyClass, test)
-{
+PHPX_METHOD(MyClass, test) {
     cout << "MyClass::test" << endl;
     retval = 1234.56;
 }
 
-PHPX_METHOD(MyClass, pget)
-{
+PHPX_METHOD(MyClass, pget) {
     String *str = _this.oGet<String>("resource", "ResourceString");
     cout << "[GET] ResourceString: " << str->length() << endl;
     retval = Variant("hello xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 }
 
-PHPX_METHOD(MyClass, pset)
-{
+PHPX_METHOD(MyClass, pset) {
     String *str = new String("hello world");
     _this.oSet("resource", "ResourceString", str);
     cout << "[SET] ResourceString: " << str->length() << endl;
 }
 
-void string_dtor(zend_resource *res)
-{
+void string_dtor(zend_resource *res) {
     String *s = static_cast<String *>(res->ptr);
     delete s;
 }
 
-PHPX_EXTENSION()
-{
+PHPX_EXTENSION() {
     Extension *extension = new Extension("cpp_ext", "1.0.2");
 
-    extension->onStart = [extension]() noexcept
-    {
+    extension->onStart = [extension]() noexcept {
         extension->registerConstant("CPP_EXT_VERSION", 10002);
 
         Class *c = new Class("MyClass");
@@ -92,40 +82,36 @@ PHPX_EXTENSION()
 
         extension->registerClass(c);
 
-//        Interface *i = new Interface("myInterface");
-//        i->addMethod("test", nullptr);
-//        extension->registerInterface(i);
+        //        Interface *i = new Interface("myInterface");
+        //        i->addMethod("test", nullptr);
+        //        extension->registerInterface(i);
 
         extension->registerResource("ResourceString", string_dtor);
     };
 
-//    extension->onShutdown = [extension]() noexcept
-//    {
-//        cout << extension->name << "shutdown" << endl;
-//    };
-//
-//    extension->onBeforeRequest = [extension]() noexcept
-//    {
-//        cout << extension->name << "beforeRequest" << endl;
-//    };
-//
-//    extension->onAfterRequest = [extension]() noexcept
-//    {
-//        cout << extension->name << "afterRequest" << endl;
-//    };
-
+    //    extension->onShutdown = [extension]() noexcept
+    //    {
+    //        cout << extension->name << "shutdown" << endl;
+    //    };
+    //
+    //    extension->onBeforeRequest = [extension]() noexcept
+    //    {
+    //        cout << extension->name << "beforeRequest" << endl;
+    //    };
+    //
+    //    extension->onAfterRequest = [extension]() noexcept
+    //    {
+    //        cout << extension->name << "afterRequest" << endl;
+    //    };
 
     extension->registerFunctions(ext_functions);
 
-    extension->info(
-    {
-        "cpp_ext support", "enabled"
-    },
-    {
-        { "author", "Rango" },
-        { "version", extension->version },
-        { "date", "2021-02-05" },
-    });
+    extension->info({"cpp_ext support", "enabled"},
+                    {
+                        {"author", "Rango"},
+                        {"version", extension->version},
+                        {"date", "2021-02-05"},
+                    });
 
     return extension;
 }
