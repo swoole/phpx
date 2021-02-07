@@ -1,18 +1,12 @@
 {
   "project": {
-    "name": "gtk",
+    "name": "bloom_filter",
     "type": "ext"
   },
   "build": {
     "ldflags": "-L/home/htf/workspace/phpx/lib",
-    "cxxflags": "-I/home/htf/workspace/phpx/include",
+    "cxxflags": "-DHAVE_CONFIG_H -I/home/htf/workspace/phpx/include -I/opt/php-8.0/include/php/ext/swoole/include -I/opt/php-8.0/include/php/ext/swoole",
     "cflags": "",
-    "packages": [
-      "gdk-3.0",
-      "gtk+-3.0",
-      "glib-2.0",
-      "atk"
-    ],
     "c_std": "",
     "cxx_std": ""
   },

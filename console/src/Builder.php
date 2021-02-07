@@ -293,8 +293,8 @@ class Builder
         if ($this->getConfigValue('build', 'packages')) {
             $pkgs = $this->getConfigValue('build', 'packages');
             foreach($pkgs as $pkg) {
-                $link_option .= ' ';
-                $link_option .= trim(`pkg-config --libs {$pkg}`);
+                $libs .= ' ';
+                $libs .= trim(`pkg-config --libs {$pkg}`);
             }
         }
 

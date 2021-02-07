@@ -1,6 +1,5 @@
 <?php
 $b = new BloomFilter(1024);
-echo "key hello\n";
 
 $b->add("hello");
 $b->add("world");

@@ -9,7 +9,7 @@ C++ wrapper for Zend API
  
 ## Requirements
 
-- PHP 7.0 or later
+- PHP 7.2 or later
 - Linux/MacOS/Windows
 - GCC 4.8 or later
 - Composer
@@ -17,6 +17,7 @@ C++ wrapper for Zend API
 ## Build phpx (bin)
 ```shell
 ./build.sh
+sudo cp bin/phpx /usr/local/bin
 ```
 
 ## Build libphpx.so
@@ -26,11 +27,21 @@ make -j 4
 sudo make install
 ```
 
+## Create Project
+```shell
+phpx create cpp_ext
+```
+
+## Generate ArgInfo & Function Entires
+```shell
+php script/gen_stub.php your_stub_dir
+```
+
 ## Build extension
 ```shell
 cd examples/cpp_ext
-make 
-sudo make install
+phpx build -v
+sudo phpx install 
 ```
 
 ## Load your extension
