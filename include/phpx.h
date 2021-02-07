@@ -1282,7 +1282,7 @@ typedef void (*resource_dtor)(zend_resource *);
     }                                                                                                                  \
     ZEND_DLEXPORT Extension *get_module()
 
-struct strCmp {
+struct StrCmp {
     bool operator()(const char *s1, const char *s2) const {
         return strcmp(s1, s2) < 0;
     }
@@ -1291,78 +1291,68 @@ struct strCmp {
 class Function;
 class Method;
 
-extern std::map<const char *, std::map<const char *, Method *, strCmp>, strCmp> method_map;
-extern std::map<const char *, Function *, strCmp> function_map;
+extern std::map<const char *, std::map<const char *, Method *, StrCmp>, StrCmp> method_map;
+extern std::map<const char *, Function *, StrCmp> function_map;
 
 #define PHPX_FN(n) #n, n
 #define PHPX_ME(c, m) #m, c##_##m
-#define PHPX_ME_WITH_ARGINFO(c, m)   #m, c##_##m, arginfo_class_##c_##m, ARRAY_SIZE(arginfo_class_##c_##m)-1
 
 class Function {
   private:
     const char *name_;
+
   public:
     Function(const char *name) {
         name_ = name;
     }
-    virtual ~Function() { };
+    virtual ~Function(){};
     virtual void impl(Args &, Variant &) = 0;
 };
 
-#define PHPX_FUNCTION(func)  class phpx_function_##func : Function { \
-  public:\
-    void impl(Args &, Variant &retval); \
-    phpx_function_##func(const char *name) : Function(name) { function_map[name] = this; }\
-    ~phpx_function_##func() {}\
-}; \
-static phpx_function_##func f_##func(#func); \
-PHP_FUNCTION(func) { } \
-void phpx_function_##func::impl(Args &args, Variant &retval)
+#define PHPX_FUNCTION(func)                                                                                            \
+    class phpx_function_##func : Function {                                                                            \
+      public:                                                                                                          \
+        void impl(Args &, Variant &retval);                                                                            \
+        phpx_function_##func(const char *name) : Function(name) {                                                      \
+            function_map[name] = this;                                                                                 \
+        }                                                                                                              \
+        ~phpx_function_##func() {}                                                                                     \
+    };                                                                                                                 \
+    static phpx_function_##func f_##func(#func);                                                                       \
+    PHP_FUNCTION(func) {}                                                                                              \
+    void phpx_function_##func::impl(Args &args, Variant &retval)
 
 class Method {
   private:
     const char *class_;
     const char *name_;
+
   public:
     Method(const char *_class, const char *_name) {
         name_ = _name;
         class_ = _class;
     }
-    virtual ~Method() { };
+    virtual ~Method(){};
     virtual void impl(Object &, Args &, Variant &) = 0;
 };
 
-#define PHPX_METHOD(class_, method)  class phpx_method_##class_##_##method : Method { \
-  public:\
-    void impl(Object &_this, Args &, Variant &retval); \
-    phpx_method_##class_##_##method(const char *_class, const char *_name) : Method(_class, _name) { method_map[_class][_name] = this; }\
-    ~phpx_method_##class_##_##method() {}\
-}; \
-static phpx_method_##class_##_##method m_##class_##_##method(#class_, #method); \
-PHP_METHOD(class_, method) { } \
-void phpx_method_##class_##_##method::impl(Object &_this, Args &args, Variant &retval)
+#define PHPX_METHOD(class_, method)                                                                                    \
+    class phpx_method_##class_##_##method : Method {                                                                   \
+      public:                                                                                                          \
+        void impl(Object &_this, Args &, Variant &retval);                                                             \
+        phpx_method_##class_##_##method(const char *_class, const char *_name) : Method(_class, _name) {               \
+            method_map[_class][_name] = this;                                                                          \
+        }                                                                                                              \
+        ~phpx_method_##class_##_##method() {}                                                                          \
+    };                                                                                                                 \
+    static phpx_method_##class_##_##method m_##class_##_##method(#class_, #method);                                    \
+    PHP_METHOD(class_, method) {}                                                                                      \
+    void phpx_method_##class_##_##method::impl(Object &_this, Args &args, Variant &retval)
 
 extern void _exec_function(zend_execute_data *data, zval *return_value);
 extern void _exec_method(zend_execute_data *data, zval *return_value);
 
-static zend_function_entry *copy_function_entries (const zend_function_entry *_functions) {
-    const zend_function_entry *ptr = _functions;
-    size_t count = 0;
-    while (ptr->fname) {
-        count ++;
-        ptr++;
-    }
-    zend_function_entry *functions = new zend_function_entry[count + 1];
-
-    int i = 0;
-    ptr = _functions;
-    while (ptr->fname) {
-        functions[i] = *ptr;
-        i++;
-        ptr++;
-    }
-    return functions;
-}
+zend_function_entry *copy_function_entries(const zend_function_entry *_functions);
 
 String number_format(double num, int decimals = 0, char dec_point = '.', char thousands_sep = ',');
 Variant http_build_query(const Variant &data,

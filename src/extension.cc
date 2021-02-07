@@ -20,12 +20,13 @@ using namespace std;
 
 namespace php {
 
-Extension::Extension(const char *name, const char *version) {
-    module.name = name;
-    module.version = version;
-    this->name = name;
-    this->version = version;
-    _name_to_extension[name] = this;
+Extension::Extension(const char *_name, const char *_version) {
+    module.name = _name;
+    module.version = _version;
+    name = _name;
+    version = _version;
+    _name_to_extension[_name] = this;
+    functions = nullptr;
 }
 
 bool Extension::require(const char *name, const char *version) {

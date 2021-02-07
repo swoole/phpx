@@ -22,8 +22,8 @@ namespace php {
 unordered_map<string, Resource *> resource_map;
 unordered_map<string, Class *> class_map;
 unordered_map<string, Interface *> interface_map;
-map<const char *, map<const char *, Method *, strCmp>, strCmp> method_map;
-map<const char *, Function *, strCmp> function_map;
+map<const char *, map<const char *, Method *, StrCmp>, StrCmp> method_map;
+map<const char *, Function *, StrCmp> function_map;
 map<int, void *> object_array;
 unordered_map<string, Extension *> _name_to_extension;
 unordered_map<int, Extension *> _module_number_to_extension;
@@ -352,7 +352,7 @@ void _exec_function(zend_execute_data *data, zval *return_value) {
 
 void _exec_method(zend_execute_data *data, zval *return_value) {
     Method *me = method_map[(const char *) data->func->common.scope->name->val]
-                              [(const char *) data->func->common.function_name->val];
+                           [(const char *) data->func->common.function_name->val];
     Args args;
 
     Object _this(&data->This, true);
@@ -428,6 +428,25 @@ Variant include(string file) {
     destroy_op_array(new_op_array);
     efree(new_op_array);
     return retval;
+}
+
+zend_function_entry *copy_function_entries(const zend_function_entry *_functions) {
+    const zend_function_entry *ptr = _functions;
+    size_t count = 0;
+    while (ptr->fname) {
+        count++;
+        ptr++;
+    }
+
+    zend_function_entry *functions = new zend_function_entry[count + 1]();
+    int i = 0;
+    ptr = _functions;
+    while (ptr->fname) {
+        functions[i] = *ptr;
+        i++;
+        ptr++;
+    }
+    return functions;
 }
 
 }  // namespace php

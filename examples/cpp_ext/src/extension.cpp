@@ -89,23 +89,10 @@ PHPX_EXTENSION() {
         extension->registerResource("ResourceString", string_dtor);
     };
 
-    //    extension->onShutdown = [extension]() noexcept
-    //    {
-    //        cout << extension->name << "shutdown" << endl;
-    //    };
-    //
-    //    extension->onBeforeRequest = [extension]() noexcept
-    //    {
-    //        cout << extension->name << "beforeRequest" << endl;
-    //    };
-    //
-    //    extension->onAfterRequest = [extension]() noexcept
-    //    {
-    //        cout << extension->name << "afterRequest" << endl;
-    //    };
-
+    extension->onShutdown = [extension]() noexcept { cout << extension->name << "shutdown" << endl; };
+    extension->onBeforeRequest = [extension]() noexcept { cout << extension->name << "beforeRequest" << endl; };
+    extension->onAfterRequest = [extension]() noexcept { cout << extension->name << "afterRequest" << endl; };
     extension->registerFunctions(ext_functions);
-
     extension->info({"cpp_ext support", "enabled"},
                     {
                         {"author", "Rango"},
