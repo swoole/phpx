@@ -18,41 +18,35 @@
 
 using namespace std;
 
-namespace php
-{
-
+namespace php {
 unordered_map<string, Resource *> resource_map;
-unordered_map<string, Class*> class_map;
-unordered_map<string, Interface*> interface_map;
-map<const char *, map<const char *, method_t, strCmp>, strCmp> method_map;
-map<const char *, function_t, strCmp> function_map;
+unordered_map<string, Class *> class_map;
+unordered_map<string, Interface *> interface_map;
+map<const char *, map<const char *, Method *, StrCmp>, StrCmp> method_map;
+map<const char *, Function *, StrCmp> function_map;
 map<int, void *> object_array;
-unordered_map<string, Extension*> _name_to_extension;
-unordered_map<int, Extension*> _module_number_to_extension;
+unordered_map<string, Extension *> _name_to_extension;
+unordered_map<int, Extension *> _module_number_to_extension;
 
-void error(int level, const char *format, ...)
-{
+void error(int level, const char *format, ...) {
     va_list args;
     va_start(args, format);
     php_verror(NULL, "", level, format, args);
     va_end(args);
 }
 
-Variant constant(const char *name)
-{
+Variant constant(const char *name) {
     zend_string *_name = zend_string_init(name, strlen(name), 0);
     zval *val = zend_get_constant_ex(_name, NULL, ZEND_FETCH_CLASS_SILENT);
     zend_string_free(_name);
-    if (val == NULL)
-    {
+    if (val == NULL) {
         return nullptr;
     }
     Variant retval(val);
     return retval;
 }
 
-void echo(const char *format, ...)
-{
+void echo(const char *format, ...) {
     va_list args;
     char *buffer;
     size_t size;
@@ -64,37 +58,28 @@ void echo(const char *format, ...)
     va_end(args);
 }
 
-#if  PHP_VERSION_ID < 70300
+#if PHP_VERSION_ID < 70300
 static int validate_constant_array(HashTable *ht) /* {{{ */
 {
     int ret = 1;
     zval *val;
 
     ht->u.v.nApplyCount++;
-    ZEND_HASH_FOREACH_VAL_IND(ht, val)
-    {
+    ZEND_HASH_FOREACH_VAL_IND(ht, val) {
         ZVAL_DEREF(val);
-        if (Z_REFCOUNTED_P(val))
-        {
-            if (Z_TYPE_P(val) == IS_ARRAY)
-            {
-                if (Z_REFCOUNTED_P(val))
-                {
-                    if (Z_ARRVAL_P(val)->u.v.nApplyCount > 0)
-                    {
+        if (Z_REFCOUNTED_P(val)) {
+            if (Z_TYPE_P(val) == IS_ARRAY) {
+                if (Z_REFCOUNTED_P(val)) {
+                    if (Z_ARRVAL_P(val)->u.v.nApplyCount > 0) {
                         zend_error(E_WARNING, "Constants cannot be recursive arrays");
                         ret = 0;
                         break;
-                    }
-                    else if (!validate_constant_array(Z_ARRVAL_P(val)))
-                    {
+                    } else if (!validate_constant_array(Z_ARRVAL_P(val))) {
                         ret = 0;
                         break;
                     }
                 }
-            }
-            else if (Z_TYPE_P(val) != IS_STRING && Z_TYPE_P(val) != IS_RESOURCE)
-            {
+            } else if (Z_TYPE_P(val) != IS_STRING && Z_TYPE_P(val) != IS_RESOURCE) {
                 zend_error(E_WARNING, "Constants may only evaluate to scalar values or arrays");
                 ret = 0;
                 break;
@@ -106,36 +91,26 @@ static int validate_constant_array(HashTable *ht) /* {{{ */
     return ret;
 }
 #else
-static int validate_constant_array(HashTable *ht)
-{
+static int validate_constant_array(HashTable *ht) {
     int ret = 1;
     zval *val;
 
     GC_PROTECT_RECURSION(ht);
-    ZEND_HASH_FOREACH_VAL_IND(ht, val)
-    {
+    ZEND_HASH_FOREACH_VAL_IND(ht, val) {
         ZVAL_DEREF(val);
-        if (Z_REFCOUNTED_P(val))
-        {
-            if (Z_TYPE_P(val) == IS_ARRAY)
-            {
-                if (Z_REFCOUNTED_P(val))
-                {
-                    if (Z_IS_RECURSIVE_P(val))
-                    {
+        if (Z_REFCOUNTED_P(val)) {
+            if (Z_TYPE_P(val) == IS_ARRAY) {
+                if (Z_REFCOUNTED_P(val)) {
+                    if (Z_IS_RECURSIVE_P(val)) {
                         zend_error(E_WARNING, "Constants cannot be recursive arrays");
                         ret = 0;
                         break;
-                    }
-                    else if (!validate_constant_array(Z_ARRVAL_P(val)))
-                    {
+                    } else if (!validate_constant_array(Z_ARRVAL_P(val))) {
                         ret = 0;
                         break;
                     }
                 }
-            }
-            else if (Z_TYPE_P(val) != IS_STRING && Z_TYPE_P(val) != IS_RESOURCE)
-            {
+            } else if (Z_TYPE_P(val) != IS_STRING && Z_TYPE_P(val) != IS_RESOURCE) {
                 zend_error(E_WARNING, "Constants may only evaluate to scalar values, arrays or resources");
                 ret = 0;
                 break;
@@ -155,50 +130,40 @@ static void copy_constant_array(zval *dst, zval *src) /* {{{ */
     zval *new_val, *val;
 
     array_init_size(dst, zend_hash_num_elements(Z_ARRVAL_P(src)));
-    ZEND_HASH_FOREACH_KEY_VAL_IND(Z_ARRVAL_P(src), idx, key, val)
-    {
+    ZEND_HASH_FOREACH_KEY_VAL_IND(Z_ARRVAL_P(src), idx, key, val) {
         /* constant arrays can't contain references */
         ZVAL_DEREF(val);
-        if (key)
-        {
+        if (key) {
             new_val = zend_hash_add_new(Z_ARRVAL_P(dst), key, val);
-        }
-        else
-        {
+        } else {
             new_val = zend_hash_index_add_new(Z_ARRVAL_P(dst), idx, val);
         }
-        if (Z_TYPE_P(val) == IS_ARRAY)
-        {
-            if (Z_REFCOUNTED_P(val))
-            {
+        if (Z_TYPE_P(val) == IS_ARRAY) {
+            if (Z_REFCOUNTED_P(val)) {
                 copy_constant_array(new_val, val);
             }
-        }
-        else if (Z_REFCOUNTED_P(val))
-        {
+        } else if (Z_REFCOUNTED_P(val)) {
             Z_ADDREF_P(val);
         }
     }
     ZEND_HASH_FOREACH_END();
 }
 
-bool define(const char *name, const Variant &v, bool case_sensitive)
-{
+bool define(const char *name, const Variant &v, bool case_sensitive) {
     size_t len = strlen(name);
     zval *val = const_cast<Variant &>(v).ptr(), val_free;
     zend_constant c;
 
     /* class constant, check if there is name and make sure class is valid & exists */
-    if (zend_memnstr(name, "::", sizeof("::") - 1, name + len))
-    {
+    if (zend_memnstr(name, "::", sizeof("::") - 1, name + len)) {
         zend_error(E_WARNING, "Class constants cannot be defined or redefined");
         return false;
     }
 
     ZVAL_UNDEF(&val_free);
 
-    repeat: switch (Z_TYPE_P(val))
-    {
+repeat:
+    switch (Z_TYPE_P(val)) {
     case IS_LONG:
     case IS_DOUBLE:
     case IS_STRING:
@@ -208,38 +173,36 @@ bool define(const char *name, const Variant &v, bool case_sensitive)
     case IS_RESOURCE:
         break;
     case IS_ARRAY:
-        if (Z_REFCOUNTED_P(val))
-        {
-            if (!validate_constant_array(Z_ARRVAL_P(val)))
-            {
+        if (Z_REFCOUNTED_P(val)) {
+            if (!validate_constant_array(Z_ARRVAL_P(val))) {
                 return false;
-            }
-            else
-            {
+            } else {
                 copy_constant_array(&c.value, val);
                 goto register_constant;
             }
         }
         break;
     case IS_OBJECT:
-        if (Z_TYPE(val_free) == IS_UNDEF)
-        {
-            if (Z_OBJ_HT_P(val)->get)
-            {
+#if PHP_VERSION_ID >= 80000
+        if (Z_OBJ_HT_P(val)->cast_object(Z_OBJ_P(val), &val_free, IS_STRING) == SUCCESS) {
+            val = &val_free;
+            break;
+        }
+#else
+        if (Z_TYPE(val_free) == IS_UNDEF) {
+            if (Z_OBJ_HT_P(val)->get) {
                 zval rv;
                 val = Z_OBJ_HT_P(val)->get(val, &rv);
                 ZVAL_COPY_VALUE(&val_free, val);
                 goto repeat;
-            }
-            else if (Z_OBJ_HT_P(val)->cast_object)
-            {
-                if (Z_OBJ_HT_P(val)->cast_object(val, &val_free, IS_STRING) == SUCCESS)
-                {
+            } else if (Z_OBJ_HT_P(val)->cast_object) {
+                if (Z_OBJ_HT_P(val)->cast_object(val, &val_free, IS_STRING) == SUCCESS) {
                     val = &val_free;
                     break;
                 }
             }
         }
+#endif
         /* no break */
     default:
         zend_error(E_WARNING, "Constants may only evaluate to scalar values or arrays");
@@ -249,41 +212,33 @@ bool define(const char *name, const Variant &v, bool case_sensitive)
 
     ZVAL_COPY(&c.value, val);
     zval_ptr_dtor(&val_free);
-    register_constant:
-#if  PHP_VERSION_ID < 70300
+register_constant:
+#if PHP_VERSION_ID < 70300
     c.flags = case_sensitive ? CONST_CS : 0; /* non persistent */
     c.module_number = PHP_USER_CONSTANT;
 #endif
     c.name = zend_string_init(name, len, 0);
-    if (zend_register_constant(&c) == SUCCESS)
-    {
+    if (zend_register_constant(&c) == SUCCESS) {
         return true;
-    }
-    else
-    {
+    } else {
         return false;
     }
 }
 
-String number_format(double num, int decimals, char dec_point, char thousands_sep)
-{
+String number_format(double num, int decimals, char dec_point, char thousands_sep) {
     return _php_math_number_format(num, decimals, dec_point, thousands_sep);
 }
 
-int extension_startup(int type, int module_number)
-{
+zend_result extension_startup(int type, int module_number) {
     zend_module_entry *module;
     void *ptr;
-    ZEND_HASH_FOREACH_PTR(&module_registry, ptr)
-    {
+    ZEND_HASH_FOREACH_PTR(&module_registry, ptr) {
         module = (zend_module_entry *) ptr;
-        if (module_number == module->module_number)
-        {
+        if (module_number == module->module_number) {
             Extension *extension = _name_to_extension[module->name];
             extension->started = true;
             extension->registerIniEntries(module_number);
-            if (extension->onStart)
-            {
+            if (extension->onStart) {
                 extension->onStart();
             }
             _module_number_to_extension[module_number] = extension;
@@ -294,16 +249,13 @@ int extension_startup(int type, int module_number)
     return SUCCESS;
 }
 
-void extension_info(zend_module_entry *module)
-{
+void extension_info(zend_module_entry *module) {
     Extension *extension = _module_number_to_extension[module->module_number];
-    if (extension->header.size() > 0 && extension->body.size() > 0)
-    {
+    if (extension->header.size() > 0 && extension->body.size() > 0) {
         php_info_print_table_start();
         auto header = extension->header;
         size_t size = header.size();
-        switch (size)
-        {
+        switch (size) {
         case 2:
             php_info_print_table_header(size, header[0].c_str(), header[1].c_str());
             break;
@@ -314,11 +266,9 @@ void extension_info(zend_module_entry *module)
             error(E_WARNING, "invalid info header size.");
             return;
         }
-        for (auto row : extension->body)
-        {
+        for (auto row : extension->body) {
             size = row.size();
-            switch (size)
-            {
+            switch (size) {
             case 2:
                 php_info_print_table_row(size, row[0].c_str(), row[1].c_str());
                 break;
@@ -334,11 +284,9 @@ void extension_info(zend_module_entry *module)
     }
 }
 
-int extension_shutdown(int type, int module_number)
-{
+zend_result extension_shutdown(int type, int module_number) {
     Extension *extension = _module_number_to_extension[module_number];
-    if (extension->onShutdown)
-    {
+    if (extension->onShutdown) {
         extension->onShutdown();
     }
     extension->unregisterIniEntries(module_number);
@@ -349,40 +297,30 @@ int extension_shutdown(int type, int module_number)
     return SUCCESS;
 }
 
-int extension_before_request(int type, int module_number)
-{
+zend_result extension_before_request(int type, int module_number) {
     Extension *extension = _module_number_to_extension[module_number];
-    if (extension->onBeforeRequest)
-    {
+    if (extension->onBeforeRequest) {
         extension->onBeforeRequest();
     }
 
     return SUCCESS;
 }
 
-int extension_after_request(int type, int module_number)
-{
+zend_result extension_after_request(int type, int module_number) {
     Extension *extension = _module_number_to_extension[module_number];
-    if (extension->onAfterRequest)
-    {
+    if (extension->onAfterRequest) {
         extension->onAfterRequest();
     }
 
     return SUCCESS;
 }
 
-static inline ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int num_args)
-{
+static inline ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int num_args) {
     uint32_t min_num_args = data->func->common.required_num_args;
     uint32_t max_num_args = data->func->common.num_args;
 
-    if (num_args < min_num_args || (num_args > max_num_args && max_num_args > 0))
-    {
-#if PHP_MINOR_VERSION == 0
-        zend_wrong_paramers_count_error(num_args, min_num_args, max_num_args);
-#elif PHP_MINOR_VERSION == 1
-        zend_wrong_parameters_count_error(num_args, min_num_args, max_num_args);
-#elif PHP_MINOR_VERSION == 2
+    if (num_args < min_num_args || (num_args > max_num_args && max_num_args > 0)) {
+#if PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION == 2
         zend_wrong_parameters_count_error(1, num_args, min_num_args, max_num_args);
 #else
         zend_wrong_parameters_count_error(min_num_args, max_num_args);
@@ -393,31 +331,28 @@ static inline ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int num_
     return SUCCESS;
 }
 
-void _exec_function(zend_execute_data *data, zval *return_value)
-{
-    function_t func = function_map[(const char *) data->func->common.function_name->val];
+void _exec_function(zend_execute_data *data, zval *return_value) {
+    Function *func = function_map[(const char *) data->func->common.function_name->val];
     Args args;
 
     zval *param_ptr = ZEND_CALL_ARG(EG(current_execute_data), 1);
     int arg_count = ZEND_CALL_NUM_ARGS(EG(current_execute_data));
 
-    if (_check_args_num(data, arg_count) == FAILURE)
-    {
+    if (_check_args_num(data, arg_count) == FAILURE) {
         return;
     }
 
-    while (arg_count-- > 0)
-    {
+    while (arg_count-- > 0) {
         args.append(param_ptr);
         param_ptr++;
     }
     Variant _retval(return_value, true);
-    func(args, _retval);
+    func->impl(args, _retval);
 }
 
-void _exec_method(zend_execute_data *data, zval *return_value)
-{
-    method_t func = method_map[(const char *) data->func->common.scope->name->val][(const char *) data->func->common.function_name->val];
+void _exec_method(zend_execute_data *data, zval *return_value) {
+    Method *me = method_map[(const char *) data->func->common.scope->name->val]
+                           [(const char *) data->func->common.function_name->val];
     Args args;
 
     Object _this(&data->This, true);
@@ -425,63 +360,49 @@ void _exec_method(zend_execute_data *data, zval *return_value)
     zval *param_ptr = ZEND_CALL_ARG(EG(current_execute_data), 1);
     int arg_count = ZEND_CALL_NUM_ARGS(EG(current_execute_data));
 
-    if (_check_args_num(data, arg_count) == FAILURE)
-    {
+    if (_check_args_num(data, arg_count) == FAILURE) {
         return;
     }
 
-    while (arg_count-- > 0)
-    {
+    while (arg_count-- > 0) {
         args.append(param_ptr);
         param_ptr++;
     }
     Variant _retval(return_value, true);
-    func(_this, args, _retval);
+    me->impl(_this, args, _retval);
 }
 
-Variant _call(zval *object, zval *func, Args &args)
-{
+Variant _call(zval *object, zval *func, Args &args) {
     Variant retval;
     zval params[PHPX_MAX_ARGC];
-    for (int i = 0; i < args.count(); i++)
-    {
+    for (int i = 0; i < args.count(); i++) {
         ZVAL_COPY_VALUE(&params[i], args[i].ptr());
     }
-    if (call_user_function(EG(function_table), object, func, retval.ptr(), args.count(), params) == SUCCESS)
-    {
+    if (call_user_function(EG(function_table), object, func, retval.ptr(), args.count(), params) == SUCCESS) {
         return retval;
-    }
-    else
-    {
+    } else {
         return nullptr;
     }
 }
 
-Variant _call(zval *object, zval *func)
-{
+Variant _call(zval *object, zval *func) {
     Variant retval = false;
-    if (call_user_function(EG(function_table), object, func, retval.ptr(), 0, NULL) == 0)
-    {
+    if (call_user_function(EG(function_table), object, func, retval.ptr(), 0, NULL) == 0) {
         return retval;
-    }
-    else
-    {
+    } else {
         return nullptr;
     }
 }
 
-Variant include(string file)
-{
+Variant include(string file) {
     zend_file_handle file_handle;
     int ret = php_stream_open_for_zend_ex(file.c_str(), &file_handle, USE_PATH | STREAM_OPEN_FOR_INCLUDE);
-    if (ret != SUCCESS)
-    {
+    if (ret != SUCCESS) {
         return false;
     }
 
     zend_string *opened_path;
-    if (!file_handle.opened_path)
-    {
+    if (!file_handle.opened_path) {
         file_handle.opened_path = zend_string_init(file.c_str(), file.length(), 0);
     }
     opened_path = zend_string_copy(file_handle.opened_path);
@@ -489,19 +410,15 @@ Variant include(string file)
     Variant retval = false;
     zend_op_array *new_op_array;
     ZVAL_NULL(&dummy);
-    if (zend_hash_add(&EG(included_files), opened_path, &dummy))
-    {
+    if (zend_hash_add(&EG(included_files), opened_path, &dummy)) {
         new_op_array = zend_compile_file(&file_handle, ZEND_REQUIRE);
         zend_destroy_file_handle(&file_handle);
-    }
-    else
-    {
+    } else {
         new_op_array = NULL;
         zend_file_handle_dtor(&file_handle);
     }
     zend_string_release(opened_path);
-    if (!new_op_array)
-    {
+    if (!new_op_array) {
         return false;
     }
 
@@ -513,4 +430,23 @@ Variant include(string file)
     return retval;
 }
 
+zend_function_entry *copy_function_entries(const zend_function_entry *_functions) {
+    const zend_function_entry *ptr = _functions;
+    size_t count = 0;
+    while (ptr->fname) {
+        count++;
+        ptr++;
+    }
+
+    zend_function_entry *functions = new zend_function_entry[count + 1]();
+    int i = 0;
+    ptr = _functions;
+    while (ptr->fname) {
+        functions[i] = *ptr;
+        i++;
+        ptr++;
+    }
+    return functions;
 }
+
+}  // namespace php

@@ -18,33 +18,25 @@
 
 using namespace std;
 
-namespace php
-{
-
-int array_data_compare(const void *a, const void *b)
-{
-    Bucket *f;
-    Bucket *s;
+namespace php {
+#if PHP_VERSION_ID >= 80000
+int array_data_compare(Bucket *f, Bucket *s) {
+#else
+int array_data_compare(const void *a, const void *b) {
+    Bucket *f = (Bucket *) a;
+    Bucket *s = (Bucket *) b;
+#endif
     zval result;
-    zval *first;
-    zval *second;
+    zval *first = &f->val;
+    zval *second = &s->val;
 
-    f = (Bucket *) a;
-    s = (Bucket *) b;
-
-    first = &f->val;
-    second = &s->val;
-
-    if (UNEXPECTED(Z_TYPE_P(first) == IS_INDIRECT))
-    {
+    if (UNEXPECTED(Z_TYPE_P(first) == IS_INDIRECT)) {
         first = Z_INDIRECT_P(first);
     }
-    if (UNEXPECTED(Z_TYPE_P(second) == IS_INDIRECT))
-    {
+    if (UNEXPECTED(Z_TYPE_P(second) == IS_INDIRECT)) {
         second = Z_INDIRECT_P(second);
     }
-    if (compare_function(&result, first, second) == FAILURE)
-    {
+    if (compare_function(&result, first, second) == FAILURE) {
         return 0;
     }
 
@@ -52,30 +44,22 @@ int array_data_compare(const void *a, const void *b)
     return Z_LVAL(result);
 }
 
-Array Array::slice(long offset, long length, bool preserve_keys)
-{
+Array Array::slice(long offset, long length, bool preserve_keys) {
     size_t num_in = count();
 
-    if (offset > num_in)
-    {
+    if (offset > num_in) {
         return Array();
-    }
-    else if (offset < 0 && (offset = (num_in + offset)) < 0)
-    {
+    } else if (offset < 0 && (offset = (num_in + offset)) < 0) {
         offset = 0;
     }
 
-    if (length < 0)
-    {
+    if (length < 0) {
         length = num_in - offset + length;
-    }
-    else if (((zend_ulong) offset + (zend_ulong) length) > (unsigned) num_in)
-    {
+    } else if (((zend_ulong) offset + (zend_ulong) length) > (unsigned) num_in) {
         length = num_in - offset;
     }
 
-    if (length <= 0)
-    {
+    if (length <= 0) {
         return Array();
     }
 
@@ -84,24 +68,19 @@ Array Array::slice(long offset, long length, bool preserve_keys)
     zval *entry;
 
     zval return_value;
-    array_init_size(&return_value, (uint32_t ) length);
+    array_init_size(&return_value, (uint32_t) length);
 
     /* Start at the beginning and go until we hit offset */
     int pos = 0;
-    if (!preserve_keys && (Z_ARRVAL_P(this->ptr())->u.flags & HASH_FLAG_PACKED))
-    {
+    if (!preserve_keys && (Z_ARRVAL_P(this->ptr())->u.flags & HASH_FLAG_PACKED)) {
         zend_hash_real_init(Z_ARRVAL_P(&return_value), 1);
-        ZEND_HASH_FILL_PACKED(Z_ARRVAL_P(&return_value))
-        {
-            ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(this->ptr()), entry)
-            {
+        ZEND_HASH_FILL_PACKED(Z_ARRVAL_P(&return_value)) {
+            ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(this->ptr()), entry) {
                 pos++;
-                if (pos <= offset)
-                {
+                if (pos <= offset) {
                     continue;
                 }
-                if (pos > offset + length)
-                {
+                if (pos > offset + length) {
                     break;
                 }
                 ZEND_HASH_FILL_ADD(entry);
@@ -110,33 +89,22 @@ Array Array::slice(long offset, long length, bool preserve_keys)
             ZEND_HASH_FOREACH_END();
         }
         ZEND_HASH_FILL_END();
-    }
-    else
-    {
-        ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(this->ptr()), num_key, string_key, entry)
-        {
+    } else {
+        ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(this->ptr()), num_key, string_key, entry) {
             pos++;
-            if (pos <= offset)
-            {
+            if (pos <= offset) {
                 continue;
             }
-            if (pos > offset + length)
-            {
+            if (pos > offset + length) {
                 break;
             }
 
-            if (string_key)
-            {
+            if (string_key) {
                 entry = zend_hash_add_new(Z_ARRVAL_P(&return_value), string_key, entry);
-            }
-            else
-            {
-                if (preserve_keys)
-                {
+            } else {
+                if (preserve_keys) {
                     entry = zend_hash_index_add_new(Z_ARRVAL_P(&return_value), num_key, entry);
-                }
-                else
-                {
+                } else {
                     entry = zend_hash_next_index_insert_new(Z_ARRVAL_P(&return_value), entry);
                 }
             }
@@ -148,4 +116,4 @@ Array Array::slice(long offset, long length, bool preserve_keys)
     return retval;
 }
 
-}
+}  // namespace php
