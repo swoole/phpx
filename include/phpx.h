@@ -63,6 +63,10 @@ typedef unsigned char uchar;
 typedef int zend_result;
 #endif
 
+#ifndef ZEND_ABSTRACT_ME_WITH_FLAGS
+#define ZEND_ABSTRACT_ME_WITH_FLAGS(classname, name, arg_info, flags)   ZEND_RAW_FENTRY(#name, NULL, arg_info, flags)
+#endif
+
 namespace php {
 
 void error(int level, const char *format, ...);

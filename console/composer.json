@@ -1,5 +1,6 @@
 {
     "require": {
-        "matyhtf/swoole_framework": "^1.20"
+        "matyhtf/swoole_framework": "^1.20",
+        "nikic/php-parser": "4.9.0"
     }
 }
