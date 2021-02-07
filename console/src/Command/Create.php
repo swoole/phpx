@@ -45,7 +45,7 @@ class Create extends Command
 //        $php_libs = trim(`php-config --libs`);
 //        $php_ldflags = trim(`php-config --ldflags`);
 //        $php_extension_dir = trim(`php-config --extension-dir`);
-        $configFile = $path . '/.config.json';
+        $configFile = $path . '/' . Builder::PROJECT_CONFIG_FILE;
 
         $conf['project']['name'] = $project_name;
         $conf['build'] = [

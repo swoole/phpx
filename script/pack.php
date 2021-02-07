@@ -1,4 +1,4 @@
-#!/usr/bin/env php
+#!/usr/bin/env php 
 <?php
 echo "start build phpx tool...\r\n";
 /**

@@ -10,9 +10,17 @@ var_dump($q->first());
 var_dump($q->pull());
 var_dump($q->first());
 
+
+echo "count\n-----------------------------------\n";
 var_dump($q->count());
+
 var_dump($q->isEmpty());
 
-var_dump($q->traverse());
 
-ReflectionClass::export("Queue");
+echo "traverse\n-----------------------------------\n";
+//var_dump($q->traverse());
+
+while (!$q->isEmpty()) {
+    var_dump($q->first());
+    var_dump($q->pull());
+}

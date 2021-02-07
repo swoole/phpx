@@ -1,11 +1,11 @@
 {
     "project": {
-        "name": "cpp_ext",
+        "name": "queue",
         "type": "ext"
     },
     "build": {
-        "ldflags": "",
-        "cxxflags": "",
+        "ldflags": "-L/home/htf/workspace/phpx/lib",
+        "cxxflags": "-I/home/htf/workspace/phpx/include",
         "cflags": "",
         "c_std": "",
         "cxx_std": ""

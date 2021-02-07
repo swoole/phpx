@@ -32,6 +32,7 @@ class Builder
 
     const CC_STD = '';
     const CXX_STD = 'c++11';
+    const PROJECT_CONFIG_FILE = 'project.json';
 
     const PHPX_LFLAGS = '-lphpx';
 
@@ -185,16 +186,28 @@ class Builder
     }
 
     /**
+     * @return string
+     */
+    protected function getProjectConfigFile()
+    {
+        $file = $this->root . '/.config.json';
+        if (is_file($file)) {
+            return $file;
+        }
+        return $this->root . self::PROJECT_CONFIG_FILE;
+    }
+
+    /**
      * 加载配置文件
      */
     protected function loadConfig()
     {
-        $this->configFile = $this->root . '/.config.json';
+        $this->configFile = $this->getProjectConfigFile();
         if (!is_dir($this->root . self::DIR_SRC)) {
             throw  new RuntimeException("no src dir\n");
         }
         if (!is_file($this->configFile)) {
-            throw  new RuntimeException("no .config.json[{$this->configFile}]\n");
+            throw  new RuntimeException("no project config file[{$this->configFile}]\n");
         }
         $config = json_decode(file_get_contents($this->configFile), true);
         if (empty($config['project']['name'])) {
