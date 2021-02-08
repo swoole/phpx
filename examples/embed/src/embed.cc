@@ -22,44 +22,38 @@
 using namespace php;
 using namespace std;
 
-void test()
-{
+void test() {
     cout << "hello world" << endl;
 }
 
-void md5test()
-{
+void md5test() {
     echo("[0]hash=%s\n", md5("hello world").c_str());
-    echo("[0]hash_hmac=%s\n", hash_hmac("ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").c_str());
+    echo("[0]hash_hmac=%s\n",
+         hash_hmac("ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").c_str());
 
     Variant a("hello world");
     echo("[1]hash=%s\n", php::exec("md5", a).toCString());
     echo("[1]hash=%s\n", php::exec("md5", "hello world").toCString());
 
     echo("[1]hash_hmac=%s\n",
-            php::exec("hash_hmac", "ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").toCString());
+         php::exec("hash_hmac", "ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").toCString());
 }
 
-void testRedis()
-{
+void testRedis() {
     cout << "=====================Test Redis==================\n";
     Object redis = php::newObject("redis");
     var_dump(redis);
     auto ret1 = redis.exec("connect", "127.0.0.1", 6379);
-    //connect success
-    if (ret1.toBool())
-    {
+    // connect success
+    if (ret1.toBool()) {
         auto ret2 = redis.exec("get", "key");
         printf("value=%s\n", ret2.toCString());
-    }
-    else
-    {
+    } else {
         cout << "connect to redis server failed." << endl;
     }
 }
 
-void jsontest()
-{
+void jsontest() {
     Array arr;
     arr.append(1234);
     arr.append(1234.02);
@@ -74,8 +68,7 @@ void jsontest()
     var_dump(arr2);
 }
 
-int main(int argc, char * argv[])
-{
+int main(int argc, char *argv[]) {
     php::VM vm(argc, argv);
     String value = ini_get("output_buffering");
     cout << "ENV:" << value.toInt() << endl;
@@ -83,24 +76,20 @@ int main(int argc, char * argv[])
     Variant a = 1;
     Variant b = 2;
 
-
     auto c = a;
-
 
     testRedis();
 
     include("index.php");
     auto o = newObject("test");
-
     var_dump(o);
-    return 0;
 
     Array url_params;
     url_params.set("name", "rango");
     url_params.set("value", 1234);
 
     Array _arg_list;
-    Object redis = php::newObject("redis");
+    Object redis = newObject("redis");
     _arg_list.append(redis);
 
     Variant func = "var_dump";
@@ -109,18 +98,16 @@ int main(int argc, char * argv[])
     auto url_query = http_build_query(url_params);
     var_dump(url_query);
 
-
-//    jsontest();
+    jsontest();
     md5test();
-    return 0;
 
     vm.eval("echo 'Hello World!';");
-    vm.include("embed.php");
+    include("embed.php");
 
-    auto a = constant("SWOOLE_BASE");
-    cout << "SWOOLE_BASE = " << a.toInt() << endl;
+    auto c1 = constant("SWOOLE_BASE");
+    cout << "SWOOLE_BASE = " << c1.toInt() << endl;
 
-    auto obj = php::newObject("Test");
+    auto obj = newObject("Test");
     auto ret = obj.exec("getName");
 
     cout << ret.toString() << endl;
@@ -144,8 +131,6 @@ int main(int argc, char * argv[])
     String s1 = "hello world";
     String s2 = s1.substr(0, 5);
     cout << "s2=" << s2.c_str() << endl;
-
-//    swoole_add_function("test", (void*) test);
 
     return 0;
 }

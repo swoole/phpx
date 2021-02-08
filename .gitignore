@@ -50,3 +50,4 @@ bin/phpx
 /build/
 \.settings/
 /Debug/
+/examples/embed/bin/embed

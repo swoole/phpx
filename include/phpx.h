@@ -64,13 +64,15 @@ typedef int zend_result;
 #endif
 
 #ifndef ZEND_ABSTRACT_ME_WITH_FLAGS
-#define ZEND_ABSTRACT_ME_WITH_FLAGS(classname, name, arg_info, flags)   ZEND_RAW_FENTRY(#name, NULL, arg_info, flags)
+#define ZEND_ABSTRACT_ME_WITH_FLAGS(classname, name, arg_info, flags) ZEND_RAW_FENTRY(#name, NULL, arg_info, flags)
 #endif
+
+#define PHPX_API
 
 namespace php {
 
-void error(int level, const char *format, ...);
-void echo(const char *format, ...);
+PHPX_API void error(int level, const char *format, ...);
+PHPX_API void echo(const char *format, ...);
 
 struct Resource {
     const char *name;
@@ -419,17 +421,17 @@ Variant newResource(const char *name, T *v) {
     return Variant(res);
 }
 
-static inline void var_dump(Variant &v) {
+PHPX_API static inline void var_dump(Variant &v) {
     php_var_dump(v.ptr(), PHPX_VAR_DUMP_LEVEL);
 }
 
-static inline bool is_callable(const Variant &fn) {
+PHPX_API static inline bool is_callable(const Variant &fn) {
     return zend_is_callable(const_cast<Variant &>(fn).ptr(), 0, nullptr);
 }
 
-Variant include(std::string file);
+PHPX_API Variant include(std::string file);
 
-static inline int version_compare(std::string s1, std::string s2) {
+PHPX_API static inline int version_compare(std::string s1, std::string s2) {
     return php_version_compare(s1.c_str(), s2.c_str());
 }
 
@@ -650,11 +652,12 @@ extern int array_data_compare(Bucket *f, Bucket *s);
 #else
 extern int array_data_compare(const void *a, const void *b);
 #endif
-extern String md5(String data, bool raw_output = false);
-extern String sha1(String data, bool raw_output = false);
-extern String crc32(String data, bool raw_output = false);
-extern String hash(String algo, String data, bool raw_output = false);
-extern String hash_hmac(String algo, String data, String key, bool raw_output = false);
+
+PHPX_API String md5(String data, bool raw_output = false);
+PHPX_API String sha1(String data, bool raw_output = false);
+PHPX_API String crc32(String data, bool raw_output = false);
+PHPX_API String hash(String algo, String data, bool raw_output = false);
+PHPX_API String hash_hmac(String algo, String data, String key, bool raw_output = false);
 
 class Array : public Variant {
   public:
@@ -1251,7 +1254,7 @@ class Object : public Variant {
     }
 };
 
-static Object create(const char *name, Args &args) {
+PHPX_API static Object create(const char *name, Args &args) {
     zend_class_entry *ce = getClassEntry(name);
     Object object;
     if (ce == NULL) {
@@ -1265,7 +1268,7 @@ static Object create(const char *name, Args &args) {
     return object;
 }
 
-static Object create(const char *name) {
+PHPX_API static Object create(const char *name) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
     if (ce == NULL) {

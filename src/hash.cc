@@ -70,7 +70,7 @@ static const php_hash_ops *get_ops(const char *name, size_t l_name) {
 
 String md5(String data, bool raw_output) {
     if (hash_algos.md5 == nullptr) {
-
+        hash_algos.md5 = get_ops(ZEND_STRL("md5"));
     }
     return doHash(hash_algos.md5, data, raw_output);
 }
