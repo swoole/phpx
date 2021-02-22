@@ -76,6 +76,21 @@ function processStubFile(string $stubFile, Context $context): ?FileInfo {
             if (($context->forceRegeneration || $stubHash !== $oldStubHash) && file_put_contents($legacyFile, $arginfoCode)) {
                 echo "Saved $legacyFile\n";
             }
+
+            $arginfoFile_for_phpx = str_replace('.stub.php', '_x_arginfo.h', $stubFile);
+            $content = "BEGIN_EXTERN_C()\n";
+
+            $content .= "#if PHP_VERSION_ID < 80000\n";
+            $content .= "#include \"".basename($legacyFile)."\"\n";
+            $content .= "#else\n";
+            $content .= "#include \"".basename($arginfoFile)."\"\n";
+            $content .= "#endif\n";
+            $content .= "END_EXTERN_C()\n";
+            $content .= "";
+
+            if (file_put_contents($arginfoFile_for_phpx, $content)) {
+                echo "Saved $arginfoFile_for_phpx\n";
+            }
         }
 
         return $fileInfo;
@@ -2422,7 +2437,7 @@ if ($generateMethodSynopses) {
 
         foreach ($methodSynopses as $filename => $content) {
             if (file_put_contents("$methodSynopsesDirectory/$filename", $content)) {
-                echo "Saved $filename\n";
+                echo "[1] Saved $filename\n";
             }
         }
     }
@@ -2433,7 +2448,7 @@ if ($replaceMethodSynopses) {
 
     foreach ($methodSynopses as $filename => $content) {
         if (file_put_contents($filename, $content)) {
-            echo "Saved $filename\n";
+            echo "[2] Saved $filename\n";
         }
     }
 }

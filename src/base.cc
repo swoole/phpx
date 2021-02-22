@@ -334,7 +334,7 @@ static inline ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int num_
 void _exec_function(zend_execute_data *data, zval *return_value) {
     auto iter_func = function_map.find((const char *) data->func->common.function_name->val);
     if (iter_func == function_map.end()) {
-        error(E_WARNING, "function '%s' not found",  data->func->common.function_name->val);
+        error(E_WARNING, "[phpx::_exec_function] function '%s' not found",  data->func->common.function_name->val);
         return;
     }
 
@@ -359,12 +359,12 @@ void _exec_function(zend_execute_data *data, zval *return_value) {
 void _exec_method(zend_execute_data *data, zval *return_value) {
     auto iter_class = method_map.find((const char *) data->func->common.scope->name->val);
     if (iter_class == method_map.end()) {
-        error(E_WARNING, "class '%s' not found",  data->func->common.scope->name->val);
+        error(E_WARNING, "[phpx::_exec_method] class '%s' not found",  data->func->common.scope->name->val);
         return;
     }
     auto iter_method = iter_class->second.find((const char *) data->func->common.function_name->val);
     if (iter_method == iter_class->second.end()) {
-        error(E_WARNING, "method '%s' not found",  data->func->common.function_name->val);
+        error(E_WARNING, "[phpx::_exec_method] method '%s' not found",  data->func->common.function_name->val);
         return;
     }
 

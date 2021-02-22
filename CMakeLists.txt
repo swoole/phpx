@@ -1,6 +1,5 @@
-#project
 project(phpx)
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 2.8.1)
 aux_source_directory(src DIR_SRCS)
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 
