@@ -20,49 +20,33 @@
 
 using namespace std;
 
-namespace php
-{
+namespace php {
 
-bool Variant::equals(Variant &v, bool strict)
-{
-    if (strict)
-    {
-        if (fast_is_identical_function(v.ptr(), ptr()))
-        {
+bool Variant::equals(Variant &v, bool strict) {
+    if (strict) {
+        if (fast_is_identical_function(v.ptr(), ptr())) {
             return true;
         }
-    }
-    else
-    {
-        if (v.isInt())
-        {
-            if (fast_equal_check_long(v.ptr(), ptr()))
-            {
+    } else {
+        if (v.isInt()) {
+            if (fast_equal_check_long(v.ptr(), ptr())) {
                 return true;
             }
-        }
-        else if (v.isString())
-        {
-            if (fast_equal_check_string(v.ptr(), ptr()))
-            {
+        } else if (v.isString()) {
+            if (fast_equal_check_string(v.ptr(), ptr())) {
                 return true;
             }
-        }
-        else
-        {
-            if (fast_equal_check_function(v.ptr(), ptr()))
-            {
+        } else {
+            if (fast_equal_check_function(v.ptr(), ptr())) {
                 return true;
-
             }
         }
     }
     return false;
 }
 
-Variant Variant::serialize()
-{
-    smart_str serialized_data = { 0 };
+Variant Variant::serialize() {
+    smart_str serialized_data = {0};
     php_serialize_data_t var_hash;
     PHP_VAR_SERIALIZE_INIT(var_hash);
     php_var_serialize(&serialized_data, ptr(), &var_hash TSRMLS_CC);
@@ -72,51 +56,41 @@ Variant Variant::serialize()
     return retval;
 }
 
-Variant Variant::unserialize()
-{
+Variant Variant::unserialize() {
     php_unserialize_data_t var_hash;
     Variant retval;
     PHP_VAR_UNSERIALIZE_INIT(var_hash);
 
     char *data = Z_STRVAL_P(ptr());
     size_t length = Z_STRLEN_P(ptr());
-    if (php_var_unserialize(retval.ptr(), (const uchar **) &data, (const uchar *) data + length, &var_hash))
-    {
+    if (php_var_unserialize(retval.ptr(), (const uchar **) &data, (const uchar *) data + length, &var_hash)) {
         return retval;
-    }
-    else
-    {
+    } else {
         return nullptr;
     }
 }
 
-Variant Variant::jsonEncode(zend_long options, zend_long depth)
-{
-    smart_str buf = { 0 };
+Variant Variant::jsonEncode(zend_long options, zend_long depth) {
+    smart_str buf = {0};
     JSON_G(error_code) = PHP_JSON_ERROR_NONE;
     JSON_G(encode_max_depth) = (int) depth;
 
     php_json_encode(&buf, ptr(), (int) options);
 
-    if (JSON_G(error_code) != PHP_JSON_ERROR_NONE && !(options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR))
-    {
+    if (JSON_G(error_code) != PHP_JSON_ERROR_NONE && !(options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR)) {
         smart_str_free(&buf);
         return false;
-    }
-    else
-    {
+    } else {
         smart_str_0(&buf);
         return buf.s;
     }
 }
 
-Variant Variant::jsonDecode(zend_long options, zend_long depth)
-{
-    smart_str buf = { 0 };
+Variant Variant::jsonDecode(zend_long options, zend_long depth) {
+    smart_str buf = {0};
     JSON_G(error_code) = PHP_JSON_ERROR_NONE;
 
-    if (this->length() == 0)
-    {
+    if (this->length() == 0) {
         JSON_G(error_code) = PHP_JSON_ERROR_SYNTAX;
         return nullptr;
     }
@@ -127,9 +101,8 @@ Variant Variant::jsonDecode(zend_long options, zend_long depth)
     return retval;
 }
 
-bool Variant::isCallable()
-{
+bool Variant::isCallable() {
     return zend_is_callable(ptr(), 0, nullptr);
 }
 
-}
+}  // namespace php
