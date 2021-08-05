@@ -51,3 +51,7 @@ bin/phpx
 \.settings/
 /Debug/
 /examples/embed/bin/embed
+/tests/cmake_install.cmake
+/tests/CMakeCache.txt
+/tests/Makefile
+/tests/bin/phpx_tests
