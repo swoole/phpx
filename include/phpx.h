@@ -958,7 +958,7 @@ static inline Variant call(const Variant &func, Args &args) {
 
 static inline Variant call(const Variant &func, Array &args) {
     Args _args;
-    for (int i = 0; i < args.count(); i++) {
+    for (size_t i = 0; i < args.count(); i++) {
         _args.append(args[i].ptr());
     }
     return _call(NULL, const_cast<Variant &>(func).ptr(), _args);
