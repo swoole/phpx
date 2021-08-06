@@ -276,7 +276,7 @@ class Variant {
         return retval;
     }
     /**
-     * [Unsafe Operation]
+     * [Unsafe Operation] When the object is released, this memory is not available
      */
     inline char *toCString() {
         if (str_val) {
@@ -400,12 +400,12 @@ class Variant {
         memset(&val, 0, sizeof(val));
     }
     void destroy() {
+        if (str_val) {
+            zend_string_release(str_val);
+        }
         if (!reference) {
             zval_ptr_dtor(&val);
             init();
-        }
-        if (str_val) {
-            zend_string_release(str_val);
         }
     }
 };
@@ -1028,7 +1028,7 @@ static inline zend_class_entry *getClassEntry(const char *name) {
     return zend_lookup_class(class_name.ptr());
 }
 
-static void throwException(const char *name, const char *message, int code = 0) {
+static inline void throwException(const char *name, const char *message, int code = 0) {
     zend_class_entry *ce = getClassEntry(name);
     if (ce == NULL) {
         php_error_docref(NULL, E_WARNING, "class '%s' undefined.", name);
@@ -1037,7 +1037,7 @@ static void throwException(const char *name, const char *message, int code = 0) 
     zend_throw_exception(ce, message, code TSRMLS_CC);
 }
 
-static Variant global(const char *name) {
+static inline Variant global(const char *name) {
     zend_string *key = zend_string_init(name, strlen(name), 0);
     zend_is_auto_global(key);
     zval *var = zend_hash_find_ind(&EG(symbol_table), key);
@@ -1254,7 +1254,7 @@ class Object : public Variant {
     }
 };
 
-PHPX_API static Object create(const char *name, Args &args) {
+PHPX_API static inline Object create(const char *name, Args &args) {
     zend_class_entry *ce = getClassEntry(name);
     Object object;
     if (ce == NULL) {
@@ -1268,7 +1268,7 @@ PHPX_API static Object create(const char *name, Args &args) {
     return object;
 }
 
-PHPX_API static Object create(const char *name) {
+PHPX_API static inline Object create(const char *name) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
     if (ce == NULL) {
