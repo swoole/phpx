@@ -108,7 +108,7 @@ class Variant {
         init();
         ZVAL_STRINGL(&val, str, len);
     }
-    Variant(std::string &str) {
+    Variant(const std::string &str) {
         init();
         ZVAL_STRINGL(&val, str.c_str(), str.length());
     }

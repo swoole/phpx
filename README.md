@@ -7,8 +7,6 @@
 
 C++ wrapper for Zend API
 
-![PHP-X](logo.png)
-
 ## Requirements
 
 - PHP 7.2 or later
