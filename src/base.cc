@@ -334,7 +334,7 @@ static inline ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int num_
 void _exec_function(zend_execute_data *data, zval *return_value) {
     auto iter_func = function_map.find((const char *) data->func->common.function_name->val);
     if (iter_func == function_map.end()) {
-        error(E_WARNING, "[phpx::_exec_function] function '%s' not found",  data->func->common.function_name->val);
+        error(E_WARNING, "[phpx::_exec_function] function '%s' not found", data->func->common.function_name->val);
         return;
     }
 
@@ -359,12 +359,12 @@ void _exec_function(zend_execute_data *data, zval *return_value) {
 void _exec_method(zend_execute_data *data, zval *return_value) {
     auto iter_class = method_map.find((const char *) data->func->common.scope->name->val);
     if (iter_class == method_map.end()) {
-        error(E_WARNING, "[phpx::_exec_method] class '%s' not found",  data->func->common.scope->name->val);
+        error(E_WARNING, "[phpx::_exec_method] class '%s' not found", data->func->common.scope->name->val);
         return;
     }
     auto iter_method = iter_class->second.find((const char *) data->func->common.function_name->val);
     if (iter_method == iter_class->second.end()) {
-        error(E_WARNING, "[phpx::_exec_method] method '%s' not found",  data->func->common.function_name->val);
+        error(E_WARNING, "[phpx::_exec_method] method '%s' not found", data->func->common.function_name->val);
         return;
     }
 
@@ -412,7 +412,12 @@ Variant _call(zval *object, zval *func) {
 
 Variant include(string file) {
     zend_file_handle file_handle;
+#if PHP_VERSION_ID >= 80100
+    zend_stream_init_filename(&file_handle, file.c_str());
+    int ret = php_stream_open_for_zend_ex(&file_handle, USE_PATH | STREAM_OPEN_FOR_INCLUDE);
+#else
     int ret = php_stream_open_for_zend_ex(file.c_str(), &file_handle, USE_PATH | STREAM_OPEN_FOR_INCLUDE);
+#endif
     if (ret != SUCCESS) {
         return false;
     }
@@ -428,11 +433,10 @@ Variant include(string file) {
     ZVAL_NULL(&dummy);
     if (zend_hash_add(&EG(included_files), opened_path, &dummy)) {
         new_op_array = zend_compile_file(&file_handle, ZEND_REQUIRE);
-        zend_destroy_file_handle(&file_handle);
     } else {
         new_op_array = NULL;
-        zend_file_handle_dtor(&file_handle);
     }
+    zend_destroy_file_handle(&file_handle);
     zend_string_release(opened_path);
     if (!new_op_array) {
         return false;

@@ -34,6 +34,15 @@ static struct HashAlgo {
     size_t key_size = 0;
 } hash_algos;
 
+
+static inline void php_hash_init_context(const php_hash_ops *ops, void *context) {
+#if PHP_VERSION_ID >= 80100
+    ops->hash_init(context, NULL);
+#else
+    ops->hash_init(context);
+#endif
+}
+
 static String doHash(const php_hash_ops *ops, String &data, bool raw_output) {
     if (hash_algos.context_size < ops->context_size) {
         hash_algos.context_size = ops->context_size;
@@ -41,7 +50,7 @@ static String doHash(const php_hash_ops *ops, String &data, bool raw_output) {
     }
 
     void *context = hash_algos.context;
-    ops->hash_init(context);
+    php_hash_init_context(ops, context);
     ops->hash_update(context, (unsigned char *) data.c_str(), data.length());
 
     zend_string *digest = zend_string_alloc(ops->digest_size, 0);
@@ -109,7 +118,7 @@ static inline void php_hash_hmac_prep_key(
     memset(K, 0, ops->block_size);
     if (key_len > ops->block_size) {
         /* Reduce the key first */
-        ops->hash_init(context);
+        php_hash_init_context(ops, context);
         ops->hash_update(context, key, key_len);
         ops->hash_final(K, context);
     } else {
@@ -139,14 +148,14 @@ String hash_hmac(String algo, String data, String key, bool raw_output) {
 
     php_hash_hmac_prep_key((uchar *) _key, ops, context, (uchar *) key.c_str(), key.length());
 
-    ops->hash_init(context);
+    php_hash_init_context(ops, context);
     ops->hash_update(context, _key, ops->block_size);
     ops->hash_update(context, (uchar *) data.c_str(), data.length());
     ops->hash_final((uchar *) ZSTR_VAL(digest), context);
 
     php_hash_string_xor_char(_key, _key, 0x6A, ops->block_size);
 
-    ops->hash_init(context);
+    php_hash_init_context(ops, context);
     ops->hash_update(context, _key, ops->block_size);
     ops->hash_update(context, (uchar *) ZSTR_VAL(digest), ops->digest_size);
     ops->hash_final((uchar *) ZSTR_VAL(digest), context);

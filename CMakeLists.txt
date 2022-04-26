@@ -1,5 +1,5 @@
 project(phpx)
-cmake_minimum_required(VERSION 2.8.1)
+cmake_minimum_required(VERSION 2.8.12)
 aux_source_directory(src DIR_SRCS)
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 
@@ -44,7 +44,7 @@ if (APPLE)
     message(${CMAKE_SHARED_LINKER_FLAGS})
 endif ()
 
-#libary
+# library
 add_library(phpx SHARED ${DIR_SRCS})
 SET_TARGET_PROPERTIES(phpx PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
@@ -52,7 +52,7 @@ add_library(phpx_static STATIC ${DIR_SRCS})
 SET_TARGET_PROPERTIES(phpx_static PROPERTIES OUTPUT_NAME phpx)
 SET_TARGET_PROPERTIES(phpx_static PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
-#install
+# install
 install(CODE "MESSAGE(\"Are you run command using root user?\")")
 install(TARGETS phpx LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 install(TARGETS phpx_static ARCHIVE DESTINATION lib)

@@ -1244,7 +1244,11 @@ class Object : public Variant {
         return Z_OBJ_HANDLE(*ptr());
     }
     String hash() {
+#if PHP_VERSION_ID >= 80100
+        return php_spl_object_hash(Z_OBJ_P(ptr()));
+#else
         return php_spl_object_hash(ptr());
+#endif
     }
     inline bool methodExists(const char *name) {
         return zend_hash_str_exists(&Z_OBJCE_P(ptr())->function_table, name, strlen(name));
