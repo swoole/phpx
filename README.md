@@ -1,4 +1,6 @@
-# PHP-X
+<h1 align=center>
+<img width="400" alt="Swoole Logo" src="logo.png" />
+</h1>
 
 [![Build Status](https://api.travis-ci.org/swoole/phpx.svg)](https://travis-ci.org/swoole/phpx)
 [![License](https://img.shields.io/badge/license-apache2-blue.svg)](LICENSE)
@@ -6,7 +8,7 @@
 C++ wrapper for Zend API
 
 ![PHP-X](logo.png)
- 
+
 ## Requirements
 
 - PHP 7.2 or later
@@ -41,7 +43,7 @@ php script/gen_stub.php your_stub_dir
 ```shell
 cd examples/cpp_ext
 phpx build -v
-sudo phpx install 
+sudo phpx install
 ```
 
 ## Load your extension
