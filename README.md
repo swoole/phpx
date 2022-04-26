@@ -2,7 +2,7 @@
 <img width="400" alt="Swoole Logo" src="logo.png" />
 </h1>
 
-[![Build Status](https://api.travis-ci.org/swoole/phpx.svg)](https://travis-ci.org/swoole/phpx)
+[![Build Status](https://github.com/matyhtf/phpx/workflows/libphpx/badge.svg)](https://github.com/matyhtf/phpx/actions?query=workflow%3Alibphpx)
 [![License](https://img.shields.io/badge/license-apache2-blue.svg)](LICENSE)
 
 C++ wrapper for Zend API

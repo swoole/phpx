@@ -8,5 +8,7 @@ jobs:
       - uses: actions/checkout@v1
       - name: install dependencies
         run: sudo apt update -y && sudo apt install -y googletest libgtest-dev libboost-stacktrace-dev
+      - name: print info
+        run: php -v && php-config
       - name: build
         run: cmake . && make VERBOSE=1 -j$(nproc)
