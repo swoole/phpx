@@ -4,7 +4,7 @@ using namespace php;
 
 TEST(hash, md5) {
     constexpr int l = 1024;
-    auto rdata = exec("random_byets", l);
+    auto rdata = exec("random_bytes", l);
     ASSERT_EQ(rdata.length(), l);
     String str(rdata);
     String hash1 = md5(str);

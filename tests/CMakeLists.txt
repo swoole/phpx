@@ -12,7 +12,7 @@ execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --include-dir
         OUTPUT_VARIABLE PHP_INCLUDE_DIR
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
-        
+
 execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --prefix
         OUTPUT_VARIABLE PHP_PREFIX_DIR
         OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -27,6 +27,11 @@ execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --ldflags
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
 
+execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --vernum
+         OUTPUT_VARIABLE PHP_VERNUM
+         OUTPUT_STRIP_TRAILING_WHITESPACE
+         )
+
 message("PHP_INCLUDE_DIR: ${PHP_INCLUDE_DIR}")
 
 set(phpx_tests_includes ./include/ ../include)
@@ -35,7 +40,11 @@ set(phpx_tests_link_directories /usr/local/lib ${PHP_PREFIX_DIR}/lib ../lib)
 
 include_directories(${PHP_INCLUDE_DIR} ${PHP_INCLUDE_DIR}/Zend ${PHP_INCLUDE_DIR}/main ${PHP_INCLUDE_DIR}/TSRM BEFORE)
 
-list(APPEND phpx_tests_libraries php7 phpx pthread)
+if (${PHP_VERNUM} GREATER_EQUAL 80000)
+    list(APPEND phpx_tests_libraries php phpx pthread)
+else()
+    list(APPEND phpx_tests_libraries php7 phpx pthread)
+endif()
 
 # find GTest
 find_package(GTest)
