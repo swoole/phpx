@@ -12,3 +12,5 @@ jobs:
         run: php -v && php -m && php -i
       - name: build
         run: cmake . && make VERBOSE=1 -j$(nproc)
+      - name: run tests
+        run: cd tests && cmake . && make VERBOSE=1 -j$(nproc)
