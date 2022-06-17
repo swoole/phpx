@@ -20,6 +20,7 @@ class Builder
     protected $target;
     protected $installTargetDir;
     protected $phpRoot;
+    protected $phpVernum;
 
     const DIR_SRC = 'src';
     const DIR_INCLUDE = 'include';
@@ -27,14 +28,14 @@ class Builder
     const DIR_BIN = 'bin';
     const DIR_BUILD = '.build';
 
-    const CXX = 'c++';
-    const CC = 'cc';
+    protected $CXX = 'c++';
+    protected $CC = 'cc';
 
     const CC_STD = '';
     const CXX_STD = 'c++11';
     const PROJECT_CONFIG_FILE = 'project.json';
 
-    const PHPX_LFLAGS = '-lphpx';
+    const PHPX_LFLAGS = '-lstdc++ -lphpx';
 
     protected $debug;
     protected $verbose;
@@ -48,6 +49,16 @@ class Builder
         $this->verbose = $verbose;
         $this->root = getcwd() . '/';
         $this->phpRoot = trim(`php-config --prefix`);
+        $this->phpVernum = intval(`php-config --vernum`);
+
+        $CC = getenv('CC');
+        $CXX = getenv('CXX');
+        if ($CC) {
+            $this->CC = $CC;
+        }
+        if ($CXX) {
+            $this->CXX = $CXX;
+        }
 
         $this->loadConfig();
         $this->projectName = $this->getConfigValue('project', 'name');
@@ -175,7 +186,7 @@ class Builder
                 if ($std) {
                     $compile_option .= '-std=' . $std . ' ';
                 }
-                $result = $this->exec(self::CC . " $php_include -I./include -c $file -o $objectFile {$compile_option} {$this->cflags}");
+                $result = $this->exec($this->CC . " $php_include -I./include -c $file -o $objectFile {$compile_option} {$this->cflags}");
             } /**
              * C++ 源代码
              */
@@ -186,7 +197,7 @@ class Builder
                 } else {
                     $compile_option .= ' -std=' . self::CXX_STD . ' ';
                 }
-                $result = $this->exec(self::CXX . " $php_include -I./include -c $file -o $objectFile {$compile_option} {$this->cxxflags}");
+                $result = $this->exec($this->CXX . " $php_include -I./include -c $file -o $objectFile {$compile_option} {$this->cxxflags}");
             }
             if ($result === false) {
                 return false;
@@ -284,7 +295,10 @@ class Builder
                 $link_option .= " -undefined dynamic_lookup";
             }
         } else {
-            $libs .= ' -lphp7';
+            $libs .= ' -lphp';
+            if ($this->phpVernum < 80000) {
+                $libs .= '7';
+            }
         }
 
         /**
@@ -298,7 +312,7 @@ class Builder
             }
         }
 
-        $this->exec(self::CXX . " $objects {$ldflags} {$libs} {$this->ldflags} {$link_option} -o {$this->target}");
+        $this->exec($this->CXX . " $objects {$ldflags} {$libs} {$this->ldflags} {$link_option} -o {$this->target}");
     }
 
     function clean()
