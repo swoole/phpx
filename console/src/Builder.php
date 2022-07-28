@@ -2,7 +2,7 @@
 
 namespace phpx;
 
-use Swoole\Upload;
+use SPF\Upload;
 use Symfony\Component\Console\Exception\RuntimeException;
 
 class Builder
