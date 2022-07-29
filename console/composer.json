@@ -1,6 +1,11 @@
 {
     "require": {
-        "matyhtf/swoole_framework": "^1.20",
+        "matyhtf/framework": "^3.0",
         "nikic/php-parser": "4.9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "phpx\\": "src/"
+        }
     }
 }
