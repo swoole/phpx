@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ 7.2, 7.3, 7.4, 8.0, 8.1, 8.2 ]
+        php: [8.0, 8.1, 8.2, 8.3 ]
     steps:
       - uses: actions/checkout@v1
       - name: Setup PHP
@@ -22,13 +22,8 @@ jobs:
           date
           env
           uname -a
-          ulimit -a
           php -v
           php --ini
-          ls -al
-          pwd
-          echo "`git log -20 --pretty --oneline`"
-          echo "`git log -10 --stat --pretty --oneline`"
       - name: build
         run: cmake . && make VERBOSE=1 -j$(nproc)
       - name: run tests
