@@ -14,7 +14,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "${{ matrix.php }}"
-          extensions: embed, curl, redis
+          extensions: embed, curl, redis, json
       - name: install dependencies
         run: sudo apt update -y && sudo apt install -y googletest libgtest-dev libboost-stacktrace-dev
       - name: Show machine information
