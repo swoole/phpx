@@ -25,6 +25,7 @@ sudo cp bin/phpx /usr/local/bin
 cmake .
 make -j 4
 sudo make install
+sudo ldconfig
 ```
 
 ## Create Project
