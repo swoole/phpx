@@ -7,13 +7,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ 7.2, 7.3, 7.4, 8.0 ]
+        php: [ 7.2, 7.3, 7.4, 8.0, 8.1, 8.2 ]
     steps:
       - uses: actions/checkout@v1
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: "${{ matrix.php }}"
+          extensions: embed, curl, redis
       - name: install dependencies
         run: sudo apt update -y && sudo apt install -y googletest libgtest-dev libboost-stacktrace-dev
       - name: Show machine information
