@@ -9,7 +9,7 @@ C++ wrapper for Zend API
 
 ## Requirements
 
-- PHP 7.2 or later
+- PHP 8.0 or later
 - Linux/MacOS/Windows
 - GCC 4.8 or later
 - Composer
@@ -35,7 +35,7 @@ phpx create cpp_ext
 
 ## Generate ArgInfo & Function Entires
 ```shell
-php script/gen_stub.php your_stub_dir
+php bin/gen_stub.php your_stub_dir
 ```
 
 ## Build extension

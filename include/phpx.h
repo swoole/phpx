@@ -26,8 +26,8 @@ extern "C" {
 #include "php_streams.h"
 #include "php_network.h"
 
-#if PHP_VERSION_ID < 70200
-#error "only supports PHP7 or later."
+#if PHP_VERSION_ID < 80000
+#error "only supports PHP8 or later."
 #endif
 
 #include "zend_interfaces.h"
