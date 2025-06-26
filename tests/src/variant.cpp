@@ -61,4 +61,18 @@ TEST(variant, calc) {
     Variant v(10);
     v += 5;
     ASSERT_EQ(v.toInt(), 15);
+
+    v -= 3;
+    ASSERT_EQ(v.toInt(), 12);
+}
+
+TEST(variant, json) {
+    Array arr1 = create_map();
+    auto json = arr1.jsonEncode();
+    ASSERT_TRUE(json.isString());
+    ASSERT_GT(json.length(), 10);
+
+    auto v3 = json.jsonDecode();
+    ASSERT_TRUE(v3.isArray());
+    ASSERT_TRUE(v3.equals(arr1));
 }
