@@ -35,7 +35,7 @@ bool Class::extends(zend_class_entry *_parent_class) {
     }
     parent_class_name = string(_parent_class->name->val, _parent_class->name->len);
     parent_ce = _parent_class;
-    return parent_ce != NULL;
+    return parent_ce != nullptr;
 }
 
 bool Class::extends(Class *parent) {
@@ -44,7 +44,7 @@ bool Class::extends(Class *parent) {
     }
     parent_class_name = parent->getName();
     parent_ce = parent->ptr();
-    return parent_ce != NULL;
+    return parent_ce != nullptr;
 }
 
 bool Class::implements(const char *name) {

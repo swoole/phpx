@@ -64,7 +64,7 @@ bool Variant::equals(Variant &v, bool strict) {
 }
 
 Variant Variant::serialize() {
-    smart_str serialized_data = {0};
+    smart_str serialized_data = {};
     php_serialize_data_t var_hash;
     PHP_VAR_SERIALIZE_INIT(var_hash);
     php_var_serialize(&serialized_data, ptr(), &var_hash TSRMLS_CC);
@@ -127,7 +127,7 @@ Variant Variant::unserialize() {
 }
 
 Variant Variant::jsonEncode(zend_long options, zend_long depth) {
-    smart_str buf = {0};
+    smart_str buf = {};
     JSON_G(error_code) = PHP_JSON_ERROR_NONE;
     JSON_G(encode_max_depth) = (int) depth;
 
@@ -143,7 +143,6 @@ Variant Variant::jsonEncode(zend_long options, zend_long depth) {
 }
 
 Variant Variant::jsonDecode(zend_long options, zend_long depth) {
-    smart_str buf = {0};
     JSON_G(error_code) = PHP_JSON_ERROR_NONE;
 
     if (this->length() == 0) {

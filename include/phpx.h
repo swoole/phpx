@@ -894,20 +894,20 @@ class Args {
     }
     Variant operator[](int i) {
         if (UNEXPECTED(i >= argc)) {
-            return Variant(nullptr);
+            return {nullptr};
         }
         zval *value = ptr_list[i];
-        return Variant(value, true);
+        return {value, true};
     }
 
   private:
     bool extend() {
         int _new_size = size == 0 ? PHPX_MAX_ARGC : size * 2;
-        zval **_new_ptr = (zval **) ecalloc(_new_size, sizeof(zval *));
+        zval **_new_ptr = static_cast<zval **>(ecalloc(_new_size, sizeof(zval *)));
         if (UNEXPECTED(_new_ptr == nullptr)) {
             return false;
         }
-        zval *_new_zval_ptr = (zval *) ecalloc(_new_size, sizeof(zval));
+        zval *_new_zval_ptr = static_cast<zval *>(ecalloc(_new_size, sizeof(zval)));
         if (UNEXPECTED(_new_zval_ptr == nullptr)) {
             efree(_new_ptr);
             return false;
@@ -1008,11 +1008,11 @@ static zend_class_entry *getClassEntry(const char *name) {
 
 static void throwException(const char *name, const char *message, int code = 0) {
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL) {
-        php_error_docref(NULL, E_WARNING, "class '%s' undefined.", name);
+    if (ce == nullptr) {
+        php_error_docref(nullptr, E_WARNING, "class '%s' undefined.", name);
         return;
     }
-    zend_throw_exception(ce, message, code TSRMLS_CC);
+    zend_throw_exception(ce, message, code);
 }
 
 static Variant global(const char *name) {
@@ -1028,8 +1028,8 @@ static Variant global(const char *name) {
 
 class Object : public Variant {
   public:
-    Object(const Variant &v) : Variant() {
-        if (!const_cast<Variant &>(v).isObject()) {
+    Object(const Variant &v) {
+        if (!v.isObject()) {
             error(E_ERROR, "parameter 1 must be zend_object.");
             return;
         }
@@ -1038,7 +1038,7 @@ class Object : public Variant {
     }
     Object(zval *v) : Variant(v) {}
     Object(zval *v, bool ref) : Variant(v, ref) {}
-    Object() : Variant() {}
+    Object() = default;
     Variant call(Variant &func, Args &args) {
         return _call(ptr(), func.ptr(), args);
     }
@@ -1046,15 +1046,9 @@ class Object : public Variant {
         Variant _func(func);
         return _call(ptr(), _func.ptr(), args);
     }
-#if PHP_VERSION_ID >= 80000
     zend_object *object() {
         return Z_OBJ_P(ptr());
     }
-#else
-    zval *object() {
-        return ptr();
-    }
-#endif
     zend_class_entry *parent_ce() {
         return Z_OBJCE_P(ptr())->parent;
     }
@@ -1063,20 +1057,20 @@ class Object : public Variant {
     }
     Variant callParentMethod(const char *func) {
         Variant retval;
-        zend_call_method_with_0_params(object(), parent_ce(), NULL, func, retval.ptr());
+        zend_call_method_with_0_params(object(), parent_ce(), nullptr, func, retval.ptr());
         return retval;
     }
     Variant callParentMethod(const char *func, const Variant &v1) {
         Variant retval;
         zend_call_method_with_1_params(
-            object(), parent_ce(), NULL, func, retval.ptr(), const_cast<Variant &>(v1).ptr());
+            object(), parent_ce(), nullptr, func, retval.ptr(), const_cast<Variant &>(v1).ptr());
         return retval;
     }
     Variant callParentMethod(const char *func, const Variant &v1, const Variant &v2) {
         Variant retval;
         zend_call_method_with_2_params(object(),
                                        parent_ce(),
-                                       NULL,
+                                       nullptr,
                                        func,
                                        retval.ptr(),
                                        const_cast<Variant &>(v1).ptr(),
@@ -1253,8 +1247,8 @@ PHPX_API static Object create(const char *name, Args &args) {
 PHPX_API static Object create(const char *name) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL) {
-        php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
+    if (ce == nullptr) {
+        php_error_docref(nullptr, E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
@@ -1284,14 +1278,13 @@ extern std::map<const char *, std::map<const char *, Method *, StrCmp>, StrCmp> 
 extern std::map<const char *, Function *, StrCmp> function_map;
 
 #define PHPX_FN(n) #n, n
-#define PHPX_ME(c, m) #m, c##_##m
+#define PHPX_ME(c, m) #m, c## _## m
 
 class Function {
-  private:
     const char *name_;
 
   public:
-    Function(const char *name) {
+    explicit Function(const char *name) {
         name_ = name;
     }
     virtual ~Function() = default;
@@ -1299,20 +1292,19 @@ class Function {
 };
 
 #define PHPX_FUNCTION(func)                                                                                            \
-    class phpx_function_##func : Function {                                                                            \
+    class phpx_function_## func : Function {                                                                            \
       public:                                                                                                          \
         void impl(Args &, Variant &retval);                                                                            \
-        phpx_function_##func(const char *name) : Function(name) {                                                      \
+        phpx_function_## func(const char *name) : Function(name) {                                                      \
             function_map[name] = this;                                                                                 \
         }                                                                                                              \
-        ~phpx_function_##func() {}                                                                                     \
+        ~phpx_function_## func() {}                                                                                     \
     };                                                                                                                 \
-    static phpx_function_##func f_##func(#func);                                                                       \
+    static phpx_function_## func f_## func(#func);                                                                       \
     PHP_FUNCTION(func) {}                                                                                              \
-    void phpx_function_##func::impl(Args &args, Variant &retval)
+    void phpx_function_## func::impl(Args &args, Variant &retval)
 
 class Method {
-  private:
     const char *class_;
     const char *name_;
 
@@ -1326,17 +1318,17 @@ class Method {
 };
 
 #define PHPX_METHOD(class_, method)                                                                                    \
-    class phpx_method_##class_##_##method : Method {                                                                   \
+    class phpx_method_## class_## _## method : Method {                                                                   \
       public:                                                                                                          \
         void impl(Object &_this, Args &, Variant &retval);                                                             \
-        phpx_method_##class_##_##method(const char *_class, const char *_name) : Method(_class, _name) {               \
+        phpx_method_## class_## _## method(const char *_class, const char *_name) : Method(_class, _name) {               \
             method_map[_class][_name] = this;                                                                          \
         }                                                                                                              \
-        ~phpx_method_##class_##_##method() {}                                                                          \
+        ~phpx_method_## class_## _## method() {}                                                                          \
     };                                                                                                                 \
-    static phpx_method_##class_##_##method m_##class_##_##method(#class_, #method);                                    \
+    static phpx_method_## class_## _## method m_## class_## _## method(#class_, #method);                                    \
     PHP_METHOD(class_, method) {}                                                                                      \
-    void phpx_method_##class_##_##method::impl(Object &_this, Args &args, Variant &retval)
+    void phpx_method_## class_## _## method::impl(Object &_this, Args &args, Variant &retval)
 
 extern void _exec_function(zend_execute_data *data, zval *return_value);
 extern void _exec_method(zend_execute_data *data, zval *return_value);
@@ -1398,7 +1390,7 @@ class Class {
     };
 
   public:
-    Class(const char *name);
+    explicit Class(const char *name);
     bool extends(zend_class_entry *_parent_class);
     bool extends(Class *parent);
     bool implements(const char *name);
@@ -1409,10 +1401,10 @@ class Class {
     bool activate();
     bool alias(const char *alias_name);
 
-    std::string getName() {
+    const std::string &getName() {
         return class_name;
     }
-    zend_class_entry *ptr() {
+    zend_class_entry *ptr() const {
         return ce;
     }
     Variant getStaticProperty(const std::string &p_name) {
@@ -1463,7 +1455,7 @@ class Interface {
     Interface(const char *name) {
         this->name = name;
         INIT_CLASS_ENTRY_EX(_ce, name, strlen(name), nullptr);
-        ce = NULL;
+        ce = nullptr;
         functions = nullptr;
     }
     std::string getName() {
@@ -1509,7 +1501,7 @@ class Extension {
   protected:
     zend_module_entry module = {
         STANDARD_MODULE_HEADER_EX,
-        NULL,
+        nullptr,
         NULL,
         NULL,                      // name
         NULL,                      // functions
