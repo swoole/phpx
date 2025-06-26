@@ -16,7 +16,7 @@ jobs:
           php-version: "${{ matrix.php }}"
           extensions: embed, curl, redis, json
       - name: Install dependencies
-        run: sudo apt update -y && sudo apt install -y googletest libgtest-dev libboost-stacktrace-dev libsodium-dev
+        run: sudo apt update -y && sudo apt install -y googletest libgtest-dev libsodium-dev libkrb5-dev libargon2-dev
       - name: Show machine information
         run: |
           date
@@ -25,6 +25,21 @@ jobs:
           php -v
           php --ini
       - name: Build
-        run: cmake . && make VERBOSE=1 -j$(nproc)
+        run: |
+          cmake . -D CODE_COVERAGE=ON || exit 1
+          make VERBOSE=1 -j$(nproc)
       - name: Run tests
         run: ./bin/phpx-tests
+      - name: Run coverage
+        shell: bash
+        run: |
+          sudo apt-get install lcov
+          sudo lcov --directory . --capture --branch-coverage --rc geninfo_unexecuted_blocks=1 --ignore-errors mismatch --output-file coverage.info
+          sudo lcov --remove coverage.info '/usr/*' --output-file coverage.info
+          sudo lcov --list coverage.info
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.info
+          fail_ci_if_error: true
