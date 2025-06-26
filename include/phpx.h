@@ -392,6 +392,12 @@ class Variant {
     Variant serialize();
     Variant unserialize();
     bool isCallable();
+    Variant &operator++();
+    Variant &operator--();
+    Int operator++(int);
+    Int operator--(int);
+    Variant &operator+=(Int v);
+    Variant &operator-=(Int v);
 
   protected:
     bool reference;

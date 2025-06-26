@@ -19,12 +19,7 @@ TEST(array, list) {
 }
 
 TEST(array, map) {
-    Array array;
-    array.set("c++", 1);
-    array.set("java", 2);
-    array.set("php", 3);
-    array.set("golang", 4);
-    array.set("node.js", 5);
+    Array array = create_map();
 
     auto arr2 = array.slice(2, 2);
     ASSERT_EQ(arr2.count(), 2);
