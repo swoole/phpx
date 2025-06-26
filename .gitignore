@@ -34,12 +34,17 @@
 /.project
 /.idea
 /cmake_install.cmake
+.cmake
 /CMakeCache.txt
 /Makefile
 /phpx.cbp
 /install_manifest.txt
+/Testing
 /examples/embed/embed
 .DS_Store
+build.ninja
+.ninja_deps
+.ninja_log
 CMakeFiles/
 examples/gtk/gtk.so.dSYM/
 examples/test/test.so.dSYM/
@@ -51,7 +56,4 @@ bin/phpx
 \.settings/
 /Debug/
 /examples/embed/bin/embed
-/tests/cmake_install.cmake
-/tests/CMakeCache.txt
-/tests/Makefile
-/tests/bin/phpx_tests
+/bin/phpx-tests

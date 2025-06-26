@@ -70,6 +70,8 @@ typedef int zend_result;
 #define PHPX_API
 
 namespace php {
+typedef zend_long Int;
+typedef double Float;
 
 PHPX_API void error(int level, const char *format, ...);
 PHPX_API void echo(const char *format, ...);
