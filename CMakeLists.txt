@@ -11,6 +11,9 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
 endif ()
 
+# Code Coverage Configuration
+add_library(coverage_config INTERFACE)
+
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
 if(CODE_COVERAGE)
     message(STATUS "Open coverage")
