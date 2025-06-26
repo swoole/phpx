@@ -17,11 +17,7 @@
 #include "phpx.h"
 
 BEGIN_EXTERN_C()
-#if PHP_VERSION_ID < 80000
-#include "extension_legacy_arginfo.h"
-#else
 #include "extension_arginfo.h"
-#endif
 END_EXTERN_C()
 
 #include <iostream>
