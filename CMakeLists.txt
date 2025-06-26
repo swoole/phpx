@@ -102,7 +102,6 @@ if (!${GTEST_FOUND})
 endif()
 message(STATUS "Found GTest")
 
-
 # tests
 file(GLOB_RECURSE TEST_FILES tests/src/*.cpp)
 add_executable(phpx-tests ${TEST_FILES})
