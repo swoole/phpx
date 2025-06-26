@@ -11,6 +11,9 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
 endif ()
 
+# Code Coverage Configuration
+add_library(coverage_config INTERFACE)
+
 option(CODE_COVERAGE "Enable coverage reporting" OFF)
 if(CODE_COVERAGE)
     message(STATUS "Open coverage")
@@ -86,7 +89,7 @@ endif ()
 # library
 add_library(phpx SHARED ${DIR_SRCS})
 set_target_properties(phpx PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-target_link_libraries(phpx ${PHP_LIBS} php)
+target_link_libraries(phpx ${PHP_LIBS} ${PHP_LDFLAGS} php)
 
 if (CODE_COVERAGE)
     target_link_libraries(phpx coverage_config gcov)
@@ -98,7 +101,6 @@ if (!${GTEST_FOUND})
     message(FATAL_ERROR "Not found GTest")
 endif()
 message(STATUS "Found GTest")
-
 
 # tests
 file(GLOB_RECURSE TEST_FILES tests/src/*.cpp)
