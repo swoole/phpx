@@ -431,9 +431,9 @@ PHPX_API static inline bool is_callable(const Variant &fn) {
     return zend_is_callable(const_cast<Variant &>(fn).ptr(), 0, nullptr);
 }
 
-PHPX_API Variant include(std::string file);
+PHPX_API Variant include(const std::string &file);
 
-PHPX_API static inline int version_compare(std::string s1, std::string s2) {
+PHPX_API static inline int version_compare(const std::string &s1, const std::string &s2) {
     return php_version_compare(s1.c_str(), s2.c_str());
 }
 
@@ -860,13 +860,8 @@ class Array : public Variant {
     void merge(Array &source, bool overwrite = false) {
         zend_hash_merge(Z_ARRVAL_P(ptr()), Z_ARRVAL_P(source.ptr()), zval_add_ref, overwrite);
     }
-    bool sort() {
-#if PHP_VERSION_ID >= 80000
-        zend_hash_sort(Z_ARRVAL_P(ptr()), array_data_compare, 1);
-        return true;
-#else
-        return zend_hash_sort(Z_ARRVAL_P(ptr()), array_data_compare, 1) == SUCCESS;
-#endif
+    void sort(bool renumber = true) {
+        zend_hash_sort(Z_ARRVAL_P(ptr()), array_data_compare, renumber);
     }
     Array slice(long offset, long length = -1, bool preserve_keys = false);
 };
