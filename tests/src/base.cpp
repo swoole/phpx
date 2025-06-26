@@ -50,3 +50,11 @@ TEST(base, include) {
     ASSERT_TRUE(retval.isInt());
     ASSERT_EQ(retval.toInt(), PHP_VERSION_ID);
 }
+
+TEST(base, method) {
+    auto obj = newObject("DateTimeImmutable");
+    ASSERT_TRUE(obj.isObject());
+    auto str = obj.exec("format", "Y-m-d H:i:s");
+    ASSERT_TRUE(str.isString());
+    ASSERT_GT(str.length(), 0);
+}
