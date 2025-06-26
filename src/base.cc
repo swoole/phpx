@@ -58,39 +58,6 @@ void echo(const char *format, ...) {
     va_end(args);
 }
 
-#if PHP_VERSION_ID < 70300
-static int validate_constant_array(HashTable *ht) /* {{{ */
-{
-    int ret = 1;
-    zval *val;
-
-    ht->u.v.nApplyCount++;
-    ZEND_HASH_FOREACH_VAL_IND(ht, val) {
-        ZVAL_DEREF(val);
-        if (Z_REFCOUNTED_P(val)) {
-            if (Z_TYPE_P(val) == IS_ARRAY) {
-                if (Z_REFCOUNTED_P(val)) {
-                    if (Z_ARRVAL_P(val)->u.v.nApplyCount > 0) {
-                        zend_error(E_WARNING, "Constants cannot be recursive arrays");
-                        ret = 0;
-                        break;
-                    } else if (!validate_constant_array(Z_ARRVAL_P(val))) {
-                        ret = 0;
-                        break;
-                    }
-                }
-            } else if (Z_TYPE_P(val) != IS_STRING && Z_TYPE_P(val) != IS_RESOURCE) {
-                zend_error(E_WARNING, "Constants may only evaluate to scalar values or arrays");
-                ret = 0;
-                break;
-            }
-        }
-    }
-    ZEND_HASH_FOREACH_END();
-    ht->u.v.nApplyCount--;
-    return ret;
-}
-#else
 static int validate_constant_array(HashTable *ht) {
     int ret = 1;
     zval *val;
@@ -121,7 +88,6 @@ static int validate_constant_array(HashTable *ht) {
     GC_UNPROTECT_RECURSION(ht);
     return ret;
 }
-#endif
 
 static void copy_constant_array(zval *dst, zval *src) /* {{{ */
 {
@@ -183,26 +149,10 @@ repeat:
         }
         break;
     case IS_OBJECT:
-#if PHP_VERSION_ID >= 80000
         if (Z_OBJ_HT_P(val)->cast_object(Z_OBJ_P(val), &val_free, IS_STRING) == SUCCESS) {
             val = &val_free;
             break;
         }
-#else
-        if (Z_TYPE(val_free) == IS_UNDEF) {
-            if (Z_OBJ_HT_P(val)->get) {
-                zval rv;
-                val = Z_OBJ_HT_P(val)->get(val, &rv);
-                ZVAL_COPY_VALUE(&val_free, val);
-                goto repeat;
-            } else if (Z_OBJ_HT_P(val)->cast_object) {
-                if (Z_OBJ_HT_P(val)->cast_object(val, &val_free, IS_STRING) == SUCCESS) {
-                    val = &val_free;
-                    break;
-                }
-            }
-        }
-#endif
         /* no break */
     default:
         zend_error(E_WARNING, "Constants may only evaluate to scalar values or arrays");
@@ -213,10 +163,6 @@ repeat:
     ZVAL_COPY(&c.value, val);
     zval_ptr_dtor(&val_free);
 register_constant:
-#if PHP_VERSION_ID < 70300
-    c.flags = case_sensitive ? CONST_CS : 0; /* non persistent */
-    c.module_number = PHP_USER_CONSTANT;
-#endif
     c.name = zend_string_init(name, len, 0);
     if (zend_register_constant(&c) == SUCCESS) {
         return true;
@@ -320,11 +266,7 @@ static inline ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int num_
     uint32_t max_num_args = data->func->common.num_args;
 
     if (num_args < min_num_args || (num_args > max_num_args && max_num_args > 0)) {
-#if PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION == 2
-        zend_wrong_parameters_count_error(1, num_args, min_num_args, max_num_args);
-#else
         zend_wrong_parameters_count_error(min_num_args, max_num_args);
-#endif
         return FAILURE;
     }
 
@@ -332,7 +274,7 @@ static inline ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int num_
 }
 
 void _exec_function(zend_execute_data *data, zval *return_value) {
-    auto iter_func = function_map.find((const char *) data->func->common.function_name->val);
+    auto iter_func = function_map.find(data->func->common.function_name->val);
     if (iter_func == function_map.end()) {
         error(E_WARNING, "[phpx::_exec_function] function '%s' not found", data->func->common.function_name->val);
         return;
@@ -410,14 +352,10 @@ Variant _call(zval *object, zval *func) {
     }
 }
 
-Variant include(string file) {
+Variant include(const string &file) {
     zend_file_handle file_handle;
-#if PHP_VERSION_ID >= 80100
     zend_stream_init_filename(&file_handle, file.c_str());
     int ret = php_stream_open_for_zend_ex(&file_handle, USE_PATH | STREAM_OPEN_FOR_INCLUDE);
-#else
-    int ret = php_stream_open_for_zend_ex(file.c_str(), &file_handle, USE_PATH | STREAM_OPEN_FOR_INCLUDE);
-#endif
     if (ret != SUCCESS) {
         return false;
     }

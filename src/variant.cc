@@ -56,6 +56,44 @@ Variant Variant::serialize() {
     return retval;
 }
 
+Variant &Variant::operator++() {
+    convert_to_long(ptr());
+    ++Z_LVAL_P(ptr());
+    return *this;
+}
+
+Variant &Variant::operator--() {
+    convert_to_long(ptr());
+    --Z_LVAL_P(ptr());
+    return *this;
+}
+
+Int Variant::operator++(int) {
+    convert_to_long(ptr());
+    auto val = toInt();
+    ++Z_LVAL_P(ptr());
+    return val;
+}
+
+Int Variant::operator--(int) {
+    convert_to_long(ptr());
+    auto val = toInt();
+    --Z_LVAL_P(ptr());
+    return val;
+}
+
+Variant &Variant::operator+=(Int v) {
+    convert_to_long(ptr());
+    Z_LVAL_P(ptr()) += v;
+    return *this;
+}
+
+Variant &Variant::operator-=(Int v) {
+    convert_to_long(ptr());
+    Z_LVAL_P(ptr()) -= v;
+    return *this;
+}
+
 Variant Variant::unserialize() {
     php_unserialize_data_t var_hash;
     Variant retval;

@@ -20,87 +20,60 @@ using namespace std;
 
 namespace php {
 
-String String::substr(long _offset, long _length) {
-    if ((_length < 0 && (size_t)(-_length) > this->length())) {
-        return "";
-    } else if (_length > (zend_long) this->length()) {
-        _length = this->length();
-    }
-
-    if (_offset > (zend_long) this->length()) {
-        return "";
-    } else if (_offset < 0 && -_offset > this->length()) {
-        _offset = 0;
-    }
-
-    if (_length < 0 && (_length + (zend_long) this->length() - _offset) < 0) {
-        return "";
-    }
-
-    /* if "from" position is negative, count start position from the end
-     * of the string
-     */
-    if (_offset < 0) {
-        _offset = (zend_long) this->length() + _offset;
-        if (_offset < 0) {
-            _offset = 0;
+String String::substr(long f, long l) const {
+    if (f < 0) {
+        /* if "from" position is negative, count start position from the end
+         * of the string
+         */
+        if (-(size_t) f > length()) {
+            f = 0;
+        } else {
+            f = (zend_long) length() + f;
         }
-    }
-
-    /* if "length" position is negative, set it to the length
-     * needed to stop that many chars from the end of the string
-     */
-    if (_length < 0) {
-        _length = ((zend_long) this->length() - _offset) + _length;
-        if (_length < 0) {
-            _length = 0;
-        }
-    }
-
-    if (_offset > (zend_long) this->length()) {
+    } else if ((size_t) f > length()) {
         return "";
     }
 
-    if ((_offset + _length) > (zend_long) this->length()) {
-        _length = this->length() - _offset;
+    if (l < 0) {
+        /* if "length" position is negative, set it to the length
+         * needed to stop that many chars from the end of the string
+         */
+        if (-(size_t) l > length() - (size_t) f) {
+            l = 0;
+        } else {
+            l = (zend_long) length() - f + l;
+        }
+    } else if ((size_t) l > length() - (size_t) f) {
+        l = (zend_long) length() - f;
     }
 
-    return String(value->val + _offset, _length);
+    return {value->val + f, (size_t) l};
 }
 
-Variant String::split(String &delim, long limit) {
+Variant String::split(String &delim, long limit) const {
     Array retval;
     php_explode(delim.ptr(), value, retval.ptr(), limit);
     return retval;
 }
 
-void String::stripTags(String &allow, bool allow_tag_spaces) {
-    value->len =
-#if PHP_VERSION_ID >= 80000
-            php_strip_tags_ex(c_str(), length(), allow.c_str(), allow.length(), allow_tag_spaces);
-#else
-            php_strip_tags_ex(c_str(), length(), nullptr, allow.c_str(), allow.length(), allow_tag_spaces);
-#endif
+void String::stripTags(const String &allow, bool allow_tag_spaces) const {
+    value->len = php_strip_tags_ex(c_str(), length(), allow.c_str(), allow.length(), allow_tag_spaces);
 }
 
-String String::addSlashes() {
-#if PHP_VERSION_ID > 70300
+String String::addSlashes() const {
     return php_addslashes(value);
-#else
-    return php_addslashes(value, false);
-#endif
 }
 
-String String::basename(String &suffix) {
+String String::basename(const String &suffix) const {
     return php_basename(this->c_str(), this->length(), suffix.c_str(), suffix.length());
 }
 
-String String::dirname() {
+String String::dirname() const {
     size_t n = php_dirname(this->c_str(), this->length());
-    return String(this->c_str(), n);
+    return {this->c_str(), n};
 }
 
-void String::stripSlashes() {
+void String::stripSlashes() const {
     php_stripslashes(value);
 }
 
