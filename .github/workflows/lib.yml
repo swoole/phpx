@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [8.0, 8.1, 8.2, 8.3 ]
+        php: [ 8.1, 8.2, 8.3, 8.4 ]
     steps:
       - uses: actions/checkout@v1
       - name: Setup PHP
@@ -15,8 +15,8 @@ jobs:
         with:
           php-version: "${{ matrix.php }}"
           extensions: embed, curl, redis, json
-      - name: install dependencies
-        run: sudo apt update -y && sudo apt install -y googletest libgtest-dev libboost-stacktrace-dev
+      - name: Install dependencies
+        run: sudo apt update -y && sudo apt install -y googletest libgtest-dev libboost-stacktrace-dev libsodium-dev
       - name: Show machine information
         run: |
           date
@@ -24,7 +24,7 @@ jobs:
           uname -a
           php -v
           php --ini
-      - name: build
+      - name: Build
         run: cmake . && make VERBOSE=1 -j$(nproc)
-      - name: run tests
+      - name: Run tests
         run: ./bin/phpx-tests
