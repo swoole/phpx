@@ -19,13 +19,7 @@
 using namespace std;
 
 namespace php {
-#if PHP_VERSION_ID >= 80000
 int array_data_compare(Bucket *f, Bucket *s) {
-#else
-int array_data_compare(const void *a, const void *b) {
-    Bucket *f = (Bucket *) a;
-    Bucket *s = (Bucket *) b;
-#endif
     zval result;
     zval *first = &f->val;
     zval *second = &s->val;
@@ -60,7 +54,7 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
     }
 
     if (length <= 0) {
-        return Array();
+        return {};
     }
 
     zend_string *string_key;
@@ -113,7 +107,63 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
         ZEND_HASH_FOREACH_END();
     }
     Array retval(&return_value);
+    zval_ptr_dtor(&return_value);
     return retval;
 }
 
+Array::Array(zval *v) : Variant(v) {
+    if (isReference()) {
+        zval_delref_p(&val);
+        ZVAL_COPY(&val, Z_REFVAL_P(&val));
+    }
+    if (isNull()) {
+        array_init(ptr());
+    } else if (!isArray()) {
+        error(E_ERROR, "parameter 1 must be zend_array.");
+    }
+}
+
+Array::Array(const Variant &v) {
+    reference = v.isZvalRef();
+
+    zval *zv = const_cast<Variant &>(v).ptr();
+    if (Z_TYPE_P(zv) == IS_REFERENCE) {
+        zv = Z_REFVAL_P(zv);
+    }
+    if (reference) {
+        ref_val = zv;
+    } else {
+        memcpy(&val, zv, sizeof(*zv));
+        addRef();
+    }
+    if (isNull()) {
+        array_init(ptr());
+    } else if (!isArray()) {
+        error(E_ERROR, "parameter 1 must be zend_array.");
+    }
+#ifdef HT_ALLOW_COW_VIOLATION
+    HT_ALLOW_COW_VIOLATION(Z_ARRVAL_P(ptr()));
+#endif
+}
+
+Array::Array(const std::initializer_list<const Variant> &list) {
+    array_init(&val);
+    for (const auto& val : list) {
+        append(val);
+    }
+}
+
+Array::Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list) {
+    array_init(&val);
+    for (const auto& kv : list) {
+        set(kv.first, kv.second);
+    }
+}
+
+Array::Array(const std::initializer_list<std::pair<Int, const Variant>> &list) {
+    array_init(&val);
+    for (const auto& kv : list) {
+        set(kv.first, kv.second);
+    }
+}
 }  // namespace php

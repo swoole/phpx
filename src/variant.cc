@@ -21,6 +21,24 @@
 using namespace std;
 
 namespace php {
+bool Variant::isEmpty() {
+    switch (type()) {
+    case IS_UNDEF:
+    case IS_NULL:
+    case IS_FALSE:
+        return true;
+    case IS_LONG:
+        return toInt() == 0;
+    case IS_DOUBLE:
+        return toFloat() == 0.0;
+    case IS_STRING:
+        return length() == 0;
+    case IS_ARRAY:
+        return Z_ARRVAL_P(const_ptr())->nNumOfElements == 0;
+    default:
+        return true;
+    }
+}
 
 bool Variant::equals(Variant &v, bool strict) {
     if (strict) {
