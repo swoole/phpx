@@ -86,7 +86,7 @@ endif ()
 # library
 add_library(phpx SHARED ${DIR_SRCS})
 set_target_properties(phpx PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-target_link_libraries(phpx ${PHP_LIBS} php)
+target_link_libraries(phpx ${PHP_LIBS} ${PHP_LDFLAGS} php)
 
 if (CODE_COVERAGE)
     target_link_libraries(phpx coverage_config gcov)
