@@ -34,7 +34,6 @@ static struct HashAlgo {
     size_t key_size = 0;
 } hash_algos;
 
-
 static inline void php_hash_init_context(const php_hash_ops *ops, void *context) {
 #if PHP_VERSION_ID >= 80100
     ops->hash_init(context, NULL);

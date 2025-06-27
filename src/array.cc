@@ -148,21 +148,21 @@ Array::Array(const Variant &v) {
 
 Array::Array(const std::initializer_list<const Variant> &list) {
     array_init(&val);
-    for (const auto& val : list) {
+    for (const auto &val : list) {
         append(val);
     }
 }
 
 Array::Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list) {
     array_init(&val);
-    for (const auto& kv : list) {
+    for (const auto &kv : list) {
         set(kv.first, kv.second);
     }
 }
 
 Array::Array(const std::initializer_list<std::pair<Int, const Variant>> &list) {
     array_init(&val);
-    for (const auto& kv : list) {
+    for (const auto &kv : list) {
         set(kv.first, kv.second);
     }
 }

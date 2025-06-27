@@ -16,17 +16,15 @@
 
 #include "phpx.h"
 
-using namespace std;
-
 namespace php {
-unordered_map<string, Resource *> resource_map;
-unordered_map<string, Class *> class_map;
-unordered_map<string, Interface *> interface_map;
-map<const char *, map<const char *, Method *, StrCmp>, StrCmp> method_map;
-map<const char *, Function *, StrCmp> function_map;
-map<int, void *> object_array;
-unordered_map<string, Extension *> _name_to_extension;
-unordered_map<int, Extension *> _module_number_to_extension;
+std::unordered_map<std::string, Resource *> resource_map;
+std::unordered_map<std::string, Class *> class_map;
+std::unordered_map<std::string, Interface *> interface_map;
+std::map<const char *, std::map<const char *, Method *, StrCmp>, StrCmp> method_map;
+std::map<const char *, Function *, StrCmp> function_map;
+std::map<int, void *> object_array;
+std::unordered_map<std::string, std::shared_ptr<Extension>> _name_to_extension;
+std::unordered_map<int, std::shared_ptr<Extension>> _module_number_to_extension;
 
 void error(int level, const char *format, ...) {
     va_list args;
@@ -178,27 +176,10 @@ String number_format(double num, int decimals, char dec_point, char thousands_se
 zend_result extension_startup(int type, int module_number) {
     zend_module_entry *module;
     void *ptr;
-    do {
-        HashTable *__ht = (&module_registry);
-        printf("ht = %p, module_registry=%p, arData=%p, module_registry->arData=%p \n", __ht, &module_registry, __ht->arData, module_registry.arData);
-        Bucket *_p = __ht->arData + (0);
-        Bucket *_end = __ht->arData + __ht->nNumUsed;
-        (static_cast<bool>(!(((__ht)->u.flags & (1 << 2)) != 0))
-             ? void(0)
-             : __assert_fail("!(((__ht)->u.flags & (1<<2)) != 0)", "base.cc", 4, __PRETTY_FUNCTION__));
-
-        for (; _p != _end; _p++) {
-            zval *_z = &_p->val;
-            if (0 && zval_get_type(&(*(_z))) == 12) {
-                _z = (*(_z)).value.zv;
-            }
-            if (__builtin_expect(!!(zval_get_type(&(*(_z))) == 0), 0)) continue;;
-            ptr = (*(_z)).value.ptr; {
-
-
+    ZEND_HASH_FOREACH_PTR(&module_registry, ptr) {
         module = (zend_module_entry *) ptr;
         if (module_number == module->module_number) {
-            Extension *extension = _name_to_extension[module->name];
+            auto extension = _name_to_extension[module->name];
             extension->started = true;
             extension->registerIniEntries(module_number);
             if (extension->onStart) {
@@ -213,7 +194,7 @@ zend_result extension_startup(int type, int module_number) {
 }
 
 void extension_info(zend_module_entry *module) {
-    Extension *extension = _module_number_to_extension[module->module_number];
+    auto extension = _module_number_to_extension[module->module_number];
     if (extension->header.size() > 0 && extension->body.size() > 0) {
         php_info_print_table_start();
         auto header = extension->header;
@@ -248,33 +229,27 @@ void extension_info(zend_module_entry *module) {
 }
 
 zend_result extension_shutdown(int type, int module_number) {
-    Extension *extension = _module_number_to_extension[module_number];
+    auto extension = _module_number_to_extension[module_number];
     if (extension->onShutdown) {
         extension->onShutdown();
     }
     extension->unregisterIniEntries(module_number);
-    _name_to_extension.erase(extension->name);
-    _module_number_to_extension.erase(module_number);
-    delete extension;
-
     return SUCCESS;
 }
 
 zend_result extension_before_request(int type, int module_number) {
-    Extension *extension = _module_number_to_extension[module_number];
+    auto extension = _module_number_to_extension[module_number];
     if (extension->onBeforeRequest) {
         extension->onBeforeRequest();
     }
-
     return SUCCESS;
 }
 
 zend_result extension_after_request(int type, int module_number) {
-    Extension *extension = _module_number_to_extension[module_number];
+    auto extension = _module_number_to_extension[module_number];
     if (extension->onAfterRequest) {
         extension->onAfterRequest();
     }
-
     return SUCCESS;
 }
 
@@ -369,7 +344,7 @@ Variant _call(zval *object, zval *func) {
     }
 }
 
-Variant include(const string &file) {
+Variant include(const std::string &file) {
     zend_file_handle file_handle;
     zend_stream_init_filename(&file_handle, file.c_str());
     int ret = php_stream_open_for_zend_ex(&file_handle, USE_PATH | STREAM_OPEN_FOR_INCLUDE);

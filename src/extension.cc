@@ -25,7 +25,7 @@ Extension::Extension(const char *_name, const char *_version) {
     module.version = _version;
     name = _name;
     version = _version;
-    _name_to_extension[_name] = this;
+    _name_to_extension[_name] = std::shared_ptr<Extension>(this);
     functions = nullptr;
 }
 

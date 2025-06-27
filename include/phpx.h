@@ -51,6 +51,7 @@ extern "C" {
 #include <vector>
 #include <functional>
 #include <map>
+#include <memory>
 
 typedef unsigned char uchar;
 
@@ -1613,8 +1614,8 @@ class Extension {
     std::vector<IniEntry> ini_entries;
 };
 
-extern std::unordered_map<std::string, Extension *> _name_to_extension;
-extern std::unordered_map<int, Extension *> _module_number_to_extension;
+extern std::unordered_map<std::string, std::shared_ptr<Extension>> _name_to_extension;
+extern std::unordered_map<int, std::shared_ptr<Extension>> _module_number_to_extension;
 
 extern Object newObject(const char *name);
 
