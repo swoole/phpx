@@ -20,10 +20,7 @@ extern "C" {
 #include <ext/hash/php_hash.h>
 }
 
-using namespace std;
-
 namespace php {
-
 static struct HashAlgo {
     const php_hash_ops *md5 = nullptr;
     const php_hash_ops *sha1 = nullptr;
@@ -36,7 +33,7 @@ static struct HashAlgo {
 
 static inline void php_hash_init_context(const php_hash_ops *ops, void *context) {
 #if PHP_VERSION_ID >= 80100
-    ops->hash_init(context, NULL);
+    ops->hash_init(context, nullptr);
 #else
     ops->hash_init(context);
 #endif
@@ -52,14 +49,14 @@ static String doHash(const php_hash_ops *ops, const String &data, bool raw_outpu
     php_hash_init_context(ops, context);
     ops->hash_update(context, (uchar *) data.c_str(), data.length());
 
-    zend_string *digest = zend_string_alloc(ops->digest_size, 0);
+    zend_string *digest = zend_string_alloc(ops->digest_size, false);
     ops->hash_final((uchar *) ZSTR_VAL(digest), context);
 
     if (raw_output) {
         ZSTR_VAL(digest)[ops->digest_size] = 0;
         return digest;
     } else {
-        zend_string *hex_digest = zend_string_safe_alloc(ops->digest_size, 2, 0, 0);
+        zend_string *hex_digest = zend_string_safe_alloc(ops->digest_size, 2, 0, false);
         php_hash_bin2hex(ZSTR_VAL(hex_digest), (uchar *) ZSTR_VAL(digest), ops->digest_size);
         ZSTR_VAL(hex_digest)[2 * ops->digest_size] = 0;
         zend_string_release(digest);
@@ -106,8 +103,7 @@ String hash(const String &algo, const String &data, bool raw_output) {
 }
 
 static inline void php_hash_string_xor_char(uchar *out, const uchar *in, const uchar xor_with, const int length) {
-    int i;
-    for (i = 0; i < length; i++) {
+    for (int i = 0; i < length; i++) {
         out[i] = in[i] ^ xor_with;
     }
 }
@@ -143,7 +139,7 @@ String hash_hmac(const String &algo, const String &data, const String &key, bool
 
     void *context = hash_algos.context;
     uchar *_key = hash_algos.key;
-    zend_string *digest = zend_string_alloc(ops->digest_size, 0);
+    zend_string *digest = zend_string_alloc(ops->digest_size, false);
 
     php_hash_hmac_prep_key((uchar *) _key, ops, context, (uchar *) key.c_str(), key.length());
 
@@ -163,7 +159,7 @@ String hash_hmac(const String &algo, const String &data, const String &key, bool
         ZSTR_VAL(digest)[ops->digest_size] = 0;
         return digest;
     } else {
-        zend_string *hex_digest = zend_string_safe_alloc(ops->digest_size, 2, 0, 0);
+        zend_string *hex_digest = zend_string_safe_alloc(ops->digest_size, 2, 0, false);
         php_hash_bin2hex(ZSTR_VAL(hex_digest), (uchar *) ZSTR_VAL(digest), ops->digest_size);
         ZSTR_VAL(hex_digest)[2 * ops->digest_size] = 0;
         zend_string_release(digest);

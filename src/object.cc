@@ -20,14 +20,11 @@ extern "C" {
 #include <ext/hash/php_hash.h>
 }
 
-using namespace std;
-
 namespace php {
-
 Object newObject(const char *name) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL) {
+    if (ce == nullptr) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
@@ -201,7 +198,7 @@ Variant Object::exec(const char *func,
 Object newObject(const char *name, const Variant &v1) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL) {
+    if (ce == nullptr) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
@@ -217,7 +214,7 @@ Object newObject(const char *name, const Variant &v1) {
 Object newObject(const char *name, const Variant &v1, const Variant &v2) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL) {
+    if (ce == nullptr) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
@@ -234,7 +231,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2) {
 Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL) {
+    if (ce == nullptr) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
@@ -252,7 +249,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
 Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL) {
+    if (ce == nullptr) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
@@ -272,7 +269,7 @@ Object newObject(
     const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL) {
+    if (ce == nullptr) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
@@ -298,7 +295,7 @@ Object newObject(const char *name,
                  const Variant &v6) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL) {
+    if (ce == nullptr) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
@@ -326,7 +323,7 @@ Object newObject(const char *name,
                  const Variant &v7) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL) {
+    if (ce == nullptr) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
@@ -356,7 +353,7 @@ Object newObject(const char *name,
                  const Variant &v8) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL) {
+    if (ce == nullptr) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
@@ -388,7 +385,7 @@ Object newObject(const char *name,
                  const Variant &v9) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL) {
+    if (ce == nullptr) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
@@ -422,7 +419,7 @@ Object newObject(const char *name,
                  const Variant &v10) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL) {
+    if (ce == nullptr) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }

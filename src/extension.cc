@@ -16,10 +16,7 @@
 
 #include "phpx.h"
 
-using namespace std;
-
 namespace php {
-
 Extension::Extension(const char *_name, const char *_version) {
     module.name = _name;
     module.version = _version;
@@ -117,9 +114,9 @@ void Extension::registerConstant(const char *name, float v) const {
     zend_register_double_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
-void Extension::registerConstant(const char *name, const string &v) const {
+void Extension::registerConstant(const char *name, const std::string &v) const {
     zend_register_stringl_constant(
-        name, strlen(name), (char *) v.c_str(), v.length(), CONST_CS | CONST_PERSISTENT, module.module_number);
+        name, strlen(name), v.c_str(), v.length(), CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
 bool Extension::registerFunctions(const zend_function_entry *_functions) {

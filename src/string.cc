@@ -16,10 +16,7 @@
 
 #include "phpx.h"
 
-using namespace std;
-
 namespace php {
-
 String String::substr(long f, long l) const {
     if (f < 0) {
         /* if "from" position is negative, count start position from the end
@@ -50,7 +47,7 @@ String String::substr(long f, long l) const {
     return {value->val + f, (size_t) l};
 }
 
-Variant String::split(String &delim, long limit) const {
+Variant String::split(String &delim, const long limit) const {
     Array retval;
     php_explode(delim.ptr(), value, retval.ptr(), limit);
     return retval;
