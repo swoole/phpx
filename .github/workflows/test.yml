@@ -41,7 +41,7 @@ jobs:
         run: |
           sudo apt-get install lcov
           sudo lcov --directory . --capture --branch-coverage --rc geninfo_unexecuted_blocks=1 --ignore-errors mismatch --output-file coverage.info
-          sudo lcov --remove coverage.info '/usr/*' '${{runner.workspace}}/tests/*' --output-file coverage.info
+          sudo lcov --remove coverage.info '/usr/*' '${{runner.workspace}}/phpx/tests/*' --output-file coverage.info
           sudo lcov --list coverage.info
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
