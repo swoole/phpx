@@ -1,8 +1,8 @@
-name: libphpx
+name: phpx
 on: [ push, pull_request ]
 
 jobs:
-  build:
+  ext:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -14,7 +14,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "${{ matrix.php }}"
-          extensions: embed, curl, redis, json
+          extensions: curl, redis, json
       - name: Install dependencies
         run: sudo apt update -y && sudo apt install -y googletest libgtest-dev libsodium-dev libkrb5-dev libargon2-dev
       - name: Show machine information
@@ -28,8 +28,12 @@ jobs:
         run: |
           cmake . -D CODE_COVERAGE=ON || exit 1
           make VERBOSE=1 -j$(nproc)
+          cp lib/libext.so $(php-config --extension-dir)/phpx_test.so
+          echo "extension=phpx_test.so" > $(php-config --ini-dir)/phpx_test.ini
       - name: Run tests
-        run: ./bin/phpx-tests
+        run: |
+          composer install
+          composer test
       - name: Run coverage
         shell: bash
         run: |

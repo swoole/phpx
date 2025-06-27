@@ -1,0 +1,12 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^12.2",
+        "friendsofphp/php-cs-fixer": "^3.75"
+    },
+    "scripts": {
+        "test": "phpunit --bootstrap tests/bootstrap.php -c phpunit.xml --colors=always",
+        "cs-fix": "php-cs-fixer fix $1",
+        "analyse": "phpstan analyse --memory-limit 512M -l 5 -c phpstan.neon",
+        "rector": "rector process --clear-cache"
+    }
+}

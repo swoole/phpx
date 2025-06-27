@@ -68,11 +68,11 @@ void string_dtor(zend_resource *res) {
 }
 
 PHPX_EXTENSION() {
-    auto *extension = new Extension("cpp_ext", "1.0.2");
+    auto *extension = new Extension("phpx_test", "1.0.2");
 
     extension->onStart = [extension]() noexcept {
         printf("onStart\n");
-        extension->registerConstant("CPP_EXT_VERSION", 10002);
+        extension->registerConstant("PHPX_TEST_EXT_VERSION", 10002);
 
         auto *c = new Class("MyClass");
         c->registerFunctions(class_MyClass_methods);
