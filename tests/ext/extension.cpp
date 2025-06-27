@@ -90,7 +90,7 @@ PHPX_EXTENSION() {
     extension->onBeforeRequest = [extension]() noexcept { cout << extension->name << "beforeRequest" << endl; };
     extension->onAfterRequest = [extension]() noexcept { cout << extension->name << "afterRequest" << endl; };
     extension->registerFunctions(ext_functions);
-    extension->info({"cpp_ext support", "enabled"},
+    extension->info({"phpx_test support", "enabled"},
                     {
                         {"author", "Rango"},
                         {"version", extension->version},
