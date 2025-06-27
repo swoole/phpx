@@ -1563,18 +1563,18 @@ class Extension {
         }
     }
 
-    bool registerClass(Class *c);
-    bool registerInterface(Interface *i);
+    bool registerClass(Class *c) const;
+    bool registerInterface(Interface *i) const;
     bool registerFunctions(const zend_function_entry *functions);
-    bool registerResource(const char *name, resource_dtor dtor);
-    void registerConstant(const char *name, long v);
-    void registerConstant(const char *name, int v);
-    void registerConstant(const char *name, bool v);
-    void registerConstant(const char *name, double v);
-    void registerConstant(const char *name, float v);
-    void registerConstant(const char *name, const char *v);
-    void registerConstant(const char *name, const char *v, size_t len);
-    void registerConstant(const char *name, std::string &v);
+    bool registerResource(const char *name, resource_dtor dtor) const;
+    void registerConstant(const char *name, long v) const;
+    void registerConstant(const char *name, int v) const;
+    void registerConstant(const char *name, bool v) const;
+    void registerConstant(const char *name, double v) const;
+    void registerConstant(const char *name, float v) const;
+    void registerConstant(const char *name, const char *v) const;
+    void registerConstant(const char *name, const char *v, size_t len) const;
+    void registerConstant(const char *name, const std::string &v) const;
 
     bool require(const char *name, const char *version = nullptr);
 
@@ -1596,10 +1596,10 @@ class Extension {
     std::string version;
     bool started = false;
 
-    std::function<void(void)> onStart = nullptr;
-    std::function<void(void)> onShutdown = nullptr;
-    std::function<void(void)> onBeforeRequest = nullptr;
-    std::function<void(void)> onAfterRequest = nullptr;
+    std::function<void()> onStart = nullptr;
+    std::function<void()> onShutdown = nullptr;
+    std::function<void()> onBeforeRequest = nullptr;
+    std::function<void()> onAfterRequest = nullptr;
 
     std::vector<std::string> header;
     std::vector<std::vector<std::string>> body;

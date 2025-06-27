@@ -61,24 +61,24 @@ bool Extension::require(const char *name, const char *version) {
     return true;
 }
 
-bool Extension::registerClass(Class *c) {
+bool Extension::registerClass(Class *c) const {
     this->checkStartupStatus(AFTER_START, __func__);
     c->activate();
     class_map[c->getName()] = c;
     return true;
 }
 
-bool Extension::registerInterface(Interface *i) {
+bool Extension::registerInterface(Interface *i) const {
     this->checkStartupStatus(AFTER_START, __func__);
     i->activate();
     interface_map[i->getName()] = i;
     return true;
 }
 
-bool Extension::registerResource(const char *name, resource_dtor dtor) {
+bool Extension::registerResource(const char *name, resource_dtor dtor) const {
     this->checkStartupStatus(AFTER_START, __func__);
-    Resource *res = new Resource;
-    int type = zend_register_list_destructors_ex(dtor, NULL, name, 0);
+    auto *res = new Resource;
+    int type = zend_register_list_destructors_ex(dtor, nullptr, name, 0);
     if (type < 0) {
         return false;
     }
@@ -88,36 +88,36 @@ bool Extension::registerResource(const char *name, resource_dtor dtor) {
     return true;
 }
 
-void Extension::registerConstant(const char *name, long v) {
+void Extension::registerConstant(const char *name, long v) const {
     zend_register_long_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
-void Extension::registerConstant(const char *name, int v) {
+void Extension::registerConstant(const char *name, int v) const {
     zend_register_long_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
-void Extension::registerConstant(const char *name, bool v) {
+void Extension::registerConstant(const char *name, bool v) const {
     zend_register_bool_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
-void Extension::registerConstant(const char *name, const char *v) {
+void Extension::registerConstant(const char *name, const char *v) const {
     zend_register_string_constant(name, strlen(name), (char *) v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
-void Extension::registerConstant(const char *name, const char *v, size_t len) {
+void Extension::registerConstant(const char *name, const char *v, size_t len) const {
     zend_register_stringl_constant(
         name, strlen(name), (char *) v, len, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
-void Extension::registerConstant(const char *name, double v) {
+void Extension::registerConstant(const char *name, double v) const {
     zend_register_double_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
-void Extension::registerConstant(const char *name, float v) {
+void Extension::registerConstant(const char *name, float v) const {
     zend_register_double_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
-void Extension::registerConstant(const char *name, string &v) {
+void Extension::registerConstant(const char *name, const string &v) const {
     zend_register_stringl_constant(
         name, strlen(name), (char *) v.c_str(), v.length(), CONST_CS | CONST_PERSISTENT, module.module_number);
 }
@@ -140,25 +140,25 @@ bool Extension::registerFunctions(const zend_function_entry *_functions) {
 }
 
 void Extension::registerIniEntries(int module_number) {
-    if (!ini_entries.size()) {
+    if (ini_entries.empty()) {
         return;
     }
 
-    zend_ini_entry_def *entry_defs = new zend_ini_entry_def[ini_entries.size() + 1];
+    auto *entry_defs = new zend_ini_entry_def[ini_entries.size() + 1];
 
     for (auto i = 0; i < ini_entries.size(); ++i) {
         IniEntry &entry = ini_entries[i];
         zend_ini_entry_def def = {
-            entry.name.c_str(),                    // name
-            NULL,                                  // on_modify
-            NULL,                                  // mh_arg1
-            NULL,                                  // mh_arg2
-            NULL,                                  // mh_arg3
-            entry.default_value.c_str(),           // value
-            NULL,                                  // displayer
-            (uint32_t) entry.modifiable,           // modifiable
-            (uint16_t) entry.name.size(),          // name_length
-            (uint8_t) entry.default_value.size(),  // value_length
+            entry.name.c_str(),
+            nullptr,
+            nullptr,
+            nullptr,
+            nullptr,
+            entry.default_value.c_str(),
+            nullptr,
+            (uint32_t) entry.default_value.size(),
+            (uint16_t) entry.name.size(),
+            (uint8_t) entry.modifiable,
         };
         entry_defs[i] = def;
     }
@@ -169,7 +169,7 @@ void Extension::registerIniEntries(int module_number) {
 }
 
 void Extension::unregisterIniEntries(int module_number) {
-    if (ini_entries.size()) {
+    if (!ini_entries.empty()) {
         zend_unregister_ini_entries(module_number);
     }
 }

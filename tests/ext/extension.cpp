@@ -82,14 +82,16 @@ PHPX_EXTENSION() {
         auto *i = new Interface("MyInterface");
         i->registerFunctions(class_MyInterface_methods);
         extension->registerInterface(i);
-
         extension->registerResource("ResourceString", string_dtor);
     };
 
     extension->onShutdown = [extension]() noexcept { cout << extension->name << "shutdown" << endl; };
     extension->onBeforeRequest = [extension]() noexcept { cout << extension->name << "beforeRequest" << endl; };
     extension->onAfterRequest = [extension]() noexcept { cout << extension->name << "afterRequest" << endl; };
+
+    extension->addIniEntry("phpx.test_val", "9999", PHP_INI_ALL);
     extension->registerFunctions(ext_functions);
+    extension->require("redis");
     extension->info({"phpx_test support", "enabled"},
                     {
                         {"author", "Rango"},

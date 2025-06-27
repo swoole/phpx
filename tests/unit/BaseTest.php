@@ -44,4 +44,8 @@ class BaseTest extends TestCase
         $result = myClass::test();
         $this->assertEquals($result, 1234.56);
     }
+
+    public function testIniConfig() {
+        $this->assertEquals(ini_get('phpx.test_val'), '9999', 'INI setting is not set correctly');
+    }
 }
