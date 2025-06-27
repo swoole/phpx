@@ -146,8 +146,8 @@ class Variant {
     }
     Variant(const Variant &v) noexcept {
         init();
-        ZVAL_COPY_VALUE(ptr(), const_cast<Variant &>(v).ptr());
-        const_cast<Variant &>(v).addRef();
+        ZVAL_COPY_VALUE(&val, v.const_ptr());
+        zval_add_ref(&val);
     }
     Variant(Variant &&v) noexcept {
         init();
