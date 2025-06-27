@@ -1415,8 +1415,7 @@ class Class {
     explicit Class(const char *name);
     bool extends(zend_class_entry *_parent_class);
     bool extends(Class *parent);
-    bool implements(const char *name);
-    bool implements(zend_class_entry *interface_ce);
+    bool implements(zend_class_entry *if_ce);
     bool addConstant(const char *name, Variant v);
     bool addProperty(const char *name, Variant v, int flags);
     bool registerFunctions(const zend_function_entry *functions);
@@ -1465,9 +1464,9 @@ class Class {
     zend_class_entry *parent_ce;
     zend_class_entry _ce;
     zend_class_entry *ce;
-    std::unordered_map<std::string, zend_class_entry *> interfaces;
+    std::vector<zend_class_entry *> interfaces;
     zend_function_entry *functions;
-    std::vector<Property> propertys;
+    std::vector<Property> properties;
     std::vector<Constant> constants;
     std::vector<std::string> aliases;
 };
