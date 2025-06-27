@@ -797,7 +797,7 @@ class Array : public Variant {
     }
     Variant get(int i) {
         zval *ret = zend_hash_index_find(Z_ARRVAL_P(ptr()), (zend_ulong) i);
-        if (ret == NULL) {
+        if (ret == nullptr) {
             return nullptr;
         }
         return ret;
@@ -810,8 +810,7 @@ class Array : public Variant {
     }
     bool remove(const char *key) {
         String _key(key);
-        bool ret = zend_hash_del(Z_ARRVAL_P(ptr()), _key.ptr()) == SUCCESS;
-        return ret;
+        return zend_hash_del(Z_ARRVAL_P(ptr()), _key.ptr()) == SUCCESS;
     }
     void clean() {
         zend_hash_clean(Z_ARRVAL_P(ptr()));
@@ -953,7 +952,7 @@ static Variant call(const Variant &func) {
 }
 
 static Variant call(const Variant &func, Args &args) {
-    return _call(NULL, const_cast<Variant &>(func).ptr(), args);
+    return _call(nullptr, const_cast<Variant &>(func).ptr(), args);
 }
 
 static Variant call(const Variant &func, Array &args) {
@@ -961,13 +960,13 @@ static Variant call(const Variant &func, Array &args) {
     for (size_t i = 0; i < args.count(); i++) {
         _args.append(args[i].ptr());
     }
-    return _call(NULL, const_cast<Variant &>(func).ptr(), _args);
+    return _call(nullptr, const_cast<Variant &>(func).ptr(), _args);
 }
 
 static Variant exec(const char *func) {
     Variant _func(func);
     Args args;
-    return _call(NULL, _func.ptr(), args);
+    return _call(nullptr, _func.ptr(), args);
 }
 /*generator*/
 extern Variant exec(const char *func, const Variant &v1);
@@ -1179,10 +1178,7 @@ class Object : public Variant {
     void set(const char *name, Array &v) {
         zend_update_property(ce(), object(), name, strlen(name), v.ptr());
     }
-    void set(const char *name, std::string &v) {
-        zend_update_property_stringl(ce(), object(), name, strlen(name), v.c_str(), v.length());
-    }
-    void set(const char *name, std::string v) {
+    void set(const char *name, const std::string& v) {
         zend_update_property_stringl(ce(), object(), name, strlen(name), v.c_str(), v.length());
     }
     void set(const char *name, const char *v) {
@@ -1232,7 +1228,7 @@ class Object : public Variant {
         return static_cast<T *>(object_array[this->getId()]);
     }
     std::string getClassName() {
-        return std::string(Z_OBJCE_P(ptr())->name->val, Z_OBJCE_P(ptr())->name->len);
+        return {Z_OBJCE_P(ptr())->name->val, Z_OBJCE_P(ptr())->name->len};
     }
     uint32_t getId() {
         return Z_OBJ_HANDLE(*ptr());
@@ -1255,8 +1251,8 @@ class Object : public Variant {
 PHPX_API static Object create(const char *name, Args &args) {
     zend_class_entry *ce = getClassEntry(name);
     Object object;
-    if (ce == NULL) {
-        php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
+    if (ce == nullptr) {
+        php_error_docref(nullptr, E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
@@ -1473,7 +1469,7 @@ class Class {
 
 class Interface {
   public:
-    Interface(const char *name) {
+    explicit Interface(const char *name) {
         this->name = name;
         INIT_CLASS_ENTRY_EX(_ce, name, strlen(name), nullptr);
         ce = nullptr;
@@ -1501,7 +1497,7 @@ class Interface {
   protected:
     bool activated = false;
     std::string name;
-    zend_class_entry _ce;
+    zend_class_entry _ce{};
     zend_class_entry *ce;
     const zend_function_entry *functions;
 };
@@ -1523,15 +1519,15 @@ class Extension {
     zend_module_entry module = {
         STANDARD_MODULE_HEADER_EX,
         nullptr,
-        NULL,
-        NULL,                      // name
-        NULL,                      // functions
-        extension_startup,         // MINIT
-        extension_shutdown,        // MSHUTDOWN
-        extension_before_request,  // RINIT
-        extension_after_request,   // RSHUTDOWN
-        extension_info,            // MINFO
-        NULL,                      // version
+        nullptr,
+        nullptr,
+        nullptr,
+        extension_startup,
+        extension_shutdown,
+        extension_before_request,
+        extension_after_request,
+        extension_info,
+        nullptr,
         STANDARD_MODULE_PROPERTIES,
     };
 
