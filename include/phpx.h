@@ -51,6 +51,7 @@ extern "C" {
 #include <vector>
 #include <functional>
 #include <map>
+#include <memory>
 
 typedef unsigned char uchar;
 
@@ -144,10 +145,22 @@ class Variant {
         init();
         ZVAL_RES(ptr(), res);
     }
-    Variant(const Variant &v) {
+    Variant(const Variant &v) noexcept {
         init();
-        ZVAL_COPY_VALUE(ptr(), const_cast<Variant &>(v).ptr());
-        const_cast<Variant &>(v).addRef();
+        ZVAL_COPY_VALUE(&val, v.const_ptr());
+        zval_add_ref(&val);
+    }
+    Variant(Variant &&v) noexcept {
+        init();
+        if (v.reference) {
+            reference = true;
+            ref_val = v.ref_val;
+            v.ref_val = nullptr;
+        } else {
+            reference = false;
+            memcpy(&val, &v.val, sizeof(zval));
+        }
+        v.init();
     }
     ~Variant() {
         destroy();
@@ -467,7 +480,7 @@ class String {
     String(double v) {
         value = zend_strpprintf(0, "%.*G", (int) EG(precision), v);
     }
-    explicit String(bool v) {
+    String(bool v) {
         value = zend_string_init(v ? "1" : "0", 1, false);
     }
     String(const char *str, size_t len) {
@@ -487,6 +500,16 @@ class String {
     }
     String(Variant &v) {
         value = zval_get_string(v.ptr());
+    }
+    String(String &&s) noexcept {
+        value = s.value;
+        s.value = nullptr;
+        free_memory = s.free_memory;
+        s.free_memory = true;
+    }
+    String(const String &s) {
+        value = zend_string_copy(s.value);
+        free_memory = true;
     }
     ~String() {
         if (free_memory) {
@@ -549,7 +572,7 @@ class String {
         return php_base64_decode_ex((const uchar *) value->val, value->len, raw);
     }
 
-    String escape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, const std::string& charset = SG(default_charset)) {
+    String escape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, const std::string &charset = SG(default_charset)) {
         return php_escape_html_entities((uchar *) value->val, value->len, 0, flags, (char *) charset.c_str());
     }
 
@@ -582,7 +605,7 @@ class String {
     zend_string *value;
 };
 
-static String ini_get(const String& varname) {
+static String ini_get(const String &varname) {
     char *value = zend_ini_string(varname.c_str(), (uint) varname.length(), 0);
     if (!value) {
         return "";
@@ -590,7 +613,7 @@ static String ini_get(const String& varname) {
     return value;
 }
 
-static Variant get_cfg_name(const String& varname) {
+static Variant get_cfg_name(const String &varname) {
     zval *retval = cfg_get_entry(varname.c_str(), (uint32_t) varname.length());
     if (retval) {
         return retval;
@@ -668,11 +691,11 @@ class ArrayIterator {
 
 extern int array_data_compare(Bucket *f, Bucket *s);
 
-PHPX_API String md5(String data, bool raw_output = false);
-PHPX_API String sha1(String data, bool raw_output = false);
-PHPX_API String crc32(String data, bool raw_output = false);
-PHPX_API String hash(String algo, String data, bool raw_output = false);
-PHPX_API String hash_hmac(String algo, String data, String key, bool raw_output = false);
+PHPX_API String md5(const String &data, bool raw_output = false);
+PHPX_API String sha1(const String &data, bool raw_output = false);
+PHPX_API String crc32(const String &data, bool raw_output = false);
+PHPX_API String hash(const String &algo, const String &data, bool raw_output = false);
+PHPX_API String hash_hmac(const String &algo, const String &data, const String &key, bool raw_output = false);
 
 class Array : public Variant {
   public:
@@ -894,20 +917,20 @@ class Args {
     }
     Variant operator[](int i) {
         if (UNEXPECTED(i >= argc)) {
-            return Variant(nullptr);
+            return {nullptr};
         }
         zval *value = ptr_list[i];
-        return Variant(value, true);
+        return {value, true};
     }
 
   private:
     bool extend() {
         int _new_size = size == 0 ? PHPX_MAX_ARGC : size * 2;
-        zval **_new_ptr = (zval **) ecalloc(_new_size, sizeof(zval *));
+        zval **_new_ptr = static_cast<zval **>(ecalloc(_new_size, sizeof(zval *)));
         if (UNEXPECTED(_new_ptr == nullptr)) {
             return false;
         }
-        zval *_new_zval_ptr = (zval *) ecalloc(_new_size, sizeof(zval));
+        zval *_new_zval_ptr = static_cast<zval *>(ecalloc(_new_size, sizeof(zval)));
         if (UNEXPECTED(_new_zval_ptr == nullptr)) {
             efree(_new_ptr);
             return false;
@@ -1008,11 +1031,11 @@ static zend_class_entry *getClassEntry(const char *name) {
 
 static void throwException(const char *name, const char *message, int code = 0) {
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL) {
-        php_error_docref(NULL, E_WARNING, "class '%s' undefined.", name);
+    if (ce == nullptr) {
+        php_error_docref(nullptr, E_WARNING, "class '%s' undefined.", name);
         return;
     }
-    zend_throw_exception(ce, message, code TSRMLS_CC);
+    zend_throw_exception(ce, message, code);
 }
 
 static Variant global(const char *name) {
@@ -1028,8 +1051,8 @@ static Variant global(const char *name) {
 
 class Object : public Variant {
   public:
-    Object(const Variant &v) : Variant() {
-        if (!const_cast<Variant &>(v).isObject()) {
+    Object(const Variant &v) {
+        if (!v.isObject()) {
             error(E_ERROR, "parameter 1 must be zend_object.");
             return;
         }
@@ -1038,7 +1061,7 @@ class Object : public Variant {
     }
     Object(zval *v) : Variant(v) {}
     Object(zval *v, bool ref) : Variant(v, ref) {}
-    Object() : Variant() {}
+    Object() = default;
     Variant call(Variant &func, Args &args) {
         return _call(ptr(), func.ptr(), args);
     }
@@ -1046,15 +1069,9 @@ class Object : public Variant {
         Variant _func(func);
         return _call(ptr(), _func.ptr(), args);
     }
-#if PHP_VERSION_ID >= 80000
     zend_object *object() {
         return Z_OBJ_P(ptr());
     }
-#else
-    zval *object() {
-        return ptr();
-    }
-#endif
     zend_class_entry *parent_ce() {
         return Z_OBJCE_P(ptr())->parent;
     }
@@ -1063,20 +1080,20 @@ class Object : public Variant {
     }
     Variant callParentMethod(const char *func) {
         Variant retval;
-        zend_call_method_with_0_params(object(), parent_ce(), NULL, func, retval.ptr());
+        zend_call_method_with_0_params(object(), parent_ce(), nullptr, func, retval.ptr());
         return retval;
     }
     Variant callParentMethod(const char *func, const Variant &v1) {
         Variant retval;
         zend_call_method_with_1_params(
-            object(), parent_ce(), NULL, func, retval.ptr(), const_cast<Variant &>(v1).ptr());
+            object(), parent_ce(), nullptr, func, retval.ptr(), const_cast<Variant &>(v1).ptr());
         return retval;
     }
     Variant callParentMethod(const char *func, const Variant &v1, const Variant &v2) {
         Variant retval;
         zend_call_method_with_2_params(object(),
                                        parent_ce(),
-                                       NULL,
+                                       nullptr,
                                        func,
                                        retval.ptr(),
                                        const_cast<Variant &>(v1).ptr(),
@@ -1253,8 +1270,8 @@ PHPX_API static Object create(const char *name, Args &args) {
 PHPX_API static Object create(const char *name) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL) {
-        php_error_docref(NULL, E_WARNING, "class '%s' is undefined.", name);
+    if (ce == nullptr) {
+        php_error_docref(nullptr, E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
@@ -1287,11 +1304,10 @@ extern std::map<const char *, Function *, StrCmp> function_map;
 #define PHPX_ME(c, m) #m, c##_##m
 
 class Function {
-  private:
     const char *name_;
 
   public:
-    Function(const char *name) {
+    explicit Function(const char *name) {
         name_ = name;
     }
     virtual ~Function() = default;
@@ -1312,7 +1328,6 @@ class Function {
     void phpx_function_##func::impl(Args &args, Variant &retval)
 
 class Method {
-  private:
     const char *class_;
     const char *name_;
 
@@ -1398,7 +1413,7 @@ class Class {
     };
 
   public:
-    Class(const char *name);
+    explicit Class(const char *name);
     bool extends(zend_class_entry *_parent_class);
     bool extends(Class *parent);
     bool implements(const char *name);
@@ -1409,10 +1424,10 @@ class Class {
     bool activate();
     bool alias(const char *alias_name);
 
-    std::string getName() {
+    const std::string &getName() {
         return class_name;
     }
-    zend_class_entry *ptr() {
+    zend_class_entry *ptr() const {
         return ce;
     }
     Variant getStaticProperty(const std::string &p_name) {
@@ -1463,7 +1478,7 @@ class Interface {
     Interface(const char *name) {
         this->name = name;
         INIT_CLASS_ENTRY_EX(_ce, name, strlen(name), nullptr);
-        ce = NULL;
+        ce = nullptr;
         functions = nullptr;
     }
     std::string getName() {
@@ -1509,7 +1524,7 @@ class Extension {
   protected:
     zend_module_entry module = {
         STANDARD_MODULE_HEADER_EX,
-        NULL,
+        nullptr,
         NULL,
         NULL,                      // name
         NULL,                      // functions
@@ -1548,18 +1563,18 @@ class Extension {
         }
     }
 
-    bool registerClass(Class *c);
-    bool registerInterface(Interface *i);
+    bool registerClass(Class *c) const;
+    bool registerInterface(Interface *i) const;
     bool registerFunctions(const zend_function_entry *functions);
-    bool registerResource(const char *name, resource_dtor dtor);
-    void registerConstant(const char *name, long v);
-    void registerConstant(const char *name, int v);
-    void registerConstant(const char *name, bool v);
-    void registerConstant(const char *name, double v);
-    void registerConstant(const char *name, float v);
-    void registerConstant(const char *name, const char *v);
-    void registerConstant(const char *name, const char *v, size_t len);
-    void registerConstant(const char *name, std::string &v);
+    bool registerResource(const char *name, resource_dtor dtor) const;
+    void registerConstant(const char *name, long v) const;
+    void registerConstant(const char *name, int v) const;
+    void registerConstant(const char *name, bool v) const;
+    void registerConstant(const char *name, double v) const;
+    void registerConstant(const char *name, float v) const;
+    void registerConstant(const char *name, const char *v) const;
+    void registerConstant(const char *name, const char *v, size_t len) const;
+    void registerConstant(const char *name, const std::string &v) const;
 
     bool require(const char *name, const char *version = nullptr);
 
@@ -1581,10 +1596,10 @@ class Extension {
     std::string version;
     bool started = false;
 
-    std::function<void(void)> onStart = nullptr;
-    std::function<void(void)> onShutdown = nullptr;
-    std::function<void(void)> onBeforeRequest = nullptr;
-    std::function<void(void)> onAfterRequest = nullptr;
+    std::function<void()> onStart = nullptr;
+    std::function<void()> onShutdown = nullptr;
+    std::function<void()> onBeforeRequest = nullptr;
+    std::function<void()> onAfterRequest = nullptr;
 
     std::vector<std::string> header;
     std::vector<std::vector<std::string>> body;
@@ -1599,8 +1614,8 @@ class Extension {
     std::vector<IniEntry> ini_entries;
 };
 
-extern std::unordered_map<std::string, Extension *> _name_to_extension;
-extern std::unordered_map<int, Extension *> _module_number_to_extension;
+extern std::unordered_map<std::string, std::shared_ptr<Extension>> _name_to_extension;
+extern std::unordered_map<int, std::shared_ptr<Extension>> _module_number_to_extension;
 
 extern Object newObject(const char *name);
 

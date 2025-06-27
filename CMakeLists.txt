@@ -4,7 +4,7 @@ project(phpx)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-aux_source_directory(src DIR_SRCS)
+aux_source_directory(src LIB_FILES)
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -89,9 +89,8 @@ if (APPLE)
 endif ()
 
 # library
-add_library(phpx SHARED ${DIR_SRCS})
+add_library(phpx SHARED ${LIB_FILES})
 set_target_properties(phpx PROPERTIES CLEAN_DIRECT_OUTPUT 1)
-target_link_libraries(phpx ${PHP_LIBS} ${PHP_LDFLAGS} php)
 
 if (CODE_COVERAGE)
     target_link_libraries(phpx coverage_config gcov)
@@ -108,7 +107,13 @@ message(STATUS "Found GTest")
 file(GLOB_RECURSE TEST_FILES tests/src/*.cpp)
 add_executable(phpx-tests ${TEST_FILES})
 add_dependencies(phpx-tests phpx)
-target_link_libraries(phpx-tests php phpx ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(phpx-tests php phpx ${PHP_LIBS} ${PHP_LDFLAGS} ${GTEST_BOTH_LIBRARIES})
+
+# ext
+file(GLOB_RECURSE EXT_FILES tests/ext/*.cpp)
+add_library(ext SHARED ${EXT_FILES})
+add_dependencies(ext phpx)
+target_link_libraries(ext phpx)
 
 # install
 install(CODE "MESSAGE(\"Are you run command using root user?\")")

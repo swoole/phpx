@@ -1,2 +1,0 @@
-<?php
-ReflectionClass::export("CppInterface");

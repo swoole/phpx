@@ -17,11 +17,7 @@
 #include "phpx.h"
 
 BEGIN_EXTERN_C()
-#if PHP_VERSION_ID < 80000
-#include "extension_legacy_arginfo.h"
-#else
 #include "extension_arginfo.h"
-#endif
 END_EXTERN_C()
 
 #include <iostream>
@@ -72,28 +68,32 @@ void string_dtor(zend_resource *res) {
 }
 
 PHPX_EXTENSION() {
-    Extension *extension = new Extension("cpp_ext", "1.0.2");
+    auto *extension = new Extension("phpx_test", "1.0.2");
 
     extension->onStart = [extension]() noexcept {
-        extension->registerConstant("CPP_EXT_VERSION", 10002);
+        printf("onStart\n");
+        extension->registerConstant("PHPX_TEST_EXT_VERSION", 10002);
 
-        Class *c = new Class("MyClass");
+        auto *c = new Class("MyClass");
         c->registerFunctions(class_MyClass_methods);
-
+        c->addConstant("TEST_CONSTANT", 8888);
+        c->addProperty("testProperty", "hello world", ZEND_ACC_PUBLIC);
         extension->registerClass(c);
 
-        Interface *i = new Interface("MyInterface");
+        auto *i = new Interface("MyInterface");
         i->registerFunctions(class_MyInterface_methods);
         extension->registerInterface(i);
-
         extension->registerResource("ResourceString", string_dtor);
     };
 
     extension->onShutdown = [extension]() noexcept { cout << extension->name << "shutdown" << endl; };
     extension->onBeforeRequest = [extension]() noexcept { cout << extension->name << "beforeRequest" << endl; };
     extension->onAfterRequest = [extension]() noexcept { cout << extension->name << "afterRequest" << endl; };
+
+    extension->addIniEntry("phpx.test_val", "9999", PHP_INI_ALL);
     extension->registerFunctions(ext_functions);
-    extension->info({"cpp_ext support", "enabled"},
+    extension->require("redis");
+    extension->info({"phpx_test support", "enabled"},
                     {
                         {"author", "Rango"},
                         {"version", extension->version},

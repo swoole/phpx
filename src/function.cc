@@ -33,14 +33,7 @@ Variant http_build_query(const Variant &data, const char *prefix, const char *ar
 
 #if PHP_VERSION_ID >= 80300
     auto _arg_sep = zend_string_init(arg_sep, strlen(arg_sep), 0);
-    php_url_encode_hash_ex(HASH_OF(_data.ptr()),
-                           &formstr,
-                           prefix,
-                           prefix_len,
-                           NULL,
-                           NULL,
-                           _arg_sep,
-                           enc_type);
+    php_url_encode_hash_ex(HASH_OF(_data.ptr()), &formstr, prefix, prefix_len, NULL, NULL, _arg_sep, enc_type);
     zend_string_release(_arg_sep);
 #else
     php_url_encode_hash_ex(HASH_OF(_data.ptr()),

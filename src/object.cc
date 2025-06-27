@@ -16,27 +16,22 @@
 
 #include "phpx.h"
 
-extern "C"
-{
+extern "C" {
 #include <ext/hash/php_hash.h>
 }
 
 using namespace std;
 
-namespace php
-{
+namespace php {
 
-Object newObject(const char *name)
-{
+Object newObject(const char *name) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL)
-    {
+    if (ce == NULL) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    if (object_init_ex(object.ptr(), ce) == FAILURE)
-    {
+    if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
     Args args;
@@ -45,16 +40,14 @@ Object newObject(const char *name)
 }
 
 /*generator-1*/
-Variant Object::exec(const char *func, const Variant &v1)
-{
+Variant Object::exec(const char *func, const Variant &v1) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
     return _call(ptr(), _func.ptr(), args);
 }
 
-Variant Object::exec(const char *func, const Variant &v1, const Variant &v2)
-{
+Variant Object::exec(const char *func, const Variant &v1, const Variant &v2) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -62,8 +55,7 @@ Variant Object::exec(const char *func, const Variant &v1, const Variant &v2)
     return _call(ptr(), _func.ptr(), args);
 }
 
-Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3)
-{
+Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -72,8 +64,7 @@ Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, con
     return _call(ptr(), _func.ptr(), args);
 }
 
-Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4)
-{
+Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -83,8 +74,8 @@ Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, con
     return _call(ptr(), _func.ptr(), args);
 }
 
-Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5)
-{
+Variant Object::exec(
+    const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -95,8 +86,13 @@ Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, con
     return _call(ptr(), _func.ptr(), args);
 }
 
-Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6)
-{
+Variant Object::exec(const char *func,
+                     const Variant &v1,
+                     const Variant &v2,
+                     const Variant &v3,
+                     const Variant &v4,
+                     const Variant &v5,
+                     const Variant &v6) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -108,8 +104,14 @@ Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, con
     return _call(ptr(), _func.ptr(), args);
 }
 
-Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7)
-{
+Variant Object::exec(const char *func,
+                     const Variant &v1,
+                     const Variant &v2,
+                     const Variant &v3,
+                     const Variant &v4,
+                     const Variant &v5,
+                     const Variant &v6,
+                     const Variant &v7) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -122,8 +124,15 @@ Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, con
     return _call(ptr(), _func.ptr(), args);
 }
 
-Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8)
-{
+Variant Object::exec(const char *func,
+                     const Variant &v1,
+                     const Variant &v2,
+                     const Variant &v3,
+                     const Variant &v4,
+                     const Variant &v5,
+                     const Variant &v6,
+                     const Variant &v7,
+                     const Variant &v8) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -137,8 +146,16 @@ Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, con
     return _call(ptr(), _func.ptr(), args);
 }
 
-Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9)
-{
+Variant Object::exec(const char *func,
+                     const Variant &v1,
+                     const Variant &v2,
+                     const Variant &v3,
+                     const Variant &v4,
+                     const Variant &v5,
+                     const Variant &v6,
+                     const Variant &v7,
+                     const Variant &v8,
+                     const Variant &v9) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -153,8 +170,17 @@ Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, con
     return _call(ptr(), _func.ptr(), args);
 }
 
-Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10)
-{
+Variant Object::exec(const char *func,
+                     const Variant &v1,
+                     const Variant &v2,
+                     const Variant &v3,
+                     const Variant &v4,
+                     const Variant &v5,
+                     const Variant &v6,
+                     const Variant &v7,
+                     const Variant &v8,
+                     const Variant &v9,
+                     const Variant &v10) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -172,17 +198,14 @@ Variant Object::exec(const char *func, const Variant &v1, const Variant &v2, con
 /*generator-1*/
 
 /*generator*/
-Object newObject(const char *name, const Variant &v1)
-{
+Object newObject(const char *name, const Variant &v1) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL)
-    {
+    if (ce == NULL) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    if (object_init_ex(object.ptr(), ce) == FAILURE)
-    {
+    if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
     Args args;
@@ -191,17 +214,14 @@ Object newObject(const char *name, const Variant &v1)
     return object;
 }
 
-Object newObject(const char *name, const Variant &v1, const Variant &v2)
-{
+Object newObject(const char *name, const Variant &v1, const Variant &v2) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL)
-    {
+    if (ce == NULL) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    if (object_init_ex(object.ptr(), ce) == FAILURE)
-    {
+    if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
     Args args;
@@ -211,17 +231,14 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2)
     return object;
 }
 
-Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3)
-{
+Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL)
-    {
+    if (ce == NULL) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    if (object_init_ex(object.ptr(), ce) == FAILURE)
-    {
+    if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
     Args args;
@@ -232,17 +249,14 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     return object;
 }
 
-Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4)
-{
+Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL)
-    {
+    if (ce == NULL) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    if (object_init_ex(object.ptr(), ce) == FAILURE)
-    {
+    if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
     Args args;
@@ -254,17 +268,15 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     return object;
 }
 
-Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5)
-{
+Object newObject(
+    const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL)
-    {
+    if (ce == NULL) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    if (object_init_ex(object.ptr(), ce) == FAILURE)
-    {
+    if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
     Args args;
@@ -277,17 +289,20 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     return object;
 }
 
-Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6)
-{
+Object newObject(const char *name,
+                 const Variant &v1,
+                 const Variant &v2,
+                 const Variant &v3,
+                 const Variant &v4,
+                 const Variant &v5,
+                 const Variant &v6) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL)
-    {
+    if (ce == NULL) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    if (object_init_ex(object.ptr(), ce) == FAILURE)
-    {
+    if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
     Args args;
@@ -301,17 +316,21 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     return object;
 }
 
-Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7)
-{
+Object newObject(const char *name,
+                 const Variant &v1,
+                 const Variant &v2,
+                 const Variant &v3,
+                 const Variant &v4,
+                 const Variant &v5,
+                 const Variant &v6,
+                 const Variant &v7) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL)
-    {
+    if (ce == NULL) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    if (object_init_ex(object.ptr(), ce) == FAILURE)
-    {
+    if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
     Args args;
@@ -326,17 +345,22 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     return object;
 }
 
-Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8)
-{
+Object newObject(const char *name,
+                 const Variant &v1,
+                 const Variant &v2,
+                 const Variant &v3,
+                 const Variant &v4,
+                 const Variant &v5,
+                 const Variant &v6,
+                 const Variant &v7,
+                 const Variant &v8) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL)
-    {
+    if (ce == NULL) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    if (object_init_ex(object.ptr(), ce) == FAILURE)
-    {
+    if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
     Args args;
@@ -352,17 +376,23 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     return object;
 }
 
-Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9)
-{
+Object newObject(const char *name,
+                 const Variant &v1,
+                 const Variant &v2,
+                 const Variant &v3,
+                 const Variant &v4,
+                 const Variant &v5,
+                 const Variant &v6,
+                 const Variant &v7,
+                 const Variant &v8,
+                 const Variant &v9) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL)
-    {
+    if (ce == NULL) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    if (object_init_ex(object.ptr(), ce) == FAILURE)
-    {
+    if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
     Args args;
@@ -379,17 +409,24 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     return object;
 }
 
-Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10)
-{
+Object newObject(const char *name,
+                 const Variant &v1,
+                 const Variant &v2,
+                 const Variant &v3,
+                 const Variant &v4,
+                 const Variant &v5,
+                 const Variant &v6,
+                 const Variant &v7,
+                 const Variant &v8,
+                 const Variant &v9,
+                 const Variant &v10) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
-    if (ce == NULL)
-    {
+    if (ce == NULL) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    if (object_init_ex(object.ptr(), ce) == FAILURE)
-    {
+    if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
     Args args;
@@ -408,6 +445,4 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
 }
 /*generator*/
 
-}
-
-
+}  // namespace php

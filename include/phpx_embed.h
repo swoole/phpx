@@ -37,9 +37,9 @@ class VM {
         std::string s(script);
         eval(s);
     }
-    void eval(std::string &script) {
+    void eval(const std::string &script) {
         zend_first_try {
-            zend_eval_stringl((char *) script.c_str(), script.length(), NULL, (char *) program_name.c_str());
+            zend_eval_stringl((char *) script.c_str(), script.length(), nullptr, (char *) program_name.c_str());
         }
         zend_catch {
             exit_status = EG(exit_status);

@@ -57,3 +57,6 @@ bin/phpx
 /Debug/
 /examples/embed/bin/embed
 /bin/phpx-tests
+/vendor
+/.phpunit.cache
+/composer.lock

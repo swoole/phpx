@@ -18,20 +18,17 @@
 
 using namespace std;
 
-namespace php
-{
+namespace php {
 
 /*generator*/
-Variant exec(const char *func, const Variant &v1)
-{
+Variant exec(const char *func, const Variant &v1) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
     return _call(NULL, _func.ptr(), args);
 }
 
-Variant exec(const char *func, const Variant &v1, const Variant &v2)
-{
+Variant exec(const char *func, const Variant &v1, const Variant &v2) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -39,8 +36,7 @@ Variant exec(const char *func, const Variant &v1, const Variant &v2)
     return _call(NULL, _func.ptr(), args);
 }
 
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3)
-{
+Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -49,8 +45,7 @@ Variant exec(const char *func, const Variant &v1, const Variant &v2, const Varia
     return _call(NULL, _func.ptr(), args);
 }
 
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4)
-{
+Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -60,8 +55,8 @@ Variant exec(const char *func, const Variant &v1, const Variant &v2, const Varia
     return _call(NULL, _func.ptr(), args);
 }
 
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5)
-{
+Variant exec(
+    const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -72,8 +67,13 @@ Variant exec(const char *func, const Variant &v1, const Variant &v2, const Varia
     return _call(NULL, _func.ptr(), args);
 }
 
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6)
-{
+Variant exec(const char *func,
+             const Variant &v1,
+             const Variant &v2,
+             const Variant &v3,
+             const Variant &v4,
+             const Variant &v5,
+             const Variant &v6) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -85,8 +85,14 @@ Variant exec(const char *func, const Variant &v1, const Variant &v2, const Varia
     return _call(NULL, _func.ptr(), args);
 }
 
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7)
-{
+Variant exec(const char *func,
+             const Variant &v1,
+             const Variant &v2,
+             const Variant &v3,
+             const Variant &v4,
+             const Variant &v5,
+             const Variant &v6,
+             const Variant &v7) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -99,8 +105,15 @@ Variant exec(const char *func, const Variant &v1, const Variant &v2, const Varia
     return _call(NULL, _func.ptr(), args);
 }
 
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8)
-{
+Variant exec(const char *func,
+             const Variant &v1,
+             const Variant &v2,
+             const Variant &v3,
+             const Variant &v4,
+             const Variant &v5,
+             const Variant &v6,
+             const Variant &v7,
+             const Variant &v8) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -114,8 +127,16 @@ Variant exec(const char *func, const Variant &v1, const Variant &v2, const Varia
     return _call(NULL, _func.ptr(), args);
 }
 
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9)
-{
+Variant exec(const char *func,
+             const Variant &v1,
+             const Variant &v2,
+             const Variant &v3,
+             const Variant &v4,
+             const Variant &v5,
+             const Variant &v6,
+             const Variant &v7,
+             const Variant &v8,
+             const Variant &v9) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -130,8 +151,17 @@ Variant exec(const char *func, const Variant &v1, const Variant &v2, const Varia
     return _call(NULL, _func.ptr(), args);
 }
 
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10)
-{
+Variant exec(const char *func,
+             const Variant &v1,
+             const Variant &v2,
+             const Variant &v3,
+             const Variant &v4,
+             const Variant &v5,
+             const Variant &v6,
+             const Variant &v7,
+             const Variant &v8,
+             const Variant &v9,
+             const Variant &v10) {
     Variant _func(func);
     Args args;
     args.append(const_cast<Variant &>(v1).ptr());
@@ -148,4 +178,4 @@ Variant exec(const char *func, const Variant &v1, const Variant &v2, const Varia
 }
 /*generator*/
 
-}
+}  // namespace php
