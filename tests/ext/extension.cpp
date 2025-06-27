@@ -76,7 +76,8 @@ PHPX_EXTENSION() {
 
         auto *c = new Class("MyClass");
         c->registerFunctions(class_MyClass_methods);
-
+        c->addConstant("TEST_CONSTANT", 8888);
+        c->addProperty("testProperty", "hello world", ZEND_ACC_PUBLIC);
         extension->registerClass(c);
 
         auto *i = new Interface("MyInterface");

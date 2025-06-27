@@ -20,6 +20,9 @@ class BaseTest extends TestCase
         $str = $o->pget();
         $this->assertTrue(is_string($str), 'pget did not return a string');
         $this->assertTrue(strlen($str) > 20, 'pget returned an empty string');
+
+        $this->assertEquals(MyClass::TEST_CONSTANT, 8888);
+        $this->assertEquals($o->testProperty, 'hello world');
     }
 
     public function testExtensionInfo() {
