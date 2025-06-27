@@ -18,8 +18,6 @@
 
 #include "zend_smart_str.h"
 
-using namespace std;
-
 namespace php {
 bool Variant::isEmpty() {
     switch (type()) {

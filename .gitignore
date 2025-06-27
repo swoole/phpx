@@ -60,3 +60,4 @@ bin/phpx
 /vendor
 /.phpunit.cache
 /composer.lock
+/bin/PHP-Parser-*

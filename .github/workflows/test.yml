@@ -16,7 +16,7 @@ jobs:
           php-version: "${{ matrix.php }}"
           extensions: embed, curl, redis, json
       - name: Install dependencies
-        run: sudo apt update -y && sudo apt install -y googletest libgtest-dev libsodium-dev libkrb5-dev libargon2-dev
+        run: sudo apt update -y && sudo apt install -y googletest libgtest-dev libsodium-dev libkrb5-dev libargon2-dev redis-server
       - name: Show machine information
         run: |
           date
@@ -41,7 +41,7 @@ jobs:
         run: |
           sudo apt-get install lcov
           sudo lcov --directory . --capture --branch-coverage --rc geninfo_unexecuted_blocks=1 --ignore-errors mismatch --output-file coverage.info
-          sudo lcov --remove coverage.info '/usr/*' 'tests/*' --output-file coverage.info
+          sudo lcov --remove coverage.info '/usr/*' '${{runner.workspace}}/tests/*' --output-file coverage.info
           sudo lcov --list coverage.info
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

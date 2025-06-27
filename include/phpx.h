@@ -355,8 +355,7 @@ class Variant {
         addRef();
         ZVAL_NEW_REF(&zref, ptr());
         zval_delref_p(&zref);
-        Variant ret(&zref, false);
-        return ret;
+        return {&zref, false};
     }
     Variant referenceTo() {
         if (!isReference()) {
