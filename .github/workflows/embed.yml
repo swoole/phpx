@@ -27,7 +27,7 @@ jobs:
       - name: Build
         run: |
           cmake . -D CODE_COVERAGE=ON || exit 1
-          make VERBOSE=1 -j$(nproc)
+          make VERBOSE=1 -j$(nproc) phpx-tests
       - name: Run tests
         run: ./bin/phpx-tests
       - name: Run coverage

@@ -27,7 +27,7 @@ jobs:
       - name: Build
         run: |
           cmake . -D CODE_COVERAGE=ON || exit 1
-          make VERBOSE=1 -j$(nproc)
+          make VERBOSE=1 -j$(nproc) ext
           sudo cp lib/libext.so $(php-config --extension-dir)/phpx_test.so
           sudo sh -c 'echo "extension=phpx_test.so" > $(php-config --ini-dir)/phpx_test.ini'
       - name: Run tests
