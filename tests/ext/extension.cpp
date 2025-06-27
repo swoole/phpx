@@ -62,6 +62,10 @@ PHPX_METHOD(MyClass, pset) {
     cout << "[SET] ResourceString: " << str->length() << endl;
 }
 
+PHPX_METHOD(MyClass, count) {
+    retval = 100;
+}
+
 void string_dtor(zend_resource *res) {
     String *s = static_cast<String *>(res->ptr);
     delete s;
@@ -78,6 +82,7 @@ PHPX_EXTENSION() {
         c->registerFunctions(class_MyClass_methods);
         c->addConstant("TEST_CONSTANT", 8888);
         c->addProperty("testProperty", "hello world", ZEND_ACC_PUBLIC);
+        c->implements(zend_ce_countable);
         extension->registerClass(c);
 
         auto *i = new Interface("MyInterface");

@@ -22,9 +22,9 @@ namespace php {
 
 Class::Class(const char *name) {
     class_name = name;
-    INIT_CLASS_ENTRY_EX(_ce, name, strlen(name), NULL);
-    parent_ce = NULL;
-    ce = NULL;
+    INIT_CLASS_ENTRY_EX(_ce, name, strlen(name), nullptr);
+    parent_ce = nullptr;
+    ce = nullptr;
     activated = false;
     functions = nullptr;
 }
@@ -47,26 +47,11 @@ bool Class::extends(Class *parent) {
     return parent_ce != nullptr;
 }
 
-bool Class::implements(const char *name) {
+bool Class::implements(zend_class_entry *if_ce) {
     if (activated) {
         return false;
     }
-    if (interfaces.find(name) != interfaces.end()) {
-        return false;
-    }
-    zend_class_entry *interface_ce = getClassEntry(name);
-    if (interface_ce == NULL) {
-        return false;
-    }
-    interfaces[name] = interface_ce;
-    return true;
-}
-
-bool Class::implements(zend_class_entry *interface_ce) {
-    if (activated) {
-        return false;
-    }
-    interfaces[interface_ce->name->val] = interface_ce;
+    interfaces.push_back(if_ce);
     return true;
 }
 
@@ -89,7 +74,7 @@ bool Class::addProperty(const char *name, Variant v, int flags) {
     p.name = name;
     ZVAL_COPY(&p.value, v.ptr());
     p.flags = flags;
-    propertys.push_back(p);
+    properties.push_back(p);
     return true;
 }
 
@@ -117,7 +102,7 @@ bool Class::alias(const char *alias_name) {
         error(E_WARNING, "Please execute alias method before activate.");
         return false;
     }
-    aliases.push_back(alias_name);
+    aliases.emplace_back(alias_name);
     return true;
 }
 
@@ -134,20 +119,19 @@ bool Class::activate() {
     } else {
         ce = zend_register_internal_class(&_ce TSRMLS_CC);
     }
-    if (ce == NULL) {
+    if (ce == nullptr) {
         return false;
     }
     /**
      * implements interface
      */
-    for (auto i = interfaces.begin(); i != interfaces.end(); i++) {
-        zend_do_implement_interface(ce, interfaces[i->first]);
+    for (auto const if_ce : interfaces) {
+        zend_do_implement_interface(ce, if_ce);
     }
     /**
      * register property
      */
-    for (int i = 0; i != propertys.size(); i++) {
-        Property p = propertys[i];
+    for (auto p : properties) {
         if (Z_TYPE(p.value) == IS_STRING) {
             zend_declare_property_stringl(
                 ce, p.name.c_str(), p.name.length(), Z_STRVAL(p.value), Z_STRLEN(p.value), p.flags);
@@ -158,25 +142,19 @@ bool Class::activate() {
     /**
      * register constant
      */
-    for (int i = 0; i != constants.size(); i++) {
-        if (Z_TYPE(constants[i].value) == IS_STRING) {
+    for (auto & constant : constants) {
+        if (Z_TYPE(constant.value) == IS_STRING) {
             zend_declare_class_constant_stringl(ce,
-                                                constants[i].name.c_str(),
-                                                constants[i].name.length(),
-                                                Z_STRVAL(constants[i].value),
-                                                Z_STRLEN(constants[i].value));
+                                                constant.name.c_str(),
+                                                constant.name.length(),
+                                                Z_STRVAL(constant.value),
+                                                Z_STRLEN(constant.value));
         } else {
-            zend_declare_class_constant(ce, constants[i].name.c_str(), constants[i].name.length(), &constants[i].value);
+            zend_declare_class_constant(ce, constant.name.c_str(), constant.name.length(), &constant.value);
         }
     }
-    for (int i = 0; i < aliases.size(); i++) {
-        string alias = aliases[i];
-#if PHP_VERSION_ID > 70300
-        if (zend_register_class_alias_ex(alias.c_str(), alias.length(), ce, 1) < 0)
-#else
-        if (zend_register_class_alias_ex(alias.c_str(), alias.length(), ce) < 0)
-#endif
-        {
+    for (const auto& alias : aliases) {
+        if (zend_register_class_alias_ex(alias.c_str(), alias.length(), ce, true) < 0) {
             return false;
         }
     }

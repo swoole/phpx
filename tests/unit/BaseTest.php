@@ -23,6 +23,8 @@ class BaseTest extends TestCase
 
         $this->assertEquals(MyClass::TEST_CONSTANT, 8888);
         $this->assertEquals($o->testProperty, 'hello world');
+
+        $this->assertEquals(count($o), 100);
     }
 
     public function testExtensionInfo() {

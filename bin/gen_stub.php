@@ -4608,10 +4608,7 @@ function installPhpParser(string $version, string $phpParserDir) {
         chdir(__DIR__);
 
         $tarName = "v$version.tar.gz";
-        passthru("wget https://github.com/nikic/PHP-Parser/archive/$tarName", $exit);
-        if ($exit !== 0) {
-            passthru("curl -LO https://github.com/nikic/PHP-Parser/archive/$tarName", $exit);
-        }
+        passthru("curl -LO https://github.com/nikic/PHP-Parser/archive/$tarName", $exit);
         if ($exit !== 0) {
             throw new Exception("Failed to download PHP-Parser tarball");
         }
