@@ -43,7 +43,7 @@ static inline void php_hash_init_context(const php_hash_ops *ops, void *context)
 #endif
 }
 
-static String doHash(const php_hash_ops *ops, String &data, bool raw_output) {
+static String doHash(const php_hash_ops *ops, const String &data, bool raw_output) {
     if (hash_algos.context_size < ops->context_size) {
         hash_algos.context_size = ops->context_size;
         hash_algos.context = malloc(hash_algos.context_size);
@@ -51,17 +51,17 @@ static String doHash(const php_hash_ops *ops, String &data, bool raw_output) {
 
     void *context = hash_algos.context;
     php_hash_init_context(ops, context);
-    ops->hash_update(context, (unsigned char *) data.c_str(), data.length());
+    ops->hash_update(context, (uchar *) data.c_str(), data.length());
 
     zend_string *digest = zend_string_alloc(ops->digest_size, 0);
-    ops->hash_final((unsigned char *) ZSTR_VAL(digest), context);
+    ops->hash_final((uchar *) ZSTR_VAL(digest), context);
 
     if (raw_output) {
         ZSTR_VAL(digest)[ops->digest_size] = 0;
         return digest;
     } else {
         zend_string *hex_digest = zend_string_safe_alloc(ops->digest_size, 2, 0, 0);
-        php_hash_bin2hex(ZSTR_VAL(hex_digest), (unsigned char *) ZSTR_VAL(digest), ops->digest_size);
+        php_hash_bin2hex(ZSTR_VAL(hex_digest), (uchar *) ZSTR_VAL(digest), ops->digest_size);
         ZSTR_VAL(hex_digest)[2 * ops->digest_size] = 0;
         zend_string_release(digest);
         return hex_digest;
@@ -77,28 +77,28 @@ static const php_hash_ops *get_ops(const char *name, size_t l_name) {
 #endif
 }
 
-String md5(String data, bool raw_output) {
+String md5(const String &data, bool raw_output) {
     if (hash_algos.md5 == nullptr) {
         hash_algos.md5 = get_ops(ZEND_STRL("md5"));
     }
     return doHash(hash_algos.md5, data, raw_output);
 }
 
-String sha1(String data, bool raw_output) {
+String sha1(const String &data, bool raw_output) {
     if (hash_algos.sha1 == nullptr) {
         hash_algos.sha1 = get_ops(ZEND_STRL("sha1"));
     }
     return doHash(hash_algos.sha1, data, raw_output);
 }
 
-String crc32(String data, bool raw_output) {
+String crc32(const String &data, bool raw_output) {
     if (hash_algos.crc32 == nullptr) {
         hash_algos.crc32 = get_ops(ZEND_STRL("crc32"));
     }
     return doHash(hash_algos.crc32, data, raw_output);
 }
 
-String hash(String algo, String data, bool raw_output) {
+String hash(const String &algo, const String &data, bool raw_output) {
     const php_hash_ops *ops = get_ops(algo.c_str(), algo.length());
     if (!ops) {
         return "";
@@ -128,7 +128,7 @@ static inline void php_hash_hmac_prep_key(
     php_hash_string_xor_char(K, K, 0x36, ops->block_size);
 }
 
-String hash_hmac(String algo, String data, String key, bool raw_output) {
+String hash_hmac(const String &algo, const String &data, const String &key, bool raw_output) {
     const php_hash_ops *ops = get_ops(algo.c_str(), algo.length());
     if (!ops) {
         return "";

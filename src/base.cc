@@ -178,7 +178,24 @@ String number_format(double num, int decimals, char dec_point, char thousands_se
 zend_result extension_startup(int type, int module_number) {
     zend_module_entry *module;
     void *ptr;
-    ZEND_HASH_FOREACH_PTR(&module_registry, ptr) {
+    do {
+        HashTable *__ht = (&module_registry);
+        printf("ht = %p, module_registry=%p, arData=%p, module_registry->arData=%p \n", __ht, &module_registry, __ht->arData, module_registry.arData);
+        Bucket *_p = __ht->arData + (0);
+        Bucket *_end = __ht->arData + __ht->nNumUsed;
+        (static_cast<bool>(!(((__ht)->u.flags & (1 << 2)) != 0))
+             ? void(0)
+             : __assert_fail("!(((__ht)->u.flags & (1<<2)) != 0)", "base.cc", 4, __PRETTY_FUNCTION__));
+
+        for (; _p != _end; _p++) {
+            zval *_z = &_p->val;
+            if (0 && zval_get_type(&(*(_z))) == 12) {
+                _z = (*(_z)).value.zv;
+            }
+            if (__builtin_expect(!!(zval_get_type(&(*(_z))) == 0), 0)) continue;;
+            ptr = (*(_z)).value.ptr; {
+
+
         module = (zend_module_entry *) ptr;
         if (module_number == module->module_number) {
             Extension *extension = _name_to_extension[module->name];

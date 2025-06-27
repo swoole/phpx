@@ -144,10 +144,22 @@ class Variant {
         init();
         ZVAL_RES(ptr(), res);
     }
-    Variant(const Variant &v) {
+    Variant(const Variant &v) noexcept {
         init();
         ZVAL_COPY_VALUE(ptr(), const_cast<Variant &>(v).ptr());
         const_cast<Variant &>(v).addRef();
+    }
+    Variant(Variant &&v) noexcept {
+        init();
+        if (v.reference) {
+            reference = true;
+            ref_val = v.ref_val;
+            v.ref_val = nullptr;
+        } else {
+            reference = false;
+            memcpy(&val, &v.val, sizeof(zval));
+        }
+        v.init();
     }
     ~Variant() {
         destroy();
@@ -467,7 +479,7 @@ class String {
     String(double v) {
         value = zend_strpprintf(0, "%.*G", (int) EG(precision), v);
     }
-    explicit String(bool v) {
+    String(bool v) {
         value = zend_string_init(v ? "1" : "0", 1, false);
     }
     String(const char *str, size_t len) {
@@ -487,6 +499,16 @@ class String {
     }
     String(Variant &v) {
         value = zval_get_string(v.ptr());
+    }
+    String(String &&s) noexcept {
+        value = s.value;
+        s.value = nullptr;
+        free_memory = s.free_memory;
+        s.free_memory = true;
+    }
+    String(const String &s) {
+        value = zend_string_copy(s.value);
+        free_memory = true;
     }
     ~String() {
         if (free_memory) {
@@ -668,11 +690,11 @@ class ArrayIterator {
 
 extern int array_data_compare(Bucket *f, Bucket *s);
 
-PHPX_API String md5(String data, bool raw_output = false);
-PHPX_API String sha1(String data, bool raw_output = false);
-PHPX_API String crc32(String data, bool raw_output = false);
-PHPX_API String hash(String algo, String data, bool raw_output = false);
-PHPX_API String hash_hmac(String algo, String data, String key, bool raw_output = false);
+PHPX_API String md5(const String &data, bool raw_output = false);
+PHPX_API String sha1(const String &data, bool raw_output = false);
+PHPX_API String crc32(const String &data, bool raw_output = false);
+PHPX_API String hash(const String &algo, const String &data, bool raw_output = false);
+PHPX_API String hash_hmac(const String &algo, const String &data, const String &key, bool raw_output = false);
 
 class Array : public Variant {
   public:

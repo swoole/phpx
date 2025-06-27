@@ -31,30 +31,30 @@ Extension::Extension(const char *_name, const char *_version) {
 
 bool Extension::require(const char *name, const char *version) {
     this->checkStartupStatus(BEFORE_START, __func__);
-    if (module.deps == NULL) {
-        module.deps = (const zend_module_dep *) calloc(16, sizeof(zend_module_dep));
-        if (module.deps == NULL) {
+    if (module.deps == nullptr) {
+        module.deps = static_cast<const zend_module_dep *>(calloc(16, sizeof(zend_module_dep)));
+        if (module.deps == nullptr) {
             return false;
         }
         deps_array_size = 16;
     } else if (deps_count + 1 == deps_array_size) {
         deps_array_size *= 2;
         void *new_array = realloc((void *) module.deps, deps_array_size * sizeof(zend_module_dep));
-        if (new_array == NULL) {
+        if (new_array == nullptr) {
             return false;
         }
-        module.deps = (const zend_module_dep *) new_array;
+        module.deps = static_cast<const zend_module_dep *>(new_array);
     }
 
-    zend_module_dep *deps_array = (zend_module_dep *) module.deps;
+    auto *deps_array = const_cast<zend_module_dep *>(module.deps);
     deps_array[deps_count].name = name;
-    deps_array[deps_count].rel = NULL;
+    deps_array[deps_count].rel = nullptr;
     deps_array[deps_count].version = version;
     deps_array[deps_count].type = MODULE_DEP_REQUIRED;
 
-    deps_array[deps_count + 1].name = NULL;
-    deps_array[deps_count + 1].rel = NULL;
-    deps_array[deps_count + 1].version = NULL;
+    deps_array[deps_count + 1].name = nullptr;
+    deps_array[deps_count + 1].rel = nullptr;
+    deps_array[deps_count + 1].version = nullptr;
     deps_array[deps_count + 1].type = 0;
 
     deps_count++;

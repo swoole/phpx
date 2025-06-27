@@ -68,17 +68,18 @@ void string_dtor(zend_resource *res) {
 }
 
 PHPX_EXTENSION() {
-    Extension *extension = new Extension("cpp_ext", "1.0.2");
+    auto *extension = new Extension("cpp_ext", "1.0.2");
 
     extension->onStart = [extension]() noexcept {
+        printf("onStart\n");
         extension->registerConstant("CPP_EXT_VERSION", 10002);
 
-        Class *c = new Class("MyClass");
+        auto *c = new Class("MyClass");
         c->registerFunctions(class_MyClass_methods);
 
         extension->registerClass(c);
 
-        Interface *i = new Interface("MyInterface");
+        auto *i = new Interface("MyInterface");
         i->registerFunctions(class_MyInterface_methods);
         extension->registerInterface(i);
 
