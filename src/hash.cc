@@ -119,7 +119,7 @@ static inline void php_hash_hmac_prep_key(
     } else {
         memcpy(K, key, key_len);
     }
-    /* XOR the key with 0x36 to get the ipad) */
+    /* XOR the key with 0x36 to get the ipad */
     php_hash_string_xor_char(K, K, 0x36, ops->block_size);
 }
 

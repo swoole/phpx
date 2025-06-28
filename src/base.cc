@@ -322,22 +322,47 @@ void _exec_method(zend_execute_data *data, zval *return_value) {
     me->impl(_this, args, _retval);
 }
 
-Variant _call(zval *object, zval *func, Args &args) {
+zend_result _call_user_function_impl(const zval *object,
+                                     const zval *function_name,
+                                     zval *retval_ptr,
+                                     uint32_t param_count,
+                                     zval params[],
+                                     HashTable *named_params) /* {{{ */
+{
+    zend_fcall_info fci;
+
+    fci.size = sizeof(fci);
+    if (object) {
+        ZEND_ASSERT(Z_TYPE_P(object) == IS_OBJECT);
+        fci.object = Z_OBJ_P(object);
+    } else {
+        fci.object = nullptr;
+    }
+    ZVAL_COPY_VALUE(&fci.function_name, function_name);
+    fci.retval = retval_ptr;
+    fci.param_count = param_count;
+    fci.params = params;
+    fci.named_params = named_params;
+
+    return zend_call_function(&fci, nullptr);
+}
+
+Variant _call(const zval *object, const zval *func, const Args &args) {
     Variant retval;
     zval params[PHPX_MAX_ARGC];
     for (int i = 0; i < args.count(); i++) {
-        ZVAL_COPY_VALUE(&params[i], args[i].ptr());
+        ZVAL_COPY_VALUE(&params[i], args[i].const_ptr());
     }
-    if (call_user_function(EG(function_table), object, func, retval.ptr(), args.count(), params) == SUCCESS) {
+    if (_call_user_function_impl(object, func, retval.ptr(), args.count(), params, nullptr) == SUCCESS) {
         return retval;
     } else {
         return nullptr;
     }
 }
 
-Variant _call(zval *object, zval *func) {
+Variant _call(const zval *object, const zval *func) {
     Variant retval = false;
-    if (call_user_function(EG(function_table), object, func, retval.ptr(), 0, NULL) == 0) {
+    if (_call_user_function_impl(object, func, retval.ptr(), 0, nullptr, nullptr) == 0) {
         return retval;
     } else {
         return nullptr;

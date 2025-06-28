@@ -55,6 +55,10 @@ bool Class::implements(zend_class_entry *if_ce) {
     return true;
 }
 
+bool Class::implements(const Interface *_if) {
+    return implements(_if->ptr());
+}
+
 bool Class::addConstant(const char *name, Variant v) {
     if (activated) {
         return false;

@@ -47,7 +47,7 @@ String String::substr(long f, long l) const {
     return {value->val + f, (size_t) l};
 }
 
-Variant String::split(String &delim, const long limit) const {
+Variant String::split(const String &delim, const long limit) const {
     Array retval;
     php_explode(delim.ptr(), value, retval.ptr(), limit);
     return retval;

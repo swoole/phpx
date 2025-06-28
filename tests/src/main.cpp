@@ -2,9 +2,41 @@
 
 using namespace std;
 
+static string root_path;
+
+static void init_root_path(const char *_exec_file) {
+    char buf[PATH_MAX];
+    string file;
+    if (_exec_file[0] == '/') {
+        file = _exec_file;
+    } else {
+        char *dir = getcwd(buf, sizeof(buf));
+        file = string(dir) + "/" + _exec_file;
+    }
+    string relative_root_path = file.substr(0, file.rfind('/')) + "/../";
+    char *_realpath = realpath(relative_root_path.c_str(), buf);
+    if (_realpath == nullptr) {
+        root_path = relative_root_path;
+    } else {
+        root_path = string(_realpath);
+    }
+}
+
+const string &get_root_path() {
+    return root_path;
+}
+
+string get_tests_dir() {
+    return get_root_path() + "/tests";
+}
+
+string get_include_dir() {
+    return get_root_path() + "/tests/include";
+}
+
 int main(int argc, char **argv) {
     php::VM vm(argc, argv);
-
+    init_root_path(argv[0]);
     ::testing::InitGoogleTest(&argc, argv);
     int retval = RUN_ALL_TESTS();
     return retval;

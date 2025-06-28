@@ -111,6 +111,21 @@ class Variant {
         init();
         ZVAL_STRINGL(&val, str, len);
     }
+    /**
+     * !!! Please note that this approach is intended solely for global constant objects.
+     */
+    Variant(const char *str, size_t len, bool persistent) {
+        init();
+        ZVAL_NEW_STR(&val, zend_string_init(str, len, persistent));
+        /**
+         * There is a flaw in PHP's design: persistent strings cause assertion failures upon destruction.
+         * By incrementing the reference count once, these strings are never released,
+         * and are instead reclaimed automatically by the operating system when the process terminates.
+         */
+        if (persistent) {
+            addRef();
+        }
+    }
     Variant(const std::string &str) {
         init();
         ZVAL_STRINGL(&val, str.c_str(), str.length());
@@ -408,12 +423,15 @@ class Variant {
     Variant serialize();
     Variant unserialize();
     bool isCallable();
+
     Variant &operator++();
     Variant &operator--();
     Int operator++(int);
     Int operator--(int);
     Variant &operator+=(Int v);
     Variant &operator-=(Int v);
+    Variant operator()() const;
+    Variant operator()(const std::initializer_list<Variant> &args) const;
 
   protected:
     bool reference;
@@ -448,8 +466,8 @@ Variant newResource(const char *name, T *v) {
     return {res};
 }
 
-PHPX_API static void var_dump(Variant &v) {
-    php_var_dump(v.ptr(), PHPX_VAR_DUMP_LEVEL);
+PHPX_API static void var_dump(const Variant &v) {
+    php_var_dump(const_cast<Variant &>(v).ptr(), PHPX_VAR_DUMP_LEVEL);
 }
 
 PHPX_API static bool is_callable(const Variant &fn) {
@@ -536,7 +554,7 @@ class String {
     bool equals(const char *str) const {
         return memcmp(str, value->val, value->len) == 0;
     }
-    bool equals(std::string &str) const {
+    bool equals(const std::string &str) const {
         if (str.length() != value->len) {
             return false;
         }
@@ -564,22 +582,22 @@ class String {
     String trim(const String &what, int mode = 3) const {
         return php_trim(value, what.c_str(), what.length(), mode);
     }
-    void tolower() {
+    void tolower() const {
         zend_str_tolower(value->val, value->len);
     }
     String base64Encode(bool raw = false) const {
-        return php_base64_decode_ex((const uchar *) value->val, value->len, raw);
+        return php_base64_decode_ex((uchar *) value->val, value->len, raw);
     }
 
-    String escape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, const std::string &charset = SG(default_charset)) {
-        return php_escape_html_entities((uchar *) value->val, value->len, 0, flags, (char *) charset.c_str());
+    String escape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, const std::string &charset = SG(default_charset)) const {
+        return php_escape_html_entities((uchar *) value->val, value->len, 0, flags, charset.c_str());
     }
 
     String unescape(int flags, const std::string &charset) const {
-        return php_unescape_html_entities(value, 1, flags, (char *) charset.c_str());
+        return php_unescape_html_entities(value, 1, flags, charset.c_str());
     }
 
-    Variant split(String &delim, long = ZEND_LONG_MAX) const;
+    Variant split(const String &delim, long = ZEND_LONG_MAX) const;
     String substr(long _offset, long _length = -1) const;
     void stripTags(const String &allow, bool allow_tag_spaces = false) const;
     String addSlashes() const;
@@ -605,7 +623,7 @@ class String {
 };
 
 static String ini_get(const String &varname) {
-    char *value = zend_ini_string(varname.c_str(), (uint) varname.length(), 0);
+    char *value = zend_ini_string(varname.c_str(), varname.length(), 0);
     if (!value) {
         return "";
     }
@@ -613,7 +631,7 @@ static String ini_get(const String &varname) {
 }
 
 static Variant get_cfg_name(const String &varname) {
-    zval *retval = cfg_get_entry(varname.c_str(), (uint32_t) varname.length());
+    zval *retval = cfg_get_entry(varname.c_str(), varname.length());
     if (retval) {
         return retval;
     } else {
@@ -756,16 +774,16 @@ class Array : public Variant {
         add_assoc_long(ptr(), key, v);
     }
     void set(const char *key, const char *v) {
-        add_assoc_string(ptr(), key, (char *) v);
+        add_assoc_string(ptr(), key, v);
     }
-    void set(const char *key, std::string &v) {
-        add_assoc_stringl(ptr(), key, (char *) v.c_str(), v.length());
+    void set(const char *key, const std::string &v) {
+        add_assoc_stringl(ptr(), key, v.c_str(), v.length());
     }
     void set(const char *key, double v) {
         add_assoc_double(ptr(), key, v);
     }
     void set(const char *key, float v) {
-        add_assoc_double(ptr(), key, (double) v);
+        add_assoc_double(ptr(), key, v);
     }
     void set(const char *key, bool v) {
         add_assoc_bool(ptr(), key, v);
@@ -785,7 +803,7 @@ class Array : public Variant {
         add_index_zval(ptr(), i, const_cast<Variant &>(v).ptr());
     }
     void del(zend_ulong i) {
-        zend_hash_index_del(Z_ARRVAL_P(ptr()), (zend_ulong) i);
+        zend_hash_index_del(Z_ARRVAL_P(ptr()), i);
     }
     //-------------------------------------------
     Variant get(const char *key) {
@@ -795,8 +813,8 @@ class Array : public Variant {
         }
         return ret;
     }
-    Variant get(int i) {
-        zval *ret = zend_hash_index_find(Z_ARRVAL_P(ptr()), (zend_ulong) i);
+    Variant get(zend_ulong i) {
+        zval *ret = zend_hash_index_find(Z_ARRVAL_P(ptr()), i);
         if (ret == nullptr) {
             return nullptr;
         }
@@ -906,14 +924,14 @@ class Args {
     bool empty() const {
         return argc == 0;
     }
-    Array toArray() {
+    Array toArray() const {
         Array array;
         for (int i = 0; i < argc; i++) {
             array.append(Variant(ptr_list[i]));
         }
         return array;
     }
-    Variant operator[](int i) {
+    Variant operator[](int i) const {
         if (UNEXPECTED(i >= argc)) {
             return {nullptr};
         }
@@ -944,8 +962,8 @@ class Args {
     zval *zval_list = nullptr;
 };
 
-extern Variant _call(zval *object, zval *func, Args &args);
-extern Variant _call(zval *object, zval *func);
+extern Variant _call(const zval *object, const zval *func, const Args &args);
+extern Variant _call(const zval *object, const zval *func);
 
 static Variant call(const Variant &func) {
     return _call(nullptr, const_cast<Variant &>(func).ptr());
@@ -1395,6 +1413,8 @@ enum SortFlags {
     SORT_FLAG_CASE = 8,
 };
 
+class Interface;
+
 class Class {
     struct Property {
         std::string name;
@@ -1412,6 +1432,7 @@ class Class {
     bool extends(zend_class_entry *_parent_class);
     bool extends(Class *parent);
     bool implements(zend_class_entry *if_ce);
+    bool implements(const Interface *);
     bool addConstant(const char *name, Variant v);
     bool addProperty(const char *name, Variant v, int flags);
     bool registerFunctions(const zend_function_entry *functions);
@@ -1424,13 +1445,13 @@ class Class {
     zend_class_entry *ptr() const {
         return ce;
     }
-    Variant getStaticProperty(const std::string &p_name) {
+    Variant getStaticProperty(const std::string &p_name) const {
         if (!activated) {
             return nullptr;
         }
         return {zend_read_static_property(ce, p_name.c_str(), p_name.length(), true)};
     }
-    bool setStaticProperty(const std::string &p_name, Variant value) {
+    bool setStaticProperty(const std::string &p_name, Variant value) const {
         if (!activated) {
             return false;
         }
@@ -1494,6 +1515,10 @@ class Interface {
         return true;
     }
 
+    zend_class_entry *ptr() const {
+        return ce;
+    }
+
   protected:
     bool activated = false;
     std::string name;
@@ -1539,7 +1564,7 @@ class Extension {
     };
 
     void registerIniEntries(int module_number);
-    void unregisterIniEntries(int module_number);
+    void unregisterIniEntries(int module_number) const;
 
   public:
     enum StartupStatus {

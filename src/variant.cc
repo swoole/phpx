@@ -110,6 +110,18 @@ Variant &Variant::operator-=(Int v) {
     return *this;
 }
 
+Variant Variant::operator()() const {
+    return _call(nullptr, const_ptr());
+}
+
+Variant Variant::operator()(const std::initializer_list<Variant> &args) const {
+    Args _args;
+    for (const auto &arg : args) {
+        _args.append(const_cast<Variant &>(arg).ptr());
+    }
+    return _call(nullptr, const_ptr(), _args);
+}
+
 Variant Variant::unserialize() {
     php_unserialize_data_t var_hash;
     Variant retval;

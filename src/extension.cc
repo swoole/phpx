@@ -165,7 +165,7 @@ void Extension::registerIniEntries(int module_number) {
     delete[] entry_defs;
 }
 
-void Extension::unregisterIniEntries(int module_number) {
+void Extension::unregisterIniEntries(int module_number) const {
     if (!ini_entries.empty()) {
         zend_unregister_ini_entries(module_number);
     }

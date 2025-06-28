@@ -4,9 +4,14 @@ using namespace php;
 
 static const char *g_date = "2009-02-15";
 
+static const Variant is_dir(ZEND_STRL("is_dir"), true);
+
 TEST(exec, func) {
-    auto retval = exec("is_dir", "/tmp");
+    auto retval = is_dir({"/tmp"});
     ASSERT_TRUE(retval.toBool());
+
+    retval = is_dir({"/tmp-not-exists"});
+    ASSERT_FALSE(retval.toBool());
 }
 
 TEST(exec, method) {
