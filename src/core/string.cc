@@ -17,6 +17,10 @@
 #include "phpx.h"
 
 namespace php {
+String::String(Variant &v) {
+    str = zval_get_string(v.ptr());
+}
+
 String String::substr(long f, long l) const {
     if (f < 0) {
         /* if "from" position is negative, count start position from the end
@@ -44,34 +48,34 @@ String String::substr(long f, long l) const {
         l = (zend_long) length() - f;
     }
 
-    return {value->val + f, (size_t) l};
+    return {str->val + f, (size_t) l};
 }
 
 Variant String::split(const String &delim, const long limit) const {
     Array retval;
-    php_explode(delim.ptr(), value, retval.ptr(), limit);
+    php_explode(delim.ptr(), str, retval.ptr(), limit);
     return retval;
 }
 
 void String::stripTags(const String &allow, bool allow_tag_spaces) const {
-    value->len = php_strip_tags_ex(c_str(), length(), allow.c_str(), allow.length(), allow_tag_spaces);
+    str->len = php_strip_tags_ex(c_str(), length(), allow.c_str(), allow.length(), allow_tag_spaces);
 }
 
 String String::addSlashes() const {
-    return php_addslashes(value);
+    return php_addslashes(str);
 }
 
 String String::basename(const String &suffix) const {
-    return php_basename(this->c_str(), this->length(), suffix.c_str(), suffix.length());
+    return php_basename(c_str(), length(), suffix.c_str(), suffix.length());
 }
 
 String String::dirname() const {
-    size_t n = php_dirname(this->c_str(), this->length());
-    return {this->c_str(), n};
+    size_t n = php_dirname(c_str(), length());
+    return {c_str(), n};
 }
 
 void String::stripSlashes() const {
-    php_stripslashes(value);
+    php_stripslashes(str);
 }
 
 }  // namespace php

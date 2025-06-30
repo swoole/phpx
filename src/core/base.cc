@@ -29,16 +29,16 @@ std::unordered_map<int, std::shared_ptr<Extension>> _module_number_to_extension;
 void error(int level, const char *format, ...) {
     va_list args;
     va_start(args, format);
-    php_verror(NULL, "", level, format, args);
+    php_verror(nullptr, "", level, format, args);
     va_end(args);
 }
 
 Variant constant(const char *name) {
-    zend_string *_name = zend_string_init(name, strlen(name), 0);
-    zval *val = zend_get_constant_ex(_name, NULL, ZEND_FETCH_CLASS_SILENT);
+    zend_string *_name = zend_string_init(name, strlen(name), false);
+    zval *val = zend_get_constant_ex(_name, nullptr, ZEND_FETCH_CLASS_SILENT);
     zend_string_free(_name);
-    if (val == NULL) {
-        return nullptr;
+    if (val == nullptr) {
+        return {};
     }
     Variant retval(val);
     return retval;
@@ -47,10 +47,9 @@ Variant constant(const char *name) {
 void echo(const char *format, ...) {
     va_list args;
     char *buffer;
-    size_t size;
 
     va_start(args, format);
-    size = vspprintf(&buffer, 0, format, args);
+    const size_t size = vspprintf(&buffer, 0, format, args);
     PHPWRITE(buffer, size);
     efree(buffer);
     va_end(args);
@@ -169,10 +168,6 @@ register_constant:
     }
 }
 
-String number_format(double num, int decimals, char dec_point, char thousands_sep) {
-    return _php_math_number_format(num, decimals, dec_point, thousands_sep);
-}
-
 zend_result extension_startup(int type, int module_number) {
     zend_module_entry *module;
     void *ptr;
@@ -286,7 +281,7 @@ void _exec_function(zend_execute_data *data, zval *return_value) {
         args.append(param_ptr);
         param_ptr++;
     }
-    Variant _retval(return_value, true);
+    Variant _retval(return_value);
     func->impl(args, _retval);
 }
 
@@ -305,7 +300,7 @@ void _exec_method(zend_execute_data *data, zval *return_value) {
     auto me = iter_method->second;
     Args args;
 
-    Object _this(&data->This, true);
+    Object _this(&data->This);
 
     zval *param_ptr = ZEND_CALL_ARG(EG(current_execute_data), 1);
     int arg_count = ZEND_CALL_NUM_ARGS(EG(current_execute_data));
@@ -318,7 +313,7 @@ void _exec_method(zend_execute_data *data, zval *return_value) {
         args.append(param_ptr);
         param_ptr++;
     }
-    Variant _retval(return_value, true);
+    Variant _retval(return_value);
     me->impl(_this, args, _retval);
 }
 
@@ -347,16 +342,12 @@ zend_result _call_user_function_impl(const zval *object,
     return zend_call_function(&fci, nullptr);
 }
 
-Variant _call(const zval *object, const zval *func, const Args &args) {
+Variant _call(const zval *object, const zval *func, Args &args) {
     Variant retval;
-    zval params[PHPX_MAX_ARGC];
-    for (int i = 0; i < args.count(); i++) {
-        ZVAL_COPY_VALUE(&params[i], args[i].const_ptr());
-    }
-    if (_call_user_function_impl(object, func, retval.ptr(), args.count(), params, nullptr) == SUCCESS) {
+    if (_call_user_function_impl(object, func, retval.ptr(), args.count(), args.ptr(), nullptr) == SUCCESS) {
         return retval;
     } else {
-        return nullptr;
+        return {};
     }
 }
 
@@ -365,7 +356,7 @@ Variant _call(const zval *object, const zval *func) {
     if (_call_user_function_impl(object, func, retval.ptr(), 0, nullptr, nullptr) == 0) {
         return retval;
     } else {
-        return nullptr;
+        return {};
     }
 }
 

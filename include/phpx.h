@@ -26,8 +26,8 @@ extern "C" {
 #include "php_streams.h"
 #include "php_network.h"
 
-#if PHP_VERSION_ID < 80000
-#error "only supports PHP8 or later."
+#if PHP_VERSION_ID < 80100
+#error "only supports PHP-8.1 or later."
 #endif
 
 #include "zend_interfaces.h"
@@ -85,37 +85,161 @@ struct Resource {
 extern std::unordered_map<std::string, Resource *> resource_map;
 extern std::map<int, void *> object_array;
 
+class Variant;
+
+class String {
+    zend_string *str;
+  public:
+    String(const char *v) {
+        str = zend_string_init(v, strlen(v), false);
+    }
+    String(int v) {
+        str = zend_long_to_str(v);
+    }
+    String(long v) {
+        str = zend_long_to_str(v);
+    }
+    String(float v) {
+        str = zend_strpprintf(0, "%.*G", (int) EG(precision), v);
+    }
+    String(double v) {
+        str = zend_strpprintf(0, "%.*G", (int) EG(precision), v);
+    }
+    String(bool v) {
+        str = zend_string_init(v ? "1" : "0", 1, false);
+    }
+    String(const char *v, size_t len, bool persistent = false) {
+        str = zend_string_init(v, len, persistent);
+    }
+    String(const std::string &v) {
+        str = zend_string_init(v.c_str(), v.length(), false);
+    }
+    String(zend_string *v) {
+        str = zend_string_copy(v);
+    }
+    String(const zval *v) {
+        str = zend_string_copy(Z_STR_P(v));
+    }
+    String(Variant &v);
+    String(String &&s) noexcept {
+        str = s.str;
+        s.str = nullptr;
+    }
+    String(const String &s) {
+        str = zend_string_copy(s.str);
+    }
+    ~String() {
+        if (str) {
+            zend_string_release(str);
+        }
+    }
+    long toInt() const {
+        return ZEND_STRTOL(ZSTR_VAL(str), nullptr, 10);
+    }
+    double toFloat() const {
+        return zend_strtod(ZSTR_VAL(str), nullptr);
+    }
+    size_t length() const {
+        return str->len;
+    }
+    char *c_str() const {
+        return str->val;
+    }
+    uint64_t hashCode() const {
+        return zend_string_hash_val(str);
+    }
+    void extend(size_t new_size) {
+        str = zend_string_extend(str, new_size, false);
+    }
+    bool equals(const char *s, size_t slen) const {
+        return zend_string_equals_cstr(str, s, slen);
+    }
+    bool equals(const std::string &s) const {
+        return equals(s.c_str(), s.length());
+    }
+    bool equals(const String &s, const bool ci = false) const {
+        if (s.length() != length()) {
+            return false;
+        }
+        if (ci) {
+            return zend_string_equals_ci(s.ptr(), str);
+        }
+        return zend_string_equals(s.ptr(), str);
+    }
+    bool operator==(const String &v) const {
+        return equals(v);
+    }
+    static String format(const char *format, ...) {
+        va_list args;
+        va_start(args, format);
+        zend_string *s = vstrpprintf(0, format, args);
+        va_end(args);
+        return s;
+    }
+    String trim(const String &what, int mode = 3) const {
+        return php_trim(str, what.c_str(), what.length(), mode);
+    }
+    void tolower() const {
+        zend_str_tolower(str->val, str->len);
+    }
+    String base64Encode(bool raw = false) const {
+        return php_base64_decode_ex((uchar *) str->val, str->len, raw);
+    }
+    String escape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, const std::string &charset = SG(default_charset)) const {
+        return php_escape_html_entities((uchar *) str->val, str->len, 0, flags, charset.c_str());
+    }
+    String unescape(int flags, const std::string &charset) const {
+        return php_unescape_html_entities(str, 1, flags, charset.c_str());
+    }
+
+    Variant split(const String &delim, long = ZEND_LONG_MAX) const;
+    String substr(long _offset, long _length = -1) const;
+    void stripTags(const String &allow, bool allow_tag_spaces = false) const;
+    String addSlashes() const;
+    void stripSlashes() const;
+    String basename(const String &suffix) const;
+    String dirname() const;
+
+    void print() const {
+        if (str) {
+            php_printf("%.*s", (int) str->len, str->val);
+        } else {
+            php_printf("(null)");
+        }
+    }
+
+    zend_string *ptr() const {
+        return str;
+    }
+};
+
 class Variant {
+  protected:
+    zval val = {};
+    void destroy() {
+        delRef();
+    }
+
   public:
     Variant() {
-        init();
-        ZVAL_NULL(&val);
-    }
-    Variant(std::nullptr_t v) {
-        init();
         ZVAL_NULL(&val);
     }
     Variant(long v) {
-        init();
         ZVAL_LONG(&val, v);
     }
     Variant(int v) {
-        init();
         ZVAL_LONG(&val, (long) v);
     }
     Variant(const char *str) {
-        init();
         ZVAL_STRING(&val, str);
     }
     Variant(const char *str, size_t len) {
-        init();
         ZVAL_STRINGL(&val, str, len);
     }
     /**
      * !!! Please note that this approach is intended solely for global constant objects.
      */
     Variant(const char *str, size_t len, bool persistent) {
-        init();
         ZVAL_NEW_STR(&val, zend_string_init(str, len, persistent));
         /**
          * There is a flaw in PHP's design: persistent strings cause assertion failures upon destruction.
@@ -127,55 +251,35 @@ class Variant {
         }
     }
     Variant(const std::string &str) {
-        init();
         ZVAL_STRINGL(&val, str.c_str(), str.length());
     }
     Variant(zend_string *str) {
-        init();
         ZVAL_STR(&val, str);
     }
     Variant(double v) {
-        init();
         ZVAL_DOUBLE(&val, v);
     }
     Variant(float v) {
-        init();
         ZVAL_DOUBLE(&val, (double) v);
     }
     Variant(bool v) {
-        init();
         ZVAL_BOOL(&val, v);
     }
-    Variant(zval *v, bool ref = false) {
-        init();
-        reference = ref;
-        if (reference) {
-            ref_val = v;
-        } else {
-            memcpy(&val, v, sizeof(zval));
-            zval_add_ref(&val);
-        }
+    Variant(const zval *v) noexcept {
+        ZVAL_COPY_VALUE(&val, v);
+        addRef();
     }
-    Variant(zend_resource *res) {
-        init();
-        ZVAL_RES(ptr(), res);
-    }
-    Variant(const Variant &v) noexcept {
-        init();
-        ZVAL_COPY_VALUE(&val, v.const_ptr());
-        zval_add_ref(&val);
-    }
+    Variant(const Variant &v) : Variant(v.const_ptr()) {}
     Variant(Variant &&v) noexcept {
-        init();
-        if (v.reference) {
-            reference = true;
-            ref_val = v.ref_val;
-            v.ref_val = nullptr;
-        } else {
-            reference = false;
-            memcpy(&val, &v.val, sizeof(zval));
-        }
-        v.init();
+        memcpy(&val, &v.val, sizeof(zval));
+        v.val = {};
+    }
+    /**
+     * res is a new reference passed in from outside;
+     * it no longer requires adding application logic and is solely used for the newResource invocation.
+     */
+    Variant(zend_resource *res) {
+        ZVAL_RES(ptr(), res);
     }
     ~Variant() {
         destroy();
@@ -220,15 +324,10 @@ class Variant {
         ZVAL_BOOL(ptr(), v);
         return *this;
     }
-    Variant &operator=(std::nullptr_t _null) {
-        destroy();
-        ZVAL_NULL(ptr());
-        return *this;
-    }
     Variant &operator=(const zval *v) {
         destroy();
-        memcpy(&val, v, sizeof(zval));
-        zval_add_ref(&val);
+        val = *v;
+        addRef();
         return *this;
     }
     Variant &operator=(const Variant &v) {
@@ -236,23 +335,15 @@ class Variant {
             return *this;
         }
         destroy();
-        ZVAL_COPY_VALUE(ptr(), const_cast<Variant &>(v).ptr());
-        const_cast<Variant &>(v).addRef();
+        ZVAL_COPY_VALUE(ptr(), v.const_ptr());
+        addRef();
         return *this;
     }
     zval *ptr() {
-        if (reference) {
-            return ref_val;
-        } else {
-            return &val;
-        }
+        return &val;
     }
     const zval *const_ptr() const {
-        if (reference) {
-            return ref_val;
-        } else {
-            return &val;
-        }
+        return &val;
     }
     void addRef() {
         zval_add_ref(ptr());
@@ -297,11 +388,6 @@ class Variant {
     bool isReference() const {
         return Z_TYPE_P(const_ptr()) == IS_REFERENCE;
     }
-#ifdef IS_TYPE_IMMUTABLE
-    bool isImmutable() {
-        return Z_TYPE_FLAGS_P(ptr()) & IS_TYPE_IMMUTABLE;
-    }
-#endif
     bool isEmpty();
     std::string toString() {
         zend_string *str = zval_get_string(ptr());
@@ -309,15 +395,9 @@ class Variant {
         zend_string_release(str);
         return retval;
     }
-    /**
-     * [Unsafe Operation] When the object is released, this memory is not available
-     */
     const char *toCString() {
-        if (str_val) {
-            zend_string_release(str_val);
-        }
-        str_val = zval_get_string(ptr());
-        return ZSTR_VAL(str_val);
+        convert_to_string(&val);
+        return Z_STRVAL(val);
     }
     long toInt() {
         return zval_get_long(ptr());
@@ -327,13 +407,6 @@ class Variant {
     }
     bool toBool() {
         return zval_is_true(ptr());
-    }
-    /**
-     * dont forget to release the memory
-     * @return point of new Object
-     */
-    Variant *dup() const {
-        return new Variant(*this);
     }
     size_t length() const {
         if (isString()) {
@@ -370,7 +443,7 @@ class Variant {
         addRef();
         ZVAL_NEW_REF(&zref, ptr());
         zval_delref_p(&zref);
-        return {&zref, false};
+        return {&zref};
     }
     Variant referenceTo() {
         if (!isReference()) {
@@ -378,7 +451,7 @@ class Variant {
         }
         zval zv;
         ZVAL_COPY_VALUE(&zv, Z_REFVAL_P(ptr()));
-        return {&zv, false};
+        return {&zv};
     }
     bool operator==(Variant &v) {
         return equals(v);
@@ -403,16 +476,9 @@ class Variant {
         Variant _tmp(v);
         return equals(_tmp);
     }
-    bool operator==(std::nullptr_t v) {
-        Variant _tmp(v);
-        return equals(_tmp);
-    }
     bool operator==(const std::string &v) {
         Variant _tmp(v);
         return equals(_tmp);
-    }
-    bool isZvalRef() const {
-        return reference;
     }
     bool equals(Variant &v, bool strict = false);
     bool same(Variant &v) {
@@ -433,194 +499,36 @@ class Variant {
     Variant operator()() const;
     Variant operator()(const std::initializer_list<Variant> &args) const;
 
-  protected:
-    bool reference;
-    zval *ref_val;
-    zend_string *str_val;
-    zval val;
-    void init() {
-        reference = false;
-        ref_val = nullptr;
-        str_val = nullptr;
-        memset(&val, 0, sizeof(val));
-    }
-    void destroy() {
-        if (str_val) {
-            zend_string_release(str_val);
-        }
-        if (!reference) {
-            zval_ptr_dtor(&val);
-            init();
-        }
-    }
+    // clang-format off
+    /* generator */
+    Variant operator()(const Variant &v1) const;
+    Variant operator()(const Variant &v1, const Variant &v2) const;
+    Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3) const;
+    Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4) const;
+    Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5) const;
+    Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6) const;
+    Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7) const;
+    Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8) const;
+    Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9) const;
+    Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10) const;    
+/* generator */
+    // clang-format on
 };
+
+extern Variant null;
 
 template <typename T>
 Variant newResource(const char *name, T *v) {
-    Resource *_c = resource_map[name];
+    const Resource *_c = resource_map[name];
     if (!_c) {
         error(E_WARNING, "%s type of resource is undefined.", name);
-        return nullptr;
+        return {};
     }
     zend_resource *res = zend_register_resource(static_cast<void *>(v), _c->type);
     return {res};
 }
 
-PHPX_API static void var_dump(const Variant &v) {
-    php_var_dump(const_cast<Variant &>(v).ptr(), PHPX_VAR_DUMP_LEVEL);
-}
-
-PHPX_API static bool is_callable(const Variant &fn) {
-    return zend_is_callable(const_cast<Variant &>(fn).ptr(), 0, nullptr);
-}
-
 PHPX_API Variant include(const std::string &file);
-
-PHPX_API static int version_compare(const std::string &s1, const std::string &s2) {
-    return php_version_compare(s1.c_str(), s2.c_str());
-}
-
-class String {
-  public:
-    String(const char *str) {
-        value = zend_string_init(str, strlen(str), false);
-    }
-    String(int v) {
-        value = zend_long_to_str(v);
-    }
-    String(long v) {
-        value = zend_long_to_str(v);
-    }
-    String(float v) {
-        value = zend_strpprintf(0, "%.*G", (int) EG(precision), v);
-    }
-    String(double v) {
-        value = zend_strpprintf(0, "%.*G", (int) EG(precision), v);
-    }
-    String(bool v) {
-        value = zend_string_init(v ? "1" : "0", 1, false);
-    }
-    String(const char *str, size_t len) {
-        value = zend_string_init(str, len, false);
-    }
-    String(const std::string &str) {
-        value = zend_string_init(str.c_str(), str.length(), false);
-    }
-    String(zend_string *str) {
-        value = str;
-    }
-    String(const zval *str, bool ref = false) {
-        value = Z_STR_P(str);
-        if (ref) {
-            free_memory = false;
-        }
-    }
-    String(Variant &v) {
-        value = zval_get_string(v.ptr());
-    }
-    String(String &&s) noexcept {
-        value = s.value;
-        s.value = nullptr;
-        free_memory = s.free_memory;
-        s.free_memory = true;
-    }
-    String(const String &s) {
-        value = zend_string_copy(s.value);
-        free_memory = true;
-    }
-    ~String() {
-        if (free_memory) {
-            zend_string_release(value);
-        }
-    }
-    long toInt() const {
-        return ZEND_STRTOL(ZSTR_VAL(value), nullptr, 10);
-    }
-    double toFloat() const {
-        return zend_strtod(ZSTR_VAL(value), nullptr);
-    }
-    size_t length() const {
-        return value->len;
-    }
-    char *c_str() const {
-        return value->val;
-    }
-    uint64_t hashCode() const {
-        return zend_string_hash_val(value);
-    }
-    void extend(size_t new_size) {
-        value = zend_string_extend(value, new_size, false);
-    }
-    bool equals(const char *str) const {
-        return memcmp(str, value->val, value->len) == 0;
-    }
-    bool equals(const std::string &str) const {
-        if (str.length() != value->len) {
-            return false;
-        }
-        return memcmp(str.c_str(), value->val, value->len) == 0;
-    }
-    bool operator==(const String &v) const {
-        return equals(v);
-    }
-    static String format(const char *format, ...) {
-        va_list args;
-        va_start(args, format);
-        zend_string *s = vstrpprintf(0, format, args);
-        va_end(args);
-        return s;
-    }
-    bool equals(const String &str, const bool ci = false) const {
-        if (str.length() != value->len) {
-            return false;
-        }
-        if (ci) {
-            return zend_binary_strcasecmp(str.c_str(), str.length(), value->val, value->len) == 0;
-        }
-        return memcmp(str.c_str(), value->val, value->len) == 0;
-    }
-    String trim(const String &what, int mode = 3) const {
-        return php_trim(value, what.c_str(), what.length(), mode);
-    }
-    void tolower() const {
-        zend_str_tolower(value->val, value->len);
-    }
-    String base64Encode(bool raw = false) const {
-        return php_base64_decode_ex((uchar *) value->val, value->len, raw);
-    }
-
-    String escape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, const std::string &charset = SG(default_charset)) const {
-        return php_escape_html_entities((uchar *) value->val, value->len, 0, flags, charset.c_str());
-    }
-
-    String unescape(int flags, const std::string &charset) const {
-        return php_unescape_html_entities(value, 1, flags, charset.c_str());
-    }
-
-    Variant split(const String &delim, long = ZEND_LONG_MAX) const;
-    String substr(long _offset, long _length = -1) const;
-    void stripTags(const String &allow, bool allow_tag_spaces = false) const;
-    String addSlashes() const;
-    void stripSlashes() const;
-    String basename(const String &suffix) const;
-    String dirname() const;
-
-    void print() const {
-        if (value) {
-            php_printf("%.*s", (int) value->len, value->val);
-        } else {
-            php_printf("(null)");
-        }
-    }
-
-    zend_string *ptr() const {
-        return value;
-    }
-
-  protected:
-    bool free_memory = true;
-    zend_string *value;
-};
 
 static String ini_get(const String &varname) {
     char *value = zend_ini_string(varname.c_str(), varname.length(), 0);
@@ -806,24 +714,24 @@ class Array : public Variant {
         zend_hash_index_del(Z_ARRVAL_P(ptr()), i);
     }
     //-------------------------------------------
-    Variant get(const char *key) {
-        zval *ret = zend_hash_str_find(Z_ARRVAL_P(ptr()), key, strlen(key));
+    Variant get(const char *key) const {
+        zval *ret = zend_hash_str_find(Z_ARRVAL_P(const_ptr()), key, strlen(key));
         if (ret == nullptr) {
-            return nullptr;
+            return {};
         }
         return ret;
     }
-    Variant get(zend_ulong i) {
-        zval *ret = zend_hash_index_find(Z_ARRVAL_P(ptr()), i);
+    Variant get(int i) const {
+        zval *ret = zend_hash_index_find(Z_ARRVAL_P(const_ptr()), i);
         if (ret == nullptr) {
-            return nullptr;
+            return {};
         }
         return ret;
     }
-    Variant operator[](int i) {
+    Variant operator[](int i) const {
         return get(i);
     }
-    Variant operator[](const char *key) {
+    Variant operator[](const char *key) const {
         return get(key);
     }
     bool remove(const char *key) {
@@ -845,10 +753,10 @@ class Array : public Variant {
     ArrayIterator end() {
         return {Z_ARRVAL_P(ptr())->arData + Z_ARRVAL_P(ptr())->nNumUsed};
     }
-    size_t count() {
-        return zend_hash_num_elements(Z_ARRVAL_P(ptr()));
+    size_t count() const {
+        return zend_hash_num_elements(Z_ARRVAL_P(const_ptr()));
     }
-    bool empty() {
+    bool empty() const {
         return count() == 0;
     }
     Variant search(Variant &_other_var, bool strict = false) {
@@ -887,158 +795,55 @@ class Array : public Variant {
 };
 
 class Args {
+    std::vector<zval> params;
+
   public:
-    ~Args() {
-        if (ptr_list) {
-            efree(ptr_list);
-        }
-        if (zval_list) {
-            efree(zval_list);
-        }
-    }
-    void append(zval *v) {
-        if (UNEXPECTED(argc == size)) {
-            if (UNEXPECTED(!extend())) {
-                return;
-            }
-        }
-        ptr_list[argc++] = v;
-    }
     void append(const Variant &v) {
-        if (UNEXPECTED(argc == size)) {
-            if (UNEXPECTED(!extend())) {
-                return;
-            }
-        }
-        int index = argc++;
-        ptr_list[index] = &zval_list[index];
-        memcpy(&zval_list[index], const_cast<Variant &>(v).ptr(), sizeof(zval));
-        zval_add_ref(ptr_list[index]);
+        params.push_back(*v.const_ptr());
     }
     size_t count() const {
-        return argc;
+        return params.size();
     }
     bool exists(int i) const {
-        return i < argc;
+        return i < count();
     }
     bool empty() const {
-        return argc == 0;
+        return params.empty();
+    }
+    zval *ptr() {
+        return params.data();
     }
     Array toArray() const {
         Array array;
-        for (int i = 0; i < argc; i++) {
-            array.append(Variant(ptr_list[i]));
+        for (const auto &param : params) {
+            array.append(Variant(&param));
         }
         return array;
     }
     Variant operator[](int i) const {
-        if (UNEXPECTED(i >= argc)) {
-            return {nullptr};
-        }
-        zval *value = ptr_list[i];
-        return {value, true};
+        auto zv = params.at(i);
+        return {&zv};
     }
-
-  private:
-    bool extend() {
-        int _new_size = size == 0 ? PHPX_MAX_ARGC : size * 2;
-        zval **_new_ptr = static_cast<zval **>(ecalloc(_new_size, sizeof(zval *)));
-        if (UNEXPECTED(_new_ptr == nullptr)) {
-            return false;
-        }
-        zval *_new_zval_ptr = static_cast<zval *>(ecalloc(_new_size, sizeof(zval)));
-        if (UNEXPECTED(_new_zval_ptr == nullptr)) {
-            efree(_new_ptr);
-            return false;
-        }
-        ptr_list = _new_ptr;
-        zval_list = _new_zval_ptr;
-        size = _new_size;
-        return true;
-    }
-    int argc = 0;
-    int size = 0;
-    zval **ptr_list = nullptr;
-    zval *zval_list = nullptr;
 };
 
-extern Variant _call(const zval *object, const zval *func, const Args &args);
+extern Variant _call(const zval *object, const zval *func, Args &args);
 extern Variant _call(const zval *object, const zval *func);
 
 static Variant call(const Variant &func) {
-    return _call(nullptr, const_cast<Variant &>(func).ptr());
+    return _call(nullptr, func.const_ptr());
 }
 
 static Variant call(const Variant &func, Args &args) {
-    return _call(nullptr, const_cast<Variant &>(func).ptr(), args);
+    return _call(nullptr, func.const_ptr(), args);
 }
 
-static Variant call(const Variant &func, Array &args) {
+static Variant call(const Variant &func, const Array &args) {
     Args _args;
     for (size_t i = 0; i < args.count(); i++) {
-        _args.append(args[i].ptr());
+        _args.append(args[i]);
     }
-    return _call(nullptr, const_cast<Variant &>(func).ptr(), _args);
+    return _call(nullptr, func.const_ptr(), _args);
 }
-
-static Variant exec(const char *func) {
-    Variant _func(func);
-    Args args;
-    return _call(nullptr, _func.ptr(), args);
-}
-/*generator*/
-extern Variant exec(const char *func, const Variant &v1);
-extern Variant exec(const char *func, const Variant &v1, const Variant &v2);
-extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3);
-extern Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4);
-extern Variant exec(
-    const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5);
-extern Variant exec(const char *func,
-                    const Variant &v1,
-                    const Variant &v2,
-                    const Variant &v3,
-                    const Variant &v4,
-                    const Variant &v5,
-                    const Variant &v6);
-extern Variant exec(const char *func,
-                    const Variant &v1,
-                    const Variant &v2,
-                    const Variant &v3,
-                    const Variant &v4,
-                    const Variant &v5,
-                    const Variant &v6,
-                    const Variant &v7);
-extern Variant exec(const char *func,
-                    const Variant &v1,
-                    const Variant &v2,
-                    const Variant &v3,
-                    const Variant &v4,
-                    const Variant &v5,
-                    const Variant &v6,
-                    const Variant &v7,
-                    const Variant &v8);
-extern Variant exec(const char *func,
-                    const Variant &v1,
-                    const Variant &v2,
-                    const Variant &v3,
-                    const Variant &v4,
-                    const Variant &v5,
-                    const Variant &v6,
-                    const Variant &v7,
-                    const Variant &v8,
-                    const Variant &v9);
-extern Variant exec(const char *func,
-                    const Variant &v1,
-                    const Variant &v2,
-                    const Variant &v3,
-                    const Variant &v4,
-                    const Variant &v5,
-                    const Variant &v6,
-                    const Variant &v7,
-                    const Variant &v8,
-                    const Variant &v9,
-                    const Variant &v10);
-/*generator*/
 
 static zend_class_entry *getClassEntry(const char *name) {
     String class_name(name, strlen(name));
@@ -1062,21 +867,23 @@ static Variant global(const char *name) {
     if (!var) {
         return false;
     }
-    return {var, true};
+    return {var};
 }
 
 class Object : public Variant {
   public:
-    Object(const Variant &v) {
+    Object(const Variant &v) : Variant(v) {
         if (!v.isObject()) {
-            error(E_ERROR, "parameter 1 must be zend_object.");
+            error(E_ERROR, "parameter 1 must be object.");
             return;
         }
-        ref_val = const_cast<Variant &>(v).ptr();
-        reference = true;
     }
-    Object(zval *v) : Variant(v) {}
-    Object(zval *v, bool ref) : Variant(v, ref) {}
+    Object(zval *v) : Variant(v) {
+        if (Z_TYPE_P(v) != IS_OBJECT) {
+            error(E_ERROR, "parameter 1 must be object.");
+            return;
+        }
+    }
     Object() = default;
     Variant call(Variant &func, Args &args) {
         return _call(ptr(), func.ptr(), args);
@@ -1121,7 +928,7 @@ class Object : public Variant {
         return _call(ptr(), _func.ptr());
     }
 
-    /*generator*/
+    /* generator */
     Variant exec(const char *func, const Variant &v1);
     Variant exec(const char *func, const Variant &v1, const Variant &v2);
     Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3);
@@ -1177,7 +984,7 @@ class Object : public Variant {
                  const Variant &v8,
                  const Variant &v9,
                  const Variant &v10);
-    /*generator*/
+    /* generator */
 
     Variant get(const char *name) {
         Variant retval;
@@ -1196,7 +1003,7 @@ class Object : public Variant {
     void set(const char *name, Array &v) {
         zend_update_property(ce(), object(), name, strlen(name), v.ptr());
     }
-    void set(const char *name, const std::string& v) {
+    void set(const char *name, const std::string &v) {
         zend_update_property_stringl(ce(), object(), name, strlen(name), v.c_str(), v.length());
     }
     void set(const char *name, const char *v) {
@@ -1371,12 +1178,6 @@ extern void _exec_method(zend_execute_data *data, zval *return_value);
 
 zend_function_entry *copy_function_entries(const zend_function_entry *_functions);
 
-String number_format(double num, int decimals = 0, char dec_point = '.', char thousands_sep = ',');
-Variant http_build_query(const Variant &data,
-                         const char *prefix = nullptr,
-                         const char *arg_sep = nullptr,
-                         int enc_type = PHP_QUERY_RFC1738);
-
 extern Variant constant(const char *name);
 extern bool define(const char *name, const Variant &v, bool case_sensitive = true);
 
@@ -1447,7 +1248,7 @@ class Class {
     }
     Variant getStaticProperty(const std::string &p_name) const {
         if (!activated) {
-            return nullptr;
+            return {};
         }
         return {zend_read_static_property(ce, p_name.c_str(), p_name.length(), true)};
     }
@@ -1461,7 +1262,7 @@ class Class {
     static Variant get(const char *name, const std::string &p_name) {
         zend_class_entry *_tmp_ce = getClassEntry(name);
         if (!_tmp_ce) {
-            return nullptr;
+            return {};
         }
         return {zend_read_static_property(_tmp_ce, p_name.c_str(), p_name.length(), true)};
     }
@@ -1637,8 +1438,8 @@ extern std::unordered_map<std::string, std::shared_ptr<Extension>> _name_to_exte
 extern std::unordered_map<int, std::shared_ptr<Extension>> _module_number_to_extension;
 
 extern Object newObject(const char *name);
-
-/*generator*/
+extern Object newObject(const char *name, const std::initializer_list<Variant> &args);
+/* generator */
 extern Object newObject(const char *name, const Variant &v1);
 extern Object newObject(const char *name, const Variant &v1, const Variant &v2);
 extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3);
@@ -1690,7 +1491,5 @@ extern Object newObject(const char *name,
                         const Variant &v8,
                         const Variant &v9,
                         const Variant &v10);
-/*generator*/
-
-// namespace end
+/* generator */
 }  // namespace php

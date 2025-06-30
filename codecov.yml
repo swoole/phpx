@@ -1,5 +1,5 @@
 ignore:
-  - "tests/*"
+  - "tests/src/*"
 
 coverage:
   range: 60..80

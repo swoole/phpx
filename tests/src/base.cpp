@@ -1,4 +1,5 @@
 #include "phpx_test.h"
+#include "phpx_func.h"
 
 using namespace php;
 
@@ -45,7 +46,7 @@ TEST(base, include) {
     auto tmp_file = "/tmp/include_test.php";
     std::string tmp_file2 = "/tmp/tmp_file.txt";
 
-    exec("file_put_contents", tmp_file, "<?php file_put_contents('" + tmp_file2 + "', 'hello phpx'); return PHP_VERSION_ID; ?>");
+    file_put_contents(tmp_file, "<?php file_put_contents('" + tmp_file2 + "', 'hello phpx'); return PHP_VERSION_ID; ?>");
     auto retval = include(tmp_file);
     ASSERT_TRUE(retval.isInt());
     ASSERT_EQ(retval.toInt(), PHP_VERSION_ID);
