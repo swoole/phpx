@@ -42,7 +42,7 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
     size_t num_in = count();
 
     if (offset > num_in) {
-        return Array();
+        return Array{};
     } else if (offset < 0 && (offset = (num_in + offset)) < 0) {
         offset = 0;
     }
@@ -67,7 +67,7 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
     /* Start at the beginning and go until we hit offset */
     int pos = 0;
     if (!preserve_keys && (Z_ARRVAL_P(this->ptr())->u.flags & HASH_FLAG_PACKED)) {
-        zend_hash_real_init(Z_ARRVAL_P(&return_value), 1);
+        zend_hash_real_init(Z_ARRVAL_P(&return_value), true);
         ZEND_HASH_FILL_PACKED(Z_ARRVAL_P(&return_value)) {
             ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(this->ptr()), entry) {
                 pos++;
@@ -111,11 +111,7 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
     return retval;
 }
 
-Array::Array(zval *v) : Variant(v) {
-    if (isReference()) {
-        zval_delref_p(&val);
-        ZVAL_COPY(&val, Z_REFVAL_P(&val));
-    }
+Array::Array(const zval *v) : Variant(v) {
     if (isNull()) {
         array_init(ptr());
     } else if (!isArray()) {
@@ -123,22 +119,7 @@ Array::Array(zval *v) : Variant(v) {
     }
 }
 
-Array::Array(const Variant &v) {
-    zval *zv = const_cast<Variant &>(v).ptr();
-    if (Z_TYPE_P(zv) == IS_REFERENCE) {
-        zv = Z_REFVAL_P(zv);
-    }
-    memcpy(&val, zv, sizeof(*zv));
-    addRef();
-    if (isNull()) {
-        array_init(ptr());
-    } else if (!isArray()) {
-        error(E_ERROR, "parameter 1 must be zend_array.");
-    }
-#ifdef HT_ALLOW_COW_VIOLATION
-    HT_ALLOW_COW_VIOLATION(Z_ARRVAL_P(ptr()));
-#endif
-}
+Array::Array(const Variant &v) : Array(v.const_ptr()) {}
 
 Array::Array(const std::initializer_list<const Variant> &list) {
     array_init(&val);

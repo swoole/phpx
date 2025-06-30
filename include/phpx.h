@@ -217,7 +217,7 @@ class Variant {
   protected:
     zval val = {};
     void destroy() {
-        delRef();
+        zval_ptr_dtor(&val);
     }
 
   public:
@@ -360,6 +360,9 @@ class Variant {
     }
     int type() const {
         return Z_TYPE_P(const_ptr());
+    }
+    uint32_t refcount() {
+        return Z_REFCOUNT(val);
     }
     bool isString() const {
         return Z_TYPE_P(const_ptr()) == IS_STRING;
@@ -627,8 +630,13 @@ class Array : public Variant {
     Array() {
         array_init(&val);
     }
-    Array(zval *v);
+    Array(const zval *v);
     Array(const Variant &v);
+    Array(Variant &&v) : Variant(std::move(v)) {
+        if (!isArray()) {
+            error(E_ERROR, "parameter 1 must be zend_array.");
+        }
+    }
     Array(const std::initializer_list<const Variant> &list);
     Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     Array(const std::initializer_list<std::pair<Int, const Variant>> &list);
