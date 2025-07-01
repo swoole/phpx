@@ -93,7 +93,7 @@ foreach ($extensions as $extension) {
     $name = strtolower($extension);
     $funcDeclarationFile = $rootDir . "/include/func/{$name}.h";
     if (is_file($funcDeclarationFile)) {
-        fwrite($classHeaderFile, "#include \"func/{$name}.h\"\n");
+        fwrite($funcHeaderFile, "#include \"func/{$name}.h\"\n");
     }
 
     $classDeclarationFile = $rootDir . "/include/class/{$name}.h";
