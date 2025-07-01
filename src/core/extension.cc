@@ -98,19 +98,14 @@ void Extension::registerConstant(const char *name, bool v) const {
 }
 
 void Extension::registerConstant(const char *name, const char *v) const {
-    zend_register_string_constant(name, strlen(name), (char *) v, CONST_CS | CONST_PERSISTENT, module.module_number);
+    zend_register_string_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
 void Extension::registerConstant(const char *name, const char *v, size_t len) const {
-    zend_register_stringl_constant(
-        name, strlen(name), (char *) v, len, CONST_CS | CONST_PERSISTENT, module.module_number);
+    zend_register_stringl_constant(name, strlen(name), v, len, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
 void Extension::registerConstant(const char *name, double v) const {
-    zend_register_double_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
-}
-
-void Extension::registerConstant(const char *name, float v) const {
     zend_register_double_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 

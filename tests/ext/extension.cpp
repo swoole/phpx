@@ -78,12 +78,19 @@ PHPX_EXTENSION() {
 
     extension->onStart = [extension]() noexcept {
         printf("onStart\n");
-        extension->registerConstant("PHPX_TEST_EXT_VERSION", 10002);
+        extension->registerConstant("PHPX_CONST_INT", 10002);
+        extension->registerConstant("PHPX_CONST_LONG", 10002L);
+        extension->registerConstant("PHPX_CONST_FLOAT", 199.188);
+        extension->registerConstant("PHPX_CONST_BOOL", true);
+        extension->registerConstant("PHPX_CONST_CSTR", "hello world");
+        extension->registerConstant("PHPX_CONST_STR", std::string("hello world"));
 
         auto *c = new Class("MyClass");
         c->registerFunctions(class_MyClass_methods);
         c->addConstant("TEST_CONSTANT", 8888);
+        c->addConstant("TEST_CONSTANT_STR", "hello world");
         c->addProperty("testProperty", "hello world", ZEND_ACC_PUBLIC);
+        c->addProperty("testPropertyInt", 9988, ZEND_ACC_PUBLIC);
         c->implements(zend_ce_countable);
         c->alias("MyClassAlias");
         extension->registerClass(c);

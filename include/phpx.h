@@ -1438,7 +1438,6 @@ class Extension {
     void registerConstant(const char *name, int v) const;
     void registerConstant(const char *name, bool v) const;
     void registerConstant(const char *name, double v) const;
-    void registerConstant(const char *name, float v) const;
     void registerConstant(const char *name, const char *v) const;
     void registerConstant(const char *name, const char *v, size_t len) const;
     void registerConstant(const char *name, const std::string &v) const;
