@@ -1,5 +1,6 @@
 ignore:
   - "tests/src/*"
+  - "tests/ext/*"
   - "src/func/*"
   - "src/class/*"
   - "src/core/caller.cc"

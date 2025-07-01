@@ -30,3 +30,29 @@ TEST(string, split) {
     ASSERT_STREQ(result[2].toCString(), "three");
     ASSERT_STREQ(result[3].toCString(), "four");
 }
+
+TEST(string, replace) {
+    String str("<h1>hello world!</h1>");
+    str.stripTags("<br>");
+    ASSERT_TRUE(str.equals(std::string("hello world!")));
+
+    auto s1 = "'hello world'";
+    String s2("'hello world'");
+    auto s3 = s2.addSlashes();
+    ASSERT_TRUE(s3.equals(std::string("\\'hello world\\'")));
+
+    s3.stripSlashes();
+    ASSERT_TRUE(s3.equals(s1));
+}
+
+TEST(string, basename) {
+    String path("/path/to/file.txt");
+    String suffix(".txt");
+    ASSERT_EQ(path.basename(suffix), "file");
+    ASSERT_EQ(path.basename(String("")), "file.txt");
+}
+
+TEST(string, dirname) {
+    String path("/path/to/file.txt");
+    ASSERT_EQ(path.dirname(), "/path/to");
+}

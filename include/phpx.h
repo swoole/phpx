@@ -158,6 +158,9 @@ class String {
     bool equals(const std::string &s) const {
         return equals(s.c_str(), s.length());
     }
+    bool equals(const char *s) const {
+        return equals(s, strlen(s));
+    }
     bool equals(const String &s, const bool ci = false) const {
         if (s.length() != length()) {
             return false;
@@ -968,9 +971,8 @@ class Object : public Variant {
                                        const_cast<Variant &>(v2).ptr());
         return retval;
     }
-    Variant exec(const char *func) {
-        Variant _func(func);
-        return _call(ptr(), _func.ptr());
+    Variant exec(const Variant &fn) {
+        return _call(ptr(), fn.const_ptr());
     }
 
     /* generator */

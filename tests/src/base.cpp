@@ -59,3 +59,34 @@ TEST(base, method) {
     ASSERT_TRUE(str.isString());
     ASSERT_GT(str.length(), 0);
 }
+
+TEST(base, ini_get) {
+    auto v = ini_get("post_max_size");
+    ASSERT_GE(v.length(), 2);
+    ASSERT_GE(v.toInt(), 8);
+
+    auto v2 = get_cfg_name("post_max_size");
+    ASSERT_TRUE(v2.isString());
+    ASSERT_STREQ(v2.toCString(), v.c_str());
+}
+
+TEST(base, global) {
+    auto server = global("_SERVER");
+    ASSERT_TRUE(server.isArray());
+    Array array(server);
+    ASSERT_TRUE(array.exists("SHELL"));
+
+    auto time = array["REQUEST_TIME"];
+    ASSERT_TRUE(time.isInt());
+}
+
+TEST(base, equals) {
+    Variant v1((zend_long) UINT_MAX);
+    auto v2 = random_int(1, 1000000);
+    ASSERT_FALSE(v1.equals(v2));
+    ASSERT_FALSE(v1.equals(v2, true));
+
+    Variant v3 = std::to_string(UINT_MAX);
+    ASSERT_TRUE(v3.equals(v1));
+    ASSERT_FALSE(v3.equals(v1, true));
+}
