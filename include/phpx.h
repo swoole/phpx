@@ -153,7 +153,7 @@ class String {
         str = zend_string_extend(str, new_size, false);
     }
     bool equals(const char *s, size_t slen) const {
-        return zend_string_equals_cstr(str, s, slen);
+        return length() == slen && memcmp(ZSTR_VAL(str), s, slen) == 0;
     }
     bool equals(const std::string &s) const {
         return equals(s.c_str(), s.length());
@@ -163,7 +163,7 @@ class String {
             return false;
         }
         if (ci) {
-            return zend_string_equals_ci(s.ptr(), str);
+            return s.length() == length() && zend_binary_strcasecmp(c_str(), length(), s.c_str(), s.length()) == 0;
         }
         return zend_string_equals(s.ptr(), str);
     }
