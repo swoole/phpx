@@ -160,10 +160,11 @@ bool Array::contains(Variant &_other_var, bool strict) {
     return false;
 }
 
-String Array::join(String &delim) {
-    Variant retval;
-    php_implode(delim.ptr(), HASH_OF(ptr()), retval.ptr());
-    retval.addRef();
-    return retval.ptr();
+String Array::join(const String &delim) {
+    zval retval;
+    php_implode(delim.ptr(), HASH_OF(ptr()), &retval);
+    String result(&retval);
+    zval_ptr_dtor(&retval);
+    return result;
 }
 }  // namespace php

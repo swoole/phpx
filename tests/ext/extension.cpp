@@ -84,6 +84,7 @@ PHPX_EXTENSION() {
         extension->registerConstant("PHPX_CONST_BOOL", true);
         extension->registerConstant("PHPX_CONST_CSTR", "hello world");
         extension->registerConstant("PHPX_CONST_STR", std::string("hello world"));
+        extension->registerConstant("PHPX_CONST_CSTR2", ZEND_STRL("hello world"));
 
         auto *c = new Class("MyClass");
         c->registerFunctions(class_MyClass_methods);

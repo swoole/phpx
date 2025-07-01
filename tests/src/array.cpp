@@ -84,3 +84,17 @@ TEST(array, foreach) {
     ASSERT_EQ(list.size(), 4);
 }
 
+TEST(array, contains) {
+    Array arr = create_list();
+    Variant v1{"php"};
+    ASSERT_TRUE(arr.contains(v1));
+
+    Variant v2{"null"};
+    ASSERT_FALSE(arr.contains(v2));
+}
+
+TEST(array, join) {
+    Array arr = create_list();
+    auto s = arr.join(",");
+    ASSERT_GE(s.length(), 20);
+}

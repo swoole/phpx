@@ -813,7 +813,7 @@ class Array : public Variant {
     }
     Variant search(Variant &_other_var, bool strict = false);
     bool contains(Variant &_other_var, bool strict = false);
-    String join(String &delim);
+    String join(const String &delim);
     void merge(Array &source, bool overwrite = false) {
         zend_hash_merge(Z_ARRVAL_P(ptr()), Z_ARRVAL_P(source.ptr()), zval_add_ref, overwrite);
     }

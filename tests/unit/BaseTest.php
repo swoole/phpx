@@ -15,6 +15,7 @@ class BaseTest extends TestCase
         $this->assertEquals(PHPX_CONST_FLOAT, 199.188);
         $this->assertEquals(PHPX_CONST_BOOL, true);
         $this->assertEquals(PHPX_CONST_CSTR, "hello world");
+        $this->assertEquals(PHPX_CONST_CSTR2, "hello world");
         $this->assertEquals(PHPX_CONST_STR, "hello world");
     }
 
