@@ -503,17 +503,54 @@ class Variant {
     Variant operator()() const;
     Variant operator()(const std::initializer_list<Variant> &args) const;
 
-    /* generator */Variant operator()(const Variant &v1) const;
-Variant operator()(const Variant &v1, const Variant &v2) const;
-Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3) const;
-Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4) const;
-Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5) const;
-Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6) const;
-Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7) const;
-Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8) const;
-Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9) const;
-Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10) const;
-/* generator */
+    /* generator */
+    Variant operator()(const Variant &v1) const;
+    Variant operator()(const Variant &v1, const Variant &v2) const;
+    Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3) const;
+    Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4) const;
+    Variant operator()(
+        const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5) const;
+    Variant operator()(const Variant &v1,
+                       const Variant &v2,
+                       const Variant &v3,
+                       const Variant &v4,
+                       const Variant &v5,
+                       const Variant &v6) const;
+    Variant operator()(const Variant &v1,
+                       const Variant &v2,
+                       const Variant &v3,
+                       const Variant &v4,
+                       const Variant &v5,
+                       const Variant &v6,
+                       const Variant &v7) const;
+    Variant operator()(const Variant &v1,
+                       const Variant &v2,
+                       const Variant &v3,
+                       const Variant &v4,
+                       const Variant &v5,
+                       const Variant &v6,
+                       const Variant &v7,
+                       const Variant &v8) const;
+    Variant operator()(const Variant &v1,
+                       const Variant &v2,
+                       const Variant &v3,
+                       const Variant &v4,
+                       const Variant &v5,
+                       const Variant &v6,
+                       const Variant &v7,
+                       const Variant &v8,
+                       const Variant &v9) const;
+    Variant operator()(const Variant &v1,
+                       const Variant &v2,
+                       const Variant &v3,
+                       const Variant &v4,
+                       const Variant &v5,
+                       const Variant &v6,
+                       const Variant &v7,
+                       const Variant &v8,
+                       const Variant &v9,
+                       const Variant &v10) const;
+    /* generator */
 };
 
 extern Variant null;
@@ -934,17 +971,63 @@ class Object : public Variant {
         return _call(ptr(), _func.ptr());
     }
 
-    /* generator */Variant exec(const char *func, const Variant &v1);
-Variant exec(const char *func, const Variant &v1, const Variant &v2);
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3);
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4);
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5);
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6);
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7);
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8);
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9);
-Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10);
-/* generator */
+    /* generator */
+    Variant exec(const char *func, const Variant &v1);
+    Variant exec(const char *func, const Variant &v1, const Variant &v2);
+    Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3);
+    Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4);
+    Variant exec(const char *func,
+                 const Variant &v1,
+                 const Variant &v2,
+                 const Variant &v3,
+                 const Variant &v4,
+                 const Variant &v5);
+    Variant exec(const char *func,
+                 const Variant &v1,
+                 const Variant &v2,
+                 const Variant &v3,
+                 const Variant &v4,
+                 const Variant &v5,
+                 const Variant &v6);
+    Variant exec(const char *func,
+                 const Variant &v1,
+                 const Variant &v2,
+                 const Variant &v3,
+                 const Variant &v4,
+                 const Variant &v5,
+                 const Variant &v6,
+                 const Variant &v7);
+    Variant exec(const char *func,
+                 const Variant &v1,
+                 const Variant &v2,
+                 const Variant &v3,
+                 const Variant &v4,
+                 const Variant &v5,
+                 const Variant &v6,
+                 const Variant &v7,
+                 const Variant &v8);
+    Variant exec(const char *func,
+                 const Variant &v1,
+                 const Variant &v2,
+                 const Variant &v3,
+                 const Variant &v4,
+                 const Variant &v5,
+                 const Variant &v6,
+                 const Variant &v7,
+                 const Variant &v8,
+                 const Variant &v9);
+    Variant exec(const char *func,
+                 const Variant &v1,
+                 const Variant &v2,
+                 const Variant &v3,
+                 const Variant &v4,
+                 const Variant &v5,
+                 const Variant &v6,
+                 const Variant &v7,
+                 const Variant &v8,
+                 const Variant &v9,
+                 const Variant &v10);
+    /* generator */
 
     Variant get(const char *name) {
         Variant retval;
@@ -1399,15 +1482,57 @@ extern std::unordered_map<int, std::shared_ptr<Extension>> _module_number_to_ext
 
 extern Object newObject(const char *name);
 extern Object newObject(const char *name, const std::initializer_list<Variant> &args);
-/* generator */extern Object newObject(const char *name, const Variant &v1);
+/* generator */
+extern Object newObject(const char *name, const Variant &v1);
 extern Object newObject(const char *name, const Variant &v1, const Variant &v2);
 extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3);
 extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4);
-extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5);
-extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6);
-extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7);
-extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8);
-extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9);
-extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10);
+extern Object newObject(
+    const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5);
+extern Object newObject(const char *name,
+                        const Variant &v1,
+                        const Variant &v2,
+                        const Variant &v3,
+                        const Variant &v4,
+                        const Variant &v5,
+                        const Variant &v6);
+extern Object newObject(const char *name,
+                        const Variant &v1,
+                        const Variant &v2,
+                        const Variant &v3,
+                        const Variant &v4,
+                        const Variant &v5,
+                        const Variant &v6,
+                        const Variant &v7);
+extern Object newObject(const char *name,
+                        const Variant &v1,
+                        const Variant &v2,
+                        const Variant &v3,
+                        const Variant &v4,
+                        const Variant &v5,
+                        const Variant &v6,
+                        const Variant &v7,
+                        const Variant &v8);
+extern Object newObject(const char *name,
+                        const Variant &v1,
+                        const Variant &v2,
+                        const Variant &v3,
+                        const Variant &v4,
+                        const Variant &v5,
+                        const Variant &v6,
+                        const Variant &v7,
+                        const Variant &v8,
+                        const Variant &v9);
+extern Object newObject(const char *name,
+                        const Variant &v1,
+                        const Variant &v2,
+                        const Variant &v3,
+                        const Variant &v4,
+                        const Variant &v5,
+                        const Variant &v6,
+                        const Variant &v7,
+                        const Variant &v8,
+                        const Variant &v9,
+                        const Variant &v10);
 /* generator */
 }  // namespace php

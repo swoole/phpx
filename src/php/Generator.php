@@ -83,9 +83,7 @@ class Generator
 
     public static function makeCaller(): void
     {
-        $SPACE_4 = str_repeat(' ', 4);
         $DELIMITER = '/* generator */';
-        $src_file = self::getRootDir() . '/src/core/caller.cc';
         $header_file = self::getRootDir() . '/include/phpx.h';
         $src = file_get_contents($header_file);
         $r = preg_match('/\#define\s+PHPX_MAX_ARGC\s+(\d+)/', $src, $match);
@@ -94,11 +92,11 @@ class Generator
         }
 
         $maxArgc = $match[1];
-        self::render(__DIR__ . '/templates/caller.tpl', self::getRootDir() . '/src/core/caller.cc', compact('maxArgc', 'SPACE_4'));
+        self::render(__DIR__ . '/templates/caller.tpl', self::getRootDir() . '/src/core/caller.cc', compact('maxArgc'));
 
-        $exec_function_code = '';
-        $exec_method_code = '';
-        $new_object_code = '';
+        $exec_function_code = PHP_EOL;
+        $exec_method_code = PHP_EOL;
+        $new_object_code = PHP_EOL;
         for ($i = 1; $i <= $maxArgc; $i++) {
             $exec_function_code .= 'Variant operator()(' . self::makeArgs($i) . ') const;' . PHP_EOL;
             $exec_method_code .= 'Variant exec(const char *func, ' . self::makeArgs($i) . ');' . PHP_EOL;
