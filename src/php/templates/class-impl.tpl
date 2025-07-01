@@ -11,7 +11,7 @@ namespace php {
     static Variant fn { ZEND_STRL("<?=$className?>::<?=$name?>"), true };
     return fn(<?=$minfo['call']?>);
 <?php else: ?>
-    return std::move(_this.exec("<?=$minfo['name']?>"<?=$minfo['call']?>));
+    return _this.exec("<?=$minfo['name']?>"<?=$minfo['call']?>);
 <?php endif; ?>
 }
 

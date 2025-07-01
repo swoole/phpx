@@ -7,39 +7,39 @@ PharException::PharException(const Variant &message, const Variant &code, const 
 }
 
 Variant PharException::__wakeup() {
-    return std::move(_this.exec("__wakeup"));
+    return _this.exec("__wakeup");
 }
 
 Variant PharException::getMessage() {
-    return std::move(_this.exec("getMessage"));
+    return _this.exec("getMessage");
 }
 
 Variant PharException::getCode() {
-    return std::move(_this.exec("getCode"));
+    return _this.exec("getCode");
 }
 
 Variant PharException::getFile() {
-    return std::move(_this.exec("getFile"));
+    return _this.exec("getFile");
 }
 
 Variant PharException::getLine() {
-    return std::move(_this.exec("getLine"));
+    return _this.exec("getLine");
 }
 
 Variant PharException::getTrace() {
-    return std::move(_this.exec("getTrace"));
+    return _this.exec("getTrace");
 }
 
 Variant PharException::getPrevious() {
-    return std::move(_this.exec("getPrevious"));
+    return _this.exec("getPrevious");
 }
 
 Variant PharException::getTraceAsString() {
-    return std::move(_this.exec("getTraceAsString"));
+    return _this.exec("getTraceAsString");
 }
 
 Variant PharException::__toString() {
-    return std::move(_this.exec("__toString"));
+    return _this.exec("__toString");
 }
 
 
@@ -48,159 +48,159 @@ Phar::Phar(const Variant &filename, const Variant &flags, const Variant &alias) 
 }
 
 Variant Phar::addEmptyDir(const Variant &directory) {
-    return std::move(_this.exec("addEmptyDir", directory));
+    return _this.exec("addEmptyDir", directory);
 }
 
 Variant Phar::addFile(const Variant &filename, const Variant &local_name) {
-    return std::move(_this.exec("addFile", filename, local_name));
+    return _this.exec("addFile", filename, local_name);
 }
 
 Variant Phar::addFromString(const Variant &local_name, const Variant &contents) {
-    return std::move(_this.exec("addFromString", local_name, contents));
+    return _this.exec("addFromString", local_name, contents);
 }
 
 Variant Phar::buildFromDirectory(const Variant &directory, const Variant &pattern) {
-    return std::move(_this.exec("buildFromDirectory", directory, pattern));
+    return _this.exec("buildFromDirectory", directory, pattern);
 }
 
 Variant Phar::buildFromIterator(const Variant &iterator, const Variant &base_directory) {
-    return std::move(_this.exec("buildFromIterator", iterator, base_directory));
+    return _this.exec("buildFromIterator", iterator, base_directory);
 }
 
 Variant Phar::compressFiles(const Variant &compression) {
-    return std::move(_this.exec("compressFiles", compression));
+    return _this.exec("compressFiles", compression);
 }
 
 Variant Phar::decompressFiles() {
-    return std::move(_this.exec("decompressFiles"));
+    return _this.exec("decompressFiles");
 }
 
 Variant Phar::compress(const Variant &compression, const Variant &extension) {
-    return std::move(_this.exec("compress", compression, extension));
+    return _this.exec("compress", compression, extension);
 }
 
 Variant Phar::decompress(const Variant &extension) {
-    return std::move(_this.exec("decompress", extension));
+    return _this.exec("decompress", extension);
 }
 
 Variant Phar::convertToExecutable(const Variant &format, const Variant &compression, const Variant &extension) {
-    return std::move(_this.exec("convertToExecutable", format, compression, extension));
+    return _this.exec("convertToExecutable", format, compression, extension);
 }
 
 Variant Phar::convertToData(const Variant &format, const Variant &compression, const Variant &extension) {
-    return std::move(_this.exec("convertToData", format, compression, extension));
+    return _this.exec("convertToData", format, compression, extension);
 }
 
 Variant Phar::copy(const Variant &from, const Variant &to) {
-    return std::move(_this.exec("copy", from, to));
+    return _this.exec("copy", from, to);
 }
 
 Variant Phar::count(const Variant &mode) {
-    return std::move(_this.exec("count", mode));
+    return _this.exec("count", mode);
 }
 
 Variant Phar::_delete(const Variant &local_name) {
-    return std::move(_this.exec("delete", local_name));
+    return _this.exec("delete", local_name);
 }
 
 Variant Phar::delMetadata() {
-    return std::move(_this.exec("delMetadata"));
+    return _this.exec("delMetadata");
 }
 
 Variant Phar::extractTo(const Variant &directory, const Variant &files, const Variant &overwrite) {
-    return std::move(_this.exec("extractTo", directory, files, overwrite));
+    return _this.exec("extractTo", directory, files, overwrite);
 }
 
 Variant Phar::getAlias() {
-    return std::move(_this.exec("getAlias"));
+    return _this.exec("getAlias");
 }
 
 Variant Phar::getPath() {
-    return std::move(_this.exec("getPath"));
+    return _this.exec("getPath");
 }
 
 Variant Phar::getMetadata(const Array &unserialize_options) {
-    return std::move(_this.exec("getMetadata", unserialize_options));
+    return _this.exec("getMetadata", unserialize_options);
 }
 
 Variant Phar::getModified() {
-    return std::move(_this.exec("getModified"));
+    return _this.exec("getModified");
 }
 
 Variant Phar::getSignature() {
-    return std::move(_this.exec("getSignature"));
+    return _this.exec("getSignature");
 }
 
 Variant Phar::getStub() {
-    return std::move(_this.exec("getStub"));
+    return _this.exec("getStub");
 }
 
 Variant Phar::getVersion() {
-    return std::move(_this.exec("getVersion"));
+    return _this.exec("getVersion");
 }
 
 Variant Phar::hasMetadata() {
-    return std::move(_this.exec("hasMetadata"));
+    return _this.exec("hasMetadata");
 }
 
 Variant Phar::isBuffering() {
-    return std::move(_this.exec("isBuffering"));
+    return _this.exec("isBuffering");
 }
 
 Variant Phar::isCompressed() {
-    return std::move(_this.exec("isCompressed"));
+    return _this.exec("isCompressed");
 }
 
 Variant Phar::isFileFormat(const Variant &format) {
-    return std::move(_this.exec("isFileFormat", format));
+    return _this.exec("isFileFormat", format);
 }
 
 Variant Phar::isWritable() {
-    return std::move(_this.exec("isWritable"));
+    return _this.exec("isWritable");
 }
 
 Variant Phar::offsetExists(const Variant &local_name) {
-    return std::move(_this.exec("offsetExists", local_name));
+    return _this.exec("offsetExists", local_name);
 }
 
 Variant Phar::offsetGet(const Variant &local_name) {
-    return std::move(_this.exec("offsetGet", local_name));
+    return _this.exec("offsetGet", local_name);
 }
 
 Variant Phar::offsetSet(const Variant &local_name, const Variant &value) {
-    return std::move(_this.exec("offsetSet", local_name, value));
+    return _this.exec("offsetSet", local_name, value);
 }
 
 Variant Phar::offsetUnset(const Variant &local_name) {
-    return std::move(_this.exec("offsetUnset", local_name));
+    return _this.exec("offsetUnset", local_name);
 }
 
 Variant Phar::setAlias(const Variant &alias) {
-    return std::move(_this.exec("setAlias", alias));
+    return _this.exec("setAlias", alias);
 }
 
 Variant Phar::setDefaultStub(const Variant &index, const Variant &web_index) {
-    return std::move(_this.exec("setDefaultStub", index, web_index));
+    return _this.exec("setDefaultStub", index, web_index);
 }
 
 Variant Phar::setMetadata(const Variant &metadata) {
-    return std::move(_this.exec("setMetadata", metadata));
+    return _this.exec("setMetadata", metadata);
 }
 
 Variant Phar::setSignatureAlgorithm(const Variant &algo, const Variant &private_key) {
-    return std::move(_this.exec("setSignatureAlgorithm", algo, private_key));
+    return _this.exec("setSignatureAlgorithm", algo, private_key);
 }
 
 Variant Phar::setStub(const Variant &stub, const Variant &length) {
-    return std::move(_this.exec("setStub", stub, length));
+    return _this.exec("setStub", stub, length);
 }
 
 Variant Phar::startBuffering() {
-    return std::move(_this.exec("startBuffering"));
+    return _this.exec("startBuffering");
 }
 
 Variant Phar::stopBuffering() {
-    return std::move(_this.exec("stopBuffering"));
+    return _this.exec("stopBuffering");
 }
 
 Variant Phar::apiVersion() {
@@ -279,167 +279,167 @@ Variant Phar::webPhar(const Variant &alias, const Variant &index, const Variant 
 }
 
 Variant Phar::hasChildren(const Variant &allow_links) {
-    return std::move(_this.exec("hasChildren", allow_links));
+    return _this.exec("hasChildren", allow_links);
 }
 
 Variant Phar::getChildren() {
-    return std::move(_this.exec("getChildren"));
+    return _this.exec("getChildren");
 }
 
 Variant Phar::getSubPath() {
-    return std::move(_this.exec("getSubPath"));
+    return _this.exec("getSubPath");
 }
 
 Variant Phar::getSubPathname() {
-    return std::move(_this.exec("getSubPathname"));
+    return _this.exec("getSubPathname");
 }
 
 Variant Phar::rewind() {
-    return std::move(_this.exec("rewind"));
+    return _this.exec("rewind");
 }
 
 Variant Phar::key() {
-    return std::move(_this.exec("key"));
+    return _this.exec("key");
 }
 
 Variant Phar::current() {
-    return std::move(_this.exec("current"));
+    return _this.exec("current");
 }
 
 Variant Phar::getFlags() {
-    return std::move(_this.exec("getFlags"));
+    return _this.exec("getFlags");
 }
 
 Variant Phar::setFlags(const Variant &flags) {
-    return std::move(_this.exec("setFlags", flags));
+    return _this.exec("setFlags", flags);
 }
 
 Variant Phar::getFilename() {
-    return std::move(_this.exec("getFilename"));
+    return _this.exec("getFilename");
 }
 
 Variant Phar::getExtension() {
-    return std::move(_this.exec("getExtension"));
+    return _this.exec("getExtension");
 }
 
 Variant Phar::getBasename(const Variant &suffix) {
-    return std::move(_this.exec("getBasename", suffix));
+    return _this.exec("getBasename", suffix);
 }
 
 Variant Phar::isDot() {
-    return std::move(_this.exec("isDot"));
+    return _this.exec("isDot");
 }
 
 Variant Phar::valid() {
-    return std::move(_this.exec("valid"));
+    return _this.exec("valid");
 }
 
 Variant Phar::next() {
-    return std::move(_this.exec("next"));
+    return _this.exec("next");
 }
 
 Variant Phar::seek(const Variant &offset) {
-    return std::move(_this.exec("seek", offset));
+    return _this.exec("seek", offset);
 }
 
 Variant Phar::__toString() {
-    return std::move(_this.exec("__toString"));
+    return _this.exec("__toString");
 }
 
 Variant Phar::getPathname() {
-    return std::move(_this.exec("getPathname"));
+    return _this.exec("getPathname");
 }
 
 Variant Phar::getPerms() {
-    return std::move(_this.exec("getPerms"));
+    return _this.exec("getPerms");
 }
 
 Variant Phar::getInode() {
-    return std::move(_this.exec("getInode"));
+    return _this.exec("getInode");
 }
 
 Variant Phar::getSize() {
-    return std::move(_this.exec("getSize"));
+    return _this.exec("getSize");
 }
 
 Variant Phar::getOwner() {
-    return std::move(_this.exec("getOwner"));
+    return _this.exec("getOwner");
 }
 
 Variant Phar::getGroup() {
-    return std::move(_this.exec("getGroup"));
+    return _this.exec("getGroup");
 }
 
 Variant Phar::getATime() {
-    return std::move(_this.exec("getATime"));
+    return _this.exec("getATime");
 }
 
 Variant Phar::getMTime() {
-    return std::move(_this.exec("getMTime"));
+    return _this.exec("getMTime");
 }
 
 Variant Phar::getCTime() {
-    return std::move(_this.exec("getCTime"));
+    return _this.exec("getCTime");
 }
 
 Variant Phar::getType() {
-    return std::move(_this.exec("getType"));
+    return _this.exec("getType");
 }
 
 Variant Phar::isReadable() {
-    return std::move(_this.exec("isReadable"));
+    return _this.exec("isReadable");
 }
 
 Variant Phar::isExecutable() {
-    return std::move(_this.exec("isExecutable"));
+    return _this.exec("isExecutable");
 }
 
 Variant Phar::isFile() {
-    return std::move(_this.exec("isFile"));
+    return _this.exec("isFile");
 }
 
 Variant Phar::isDir() {
-    return std::move(_this.exec("isDir"));
+    return _this.exec("isDir");
 }
 
 Variant Phar::isLink() {
-    return std::move(_this.exec("isLink"));
+    return _this.exec("isLink");
 }
 
 Variant Phar::getLinkTarget() {
-    return std::move(_this.exec("getLinkTarget"));
+    return _this.exec("getLinkTarget");
 }
 
 Variant Phar::getRealPath() {
-    return std::move(_this.exec("getRealPath"));
+    return _this.exec("getRealPath");
 }
 
 Variant Phar::getFileInfo(const Variant &_class) {
-    return std::move(_this.exec("getFileInfo", _class));
+    return _this.exec("getFileInfo", _class);
 }
 
 Variant Phar::getPathInfo(const Variant &_class) {
-    return std::move(_this.exec("getPathInfo", _class));
+    return _this.exec("getPathInfo", _class);
 }
 
 Variant Phar::openFile(const Variant &mode, const Variant &use_include_path, const Variant &context) {
-    return std::move(_this.exec("openFile", mode, use_include_path, context));
+    return _this.exec("openFile", mode, use_include_path, context);
 }
 
 Variant Phar::setFileClass(const Variant &_class) {
-    return std::move(_this.exec("setFileClass", _class));
+    return _this.exec("setFileClass", _class);
 }
 
 Variant Phar::setInfoClass(const Variant &_class) {
-    return std::move(_this.exec("setInfoClass", _class));
+    return _this.exec("setInfoClass", _class);
 }
 
 Variant Phar::__debugInfo() {
-    return std::move(_this.exec("__debugInfo"));
+    return _this.exec("__debugInfo");
 }
 
 Variant Phar::_bad_state_ex() {
-    return std::move(_this.exec("_bad_state_ex"));
+    return _this.exec("_bad_state_ex");
 }
 
 
@@ -448,159 +448,159 @@ PharData::PharData(const Variant &filename, const Variant &flags, const Variant 
 }
 
 Variant PharData::addEmptyDir(const Variant &directory) {
-    return std::move(_this.exec("addEmptyDir", directory));
+    return _this.exec("addEmptyDir", directory);
 }
 
 Variant PharData::addFile(const Variant &filename, const Variant &local_name) {
-    return std::move(_this.exec("addFile", filename, local_name));
+    return _this.exec("addFile", filename, local_name);
 }
 
 Variant PharData::addFromString(const Variant &local_name, const Variant &contents) {
-    return std::move(_this.exec("addFromString", local_name, contents));
+    return _this.exec("addFromString", local_name, contents);
 }
 
 Variant PharData::buildFromDirectory(const Variant &directory, const Variant &pattern) {
-    return std::move(_this.exec("buildFromDirectory", directory, pattern));
+    return _this.exec("buildFromDirectory", directory, pattern);
 }
 
 Variant PharData::buildFromIterator(const Variant &iterator, const Variant &base_directory) {
-    return std::move(_this.exec("buildFromIterator", iterator, base_directory));
+    return _this.exec("buildFromIterator", iterator, base_directory);
 }
 
 Variant PharData::compressFiles(const Variant &compression) {
-    return std::move(_this.exec("compressFiles", compression));
+    return _this.exec("compressFiles", compression);
 }
 
 Variant PharData::decompressFiles() {
-    return std::move(_this.exec("decompressFiles"));
+    return _this.exec("decompressFiles");
 }
 
 Variant PharData::compress(const Variant &compression, const Variant &extension) {
-    return std::move(_this.exec("compress", compression, extension));
+    return _this.exec("compress", compression, extension);
 }
 
 Variant PharData::decompress(const Variant &extension) {
-    return std::move(_this.exec("decompress", extension));
+    return _this.exec("decompress", extension);
 }
 
 Variant PharData::convertToExecutable(const Variant &format, const Variant &compression, const Variant &extension) {
-    return std::move(_this.exec("convertToExecutable", format, compression, extension));
+    return _this.exec("convertToExecutable", format, compression, extension);
 }
 
 Variant PharData::convertToData(const Variant &format, const Variant &compression, const Variant &extension) {
-    return std::move(_this.exec("convertToData", format, compression, extension));
+    return _this.exec("convertToData", format, compression, extension);
 }
 
 Variant PharData::copy(const Variant &from, const Variant &to) {
-    return std::move(_this.exec("copy", from, to));
+    return _this.exec("copy", from, to);
 }
 
 Variant PharData::count(const Variant &mode) {
-    return std::move(_this.exec("count", mode));
+    return _this.exec("count", mode);
 }
 
 Variant PharData::_delete(const Variant &local_name) {
-    return std::move(_this.exec("delete", local_name));
+    return _this.exec("delete", local_name);
 }
 
 Variant PharData::delMetadata() {
-    return std::move(_this.exec("delMetadata"));
+    return _this.exec("delMetadata");
 }
 
 Variant PharData::extractTo(const Variant &directory, const Variant &files, const Variant &overwrite) {
-    return std::move(_this.exec("extractTo", directory, files, overwrite));
+    return _this.exec("extractTo", directory, files, overwrite);
 }
 
 Variant PharData::getAlias() {
-    return std::move(_this.exec("getAlias"));
+    return _this.exec("getAlias");
 }
 
 Variant PharData::getPath() {
-    return std::move(_this.exec("getPath"));
+    return _this.exec("getPath");
 }
 
 Variant PharData::getMetadata(const Array &unserialize_options) {
-    return std::move(_this.exec("getMetadata", unserialize_options));
+    return _this.exec("getMetadata", unserialize_options);
 }
 
 Variant PharData::getModified() {
-    return std::move(_this.exec("getModified"));
+    return _this.exec("getModified");
 }
 
 Variant PharData::getSignature() {
-    return std::move(_this.exec("getSignature"));
+    return _this.exec("getSignature");
 }
 
 Variant PharData::getStub() {
-    return std::move(_this.exec("getStub"));
+    return _this.exec("getStub");
 }
 
 Variant PharData::getVersion() {
-    return std::move(_this.exec("getVersion"));
+    return _this.exec("getVersion");
 }
 
 Variant PharData::hasMetadata() {
-    return std::move(_this.exec("hasMetadata"));
+    return _this.exec("hasMetadata");
 }
 
 Variant PharData::isBuffering() {
-    return std::move(_this.exec("isBuffering"));
+    return _this.exec("isBuffering");
 }
 
 Variant PharData::isCompressed() {
-    return std::move(_this.exec("isCompressed"));
+    return _this.exec("isCompressed");
 }
 
 Variant PharData::isFileFormat(const Variant &format) {
-    return std::move(_this.exec("isFileFormat", format));
+    return _this.exec("isFileFormat", format);
 }
 
 Variant PharData::isWritable() {
-    return std::move(_this.exec("isWritable"));
+    return _this.exec("isWritable");
 }
 
 Variant PharData::offsetExists(const Variant &local_name) {
-    return std::move(_this.exec("offsetExists", local_name));
+    return _this.exec("offsetExists", local_name);
 }
 
 Variant PharData::offsetGet(const Variant &local_name) {
-    return std::move(_this.exec("offsetGet", local_name));
+    return _this.exec("offsetGet", local_name);
 }
 
 Variant PharData::offsetSet(const Variant &local_name, const Variant &value) {
-    return std::move(_this.exec("offsetSet", local_name, value));
+    return _this.exec("offsetSet", local_name, value);
 }
 
 Variant PharData::offsetUnset(const Variant &local_name) {
-    return std::move(_this.exec("offsetUnset", local_name));
+    return _this.exec("offsetUnset", local_name);
 }
 
 Variant PharData::setAlias(const Variant &alias) {
-    return std::move(_this.exec("setAlias", alias));
+    return _this.exec("setAlias", alias);
 }
 
 Variant PharData::setDefaultStub(const Variant &index, const Variant &web_index) {
-    return std::move(_this.exec("setDefaultStub", index, web_index));
+    return _this.exec("setDefaultStub", index, web_index);
 }
 
 Variant PharData::setMetadata(const Variant &metadata) {
-    return std::move(_this.exec("setMetadata", metadata));
+    return _this.exec("setMetadata", metadata);
 }
 
 Variant PharData::setSignatureAlgorithm(const Variant &algo, const Variant &private_key) {
-    return std::move(_this.exec("setSignatureAlgorithm", algo, private_key));
+    return _this.exec("setSignatureAlgorithm", algo, private_key);
 }
 
 Variant PharData::setStub(const Variant &stub, const Variant &length) {
-    return std::move(_this.exec("setStub", stub, length));
+    return _this.exec("setStub", stub, length);
 }
 
 Variant PharData::startBuffering() {
-    return std::move(_this.exec("startBuffering"));
+    return _this.exec("startBuffering");
 }
 
 Variant PharData::stopBuffering() {
-    return std::move(_this.exec("stopBuffering"));
+    return _this.exec("stopBuffering");
 }
 
 Variant PharData::apiVersion() {
@@ -679,167 +679,167 @@ Variant PharData::webPhar(const Variant &alias, const Variant &index, const Vari
 }
 
 Variant PharData::hasChildren(const Variant &allow_links) {
-    return std::move(_this.exec("hasChildren", allow_links));
+    return _this.exec("hasChildren", allow_links);
 }
 
 Variant PharData::getChildren() {
-    return std::move(_this.exec("getChildren"));
+    return _this.exec("getChildren");
 }
 
 Variant PharData::getSubPath() {
-    return std::move(_this.exec("getSubPath"));
+    return _this.exec("getSubPath");
 }
 
 Variant PharData::getSubPathname() {
-    return std::move(_this.exec("getSubPathname"));
+    return _this.exec("getSubPathname");
 }
 
 Variant PharData::rewind() {
-    return std::move(_this.exec("rewind"));
+    return _this.exec("rewind");
 }
 
 Variant PharData::key() {
-    return std::move(_this.exec("key"));
+    return _this.exec("key");
 }
 
 Variant PharData::current() {
-    return std::move(_this.exec("current"));
+    return _this.exec("current");
 }
 
 Variant PharData::getFlags() {
-    return std::move(_this.exec("getFlags"));
+    return _this.exec("getFlags");
 }
 
 Variant PharData::setFlags(const Variant &flags) {
-    return std::move(_this.exec("setFlags", flags));
+    return _this.exec("setFlags", flags);
 }
 
 Variant PharData::getFilename() {
-    return std::move(_this.exec("getFilename"));
+    return _this.exec("getFilename");
 }
 
 Variant PharData::getExtension() {
-    return std::move(_this.exec("getExtension"));
+    return _this.exec("getExtension");
 }
 
 Variant PharData::getBasename(const Variant &suffix) {
-    return std::move(_this.exec("getBasename", suffix));
+    return _this.exec("getBasename", suffix);
 }
 
 Variant PharData::isDot() {
-    return std::move(_this.exec("isDot"));
+    return _this.exec("isDot");
 }
 
 Variant PharData::valid() {
-    return std::move(_this.exec("valid"));
+    return _this.exec("valid");
 }
 
 Variant PharData::next() {
-    return std::move(_this.exec("next"));
+    return _this.exec("next");
 }
 
 Variant PharData::seek(const Variant &offset) {
-    return std::move(_this.exec("seek", offset));
+    return _this.exec("seek", offset);
 }
 
 Variant PharData::__toString() {
-    return std::move(_this.exec("__toString"));
+    return _this.exec("__toString");
 }
 
 Variant PharData::getPathname() {
-    return std::move(_this.exec("getPathname"));
+    return _this.exec("getPathname");
 }
 
 Variant PharData::getPerms() {
-    return std::move(_this.exec("getPerms"));
+    return _this.exec("getPerms");
 }
 
 Variant PharData::getInode() {
-    return std::move(_this.exec("getInode"));
+    return _this.exec("getInode");
 }
 
 Variant PharData::getSize() {
-    return std::move(_this.exec("getSize"));
+    return _this.exec("getSize");
 }
 
 Variant PharData::getOwner() {
-    return std::move(_this.exec("getOwner"));
+    return _this.exec("getOwner");
 }
 
 Variant PharData::getGroup() {
-    return std::move(_this.exec("getGroup"));
+    return _this.exec("getGroup");
 }
 
 Variant PharData::getATime() {
-    return std::move(_this.exec("getATime"));
+    return _this.exec("getATime");
 }
 
 Variant PharData::getMTime() {
-    return std::move(_this.exec("getMTime"));
+    return _this.exec("getMTime");
 }
 
 Variant PharData::getCTime() {
-    return std::move(_this.exec("getCTime"));
+    return _this.exec("getCTime");
 }
 
 Variant PharData::getType() {
-    return std::move(_this.exec("getType"));
+    return _this.exec("getType");
 }
 
 Variant PharData::isReadable() {
-    return std::move(_this.exec("isReadable"));
+    return _this.exec("isReadable");
 }
 
 Variant PharData::isExecutable() {
-    return std::move(_this.exec("isExecutable"));
+    return _this.exec("isExecutable");
 }
 
 Variant PharData::isFile() {
-    return std::move(_this.exec("isFile"));
+    return _this.exec("isFile");
 }
 
 Variant PharData::isDir() {
-    return std::move(_this.exec("isDir"));
+    return _this.exec("isDir");
 }
 
 Variant PharData::isLink() {
-    return std::move(_this.exec("isLink"));
+    return _this.exec("isLink");
 }
 
 Variant PharData::getLinkTarget() {
-    return std::move(_this.exec("getLinkTarget"));
+    return _this.exec("getLinkTarget");
 }
 
 Variant PharData::getRealPath() {
-    return std::move(_this.exec("getRealPath"));
+    return _this.exec("getRealPath");
 }
 
 Variant PharData::getFileInfo(const Variant &_class) {
-    return std::move(_this.exec("getFileInfo", _class));
+    return _this.exec("getFileInfo", _class);
 }
 
 Variant PharData::getPathInfo(const Variant &_class) {
-    return std::move(_this.exec("getPathInfo", _class));
+    return _this.exec("getPathInfo", _class);
 }
 
 Variant PharData::openFile(const Variant &mode, const Variant &use_include_path, const Variant &context) {
-    return std::move(_this.exec("openFile", mode, use_include_path, context));
+    return _this.exec("openFile", mode, use_include_path, context);
 }
 
 Variant PharData::setFileClass(const Variant &_class) {
-    return std::move(_this.exec("setFileClass", _class));
+    return _this.exec("setFileClass", _class);
 }
 
 Variant PharData::setInfoClass(const Variant &_class) {
-    return std::move(_this.exec("setInfoClass", _class));
+    return _this.exec("setInfoClass", _class);
 }
 
 Variant PharData::__debugInfo() {
-    return std::move(_this.exec("__debugInfo"));
+    return _this.exec("__debugInfo");
 }
 
 Variant PharData::_bad_state_ex() {
-    return std::move(_this.exec("_bad_state_ex"));
+    return _this.exec("_bad_state_ex");
 }
 
 
@@ -848,175 +848,175 @@ PharFileInfo::PharFileInfo(const Variant &filename) {
 }
 
 Variant PharFileInfo::chmod(const Variant &perms) {
-    return std::move(_this.exec("chmod", perms));
+    return _this.exec("chmod", perms);
 }
 
 Variant PharFileInfo::compress(const Variant &compression) {
-    return std::move(_this.exec("compress", compression));
+    return _this.exec("compress", compression);
 }
 
 Variant PharFileInfo::decompress() {
-    return std::move(_this.exec("decompress"));
+    return _this.exec("decompress");
 }
 
 Variant PharFileInfo::delMetadata() {
-    return std::move(_this.exec("delMetadata"));
+    return _this.exec("delMetadata");
 }
 
 Variant PharFileInfo::getCompressedSize() {
-    return std::move(_this.exec("getCompressedSize"));
+    return _this.exec("getCompressedSize");
 }
 
 Variant PharFileInfo::getCRC32() {
-    return std::move(_this.exec("getCRC32"));
+    return _this.exec("getCRC32");
 }
 
 Variant PharFileInfo::getContent() {
-    return std::move(_this.exec("getContent"));
+    return _this.exec("getContent");
 }
 
 Variant PharFileInfo::getMetadata(const Array &unserialize_options) {
-    return std::move(_this.exec("getMetadata", unserialize_options));
+    return _this.exec("getMetadata", unserialize_options);
 }
 
 Variant PharFileInfo::getPharFlags() {
-    return std::move(_this.exec("getPharFlags"));
+    return _this.exec("getPharFlags");
 }
 
 Variant PharFileInfo::hasMetadata() {
-    return std::move(_this.exec("hasMetadata"));
+    return _this.exec("hasMetadata");
 }
 
 Variant PharFileInfo::isCompressed(const Variant &compression) {
-    return std::move(_this.exec("isCompressed", compression));
+    return _this.exec("isCompressed", compression);
 }
 
 Variant PharFileInfo::isCRCChecked() {
-    return std::move(_this.exec("isCRCChecked"));
+    return _this.exec("isCRCChecked");
 }
 
 Variant PharFileInfo::setMetadata(const Variant &metadata) {
-    return std::move(_this.exec("setMetadata", metadata));
+    return _this.exec("setMetadata", metadata);
 }
 
 Variant PharFileInfo::getPath() {
-    return std::move(_this.exec("getPath"));
+    return _this.exec("getPath");
 }
 
 Variant PharFileInfo::getFilename() {
-    return std::move(_this.exec("getFilename"));
+    return _this.exec("getFilename");
 }
 
 Variant PharFileInfo::getExtension() {
-    return std::move(_this.exec("getExtension"));
+    return _this.exec("getExtension");
 }
 
 Variant PharFileInfo::getBasename(const Variant &suffix) {
-    return std::move(_this.exec("getBasename", suffix));
+    return _this.exec("getBasename", suffix);
 }
 
 Variant PharFileInfo::getPathname() {
-    return std::move(_this.exec("getPathname"));
+    return _this.exec("getPathname");
 }
 
 Variant PharFileInfo::getPerms() {
-    return std::move(_this.exec("getPerms"));
+    return _this.exec("getPerms");
 }
 
 Variant PharFileInfo::getInode() {
-    return std::move(_this.exec("getInode"));
+    return _this.exec("getInode");
 }
 
 Variant PharFileInfo::getSize() {
-    return std::move(_this.exec("getSize"));
+    return _this.exec("getSize");
 }
 
 Variant PharFileInfo::getOwner() {
-    return std::move(_this.exec("getOwner"));
+    return _this.exec("getOwner");
 }
 
 Variant PharFileInfo::getGroup() {
-    return std::move(_this.exec("getGroup"));
+    return _this.exec("getGroup");
 }
 
 Variant PharFileInfo::getATime() {
-    return std::move(_this.exec("getATime"));
+    return _this.exec("getATime");
 }
 
 Variant PharFileInfo::getMTime() {
-    return std::move(_this.exec("getMTime"));
+    return _this.exec("getMTime");
 }
 
 Variant PharFileInfo::getCTime() {
-    return std::move(_this.exec("getCTime"));
+    return _this.exec("getCTime");
 }
 
 Variant PharFileInfo::getType() {
-    return std::move(_this.exec("getType"));
+    return _this.exec("getType");
 }
 
 Variant PharFileInfo::isWritable() {
-    return std::move(_this.exec("isWritable"));
+    return _this.exec("isWritable");
 }
 
 Variant PharFileInfo::isReadable() {
-    return std::move(_this.exec("isReadable"));
+    return _this.exec("isReadable");
 }
 
 Variant PharFileInfo::isExecutable() {
-    return std::move(_this.exec("isExecutable"));
+    return _this.exec("isExecutable");
 }
 
 Variant PharFileInfo::isFile() {
-    return std::move(_this.exec("isFile"));
+    return _this.exec("isFile");
 }
 
 Variant PharFileInfo::isDir() {
-    return std::move(_this.exec("isDir"));
+    return _this.exec("isDir");
 }
 
 Variant PharFileInfo::isLink() {
-    return std::move(_this.exec("isLink"));
+    return _this.exec("isLink");
 }
 
 Variant PharFileInfo::getLinkTarget() {
-    return std::move(_this.exec("getLinkTarget"));
+    return _this.exec("getLinkTarget");
 }
 
 Variant PharFileInfo::getRealPath() {
-    return std::move(_this.exec("getRealPath"));
+    return _this.exec("getRealPath");
 }
 
 Variant PharFileInfo::getFileInfo(const Variant &_class) {
-    return std::move(_this.exec("getFileInfo", _class));
+    return _this.exec("getFileInfo", _class);
 }
 
 Variant PharFileInfo::getPathInfo(const Variant &_class) {
-    return std::move(_this.exec("getPathInfo", _class));
+    return _this.exec("getPathInfo", _class);
 }
 
 Variant PharFileInfo::openFile(const Variant &mode, const Variant &use_include_path, const Variant &context) {
-    return std::move(_this.exec("openFile", mode, use_include_path, context));
+    return _this.exec("openFile", mode, use_include_path, context);
 }
 
 Variant PharFileInfo::setFileClass(const Variant &_class) {
-    return std::move(_this.exec("setFileClass", _class));
+    return _this.exec("setFileClass", _class);
 }
 
 Variant PharFileInfo::setInfoClass(const Variant &_class) {
-    return std::move(_this.exec("setInfoClass", _class));
+    return _this.exec("setInfoClass", _class);
 }
 
 Variant PharFileInfo::__toString() {
-    return std::move(_this.exec("__toString"));
+    return _this.exec("__toString");
 }
 
 Variant PharFileInfo::__debugInfo() {
-    return std::move(_this.exec("__debugInfo"));
+    return _this.exec("__debugInfo");
 }
 
 Variant PharFileInfo::_bad_state_ex() {
-    return std::move(_this.exec("_bad_state_ex"));
+    return _this.exec("_bad_state_ex");
 }
 
 

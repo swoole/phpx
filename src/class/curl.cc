@@ -7,23 +7,23 @@ CURLFile::CURLFile(const Variant &filename, const Variant &mime_type, const Vari
 }
 
 Variant CURLFile::getFilename() {
-    return std::move(_this.exec("getFilename"));
+    return _this.exec("getFilename");
 }
 
 Variant CURLFile::getMimeType() {
-    return std::move(_this.exec("getMimeType"));
+    return _this.exec("getMimeType");
 }
 
 Variant CURLFile::getPostFilename() {
-    return std::move(_this.exec("getPostFilename"));
+    return _this.exec("getPostFilename");
 }
 
 Variant CURLFile::setMimeType(const Variant &mime_type) {
-    return std::move(_this.exec("setMimeType", mime_type));
+    return _this.exec("setMimeType", mime_type);
 }
 
 Variant CURLFile::setPostFilename(const Variant &posted_filename) {
-    return std::move(_this.exec("setPostFilename", posted_filename));
+    return _this.exec("setPostFilename", posted_filename);
 }
 
 

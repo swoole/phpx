@@ -12,19 +12,19 @@ PhpToken::PhpToken(const Variant &id, const Variant &text, const Variant &line, 
 }
 
 Variant PhpToken::is(const Variant &kind) {
-    return std::move(_this.exec("is", kind));
+    return _this.exec("is", kind);
 }
 
 Variant PhpToken::isIgnorable() {
-    return std::move(_this.exec("isIgnorable"));
+    return _this.exec("isIgnorable");
 }
 
 Variant PhpToken::getTokenName() {
-    return std::move(_this.exec("getTokenName"));
+    return _this.exec("getTokenName");
 }
 
 Variant PhpToken::__toString() {
-    return std::move(_this.exec("__toString"));
+    return _this.exec("__toString");
 }
 
 
