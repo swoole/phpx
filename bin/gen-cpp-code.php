@@ -5,11 +5,13 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 use Phpx\Generator;
 
 $extensions = [
+    'bcmath',
     'Core',
     'ctype',
     'curl',
     'date',
     'dom',
+    'exif',
     'fileinfo',
     'filter',
     'gd',
@@ -20,6 +22,7 @@ $extensions = [
     'mbstring',
     'mysqlnd',
     'openssl',
+    'pcntl',
     'pcre',
     'PDO',
     'pdo_mysql',

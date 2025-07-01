@@ -18,6 +18,20 @@
 
 #include "phpx.h"
 
+/** extension bcmath */
+namespace php {
+extern Variant bcadd;
+extern Variant bcsub;
+extern Variant bcmul;
+extern Variant bcdiv;
+extern Variant bcmod;
+extern Variant bcpowmod;
+extern Variant bcpow;
+extern Variant bcsqrt;
+extern Variant bccomp;
+extern Variant bcscale;
+}
+
 /** extension Core */
 namespace php {
 extern Variant zend_version;
@@ -186,6 +200,14 @@ extern Variant date_sun_info;
 /** extension dom */
 namespace php {
 extern Variant dom_import_simplexml;
+}
+
+/** extension exif */
+namespace php {
+extern Variant exif_tagname;
+extern Variant exif_read_data;
+extern Variant exif_thumbnail;
+extern Variant exif_imagetype;
 }
 
 /** extension fileinfo */
@@ -492,6 +514,35 @@ extern Variant openssl_spki_verify;
 extern Variant openssl_spki_export;
 extern Variant openssl_spki_export_challenge;
 extern Variant openssl_get_cert_locations;
+}
+
+/** extension pcntl */
+namespace php {
+extern Variant pcntl_fork;
+extern Variant pcntl_waitpid;
+extern Variant pcntl_wait;
+extern Variant pcntl_signal;
+extern Variant pcntl_signal_get_handler;
+extern Variant pcntl_signal_dispatch;
+extern Variant pcntl_sigprocmask;
+extern Variant pcntl_sigwaitinfo;
+extern Variant pcntl_sigtimedwait;
+extern Variant pcntl_wifexited;
+extern Variant pcntl_wifstopped;
+extern Variant pcntl_wifcontinued;
+extern Variant pcntl_wifsignaled;
+extern Variant pcntl_wexitstatus;
+extern Variant pcntl_wtermsig;
+extern Variant pcntl_wstopsig;
+extern Variant pcntl_exec;
+extern Variant pcntl_alarm;
+extern Variant pcntl_get_last_error;
+extern Variant pcntl_errno;
+extern Variant pcntl_getpriority;
+extern Variant pcntl_setpriority;
+extern Variant pcntl_strerror;
+extern Variant pcntl_async_signals;
+extern Variant pcntl_unshare;
 }
 
 /** extension pcre */
