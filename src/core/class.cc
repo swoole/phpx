@@ -143,18 +143,15 @@ bool Class::activate() {
     /**
      * register constant
      */
-    for (auto & constant : constants) {
+    for (auto &constant : constants) {
         if (Z_TYPE(constant.value) == IS_STRING) {
-            zend_declare_class_constant_stringl(ce,
-                                                constant.name.c_str(),
-                                                constant.name.length(),
-                                                Z_STRVAL(constant.value),
-                                                Z_STRLEN(constant.value));
+            zend_declare_class_constant_stringl(
+                ce, constant.name.c_str(), constant.name.length(), Z_STRVAL(constant.value), Z_STRLEN(constant.value));
         } else {
             zend_declare_class_constant(ce, constant.name.c_str(), constant.name.length(), &constant.value);
         }
     }
-    for (const auto& alias : aliases) {
+    for (const auto &alias : aliases) {
         if (zend_register_class_alias_ex(alias.c_str(), alias.length(), ce, true) < 0) {
             return false;
         }

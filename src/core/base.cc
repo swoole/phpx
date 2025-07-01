@@ -278,6 +278,10 @@ void _exec_function(zend_execute_data *data, zval *return_value) {
     }
     Variant _retval(return_value);
     func->impl(args, _retval);
+    // An increment in the reference count is necessary;
+    // otherwise, the _retval object will be released upon destruction.
+    // The return_value will be passed back to ZendVM with a reference count of one.
+    _retval.addRef();
 }
 
 void _exec_method(zend_execute_data *data, zval *return_value) {
@@ -310,6 +314,7 @@ void _exec_method(zend_execute_data *data, zval *return_value) {
     }
     Variant _retval(return_value);
     me->impl(_this, args, _retval);
+    _retval.addRef();
 }
 
 zend_result _call_user_function_impl(const zval *object,

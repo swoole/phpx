@@ -53,7 +53,7 @@ PHPX_METHOD(MyClass, test) {
 PHPX_METHOD(MyClass, pget) {
     String *str = _this.oGet<String>("resource", "ResourceString");
     cout << "[GET] ResourceString: " << str->length() << endl;
-    retval = Variant("hello xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+    retval = "hello xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 }
 
 PHPX_METHOD(MyClass, pset) {
