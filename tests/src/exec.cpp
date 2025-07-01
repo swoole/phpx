@@ -36,6 +36,24 @@ TEST(exec, redis) {
     ASSERT_STREQ(val2.toCString(), val);
 }
 
+TEST(exec, curl) {
+    auto ch = curl_init();
+    auto url = "https://www.gov.cn/";
+    Array headerArray = {{"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like "
+                          "Gecko) Chrome/58.0.3029.110 Safari/537.3"},
+                         {"Accept-Language: zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3"}};
+    curl_setopt(ch, constant("CURLOPT_URL"), url);
+    curl_setopt(ch, constant("CURLOPT_SSL_VERIFYPEER"), false);
+    curl_setopt(ch, constant("CURLOPT_SSL_VERIFYHOST"), false);
+    curl_setopt(ch, constant("CURLOPT_RETURNTRANSFER"), 1);
+    curl_setopt(ch, constant("CURLOPT_HTTPHEADER"), headerArray);
+    auto output = curl_exec(ch);
+    curl_close(ch);
+
+    ASSERT_FALSE(output.isEmpty());
+    ASSERT_TRUE(str_contains(output, "中国").toBool());
+}
+
 TEST(exec, array_push) {
     Array arr;
     auto ref = arr.toReference();

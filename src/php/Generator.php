@@ -179,6 +179,21 @@ class Generator
     {
         $ext = strtolower($this->extension);
 
+        $constants = $this->getConstants();
+        if (!empty($constants)) {
+            self::render(
+                __DIR__ . '/templates/const-impl.tpl',
+                self::$rootDir . '/src/const/' . $ext . '.cc',
+                compact('constants')
+            );
+
+            self::render(
+                __DIR__ . '/templates/const-declare.tpl',
+                self::$rootDir . '/include/const/' . $ext . '.h',
+                compact('constants')
+            );
+        }
+
         $functions = $this->getFunctions();
         if (!empty($functions)) {
             self::render(
@@ -322,5 +337,16 @@ class Generator
             ];
         }
         return $classes;
+    }
+
+    protected function getConstants(): array
+    {
+        $constants = [];
+        if ($this->rf_ext->getConstants()) {
+            foreach ($this->rf_ext->getConstants() as $name => $value) {
+                $constants[$name] = self::valueToCppRepr($value);
+            }
+        }
+        return $constants;
     }
 }

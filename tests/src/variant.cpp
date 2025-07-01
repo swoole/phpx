@@ -76,3 +76,49 @@ TEST(variant, json) {
     ASSERT_TRUE(v3.isArray());
     ASSERT_TRUE(v3.equals(arr1));
 }
+
+TEST(variant, object) {
+    auto array = create_map();
+    auto object = newObject("ArrayObject", {array, constant("ArrayObject::ARRAY_AS_PROPS")});
+    ASSERT_TRUE(object.isObject());
+    ASSERT_EQ(object.get("php").toInt(), 3);
+
+    auto o2 = newObject("class_not_exists");
+    ASSERT_FALSE(o2.isUndef());
+}
+
+TEST(variant, callable) {
+    Variant v1{"phpinfo"};
+    ASSERT_TRUE(v1.isCallable());
+
+    Variant v2{"fn_not_exists"};
+    ASSERT_FALSE(v2.isCallable());
+}
+
+TEST(variant, empty) {
+    ASSERT_TRUE(null.isEmpty());
+    Variant v;
+    v = false;
+    ASSERT_TRUE(v.isEmpty());
+    v = true;
+    ASSERT_FALSE(v.isEmpty());
+    v = "";
+    ASSERT_TRUE(v.isEmpty());
+    v = "hello";
+    ASSERT_FALSE(v.isEmpty());
+    v = 0;
+    ASSERT_TRUE(v.isEmpty());
+    v = 9999;
+    ASSERT_FALSE(v.isEmpty());
+
+    v = 0.0;
+    ASSERT_TRUE(v.isEmpty());
+    v = 1.1;
+    ASSERT_FALSE(v.isEmpty());
+
+    Array arr;
+    ASSERT_TRUE(arr.isEmpty());
+
+    arr.append("hello");
+    ASSERT_FALSE(arr.isEmpty());
+}

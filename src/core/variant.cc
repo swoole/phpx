@@ -36,7 +36,7 @@ bool Variant::isEmpty() {
     case IS_ARRAY:
         return Z_ARRVAL_P(const_ptr())->nNumOfElements == 0;
     default:
-        return true;
+        return false;
     }
 }
 
