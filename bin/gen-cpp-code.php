@@ -77,18 +77,33 @@ fwrite($funcHeaderFile, $header);
 $classHeaderFile = fopen($rootDir . '/include/phpx_class.h', "w");
 fwrite($classHeaderFile, $header);
 
+$constHeaderFile = fopen($rootDir . '/include/phpx_const.h', "w");
+fwrite($constHeaderFile, $header);
+
+shell_exec('rm -rf ' . $rootDir . '/include/class/*');
+shell_exec('rm -rf ' . $rootDir . '/include/const/*');
+shell_exec('rm -rf ' . $rootDir . '/include/func/*');
+
+shell_exec('rm -rf ' . $rootDir . '/src/class/*');
+shell_exec('rm -rf ' . $rootDir . '/src/const/*');
+shell_exec('rm -rf ' . $rootDir . '/src/func/*');
+
 foreach ($extensions as $extension) {
     Generator::make($extension);
     $name = strtolower($extension);
     $funcDeclarationFile = $rootDir . "/include/func/{$name}.h";
     if (is_file($funcDeclarationFile)) {
-        fwrite($funcHeaderFile, "\n/** extension $extension */\n" . file_get_contents($funcDeclarationFile));
-        unlink($funcDeclarationFile);
+        fwrite($classHeaderFile, "#include \"func/{$name}.h\"\n");
     }
 
     $classDeclarationFile = $rootDir . "/include/class/{$name}.h";
     if (is_file($classDeclarationFile)) {
         fwrite($classHeaderFile, "#include \"class/{$name}.h\"\n");
+    }
+
+    $constDeclarationFile = $rootDir . "/include/const/{$name}.h";
+    if (is_file($constDeclarationFile)) {
+        fwrite($constHeaderFile, "#include \"const/{$name}.h\"\n");
     }
 
     echo "Generate C++ facade code for ext-{$extension} successfully.\n";

@@ -1,0 +1,15 @@
+#include "phpx.h"
+
+namespace php {
+Variant FILEINFO_NONE { 0 };
+Variant FILEINFO_SYMLINK { 2 };
+Variant FILEINFO_MIME { 1040 };
+Variant FILEINFO_MIME_TYPE { 16 };
+Variant FILEINFO_MIME_ENCODING { 1024 };
+Variant FILEINFO_DEVICES { 8 };
+Variant FILEINFO_CONTINUE { 32 };
+Variant FILEINFO_PRESERVE_ATIME { 128 };
+Variant FILEINFO_RAW { 256 };
+Variant FILEINFO_APPLE { 2048 };
+Variant FILEINFO_EXTENSION { 16777216 };
+}

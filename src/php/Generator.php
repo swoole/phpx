@@ -344,7 +344,23 @@ class Generator
         $constants = [];
         if ($this->rf_ext->getConstants()) {
             foreach ($this->rf_ext->getConstants() as $name => $value) {
-                $constants[$name] = self::valueToCppRepr($value);
+                if (is_array($value) or is_object($value) or is_resource($value)) {
+                    continue;
+                }
+                $ext = strtolower($this->extension);
+                if ($ext === 'pcntl' or $ext === 'standard' or $ext === 'core' or $ext === 'random') {
+                    continue;
+                }
+                if ($ext === 'sockets' and !str_starts_with($name, 'SOCKET_')) {
+                    continue;
+                }
+                self::nameSafety($name);
+                $repr = self::valueToCppRepr($value);
+                if (is_string($value)) {
+                    $constants[$name] = "ZEND_STRL(" . $repr . "), true";
+                } else {
+                    $constants[$name] = $repr;
+                }
             }
         }
         return $constants;

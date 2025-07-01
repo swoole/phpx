@@ -1,0 +1,19 @@
+namespace php {
+extern Variant DATE_ATOM;
+extern Variant DATE_COOKIE;
+extern Variant DATE_ISO8601;
+extern Variant DATE_ISO8601_EXPANDED;
+extern Variant DATE_RFC822;
+extern Variant DATE_RFC850;
+extern Variant DATE_RFC1036;
+extern Variant DATE_RFC1123;
+extern Variant DATE_RFC7231;
+extern Variant DATE_RFC2822;
+extern Variant DATE_RFC3339;
+extern Variant DATE_RFC3339_EXTENDED;
+extern Variant DATE_RSS;
+extern Variant DATE_W3C;
+extern Variant SUNFUNCS_RET_TIMESTAMP;
+extern Variant SUNFUNCS_RET_STRING;
+extern Variant SUNFUNCS_RET_DOUBLE;
+}

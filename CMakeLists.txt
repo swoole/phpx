@@ -86,7 +86,7 @@ if (APPLE)
 endif ()
 
 # library
-file(GLOB_RECURSE SRC_FILES src/core/*.cc src/func/*.cc src/class/*.cc)
+file(GLOB_RECURSE SRC_FILES src/core/*.cc src/func/*.cc src/class/*.cc src/const/*.cc)
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 add_library(phpx SHARED ${SRC_FILES})
 set_target_properties(phpx PROPERTIES CLEAN_DIRECT_OUTPUT 1)

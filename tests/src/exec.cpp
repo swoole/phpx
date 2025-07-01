@@ -1,6 +1,7 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
 #include "phpx_class.h"
+#include "const/curl.h"
 
 using namespace php;
 
@@ -42,11 +43,11 @@ TEST(exec, curl) {
     Array headerArray = {{"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like "
                           "Gecko) Chrome/58.0.3029.110 Safari/537.3"},
                          {"Accept-Language: zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3"}};
-    curl_setopt(ch, constant("CURLOPT_URL"), url);
-    curl_setopt(ch, constant("CURLOPT_SSL_VERIFYPEER"), false);
-    curl_setopt(ch, constant("CURLOPT_SSL_VERIFYHOST"), false);
-    curl_setopt(ch, constant("CURLOPT_RETURNTRANSFER"), 1);
-    curl_setopt(ch, constant("CURLOPT_HTTPHEADER"), headerArray);
+    curl_setopt(ch, CURLOPT_URL, url);
+    curl_setopt(ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt(ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt(ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt(ch, CURLOPT_HTTPHEADER, headerArray);
     auto output = curl_exec(ch);
     curl_close(ch);
 
