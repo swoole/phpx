@@ -16,10 +16,6 @@
 
 #include "phpx.h"
 
-extern "C" {
-#include <ext/hash/php_hash.h>
-}
-
 namespace php {
 <?php for ($i = 1; $i <= $maxArgc; $i++): ?>
 Variant Variant::operator()(<?=self::makeArgs($i)?>) const {
@@ -29,7 +25,8 @@ Variant Variant::operator()(<?=self::makeArgs($i)?>) const {
 <?php endfor; ?>
     return _call(nullptr, const_ptr(), args);
 }
-
+<?php endfor; ?>
+<?php for ($i = 1; $i <= $maxArgc; $i++): ?>
 Object newObject(const char *name, <?=self::makeArgs($i)?>) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
@@ -47,14 +44,14 @@ Object newObject(const char *name, <?=self::makeArgs($i)?>) {
     object.call("__construct", args);
     return object;
 }
-
-Variant Object::exec(const char *func, <?=self::makeArgs($i)?>) {
-    Variant _func(func);
+<?php endfor; ?>
+<?php for ($i = 1; $i <= $maxArgc; $i++): ?>
+Variant Object::exec(const Variant &fn, <?=self::makeArgs($i)?>) {
     Args args;
 <?php for ($j = 1; $j <= $i; $j++) :?>
     args.append(v<?=$j?>);
 <?php endfor; ?>
-    return _call(ptr(), _func.const_ptr(), args);
+    return _call(ptr(), fn.const_ptr(), args);
 }
 <?php endfor; ?>
 }

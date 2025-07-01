@@ -386,6 +386,9 @@ class Variant {
     bool isNull() const {
         return Z_TYPE_P(const_ptr()) == IS_NULL;
     }
+    bool isUndef() const {
+        return Z_TYPE_P(const_ptr()) == IS_UNDEF;
+    }
     bool isResource() const {
         return Z_TYPE_P(const_ptr()) == IS_RESOURCE;
     }
@@ -456,6 +459,10 @@ class Variant {
         zval zv;
         ZVAL_COPY_VALUE(&zv, Z_REFVAL_P(ptr()));
         return {&zv};
+    }
+    void moveTo(zval *dest) {
+        ZVAL_COPY_VALUE(dest, &val);
+        val = {};
     }
     bool operator==(Variant &v) {
         return equals(v);
@@ -915,18 +922,13 @@ static Variant global(const char *name) {
 
 class Object : public Variant {
   public:
-    Object(const Variant &v) : Variant(v) {
-        if (!v.isObject()) {
+    Object(const zval *v) : Variant(v) {
+        if (!isUndef() && !isObject()) {
             error(E_ERROR, "parameter 1 must be object.");
             return;
         }
     }
-    Object(zval *v) : Variant(v) {
-        if (Z_TYPE_P(v) != IS_OBJECT) {
-            error(E_ERROR, "parameter 1 must be object.");
-            return;
-        }
-    }
+    Object(const Variant &v) : Object(v.const_ptr()) {}
     Object() = default;
     Variant call(Variant &func, Args &args) {
         return _call(ptr(), func.ptr(), args);
@@ -972,24 +974,24 @@ class Object : public Variant {
     }
 
     /* generator */
-    Variant exec(const char *func, const Variant &v1);
-    Variant exec(const char *func, const Variant &v1, const Variant &v2);
-    Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3);
-    Variant exec(const char *func, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4);
-    Variant exec(const char *func,
+    Variant exec(const Variant &fn, const Variant &v1);
+    Variant exec(const Variant &fn, const Variant &v1, const Variant &v2);
+    Variant exec(const Variant &fn, const Variant &v1, const Variant &v2, const Variant &v3);
+    Variant exec(const Variant &fn, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4);
+    Variant exec(const Variant &fn,
                  const Variant &v1,
                  const Variant &v2,
                  const Variant &v3,
                  const Variant &v4,
                  const Variant &v5);
-    Variant exec(const char *func,
+    Variant exec(const Variant &fn,
                  const Variant &v1,
                  const Variant &v2,
                  const Variant &v3,
                  const Variant &v4,
                  const Variant &v5,
                  const Variant &v6);
-    Variant exec(const char *func,
+    Variant exec(const Variant &fn,
                  const Variant &v1,
                  const Variant &v2,
                  const Variant &v3,
@@ -997,7 +999,7 @@ class Object : public Variant {
                  const Variant &v5,
                  const Variant &v6,
                  const Variant &v7);
-    Variant exec(const char *func,
+    Variant exec(const Variant &fn,
                  const Variant &v1,
                  const Variant &v2,
                  const Variant &v3,
@@ -1006,7 +1008,7 @@ class Object : public Variant {
                  const Variant &v6,
                  const Variant &v7,
                  const Variant &v8);
-    Variant exec(const char *func,
+    Variant exec(const Variant &fn,
                  const Variant &v1,
                  const Variant &v2,
                  const Variant &v3,
@@ -1016,7 +1018,7 @@ class Object : public Variant {
                  const Variant &v7,
                  const Variant &v8,
                  const Variant &v9);
-    Variant exec(const char *func,
+    Variant exec(const Variant &fn,
                  const Variant &v1,
                  const Variant &v2,
                  const Variant &v3,
@@ -1174,13 +1176,13 @@ class Function {
         name_ = name;
     }
     virtual ~Function() = default;
-    virtual void impl(Args &, Variant &) = 0;
+    virtual Variant impl(Args &) = 0;
 };
 
 #define PHPX_FUNCTION(func)                                                                                            \
     class phpx_function_##func : Function {                                                                            \
       public:                                                                                                          \
-        void impl(Args &, Variant &retval);                                                                            \
+        Variant impl(Args &);                                                                                          \
         phpx_function_##func(const char *name) : Function(name) {                                                      \
             function_map[name] = this;                                                                                 \
         }                                                                                                              \
@@ -1188,7 +1190,7 @@ class Function {
     };                                                                                                                 \
     static phpx_function_##func f_##func(#func);                                                                       \
     PHP_FUNCTION(func) {}                                                                                              \
-    void phpx_function_##func::impl(Args &args, Variant &retval)
+    Variant phpx_function_##func::impl(Args &args)
 
 class Method {
     const char *class_;
@@ -1200,13 +1202,13 @@ class Method {
         class_ = _class;
     }
     virtual ~Method() = default;
-    virtual void impl(Object &, Args &, Variant &) = 0;
+    virtual Variant impl(Object &, Args &) = 0;
 };
 
 #define PHPX_METHOD(class_, method)                                                                                    \
     class phpx_method_##class_##_##method : Method {                                                                   \
       public:                                                                                                          \
-        void impl(Object &_this, Args &, Variant &retval);                                                             \
+        Variant impl(Object &_this, Args &);                                                                           \
         phpx_method_##class_##_##method(const char *_class, const char *_name) : Method(_class, _name) {               \
             method_map[_class][_name] = this;                                                                          \
         }                                                                                                              \
@@ -1214,7 +1216,7 @@ class Method {
     };                                                                                                                 \
     static phpx_method_##class_##_##method m_##class_##_##method(#class_, #method);                                    \
     PHP_METHOD(class_, method) {}                                                                                      \
-    void phpx_method_##class_##_##method::impl(Object &_this, Args &args, Variant &retval)
+    Variant phpx_method_##class_##_##method::impl(Object &_this, Args &args)
 
 extern void _exec_function(zend_execute_data *data, zval *return_value);
 extern void _exec_method(zend_execute_data *data, zval *return_value);

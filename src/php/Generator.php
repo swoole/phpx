@@ -99,7 +99,7 @@ class Generator
         $new_object_code = PHP_EOL;
         for ($i = 1; $i <= $maxArgc; $i++) {
             $exec_function_code .= 'Variant operator()(' . self::makeArgs($i) . ') const;' . PHP_EOL;
-            $exec_method_code .= 'Variant exec(const char *func, ' . self::makeArgs($i) . ');' . PHP_EOL;
+            $exec_method_code .= 'Variant exec(const Variant &fn, ' . self::makeArgs($i) . ');' . PHP_EOL;
             $new_object_code .= "extern Object newObject(const char *name, " . self::makeArgs($i) . ");" . PHP_EOL;
         }
 

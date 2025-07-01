@@ -30,7 +30,7 @@ extern Variant bcpow;
 extern Variant bcsqrt;
 extern Variant bccomp;
 extern Variant bcscale;
-}
+}  // namespace php
 
 /** extension Core */
 namespace php {
@@ -91,7 +91,7 @@ extern Variant gc_enabled;
 extern Variant gc_enable;
 extern Variant gc_disable;
 extern Variant gc_status;
-}
+}  // namespace php
 
 /** extension ctype */
 namespace php {
@@ -106,7 +106,7 @@ extern Variant ctype_punct;
 extern Variant ctype_space;
 extern Variant ctype_upper;
 extern Variant ctype_xdigit;
-}
+}  // namespace php
 
 /** extension curl */
 namespace php {
@@ -143,7 +143,7 @@ extern Variant curl_share_setopt;
 extern Variant curl_share_strerror;
 extern Variant curl_strerror;
 extern Variant curl_version;
-}
+}  // namespace php
 
 /** extension date */
 namespace php {
@@ -195,7 +195,7 @@ extern Variant date_default_timezone_get;
 extern Variant date_sunrise;
 extern Variant date_sunset;
 extern Variant date_sun_info;
-}
+}  // namespace php
 
 /** extension dom */
 namespace php {
@@ -208,7 +208,7 @@ extern Variant exif_tagname;
 extern Variant exif_read_data;
 extern Variant exif_thumbnail;
 extern Variant exif_imagetype;
-}
+}  // namespace php
 
 /** extension fileinfo */
 namespace php {
@@ -218,7 +218,7 @@ extern Variant finfo_set_flags;
 extern Variant finfo_file;
 extern Variant finfo_buffer;
 extern Variant mime_content_type;
-}
+}  // namespace php
 
 /** extension filter */
 namespace php {
@@ -229,7 +229,7 @@ extern Variant filter_input_array;
 extern Variant filter_var_array;
 extern Variant filter_list;
 extern Variant filter_id;
-}
+}  // namespace php
 
 /** extension gd */
 namespace php {
@@ -332,7 +332,7 @@ extern Variant imageaffinematrixconcat;
 extern Variant imagegetinterpolation;
 extern Variant imagesetinterpolation;
 extern Variant imageresolution;
-}
+}  // namespace php
 
 /** extension hash */
 namespace php {
@@ -349,7 +349,7 @@ extern Variant hash_hmac_algos;
 extern Variant hash_pbkdf2;
 extern Variant hash_equals;
 extern Variant hash_hkdf;
-}
+}  // namespace php
 
 /** extension iconv */
 namespace php {
@@ -363,7 +363,7 @@ extern Variant iconv_mime_decode_headers;
 extern Variant iconv;
 extern Variant iconv_set_encoding;
 extern Variant iconv_get_encoding;
-}
+}  // namespace php
 
 /** extension json */
 namespace php {
@@ -371,7 +371,7 @@ extern Variant json_encode;
 extern Variant json_decode;
 extern Variant json_last_error;
 extern Variant json_last_error_msg;
-}
+}  // namespace php
 
 /** extension libxml */
 namespace php {
@@ -383,7 +383,7 @@ extern Variant libxml_clear_errors;
 extern Variant libxml_disable_entity_loader;
 extern Variant libxml_set_external_entity_loader;
 extern Variant libxml_get_external_entity_loader;
-}
+}  // namespace php
 
 /** extension mbstring */
 namespace php {
@@ -446,7 +446,7 @@ extern Variant mb_ereg_search_getregs;
 extern Variant mb_ereg_search_getpos;
 extern Variant mb_ereg_search_setpos;
 extern Variant mb_regex_set_options;
-}
+}  // namespace php
 
 /** extension openssl */
 namespace php {
@@ -514,7 +514,7 @@ extern Variant openssl_spki_verify;
 extern Variant openssl_spki_export;
 extern Variant openssl_spki_export_challenge;
 extern Variant openssl_get_cert_locations;
-}
+}  // namespace php
 
 /** extension pcntl */
 namespace php {
@@ -543,7 +543,7 @@ extern Variant pcntl_setpriority;
 extern Variant pcntl_strerror;
 extern Variant pcntl_async_signals;
 extern Variant pcntl_unshare;
-}
+}  // namespace php
 
 /** extension pcre */
 namespace php {
@@ -558,7 +558,7 @@ extern Variant preg_quote;
 extern Variant preg_grep;
 extern Variant preg_last_error;
 extern Variant preg_last_error_msg;
-}
+}  // namespace php
 
 /** extension PDO */
 namespace php {
@@ -604,7 +604,7 @@ extern Variant posix_get_last_error;
 extern Variant posix_errno;
 extern Variant posix_strerror;
 extern Variant posix_initgroups;
-}
+}  // namespace php
 
 /** extension random */
 namespace php {
@@ -617,7 +617,7 @@ extern Variant mt_getrandmax;
 extern Variant getrandmax;
 extern Variant random_bytes;
 extern Variant random_int;
-}
+}  // namespace php
 
 /** extension session */
 namespace php {
@@ -644,14 +644,14 @@ extern Variant session_cache_limiter;
 extern Variant session_cache_expire;
 extern Variant session_set_cookie_params;
 extern Variant session_start;
-}
+}  // namespace php
 
 /** extension SimpleXML */
 namespace php {
 extern Variant simplexml_load_file;
 extern Variant simplexml_load_string;
 extern Variant simplexml_import_dom;
-}
+}  // namespace php
 
 /** extension sockets */
 namespace php {
@@ -691,7 +691,7 @@ extern Variant socket_addrinfo_lookup;
 extern Variant socket_addrinfo_connect;
 extern Variant socket_addrinfo_bind;
 extern Variant socket_addrinfo_explain;
-}
+}  // namespace php
 
 /** extension SPL */
 namespace php {
@@ -710,7 +710,7 @@ extern Variant spl_object_id;
 extern Variant iterator_apply;
 extern Variant iterator_count;
 extern Variant iterator_to_array;
-}
+}  // namespace php
 
 /** extension standard */
 namespace php {
@@ -1239,13 +1239,13 @@ extern Variant version_compare;
 extern Variant dl;
 extern Variant cli_set_process_title;
 extern Variant cli_get_process_title;
-}
+}  // namespace php
 
 /** extension tokenizer */
 namespace php {
 extern Variant token_get_all;
 extern Variant token_name;
-}
+}  // namespace php
 
 /** extension xml */
 namespace php {
@@ -1271,7 +1271,7 @@ extern Variant xml_get_current_byte_index;
 extern Variant xml_parser_free;
 extern Variant xml_parser_set_option;
 extern Variant xml_parser_get_option;
-}
+}  // namespace php
 
 /** extension xmlwriter */
 namespace php {
@@ -1317,7 +1317,7 @@ extern Variant xmlwriter_end_dtd_entity;
 extern Variant xmlwriter_write_dtd_entity;
 extern Variant xmlwriter_output_memory;
 extern Variant xmlwriter_flush;
-}
+}  // namespace php
 
 /** extension zlib */
 namespace php {
@@ -1351,4 +1351,4 @@ extern Variant inflate_init;
 extern Variant inflate_add;
 extern Variant inflate_get_status;
 extern Variant inflate_get_read_len;
-}
+}  // namespace php

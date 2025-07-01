@@ -276,16 +276,12 @@ void _exec_function(zend_execute_data *data, zval *return_value) {
         args.append(param_ptr);
         param_ptr++;
     }
-    Variant _retval(return_value);
-    func->impl(args, _retval);
-    // An increment in the reference count is necessary;
-    // otherwise, the _retval object will be released upon destruction.
-    // The return_value will be passed back to ZendVM with a reference count of one.
-    _retval.addRef();
+    auto retval = func->impl(args);
+    retval.moveTo(return_value);
 }
 
 void _exec_method(zend_execute_data *data, zval *return_value) {
-    auto iter_class = method_map.find((const char *) data->func->common.scope->name->val);
+    auto iter_class = method_map.find(data->func->common.scope->name->val);
     if (iter_class == method_map.end()) {
         error(E_WARNING, "[phpx::_exec_method] class '%s' not found", data->func->common.scope->name->val);
         return;
@@ -312,9 +308,8 @@ void _exec_method(zend_execute_data *data, zval *return_value) {
         args.append(param_ptr);
         param_ptr++;
     }
-    Variant _retval(return_value);
-    me->impl(_this, args, _retval);
-    _retval.addRef();
+    auto retval = me->impl(_this, args);
+    retval.moveTo(return_value);
 }
 
 zend_result _call_user_function_impl(const zval *object,

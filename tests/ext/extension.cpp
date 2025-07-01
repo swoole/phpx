@@ -29,7 +29,7 @@ PHPX_FUNCTION(cpp_ext_test) {
     for (int i = 0; i < args.count(); i++) {
         cout << args[i].type() << endl;
     }
-    retval = 1234;
+    return 1234;
 }
 
 PHPX_FUNCTION(cpp_ext_test2) {
@@ -40,30 +40,31 @@ PHPX_FUNCTION(cpp_ext_test2) {
     Array arr(v1);
     arr.set(1, "efg");
 
-    retval = arr;
+    return arr;
     // php::echo("argc=%d\n", args.count());
     // php::error(E_WARNING, "extension warning.");
 }
 
 PHPX_METHOD(MyClass, test) {
     cout << "MyClass::test" << endl;
-    retval = 1234.56;
+    return 1234.56;
 }
 
 PHPX_METHOD(MyClass, pget) {
     String *str = _this.oGet<String>("resource", "ResourceString");
     cout << "[GET] ResourceString: " << str->length() << endl;
-    retval = "hello xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+    return "hello xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 }
 
 PHPX_METHOD(MyClass, pset) {
     String *str = new String("hello world");
     _this.oSet("resource", "ResourceString", str);
     cout << "[SET] ResourceString: " << str->length() << endl;
+    return {};
 }
 
 PHPX_METHOD(MyClass, count) {
-    retval = 100;
+    return 100;
 }
 
 void string_dtor(zend_resource *res) {
