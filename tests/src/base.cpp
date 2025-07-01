@@ -90,3 +90,18 @@ TEST(base, equals) {
     ASSERT_TRUE(v3.equals(v1));
     ASSERT_FALSE(v3.equals(v1, true));
 }
+
+#if 0
+TEST(base, exception) {
+    zend_try {
+        throwException("RuntimeException", "phpx exception test");
+    }
+    zend_catch {
+        auto e = Object(getException());
+        auto msg = e.exec("getMessage");
+        ASSERT_TRUE(msg.isString());
+        ASSERT_TRUE(str_contains(msg, "phpx exception test").isTrue());
+    }
+    zend_end_try();
+}
+#endif

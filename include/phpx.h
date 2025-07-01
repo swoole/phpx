@@ -888,6 +888,12 @@ static void throwException(const char *name, const char *message, int code = 0) 
     zend_throw_exception(ce, message, code);
 }
 
+static Variant getException() {
+    zval zv;
+    ZVAL_OBJ(&zv, EG(exception));
+    return {&zv};
+}
+
 static Variant global(const char *name) {
     zend_string *key = zend_string_init(name, strlen(name), false);
     zend_is_auto_global(key);

@@ -70,3 +70,22 @@ TEST(exec, array_push) {
     auto v3 = ref.referenceTo();
     ASSERT_EQ(v3.length(), 12);
 }
+
+TEST(exec, call) {
+    auto rs = call(php_uname);
+    ASSERT_TRUE(rs.isString());
+    ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
+
+    Args args;
+    args.append("m");
+    rs = call(php_uname, args);
+    ASSERT_TRUE(rs.isString());
+    ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
+
+    Array arr;
+    arr.append("m");
+    rs = call(php_uname, arr);
+    ASSERT_TRUE(rs.isString());
+    ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
+}
+
