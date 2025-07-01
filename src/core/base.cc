@@ -160,19 +160,14 @@ repeat:
     ZVAL_COPY(&c.value, val);
     zval_ptr_dtor(&val_free);
 register_constant:
-    c.name = zend_string_init(name, len, 0);
-    if (zend_register_constant(&c) == SUCCESS) {
-        return true;
-    } else {
-        return false;
-    }
+    c.name = zend_string_init(name, len, false);
+    return zend_register_constant(&c) == SUCCESS;
 }
 
 zend_result extension_startup(int type, int module_number) {
-    zend_module_entry *module;
     void *ptr;
     ZEND_HASH_FOREACH_PTR(&module_registry, ptr) {
-        module = (zend_module_entry *) ptr;
+        auto *module = static_cast<zend_module_entry *>(ptr);
         if (module_number == module->module_number) {
             auto extension = _name_to_extension[module->name];
             extension->started = true;
@@ -190,7 +185,7 @@ zend_result extension_startup(int type, int module_number) {
 
 void extension_info(zend_module_entry *module) {
     auto extension = _module_number_to_extension[module->module_number];
-    if (extension->header.size() > 0 && extension->body.size() > 0) {
+    if (!extension->header.empty() && !extension->body.empty()) {
         php_info_print_table_start();
         auto header = extension->header;
         size_t size = header.size();
@@ -368,11 +363,10 @@ Variant include(const std::string &file) {
         return false;
     }
 
-    zend_string *opened_path;
     if (!file_handle.opened_path) {
-        file_handle.opened_path = zend_string_init(file.c_str(), file.length(), 0);
+        file_handle.opened_path = zend_string_init(file.c_str(), file.length(), false);
     }
-    opened_path = zend_string_copy(file_handle.opened_path);
+    zend_string *opened_path = zend_string_copy(file_handle.opened_path);
     zval dummy;
     Variant retval = false;
     zend_op_array *new_op_array;
@@ -380,7 +374,7 @@ Variant include(const std::string &file) {
     if (zend_hash_add(&EG(included_files), opened_path, &dummy)) {
         new_op_array = zend_compile_file(&file_handle, ZEND_REQUIRE);
     } else {
-        new_op_array = NULL;
+        new_op_array = nullptr;
     }
     zend_destroy_file_handle(&file_handle);
     zend_string_release(opened_path);
@@ -404,7 +398,7 @@ zend_function_entry *copy_function_entries(const zend_function_entry *_functions
         ptr++;
     }
 
-    zend_function_entry *functions = new zend_function_entry[count + 1]();
+    auto *functions = new zend_function_entry[count + 1]();
     int i = 0;
     ptr = _functions;
     while (ptr->fname) {

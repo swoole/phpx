@@ -63,6 +63,7 @@ $header = <<<HEADER
 #pragma once
 
 #include "phpx.h"
+
 HEADER;
 
 $rootDir = dirname(__DIR__);
@@ -83,7 +84,7 @@ foreach ($extensions as $extension) {
 
     $classDeclarationFile = $rootDir . "/include/class/{$name}.h";
     if (is_file($classDeclarationFile)) {
-        fwrite($classHeaderFile, "\n/** extension $extension */\n" . file_get_contents($classDeclarationFile));
+        fwrite($classHeaderFile, "#include \"class/{$name}.h\"\n");
     }
 
     echo "Generate C++ facade code for ext-{$extension} successfully.\n";

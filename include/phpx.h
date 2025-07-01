@@ -1288,7 +1288,7 @@ class Class {
     std::string class_name;
     std::string parent_class_name;
     zend_class_entry *parent_ce;
-    zend_class_entry _ce;
+    zend_class_entry _ce{};
     zend_class_entry *ce;
     std::vector<zend_class_entry *> interfaces;
     zend_function_entry *functions;

@@ -16,10 +16,7 @@
 
 #include "phpx.h"
 
-using namespace std;
-
 namespace php {
-
 Class::Class(const char *name) {
     class_name = name;
     INIT_CLASS_ENTRY_EX(_ce, name, strlen(name), nullptr);
@@ -33,7 +30,7 @@ bool Class::extends(zend_class_entry *_parent_class) {
     if (activated) {
         return false;
     }
-    parent_class_name = string(_parent_class->name->val, _parent_class->name->len);
+    parent_class_name = std::string(_parent_class->name->val, _parent_class->name->len);
     parent_ce = _parent_class;
     return parent_ce != nullptr;
 }

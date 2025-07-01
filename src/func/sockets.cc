@@ -1,0 +1,40 @@
+#include "phpx.h"
+
+namespace php {
+Variant socket_select{ZEND_STRL("socket_select"), true};
+Variant socket_create_listen{ZEND_STRL("socket_create_listen"), true};
+Variant socket_accept{ZEND_STRL("socket_accept"), true};
+Variant socket_set_nonblock{ZEND_STRL("socket_set_nonblock"), true};
+Variant socket_set_block{ZEND_STRL("socket_set_block"), true};
+Variant socket_listen{ZEND_STRL("socket_listen"), true};
+Variant socket_close{ZEND_STRL("socket_close"), true};
+Variant socket_write{ZEND_STRL("socket_write"), true};
+Variant socket_read{ZEND_STRL("socket_read"), true};
+Variant socket_getsockname{ZEND_STRL("socket_getsockname"), true};
+Variant socket_getpeername{ZEND_STRL("socket_getpeername"), true};
+Variant socket_create{ZEND_STRL("socket_create"), true};
+Variant socket_connect{ZEND_STRL("socket_connect"), true};
+Variant socket_strerror{ZEND_STRL("socket_strerror"), true};
+Variant socket_bind{ZEND_STRL("socket_bind"), true};
+Variant socket_recv{ZEND_STRL("socket_recv"), true};
+Variant socket_send{ZEND_STRL("socket_send"), true};
+Variant socket_recvfrom{ZEND_STRL("socket_recvfrom"), true};
+Variant socket_sendto{ZEND_STRL("socket_sendto"), true};
+Variant socket_get_option{ZEND_STRL("socket_get_option"), true};
+Variant socket_getopt{ZEND_STRL("socket_getopt"), true};
+Variant socket_set_option{ZEND_STRL("socket_set_option"), true};
+Variant socket_setopt{ZEND_STRL("socket_setopt"), true};
+Variant socket_create_pair{ZEND_STRL("socket_create_pair"), true};
+Variant socket_shutdown{ZEND_STRL("socket_shutdown"), true};
+Variant socket_last_error{ZEND_STRL("socket_last_error"), true};
+Variant socket_clear_error{ZEND_STRL("socket_clear_error"), true};
+Variant socket_import_stream{ZEND_STRL("socket_import_stream"), true};
+Variant socket_export_stream{ZEND_STRL("socket_export_stream"), true};
+Variant socket_sendmsg{ZEND_STRL("socket_sendmsg"), true};
+Variant socket_recvmsg{ZEND_STRL("socket_recvmsg"), true};
+Variant socket_cmsg_space{ZEND_STRL("socket_cmsg_space"), true};
+Variant socket_addrinfo_lookup{ZEND_STRL("socket_addrinfo_lookup"), true};
+Variant socket_addrinfo_connect{ZEND_STRL("socket_addrinfo_connect"), true};
+Variant socket_addrinfo_bind{ZEND_STRL("socket_addrinfo_bind"), true};
+Variant socket_addrinfo_explain{ZEND_STRL("socket_addrinfo_explain"), true};
+}
