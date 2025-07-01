@@ -96,29 +96,29 @@ TEST(variant, callable) {
 }
 
 TEST(variant, empty) {
-    ASSERT_TRUE(null.isEmpty());
+    ASSERT_TRUE(null.empty());
     Variant v;
     v = false;
-    ASSERT_TRUE(v.isEmpty());
+    ASSERT_TRUE(v.empty());
     v = true;
-    ASSERT_FALSE(v.isEmpty());
+    ASSERT_FALSE(v.empty());
     v = "";
-    ASSERT_TRUE(v.isEmpty());
+    ASSERT_TRUE(v.empty());
     v = "hello";
-    ASSERT_FALSE(v.isEmpty());
+    ASSERT_FALSE(v.empty());
     v = 0;
-    ASSERT_TRUE(v.isEmpty());
+    ASSERT_TRUE(v.empty());
     v = 9999;
-    ASSERT_FALSE(v.isEmpty());
+    ASSERT_FALSE(v.empty());
 
     v = 0.0;
-    ASSERT_TRUE(v.isEmpty());
+    ASSERT_TRUE(v.empty());
     v = 1.1;
-    ASSERT_FALSE(v.isEmpty());
+    ASSERT_FALSE(v.empty());
 
     Array arr;
-    ASSERT_TRUE(arr.isEmpty());
+    ASSERT_TRUE(arr.empty());
 
     arr.append("hello");
-    ASSERT_FALSE(arr.isEmpty());
+    ASSERT_FALSE(arr.empty());
 }

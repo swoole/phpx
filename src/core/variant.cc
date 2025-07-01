@@ -21,7 +21,7 @@
 namespace php {
 Variant null = {};
 
-bool Variant::isEmpty() {
+bool Variant::empty() {
     switch (type()) {
     case IS_UNDEF:
     case IS_NULL:

@@ -398,7 +398,7 @@ class Variant {
     bool isReference() const {
         return Z_TYPE_P(const_ptr()) == IS_REFERENCE;
     }
-    bool isEmpty();
+    bool empty();
     std::string toString() {
         zend_string *str = zval_get_string(ptr());
         auto retval = std::string(ZSTR_VAL(str), ZSTR_LEN(str));

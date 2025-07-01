@@ -51,7 +51,7 @@ TEST(exec, curl) {
     auto output = curl_exec(ch);
     curl_close(ch);
 
-    ASSERT_FALSE(output.isEmpty());
+    ASSERT_FALSE(output.empty());
     ASSERT_TRUE(str_contains(output, "中国").toBool());
 }
 
