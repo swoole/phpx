@@ -15,6 +15,7 @@
 */
 
 #include "phpx.h"
+#include "class/spl.h"
 
 BEGIN_EXTERN_C()
 #include "extension_arginfo.h"
@@ -84,7 +85,16 @@ PHPX_EXTENSION() {
         c->addConstant("TEST_CONSTANT", 8888);
         c->addProperty("testProperty", "hello world", ZEND_ACC_PUBLIC);
         c->implements(zend_ce_countable);
+        c->alias("MyClassAlias");
         extension->registerClass(c);
+
+        auto *e = new Class("MyException");
+        e->extends(zend_ce_exception);
+        extension->registerClass(e);
+
+        auto *e2 = new Class("MyRuntimeException");
+        e2->extends(e);
+        extension->registerClass(e2);
 
         auto *i = new Interface("MyInterface");
         i->registerFunctions(class_MyInterface_methods);
@@ -104,6 +114,7 @@ PHPX_EXTENSION() {
                         {"author", "Rango"},
                         {"version", extension->version},
                         {"date", "2021-02-05"},
+                        {"test", "hello", "world"},
                     });
 
     return extension;

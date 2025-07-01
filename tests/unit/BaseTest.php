@@ -53,4 +53,12 @@ class BaseTest extends TestCase
     public function testIniConfig() {
         $this->assertEquals(ini_get('phpx.test_val'), '9999', 'INI setting is not set correctly');
     }
+
+    public function testClass()
+    {
+        $this->assertTrue(class_exists('MyClass', false));
+        $this->assertTrue(class_exists('MyClassAlias', false));
+        $this->assertTrue(class_exists('MyException', false));
+        $this->assertTrue(class_exists('MyRuntimeException', false));
+    }
 }
