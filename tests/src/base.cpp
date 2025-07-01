@@ -43,7 +43,7 @@ TEST(base, define) {
 }
 
 TEST(base, include) {
-    auto tmp_file = "/tmp/include_test.php";
+    std::string tmp_file = "/tmp/include_test.php";
     std::string tmp_file2 = "/tmp/tmp_file.txt";
 
     file_put_contents(tmp_file, "<?php file_put_contents('" + tmp_file2 + "', 'hello phpx'); return PHP_VERSION_ID; ?>");

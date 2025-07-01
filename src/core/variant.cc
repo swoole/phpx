@@ -124,113 +124,6 @@ Variant Variant::operator()(const std::initializer_list<Variant> &args) const {
     return _call(nullptr, const_ptr(), _args);
 }
 
-/* generator */
-Variant Variant::operator()(const Variant &v1) const  {
-    Args args;
-    args.append(v1);
-    return _call(nullptr, const_ptr(), args);
-}
-
-Variant Variant::operator()(const Variant &v1, const Variant &v2) const  {
-    Args args;
-    args.append(v1);
-    args.append(v2);
-    return _call(nullptr, const_ptr(), args);
-}
-
-Variant Variant::operator()(const Variant &v1, const Variant &v2, const Variant &v3) const  {
-    Args args;
-    args.append(v1);
-    args.append(v2);
-    args.append(v3);
-    return _call(nullptr, const_ptr(), args);
-}
-
-Variant Variant::operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4) const  {
-    Args args;
-    args.append(v1);
-    args.append(v2);
-    args.append(v3);
-    args.append(v4);
-    return _call(nullptr, const_ptr(), args);
-}
-
-Variant Variant::operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5) const  {
-    Args args;
-    args.append(v1);
-    args.append(v2);
-    args.append(v3);
-    args.append(v4);
-    args.append(v5);
-    return _call(nullptr, const_ptr(), args);
-}
-
-Variant Variant::operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6) const  {
-    Args args;
-    args.append(v1);
-    args.append(v2);
-    args.append(v3);
-    args.append(v4);
-    args.append(v5);
-    args.append(v6);
-    return _call(nullptr, const_ptr(), args);
-}
-
-Variant Variant::operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7) const  {
-    Args args;
-    args.append(v1);
-    args.append(v2);
-    args.append(v3);
-    args.append(v4);
-    args.append(v5);
-    args.append(v6);
-    args.append(v7);
-    return _call(nullptr, const_ptr(), args);
-}
-
-Variant Variant::operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8) const  {
-    Args args;
-    args.append(v1);
-    args.append(v2);
-    args.append(v3);
-    args.append(v4);
-    args.append(v5);
-    args.append(v6);
-    args.append(v7);
-    args.append(v8);
-    return _call(nullptr, const_ptr(), args);
-}
-
-Variant Variant::operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9) const  {
-    Args args;
-    args.append(v1);
-    args.append(v2);
-    args.append(v3);
-    args.append(v4);
-    args.append(v5);
-    args.append(v6);
-    args.append(v7);
-    args.append(v8);
-    args.append(v9);
-    return _call(nullptr, const_ptr(), args);
-}
-
-Variant Variant::operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5, const Variant &v6, const Variant &v7, const Variant &v8, const Variant &v9, const Variant &v10) const  {
-    Args args;
-    args.append(v1);
-    args.append(v2);
-    args.append(v3);
-    args.append(v4);
-    args.append(v5);
-    args.append(v6);
-    args.append(v7);
-    args.append(v8);
-    args.append(v9);
-    args.append(v10);
-    return _call(nullptr, const_ptr(), args);
-}
-/* generator */
-
 Variant Variant::unserialize() {
     php_unserialize_data_t var_hash;
     Variant retval;
@@ -277,5 +170,38 @@ Variant Variant::jsonDecode(zend_long options, zend_long depth) {
 
 bool Variant::isCallable() {
     return zend_is_callable(ptr(), 0, nullptr);
+}
+
+Object newObject(const char *name) {
+    Object object;
+    zend_class_entry *ce = getClassEntry(name);
+    if (ce == nullptr) {
+        error(E_WARNING, "class '%s' is undefined.", name);
+        return object;
+    }
+    if (object_init_ex(object.ptr(), ce) == FAILURE) {
+        return object;
+    }
+    Args args;
+    object.call("__construct", args);
+    return object;
+}
+
+Object newObject(const char *name, const std::initializer_list<Variant> &args) {
+    Object object;
+    zend_class_entry *ce = getClassEntry(name);
+    if (ce == nullptr) {
+        error(E_WARNING, "class '%s' is undefined.", name);
+        return object;
+    }
+    if (object_init_ex(object.ptr(), ce) == FAILURE) {
+        return object;
+    }
+    Args _args;
+    for (const auto &arg : args) {
+        _args.append(const_cast<Variant &>(arg).ptr());
+    }
+    object.call("__construct", _args);
+    return object;
 }
 }  // namespace php

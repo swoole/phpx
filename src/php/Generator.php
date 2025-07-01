@@ -36,6 +36,14 @@ class Generator
 
     const KEYWORDS = ['delete', 'auto', 'setbit', 'throw', 'getThis', 'namespace', 'class', 'default'];
 
+    public static function getRootDir(): string
+    {
+        if (self::$rootDir === '') {
+            self::$rootDir = dirname(__DIR__, 2);
+        }
+        return self::$rootDir;
+    }
+
     /**
      * @param $extension
      * @return void
@@ -44,9 +52,7 @@ class Generator
      */
     public static function make($extension): void
     {
-        if (self::$rootDir === '') {
-            self::$rootDir = dirname(__DIR__, 2);
-        }
+        self::getRootDir();
         $generator = new self($extension);
         $generator->export();
     }
@@ -64,6 +70,52 @@ class Generator
         }
 
         file_put_contents($outFile, $out);
+    }
+
+    public static function makeArgs(int $n): string
+    {
+        $code = '';
+        for ($j = 1; $j <= $n; $j++) {
+            $code .= 'const Variant &v' . ($j == $n ? $j : $j . ', ');
+        }
+        return $code;
+    }
+
+    public static function makeCaller(): void
+    {
+        $SPACE_4 = str_repeat(' ', 4);
+        $DELIMITER = '/* generator */';
+        $src_file = self::getRootDir() . '/src/core/caller.cc';
+        $header_file = self::getRootDir() . '/include/phpx.h';
+        $src = file_get_contents($header_file);
+        $r = preg_match('/\#define\s+PHPX_MAX_ARGC\s+(\d+)/', $src, $match);
+        if (!$r) {
+            exit("no PHPX_MAX_ARGC\n");
+        }
+
+        $maxArgc = $match[1];
+        self::render(__DIR__ . '/templates/caller.tpl', self::getRootDir() . '/src/core/caller.cc', compact('maxArgc', 'SPACE_4'));
+
+        $exec_function_code = '';
+        $exec_method_code = '';
+        $new_object_code = '';
+        for ($i = 1; $i <= $maxArgc; $i++) {
+            $exec_function_code .= 'Variant operator()(' . self::makeArgs($i) . ') const;' . PHP_EOL;
+            $exec_method_code .= 'Variant exec(const char *func, ' . self::makeArgs($i) . ');' . PHP_EOL;
+            $new_object_code .= "extern Object newObject(const char *name, " . self::makeArgs($i) . ");" . PHP_EOL;
+        }
+
+        $parts = explode($DELIMITER, $src);
+        $src = implode($DELIMITER, [
+            $parts[0],
+            $exec_function_code,
+            $parts[2],
+            $exec_method_code,
+            $parts[4],
+            $new_object_code,
+            $parts[6],
+        ]);
+        file_put_contents($header_file, $src);
     }
 
     public static function valueToCppRepr($v): ?string
