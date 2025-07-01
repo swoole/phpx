@@ -1,6 +1,6 @@
 namespace php {
 class DOMException {
-    Object _this;
+    Object this_;
   public:
     DOMException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -15,7 +15,7 @@ class DOMException {
 };
 
 class DOMImplementation {
-    Object _this;
+    Object this_;
   public:
     Variant getFeature(const Variant &feature, const Variant &version);
     Variant hasFeature(const Variant &feature, const Variant &version);
@@ -24,7 +24,7 @@ class DOMImplementation {
 };
 
 class DOMNode {
-    Object _this;
+    Object this_;
   public:
     Variant __sleep();
     Variant __wakeup();
@@ -48,14 +48,14 @@ class DOMNode {
 };
 
 class DOMNameSpaceNode {
-    Object _this;
+    Object this_;
   public:
     Variant __sleep();
     Variant __wakeup();
 };
 
 class DOMDocumentFragment {
-    Object _this;
+    Object this_;
   public:
     DOMDocumentFragment();
     Variant appendXML(const Variant &data);
@@ -83,7 +83,7 @@ class DOMDocumentFragment {
 };
 
 class DOMDocument {
-    Object _this;
+    Object this_;
   public:
     DOMDocument(const Variant &version = "1.0", const Variant &encoding = "");
     Variant createAttribute(const Variant &local_name);
@@ -141,7 +141,7 @@ class DOMDocument {
 };
 
 class DOMNodeList {
-    Object _this;
+    Object this_;
   public:
     Variant count();
     Variant getIterator();
@@ -149,7 +149,7 @@ class DOMNodeList {
 };
 
 class DOMNamedNodeMap {
-    Object _this;
+    Object this_;
   public:
     Variant getNamedItem(const Variant &qualified_name);
     Variant getNamedItemNS(const Variant &_namespace, const Variant &local_name);
@@ -159,7 +159,7 @@ class DOMNamedNodeMap {
 };
 
 class DOMCharacterData {
-    Object _this;
+    Object this_;
   public:
     Variant appendData(const Variant &data);
     Variant substringData(const Variant &offset, const Variant &count);
@@ -192,7 +192,7 @@ class DOMCharacterData {
 };
 
 class DOMAttr {
-    Object _this;
+    Object this_;
   public:
     DOMAttr(const Variant &name, const Variant &value = "");
     Variant isId();
@@ -218,7 +218,7 @@ class DOMAttr {
 };
 
 class DOMElement {
-    Object _this;
+    Object this_;
   public:
     DOMElement(const Variant &qualified_name, const Variant &value = {}, const Variant &_namespace = "");
     Variant getAttribute(const Variant &qualified_name);
@@ -267,7 +267,7 @@ class DOMElement {
 };
 
 class DOMText {
-    Object _this;
+    Object this_;
   public:
     DOMText(const Variant &data = "");
     Variant isWhitespaceInElementContent();
@@ -304,7 +304,7 @@ class DOMText {
 };
 
 class DOMComment {
-    Object _this;
+    Object this_;
   public:
     DOMComment(const Variant &data = "");
     Variant appendData(const Variant &data);
@@ -338,7 +338,7 @@ class DOMComment {
 };
 
 class DOMCdataSection {
-    Object _this;
+    Object this_;
   public:
     DOMCdataSection(const Variant &data);
     Variant isWhitespaceInElementContent();
@@ -375,7 +375,7 @@ class DOMCdataSection {
 };
 
 class DOMDocumentType {
-    Object _this;
+    Object this_;
   public:
     Variant __sleep();
     Variant __wakeup();
@@ -399,7 +399,7 @@ class DOMDocumentType {
 };
 
 class DOMNotation {
-    Object _this;
+    Object this_;
   public:
     Variant __sleep();
     Variant __wakeup();
@@ -423,7 +423,7 @@ class DOMNotation {
 };
 
 class DOMEntity {
-    Object _this;
+    Object this_;
   public:
     Variant __sleep();
     Variant __wakeup();
@@ -447,7 +447,7 @@ class DOMEntity {
 };
 
 class DOMEntityReference {
-    Object _this;
+    Object this_;
   public:
     DOMEntityReference(const Variant &name);
     Variant __sleep();
@@ -472,7 +472,7 @@ class DOMEntityReference {
 };
 
 class DOMProcessingInstruction {
-    Object _this;
+    Object this_;
   public:
     DOMProcessingInstruction(const Variant &name, const Variant &value = "");
     Variant __sleep();
@@ -497,7 +497,7 @@ class DOMProcessingInstruction {
 };
 
 class DOMXPath {
-    Object _this;
+    Object this_;
   public:
     DOMXPath(const Variant &document, const Variant &register_node_n_s = true);
     Variant evaluate(const Variant &expression, const Variant &context_node = {}, const Variant &register_node_n_s = true);

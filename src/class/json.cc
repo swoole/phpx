@@ -3,43 +3,43 @@
 
 namespace php {
 JsonException::JsonException(const Variant &message, const Variant &code, const Variant &previous) {
-    _this = newObject("JsonException", message, code, previous);
+    this_ = newObject("JsonException", message, code, previous);
 }
 
 Variant JsonException::__wakeup() {
-    return _this.exec("__wakeup");
+    return this_.exec("__wakeup");
 }
 
 Variant JsonException::getMessage() {
-    return _this.exec("getMessage");
+    return this_.exec("getMessage");
 }
 
 Variant JsonException::getCode() {
-    return _this.exec("getCode");
+    return this_.exec("getCode");
 }
 
 Variant JsonException::getFile() {
-    return _this.exec("getFile");
+    return this_.exec("getFile");
 }
 
 Variant JsonException::getLine() {
-    return _this.exec("getLine");
+    return this_.exec("getLine");
 }
 
 Variant JsonException::getTrace() {
-    return _this.exec("getTrace");
+    return this_.exec("getTrace");
 }
 
 Variant JsonException::getPrevious() {
-    return _this.exec("getPrevious");
+    return this_.exec("getPrevious");
 }
 
 Variant JsonException::getTraceAsString() {
-    return _this.exec("getTraceAsString");
+    return this_.exec("getTraceAsString");
 }
 
 Variant JsonException::__toString() {
-    return _this.exec("__toString");
+    return this_.exec("__toString");
 }
 
 

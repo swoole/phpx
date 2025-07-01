@@ -1,6 +1,6 @@
 namespace php {
 class PharException {
-    Object _this;
+    Object this_;
   public:
     PharException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -15,7 +15,7 @@ class PharException {
 };
 
 class Phar {
-    Object _this;
+    Object this_;
   public:
     Phar(const Variant &filename, const Variant &flags = 12288, const Variant &alias = {});
     Variant addEmptyDir(const Variant &directory);
@@ -116,7 +116,7 @@ class Phar {
 };
 
 class PharData {
-    Object _this;
+    Object this_;
   public:
     PharData(const Variant &filename, const Variant &flags = 12288, const Variant &alias = {}, const Variant &format = 0);
     Variant addEmptyDir(const Variant &directory);
@@ -217,7 +217,7 @@ class PharData {
 };
 
 class PharFileInfo {
-    Object _this;
+    Object this_;
   public:
     PharFileInfo(const Variant &filename);
     Variant chmod(const Variant &perms);

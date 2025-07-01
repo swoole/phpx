@@ -1,6 +1,6 @@
 namespace php {
 class SQLite3 {
-    Object _this;
+    Object this_;
   public:
     SQLite3(const Variant &filename, const Variant &flags = 6, const Variant &encryption_key = "");
     Variant open(const Variant &filename, const Variant &flags = 6, const Variant &encryption_key = "");
@@ -29,7 +29,7 @@ class SQLite3 {
 };
 
 class SQLite3Stmt {
-    Object _this;
+    Object this_;
   public:
     Variant bindParam(const Variant &param, const Variant &var, const Variant &type = 3);
     Variant bindValue(const Variant &param, const Variant &value, const Variant &type = 3);
@@ -43,7 +43,7 @@ class SQLite3Stmt {
 };
 
 class SQLite3Result {
-    Object _this;
+    Object this_;
   public:
     Variant numColumns();
     Variant columnName(const Variant &column);

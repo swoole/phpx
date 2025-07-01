@@ -3,69 +3,69 @@
 
 namespace php {
 AssertionError::AssertionError(const Variant &message, const Variant &code, const Variant &previous) {
-    _this = newObject("AssertionError", message, code, previous);
+    this_ = newObject("AssertionError", message, code, previous);
 }
 
 Variant AssertionError::__wakeup() {
-    return _this.exec("__wakeup");
+    return this_.exec("__wakeup");
 }
 
 Variant AssertionError::getMessage() {
-    return _this.exec("getMessage");
+    return this_.exec("getMessage");
 }
 
 Variant AssertionError::getCode() {
-    return _this.exec("getCode");
+    return this_.exec("getCode");
 }
 
 Variant AssertionError::getFile() {
-    return _this.exec("getFile");
+    return this_.exec("getFile");
 }
 
 Variant AssertionError::getLine() {
-    return _this.exec("getLine");
+    return this_.exec("getLine");
 }
 
 Variant AssertionError::getTrace() {
-    return _this.exec("getTrace");
+    return this_.exec("getTrace");
 }
 
 Variant AssertionError::getPrevious() {
-    return _this.exec("getPrevious");
+    return this_.exec("getPrevious");
 }
 
 Variant AssertionError::getTraceAsString() {
-    return _this.exec("getTraceAsString");
+    return this_.exec("getTraceAsString");
 }
 
 Variant AssertionError::__toString() {
-    return _this.exec("__toString");
+    return this_.exec("__toString");
 }
 
 
 Variant php_user_filter::filter(const Variant &in, const Variant &out, const Variant &consumed, const Variant &closing) {
-    return _this.exec("filter", in, out, consumed, closing);
+    return this_.exec("filter", in, out, consumed, closing);
 }
 
 Variant php_user_filter::onCreate() {
-    return _this.exec("onCreate");
+    return this_.exec("onCreate");
 }
 
 Variant php_user_filter::onClose() {
-    return _this.exec("onClose");
+    return this_.exec("onClose");
 }
 
 
 Variant Directory::close() {
-    return _this.exec("close");
+    return this_.exec("close");
 }
 
 Variant Directory::rewind() {
-    return _this.exec("rewind");
+    return this_.exec("rewind");
 }
 
 Variant Directory::read() {
-    return _this.exec("read");
+    return this_.exec("read");
 }
 
 

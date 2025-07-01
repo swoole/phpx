@@ -1,6 +1,6 @@
 namespace php {
 class XMLReader {
-    Object _this;
+    Object this_;
   public:
     Variant close();
     Variant getAttribute(const Variant &name);

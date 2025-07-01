@@ -1,6 +1,6 @@
 namespace php {
 class PDOException {
-    Object _this;
+    Object this_;
   public:
     PDOException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -15,7 +15,7 @@ class PDOException {
 };
 
 class PDO {
-    Object _this;
+    Object this_;
   public:
     PDO(const Variant &dsn, const Variant &username = {}, const Variant &password = {}, const Variant &options = {});
     Variant beginTransaction();
@@ -35,7 +35,7 @@ class PDO {
 };
 
 class PDOStatement {
-    Object _this;
+    Object this_;
   public:
     Variant bindColumn(const Variant &column, const Variant &var, const Variant &type = 2, const Variant &max_length = 0, const Variant &driver_options = {});
     Variant bindParam(const Variant &param, const Variant &var, const Variant &type = 2, const Variant &max_length = 0, const Variant &driver_options = {});

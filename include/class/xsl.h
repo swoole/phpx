@@ -1,6 +1,6 @@
 namespace php {
 class XSLTProcessor {
-    Object _this;
+    Object this_;
   public:
     Variant importStylesheet(const Variant &stylesheet);
     Variant transformToDoc(const Variant &document, const Variant &return_class = {});

@@ -1,6 +1,6 @@
 namespace php {
 class XMLWriter {
-    Object _this;
+    Object this_;
   public:
     Variant openUri(const Variant &uri);
     Variant openMemory();

@@ -1,6 +1,6 @@
 namespace php {
 class AssertionError {
-    Object _this;
+    Object this_;
   public:
     AssertionError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -15,7 +15,7 @@ class AssertionError {
 };
 
 class php_user_filter {
-    Object _this;
+    Object this_;
   public:
     Variant filter(const Variant &in, const Variant &out, const Variant &consumed, const Variant &closing);
     Variant onCreate();
@@ -23,7 +23,7 @@ class php_user_filter {
 };
 
 class Directory {
-    Object _this;
+    Object this_;
   public:
     Variant close();
     Variant rewind();

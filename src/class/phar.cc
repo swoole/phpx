@@ -3,204 +3,204 @@
 
 namespace php {
 PharException::PharException(const Variant &message, const Variant &code, const Variant &previous) {
-    _this = newObject("PharException", message, code, previous);
+    this_ = newObject("PharException", message, code, previous);
 }
 
 Variant PharException::__wakeup() {
-    return _this.exec("__wakeup");
+    return this_.exec("__wakeup");
 }
 
 Variant PharException::getMessage() {
-    return _this.exec("getMessage");
+    return this_.exec("getMessage");
 }
 
 Variant PharException::getCode() {
-    return _this.exec("getCode");
+    return this_.exec("getCode");
 }
 
 Variant PharException::getFile() {
-    return _this.exec("getFile");
+    return this_.exec("getFile");
 }
 
 Variant PharException::getLine() {
-    return _this.exec("getLine");
+    return this_.exec("getLine");
 }
 
 Variant PharException::getTrace() {
-    return _this.exec("getTrace");
+    return this_.exec("getTrace");
 }
 
 Variant PharException::getPrevious() {
-    return _this.exec("getPrevious");
+    return this_.exec("getPrevious");
 }
 
 Variant PharException::getTraceAsString() {
-    return _this.exec("getTraceAsString");
+    return this_.exec("getTraceAsString");
 }
 
 Variant PharException::__toString() {
-    return _this.exec("__toString");
+    return this_.exec("__toString");
 }
 
 
 Phar::Phar(const Variant &filename, const Variant &flags, const Variant &alias) {
-    _this = newObject("Phar", filename, flags, alias);
+    this_ = newObject("Phar", filename, flags, alias);
 }
 
 Variant Phar::addEmptyDir(const Variant &directory) {
-    return _this.exec("addEmptyDir", directory);
+    return this_.exec("addEmptyDir", directory);
 }
 
 Variant Phar::addFile(const Variant &filename, const Variant &local_name) {
-    return _this.exec("addFile", filename, local_name);
+    return this_.exec("addFile", filename, local_name);
 }
 
 Variant Phar::addFromString(const Variant &local_name, const Variant &contents) {
-    return _this.exec("addFromString", local_name, contents);
+    return this_.exec("addFromString", local_name, contents);
 }
 
 Variant Phar::buildFromDirectory(const Variant &directory, const Variant &pattern) {
-    return _this.exec("buildFromDirectory", directory, pattern);
+    return this_.exec("buildFromDirectory", directory, pattern);
 }
 
 Variant Phar::buildFromIterator(const Variant &iterator, const Variant &base_directory) {
-    return _this.exec("buildFromIterator", iterator, base_directory);
+    return this_.exec("buildFromIterator", iterator, base_directory);
 }
 
 Variant Phar::compressFiles(const Variant &compression) {
-    return _this.exec("compressFiles", compression);
+    return this_.exec("compressFiles", compression);
 }
 
 Variant Phar::decompressFiles() {
-    return _this.exec("decompressFiles");
+    return this_.exec("decompressFiles");
 }
 
 Variant Phar::compress(const Variant &compression, const Variant &extension) {
-    return _this.exec("compress", compression, extension);
+    return this_.exec("compress", compression, extension);
 }
 
 Variant Phar::decompress(const Variant &extension) {
-    return _this.exec("decompress", extension);
+    return this_.exec("decompress", extension);
 }
 
 Variant Phar::convertToExecutable(const Variant &format, const Variant &compression, const Variant &extension) {
-    return _this.exec("convertToExecutable", format, compression, extension);
+    return this_.exec("convertToExecutable", format, compression, extension);
 }
 
 Variant Phar::convertToData(const Variant &format, const Variant &compression, const Variant &extension) {
-    return _this.exec("convertToData", format, compression, extension);
+    return this_.exec("convertToData", format, compression, extension);
 }
 
 Variant Phar::copy(const Variant &from, const Variant &to) {
-    return _this.exec("copy", from, to);
+    return this_.exec("copy", from, to);
 }
 
 Variant Phar::count(const Variant &mode) {
-    return _this.exec("count", mode);
+    return this_.exec("count", mode);
 }
 
 Variant Phar::_delete(const Variant &local_name) {
-    return _this.exec("delete", local_name);
+    return this_.exec("delete", local_name);
 }
 
 Variant Phar::delMetadata() {
-    return _this.exec("delMetadata");
+    return this_.exec("delMetadata");
 }
 
 Variant Phar::extractTo(const Variant &directory, const Variant &files, const Variant &overwrite) {
-    return _this.exec("extractTo", directory, files, overwrite);
+    return this_.exec("extractTo", directory, files, overwrite);
 }
 
 Variant Phar::getAlias() {
-    return _this.exec("getAlias");
+    return this_.exec("getAlias");
 }
 
 Variant Phar::getPath() {
-    return _this.exec("getPath");
+    return this_.exec("getPath");
 }
 
 Variant Phar::getMetadata(const Array &unserialize_options) {
-    return _this.exec("getMetadata", unserialize_options);
+    return this_.exec("getMetadata", unserialize_options);
 }
 
 Variant Phar::getModified() {
-    return _this.exec("getModified");
+    return this_.exec("getModified");
 }
 
 Variant Phar::getSignature() {
-    return _this.exec("getSignature");
+    return this_.exec("getSignature");
 }
 
 Variant Phar::getStub() {
-    return _this.exec("getStub");
+    return this_.exec("getStub");
 }
 
 Variant Phar::getVersion() {
-    return _this.exec("getVersion");
+    return this_.exec("getVersion");
 }
 
 Variant Phar::hasMetadata() {
-    return _this.exec("hasMetadata");
+    return this_.exec("hasMetadata");
 }
 
 Variant Phar::isBuffering() {
-    return _this.exec("isBuffering");
+    return this_.exec("isBuffering");
 }
 
 Variant Phar::isCompressed() {
-    return _this.exec("isCompressed");
+    return this_.exec("isCompressed");
 }
 
 Variant Phar::isFileFormat(const Variant &format) {
-    return _this.exec("isFileFormat", format);
+    return this_.exec("isFileFormat", format);
 }
 
 Variant Phar::isWritable() {
-    return _this.exec("isWritable");
+    return this_.exec("isWritable");
 }
 
 Variant Phar::offsetExists(const Variant &local_name) {
-    return _this.exec("offsetExists", local_name);
+    return this_.exec("offsetExists", local_name);
 }
 
 Variant Phar::offsetGet(const Variant &local_name) {
-    return _this.exec("offsetGet", local_name);
+    return this_.exec("offsetGet", local_name);
 }
 
 Variant Phar::offsetSet(const Variant &local_name, const Variant &value) {
-    return _this.exec("offsetSet", local_name, value);
+    return this_.exec("offsetSet", local_name, value);
 }
 
 Variant Phar::offsetUnset(const Variant &local_name) {
-    return _this.exec("offsetUnset", local_name);
+    return this_.exec("offsetUnset", local_name);
 }
 
 Variant Phar::setAlias(const Variant &alias) {
-    return _this.exec("setAlias", alias);
+    return this_.exec("setAlias", alias);
 }
 
 Variant Phar::setDefaultStub(const Variant &index, const Variant &web_index) {
-    return _this.exec("setDefaultStub", index, web_index);
+    return this_.exec("setDefaultStub", index, web_index);
 }
 
 Variant Phar::setMetadata(const Variant &metadata) {
-    return _this.exec("setMetadata", metadata);
+    return this_.exec("setMetadata", metadata);
 }
 
 Variant Phar::setSignatureAlgorithm(const Variant &algo, const Variant &private_key) {
-    return _this.exec("setSignatureAlgorithm", algo, private_key);
+    return this_.exec("setSignatureAlgorithm", algo, private_key);
 }
 
 Variant Phar::setStub(const Variant &stub, const Variant &length) {
-    return _this.exec("setStub", stub, length);
+    return this_.exec("setStub", stub, length);
 }
 
 Variant Phar::startBuffering() {
-    return _this.exec("startBuffering");
+    return this_.exec("startBuffering");
 }
 
 Variant Phar::stopBuffering() {
-    return _this.exec("stopBuffering");
+    return this_.exec("stopBuffering");
 }
 
 Variant Phar::apiVersion() {
@@ -279,328 +279,328 @@ Variant Phar::webPhar(const Variant &alias, const Variant &index, const Variant 
 }
 
 Variant Phar::hasChildren(const Variant &allow_links) {
-    return _this.exec("hasChildren", allow_links);
+    return this_.exec("hasChildren", allow_links);
 }
 
 Variant Phar::getChildren() {
-    return _this.exec("getChildren");
+    return this_.exec("getChildren");
 }
 
 Variant Phar::getSubPath() {
-    return _this.exec("getSubPath");
+    return this_.exec("getSubPath");
 }
 
 Variant Phar::getSubPathname() {
-    return _this.exec("getSubPathname");
+    return this_.exec("getSubPathname");
 }
 
 Variant Phar::rewind() {
-    return _this.exec("rewind");
+    return this_.exec("rewind");
 }
 
 Variant Phar::key() {
-    return _this.exec("key");
+    return this_.exec("key");
 }
 
 Variant Phar::current() {
-    return _this.exec("current");
+    return this_.exec("current");
 }
 
 Variant Phar::getFlags() {
-    return _this.exec("getFlags");
+    return this_.exec("getFlags");
 }
 
 Variant Phar::setFlags(const Variant &flags) {
-    return _this.exec("setFlags", flags);
+    return this_.exec("setFlags", flags);
 }
 
 Variant Phar::getFilename() {
-    return _this.exec("getFilename");
+    return this_.exec("getFilename");
 }
 
 Variant Phar::getExtension() {
-    return _this.exec("getExtension");
+    return this_.exec("getExtension");
 }
 
 Variant Phar::getBasename(const Variant &suffix) {
-    return _this.exec("getBasename", suffix);
+    return this_.exec("getBasename", suffix);
 }
 
 Variant Phar::isDot() {
-    return _this.exec("isDot");
+    return this_.exec("isDot");
 }
 
 Variant Phar::valid() {
-    return _this.exec("valid");
+    return this_.exec("valid");
 }
 
 Variant Phar::next() {
-    return _this.exec("next");
+    return this_.exec("next");
 }
 
 Variant Phar::seek(const Variant &offset) {
-    return _this.exec("seek", offset);
+    return this_.exec("seek", offset);
 }
 
 Variant Phar::__toString() {
-    return _this.exec("__toString");
+    return this_.exec("__toString");
 }
 
 Variant Phar::getPathname() {
-    return _this.exec("getPathname");
+    return this_.exec("getPathname");
 }
 
 Variant Phar::getPerms() {
-    return _this.exec("getPerms");
+    return this_.exec("getPerms");
 }
 
 Variant Phar::getInode() {
-    return _this.exec("getInode");
+    return this_.exec("getInode");
 }
 
 Variant Phar::getSize() {
-    return _this.exec("getSize");
+    return this_.exec("getSize");
 }
 
 Variant Phar::getOwner() {
-    return _this.exec("getOwner");
+    return this_.exec("getOwner");
 }
 
 Variant Phar::getGroup() {
-    return _this.exec("getGroup");
+    return this_.exec("getGroup");
 }
 
 Variant Phar::getATime() {
-    return _this.exec("getATime");
+    return this_.exec("getATime");
 }
 
 Variant Phar::getMTime() {
-    return _this.exec("getMTime");
+    return this_.exec("getMTime");
 }
 
 Variant Phar::getCTime() {
-    return _this.exec("getCTime");
+    return this_.exec("getCTime");
 }
 
 Variant Phar::getType() {
-    return _this.exec("getType");
+    return this_.exec("getType");
 }
 
 Variant Phar::isReadable() {
-    return _this.exec("isReadable");
+    return this_.exec("isReadable");
 }
 
 Variant Phar::isExecutable() {
-    return _this.exec("isExecutable");
+    return this_.exec("isExecutable");
 }
 
 Variant Phar::isFile() {
-    return _this.exec("isFile");
+    return this_.exec("isFile");
 }
 
 Variant Phar::isDir() {
-    return _this.exec("isDir");
+    return this_.exec("isDir");
 }
 
 Variant Phar::isLink() {
-    return _this.exec("isLink");
+    return this_.exec("isLink");
 }
 
 Variant Phar::getLinkTarget() {
-    return _this.exec("getLinkTarget");
+    return this_.exec("getLinkTarget");
 }
 
 Variant Phar::getRealPath() {
-    return _this.exec("getRealPath");
+    return this_.exec("getRealPath");
 }
 
 Variant Phar::getFileInfo(const Variant &_class) {
-    return _this.exec("getFileInfo", _class);
+    return this_.exec("getFileInfo", _class);
 }
 
 Variant Phar::getPathInfo(const Variant &_class) {
-    return _this.exec("getPathInfo", _class);
+    return this_.exec("getPathInfo", _class);
 }
 
 Variant Phar::openFile(const Variant &mode, const Variant &use_include_path, const Variant &context) {
-    return _this.exec("openFile", mode, use_include_path, context);
+    return this_.exec("openFile", mode, use_include_path, context);
 }
 
 Variant Phar::setFileClass(const Variant &_class) {
-    return _this.exec("setFileClass", _class);
+    return this_.exec("setFileClass", _class);
 }
 
 Variant Phar::setInfoClass(const Variant &_class) {
-    return _this.exec("setInfoClass", _class);
+    return this_.exec("setInfoClass", _class);
 }
 
 Variant Phar::__debugInfo() {
-    return _this.exec("__debugInfo");
+    return this_.exec("__debugInfo");
 }
 
 Variant Phar::_bad_state_ex() {
-    return _this.exec("_bad_state_ex");
+    return this_.exec("_bad_state_ex");
 }
 
 
 PharData::PharData(const Variant &filename, const Variant &flags, const Variant &alias, const Variant &format) {
-    _this = newObject("PharData", filename, flags, alias, format);
+    this_ = newObject("PharData", filename, flags, alias, format);
 }
 
 Variant PharData::addEmptyDir(const Variant &directory) {
-    return _this.exec("addEmptyDir", directory);
+    return this_.exec("addEmptyDir", directory);
 }
 
 Variant PharData::addFile(const Variant &filename, const Variant &local_name) {
-    return _this.exec("addFile", filename, local_name);
+    return this_.exec("addFile", filename, local_name);
 }
 
 Variant PharData::addFromString(const Variant &local_name, const Variant &contents) {
-    return _this.exec("addFromString", local_name, contents);
+    return this_.exec("addFromString", local_name, contents);
 }
 
 Variant PharData::buildFromDirectory(const Variant &directory, const Variant &pattern) {
-    return _this.exec("buildFromDirectory", directory, pattern);
+    return this_.exec("buildFromDirectory", directory, pattern);
 }
 
 Variant PharData::buildFromIterator(const Variant &iterator, const Variant &base_directory) {
-    return _this.exec("buildFromIterator", iterator, base_directory);
+    return this_.exec("buildFromIterator", iterator, base_directory);
 }
 
 Variant PharData::compressFiles(const Variant &compression) {
-    return _this.exec("compressFiles", compression);
+    return this_.exec("compressFiles", compression);
 }
 
 Variant PharData::decompressFiles() {
-    return _this.exec("decompressFiles");
+    return this_.exec("decompressFiles");
 }
 
 Variant PharData::compress(const Variant &compression, const Variant &extension) {
-    return _this.exec("compress", compression, extension);
+    return this_.exec("compress", compression, extension);
 }
 
 Variant PharData::decompress(const Variant &extension) {
-    return _this.exec("decompress", extension);
+    return this_.exec("decompress", extension);
 }
 
 Variant PharData::convertToExecutable(const Variant &format, const Variant &compression, const Variant &extension) {
-    return _this.exec("convertToExecutable", format, compression, extension);
+    return this_.exec("convertToExecutable", format, compression, extension);
 }
 
 Variant PharData::convertToData(const Variant &format, const Variant &compression, const Variant &extension) {
-    return _this.exec("convertToData", format, compression, extension);
+    return this_.exec("convertToData", format, compression, extension);
 }
 
 Variant PharData::copy(const Variant &from, const Variant &to) {
-    return _this.exec("copy", from, to);
+    return this_.exec("copy", from, to);
 }
 
 Variant PharData::count(const Variant &mode) {
-    return _this.exec("count", mode);
+    return this_.exec("count", mode);
 }
 
 Variant PharData::_delete(const Variant &local_name) {
-    return _this.exec("delete", local_name);
+    return this_.exec("delete", local_name);
 }
 
 Variant PharData::delMetadata() {
-    return _this.exec("delMetadata");
+    return this_.exec("delMetadata");
 }
 
 Variant PharData::extractTo(const Variant &directory, const Variant &files, const Variant &overwrite) {
-    return _this.exec("extractTo", directory, files, overwrite);
+    return this_.exec("extractTo", directory, files, overwrite);
 }
 
 Variant PharData::getAlias() {
-    return _this.exec("getAlias");
+    return this_.exec("getAlias");
 }
 
 Variant PharData::getPath() {
-    return _this.exec("getPath");
+    return this_.exec("getPath");
 }
 
 Variant PharData::getMetadata(const Array &unserialize_options) {
-    return _this.exec("getMetadata", unserialize_options);
+    return this_.exec("getMetadata", unserialize_options);
 }
 
 Variant PharData::getModified() {
-    return _this.exec("getModified");
+    return this_.exec("getModified");
 }
 
 Variant PharData::getSignature() {
-    return _this.exec("getSignature");
+    return this_.exec("getSignature");
 }
 
 Variant PharData::getStub() {
-    return _this.exec("getStub");
+    return this_.exec("getStub");
 }
 
 Variant PharData::getVersion() {
-    return _this.exec("getVersion");
+    return this_.exec("getVersion");
 }
 
 Variant PharData::hasMetadata() {
-    return _this.exec("hasMetadata");
+    return this_.exec("hasMetadata");
 }
 
 Variant PharData::isBuffering() {
-    return _this.exec("isBuffering");
+    return this_.exec("isBuffering");
 }
 
 Variant PharData::isCompressed() {
-    return _this.exec("isCompressed");
+    return this_.exec("isCompressed");
 }
 
 Variant PharData::isFileFormat(const Variant &format) {
-    return _this.exec("isFileFormat", format);
+    return this_.exec("isFileFormat", format);
 }
 
 Variant PharData::isWritable() {
-    return _this.exec("isWritable");
+    return this_.exec("isWritable");
 }
 
 Variant PharData::offsetExists(const Variant &local_name) {
-    return _this.exec("offsetExists", local_name);
+    return this_.exec("offsetExists", local_name);
 }
 
 Variant PharData::offsetGet(const Variant &local_name) {
-    return _this.exec("offsetGet", local_name);
+    return this_.exec("offsetGet", local_name);
 }
 
 Variant PharData::offsetSet(const Variant &local_name, const Variant &value) {
-    return _this.exec("offsetSet", local_name, value);
+    return this_.exec("offsetSet", local_name, value);
 }
 
 Variant PharData::offsetUnset(const Variant &local_name) {
-    return _this.exec("offsetUnset", local_name);
+    return this_.exec("offsetUnset", local_name);
 }
 
 Variant PharData::setAlias(const Variant &alias) {
-    return _this.exec("setAlias", alias);
+    return this_.exec("setAlias", alias);
 }
 
 Variant PharData::setDefaultStub(const Variant &index, const Variant &web_index) {
-    return _this.exec("setDefaultStub", index, web_index);
+    return this_.exec("setDefaultStub", index, web_index);
 }
 
 Variant PharData::setMetadata(const Variant &metadata) {
-    return _this.exec("setMetadata", metadata);
+    return this_.exec("setMetadata", metadata);
 }
 
 Variant PharData::setSignatureAlgorithm(const Variant &algo, const Variant &private_key) {
-    return _this.exec("setSignatureAlgorithm", algo, private_key);
+    return this_.exec("setSignatureAlgorithm", algo, private_key);
 }
 
 Variant PharData::setStub(const Variant &stub, const Variant &length) {
-    return _this.exec("setStub", stub, length);
+    return this_.exec("setStub", stub, length);
 }
 
 Variant PharData::startBuffering() {
-    return _this.exec("startBuffering");
+    return this_.exec("startBuffering");
 }
 
 Variant PharData::stopBuffering() {
-    return _this.exec("stopBuffering");
+    return this_.exec("stopBuffering");
 }
 
 Variant PharData::apiVersion() {
@@ -679,344 +679,344 @@ Variant PharData::webPhar(const Variant &alias, const Variant &index, const Vari
 }
 
 Variant PharData::hasChildren(const Variant &allow_links) {
-    return _this.exec("hasChildren", allow_links);
+    return this_.exec("hasChildren", allow_links);
 }
 
 Variant PharData::getChildren() {
-    return _this.exec("getChildren");
+    return this_.exec("getChildren");
 }
 
 Variant PharData::getSubPath() {
-    return _this.exec("getSubPath");
+    return this_.exec("getSubPath");
 }
 
 Variant PharData::getSubPathname() {
-    return _this.exec("getSubPathname");
+    return this_.exec("getSubPathname");
 }
 
 Variant PharData::rewind() {
-    return _this.exec("rewind");
+    return this_.exec("rewind");
 }
 
 Variant PharData::key() {
-    return _this.exec("key");
+    return this_.exec("key");
 }
 
 Variant PharData::current() {
-    return _this.exec("current");
+    return this_.exec("current");
 }
 
 Variant PharData::getFlags() {
-    return _this.exec("getFlags");
+    return this_.exec("getFlags");
 }
 
 Variant PharData::setFlags(const Variant &flags) {
-    return _this.exec("setFlags", flags);
+    return this_.exec("setFlags", flags);
 }
 
 Variant PharData::getFilename() {
-    return _this.exec("getFilename");
+    return this_.exec("getFilename");
 }
 
 Variant PharData::getExtension() {
-    return _this.exec("getExtension");
+    return this_.exec("getExtension");
 }
 
 Variant PharData::getBasename(const Variant &suffix) {
-    return _this.exec("getBasename", suffix);
+    return this_.exec("getBasename", suffix);
 }
 
 Variant PharData::isDot() {
-    return _this.exec("isDot");
+    return this_.exec("isDot");
 }
 
 Variant PharData::valid() {
-    return _this.exec("valid");
+    return this_.exec("valid");
 }
 
 Variant PharData::next() {
-    return _this.exec("next");
+    return this_.exec("next");
 }
 
 Variant PharData::seek(const Variant &offset) {
-    return _this.exec("seek", offset);
+    return this_.exec("seek", offset);
 }
 
 Variant PharData::__toString() {
-    return _this.exec("__toString");
+    return this_.exec("__toString");
 }
 
 Variant PharData::getPathname() {
-    return _this.exec("getPathname");
+    return this_.exec("getPathname");
 }
 
 Variant PharData::getPerms() {
-    return _this.exec("getPerms");
+    return this_.exec("getPerms");
 }
 
 Variant PharData::getInode() {
-    return _this.exec("getInode");
+    return this_.exec("getInode");
 }
 
 Variant PharData::getSize() {
-    return _this.exec("getSize");
+    return this_.exec("getSize");
 }
 
 Variant PharData::getOwner() {
-    return _this.exec("getOwner");
+    return this_.exec("getOwner");
 }
 
 Variant PharData::getGroup() {
-    return _this.exec("getGroup");
+    return this_.exec("getGroup");
 }
 
 Variant PharData::getATime() {
-    return _this.exec("getATime");
+    return this_.exec("getATime");
 }
 
 Variant PharData::getMTime() {
-    return _this.exec("getMTime");
+    return this_.exec("getMTime");
 }
 
 Variant PharData::getCTime() {
-    return _this.exec("getCTime");
+    return this_.exec("getCTime");
 }
 
 Variant PharData::getType() {
-    return _this.exec("getType");
+    return this_.exec("getType");
 }
 
 Variant PharData::isReadable() {
-    return _this.exec("isReadable");
+    return this_.exec("isReadable");
 }
 
 Variant PharData::isExecutable() {
-    return _this.exec("isExecutable");
+    return this_.exec("isExecutable");
 }
 
 Variant PharData::isFile() {
-    return _this.exec("isFile");
+    return this_.exec("isFile");
 }
 
 Variant PharData::isDir() {
-    return _this.exec("isDir");
+    return this_.exec("isDir");
 }
 
 Variant PharData::isLink() {
-    return _this.exec("isLink");
+    return this_.exec("isLink");
 }
 
 Variant PharData::getLinkTarget() {
-    return _this.exec("getLinkTarget");
+    return this_.exec("getLinkTarget");
 }
 
 Variant PharData::getRealPath() {
-    return _this.exec("getRealPath");
+    return this_.exec("getRealPath");
 }
 
 Variant PharData::getFileInfo(const Variant &_class) {
-    return _this.exec("getFileInfo", _class);
+    return this_.exec("getFileInfo", _class);
 }
 
 Variant PharData::getPathInfo(const Variant &_class) {
-    return _this.exec("getPathInfo", _class);
+    return this_.exec("getPathInfo", _class);
 }
 
 Variant PharData::openFile(const Variant &mode, const Variant &use_include_path, const Variant &context) {
-    return _this.exec("openFile", mode, use_include_path, context);
+    return this_.exec("openFile", mode, use_include_path, context);
 }
 
 Variant PharData::setFileClass(const Variant &_class) {
-    return _this.exec("setFileClass", _class);
+    return this_.exec("setFileClass", _class);
 }
 
 Variant PharData::setInfoClass(const Variant &_class) {
-    return _this.exec("setInfoClass", _class);
+    return this_.exec("setInfoClass", _class);
 }
 
 Variant PharData::__debugInfo() {
-    return _this.exec("__debugInfo");
+    return this_.exec("__debugInfo");
 }
 
 Variant PharData::_bad_state_ex() {
-    return _this.exec("_bad_state_ex");
+    return this_.exec("_bad_state_ex");
 }
 
 
 PharFileInfo::PharFileInfo(const Variant &filename) {
-    _this = newObject("PharFileInfo", filename);
+    this_ = newObject("PharFileInfo", filename);
 }
 
 Variant PharFileInfo::chmod(const Variant &perms) {
-    return _this.exec("chmod", perms);
+    return this_.exec("chmod", perms);
 }
 
 Variant PharFileInfo::compress(const Variant &compression) {
-    return _this.exec("compress", compression);
+    return this_.exec("compress", compression);
 }
 
 Variant PharFileInfo::decompress() {
-    return _this.exec("decompress");
+    return this_.exec("decompress");
 }
 
 Variant PharFileInfo::delMetadata() {
-    return _this.exec("delMetadata");
+    return this_.exec("delMetadata");
 }
 
 Variant PharFileInfo::getCompressedSize() {
-    return _this.exec("getCompressedSize");
+    return this_.exec("getCompressedSize");
 }
 
 Variant PharFileInfo::getCRC32() {
-    return _this.exec("getCRC32");
+    return this_.exec("getCRC32");
 }
 
 Variant PharFileInfo::getContent() {
-    return _this.exec("getContent");
+    return this_.exec("getContent");
 }
 
 Variant PharFileInfo::getMetadata(const Array &unserialize_options) {
-    return _this.exec("getMetadata", unserialize_options);
+    return this_.exec("getMetadata", unserialize_options);
 }
 
 Variant PharFileInfo::getPharFlags() {
-    return _this.exec("getPharFlags");
+    return this_.exec("getPharFlags");
 }
 
 Variant PharFileInfo::hasMetadata() {
-    return _this.exec("hasMetadata");
+    return this_.exec("hasMetadata");
 }
 
 Variant PharFileInfo::isCompressed(const Variant &compression) {
-    return _this.exec("isCompressed", compression);
+    return this_.exec("isCompressed", compression);
 }
 
 Variant PharFileInfo::isCRCChecked() {
-    return _this.exec("isCRCChecked");
+    return this_.exec("isCRCChecked");
 }
 
 Variant PharFileInfo::setMetadata(const Variant &metadata) {
-    return _this.exec("setMetadata", metadata);
+    return this_.exec("setMetadata", metadata);
 }
 
 Variant PharFileInfo::getPath() {
-    return _this.exec("getPath");
+    return this_.exec("getPath");
 }
 
 Variant PharFileInfo::getFilename() {
-    return _this.exec("getFilename");
+    return this_.exec("getFilename");
 }
 
 Variant PharFileInfo::getExtension() {
-    return _this.exec("getExtension");
+    return this_.exec("getExtension");
 }
 
 Variant PharFileInfo::getBasename(const Variant &suffix) {
-    return _this.exec("getBasename", suffix);
+    return this_.exec("getBasename", suffix);
 }
 
 Variant PharFileInfo::getPathname() {
-    return _this.exec("getPathname");
+    return this_.exec("getPathname");
 }
 
 Variant PharFileInfo::getPerms() {
-    return _this.exec("getPerms");
+    return this_.exec("getPerms");
 }
 
 Variant PharFileInfo::getInode() {
-    return _this.exec("getInode");
+    return this_.exec("getInode");
 }
 
 Variant PharFileInfo::getSize() {
-    return _this.exec("getSize");
+    return this_.exec("getSize");
 }
 
 Variant PharFileInfo::getOwner() {
-    return _this.exec("getOwner");
+    return this_.exec("getOwner");
 }
 
 Variant PharFileInfo::getGroup() {
-    return _this.exec("getGroup");
+    return this_.exec("getGroup");
 }
 
 Variant PharFileInfo::getATime() {
-    return _this.exec("getATime");
+    return this_.exec("getATime");
 }
 
 Variant PharFileInfo::getMTime() {
-    return _this.exec("getMTime");
+    return this_.exec("getMTime");
 }
 
 Variant PharFileInfo::getCTime() {
-    return _this.exec("getCTime");
+    return this_.exec("getCTime");
 }
 
 Variant PharFileInfo::getType() {
-    return _this.exec("getType");
+    return this_.exec("getType");
 }
 
 Variant PharFileInfo::isWritable() {
-    return _this.exec("isWritable");
+    return this_.exec("isWritable");
 }
 
 Variant PharFileInfo::isReadable() {
-    return _this.exec("isReadable");
+    return this_.exec("isReadable");
 }
 
 Variant PharFileInfo::isExecutable() {
-    return _this.exec("isExecutable");
+    return this_.exec("isExecutable");
 }
 
 Variant PharFileInfo::isFile() {
-    return _this.exec("isFile");
+    return this_.exec("isFile");
 }
 
 Variant PharFileInfo::isDir() {
-    return _this.exec("isDir");
+    return this_.exec("isDir");
 }
 
 Variant PharFileInfo::isLink() {
-    return _this.exec("isLink");
+    return this_.exec("isLink");
 }
 
 Variant PharFileInfo::getLinkTarget() {
-    return _this.exec("getLinkTarget");
+    return this_.exec("getLinkTarget");
 }
 
 Variant PharFileInfo::getRealPath() {
-    return _this.exec("getRealPath");
+    return this_.exec("getRealPath");
 }
 
 Variant PharFileInfo::getFileInfo(const Variant &_class) {
-    return _this.exec("getFileInfo", _class);
+    return this_.exec("getFileInfo", _class);
 }
 
 Variant PharFileInfo::getPathInfo(const Variant &_class) {
-    return _this.exec("getPathInfo", _class);
+    return this_.exec("getPathInfo", _class);
 }
 
 Variant PharFileInfo::openFile(const Variant &mode, const Variant &use_include_path, const Variant &context) {
-    return _this.exec("openFile", mode, use_include_path, context);
+    return this_.exec("openFile", mode, use_include_path, context);
 }
 
 Variant PharFileInfo::setFileClass(const Variant &_class) {
-    return _this.exec("setFileClass", _class);
+    return this_.exec("setFileClass", _class);
 }
 
 Variant PharFileInfo::setInfoClass(const Variant &_class) {
-    return _this.exec("setInfoClass", _class);
+    return this_.exec("setInfoClass", _class);
 }
 
 Variant PharFileInfo::__toString() {
-    return _this.exec("__toString");
+    return this_.exec("__toString");
 }
 
 Variant PharFileInfo::__debugInfo() {
-    return _this.exec("__debugInfo");
+    return this_.exec("__debugInfo");
 }
 
 Variant PharFileInfo::_bad_state_ex() {
-    return _this.exec("_bad_state_ex");
+    return this_.exec("_bad_state_ex");
 }
 
 

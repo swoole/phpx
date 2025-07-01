@@ -1,6 +1,6 @@
 namespace php {
 class DateTime {
-    Object _this;
+    Object this_;
   public:
     DateTime(const Variant &datetime = "now", const Variant &timezone = {});
     Variant __serialize();
@@ -27,7 +27,7 @@ class DateTime {
 };
 
 class DateTimeImmutable {
-    Object _this;
+    Object this_;
   public:
     DateTimeImmutable(const Variant &datetime = "now", const Variant &timezone = {});
     Variant __serialize();
@@ -54,7 +54,7 @@ class DateTimeImmutable {
 };
 
 class DateTimeZone {
-    Object _this;
+    Object this_;
   public:
     DateTimeZone(const Variant &timezone);
     Variant getName();
@@ -70,7 +70,7 @@ class DateTimeZone {
 };
 
 class DateInterval {
-    Object _this;
+    Object this_;
   public:
     DateInterval(const Variant &duration);
     static Variant createFromDateString(const Variant &datetime);
@@ -82,7 +82,7 @@ class DateInterval {
 };
 
 class DatePeriod {
-    Object _this;
+    Object this_;
   public:
     DatePeriod(const Variant &start, const Variant &interval = {}, const Variant &end = {}, const Variant &options = {});
     Variant getStartDate();

@@ -1,6 +1,6 @@
 namespace php {
 class LogicException {
-    Object _this;
+    Object this_;
   public:
     LogicException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -15,7 +15,7 @@ class LogicException {
 };
 
 class BadFunctionCallException {
-    Object _this;
+    Object this_;
   public:
     BadFunctionCallException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -30,7 +30,7 @@ class BadFunctionCallException {
 };
 
 class BadMethodCallException {
-    Object _this;
+    Object this_;
   public:
     BadMethodCallException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -45,7 +45,7 @@ class BadMethodCallException {
 };
 
 class DomainException {
-    Object _this;
+    Object this_;
   public:
     DomainException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -60,7 +60,7 @@ class DomainException {
 };
 
 class InvalidArgumentException {
-    Object _this;
+    Object this_;
   public:
     InvalidArgumentException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -75,7 +75,7 @@ class InvalidArgumentException {
 };
 
 class LengthException {
-    Object _this;
+    Object this_;
   public:
     LengthException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -90,7 +90,7 @@ class LengthException {
 };
 
 class OutOfRangeException {
-    Object _this;
+    Object this_;
   public:
     OutOfRangeException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -105,7 +105,7 @@ class OutOfRangeException {
 };
 
 class RuntimeException {
-    Object _this;
+    Object this_;
   public:
     RuntimeException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -120,7 +120,7 @@ class RuntimeException {
 };
 
 class OutOfBoundsException {
-    Object _this;
+    Object this_;
   public:
     OutOfBoundsException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -135,7 +135,7 @@ class OutOfBoundsException {
 };
 
 class OverflowException {
-    Object _this;
+    Object this_;
   public:
     OverflowException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -150,7 +150,7 @@ class OverflowException {
 };
 
 class RangeException {
-    Object _this;
+    Object this_;
   public:
     RangeException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -165,7 +165,7 @@ class RangeException {
 };
 
 class UnderflowException {
-    Object _this;
+    Object this_;
   public:
     UnderflowException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -180,7 +180,7 @@ class UnderflowException {
 };
 
 class UnexpectedValueException {
-    Object _this;
+    Object this_;
   public:
     UnexpectedValueException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -195,7 +195,7 @@ class UnexpectedValueException {
 };
 
 class RecursiveIteratorIterator {
-    Object _this;
+    Object this_;
   public:
     RecursiveIteratorIterator(const Variant &iterator, const Variant &mode = 0, const Variant &flags = 0);
     Variant rewind();
@@ -218,7 +218,7 @@ class RecursiveIteratorIterator {
 };
 
 class IteratorIterator {
-    Object _this;
+    Object this_;
   public:
     IteratorIterator(const Variant &iterator, const Variant &_class = {});
     Variant getInnerIterator();
@@ -230,7 +230,7 @@ class IteratorIterator {
 };
 
 class CallbackFilterIterator {
-    Object _this;
+    Object this_;
   public:
     CallbackFilterIterator(const Variant &iterator, const Variant &callback);
     Variant accept();
@@ -243,7 +243,7 @@ class CallbackFilterIterator {
 };
 
 class RecursiveCallbackFilterIterator {
-    Object _this;
+    Object this_;
   public:
     RecursiveCallbackFilterIterator(const Variant &iterator, const Variant &callback);
     Variant hasChildren();
@@ -258,7 +258,7 @@ class RecursiveCallbackFilterIterator {
 };
 
 class ParentIterator {
-    Object _this;
+    Object this_;
   public:
     ParentIterator(const Variant &iterator);
     Variant accept();
@@ -273,7 +273,7 @@ class ParentIterator {
 };
 
 class LimitIterator {
-    Object _this;
+    Object this_;
   public:
     LimitIterator(const Variant &iterator, const Variant &offset = 0, const Variant &limit = -1);
     Variant rewind();
@@ -287,7 +287,7 @@ class LimitIterator {
 };
 
 class CachingIterator {
-    Object _this;
+    Object this_;
   public:
     CachingIterator(const Variant &iterator, const Variant &flags = 1);
     Variant rewind();
@@ -309,7 +309,7 @@ class CachingIterator {
 };
 
 class RecursiveCachingIterator {
-    Object _this;
+    Object this_;
   public:
     RecursiveCachingIterator(const Variant &iterator, const Variant &flags = 1);
     Variant hasChildren();
@@ -333,7 +333,7 @@ class RecursiveCachingIterator {
 };
 
 class NoRewindIterator {
-    Object _this;
+    Object this_;
   public:
     NoRewindIterator(const Variant &iterator);
     Variant rewind();
@@ -345,7 +345,7 @@ class NoRewindIterator {
 };
 
 class AppendIterator {
-    Object _this;
+    Object this_;
   public:
     AppendIterator();
     Variant append(const Variant &iterator);
@@ -360,7 +360,7 @@ class AppendIterator {
 };
 
 class InfiniteIterator {
-    Object _this;
+    Object this_;
   public:
     InfiniteIterator(const Variant &iterator);
     Variant next();
@@ -372,7 +372,7 @@ class InfiniteIterator {
 };
 
 class RegexIterator {
-    Object _this;
+    Object this_;
   public:
     RegexIterator(const Variant &iterator, const Variant &pattern, const Variant &mode = 0, const Variant &flags = 0, const Variant &preg_flags = 0);
     Variant accept();
@@ -392,7 +392,7 @@ class RegexIterator {
 };
 
 class RecursiveRegexIterator {
-    Object _this;
+    Object this_;
   public:
     RecursiveRegexIterator(const Variant &iterator, const Variant &pattern, const Variant &mode = 0, const Variant &flags = 0, const Variant &preg_flags = 0);
     Variant accept();
@@ -414,7 +414,7 @@ class RecursiveRegexIterator {
 };
 
 class EmptyIterator {
-    Object _this;
+    Object this_;
   public:
     Variant current();
     Variant next();
@@ -424,7 +424,7 @@ class EmptyIterator {
 };
 
 class RecursiveTreeIterator {
-    Object _this;
+    Object this_;
   public:
     RecursiveTreeIterator(const Variant &iterator, const Variant &flags = 8, const Variant &caching_iterator_flags = 16, const Variant &mode = 1);
     Variant key();
@@ -452,7 +452,7 @@ class RecursiveTreeIterator {
 };
 
 class ArrayObject {
-    Object _this;
+    Object this_;
   public:
     ArrayObject(const Array &array = {}, const Variant &flags = 0, const Variant &iterator_class = "ArrayIterator");
     Variant offsetExists(const Variant &key);
@@ -482,7 +482,7 @@ class ArrayObject {
 };
 
 class _ArrayIterator {
-    Object _this;
+    Object this_;
   public:
     _ArrayIterator(const Array &array = {}, const Variant &flags = 0);
     Variant offsetExists(const Variant &key);
@@ -514,7 +514,7 @@ class _ArrayIterator {
 };
 
 class RecursiveArrayIterator {
-    Object _this;
+    Object this_;
   public:
     Variant hasChildren();
     Variant getChildren();
@@ -548,7 +548,7 @@ class RecursiveArrayIterator {
 };
 
 class SplFileInfo {
-    Object _this;
+    Object this_;
   public:
     SplFileInfo(const Variant &filename);
     Variant getPath();
@@ -584,7 +584,7 @@ class SplFileInfo {
 };
 
 class DirectoryIterator {
-    Object _this;
+    Object this_;
   public:
     DirectoryIterator(const Variant &directory);
     Variant getFilename();
@@ -627,7 +627,7 @@ class DirectoryIterator {
 };
 
 class FilesystemIterator {
-    Object _this;
+    Object this_;
   public:
     FilesystemIterator(const Variant &directory, const Variant &flags = 4096);
     Variant rewind();
@@ -672,7 +672,7 @@ class FilesystemIterator {
 };
 
 class RecursiveDirectoryIterator {
-    Object _this;
+    Object this_;
   public:
     RecursiveDirectoryIterator(const Variant &directory, const Variant &flags = 0);
     Variant hasChildren(const Variant &allow_links = false);
@@ -721,7 +721,7 @@ class RecursiveDirectoryIterator {
 };
 
 class GlobIterator {
-    Object _this;
+    Object this_;
   public:
     GlobIterator(const Variant &pattern, const Variant &flags = 0);
     Variant count();
@@ -767,7 +767,7 @@ class GlobIterator {
 };
 
 class SplFileObject {
-    Object _this;
+    Object this_;
   public:
     SplFileObject(const Variant &filename, const Variant &mode = "r", const Variant &use_include_path = false, const Variant &context = {});
     Variant rewind();
@@ -833,7 +833,7 @@ class SplFileObject {
 };
 
 class SplTempFileObject {
-    Object _this;
+    Object this_;
   public:
     SplTempFileObject(const Variant &max_memory = 2097152);
     Variant rewind();
@@ -899,7 +899,7 @@ class SplTempFileObject {
 };
 
 class SplDoublyLinkedList {
-    Object _this;
+    Object this_;
   public:
     Variant add(const Variant &index, const Variant &value);
     Variant pop();
@@ -930,7 +930,7 @@ class SplDoublyLinkedList {
 };
 
 class SplQueue {
-    Object _this;
+    Object this_;
   public:
     Variant enqueue(const Variant &value);
     Variant dequeue();
@@ -963,7 +963,7 @@ class SplQueue {
 };
 
 class SplStack {
-    Object _this;
+    Object this_;
   public:
     Variant add(const Variant &index, const Variant &value);
     Variant pop();
@@ -994,7 +994,7 @@ class SplStack {
 };
 
 class SplMinHeap {
-    Object _this;
+    Object this_;
   public:
     Variant extract();
     Variant insert(const Variant &value);
@@ -1012,7 +1012,7 @@ class SplMinHeap {
 };
 
 class SplMaxHeap {
-    Object _this;
+    Object this_;
   public:
     Variant extract();
     Variant insert(const Variant &value);
@@ -1030,7 +1030,7 @@ class SplMaxHeap {
 };
 
 class SplPriorityQueue {
-    Object _this;
+    Object this_;
   public:
     Variant compare(const Variant &priority1, const Variant &priority2);
     Variant insert(const Variant &value, const Variant &priority);
@@ -1051,7 +1051,7 @@ class SplPriorityQueue {
 };
 
 class SplFixedArray {
-    Object _this;
+    Object this_;
   public:
     SplFixedArray(const Variant &size = 0);
     Variant __wakeup();
@@ -1071,7 +1071,7 @@ class SplFixedArray {
 };
 
 class SplObjectStorage {
-    Object _this;
+    Object this_;
   public:
     Variant attach(const Variant &object, const Variant &info = {});
     Variant detach(const Variant &object);
@@ -1100,7 +1100,7 @@ class SplObjectStorage {
 };
 
 class MultipleIterator {
-    Object _this;
+    Object this_;
   public:
     MultipleIterator(const Variant &flags = 1);
     Variant getFlags();

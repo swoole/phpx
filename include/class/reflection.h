@@ -1,6 +1,6 @@
 namespace php {
 class ReflectionException {
-    Object _this;
+    Object this_;
   public:
     ReflectionException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -15,13 +15,13 @@ class ReflectionException {
 };
 
 class Reflection {
-    Object _this;
+    Object this_;
   public:
     static Variant getModifierNames(const Variant &modifiers);
 };
 
 class ReflectionFunction {
-    Object _this;
+    Object this_;
   public:
     ReflectionFunction(const Variant &function);
     Variant __toString();
@@ -64,7 +64,7 @@ class ReflectionFunction {
 };
 
 class ReflectionGenerator {
-    Object _this;
+    Object this_;
   public:
     ReflectionGenerator(const Variant &generator);
     Variant getExecutingLine();
@@ -76,7 +76,7 @@ class ReflectionGenerator {
 };
 
 class ReflectionParameter {
-    Object _this;
+    Object this_;
   public:
     ReflectionParameter(const Variant &function, const Variant &param);
     Variant __toString();
@@ -103,7 +103,7 @@ class ReflectionParameter {
 };
 
 class ReflectionNamedType {
-    Object _this;
+    Object this_;
   public:
     Variant getName();
     Variant isBuiltin();
@@ -112,7 +112,7 @@ class ReflectionNamedType {
 };
 
 class ReflectionUnionType {
-    Object _this;
+    Object this_;
   public:
     Variant getTypes();
     Variant allowsNull();
@@ -120,7 +120,7 @@ class ReflectionUnionType {
 };
 
 class ReflectionIntersectionType {
-    Object _this;
+    Object this_;
   public:
     Variant getTypes();
     Variant allowsNull();
@@ -128,7 +128,7 @@ class ReflectionIntersectionType {
 };
 
 class ReflectionMethod {
-    Object _this;
+    Object this_;
   public:
     ReflectionMethod(const Variant &object_or_method, const Variant &method = {});
     Variant __toString();
@@ -181,7 +181,7 @@ class ReflectionMethod {
 };
 
 class ReflectionClass {
-    Object _this;
+    Object this_;
   public:
     ReflectionClass(const Variant &object_or_class);
     Variant __toString();
@@ -241,7 +241,7 @@ class ReflectionClass {
 };
 
 class ReflectionObject {
-    Object _this;
+    Object this_;
   public:
     ReflectionObject(const Variant &object);
     Variant __toString();
@@ -301,7 +301,7 @@ class ReflectionObject {
 };
 
 class ReflectionProperty {
-    Object _this;
+    Object this_;
   public:
     ReflectionProperty(const Variant &_class, const Variant &property);
     Variant __toString();
@@ -328,7 +328,7 @@ class ReflectionProperty {
 };
 
 class ReflectionClassConstant {
-    Object _this;
+    Object this_;
   public:
     ReflectionClassConstant(const Variant &_class, const Variant &constant);
     Variant __toString();
@@ -346,7 +346,7 @@ class ReflectionClassConstant {
 };
 
 class ReflectionExtension {
-    Object _this;
+    Object this_;
   public:
     ReflectionExtension(const Variant &name);
     Variant __toString();
@@ -364,7 +364,7 @@ class ReflectionExtension {
 };
 
 class ReflectionZendExtension {
-    Object _this;
+    Object this_;
   public:
     ReflectionZendExtension(const Variant &name);
     Variant __toString();
@@ -376,14 +376,14 @@ class ReflectionZendExtension {
 };
 
 class ReflectionReference {
-    Object _this;
+    Object this_;
   public:
     static Variant fromArrayElement(const Variant &array, const Variant &key);
     Variant getId();
 };
 
 class ReflectionAttribute {
-    Object _this;
+    Object this_;
   public:
     Variant getName();
     Variant getTarget();
@@ -394,7 +394,7 @@ class ReflectionAttribute {
 };
 
 class ReflectionEnum {
-    Object _this;
+    Object this_;
   public:
     ReflectionEnum(const Variant &object_or_class);
     Variant hasCase(const Variant &name);
@@ -459,7 +459,7 @@ class ReflectionEnum {
 };
 
 class ReflectionEnumUnitCase {
-    Object _this;
+    Object this_;
   public:
     ReflectionEnumUnitCase(const Variant &_class, const Variant &constant);
     Variant getEnum();
@@ -478,7 +478,7 @@ class ReflectionEnumUnitCase {
 };
 
 class ReflectionEnumBackedCase {
-    Object _this;
+    Object this_;
   public:
     ReflectionEnumBackedCase(const Variant &_class, const Variant &constant);
     Variant getBackingValue();
@@ -498,7 +498,7 @@ class ReflectionEnumBackedCase {
 };
 
 class ReflectionFiber {
-    Object _this;
+    Object this_;
   public:
     ReflectionFiber(const Variant &fiber);
     Variant getFiber();

@@ -1,6 +1,6 @@
 namespace php {
 class PhpToken {
-    Object _this;
+    Object this_;
   public:
     static Variant tokenize(const Variant &code, const Variant &flags = 0);
     PhpToken(const Variant &id, const Variant &text, const Variant &line = -1, const Variant &pos = -1);

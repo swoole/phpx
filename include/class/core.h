@@ -1,6 +1,6 @@
 namespace php {
 class InternalIterator {
-    Object _this;
+    Object this_;
   public:
     Variant current();
     Variant key();
@@ -10,7 +10,7 @@ class InternalIterator {
 };
 
 class Exception {
-    Object _this;
+    Object this_;
   public:
     Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -25,7 +25,7 @@ class Exception {
 };
 
 class ErrorException {
-    Object _this;
+    Object this_;
   public:
     ErrorException(const Variant &message = "", const Variant &code = 0, const Variant &severity = 1, const Variant &filename = {}, const Variant &line = {}, const Variant &previous = {});
     Variant getSeverity();
@@ -41,7 +41,7 @@ class ErrorException {
 };
 
 class Error {
-    Object _this;
+    Object this_;
   public:
     Error(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -56,7 +56,7 @@ class Error {
 };
 
 class CompileError {
-    Object _this;
+    Object this_;
   public:
     CompileError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -71,7 +71,7 @@ class CompileError {
 };
 
 class ParseError {
-    Object _this;
+    Object this_;
   public:
     ParseError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -86,7 +86,7 @@ class ParseError {
 };
 
 class TypeError {
-    Object _this;
+    Object this_;
   public:
     TypeError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -101,7 +101,7 @@ class TypeError {
 };
 
 class ArgumentCountError {
-    Object _this;
+    Object this_;
   public:
     ArgumentCountError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -116,7 +116,7 @@ class ArgumentCountError {
 };
 
 class ValueError {
-    Object _this;
+    Object this_;
   public:
     ValueError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -131,7 +131,7 @@ class ValueError {
 };
 
 class ArithmeticError {
-    Object _this;
+    Object this_;
   public:
     ArithmeticError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -146,7 +146,7 @@ class ArithmeticError {
 };
 
 class DivisionByZeroError {
-    Object _this;
+    Object this_;
   public:
     DivisionByZeroError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -161,7 +161,7 @@ class DivisionByZeroError {
 };
 
 class UnhandledMatchError {
-    Object _this;
+    Object this_;
   public:
     UnhandledMatchError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -176,7 +176,7 @@ class UnhandledMatchError {
 };
 
 class Closure {
-    Object _this;
+    Object this_;
   public:
     static Variant bind(const Variant &closure, const Variant &new_this, const Variant &new_scope = "static");
     Variant bindTo(const Variant &new_this, const Variant &new_scope = "static");
@@ -186,7 +186,7 @@ class Closure {
 };
 
 class Generator {
-    Object _this;
+    Object this_;
   public:
     Variant rewind();
     Variant valid();
@@ -199,7 +199,7 @@ class Generator {
 };
 
 class ClosedGeneratorException {
-    Object _this;
+    Object this_;
   public:
     ClosedGeneratorException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -214,7 +214,7 @@ class ClosedGeneratorException {
 };
 
 class WeakReference {
-    Object _this;
+    Object this_;
   public:
     WeakReference();
     static Variant create(const Variant &object);
@@ -222,7 +222,7 @@ class WeakReference {
 };
 
 class WeakMap {
-    Object _this;
+    Object this_;
   public:
     Variant offsetGet(const Variant &object);
     Variant offsetSet(const Variant &object, const Variant &value);
@@ -233,31 +233,31 @@ class WeakMap {
 };
 
 class Attribute {
-    Object _this;
+    Object this_;
   public:
     Attribute(const Variant &flags = 63);
 };
 
 class ReturnTypeWillChange {
-    Object _this;
+    Object this_;
   public:
     ReturnTypeWillChange();
 };
 
 class AllowDynamicProperties {
-    Object _this;
+    Object this_;
   public:
     AllowDynamicProperties();
 };
 
 class SensitiveParameter {
-    Object _this;
+    Object this_;
   public:
     SensitiveParameter();
 };
 
 class SensitiveParameterValue {
-    Object _this;
+    Object this_;
   public:
     SensitiveParameterValue(const Variant &value);
     Variant getValue();
@@ -265,7 +265,7 @@ class SensitiveParameterValue {
 };
 
 class Fiber {
-    Object _this;
+    Object this_;
   public:
     Fiber(const Variant &callback);
     Variant start(const Variant &args = {});
@@ -281,7 +281,7 @@ class Fiber {
 };
 
 class FiberError {
-    Object _this;
+    Object this_;
   public:
     FiberError();
     Variant __wakeup();

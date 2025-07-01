@@ -6,12 +6,12 @@ namespace php {
 <?php foreach ($info['methods'] as $name => $minfo): ?>
 <?=!$minfo['ctor'] ? 'Variant ' : '' ?><?=$className?>::<?=$name?>(<?=$minfo['args_impl']?>) {
 <?php if ($minfo['ctor']): ?>
-    _this = newObject(<?=$info['class']?><?=$minfo['call']?>);
+    this_ = newObject(<?=$info['class']?><?=$minfo['call']?>);
 <?php elseif ($minfo['static']): ?>
     static Variant fn { ZEND_STRL("<?=$className?>::<?=$name?>"), true };
     return fn(<?=$minfo['call']?>);
 <?php else: ?>
-    return _this.exec("<?=$minfo['name']?>"<?=$minfo['call']?>);
+    return this_.exec("<?=$minfo['name']?>"<?=$minfo['call']?>);
 <?php endif; ?>
 }
 

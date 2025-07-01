@@ -1,6 +1,6 @@
 namespace php {
 class SimpleXMLElement {
-    Object _this;
+    Object this_;
   public:
     Variant xpath(const Variant &expression);
     Variant registerXPathNamespace(const Variant &prefix, const Variant &_namespace);
@@ -26,7 +26,7 @@ class SimpleXMLElement {
 };
 
 class SimpleXMLIterator {
-    Object _this;
+    Object this_;
   public:
     Variant xpath(const Variant &expression);
     Variant registerXPathNamespace(const Variant &prefix, const Variant &_namespace);

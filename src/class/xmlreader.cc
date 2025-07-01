@@ -3,63 +3,63 @@
 
 namespace php {
 Variant XMLReader::close() {
-    return _this.exec("close");
+    return this_.exec("close");
 }
 
 Variant XMLReader::getAttribute(const Variant &name) {
-    return _this.exec("getAttribute", name);
+    return this_.exec("getAttribute", name);
 }
 
 Variant XMLReader::getAttributeNo(const Variant &index) {
-    return _this.exec("getAttributeNo", index);
+    return this_.exec("getAttributeNo", index);
 }
 
 Variant XMLReader::getAttributeNs(const Variant &name, const Variant &_namespace) {
-    return _this.exec("getAttributeNs", name, _namespace);
+    return this_.exec("getAttributeNs", name, _namespace);
 }
 
 Variant XMLReader::getParserProperty(const Variant &property) {
-    return _this.exec("getParserProperty", property);
+    return this_.exec("getParserProperty", property);
 }
 
 Variant XMLReader::isValid() {
-    return _this.exec("isValid");
+    return this_.exec("isValid");
 }
 
 Variant XMLReader::lookupNamespace(const Variant &prefix) {
-    return _this.exec("lookupNamespace", prefix);
+    return this_.exec("lookupNamespace", prefix);
 }
 
 Variant XMLReader::moveToAttribute(const Variant &name) {
-    return _this.exec("moveToAttribute", name);
+    return this_.exec("moveToAttribute", name);
 }
 
 Variant XMLReader::moveToAttributeNo(const Variant &index) {
-    return _this.exec("moveToAttributeNo", index);
+    return this_.exec("moveToAttributeNo", index);
 }
 
 Variant XMLReader::moveToAttributeNs(const Variant &name, const Variant &_namespace) {
-    return _this.exec("moveToAttributeNs", name, _namespace);
+    return this_.exec("moveToAttributeNs", name, _namespace);
 }
 
 Variant XMLReader::moveToElement() {
-    return _this.exec("moveToElement");
+    return this_.exec("moveToElement");
 }
 
 Variant XMLReader::moveToFirstAttribute() {
-    return _this.exec("moveToFirstAttribute");
+    return this_.exec("moveToFirstAttribute");
 }
 
 Variant XMLReader::moveToNextAttribute() {
-    return _this.exec("moveToNextAttribute");
+    return this_.exec("moveToNextAttribute");
 }
 
 Variant XMLReader::read() {
-    return _this.exec("read");
+    return this_.exec("read");
 }
 
 Variant XMLReader::next(const Variant &name) {
-    return _this.exec("next", name);
+    return this_.exec("next", name);
 }
 
 Variant XMLReader::open(const Variant &uri, const Variant &encoding, const Variant &flags) {
@@ -68,31 +68,31 @@ Variant XMLReader::open(const Variant &uri, const Variant &encoding, const Varia
 }
 
 Variant XMLReader::readInnerXml() {
-    return _this.exec("readInnerXml");
+    return this_.exec("readInnerXml");
 }
 
 Variant XMLReader::readOuterXml() {
-    return _this.exec("readOuterXml");
+    return this_.exec("readOuterXml");
 }
 
 Variant XMLReader::readString() {
-    return _this.exec("readString");
+    return this_.exec("readString");
 }
 
 Variant XMLReader::setSchema(const Variant &filename) {
-    return _this.exec("setSchema", filename);
+    return this_.exec("setSchema", filename);
 }
 
 Variant XMLReader::setParserProperty(const Variant &property, const Variant &value) {
-    return _this.exec("setParserProperty", property, value);
+    return this_.exec("setParserProperty", property, value);
 }
 
 Variant XMLReader::setRelaxNGSchema(const Variant &filename) {
-    return _this.exec("setRelaxNGSchema", filename);
+    return this_.exec("setRelaxNGSchema", filename);
 }
 
 Variant XMLReader::setRelaxNGSchemaSource(const Variant &source) {
-    return _this.exec("setRelaxNGSchemaSource", source);
+    return this_.exec("setRelaxNGSchemaSource", source);
 }
 
 Variant XMLReader::XML(const Variant &source, const Variant &encoding, const Variant &flags) {
@@ -101,7 +101,7 @@ Variant XMLReader::XML(const Variant &source, const Variant &encoding, const Var
 }
 
 Variant XMLReader::expand(const Variant &base_node) {
-    return _this.exec("expand", base_node);
+    return this_.exec("expand", base_node);
 }
 
 

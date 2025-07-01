@@ -3,19 +3,19 @@
 
 namespace php {
 DateTime::DateTime(const Variant &datetime, const Variant &timezone) {
-    _this = newObject("DateTime", datetime, timezone);
+    this_ = newObject("DateTime", datetime, timezone);
 }
 
 Variant DateTime::__serialize() {
-    return _this.exec("__serialize");
+    return this_.exec("__serialize");
 }
 
 Variant DateTime::__unserialize(const Variant &data) {
-    return _this.exec("__unserialize", data);
+    return this_.exec("__unserialize", data);
 }
 
 Variant DateTime::__wakeup() {
-    return _this.exec("__wakeup");
+    return this_.exec("__wakeup");
 }
 
 Variant DateTime::__set_state(const Variant &array) {
@@ -44,72 +44,72 @@ Variant DateTime::getLastErrors() {
 }
 
 Variant DateTime::format(const Variant &format) {
-    return _this.exec("format", format);
+    return this_.exec("format", format);
 }
 
 Variant DateTime::modify(const Variant &modifier) {
-    return _this.exec("modify", modifier);
+    return this_.exec("modify", modifier);
 }
 
 Variant DateTime::add(const Variant &interval) {
-    return _this.exec("add", interval);
+    return this_.exec("add", interval);
 }
 
 Variant DateTime::sub(const Variant &interval) {
-    return _this.exec("sub", interval);
+    return this_.exec("sub", interval);
 }
 
 Variant DateTime::getTimezone() {
-    return _this.exec("getTimezone");
+    return this_.exec("getTimezone");
 }
 
 Variant DateTime::setTimezone(const Variant &timezone) {
-    return _this.exec("setTimezone", timezone);
+    return this_.exec("setTimezone", timezone);
 }
 
 Variant DateTime::getOffset() {
-    return _this.exec("getOffset");
+    return this_.exec("getOffset");
 }
 
 Variant DateTime::setTime(const Variant &hour, const Variant &minute, const Variant &second, const Variant &microsecond) {
-    return _this.exec("setTime", hour, minute, second, microsecond);
+    return this_.exec("setTime", hour, minute, second, microsecond);
 }
 
 Variant DateTime::setDate(const Variant &year, const Variant &month, const Variant &day) {
-    return _this.exec("setDate", year, month, day);
+    return this_.exec("setDate", year, month, day);
 }
 
 Variant DateTime::setISODate(const Variant &year, const Variant &week, const Variant &day_of_week) {
-    return _this.exec("setISODate", year, week, day_of_week);
+    return this_.exec("setISODate", year, week, day_of_week);
 }
 
 Variant DateTime::setTimestamp(const Variant &timestamp) {
-    return _this.exec("setTimestamp", timestamp);
+    return this_.exec("setTimestamp", timestamp);
 }
 
 Variant DateTime::getTimestamp() {
-    return _this.exec("getTimestamp");
+    return this_.exec("getTimestamp");
 }
 
 Variant DateTime::diff(const Variant &target_object, const Variant &absolute) {
-    return _this.exec("diff", target_object, absolute);
+    return this_.exec("diff", target_object, absolute);
 }
 
 
 DateTimeImmutable::DateTimeImmutable(const Variant &datetime, const Variant &timezone) {
-    _this = newObject("DateTimeImmutable", datetime, timezone);
+    this_ = newObject("DateTimeImmutable", datetime, timezone);
 }
 
 Variant DateTimeImmutable::__serialize() {
-    return _this.exec("__serialize");
+    return this_.exec("__serialize");
 }
 
 Variant DateTimeImmutable::__unserialize(const Variant &data) {
-    return _this.exec("__unserialize", data);
+    return this_.exec("__unserialize", data);
 }
 
 Variant DateTimeImmutable::__wakeup() {
-    return _this.exec("__wakeup");
+    return this_.exec("__wakeup");
 }
 
 Variant DateTimeImmutable::__set_state(const Variant &array) {
@@ -128,55 +128,55 @@ Variant DateTimeImmutable::getLastErrors() {
 }
 
 Variant DateTimeImmutable::format(const Variant &format) {
-    return _this.exec("format", format);
+    return this_.exec("format", format);
 }
 
 Variant DateTimeImmutable::getTimezone() {
-    return _this.exec("getTimezone");
+    return this_.exec("getTimezone");
 }
 
 Variant DateTimeImmutable::getOffset() {
-    return _this.exec("getOffset");
+    return this_.exec("getOffset");
 }
 
 Variant DateTimeImmutable::getTimestamp() {
-    return _this.exec("getTimestamp");
+    return this_.exec("getTimestamp");
 }
 
 Variant DateTimeImmutable::diff(const Variant &target_object, const Variant &absolute) {
-    return _this.exec("diff", target_object, absolute);
+    return this_.exec("diff", target_object, absolute);
 }
 
 Variant DateTimeImmutable::modify(const Variant &modifier) {
-    return _this.exec("modify", modifier);
+    return this_.exec("modify", modifier);
 }
 
 Variant DateTimeImmutable::add(const Variant &interval) {
-    return _this.exec("add", interval);
+    return this_.exec("add", interval);
 }
 
 Variant DateTimeImmutable::sub(const Variant &interval) {
-    return _this.exec("sub", interval);
+    return this_.exec("sub", interval);
 }
 
 Variant DateTimeImmutable::setTimezone(const Variant &timezone) {
-    return _this.exec("setTimezone", timezone);
+    return this_.exec("setTimezone", timezone);
 }
 
 Variant DateTimeImmutable::setTime(const Variant &hour, const Variant &minute, const Variant &second, const Variant &microsecond) {
-    return _this.exec("setTime", hour, minute, second, microsecond);
+    return this_.exec("setTime", hour, minute, second, microsecond);
 }
 
 Variant DateTimeImmutable::setDate(const Variant &year, const Variant &month, const Variant &day) {
-    return _this.exec("setDate", year, month, day);
+    return this_.exec("setDate", year, month, day);
 }
 
 Variant DateTimeImmutable::setISODate(const Variant &year, const Variant &week, const Variant &day_of_week) {
-    return _this.exec("setISODate", year, week, day_of_week);
+    return this_.exec("setISODate", year, week, day_of_week);
 }
 
 Variant DateTimeImmutable::setTimestamp(const Variant &timestamp) {
-    return _this.exec("setTimestamp", timestamp);
+    return this_.exec("setTimestamp", timestamp);
 }
 
 Variant DateTimeImmutable::createFromMutable(const Variant &object) {
@@ -191,23 +191,23 @@ Variant DateTimeImmutable::createFromInterface(const Variant &object) {
 
 
 DateTimeZone::DateTimeZone(const Variant &timezone) {
-    _this = newObject("DateTimeZone", timezone);
+    this_ = newObject("DateTimeZone", timezone);
 }
 
 Variant DateTimeZone::getName() {
-    return _this.exec("getName");
+    return this_.exec("getName");
 }
 
 Variant DateTimeZone::getOffset(const Variant &datetime) {
-    return _this.exec("getOffset", datetime);
+    return this_.exec("getOffset", datetime);
 }
 
 Variant DateTimeZone::getTransitions(const Variant &timestamp_begin, const Variant &timestamp_end) {
-    return _this.exec("getTransitions", timestamp_begin, timestamp_end);
+    return this_.exec("getTransitions", timestamp_begin, timestamp_end);
 }
 
 Variant DateTimeZone::getLocation() {
-    return _this.exec("getLocation");
+    return this_.exec("getLocation");
 }
 
 Variant DateTimeZone::listAbbreviations() {
@@ -221,15 +221,15 @@ Variant DateTimeZone::listIdentifiers(const Variant &timezone_group, const Varia
 }
 
 Variant DateTimeZone::__serialize() {
-    return _this.exec("__serialize");
+    return this_.exec("__serialize");
 }
 
 Variant DateTimeZone::__unserialize(const Variant &data) {
-    return _this.exec("__unserialize", data);
+    return this_.exec("__unserialize", data);
 }
 
 Variant DateTimeZone::__wakeup() {
-    return _this.exec("__wakeup");
+    return this_.exec("__wakeup");
 }
 
 Variant DateTimeZone::__set_state(const Variant &array) {
@@ -239,7 +239,7 @@ Variant DateTimeZone::__set_state(const Variant &array) {
 
 
 DateInterval::DateInterval(const Variant &duration) {
-    _this = newObject("DateInterval", duration);
+    this_ = newObject("DateInterval", duration);
 }
 
 Variant DateInterval::createFromDateString(const Variant &datetime) {
@@ -248,19 +248,19 @@ Variant DateInterval::createFromDateString(const Variant &datetime) {
 }
 
 Variant DateInterval::format(const Variant &format) {
-    return _this.exec("format", format);
+    return this_.exec("format", format);
 }
 
 Variant DateInterval::__serialize() {
-    return _this.exec("__serialize");
+    return this_.exec("__serialize");
 }
 
 Variant DateInterval::__unserialize(const Variant &data) {
-    return _this.exec("__unserialize", data);
+    return this_.exec("__unserialize", data);
 }
 
 Variant DateInterval::__wakeup() {
-    return _this.exec("__wakeup");
+    return this_.exec("__wakeup");
 }
 
 Variant DateInterval::__set_state(const Variant &array) {
@@ -270,35 +270,35 @@ Variant DateInterval::__set_state(const Variant &array) {
 
 
 DatePeriod::DatePeriod(const Variant &start, const Variant &interval, const Variant &end, const Variant &options) {
-    _this = newObject("DatePeriod", start, interval, end, options);
+    this_ = newObject("DatePeriod", start, interval, end, options);
 }
 
 Variant DatePeriod::getStartDate() {
-    return _this.exec("getStartDate");
+    return this_.exec("getStartDate");
 }
 
 Variant DatePeriod::getEndDate() {
-    return _this.exec("getEndDate");
+    return this_.exec("getEndDate");
 }
 
 Variant DatePeriod::getDateInterval() {
-    return _this.exec("getDateInterval");
+    return this_.exec("getDateInterval");
 }
 
 Variant DatePeriod::getRecurrences() {
-    return _this.exec("getRecurrences");
+    return this_.exec("getRecurrences");
 }
 
 Variant DatePeriod::__serialize() {
-    return _this.exec("__serialize");
+    return this_.exec("__serialize");
 }
 
 Variant DatePeriod::__unserialize(const Variant &data) {
-    return _this.exec("__unserialize", data);
+    return this_.exec("__unserialize", data);
 }
 
 Variant DatePeriod::__wakeup() {
-    return _this.exec("__wakeup");
+    return this_.exec("__wakeup");
 }
 
 Variant DatePeriod::__set_state(const Variant &array) {
@@ -307,7 +307,7 @@ Variant DatePeriod::__set_state(const Variant &array) {
 }
 
 Variant DatePeriod::getIterator() {
-    return _this.exec("getIterator");
+    return this_.exec("getIterator");
 }
 
 

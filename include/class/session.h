@@ -1,6 +1,6 @@
 namespace php {
 class SessionHandler {
-    Object _this;
+    Object this_;
   public:
     Variant open(const Variant &path, const Variant &name);
     Variant close();

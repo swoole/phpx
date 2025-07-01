@@ -1,6 +1,6 @@
 namespace php {
 class Redis {
-    Object _this;
+    Object this_;
   public:
     Redis(const Variant &options = {});
     Variant _compress(const Variant &value);
@@ -258,7 +258,7 @@ class Redis {
 };
 
 class RedisArray {
-    Object _this;
+    Object this_;
   public:
     Variant __call(const Variant &function_name, const Variant &arguments);
     RedisArray(const Variant &name_or_hosts, const Variant &options = {});
@@ -294,7 +294,7 @@ class RedisArray {
 };
 
 class RedisCluster {
-    Object _this;
+    Object this_;
   public:
     RedisCluster(const Variant &name, const Variant &seeds = {}, const Variant &timeout = 0, const Variant &read_timeout = 0, const Variant &persistent = false, const Variant &auth = {}, const Variant &context = {});
     Variant _compress(const Variant &value);
@@ -521,7 +521,7 @@ class RedisCluster {
 };
 
 class RedisClusterException {
-    Object _this;
+    Object this_;
   public:
     RedisClusterException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -536,7 +536,7 @@ class RedisClusterException {
 };
 
 class RedisSentinel {
-    Object _this;
+    Object this_;
   public:
     RedisSentinel(const Variant &options = {});
     Variant ckquorum(const Variant &master);
@@ -553,7 +553,7 @@ class RedisSentinel {
 };
 
 class RedisException {
-    Object _this;
+    Object this_;
   public:
     RedisException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();

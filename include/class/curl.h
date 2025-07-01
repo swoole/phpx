@@ -1,6 +1,6 @@
 namespace php {
 class CURLFile {
-    Object _this;
+    Object this_;
   public:
     CURLFile(const Variant &filename, const Variant &mime_type = {}, const Variant &posted_filename = {});
     Variant getFilename();
@@ -11,7 +11,7 @@ class CURLFile {
 };
 
 class CURLStringFile {
-    Object _this;
+    Object this_;
   public:
     CURLStringFile(const Variant &data, const Variant &postname, const Variant &mime = "application/octet-stream");
 };

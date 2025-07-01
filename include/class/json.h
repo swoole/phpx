@@ -1,6 +1,6 @@
 namespace php {
 class JsonException {
-    Object _this;
+    Object this_;
   public:
     JsonException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
