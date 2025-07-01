@@ -1,4 +1,5 @@
 #include "phpx_test.h"
+#include "phpx_func.h"
 
 using namespace php;
 
@@ -51,3 +52,35 @@ TEST(array, init) {
     ASSERT_EQ(a3[2222].toFloat(), 3.14);
     ASSERT_EQ(a3[3333].toFloat(), 100);
 }
+
+TEST(array, search) {
+    Array arr = create_list();
+    Variant v1{"php"};
+    Variant v2{"python"};
+    Variant v3{"not-exists"};
+
+    ASSERT_EQ(arr.search(v1).toInt(), 0);
+    ASSERT_EQ(arr.search(v2).toInt(), 3);
+    ASSERT_TRUE(arr.search(v3).isFalse());
+
+    Array arr2 = create_map();
+    Variant v4{3};
+    ASSERT_STREQ(arr2.search(v4).toCString(), "php");
+}
+
+TEST(array, foreach) {
+    Array arr = create_list();
+    std::vector<std::string> list;
+    for (auto i = arr.begin(); i != arr.end(); i++) {
+        list.push_back(i.value().toString());
+    }
+    ASSERT_EQ(list.size(), 5);
+
+    arr.del(3);
+    list.clear();
+    for (auto i = arr.begin(); i != arr.end(); i++) {
+        list.push_back(i.value().toString());
+    }
+    ASSERT_EQ(list.size(), 4);
+}
+

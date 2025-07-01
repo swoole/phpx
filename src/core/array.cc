@@ -16,7 +16,7 @@
 
 #include "phpx.h"
 
-using namespace std;
+#include "phpx_func.h"
 
 namespace php {
 int array_data_compare(Bucket *f, Bucket *s) {
@@ -140,5 +140,30 @@ Array::Array(const std::initializer_list<std::pair<Int, const Variant>> &list) {
     for (const auto &kv : list) {
         set(kv.first, kv.second);
     }
+}
+
+Variant Array::search(Variant &_other_var, bool strict) {
+    for (auto i = begin(); i != end(); i++) {
+        if (i.value().equals(_other_var, strict)) {
+            return i.key();
+        }
+    }
+    return false;
+}
+
+bool Array::contains(Variant &_other_var, bool strict) {
+    for (auto i = begin(); i != end(); i++) {
+        if (i.value().equals(_other_var, strict)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+String Array::join(String &delim) {
+    Variant retval;
+    php_implode(delim.ptr(), HASH_OF(ptr()), retval.ptr());
+    retval.addRef();
+    return retval.ptr();
 }
 }  // namespace php

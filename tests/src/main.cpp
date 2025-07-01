@@ -51,3 +51,7 @@ php::Array create_map() {
     v1.set("node.js", 5);
     return v1;
 }
+
+php::Array create_list() {
+    return {"php", "java", "go", "python", "c++"};
+}

@@ -386,6 +386,12 @@ class Variant {
     bool isBool() const {
         return Z_TYPE_P(const_ptr()) == IS_TRUE || Z_TYPE_P(const_ptr()) == IS_FALSE;
     }
+    bool isFalse() const {
+        return Z_TYPE_P(const_ptr()) == IS_FALSE;
+    }
+    bool isTrue() const {
+        return Z_TYPE_P(const_ptr()) == IS_TRUE;
+    }
     bool isNull() const {
         return Z_TYPE_P(const_ptr()) == IS_NULL;
     }
@@ -595,71 +601,63 @@ static Variant get_cfg_name(const String &varname) {
     }
 }
 
+#ifndef ZEND_HASH_ELEMENT
+#define ZEND_HASH_ELEMENT(ht, idx) &HT_HASH_TO_BUCKET(ht, idx)->val
+#endif
+
 class ArrayIterator {
+    zend_array *array_;
+    zend_ulong idx_;
   public:
-    ArrayIterator(Bucket *p) {
-        _ptr = p;
-        _key = _ptr->key;
-        _val = &_ptr->val;
-        _index = _ptr->h;
-        pe = p;
-    }
-    ArrayIterator(Bucket *p, Bucket *_pe) {
-        _ptr = p;
-        _key = _ptr->key;
-        _val = &_ptr->val;
-        _index = _ptr->h;
-        pe = _pe;
+    ArrayIterator(zend_array *array, zend_ulong idx) {
+        array_ = array;
+        idx_ = idx;
         skipUndefBucket();
     }
     void operator++(int i) {
-        ++_ptr;
+        ++idx_;
         skipUndefBucket();
     }
-    bool operator!=(ArrayIterator b) const {
-        return b.ptr() != _ptr;
+    bool operator!=(const ArrayIterator b) const {
+        return b.index() != index();
+    }
+    bool operator==(const ArrayIterator b) const {
+        return b.index() == index();
     }
     Variant key() const {
-        if (_key) {
-            return {_key->val, _key->len};
-        } else {
-            return {(long) _index};
+#if PHP_VERSION_ID >= 80100
+        if (HT_IS_PACKED(array_)) {
+            return (zend_long) idx_;
+        } else
+#endif
+        {
+            auto *bucket = HT_HASH_TO_BUCKET(array_, idx_);
+            if (bucket->key) {
+                return bucket->key;
+            } else {
+                return (zend_long) bucket->h;
+            }
         }
     }
-    Variant value() {
-        return {_val};
+    Variant value() const {
+        return current();
     }
-    Bucket *ptr() const {
-        return _ptr;
+    zend_ulong index() const {
+        return idx_;
     }
-
+    zval *current() const {
+        return ZEND_HASH_ELEMENT(array_, idx_);
+    }
   private:
     void skipUndefBucket() {
-        while (_ptr != pe) {
-            _val = &_ptr->val;
-            if (_val && Z_TYPE_P(_val) == IS_INDIRECT) {
-                _val = Z_INDIRECT_P(_val);
-            }
-            if (UNEXPECTED(Z_TYPE_P(_val) == IS_UNDEF)) {
-                ++_ptr;
-                continue;
-            }
-            if (_ptr->key) {
-                _key = _ptr->key;
-                _index = 0;
+        while (idx_ < array_->nNumUsed - 1) {
+            if (Z_TYPE_P(current()) == IS_UNDEF) {
+                idx_++;
             } else {
-                _index = _ptr->h;
-                _key = nullptr;
+                break;
             }
-            break;
         }
     }
-
-    zval *_val;
-    zend_string *_key;
-    Bucket *_ptr;
-    Bucket *pe;
-    zend_ulong _index;
 };
 
 extern int array_data_compare(Bucket *f, Bucket *s);
@@ -801,10 +799,11 @@ class Array : public Variant {
         return zend_hash_str_exists(Z_ARRVAL_P(ptr()), key.c_str(), key.length());
     }
     ArrayIterator begin() {
-        return {Z_ARRVAL_P(ptr())->arData, Z_ARRVAL_P(ptr())->arData + Z_ARRVAL_P(ptr())->nNumUsed};
+        return {Z_ARRVAL_P(ptr()), 0};
     }
     ArrayIterator end() {
-        return {Z_ARRVAL_P(ptr())->arData + Z_ARRVAL_P(ptr())->nNumUsed};
+        const auto ht = Z_ARRVAL_P(ptr());
+        return {ht, ht->nNumUsed};
     }
     size_t count() const {
         return zend_hash_num_elements(Z_ARRVAL_P(const_ptr()));
@@ -812,32 +811,9 @@ class Array : public Variant {
     bool empty() const {
         return count() == 0;
     }
-    Variant search(Variant &_other_var, bool strict = false) {
-        for (auto i = this->begin(); i != this->end(); i++) {
-            if (i.value().equals(_other_var, strict)) {
-                return i.key();
-            }
-        }
-        return false;
-    }
-    bool contains(Variant &_other_var, bool strict = false) {
-        for (auto i = this->begin(); i != this->end(); i++) {
-            if (i.value().equals(_other_var, strict)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    String join(String &delim) {
-        Variant retval;
-#if PHP_VERSION_ID >= 80000
-        php_implode(delim.ptr(), HASH_OF(ptr()), retval.ptr());
-#else
-        php_implode(delim.ptr(), ptr(), retval.ptr());
-#endif
-        retval.addRef();
-        return retval.ptr();
-    }
+    Variant search(Variant &_other_var, bool strict = false);
+    bool contains(Variant &_other_var, bool strict = false);
+    String join(String &delim);
     void merge(Array &source, bool overwrite = false) {
         zend_hash_merge(Z_ARRVAL_P(ptr()), Z_ARRVAL_P(source.ptr()), zval_add_ref, overwrite);
     }
