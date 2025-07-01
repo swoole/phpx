@@ -80,6 +80,7 @@ foreach ($extensions as $extension) {
     $funcDeclarationFile = $rootDir . "/include/func/{$name}.h";
     if (is_file($funcDeclarationFile)) {
         fwrite($funcHeaderFile, "\n/** extension $extension */\n" . file_get_contents($funcDeclarationFile));
+        unlink($funcDeclarationFile);
     }
 
     $classDeclarationFile = $rootDir . "/include/class/{$name}.h";

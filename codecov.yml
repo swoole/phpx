@@ -1,5 +1,7 @@
 ignore:
   - "tests/src/*"
+  - "src/func/*"
+  - "src/class/*"
 
 coverage:
   range: 60..80
