@@ -86,7 +86,10 @@ void Variant::debug() {
     } else if (Z_TYPE_P(_val) == IS_STRING) {
         printf("value=\"%.*s\"\n", (int) Z_STRLEN_P(_val), Z_STRVAL_P(_val));
     } else if (Z_TYPE_P(_val) == IS_ARRAY) {
-        printf("array[rc=%d]=%p, count=%u\n", Z_REFCOUNT_P(_val), _val->value.arr, zend_hash_num_elements(Z_ARRVAL_P(_val)));
+        printf("array[rc=%d]=%p, count=%u\n",
+               Z_REFCOUNT_P(_val),
+               _val->value.arr,
+               zend_hash_num_elements(Z_ARRVAL_P(_val)));
     } else if (Z_TYPE_P(_val) == IS_OBJECT) {
         printf("object[rc=%d]=%p, class=%s\n", Z_REFCOUNT_P(_val), _val->value.obj, ZSTR_VAL(Z_OBJCE_P(_val)->name));
     } else if (Z_TYPE_P(_val) == IS_RESOURCE) {

@@ -1020,33 +1020,6 @@ class Object : public Variant {
     }
 };
 
-PHPX_API static Object create(const char *name, Args &args) {
-    zend_class_entry *ce = getClassEntry(name);
-    Object object;
-    if (ce == nullptr) {
-        php_error_docref(nullptr, E_WARNING, "class '%s' is undefined.", name);
-        return object;
-    }
-    if (object_init_ex(object.ptr(), ce) == FAILURE) {
-        return object;
-    }
-    object.call("__construct", args);
-    return object;
-}
-
-PHPX_API static Object create(const char *name) {
-    Object object;
-    zend_class_entry *ce = getClassEntry(name);
-    if (ce == nullptr) {
-        php_error_docref(nullptr, E_WARNING, "class '%s' is undefined.", name);
-        return object;
-    }
-    if (object_init_ex(object.ptr(), ce) == FAILURE) {
-        return object;
-    }
-    return object;
-}
-
 typedef void (*resource_dtor)(zend_resource *);
 
 #define PHPX_EXTENSION()                                                                                               \
@@ -1282,8 +1255,23 @@ extern zend_result extension_before_request(int type, int module_number);
 extern zend_result extension_after_request(int type, int module_number);
 
 class Extension {
+    struct IniEntry {
+        std::string name;
+        std::string default_value;
+        int modifiable;
+    };
+
     friend zend_result extension_startup(int type, int module_number);
     friend zend_result extension_shutdown(int type, int module_number);
+    bool started = false;
+
+    int function_count = 0;
+    int deps_count = 0;
+    int function_array_size = 0;
+
+    zend_function_entry *functions;
+    std::vector<IniEntry> ini_entries;
+    std::vector<zend_module_dep> deps_;
 
   protected:
     zend_module_entry module = {
@@ -1301,13 +1289,6 @@ class Extension {
         STANDARD_MODULE_PROPERTIES,
     };
 
-    // INI
-    struct IniEntry {
-        std::string name;
-        std::string default_value;
-        int modifiable;
-    };
-
     void registerIniEntries(int module_number);
     void unregisterIniEntries(int module_number) const;
 
@@ -1317,15 +1298,19 @@ class Extension {
         AFTER_START,
     };
 
-    Extension(const char *name, const char *version);
+    std::string name;
+    std::string version;
 
-    void checkStartupStatus(enum StartupStatus status, const char *func) const {
-        if (status == AFTER_START && !this->started) {
-            zend_error(E_CORE_ERROR, "php::%s must be called after startup.", func);
-        } else if (status == BEFORE_START && this->started) {
-            zend_error(E_CORE_ERROR, "php::%s must be called before startup.", func);
-        }
-    }
+    std::function<void()> onStart = nullptr;
+    std::function<void()> onShutdown = nullptr;
+    std::function<void()> onBeforeRequest = nullptr;
+    std::function<void()> onAfterRequest = nullptr;
+
+    std::vector<std::string> header;
+    std::vector<std::vector<std::string>> body;
+
+    Extension(const char *name, const char *version);
+    void checkStartupStatus(StartupStatus status, const char *func) const;
 
     bool registerClass(Class *c) const;
     bool registerInterface(Interface *i) const;
@@ -1347,34 +1332,7 @@ class Extension {
     }
 
     // modifiable can be one of these:PHP_INI_SYSTEM/PHP_INI_PERDIR/PHP_INI_USER/PHP_INI_ALL
-    void addIniEntry(const char *name, const char *default_value = "", int modifiable = PHP_INI_ALL) {
-        IniEntry entry;
-        entry.name = name;
-        entry.default_value = default_value;
-        entry.modifiable = modifiable;
-        ini_entries.push_back(entry);
-    }
-
-    std::string name;
-    std::string version;
-    bool started = false;
-
-    std::function<void()> onStart = nullptr;
-    std::function<void()> onShutdown = nullptr;
-    std::function<void()> onBeforeRequest = nullptr;
-    std::function<void()> onAfterRequest = nullptr;
-
-    std::vector<std::string> header;
-    std::vector<std::vector<std::string>> body;
-
-  protected:
-    int function_count = 0;
-    int deps_count = 0;
-    int function_array_size = 0;
-
-    zend_function_entry *functions;
-    std::vector<IniEntry> ini_entries;
-    std::vector<zend_module_dep> deps_;
+    void addIniEntry(const char *name, const char *default_value = "", int modifiable = PHP_INI_ALL);
 };
 
 extern std::unordered_map<std::string, std::shared_ptr<Extension>> _name_to_extension;

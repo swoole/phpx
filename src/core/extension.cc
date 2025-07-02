@@ -155,4 +155,19 @@ void Extension::unregisterIniEntries(int module_number) const {
     }
 }
 
+void Extension::checkStartupStatus(const StartupStatus status, const char *func) const {
+    if (status == AFTER_START && !this->started) {
+        zend_error(E_CORE_ERROR, "php::%s must be called after startup.", func);
+    } else if (status == BEFORE_START && this->started) {
+        zend_error(E_CORE_ERROR, "php::%s must be called before startup.", func);
+    }
+}
+
+void Extension::addIniEntry(const char *name, const char *default_value, int modifiable) {
+    IniEntry entry;
+    entry.name = name;
+    entry.default_value = default_value;
+    entry.modifiable = modifiable;
+    ini_entries.push_back(entry);
+}
 }  // namespace php
