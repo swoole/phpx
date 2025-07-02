@@ -50,9 +50,11 @@ TEST(string, basename) {
     String suffix(".txt");
     ASSERT_EQ(path.basename(suffix), "file");
     ASSERT_EQ(path.basename(String("")), "file.txt");
+    path.print();
 }
 
 TEST(string, dirname) {
     String path("/path/to/file.txt");
     ASSERT_EQ(path.dirname(), "/path/to");
+    path.print();
 }

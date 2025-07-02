@@ -157,15 +157,7 @@ class String {
     bool equals(const char *s) const {
         return equals(s, strlen(s));
     }
-    bool equals(const String &s, const bool ci = false) const {
-        if (s.length() != length()) {
-            return false;
-        }
-        if (ci) {
-            return s.length() == length() && zend_binary_strcasecmp(c_str(), length(), s.c_str(), s.length()) == 0;
-        }
-        return zend_string_equals(s.ptr(), str);
-    }
+    bool equals(const String &s, const bool ci = false) const;
     bool operator==(const String &v) const {
         return equals(v);
     }
@@ -199,14 +191,7 @@ class String {
     void stripSlashes() const;
     String basename(const String &suffix) const;
     String dirname() const;
-
-    void print() const {
-        if (str) {
-            php_printf("%.*s", (int) str->len, str->val);
-        } else {
-            php_printf("(null)");
-        }
-    }
+    void print() const;
 
     zend_string *ptr() const {
         return str;

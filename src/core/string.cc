@@ -21,6 +21,24 @@ String::String(Variant &v) {
     str = zval_get_string(v.ptr());
 }
 
+void String::print() const {
+    if (str) {
+        php_printf("(string) \"%.*s\"\n", (int) str->len, str->val);
+    } else {
+        php_printf("(null)");
+    }
+}
+
+bool String::equals(const String &s, const bool ci) const {
+    if (s.length() != length()) {
+        return false;
+    }
+    if (ci) {
+        return s.length() == length() && zend_binary_strcasecmp(c_str(), length(), s.c_str(), s.length()) == 0;
+    }
+    return zend_string_equals(s.ptr(), str);
+}
+
 String String::substr(long f, long l) const {
     if (f < 0) {
         /* if "from" position is negative, count start position from the end
