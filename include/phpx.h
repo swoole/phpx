@@ -608,6 +608,7 @@ static Variant get_cfg_name(const String &varname) {
 class ArrayIterator {
     zend_array *array_;
     zend_ulong idx_;
+
   public:
     ArrayIterator(zend_array *array, zend_ulong idx) {
         array_ = array;
@@ -648,6 +649,7 @@ class ArrayIterator {
     zval *current() const {
         return ZEND_HASH_ELEMENT(array_, idx_);
     }
+
   private:
     void skipUndefBucket() {
         while (idx_ < array_->nNumUsed - 1) {
@@ -862,17 +864,8 @@ static Variant call(const Variant &func) {
     return _call(nullptr, func.const_ptr());
 }
 
-static Variant call(const Variant &func, Args &args) {
-    return _call(nullptr, func.const_ptr(), args);
-}
-
-static Variant call(const Variant &func, const Array &args) {
-    Args _args;
-    for (size_t i = 0; i < args.count(); i++) {
-        _args.append(args[i]);
-    }
-    return _call(nullptr, func.const_ptr(), _args);
-}
+extern Variant call(const Variant &func, const Array &args);
+extern Variant call(const Variant &func, const std::initializer_list<Variant> &args);
 
 static zend_class_entry *getClassEntry(const char *name) {
     String class_name(name, strlen(name));

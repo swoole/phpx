@@ -355,6 +355,22 @@ Variant _call(const zval *object, const zval *func) {
     }
 }
 
+Variant call(const Variant &func, const Array &args) {
+    Args _args;
+    for (size_t i = 0; i < args.count(); i++) {
+        _args.append(args[i]);
+    }
+    return _call(nullptr, func.const_ptr(), _args);
+}
+
+Variant call(const Variant &func, const std::initializer_list<Variant> &args) {
+    Args _args;
+    for (const auto &arg : args) {
+        _args.append(const_cast<Variant &>(arg).ptr());
+    }
+    return _call(nullptr, func.const_ptr(), _args);
+}
+
 Variant include(const std::string &file) {
     zend_file_handle file_handle;
     zend_stream_init_filename(&file_handle, file.c_str());

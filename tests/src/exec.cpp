@@ -76,9 +76,7 @@ TEST(exec, call) {
     ASSERT_TRUE(rs.isString());
     ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
 
-    Args args;
-    args.append("m");
-    rs = call(php_uname, args);
+    rs = call(php_uname, {"m"});
     ASSERT_TRUE(rs.isString());
     ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
 
