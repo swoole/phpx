@@ -56,27 +56,31 @@ bool Class::implements(const Interface *_if) {
     return implements(_if->ptr());
 }
 
-bool Class::addConstant(const char *name, Variant v) {
+bool Class::addConstant(const char *name, const Variant &v) {
     if (activated) {
         return false;
     }
     Constant c;
     c.name = name;
-    ZVAL_COPY(&c.value, v.ptr());
+    ZVAL_COPY(&c.value, v.const_ptr());
     constants.push_back(c);
     return true;
 }
 
-bool Class::addProperty(const char *name, Variant v, int flags) {
+bool Class::addProperty(const char *name, const Variant &v, int flags) {
     if (activated) {
         return false;
     }
     Property p;
     p.name = name;
-    ZVAL_COPY(&p.value, v.ptr());
+    ZVAL_COPY(&p.value, v.const_ptr());
     p.flags = flags;
     properties.push_back(p);
     return true;
+}
+
+bool Class::addStaticProperty(const char *name, const Variant &v, int flags) {
+    return addProperty(name, v, flags | ZEND_ACC_STATIC);
 }
 
 bool Class::registerFunctions(const zend_function_entry *_functions) {
@@ -160,20 +164,24 @@ bool Class::activate() {
     return true;
 }
 
-ClassEntry::ClassEntry(const char *name) {
-    ce = getClassEntry(name);
+Variant Class::getStaticProperty(const char *name, const std::string &prop) {
+    const auto ce = getClassEntry(name);
     if (!ce) {
         zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
     }
+    const auto retval = zend_read_static_property(ce, prop.c_str(), prop.length(), true);
+    Variant rv{retval};
+    zval_ptr_dtor(retval);
+    return rv;
 }
 
-Variant ClassEntry::getStaticProperty(const std::string &p_name) const {
-    return {zend_read_static_property(ce, p_name.c_str(), p_name.length(), true)};
-}
-
-bool ClassEntry::setStaticProperty(const std::string &p_name, const Variant &value) const {
+bool Class::setStaticProperty(const char *name, const std::string &prop, const Variant &value) {
+    const auto ce = getClassEntry(name);
+    if (!ce) {
+        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
+    }
     auto v = const_cast<Variant &>(value);
     v.addRef();
-    return zend_update_static_property(ce, p_name.c_str(), p_name.length(), v.ptr()) == SUCCESS;
+    return zend_update_static_property(ce, prop.c_str(), prop.length(), v.ptr()) == SUCCESS;
 }
 }  // namespace php

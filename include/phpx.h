@@ -1155,8 +1155,9 @@ class Class {
     bool extends(Class *parent);
     bool implements(zend_class_entry *if_ce);
     bool implements(const Interface *);
-    bool addConstant(const char *name, Variant v);
-    bool addProperty(const char *name, Variant v, int flags);
+    bool addConstant(const char *name, const Variant &v);
+    bool addProperty(const char *name, const Variant &v, int flags);
+    bool addStaticProperty(const char *name, const Variant &v, int flags);
     bool registerFunctions(const zend_function_entry *functions);
     bool activate();
     bool alias(const char *alias_name);
@@ -1164,9 +1165,13 @@ class Class {
     const std::string &getName() {
         return class_name;
     }
+
     zend_class_entry *ptr() const {
         return ce;
     }
+
+    static Variant getStaticProperty(const char *name, const std::string &prop);
+    static bool setStaticProperty(const char *name, const std::string &prop, const Variant &value);
 
   protected:
     bool activated;
@@ -1178,17 +1183,9 @@ class Class {
     std::vector<zend_class_entry *> interfaces;
     zend_function_entry *functions;
     std::vector<Property> properties;
+    std::vector<Property> static_properties;
     std::vector<Constant> constants;
     std::vector<std::string> aliases;
-};
-
-class ClassEntry {
-    zend_class_entry *ce;
-public:
-    explicit ClassEntry(const char *name);
-
-    Variant getStaticProperty(const std::string &p_name) const;
-    bool setStaticProperty(const std::string &p_name, const Variant &value) const;
 };
 
 class Interface {

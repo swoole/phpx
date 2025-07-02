@@ -92,6 +92,7 @@ PHPX_EXTENSION() {
         c->addConstant("TEST_CONSTANT_STR", "hello world");
         c->addProperty("testProperty", "hello world", ZEND_ACC_PUBLIC);
         c->addProperty("testPropertyInt", 9988, ZEND_ACC_PUBLIC);
+        c->addStaticProperty("testStaticProperty", "(static) hello world", ZEND_ACC_PUBLIC);
         c->implements(zend_ce_countable);
         c->alias("MyClassAlias");
         extension->registerClass(c);
