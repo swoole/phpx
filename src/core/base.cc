@@ -33,17 +33,6 @@ void error(int level, const char *format, ...) {
     va_end(args);
 }
 
-Variant constant(const char *name) {
-    zend_string *_name = zend_string_init(name, strlen(name), false);
-    zval *val = zend_get_constant_ex(_name, nullptr, ZEND_FETCH_CLASS_SILENT);
-    zend_string_free(_name);
-    if (val == nullptr) {
-        return {};
-    }
-    Variant retval(val);
-    return retval;
-}
-
 void echo(const char *format, ...) {
     va_list args;
     char *buffer;
