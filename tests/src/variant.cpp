@@ -176,6 +176,9 @@ TEST(variant, empty) {
     ASSERT_TRUE(arr.empty());
     arr.append("hello");
     ASSERT_FALSE(arr.empty());
+    ASSERT_EQ(arr.getRefCount(), 1);
+
     Variant alias_arr = arr;
     ASSERT_FALSE(alias_arr.empty());
+    ASSERT_EQ(arr.getRefCount(), 2);
 }

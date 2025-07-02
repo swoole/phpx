@@ -87,6 +87,15 @@ TEST(base, equals) {
     ASSERT_FALSE(v3.equals(v1, true));
 }
 
+TEST(base, class_entry) {
+    include(get_include_dir() + "/library.php");
+    ClassEntry ce("TestClass");
+    ASSERT_EQ(ce.getStaticProperty("propInt").toInt(), 1990018900);
+    ASSERT_STREQ(ce.getStaticProperty("propString").toCString(), "Hello, World!");
+    ASSERT_TRUE(ce.setStaticProperty("propString", "phpx test"));
+    ASSERT_STREQ(ce.getStaticProperty("propString").toCString(), "phpx test");
+}
+
 #if 0
 TEST(base, exception) {
     zend_try {

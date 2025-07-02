@@ -160,4 +160,20 @@ bool Class::activate() {
     return true;
 }
 
+ClassEntry::ClassEntry(const char *name) {
+    ce = getClassEntry(name);
+    if (!ce) {
+        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
+    }
+}
+
+Variant ClassEntry::getStaticProperty(const std::string &p_name) const {
+    return {zend_read_static_property(ce, p_name.c_str(), p_name.length(), true)};
+}
+
+bool ClassEntry::setStaticProperty(const std::string &p_name, const Variant &value) const {
+    auto v = const_cast<Variant &>(value);
+    v.addRef();
+    return zend_update_static_property(ce, p_name.c_str(), p_name.length(), v.ptr()) == SUCCESS;
+}
 }  // namespace php

@@ -193,6 +193,10 @@ class String {
     String dirname() const;
     void print() const;
 
+    uint32_t getRefCount() const {
+        return zend_string_refcount(ptr());
+    }
+
     zend_string *ptr() const {
         return str;
     }
@@ -1164,11 +1168,6 @@ class Class {
         return ce;
     }
 
-    Variant getStaticProperty(const std::string &p_name) const;
-    bool setStaticProperty(const std::string &p_name, Variant value) const;
-    static Variant get(const char *name, const std::string &p_name);
-    static bool set(const char *class_name, const std::string &p_name, Variant value);
-
   protected:
     bool activated;
     std::string class_name;
@@ -1181,6 +1180,15 @@ class Class {
     std::vector<Property> properties;
     std::vector<Constant> constants;
     std::vector<std::string> aliases;
+};
+
+class ClassEntry {
+    zend_class_entry *ce;
+public:
+    explicit ClassEntry(const char *name);
+
+    Variant getStaticProperty(const std::string &p_name) const;
+    bool setStaticProperty(const std::string &p_name, const Variant &value) const;
 };
 
 class Interface {

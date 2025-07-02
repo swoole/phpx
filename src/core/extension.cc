@@ -171,38 +171,6 @@ void Extension::addIniEntry(const char *name, const char *default_value, int mod
     ini_entries.push_back(entry);
 }
 
-Variant Class::getStaticProperty(const std::string &p_name) const {
-    if (!activated) {
-        return {};
-    }
-    return {zend_read_static_property(ce, p_name.c_str(), p_name.length(), true)};
-}
-
-bool Class::setStaticProperty(const std::string &p_name, Variant value) const {
-    if (!activated) {
-        return false;
-    }
-    value.addRef();
-    return zend_update_static_property(ce, p_name.c_str(), p_name.length(), value.ptr()) == SUCCESS;
-}
-
-Variant Class::get(const char *name, const std::string &p_name) {
-    zend_class_entry *_tmp_ce = getClassEntry(name);
-    if (!_tmp_ce) {
-        return {};
-    }
-    return {zend_read_static_property(_tmp_ce, p_name.c_str(), p_name.length(), true)};
-}
-
-bool Class::set(const char *class_name, const std::string &p_name, Variant value) {
-    zend_class_entry *_tmp_ce = getClassEntry(class_name);
-    if (!_tmp_ce) {
-        return false;
-    }
-    value.addRef();
-    return zend_update_static_property(_tmp_ce, p_name.c_str(), p_name.length(), value.ptr()) == SUCCESS;
-}
-
 Interface::Interface(const char *name) {
     this->name = name;
     INIT_CLASS_ENTRY_EX(_ce, name, strlen(name), nullptr);

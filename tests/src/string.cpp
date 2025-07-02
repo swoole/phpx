@@ -1,6 +1,19 @@
 #include "phpx_test.h"
+#include "phpx_func.h"
 
 using namespace php;
+
+TEST(string, equals) {
+    auto s = random_bytes(1000);
+    String str(s);
+    ASSERT_EQ(str.length(), s.length());
+    ASSERT_EQ(str.length(), 1000);
+    ASSERT_EQ(str.getRefCount(), 2);
+
+    String str2(str.c_str(), str.length());
+    ASSERT_TRUE(str.equals(str2, true));
+    ASSERT_EQ(str2.getRefCount(), 1);
+}
 
 TEST(string, substr) {
     String str("Hello, World!");

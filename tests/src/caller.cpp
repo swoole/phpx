@@ -7,7 +7,7 @@ using namespace php;
 
 static const char *g_date = "2009-02-15";
 
-TEST(exec, func) {
+TEST(caller, func) {
     auto retval = is_dir({"/tmp"});
     ASSERT_TRUE(retval.toBool());
 
@@ -15,7 +15,7 @@ TEST(exec, func) {
     ASSERT_FALSE(retval.toBool());
 }
 
-TEST(exec, method) {
+TEST(caller, method) {
     auto retval = DateTime::createFromFormat("j-M-Y", "15-Feb-2009");
     ASSERT_TRUE(retval.isObject());
     Object o(retval);
@@ -23,7 +23,7 @@ TEST(exec, method) {
     ASSERT_STREQ(_date.toCString(), g_date);
 }
 
-TEST(exec, redis) {
+TEST(caller, redis) {
     Redis redis {};
     Array context{};
     auto ref_context = context.toReference();
@@ -37,7 +37,7 @@ TEST(exec, redis) {
     ASSERT_STREQ(val2.toCString(), val);
 }
 
-TEST(exec, curl) {
+TEST(caller, curl) {
     auto ch = curl_init();
     auto url = "https://www.gov.cn/";
     Array headerArray = {{"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like "
@@ -55,7 +55,7 @@ TEST(exec, curl) {
     ASSERT_TRUE(str_contains(output, "中国").toBool());
 }
 
-TEST(exec, call) {
+TEST(caller, call) {
     auto rs = call(php_uname);
     ASSERT_TRUE(rs.isString());
     ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
@@ -71,3 +71,33 @@ TEST(exec, call) {
     ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
 }
 
+TEST(caller, http_build_query) {
+    Array arr1;
+    arr1.set("hello", "world");
+    arr1.set("count", 182);
+    auto query = http_build_query(arr1, null, "&", PHP_QUERY_RFC1738);
+
+    ASSERT_TRUE(query.isString());
+    ASSERT_GT(query.length(), 10);
+
+    String expected = "hello=world&count=182";
+    ASSERT_STREQ(query.toCString(), expected.c_str());
+}
+
+TEST(caller, md5) {
+    constexpr int l = 1024;
+    auto rdata = random_bytes({l});
+    ASSERT_EQ(rdata.length(), l);
+    auto hash1 = md5(rdata);
+    auto hash2 = hash({"md5", rdata});
+    ASSERT_STREQ(hash1.toCString(), hash2.toCString());
+}
+
+TEST(caller, sha1) {
+    constexpr int l = 1024;
+    auto rdata = random_bytes({l});
+    ASSERT_EQ(rdata.length(), l);
+    auto hash1 = sha1(rdata);
+    auto hash2 = hash({ "sha1", rdata});
+    ASSERT_STREQ(hash1.toCString(), hash2.toCString());
+}
