@@ -1,0 +1,18 @@
+#include "phpx.h"
+
+namespace php {
+Variant XSL_CLONE_AUTO { 0 };
+Variant XSL_CLONE_NEVER { -1 };
+Variant XSL_CLONE_ALWAYS { 1 };
+Variant XSL_SECPREF_NONE { 0 };
+Variant XSL_SECPREF_READ_FILE { 2 };
+Variant XSL_SECPREF_WRITE_FILE { 4 };
+Variant XSL_SECPREF_CREATE_DIRECTORY { 8 };
+Variant XSL_SECPREF_READ_NETWORK { 16 };
+Variant XSL_SECPREF_WRITE_NETWORK { 32 };
+Variant XSL_SECPREF_DEFAULT { 44 };
+Variant LIBXSLT_VERSION { 10134 };
+Variant LIBXSLT_DOTTED_VERSION { ZEND_STRL("1.1.34"), true };
+Variant LIBEXSLT_VERSION { 820 };
+Variant LIBEXSLT_DOTTED_VERSION { ZEND_STRL("1.1.34"), true };
+}

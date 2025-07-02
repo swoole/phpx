@@ -1,0 +1,45 @@
+#include "phpx.h"
+
+namespace php {
+Variant posix_kill{ZEND_STRL("posix_kill"), true};
+Variant posix_getpid{ZEND_STRL("posix_getpid"), true};
+Variant posix_getppid{ZEND_STRL("posix_getppid"), true};
+Variant posix_getuid{ZEND_STRL("posix_getuid"), true};
+Variant posix_setuid{ZEND_STRL("posix_setuid"), true};
+Variant posix_geteuid{ZEND_STRL("posix_geteuid"), true};
+Variant posix_seteuid{ZEND_STRL("posix_seteuid"), true};
+Variant posix_getgid{ZEND_STRL("posix_getgid"), true};
+Variant posix_setgid{ZEND_STRL("posix_setgid"), true};
+Variant posix_getegid{ZEND_STRL("posix_getegid"), true};
+Variant posix_setegid{ZEND_STRL("posix_setegid"), true};
+Variant posix_getgroups{ZEND_STRL("posix_getgroups"), true};
+Variant posix_getlogin{ZEND_STRL("posix_getlogin"), true};
+Variant posix_getpgrp{ZEND_STRL("posix_getpgrp"), true};
+Variant posix_setsid{ZEND_STRL("posix_setsid"), true};
+Variant posix_setpgid{ZEND_STRL("posix_setpgid"), true};
+Variant posix_getpgid{ZEND_STRL("posix_getpgid"), true};
+Variant posix_getsid{ZEND_STRL("posix_getsid"), true};
+Variant posix_uname{ZEND_STRL("posix_uname"), true};
+Variant posix_times{ZEND_STRL("posix_times"), true};
+Variant posix_ctermid{ZEND_STRL("posix_ctermid"), true};
+Variant posix_ttyname{ZEND_STRL("posix_ttyname"), true};
+Variant posix_isatty{ZEND_STRL("posix_isatty"), true};
+Variant posix_getcwd{ZEND_STRL("posix_getcwd"), true};
+Variant posix_mkfifo{ZEND_STRL("posix_mkfifo"), true};
+Variant posix_mknod{ZEND_STRL("posix_mknod"), true};
+Variant posix_access{ZEND_STRL("posix_access"), true};
+Variant posix_eaccess{ZEND_STRL("posix_eaccess"), true};
+Variant posix_getgrnam{ZEND_STRL("posix_getgrnam"), true};
+Variant posix_getgrgid{ZEND_STRL("posix_getgrgid"), true};
+Variant posix_getpwnam{ZEND_STRL("posix_getpwnam"), true};
+Variant posix_getpwuid{ZEND_STRL("posix_getpwuid"), true};
+Variant posix_getrlimit{ZEND_STRL("posix_getrlimit"), true};
+Variant posix_setrlimit{ZEND_STRL("posix_setrlimit"), true};
+Variant posix_get_last_error{ZEND_STRL("posix_get_last_error"), true};
+Variant posix_errno{ZEND_STRL("posix_errno"), true};
+Variant posix_strerror{ZEND_STRL("posix_strerror"), true};
+Variant posix_initgroups{ZEND_STRL("posix_initgroups"), true};
+Variant posix_sysconf{ZEND_STRL("posix_sysconf"), true};
+Variant posix_pathconf{ZEND_STRL("posix_pathconf"), true};
+Variant posix_fpathconf{ZEND_STRL("posix_fpathconf"), true};
+}

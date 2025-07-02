@@ -4,9 +4,6 @@ project(phpx)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-aux_source_directory(src LIB_FILES)
-file(GLOB_RECURSE HEADER_FILES include/*.h)
-
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
 endif ()
@@ -89,7 +86,9 @@ if (APPLE)
 endif ()
 
 # library
-add_library(phpx SHARED ${LIB_FILES})
+file(GLOB_RECURSE SRC_FILES src/core/*.cc src/func/*.cc src/class/*.cc src/const/*.cc)
+file(GLOB_RECURSE HEADER_FILES include/*.h)
+add_library(phpx SHARED ${SRC_FILES})
 set_target_properties(phpx PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
 if (CODE_COVERAGE)

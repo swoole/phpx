@@ -1,0 +1,31 @@
+#include "phpx.h"
+
+namespace php {
+Variant LIBXML_VERSION { 20913 };
+Variant LIBXML_DOTTED_VERSION { ZEND_STRL("2.9.13"), true };
+Variant LIBXML_LOADED_VERSION { ZEND_STRL("20913"), true };
+Variant LIBXML_NOENT { 2 };
+Variant LIBXML_DTDLOAD { 4 };
+Variant LIBXML_DTDATTR { 8 };
+Variant LIBXML_DTDVALID { 16 };
+Variant LIBXML_NOERROR { 32 };
+Variant LIBXML_NOWARNING { 64 };
+Variant LIBXML_NOBLANKS { 256 };
+Variant LIBXML_XINCLUDE { 1024 };
+Variant LIBXML_NSCLEAN { 8192 };
+Variant LIBXML_NOCDATA { 16384 };
+Variant LIBXML_NONET { 2048 };
+Variant LIBXML_PEDANTIC { 128 };
+Variant LIBXML_COMPACT { 65536 };
+Variant LIBXML_NOXMLDECL { 2 };
+Variant LIBXML_PARSEHUGE { 524288 };
+Variant LIBXML_BIGLINES { 4194304 };
+Variant LIBXML_NOEMPTYTAG { 4 };
+Variant LIBXML_SCHEMA_CREATE { 1 };
+Variant LIBXML_HTML_NOIMPLIED { 8192 };
+Variant LIBXML_HTML_NODEFDTD { 4 };
+Variant LIBXML_ERR_NONE { 0 };
+Variant LIBXML_ERR_WARNING { 1 };
+Variant LIBXML_ERR_ERROR { 2 };
+Variant LIBXML_ERR_FATAL { 3 };
+}

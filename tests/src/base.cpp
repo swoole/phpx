@@ -1,4 +1,5 @@
 #include "phpx_test.h"
+#include "phpx_func.h"
 
 using namespace php;
 
@@ -42,10 +43,10 @@ TEST(base, define) {
 }
 
 TEST(base, include) {
-    auto tmp_file = "/tmp/include_test.php";
+    std::string tmp_file = "/tmp/include_test.php";
     std::string tmp_file2 = "/tmp/tmp_file.txt";
 
-    exec("file_put_contents", tmp_file, "<?php file_put_contents('" + tmp_file2 + "', 'hello phpx'); return PHP_VERSION_ID; ?>");
+    file_put_contents(tmp_file, "<?php file_put_contents('" + tmp_file2 + "', 'hello phpx'); return PHP_VERSION_ID; ?>");
     auto retval = include(tmp_file);
     ASSERT_TRUE(retval.isInt());
     ASSERT_EQ(retval.toInt(), PHP_VERSION_ID);
@@ -58,3 +59,53 @@ TEST(base, method) {
     ASSERT_TRUE(str.isString());
     ASSERT_GT(str.length(), 0);
 }
+
+TEST(base, ini_get) {
+    auto v = ini_get("post_max_size");
+    ASSERT_GE(v.length(), 2);
+    ASSERT_GE(v.toInt(), 8);
+}
+
+TEST(base, global) {
+    auto server = global("_SERVER");
+    ASSERT_TRUE(server.isArray());
+    Array array(server);
+    ASSERT_TRUE(array.exists("SHELL"));
+
+    auto time = array["REQUEST_TIME"];
+    ASSERT_TRUE(time.isInt());
+}
+
+TEST(base, equals) {
+    Variant v1((zend_long) UINT_MAX);
+    auto v2 = random_int(1, 1000000);
+    ASSERT_FALSE(v1.equals(v2));
+    ASSERT_FALSE(v1.equals(v2, true));
+
+    Variant v3 = std::to_string(UINT_MAX);
+    ASSERT_TRUE(v3.equals(v1));
+    ASSERT_FALSE(v3.equals(v1, true));
+}
+
+TEST(base, static_property) {
+    include(get_include_dir() + "/library.php");
+    ASSERT_EQ(Class::getStaticProperty("TestClass", "propInt").toInt(), 1990018900);
+    ASSERT_STREQ(Class::getStaticProperty("TestClass", "propString").toCString(), "Hello, World!");
+    ASSERT_TRUE(Class::setStaticProperty("TestClass", "propString", "phpx test"));
+    ASSERT_STREQ(Class::getStaticProperty("TestClass", "propString").toCString(), "phpx test");
+}
+
+#if 0
+TEST(base, exception) {
+    zend_try {
+        throwException("RuntimeException", "phpx exception test");
+    }
+    zend_catch {
+        auto e = Object(getException());
+        auto msg = e.exec("getMessage");
+        ASSERT_TRUE(msg.isString());
+        ASSERT_TRUE(str_contains(msg, "phpx exception test").isTrue());
+    }
+    zend_end_try();
+}
+#endif

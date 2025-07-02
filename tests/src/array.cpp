@@ -1,4 +1,5 @@
 #include "phpx_test.h"
+#include "phpx_func.h"
 
 using namespace php;
 
@@ -9,6 +10,13 @@ TEST(array, list) {
     array.append(100);
     array.append(10);
     array.append(90);
+
+    zend_ulong j = 0;
+    for (auto i = array.begin(); i != array.end(); i++) {
+        ASSERT_EQ(i.key().toInt(), j);
+        ASSERT_EQ(i.value().toInt(), array[j].toInt());
+        j++;
+    }
 
     auto arr2 = array.slice(1, 3);
     ASSERT_EQ(arr2.count(), 3);
@@ -50,4 +58,64 @@ TEST(array, init) {
     ASSERT_STREQ(a3[1111].toCString(), "hello");
     ASSERT_EQ(a3[2222].toFloat(), 3.14);
     ASSERT_EQ(a3[3333].toFloat(), 100);
+}
+
+TEST(array, search) {
+    Array arr = create_list();
+    Variant v1{"php"};
+    Variant v2{"python"};
+    Variant v3{"not-exists"};
+
+    ASSERT_EQ(arr.search(v1).toInt(), 0);
+    ASSERT_EQ(arr.search(v2).toInt(), 3);
+    ASSERT_TRUE(arr.search(v3).isFalse());
+
+    Array arr2 = create_map();
+    Variant v4{3};
+    ASSERT_STREQ(arr2.search(v4).toCString(), "php");
+}
+
+TEST(array, foreach) {
+    Array arr = create_list();
+    std::vector<std::string> list;
+    for (auto i = arr.begin(); i != arr.end(); i++) {
+        list.push_back(i.value().toString());
+    }
+    ASSERT_EQ(list.size(), 5);
+
+    arr.del(3);
+    list.clear();
+    for (auto i = arr.begin(); i != arr.end(); i++) {
+        list.push_back(i.value().toString());
+    }
+    ASSERT_EQ(list.size(), 4);
+}
+
+TEST(array, contains) {
+    Array arr = create_list();
+    Variant v1{"php"};
+    ASSERT_TRUE(arr.contains(v1));
+
+    Variant v2{"null"};
+    ASSERT_FALSE(arr.contains(v2));
+}
+
+TEST(array, join) {
+    Array arr = create_list();
+    auto s = arr.join(",");
+    ASSERT_GE(s.length(), 20);
+}
+
+TEST(array, swap) {
+    Variant v;
+    zval zarr;
+    array_init(&zarr);
+    add_next_index_long(&zarr, 199);
+    add_next_index_long(&zarr, 189);
+    v = &zarr;
+    zval_ptr_dtor(&zarr);
+
+    Array arr(v);
+    ASSERT_EQ(arr[0].toInt(), 199);
+    ASSERT_EQ(arr[1].toInt(), 189);
 }

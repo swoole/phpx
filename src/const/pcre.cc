@@ -1,0 +1,23 @@
+#include "phpx.h"
+
+namespace php {
+Variant PREG_PATTERN_ORDER { 1 };
+Variant PREG_SET_ORDER { 2 };
+Variant PREG_OFFSET_CAPTURE { 256 };
+Variant PREG_UNMATCHED_AS_NULL { 512 };
+Variant PREG_SPLIT_NO_EMPTY { 1 };
+Variant PREG_SPLIT_DELIM_CAPTURE { 2 };
+Variant PREG_SPLIT_OFFSET_CAPTURE { 4 };
+Variant PREG_GREP_INVERT { 1 };
+Variant PREG_NO_ERROR { 0 };
+Variant PREG_INTERNAL_ERROR { 1 };
+Variant PREG_BACKTRACK_LIMIT_ERROR { 2 };
+Variant PREG_RECURSION_LIMIT_ERROR { 3 };
+Variant PREG_BAD_UTF8_ERROR { 4 };
+Variant PREG_BAD_UTF8_OFFSET_ERROR { 5 };
+Variant PREG_JIT_STACKLIMIT_ERROR { 6 };
+Variant PCRE_VERSION { ZEND_STRL("10.42 2022-12-12"), true };
+Variant PCRE_VERSION_MAJOR { 10 };
+Variant PCRE_VERSION_MINOR { 42 };
+Variant PCRE_JIT_SUPPORT { true };
+}

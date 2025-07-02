@@ -1,0 +1,21 @@
+namespace php {
+extern Variant PREG_PATTERN_ORDER;
+extern Variant PREG_SET_ORDER;
+extern Variant PREG_OFFSET_CAPTURE;
+extern Variant PREG_UNMATCHED_AS_NULL;
+extern Variant PREG_SPLIT_NO_EMPTY;
+extern Variant PREG_SPLIT_DELIM_CAPTURE;
+extern Variant PREG_SPLIT_OFFSET_CAPTURE;
+extern Variant PREG_GREP_INVERT;
+extern Variant PREG_NO_ERROR;
+extern Variant PREG_INTERNAL_ERROR;
+extern Variant PREG_BACKTRACK_LIMIT_ERROR;
+extern Variant PREG_RECURSION_LIMIT_ERROR;
+extern Variant PREG_BAD_UTF8_ERROR;
+extern Variant PREG_BAD_UTF8_OFFSET_ERROR;
+extern Variant PREG_JIT_STACKLIMIT_ERROR;
+extern Variant PCRE_VERSION;
+extern Variant PCRE_VERSION_MAJOR;
+extern Variant PCRE_VERSION_MINOR;
+extern Variant PCRE_JIT_SUPPORT;
+}

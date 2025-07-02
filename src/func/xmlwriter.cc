@@ -1,0 +1,46 @@
+#include "phpx.h"
+
+namespace php {
+Variant xmlwriter_open_uri{ZEND_STRL("xmlwriter_open_uri"), true};
+Variant xmlwriter_open_memory{ZEND_STRL("xmlwriter_open_memory"), true};
+Variant xmlwriter_set_indent{ZEND_STRL("xmlwriter_set_indent"), true};
+Variant xmlwriter_set_indent_string{ZEND_STRL("xmlwriter_set_indent_string"), true};
+Variant xmlwriter_start_comment{ZEND_STRL("xmlwriter_start_comment"), true};
+Variant xmlwriter_end_comment{ZEND_STRL("xmlwriter_end_comment"), true};
+Variant xmlwriter_start_attribute{ZEND_STRL("xmlwriter_start_attribute"), true};
+Variant xmlwriter_end_attribute{ZEND_STRL("xmlwriter_end_attribute"), true};
+Variant xmlwriter_write_attribute{ZEND_STRL("xmlwriter_write_attribute"), true};
+Variant xmlwriter_start_attribute_ns{ZEND_STRL("xmlwriter_start_attribute_ns"), true};
+Variant xmlwriter_write_attribute_ns{ZEND_STRL("xmlwriter_write_attribute_ns"), true};
+Variant xmlwriter_start_element{ZEND_STRL("xmlwriter_start_element"), true};
+Variant xmlwriter_end_element{ZEND_STRL("xmlwriter_end_element"), true};
+Variant xmlwriter_full_end_element{ZEND_STRL("xmlwriter_full_end_element"), true};
+Variant xmlwriter_start_element_ns{ZEND_STRL("xmlwriter_start_element_ns"), true};
+Variant xmlwriter_write_element{ZEND_STRL("xmlwriter_write_element"), true};
+Variant xmlwriter_write_element_ns{ZEND_STRL("xmlwriter_write_element_ns"), true};
+Variant xmlwriter_start_pi{ZEND_STRL("xmlwriter_start_pi"), true};
+Variant xmlwriter_end_pi{ZEND_STRL("xmlwriter_end_pi"), true};
+Variant xmlwriter_write_pi{ZEND_STRL("xmlwriter_write_pi"), true};
+Variant xmlwriter_start_cdata{ZEND_STRL("xmlwriter_start_cdata"), true};
+Variant xmlwriter_end_cdata{ZEND_STRL("xmlwriter_end_cdata"), true};
+Variant xmlwriter_write_cdata{ZEND_STRL("xmlwriter_write_cdata"), true};
+Variant xmlwriter_text{ZEND_STRL("xmlwriter_text"), true};
+Variant xmlwriter_write_raw{ZEND_STRL("xmlwriter_write_raw"), true};
+Variant xmlwriter_start_document{ZEND_STRL("xmlwriter_start_document"), true};
+Variant xmlwriter_end_document{ZEND_STRL("xmlwriter_end_document"), true};
+Variant xmlwriter_write_comment{ZEND_STRL("xmlwriter_write_comment"), true};
+Variant xmlwriter_start_dtd{ZEND_STRL("xmlwriter_start_dtd"), true};
+Variant xmlwriter_end_dtd{ZEND_STRL("xmlwriter_end_dtd"), true};
+Variant xmlwriter_write_dtd{ZEND_STRL("xmlwriter_write_dtd"), true};
+Variant xmlwriter_start_dtd_element{ZEND_STRL("xmlwriter_start_dtd_element"), true};
+Variant xmlwriter_end_dtd_element{ZEND_STRL("xmlwriter_end_dtd_element"), true};
+Variant xmlwriter_write_dtd_element{ZEND_STRL("xmlwriter_write_dtd_element"), true};
+Variant xmlwriter_start_dtd_attlist{ZEND_STRL("xmlwriter_start_dtd_attlist"), true};
+Variant xmlwriter_end_dtd_attlist{ZEND_STRL("xmlwriter_end_dtd_attlist"), true};
+Variant xmlwriter_write_dtd_attlist{ZEND_STRL("xmlwriter_write_dtd_attlist"), true};
+Variant xmlwriter_start_dtd_entity{ZEND_STRL("xmlwriter_start_dtd_entity"), true};
+Variant xmlwriter_end_dtd_entity{ZEND_STRL("xmlwriter_end_dtd_entity"), true};
+Variant xmlwriter_write_dtd_entity{ZEND_STRL("xmlwriter_write_dtd_entity"), true};
+Variant xmlwriter_output_memory{ZEND_STRL("xmlwriter_output_memory"), true};
+Variant xmlwriter_flush{ZEND_STRL("xmlwriter_flush"), true};
+}
