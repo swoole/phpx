@@ -57,18 +57,15 @@ TEST(exec, curl) {
 
 TEST(exec, array_push) {
     Array arr;
-    auto ref = arr.toReference();
+    Variant ref = &arr;
     array_push(ref, "php", "java", "go");
-    auto v1 = ref.referenceTo();
-    ASSERT_EQ(v1.length(), 3);
+    ASSERT_EQ(arr.length(), 3);
 
     array_push(ref, "c++", "rust", "erlang", "node.js");
-    auto v2 = ref.referenceTo();
-    ASSERT_EQ(v2.length(), 7);
+    ASSERT_EQ((*ref).length(), 7);
 
     array_push(ref, "python", "ruby", "lua", "perl", "vue");
-    auto v3 = ref.referenceTo();
-    ASSERT_EQ(v3.length(), 12);
+    ASSERT_EQ(ref.getRefValue().length(), 12);
 }
 
 TEST(exec, call) {

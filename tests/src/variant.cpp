@@ -78,6 +78,32 @@ TEST(variant, json) {
     ASSERT_TRUE(v3.equals(arr1));
 }
 
+TEST(variant, ref) {
+    Array arr;
+    Variant ref(&arr);
+    parse_str("first=value1&second=value2", ref);
+    Array v3 = ref.getRefValue();
+    ASSERT_EQ(v3.count(), 2);
+}
+
+TEST(variant, ref2) {
+    Array arr;
+    Variant ref = &arr;
+    parse_str("first=value1&second=value2", ref);
+    Array v3 = *ref;
+    ASSERT_EQ(v3.count(), 2);
+}
+
+TEST(variant, ref3) {
+    Array arr;
+    Variant ref = &arr;
+    array_push(ref, "php", "java", "go");
+    ASSERT_EQ((*ref).length(), 3);
+
+    array_push(&arr, "python", "ruby", "lua", "perl", "vue");
+    ASSERT_EQ(arr.length(), 8);
+}
+
 TEST(variant, object) {
     auto array = create_map();
     auto object = newObject("ArrayObject", {array, constant("ArrayObject::ARRAY_AS_PROPS")});

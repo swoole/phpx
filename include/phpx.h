@@ -259,6 +259,9 @@ class Variant {
         memcpy(&val, &v.val, sizeof(zval));
         v.val = {};
     }
+    Variant(const Variant *v) {
+        ZVAL_NEW_REF(&val, v->const_ptr());
+    }
     /**
      * res is a new reference passed in from outside;
      * it no longer requires adding application logic and is solely used for the newResource invocation.
@@ -322,6 +325,11 @@ class Variant {
         destroy();
         ZVAL_COPY_VALUE(ptr(), v.const_ptr());
         addRef();
+        return *this;
+    }
+    Variant &operator=(const Variant *v) {
+        destroy();
+        ZVAL_NEW_REF(&val, v->const_ptr());
         return *this;
     }
     zval *ptr() {
@@ -434,21 +442,13 @@ class Variant {
     }
     Variant toReference() {
         if (isReference()) {
-            return this;
-        }
-        zval zref;
-        addRef();
-        ZVAL_NEW_REF(&zref, ptr());
-        zval_delref_p(&zref);
-        return {&zref};
-    }
-    Variant referenceTo() {
-        if (!isReference()) {
             return *this;
         }
-        zval zv;
-        ZVAL_COPY_VALUE(&zv, Z_REFVAL_P(ptr()));
-        return {&zv};
+        return {this};
+    }
+    Variant getRefValue() const;
+    Variant operator*() const {
+        return getRefValue();
     }
     void moveTo(zval *dest) {
         ZVAL_COPY_VALUE(dest, &val);

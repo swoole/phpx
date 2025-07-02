@@ -40,6 +40,15 @@ bool Variant::empty() {
     }
 }
 
+Variant Variant::getRefValue() const {
+    if (!isReference()) {
+        return *this;
+    }
+    zval zv;
+    ZVAL_COPY_VALUE(&zv, Z_REFVAL_P(const_ptr()));
+    return {&zv};
+}
+
 bool Variant::equals(Variant &v, bool strict) {
     if (strict) {
         if (fast_is_identical_function(v.ptr(), ptr())) {
