@@ -11,6 +11,13 @@ TEST(array, list) {
     array.append(10);
     array.append(90);
 
+    zend_ulong j = 0;
+    for (auto i = array.begin(); i != array.end(); i++) {
+        ASSERT_EQ(i.key().toInt(), j);
+        ASSERT_EQ(i.value().toInt(), array[j].toInt());
+        j++;
+    }
+
     auto arr2 = array.slice(1, 3);
     ASSERT_EQ(arr2.count(), 3);
     ASSERT_EQ(arr2[0].toInt(), 30);

@@ -32,6 +32,7 @@ class BaseTest extends TestCase
         $this->assertEquals($o->testPropertyInt, 9988);
         $this->assertEquals(MyClass::$testStaticProperty, '(static) hello world');
         $this->assertEquals(count($o), 100);
+
     }
 
     public function testExtensionInfo() {
@@ -53,7 +54,7 @@ class BaseTest extends TestCase
         $this->assertEquals("abc", $result[0]);
         $this->assertEquals("efg", $result[1]);
 
-        $result = myClass::test();
+        $result = MyClass::test();
         $this->assertEquals($result, 1234.56);
     }
 
@@ -69,5 +70,14 @@ class BaseTest extends TestCase
         $this->assertTrue(class_exists('MyRuntimeException', false));
         $this->assertEquals(MyClass::TEST_CONSTANT, 8888);
         $this->assertEquals(MyClass::TEST_CONSTANT_STR, "hello world");
+    }
+
+    public function testException()
+    {
+        try {
+            cpp_throw_error();
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString("phpx exception", $e->getMessage());
+        }
     }
 }

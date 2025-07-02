@@ -11,6 +11,9 @@ function cpp_ext_test2(mixed ...$args) : array {
 
 }
 
+function cpp_throw_error(): void {
+}
+
 class MyClass implements Countable {
     public static function test() : float {
         

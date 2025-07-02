@@ -401,11 +401,11 @@ class Variant {
         void *_ptr = nullptr;
         Resource *_c = resource_map[name];
         if (_c == nullptr) {
-            error(E_WARNING, "The %s type of resource is undefined.", name);
+            error(E_WARNING, "The `%s` type of resource is undefined.", name);
             return nullptr;
         }
         if ((_ptr = zend_fetch_resource(Z_RES_P(ptr()), name, _c->type)) == nullptr) {
-            error(E_WARNING, "The %s type of resource is undefined.", name);
+            error(E_WARNING, "The `%s` type of resource is undefined.", name);
             return nullptr;
         }
         return static_cast<T *>(_ptr);

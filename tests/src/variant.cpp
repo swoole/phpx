@@ -139,6 +139,11 @@ TEST(variant, object) {
     auto r2 = object.get("python");
     ASSERT_EQ(r2.toInt(), 9);
 
+    auto flags = object.exec("getFlags");
+    ASSERT_TRUE(flags.isInt());
+    ASSERT_TRUE(flags.toInt() & constant("ArrayObject::ARRAY_AS_PROPS").toInt());
+    flags.debug();
+
     auto o2 = newObject("class_not_exists");
     ASSERT_FALSE(o2.isUndef());
 }
@@ -181,4 +186,19 @@ TEST(variant, empty) {
     Variant alias_arr = arr;
     ASSERT_FALSE(alias_arr.empty());
     ASSERT_EQ(arr.getRefCount(), 2);
+}
+
+TEST(variant, resource) {
+    Variant v;
+    auto rs = v.toResource<String>("string");
+    ASSERT_EQ(rs, nullptr);
+
+    auto fp = php::fopen("/tmp/test.txt", "w+");
+    ASSERT_TRUE(fp.isResource());
+    auto rs2 = fp.toResource<php_stream>("php_stream");
+    ASSERT_EQ(rs2, nullptr);
+
+    auto *s = new String("hello world");
+    auto rs3 = newResource<String>("string", s);
+    ASSERT_TRUE(rs3.isNull());
 }

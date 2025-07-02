@@ -46,6 +46,11 @@ PHPX_FUNCTION(cpp_ext_test2) {
     // php::error(E_WARNING, "extension warning.");
 }
 
+PHPX_FUNCTION(cpp_throw_error) {
+    throwException("RuntimeException", "phpx exception: test");
+    return {};
+}
+
 PHPX_METHOD(MyClass, test) {
     cout << "MyClass::test" << endl;
     return 1234.56;
@@ -109,6 +114,8 @@ PHPX_EXTENSION() {
         i->registerFunctions(class_MyInterface_methods);
         extension->registerInterface(i);
         extension->registerResource("ResourceString", string_dtor);
+        const auto ce = i->ptr();
+        printf("ce=%p\n", ce);
     };
 
     extension->onShutdown = [extension]() noexcept { cout << extension->name << "shutdown" << endl; };
