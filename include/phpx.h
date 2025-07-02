@@ -259,9 +259,6 @@ class Variant {
         memcpy(&val, &v.val, sizeof(zval));
         v.val = {};
     }
-    Variant(const Variant *v) {
-        ZVAL_NEW_REF(&val, v->const_ptr());
-    }
     /**
      * res is a new reference passed in from outside;
      * it no longer requires adding application logic and is solely used for the newResource invocation.
@@ -312,29 +309,17 @@ class Variant {
         ZVAL_BOOL(ptr(), v);
         return *this;
     }
-    Variant &operator=(const zval *v) {
-        destroy();
-        val = *v;
-        addRef();
-        return *this;
-    }
-    Variant &operator=(const Variant &v) {
-        if (&v == this) {
-            return *this;
-        }
-        destroy();
-        ZVAL_COPY_VALUE(ptr(), v.const_ptr());
-        addRef();
-        return *this;
-    }
-    Variant &operator=(const Variant *v) {
-        destroy();
+    Variant &operator=(const zval *v);
+    Variant &operator=(const Variant &v);
+    Variant(const Variant *v) {
         ZVAL_NEW_REF(&val, v->const_ptr());
-        return *this;
+        zval_add_ref(Z_REFVAL(val));
     }
+    Variant &operator=(const Variant *v);
     zval *ptr() {
         return &val;
     }
+    void debug();
     const zval *const_ptr() const {
         return &val;
     }
@@ -344,13 +329,7 @@ class Variant {
     void delRef() {
         zval_delref_p(ptr());
     }
-    int getRefCount() const {
-        const zend_refcounted *counted = Z_COUNTED_P(const_ptr());
-        if (!counted) {
-            return 0;
-        }
-        return GC_REFCOUNT(counted);
-    }
+    int getRefCount() const;
     int type() const {
         return Z_TYPE_P(const_ptr());
     }
@@ -394,12 +373,7 @@ class Variant {
         return Z_TYPE_P(const_ptr()) == IS_REFERENCE;
     }
     bool empty();
-    std::string toString() {
-        zend_string *str = zval_get_string(ptr());
-        auto retval = std::string(ZSTR_VAL(str), ZSTR_LEN(str));
-        zend_string_release(str);
-        return retval;
-    }
+    std::string toString();
     const char *toCString() {
         convert_to_string(&val);
         return Z_STRVAL(val);
@@ -413,15 +387,7 @@ class Variant {
     bool toBool() {
         return zval_is_true(ptr());
     }
-    size_t length() const {
-        if (isString()) {
-            return Z_STRLEN_P(const_ptr());
-        } else if (isArray()) {
-            return zend_hash_num_elements(Z_ARRVAL_P(const_ptr()));
-        } else {
-            return 0;
-        }
-    }
+    size_t length() const;
     template <class T>
     T *toResource(const char *name) {
         if (!isResource()) {

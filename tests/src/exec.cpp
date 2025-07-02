@@ -55,19 +55,6 @@ TEST(exec, curl) {
     ASSERT_TRUE(str_contains(output, "中国").toBool());
 }
 
-TEST(exec, array_push) {
-    Array arr;
-    Variant ref = &arr;
-    array_push(ref, "php", "java", "go");
-    ASSERT_EQ(arr.length(), 3);
-
-    array_push(ref, "c++", "rust", "erlang", "node.js");
-    ASSERT_EQ((*ref).length(), 7);
-
-    array_push(ref, "python", "ruby", "lua", "perl", "vue");
-    ASSERT_EQ(ref.getRefValue().length(), 12);
-}
-
 TEST(exec, call) {
     auto rs = call(php_uname);
     ASSERT_TRUE(rs.isString());

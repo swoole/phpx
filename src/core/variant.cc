@@ -21,6 +21,92 @@
 namespace php {
 Variant null = {};
 
+Variant &Variant::operator=(const zval *v) {
+    destroy();
+    val = *v;
+    addRef();
+    return *this;
+}
+
+Variant &Variant::operator=(const Variant &v) {
+    if (&v == this) {
+        return *this;
+    }
+    destroy();
+    ZVAL_COPY_VALUE(ptr(), v.const_ptr());
+    addRef();
+    return *this;
+}
+
+Variant &Variant::operator=(const Variant *v) {
+    destroy();
+    ZVAL_NEW_REF(&val, v->const_ptr());
+    zval_add_ref(Z_REFVAL(val));
+    return *this;
+}
+
+std::string Variant::toString() {
+    zend_string *str = zval_get_string(ptr());
+    auto retval = std::string(ZSTR_VAL(str), ZSTR_LEN(str));
+    zend_string_release(str);
+    return retval;
+}
+
+size_t Variant::length() const {
+    if (isString()) {
+        return Z_STRLEN_P(const_ptr());
+    } else if (isArray()) {
+        return zend_hash_num_elements(Z_ARRVAL_P(const_ptr()));
+    } else {
+        return 0;
+    }
+}
+
+#if ZEND_DEBUG
+void Variant::debug() {
+    printf("zval=%p, type=%d, refcount=%d, is_ref=%d\n", const_ptr(), type(), getRefCount(), isReference());
+    const zval *_val;
+    if (isReference()) {
+        _val = Z_REFVAL_P(const_ptr());
+    } else {
+        _val = const_ptr();
+    }
+    if (Z_TYPE_P(_val) == IS_NULL) {
+        printf("value=null\n");
+    } else if (Z_TYPE_P(_val) == IS_UNDEF) {
+        printf("value=undefined\n");
+    } else if (Z_TYPE_P(_val) == IS_FALSE) {
+        printf("value=false\n");
+    } else if (Z_TYPE_P(_val) == IS_TRUE) {
+        printf("value=true\n");
+    } else if (Z_TYPE_P(_val) == IS_LONG) {
+        printf("value=%ld\n", Z_LVAL_P(_val));
+    } else if (Z_TYPE_P(_val) == IS_DOUBLE) {
+        printf("value=%f\n", Z_DVAL_P(_val));
+    } else if (Z_TYPE_P(_val) == IS_STRING) {
+        printf("value=\"%.*s\"\n", (int) Z_STRLEN_P(_val), Z_STRVAL_P(_val));
+    } else if (Z_TYPE_P(_val) == IS_ARRAY) {
+        printf("array[rc=%d]=%p, count=%u\n", Z_REFCOUNT_P(_val), _val->value.arr, zend_hash_num_elements(Z_ARRVAL_P(_val)));
+    } else if (Z_TYPE_P(_val) == IS_OBJECT) {
+        printf("object[rc=%d]=%p, class=%s\n", Z_REFCOUNT_P(_val), _val->value.obj, ZSTR_VAL(Z_OBJCE_P(_val)->name));
+    } else if (Z_TYPE_P(_val) == IS_RESOURCE) {
+        printf("resource=%p, type=%d\n", _val->value.res, _val->value.res->type);
+    }
+}
+#else
+void Variant::debug() {
+    php_debug_zval_dump(ptr(), 10);
+}
+#endif
+
+int Variant::getRefCount() const {
+    const zend_refcounted *counted = Z_COUNTED_P(const_ptr());
+    if (!counted) {
+        return 0;
+    }
+    return GC_REFCOUNT(counted);
+}
+
 bool Variant::empty() {
     switch (type()) {
     case IS_UNDEF:

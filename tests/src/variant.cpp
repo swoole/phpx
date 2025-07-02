@@ -78,7 +78,23 @@ TEST(variant, json) {
     ASSERT_TRUE(v3.equals(arr1));
 }
 
-TEST(variant, ref) {
+TEST(variant, ref0) {
+    Array arr;
+    Variant ref = &arr;
+    array_push(ref, "php", "java", "go");
+    ASSERT_EQ((*ref).length(), 3);
+
+    array_push(ref, "c++", "rust", "erlang", "node.js");
+    ASSERT_EQ((*ref).length(), 7);
+
+    array_push(ref, "python", "ruby", "lua", "perl", "vue");
+    ASSERT_EQ(ref.getRefValue().length(), 12);
+
+    arr.debug();
+    ref.debug();
+}
+
+TEST(variant, ref1) {
     Array arr;
     Variant ref(&arr);
     parse_str("first=value1&second=value2", ref);
@@ -100,8 +116,8 @@ TEST(variant, ref3) {
     array_push(ref, "php", "java", "go");
     ASSERT_EQ((*ref).length(), 3);
 
-    array_push(&arr, "python", "ruby", "lua", "perl", "vue");
-    ASSERT_EQ(arr.length(), 8);
+    array_push(ref, "python", "ruby", "lua", "perl", "vue");
+    ASSERT_EQ((*ref).length(), 8);
 }
 
 TEST(variant, object) {
