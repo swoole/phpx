@@ -1183,7 +1183,6 @@ class Class {
     std::vector<zend_class_entry *> interfaces;
     zend_function_entry *functions;
     std::vector<Property> properties;
-    std::vector<Property> static_properties;
     std::vector<Constant> constants;
     std::vector<std::string> aliases;
 };
