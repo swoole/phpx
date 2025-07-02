@@ -895,12 +895,8 @@ class Object : public Variant {
     }
     Object(const Variant &v) : Object(v.const_ptr()) {}
     Object() = default;
-    Variant call(Variant &func, Args &args) {
-        return _call(ptr(), func.ptr(), args);
-    }
-    Variant call(const char *func, Args &args) {
-        Variant _func(func);
-        return _call(ptr(), _func.ptr(), args);
+    Variant call(const Variant &func, Args &args) {
+        return _call(ptr(), func.const_ptr(), args);
     }
     zend_object *object() {
         return Z_OBJ_P(ptr());
@@ -936,6 +932,7 @@ class Object : public Variant {
     Variant exec(const Variant &fn) {
         return _call(ptr(), fn.const_ptr());
     }
+    Variant exec(const Variant &fn, const std::initializer_list<Variant> &args);
 
     /* generator */
     Variant exec(const Variant &fn, const Variant &v1);

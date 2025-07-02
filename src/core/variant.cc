@@ -204,4 +204,12 @@ Object newObject(const char *name, const std::initializer_list<Variant> &args) {
     object.call("__construct", _args);
     return object;
 }
+
+Variant Object::exec(const Variant &fn, const std::initializer_list<Variant> &args) {
+    Args _args;
+    for (const auto &arg : args) {
+        _args.append(const_cast<Variant &>(arg).ptr());
+    }
+    return _call(ptr(), fn.const_ptr(), _args);
+}
 }  // namespace php

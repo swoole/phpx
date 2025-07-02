@@ -118,7 +118,8 @@ TEST(variant, empty) {
 
     Array arr;
     ASSERT_TRUE(arr.empty());
-
     arr.append("hello");
     ASSERT_FALSE(arr.empty());
+    Variant alias_arr = arr;
+    ASSERT_FALSE(alias_arr.empty());
 }
