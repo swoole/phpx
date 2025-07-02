@@ -36,12 +36,8 @@ extern "C" {
 #include "zend_inheritance.h"
 #include "zend_types.h"
 
-#include <ext/date/php_date.h>
 #include <ext/json/php_json.h>
-#include <ext/standard/url.h>
-#include <ext/standard/info.h>
 #include <ext/standard/html.h>
-#include <ext/standard/php_http.h>
 #include <ext/standard/php_standard.h>
 #include <ext/spl/php_spl.h>
 }
@@ -647,12 +643,6 @@ class ArrayIterator {
 
 extern int array_data_compare(Bucket *f, Bucket *s);
 
-PHPX_API String md5(const String &data, bool raw_output = false);
-PHPX_API String sha1(const String &data, bool raw_output = false);
-PHPX_API String crc32(const String &data, bool raw_output = false);
-PHPX_API String hash(const String &algo, const String &data, bool raw_output = false);
-PHPX_API String hash_hmac(const String &algo, const String &data, const String &key, bool raw_output = false);
-
 class Array : public Variant {
   public:
     Array() {
@@ -1183,9 +1173,6 @@ extern void _exec_function(zend_execute_data *data, zval *return_value);
 extern void _exec_method(zend_execute_data *data, zval *return_value);
 
 zend_function_entry *copy_function_entries(const zend_function_entry *_functions);
-
-extern Variant constant(const char *name);
-extern bool define(const char *name, const Variant &v, bool case_sensitive = true);
 
 enum ClassFlags {
     STATIC = ZEND_ACC_STATIC,

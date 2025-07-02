@@ -1,7 +1,9 @@
 #include "phpx.h"
 
 namespace php {
+Variant hash{ZEND_STRL("hash"), true};
 Variant hash_file{ZEND_STRL("hash_file"), true};
+Variant hash_hmac{ZEND_STRL("hash_hmac"), true};
 Variant hash_hmac_file{ZEND_STRL("hash_hmac_file"), true};
 Variant hash_init{ZEND_STRL("hash_init"), true};
 Variant hash_update{ZEND_STRL("hash_update"), true};

@@ -1,4 +1,5 @@
 #include "phpx_test.h"
+#include "phpx_func.h"
 
 using namespace php;
 

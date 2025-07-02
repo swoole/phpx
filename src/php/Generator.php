@@ -18,15 +18,7 @@ class Generator
     public static string $rootDir = '';
 
     const BUILTIN_FUNCTIONS = [
-        'define',
-        'hash',
-        'hash_hmac',
         'sizeof',
-        'constant',
-        'crc32',
-        'md5',
-        'sha1',
-        'exec',
     ];
 
     const BUILTIN_CLASSES = [

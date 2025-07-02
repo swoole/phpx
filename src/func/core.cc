@@ -11,6 +11,7 @@ Variant strncmp{ZEND_STRL("strncmp"), true};
 Variant strcasecmp{ZEND_STRL("strcasecmp"), true};
 Variant strncasecmp{ZEND_STRL("strncasecmp"), true};
 Variant error_reporting{ZEND_STRL("error_reporting"), true};
+Variant define{ZEND_STRL("define"), true};
 Variant defined{ZEND_STRL("defined"), true};
 Variant get_class{ZEND_STRL("get_class"), true};
 Variant get_called_class{ZEND_STRL("get_called_class"), true};

@@ -9,6 +9,7 @@ extern Variant strncmp;
 extern Variant strcasecmp;
 extern Variant strncasecmp;
 extern Variant error_reporting;
+extern Variant define;
 extern Variant defined;
 extern Variant get_class;
 extern Variant get_called_class;

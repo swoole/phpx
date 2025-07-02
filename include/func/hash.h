@@ -1,5 +1,7 @@
 namespace php {
+extern Variant hash;
 extern Variant hash_file;
+extern Variant hash_hmac;
 extern Variant hash_hmac_file;
 extern Variant hash_init;
 extern Variant hash_update;

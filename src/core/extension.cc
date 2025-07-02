@@ -28,7 +28,7 @@ Extension::Extension(const char *_name, const char *_version) {
 
 void Extension::require(const char *name, const char *version) {
     checkStartupStatus(BEFORE_START, __func__);
-    if (deps_.size() <= deps_count + 2) {
+    if (deps_.size() < deps_count + 2) {
         deps_.resize(deps_.size() + 8);
     }
 
