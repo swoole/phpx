@@ -12,6 +12,7 @@
         "test": "phpunit --bootstrap tests/bootstrap.php -c phpunit.xml --colors=always",
         "cs-fix": "php-cs-fixer fix $1",
         "analyse": "phpstan analyse --memory-limit 512M -l 5 -c phpstan.neon",
-        "rector": "rector process --clear-cache"
+        "rector": "rector process --clear-cache",
+        "phpx": "php bin/phpx.php $1"
     }
 }

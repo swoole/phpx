@@ -98,3 +98,17 @@ TEST(array, join) {
     auto s = arr.join(",");
     ASSERT_GE(s.length(), 20);
 }
+
+TEST(array, swap) {
+    Variant v;
+    zval zarr;
+    array_init(&zarr);
+    add_next_index_long(&zarr, 199);
+    add_next_index_long(&zarr, 189);
+    v = &zarr;
+    zval_ptr_dtor(&zarr);
+
+    Array arr(v);
+    ASSERT_EQ(arr[0].toInt(), 199);
+    ASSERT_EQ(arr[1].toInt(), 189);
+}

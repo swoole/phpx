@@ -120,6 +120,15 @@ TEST(variant, ref3) {
     ASSERT_EQ((*ref).length(), 8);
 }
 
+TEST(variant, ref4) {
+    Array arr;
+    Variant ref;
+    ref = &arr;
+
+    array_push(ref, "php", "java", "go");
+    ASSERT_EQ((*ref).length(), 3);
+}
+
 TEST(variant, object) {
     auto array = create_map();
     auto object = newObject("ArrayObject", {array, constant("ArrayObject::ARRAY_AS_PROPS")});
