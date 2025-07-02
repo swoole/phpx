@@ -1401,7 +1401,7 @@ class Extension {
     void registerConstant(const char *name, const char *v, size_t len) const;
     void registerConstant(const char *name, const std::string &v) const;
 
-    bool require(const char *name, const char *version = nullptr);
+    void require(const char *name, const char *version = nullptr);
 
     void info(const std::vector<std::string> &header, const std::vector<std::vector<std::string>> &body) {
         this->header = header;
@@ -1431,12 +1431,12 @@ class Extension {
 
   protected:
     int function_count = 0;
-    int function_array_size = 0;
     int deps_count = 0;
-    int deps_array_size = 0;
+    int function_array_size = 0;
 
     zend_function_entry *functions;
     std::vector<IniEntry> ini_entries;
+    std::vector<zend_module_dep> deps_;
 };
 
 extern std::unordered_map<std::string, std::shared_ptr<Extension>> _name_to_extension;

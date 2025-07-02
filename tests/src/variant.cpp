@@ -83,6 +83,10 @@ TEST(variant, object) {
     ASSERT_TRUE(object.isObject());
     ASSERT_EQ(object.get("php").toInt(), 3);
 
+    object.exec("offsetSet", {"python", 9});
+    auto r2 = object.get("python");
+    ASSERT_EQ(r2.toInt(), 9);
+
     auto o2 = newObject("class_not_exists");
     ASSERT_FALSE(o2.isUndef());
 }
