@@ -1222,18 +1222,6 @@ class Extension {
         int modifiable;
     };
 
-    friend zend_result extension_startup(int type, int module_number);
-    friend zend_result extension_shutdown(int type, int module_number);
-    bool started = false;
-
-    int function_count = 0;
-    int deps_count = 0;
-    int function_array_size = 0;
-
-    zend_function_entry *functions;
-    std::vector<IniEntry> ini_entries;
-    std::vector<zend_module_dep> deps_;
-
   protected:
     zend_module_entry module = {
         STANDARD_MODULE_HEADER_EX,
@@ -1249,6 +1237,18 @@ class Extension {
         nullptr,
         STANDARD_MODULE_PROPERTIES,
     };
+
+    friend zend_result extension_startup(int type, int module_number);
+    friend zend_result extension_shutdown(int type, int module_number);
+    bool started = false;
+
+    int function_count = 0;
+    int deps_count = 0;
+    int function_array_size = 0;
+
+    zend_function_entry *functions;
+    std::vector<IniEntry> ini_entries;
+    std::vector<zend_module_dep> deps_;
 
     void registerIniEntries(int module_number);
     void unregisterIniEntries(int module_number) const;
