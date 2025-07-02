@@ -1163,34 +1163,11 @@ class Class {
     zend_class_entry *ptr() const {
         return ce;
     }
-    Variant getStaticProperty(const std::string &p_name) const {
-        if (!activated) {
-            return {};
-        }
-        return {zend_read_static_property(ce, p_name.c_str(), p_name.length(), true)};
-    }
-    bool setStaticProperty(const std::string &p_name, Variant value) const {
-        if (!activated) {
-            return false;
-        }
-        value.addRef();
-        return zend_update_static_property(ce, p_name.c_str(), p_name.length(), value.ptr()) == SUCCESS;
-    }
-    static Variant get(const char *name, const std::string &p_name) {
-        zend_class_entry *_tmp_ce = getClassEntry(name);
-        if (!_tmp_ce) {
-            return {};
-        }
-        return {zend_read_static_property(_tmp_ce, p_name.c_str(), p_name.length(), true)};
-    }
-    static bool set(const char *class_name, const std::string &p_name, Variant value) {
-        zend_class_entry *_tmp_ce = getClassEntry(class_name);
-        if (!_tmp_ce) {
-            return false;
-        }
-        value.addRef();
-        return zend_update_static_property(_tmp_ce, p_name.c_str(), p_name.length(), value.ptr()) == SUCCESS;
-    }
+
+    Variant getStaticProperty(const std::string &p_name) const;
+    bool setStaticProperty(const std::string &p_name, Variant value) const;
+    static Variant get(const char *name, const std::string &p_name);
+    static bool set(const char *class_name, const std::string &p_name, Variant value);
 
   protected:
     bool activated;
@@ -1208,30 +1185,14 @@ class Class {
 
 class Interface {
   public:
-    explicit Interface(const char *name) {
-        this->name = name;
-        INIT_CLASS_ENTRY_EX(_ce, name, strlen(name), nullptr);
-        ce = nullptr;
-        functions = nullptr;
-    }
+    explicit Interface(const char *name);
     std::string getName() {
         return name;
     }
     void registerFunctions(const zend_function_entry *_functions) {
         functions = _functions;
     }
-    bool activate() {
-        if (activated) {
-            return false;
-        }
-        _ce.info.internal.builtin_functions = functions;
-        ce = zend_register_internal_interface(&_ce TSRMLS_CC);
-        if (ce == nullptr) {
-            return false;
-        }
-        activated = true;
-        return true;
-    }
+    bool activate();
 
     zend_class_entry *ptr() const {
         return ce;
