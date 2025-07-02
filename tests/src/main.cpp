@@ -37,7 +37,9 @@ string get_include_dir() {
 int main(int argc, char **argv) {
     php::VM vm(argc, argv);
     init_root_path(argv[0]);
-    ::testing::InitGoogleTest(&argc, argv);
+    zend_first_try {
+        ::testing::InitGoogleTest(&argc, argv);
+    } zend_end_try();
     int retval = RUN_ALL_TESTS();
     return retval;
 }

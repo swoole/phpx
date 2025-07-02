@@ -112,6 +112,10 @@ Variant DOMNode::isSameNode(const Variant &other_node) {
     return this_.exec("isSameNode", other_node);
 }
 
+Variant DOMNode::isEqualNode(const Variant &other_node) {
+    return this_.exec("isEqualNode", other_node);
+}
+
 Variant DOMNode::isSupported(const Variant &feature, const Variant &version) {
     return this_.exec("isSupported", feature, version);
 }
@@ -134,6 +138,14 @@ Variant DOMNode::removeChild(const Variant &child) {
 
 Variant DOMNode::replaceChild(const Variant &node, const Variant &child) {
     return this_.exec("replaceChild", node, child);
+}
+
+Variant DOMNode::contains(const Variant &other) {
+    return this_.exec("contains", other);
+}
+
+Variant DOMNode::getRootNode(const Variant &options) {
+    return this_.exec("getRootNode", options);
 }
 
 
@@ -160,6 +172,10 @@ Variant DOMDocumentFragment::append(const Variant &nodes) {
 
 Variant DOMDocumentFragment::prepend(const Variant &nodes) {
     return this_.exec("prepend", nodes);
+}
+
+Variant DOMDocumentFragment::replaceChildren(const Variant &nodes) {
+    return this_.exec("replaceChildren", nodes);
 }
 
 Variant DOMDocumentFragment::__sleep() {
@@ -214,6 +230,10 @@ Variant DOMDocumentFragment::isSameNode(const Variant &other_node) {
     return this_.exec("isSameNode", other_node);
 }
 
+Variant DOMDocumentFragment::isEqualNode(const Variant &other_node) {
+    return this_.exec("isEqualNode", other_node);
+}
+
 Variant DOMDocumentFragment::isSupported(const Variant &feature, const Variant &version) {
     return this_.exec("isSupported", feature, version);
 }
@@ -236,6 +256,14 @@ Variant DOMDocumentFragment::removeChild(const Variant &child) {
 
 Variant DOMDocumentFragment::replaceChild(const Variant &node, const Variant &child) {
     return this_.exec("replaceChild", node, child);
+}
+
+Variant DOMDocumentFragment::contains(const Variant &other) {
+    return this_.exec("contains", other);
+}
+
+Variant DOMDocumentFragment::getRootNode(const Variant &options) {
+    return this_.exec("getRootNode", options);
 }
 
 
@@ -375,6 +403,10 @@ Variant DOMDocument::prepend(const Variant &nodes) {
     return this_.exec("prepend", nodes);
 }
 
+Variant DOMDocument::replaceChildren(const Variant &nodes) {
+    return this_.exec("replaceChildren", nodes);
+}
+
 Variant DOMDocument::__sleep() {
     return this_.exec("__sleep");
 }
@@ -427,6 +459,10 @@ Variant DOMDocument::isSameNode(const Variant &other_node) {
     return this_.exec("isSameNode", other_node);
 }
 
+Variant DOMDocument::isEqualNode(const Variant &other_node) {
+    return this_.exec("isEqualNode", other_node);
+}
+
 Variant DOMDocument::isSupported(const Variant &feature, const Variant &version) {
     return this_.exec("isSupported", feature, version);
 }
@@ -449,6 +485,14 @@ Variant DOMDocument::removeChild(const Variant &child) {
 
 Variant DOMDocument::replaceChild(const Variant &node, const Variant &child) {
     return this_.exec("replaceChild", node, child);
+}
+
+Variant DOMDocument::contains(const Variant &other) {
+    return this_.exec("contains", other);
+}
+
+Variant DOMDocument::getRootNode(const Variant &options) {
+    return this_.exec("getRootNode", options);
 }
 
 
@@ -574,6 +618,10 @@ Variant DOMCharacterData::isSameNode(const Variant &other_node) {
     return this_.exec("isSameNode", other_node);
 }
 
+Variant DOMCharacterData::isEqualNode(const Variant &other_node) {
+    return this_.exec("isEqualNode", other_node);
+}
+
 Variant DOMCharacterData::isSupported(const Variant &feature, const Variant &version) {
     return this_.exec("isSupported", feature, version);
 }
@@ -596,6 +644,14 @@ Variant DOMCharacterData::removeChild(const Variant &child) {
 
 Variant DOMCharacterData::replaceChild(const Variant &node, const Variant &child) {
     return this_.exec("replaceChild", node, child);
+}
+
+Variant DOMCharacterData::contains(const Variant &other) {
+    return this_.exec("contains", other);
+}
+
+Variant DOMCharacterData::getRootNode(const Variant &options) {
+    return this_.exec("getRootNode", options);
 }
 
 
@@ -659,6 +715,10 @@ Variant DOMAttr::isSameNode(const Variant &other_node) {
     return this_.exec("isSameNode", other_node);
 }
 
+Variant DOMAttr::isEqualNode(const Variant &other_node) {
+    return this_.exec("isEqualNode", other_node);
+}
+
 Variant DOMAttr::isSupported(const Variant &feature, const Variant &version) {
     return this_.exec("isSupported", feature, version);
 }
@@ -683,6 +743,14 @@ Variant DOMAttr::replaceChild(const Variant &node, const Variant &child) {
     return this_.exec("replaceChild", node, child);
 }
 
+Variant DOMAttr::contains(const Variant &other) {
+    return this_.exec("contains", other);
+}
+
+Variant DOMAttr::getRootNode(const Variant &options) {
+    return this_.exec("getRootNode", options);
+}
+
 
 DOMElement::DOMElement(const Variant &qualified_name, const Variant &value, const Variant &_namespace) {
     this_ = newObject("DOMElement", qualified_name, value, _namespace);
@@ -690,6 +758,10 @@ DOMElement::DOMElement(const Variant &qualified_name, const Variant &value, cons
 
 Variant DOMElement::getAttribute(const Variant &qualified_name) {
     return this_.exec("getAttribute", qualified_name);
+}
+
+Variant DOMElement::getAttributeNames() {
+    return this_.exec("getAttributeNames");
 }
 
 Variant DOMElement::getAttributeNS(const Variant &_namespace, const Variant &local_name) {
@@ -760,6 +832,10 @@ Variant DOMElement::setIdAttributeNode(const Variant &attr, const Variant &is_id
     return this_.exec("setIdAttributeNode", attr, is_id);
 }
 
+Variant DOMElement::toggleAttribute(const Variant &qualified_name, const Variant &force) {
+    return this_.exec("toggleAttribute", qualified_name, force);
+}
+
 Variant DOMElement::remove() {
     return this_.exec("remove");
 }
@@ -782,6 +858,18 @@ Variant DOMElement::append(const Variant &nodes) {
 
 Variant DOMElement::prepend(const Variant &nodes) {
     return this_.exec("prepend", nodes);
+}
+
+Variant DOMElement::replaceChildren(const Variant &nodes) {
+    return this_.exec("replaceChildren", nodes);
+}
+
+Variant DOMElement::insertAdjacentElement(const Variant &where, const Variant &element) {
+    return this_.exec("insertAdjacentElement", where, element);
+}
+
+Variant DOMElement::insertAdjacentText(const Variant &where, const Variant &data) {
+    return this_.exec("insertAdjacentText", where, data);
 }
 
 Variant DOMElement::__sleep() {
@@ -836,6 +924,10 @@ Variant DOMElement::isSameNode(const Variant &other_node) {
     return this_.exec("isSameNode", other_node);
 }
 
+Variant DOMElement::isEqualNode(const Variant &other_node) {
+    return this_.exec("isEqualNode", other_node);
+}
+
 Variant DOMElement::isSupported(const Variant &feature, const Variant &version) {
     return this_.exec("isSupported", feature, version);
 }
@@ -858,6 +950,14 @@ Variant DOMElement::removeChild(const Variant &child) {
 
 Variant DOMElement::replaceChild(const Variant &node, const Variant &child) {
     return this_.exec("replaceChild", node, child);
+}
+
+Variant DOMElement::contains(const Variant &other) {
+    return this_.exec("contains", other);
+}
+
+Variant DOMElement::getRootNode(const Variant &options) {
+    return this_.exec("getRootNode", options);
 }
 
 
@@ -965,6 +1065,10 @@ Variant DOMText::isSameNode(const Variant &other_node) {
     return this_.exec("isSameNode", other_node);
 }
 
+Variant DOMText::isEqualNode(const Variant &other_node) {
+    return this_.exec("isEqualNode", other_node);
+}
+
 Variant DOMText::isSupported(const Variant &feature, const Variant &version) {
     return this_.exec("isSupported", feature, version);
 }
@@ -987,6 +1091,14 @@ Variant DOMText::removeChild(const Variant &child) {
 
 Variant DOMText::replaceChild(const Variant &node, const Variant &child) {
     return this_.exec("replaceChild", node, child);
+}
+
+Variant DOMText::contains(const Variant &other) {
+    return this_.exec("contains", other);
+}
+
+Variant DOMText::getRootNode(const Variant &options) {
+    return this_.exec("getRootNode", options);
 }
 
 
@@ -1082,6 +1194,10 @@ Variant DOMComment::isSameNode(const Variant &other_node) {
     return this_.exec("isSameNode", other_node);
 }
 
+Variant DOMComment::isEqualNode(const Variant &other_node) {
+    return this_.exec("isEqualNode", other_node);
+}
+
 Variant DOMComment::isSupported(const Variant &feature, const Variant &version) {
     return this_.exec("isSupported", feature, version);
 }
@@ -1104,6 +1220,14 @@ Variant DOMComment::removeChild(const Variant &child) {
 
 Variant DOMComment::replaceChild(const Variant &node, const Variant &child) {
     return this_.exec("replaceChild", node, child);
+}
+
+Variant DOMComment::contains(const Variant &other) {
+    return this_.exec("contains", other);
+}
+
+Variant DOMComment::getRootNode(const Variant &options) {
+    return this_.exec("getRootNode", options);
 }
 
 
@@ -1211,6 +1335,10 @@ Variant DOMCdataSection::isSameNode(const Variant &other_node) {
     return this_.exec("isSameNode", other_node);
 }
 
+Variant DOMCdataSection::isEqualNode(const Variant &other_node) {
+    return this_.exec("isEqualNode", other_node);
+}
+
 Variant DOMCdataSection::isSupported(const Variant &feature, const Variant &version) {
     return this_.exec("isSupported", feature, version);
 }
@@ -1233,6 +1361,14 @@ Variant DOMCdataSection::removeChild(const Variant &child) {
 
 Variant DOMCdataSection::replaceChild(const Variant &node, const Variant &child) {
     return this_.exec("replaceChild", node, child);
+}
+
+Variant DOMCdataSection::contains(const Variant &other) {
+    return this_.exec("contains", other);
+}
+
+Variant DOMCdataSection::getRootNode(const Variant &options) {
+    return this_.exec("getRootNode", options);
 }
 
 
@@ -1288,6 +1424,10 @@ Variant DOMDocumentType::isSameNode(const Variant &other_node) {
     return this_.exec("isSameNode", other_node);
 }
 
+Variant DOMDocumentType::isEqualNode(const Variant &other_node) {
+    return this_.exec("isEqualNode", other_node);
+}
+
 Variant DOMDocumentType::isSupported(const Variant &feature, const Variant &version) {
     return this_.exec("isSupported", feature, version);
 }
@@ -1310,6 +1450,14 @@ Variant DOMDocumentType::removeChild(const Variant &child) {
 
 Variant DOMDocumentType::replaceChild(const Variant &node, const Variant &child) {
     return this_.exec("replaceChild", node, child);
+}
+
+Variant DOMDocumentType::contains(const Variant &other) {
+    return this_.exec("contains", other);
+}
+
+Variant DOMDocumentType::getRootNode(const Variant &options) {
+    return this_.exec("getRootNode", options);
 }
 
 
@@ -1365,6 +1513,10 @@ Variant DOMNotation::isSameNode(const Variant &other_node) {
     return this_.exec("isSameNode", other_node);
 }
 
+Variant DOMNotation::isEqualNode(const Variant &other_node) {
+    return this_.exec("isEqualNode", other_node);
+}
+
 Variant DOMNotation::isSupported(const Variant &feature, const Variant &version) {
     return this_.exec("isSupported", feature, version);
 }
@@ -1387,6 +1539,14 @@ Variant DOMNotation::removeChild(const Variant &child) {
 
 Variant DOMNotation::replaceChild(const Variant &node, const Variant &child) {
     return this_.exec("replaceChild", node, child);
+}
+
+Variant DOMNotation::contains(const Variant &other) {
+    return this_.exec("contains", other);
+}
+
+Variant DOMNotation::getRootNode(const Variant &options) {
+    return this_.exec("getRootNode", options);
 }
 
 
@@ -1442,6 +1602,10 @@ Variant DOMEntity::isSameNode(const Variant &other_node) {
     return this_.exec("isSameNode", other_node);
 }
 
+Variant DOMEntity::isEqualNode(const Variant &other_node) {
+    return this_.exec("isEqualNode", other_node);
+}
+
 Variant DOMEntity::isSupported(const Variant &feature, const Variant &version) {
     return this_.exec("isSupported", feature, version);
 }
@@ -1464,6 +1628,14 @@ Variant DOMEntity::removeChild(const Variant &child) {
 
 Variant DOMEntity::replaceChild(const Variant &node, const Variant &child) {
     return this_.exec("replaceChild", node, child);
+}
+
+Variant DOMEntity::contains(const Variant &other) {
+    return this_.exec("contains", other);
+}
+
+Variant DOMEntity::getRootNode(const Variant &options) {
+    return this_.exec("getRootNode", options);
 }
 
 
@@ -1523,6 +1695,10 @@ Variant DOMEntityReference::isSameNode(const Variant &other_node) {
     return this_.exec("isSameNode", other_node);
 }
 
+Variant DOMEntityReference::isEqualNode(const Variant &other_node) {
+    return this_.exec("isEqualNode", other_node);
+}
+
 Variant DOMEntityReference::isSupported(const Variant &feature, const Variant &version) {
     return this_.exec("isSupported", feature, version);
 }
@@ -1545,6 +1721,14 @@ Variant DOMEntityReference::removeChild(const Variant &child) {
 
 Variant DOMEntityReference::replaceChild(const Variant &node, const Variant &child) {
     return this_.exec("replaceChild", node, child);
+}
+
+Variant DOMEntityReference::contains(const Variant &other) {
+    return this_.exec("contains", other);
+}
+
+Variant DOMEntityReference::getRootNode(const Variant &options) {
+    return this_.exec("getRootNode", options);
 }
 
 
@@ -1604,6 +1788,10 @@ Variant DOMProcessingInstruction::isSameNode(const Variant &other_node) {
     return this_.exec("isSameNode", other_node);
 }
 
+Variant DOMProcessingInstruction::isEqualNode(const Variant &other_node) {
+    return this_.exec("isEqualNode", other_node);
+}
+
 Variant DOMProcessingInstruction::isSupported(const Variant &feature, const Variant &version) {
     return this_.exec("isSupported", feature, version);
 }
@@ -1626,6 +1814,14 @@ Variant DOMProcessingInstruction::removeChild(const Variant &child) {
 
 Variant DOMProcessingInstruction::replaceChild(const Variant &node, const Variant &child) {
     return this_.exec("replaceChild", node, child);
+}
+
+Variant DOMProcessingInstruction::contains(const Variant &other) {
+    return this_.exec("contains", other);
+}
+
+Variant DOMProcessingInstruction::getRootNode(const Variant &options) {
+    return this_.exec("getRootNode", options);
 }
 
 

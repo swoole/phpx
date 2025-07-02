@@ -131,6 +131,7 @@ class ReflectionMethod {
     Object this_;
   public:
     ReflectionMethod(const Variant &object_or_method, const Variant &method = {});
+    static Variant createFromMethodName(const Variant &method);
     Variant __toString();
     Variant isPublic();
     Variant isPrivate();
@@ -343,6 +344,8 @@ class ReflectionClassConstant {
     Variant getDocComment();
     Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
     Variant isEnumCase();
+    Variant hasType();
+    Variant getType();
 };
 
 class ReflectionExtension {
@@ -475,6 +478,8 @@ class ReflectionEnumUnitCase {
     Variant getDocComment();
     Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
     Variant isEnumCase();
+    Variant hasType();
+    Variant getType();
 };
 
 class ReflectionEnumBackedCase {
@@ -495,6 +500,8 @@ class ReflectionEnumBackedCase {
     Variant getDocComment();
     Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
     Variant isEnumCase();
+    Variant hasType();
+    Variant getType();
 };
 
 class ReflectionFiber {

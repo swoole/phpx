@@ -44,6 +44,7 @@ Variant mb_check_encoding{ZEND_STRL("mb_check_encoding"), true};
 Variant mb_scrub{ZEND_STRL("mb_scrub"), true};
 Variant mb_ord{ZEND_STRL("mb_ord"), true};
 Variant mb_chr{ZEND_STRL("mb_chr"), true};
+Variant mb_str_pad{ZEND_STRL("mb_str_pad"), true};
 Variant mb_regex_encoding{ZEND_STRL("mb_regex_encoding"), true};
 Variant mb_ereg{ZEND_STRL("mb_ereg"), true};
 Variant mb_eregi{ZEND_STRL("mb_eregi"), true};

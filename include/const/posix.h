@@ -25,4 +25,18 @@ extern Variant POSIX_RLIMIT_RTTIME;
 extern Variant POSIX_RLIMIT_SIGPENDING;
 extern Variant POSIX_RLIMIT_STACK;
 extern Variant POSIX_RLIMIT_INFINITY;
+extern Variant POSIX_SC_ARG_MAX;
+extern Variant POSIX_SC_PAGESIZE;
+extern Variant POSIX_SC_NPROCESSORS_CONF;
+extern Variant POSIX_SC_NPROCESSORS_ONLN;
+extern Variant POSIX_PC_LINK_MAX;
+extern Variant POSIX_PC_MAX_CANON;
+extern Variant POSIX_PC_MAX_INPUT;
+extern Variant POSIX_PC_NAME_MAX;
+extern Variant POSIX_PC_PATH_MAX;
+extern Variant POSIX_PC_PIPE_BUF;
+extern Variant POSIX_PC_CHOWN_RESTRICTED;
+extern Variant POSIX_PC_NO_TRUNC;
+extern Variant POSIX_PC_ALLOC_SIZE_MIN;
+extern Variant POSIX_PC_SYMLINK_MAX;
 }

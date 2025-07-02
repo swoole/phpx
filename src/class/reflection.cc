@@ -367,6 +367,11 @@ ReflectionMethod::ReflectionMethod(const Variant &object_or_method, const Varian
     this_ = newObject("ReflectionMethod", object_or_method, method);
 }
 
+Variant ReflectionMethod::createFromMethodName(const Variant &method) {
+    static Variant fn { ZEND_STRL("ReflectionMethod::createFromMethodName"), true };
+    return fn(method);
+}
+
 Variant ReflectionMethod::__toString() {
     return this_.exec("__toString");
 }
@@ -1139,6 +1144,14 @@ Variant ReflectionClassConstant::isEnumCase() {
     return this_.exec("isEnumCase");
 }
 
+Variant ReflectionClassConstant::hasType() {
+    return this_.exec("hasType");
+}
+
+Variant ReflectionClassConstant::getType() {
+    return this_.exec("getType");
+}
+
 
 ReflectionExtension::ReflectionExtension(const Variant &name) {
     this_ = newObject("ReflectionExtension", name);
@@ -1554,6 +1567,14 @@ Variant ReflectionEnumUnitCase::isEnumCase() {
     return this_.exec("isEnumCase");
 }
 
+Variant ReflectionEnumUnitCase::hasType() {
+    return this_.exec("hasType");
+}
+
+Variant ReflectionEnumUnitCase::getType() {
+    return this_.exec("getType");
+}
+
 
 ReflectionEnumBackedCase::ReflectionEnumBackedCase(const Variant &_class, const Variant &constant) {
     this_ = newObject("ReflectionEnumBackedCase", _class, constant);
@@ -1613,6 +1634,14 @@ Variant ReflectionEnumBackedCase::getAttributes(const Variant &name, const Varia
 
 Variant ReflectionEnumBackedCase::isEnumCase() {
     return this_.exec("isEnumCase");
+}
+
+Variant ReflectionEnumBackedCase::hasType() {
+    return this_.exec("hasType");
+}
+
+Variant ReflectionEnumBackedCase::getType() {
+    return this_.exec("getType");
 }
 
 

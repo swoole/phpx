@@ -24,6 +24,7 @@ extern Variant socket_set_option;
 extern Variant socket_setopt;
 extern Variant socket_create_pair;
 extern Variant socket_shutdown;
+extern Variant socket_atmark;
 extern Variant socket_last_error;
 extern Variant socket_clear_error;
 extern Variant socket_import_stream;

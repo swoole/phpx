@@ -15,6 +15,7 @@ class Redis {
     Variant auth(const Variant &credentials);
     Variant bgSave();
     Variant bgrewriteaof();
+    Variant waitaof(const Variant &numlocal, const Variant &numreplicas, const Variant &timeout);
     Variant bitcount(const Variant &key, const Variant &start = 0, const Variant &end = -1, const Variant &bybit = false);
     Variant bitop(const Variant &operation, const Variant &deskey, const Variant &srckey, const Variant &other_keys = {});
     Variant bitpos(const Variant &key, const Variant &bit, const Variant &start = 0, const Variant &end = -1, const Variant &bybit = false);
@@ -70,6 +71,7 @@ class Redis {
     Variant geosearch(const Variant &key, const Variant &position, const Variant &shape, const Variant &unit, const Array &options = {});
     Variant geosearchstore(const Variant &dst, const Variant &src, const Variant &position, const Variant &shape, const Variant &unit, const Array &options = {});
     Variant get(const Variant &key);
+    Variant getWithMeta(const Variant &key);
     Variant getAuth();
     Variant getBit(const Variant &key, const Variant &idx);
     Variant getEx(const Variant &key, const Array &options = {});
@@ -81,6 +83,8 @@ class Redis {
     Variant getOption(const Variant &option);
     Variant getPersistentID();
     Variant getPort();
+    Variant serverName();
+    Variant serverVersion();
     Variant getRange(const Variant &key, const Variant &start, const Variant &end);
     Variant lcs(const Variant &key1, const Variant &key2, const Variant &options = {});
     Variant getReadTimeout();
@@ -99,11 +103,13 @@ class Redis {
     Variant hMget(const Variant &key, const Variant &fields);
     Variant hMset(const Variant &key, const Variant &fieldvals);
     Variant hRandField(const Variant &key, const Variant &options = {});
-    Variant hSet(const Variant &key, const Variant &member, const Variant &value);
+    Variant hSet(const Variant &key, const Variant &fields_and_vals = {});
     Variant hSetNx(const Variant &key, const Variant &field, const Variant &value);
     Variant hStrLen(const Variant &key, const Variant &field);
     Variant hVals(const Variant &key);
     Variant hscan(const Variant &key, const Variant &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    Variant expiremember(const Variant &key, const Variant &field, const Variant &ttl, const Variant &unit = {});
+    Variant expirememberat(const Variant &key, const Variant &field, const Variant &timestamp);
     Variant incr(const Variant &key, const Variant &by = 1);
     Variant incrBy(const Variant &key, const Variant &value);
     Variant incrByFloat(const Variant &key, const Variant &value);
@@ -309,6 +315,7 @@ class RedisCluster {
     Variant acl(const Variant &key_or_address, const Variant &subcmd, const Variant &args = {});
     Variant append(const Variant &key, const Variant &value);
     Variant bgrewriteaof(const Variant &key_or_address);
+    Variant waitaof(const Variant &key_or_address, const Variant &numlocal, const Variant &numreplicas, const Variant &timeout);
     Variant bgsave(const Variant &key_or_address);
     Variant bitcount(const Variant &key, const Variant &start = 0, const Variant &end = -1, const Variant &bybit = false);
     Variant bitop(const Variant &operation, const Variant &deskey, const Variant &srckey, const Variant &otherkeys = {});
@@ -363,6 +370,9 @@ class RedisCluster {
     Variant geosearch(const Variant &key, const Variant &position, const Variant &shape, const Variant &unit, const Array &options = {});
     Variant geosearchstore(const Variant &dst, const Variant &src, const Variant &position, const Variant &shape, const Variant &unit, const Array &options = {});
     Variant get(const Variant &key);
+    Variant getdel(const Variant &key);
+    Variant getWithMeta(const Variant &key);
+    Variant getex(const Variant &key, const Array &options = {});
     Variant getbit(const Variant &key, const Variant &value);
     Variant getlasterror();
     Variant getmode();
@@ -383,6 +393,8 @@ class RedisCluster {
     Variant hmget(const Variant &key, const Variant &keys);
     Variant hmset(const Variant &key, const Variant &key_values);
     Variant hscan(const Variant &key, const Variant &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    Variant expiremember(const Variant &key, const Variant &field, const Variant &ttl, const Variant &unit = {});
+    Variant expirememberat(const Variant &key, const Variant &field, const Variant &timestamp);
     Variant hrandfield(const Variant &key, const Variant &options = {});
     Variant hset(const Variant &key, const Variant &member, const Variant &value);
     Variant hsetnx(const Variant &key, const Variant &member, const Variant &value);

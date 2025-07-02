@@ -84,6 +84,7 @@ class DateInterval {
 class DatePeriod {
     Object this_;
   public:
+    static Variant createFromISO8601String(const Variant &specification, const Variant &options = 0);
     DatePeriod(const Variant &start, const Variant &interval = {}, const Variant &end = {}, const Variant &options = {});
     Variant getStartDate();
     Variant getEndDate();
@@ -94,6 +95,141 @@ class DatePeriod {
     Variant __wakeup();
     static Variant __set_state(const Variant &array);
     Variant getIterator();
+};
+
+class DateError {
+    Object this_;
+  public:
+    DateError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Variant __wakeup();
+    Variant getMessage();
+    Variant getCode();
+    Variant getFile();
+    Variant getLine();
+    Variant getTrace();
+    Variant getPrevious();
+    Variant getTraceAsString();
+    Variant __toString();
+};
+
+class DateObjectError {
+    Object this_;
+  public:
+    DateObjectError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Variant __wakeup();
+    Variant getMessage();
+    Variant getCode();
+    Variant getFile();
+    Variant getLine();
+    Variant getTrace();
+    Variant getPrevious();
+    Variant getTraceAsString();
+    Variant __toString();
+};
+
+class DateRangeError {
+    Object this_;
+  public:
+    DateRangeError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Variant __wakeup();
+    Variant getMessage();
+    Variant getCode();
+    Variant getFile();
+    Variant getLine();
+    Variant getTrace();
+    Variant getPrevious();
+    Variant getTraceAsString();
+    Variant __toString();
+};
+
+class DateException {
+    Object this_;
+  public:
+    DateException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Variant __wakeup();
+    Variant getMessage();
+    Variant getCode();
+    Variant getFile();
+    Variant getLine();
+    Variant getTrace();
+    Variant getPrevious();
+    Variant getTraceAsString();
+    Variant __toString();
+};
+
+class DateInvalidTimeZoneException {
+    Object this_;
+  public:
+    DateInvalidTimeZoneException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Variant __wakeup();
+    Variant getMessage();
+    Variant getCode();
+    Variant getFile();
+    Variant getLine();
+    Variant getTrace();
+    Variant getPrevious();
+    Variant getTraceAsString();
+    Variant __toString();
+};
+
+class DateInvalidOperationException {
+    Object this_;
+  public:
+    DateInvalidOperationException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Variant __wakeup();
+    Variant getMessage();
+    Variant getCode();
+    Variant getFile();
+    Variant getLine();
+    Variant getTrace();
+    Variant getPrevious();
+    Variant getTraceAsString();
+    Variant __toString();
+};
+
+class DateMalformedStringException {
+    Object this_;
+  public:
+    DateMalformedStringException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Variant __wakeup();
+    Variant getMessage();
+    Variant getCode();
+    Variant getFile();
+    Variant getLine();
+    Variant getTrace();
+    Variant getPrevious();
+    Variant getTraceAsString();
+    Variant __toString();
+};
+
+class DateMalformedIntervalStringException {
+    Object this_;
+  public:
+    DateMalformedIntervalStringException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Variant __wakeup();
+    Variant getMessage();
+    Variant getCode();
+    Variant getFile();
+    Variant getLine();
+    Variant getTrace();
+    Variant getPrevious();
+    Variant getTraceAsString();
+    Variant __toString();
+};
+
+class DateMalformedPeriodStringException {
+    Object this_;
+  public:
+    DateMalformedPeriodStringException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Variant __wakeup();
+    Variant getMessage();
+    Variant getCode();
+    Variant getFile();
+    Variant getLine();
+    Variant getTrace();
+    Variant getPrevious();
+    Variant getTraceAsString();
+    Variant __toString();
 };
 
 }

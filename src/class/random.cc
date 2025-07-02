@@ -213,12 +213,24 @@ Variant Random_Randomizer::nextInt() {
     return this_.exec("nextInt");
 }
 
+Variant Random_Randomizer::nextFloat() {
+    return this_.exec("nextFloat");
+}
+
+Variant Random_Randomizer::getFloat(const Variant &min, const Variant &max, const Object &boundary) {
+    return this_.exec("getFloat", min, max, boundary);
+}
+
 Variant Random_Randomizer::getInt(const Variant &min, const Variant &max) {
     return this_.exec("getInt", min, max);
 }
 
 Variant Random_Randomizer::getBytes(const Variant &length) {
     return this_.exec("getBytes", length);
+}
+
+Variant Random_Randomizer::getBytesFromString(const Variant &string, const Variant &length) {
+    return this_.exec("getBytesFromString", string, length);
 }
 
 Variant Random_Randomizer::shuffleArray(const Variant &array) {
@@ -239,6 +251,12 @@ Variant Random_Randomizer::__serialize() {
 
 Variant Random_Randomizer::__unserialize(const Variant &data) {
     return this_.exec("__unserialize", data);
+}
+
+
+Variant Random_IntervalBoundary::cases() {
+    static Variant fn { ZEND_STRL("Random_IntervalBoundary::cases"), true };
+    return fn();
 }
 
 

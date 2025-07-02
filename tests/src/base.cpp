@@ -64,10 +64,6 @@ TEST(base, ini_get) {
     auto v = ini_get("post_max_size");
     ASSERT_GE(v.length(), 2);
     ASSERT_GE(v.toInt(), 8);
-
-    auto v2 = get_cfg_name("post_max_size");
-    ASSERT_TRUE(v2.isString());
-    ASSERT_STREQ(v2.toCString(), v.c_str());
 }
 
 TEST(base, global) {

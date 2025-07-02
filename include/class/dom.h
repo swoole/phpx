@@ -39,12 +39,15 @@ class DOMNode {
     Variant insertBefore(const Variant &node, const Variant &child = {});
     Variant isDefaultNamespace(const Variant &_namespace);
     Variant isSameNode(const Variant &other_node);
+    Variant isEqualNode(const Variant &other_node);
     Variant isSupported(const Variant &feature, const Variant &version);
     Variant lookupNamespaceURI(const Variant &prefix);
     Variant lookupPrefix(const Variant &_namespace);
     Variant normalize();
     Variant removeChild(const Variant &child);
     Variant replaceChild(const Variant &node, const Variant &child);
+    Variant contains(const Variant &other);
+    Variant getRootNode(const Variant &options = {});
 };
 
 class DOMNameSpaceNode {
@@ -61,6 +64,7 @@ class DOMDocumentFragment {
     Variant appendXML(const Variant &data);
     Variant append(const Variant &nodes = {});
     Variant prepend(const Variant &nodes = {});
+    Variant replaceChildren(const Variant &nodes = {});
     Variant __sleep();
     Variant __wakeup();
     Variant appendChild(const Variant &node);
@@ -74,12 +78,15 @@ class DOMDocumentFragment {
     Variant insertBefore(const Variant &node, const Variant &child = {});
     Variant isDefaultNamespace(const Variant &_namespace);
     Variant isSameNode(const Variant &other_node);
+    Variant isEqualNode(const Variant &other_node);
     Variant isSupported(const Variant &feature, const Variant &version);
     Variant lookupNamespaceURI(const Variant &prefix);
     Variant lookupPrefix(const Variant &_namespace);
     Variant normalize();
     Variant removeChild(const Variant &child);
     Variant replaceChild(const Variant &node, const Variant &child);
+    Variant contains(const Variant &other);
+    Variant getRootNode(const Variant &options = {});
 };
 
 class DOMDocument {
@@ -119,6 +126,7 @@ class DOMDocument {
     Variant adoptNode(const Variant &node);
     Variant append(const Variant &nodes = {});
     Variant prepend(const Variant &nodes = {});
+    Variant replaceChildren(const Variant &nodes = {});
     Variant __sleep();
     Variant __wakeup();
     Variant appendChild(const Variant &node);
@@ -132,12 +140,15 @@ class DOMDocument {
     Variant insertBefore(const Variant &node, const Variant &child = {});
     Variant isDefaultNamespace(const Variant &_namespace);
     Variant isSameNode(const Variant &other_node);
+    Variant isEqualNode(const Variant &other_node);
     Variant isSupported(const Variant &feature, const Variant &version);
     Variant lookupNamespaceURI(const Variant &prefix);
     Variant lookupPrefix(const Variant &_namespace);
     Variant normalize();
     Variant removeChild(const Variant &child);
     Variant replaceChild(const Variant &node, const Variant &child);
+    Variant contains(const Variant &other);
+    Variant getRootNode(const Variant &options = {});
 };
 
 class DOMNodeList {
@@ -183,12 +194,15 @@ class DOMCharacterData {
     Variant insertBefore(const Variant &node, const Variant &child = {});
     Variant isDefaultNamespace(const Variant &_namespace);
     Variant isSameNode(const Variant &other_node);
+    Variant isEqualNode(const Variant &other_node);
     Variant isSupported(const Variant &feature, const Variant &version);
     Variant lookupNamespaceURI(const Variant &prefix);
     Variant lookupPrefix(const Variant &_namespace);
     Variant normalize();
     Variant removeChild(const Variant &child);
     Variant replaceChild(const Variant &node, const Variant &child);
+    Variant contains(const Variant &other);
+    Variant getRootNode(const Variant &options = {});
 };
 
 class DOMAttr {
@@ -209,12 +223,15 @@ class DOMAttr {
     Variant insertBefore(const Variant &node, const Variant &child = {});
     Variant isDefaultNamespace(const Variant &_namespace);
     Variant isSameNode(const Variant &other_node);
+    Variant isEqualNode(const Variant &other_node);
     Variant isSupported(const Variant &feature, const Variant &version);
     Variant lookupNamespaceURI(const Variant &prefix);
     Variant lookupPrefix(const Variant &_namespace);
     Variant normalize();
     Variant removeChild(const Variant &child);
     Variant replaceChild(const Variant &node, const Variant &child);
+    Variant contains(const Variant &other);
+    Variant getRootNode(const Variant &options = {});
 };
 
 class DOMElement {
@@ -222,6 +239,7 @@ class DOMElement {
   public:
     DOMElement(const Variant &qualified_name, const Variant &value = {}, const Variant &_namespace = "");
     Variant getAttribute(const Variant &qualified_name);
+    Variant getAttributeNames();
     Variant getAttributeNS(const Variant &_namespace, const Variant &local_name);
     Variant getAttributeNode(const Variant &qualified_name);
     Variant getAttributeNodeNS(const Variant &_namespace, const Variant &local_name);
@@ -239,12 +257,16 @@ class DOMElement {
     Variant setIdAttribute(const Variant &qualified_name, const Variant &is_id);
     Variant setIdAttributeNS(const Variant &_namespace, const Variant &qualified_name, const Variant &is_id);
     Variant setIdAttributeNode(const Variant &attr, const Variant &is_id);
+    Variant toggleAttribute(const Variant &qualified_name, const Variant &force = {});
     Variant remove();
     Variant before(const Variant &nodes = {});
     Variant after(const Variant &nodes = {});
     Variant replaceWith(const Variant &nodes = {});
     Variant append(const Variant &nodes = {});
     Variant prepend(const Variant &nodes = {});
+    Variant replaceChildren(const Variant &nodes = {});
+    Variant insertAdjacentElement(const Variant &where, const Variant &element);
+    Variant insertAdjacentText(const Variant &where, const Variant &data);
     Variant __sleep();
     Variant __wakeup();
     Variant appendChild(const Variant &node);
@@ -258,12 +280,15 @@ class DOMElement {
     Variant insertBefore(const Variant &node, const Variant &child = {});
     Variant isDefaultNamespace(const Variant &_namespace);
     Variant isSameNode(const Variant &other_node);
+    Variant isEqualNode(const Variant &other_node);
     Variant isSupported(const Variant &feature, const Variant &version);
     Variant lookupNamespaceURI(const Variant &prefix);
     Variant lookupPrefix(const Variant &_namespace);
     Variant normalize();
     Variant removeChild(const Variant &child);
     Variant replaceChild(const Variant &node, const Variant &child);
+    Variant contains(const Variant &other);
+    Variant getRootNode(const Variant &options = {});
 };
 
 class DOMText {
@@ -295,12 +320,15 @@ class DOMText {
     Variant insertBefore(const Variant &node, const Variant &child = {});
     Variant isDefaultNamespace(const Variant &_namespace);
     Variant isSameNode(const Variant &other_node);
+    Variant isEqualNode(const Variant &other_node);
     Variant isSupported(const Variant &feature, const Variant &version);
     Variant lookupNamespaceURI(const Variant &prefix);
     Variant lookupPrefix(const Variant &_namespace);
     Variant normalize();
     Variant removeChild(const Variant &child);
     Variant replaceChild(const Variant &node, const Variant &child);
+    Variant contains(const Variant &other);
+    Variant getRootNode(const Variant &options = {});
 };
 
 class DOMComment {
@@ -329,12 +357,15 @@ class DOMComment {
     Variant insertBefore(const Variant &node, const Variant &child = {});
     Variant isDefaultNamespace(const Variant &_namespace);
     Variant isSameNode(const Variant &other_node);
+    Variant isEqualNode(const Variant &other_node);
     Variant isSupported(const Variant &feature, const Variant &version);
     Variant lookupNamespaceURI(const Variant &prefix);
     Variant lookupPrefix(const Variant &_namespace);
     Variant normalize();
     Variant removeChild(const Variant &child);
     Variant replaceChild(const Variant &node, const Variant &child);
+    Variant contains(const Variant &other);
+    Variant getRootNode(const Variant &options = {});
 };
 
 class DOMCdataSection {
@@ -366,12 +397,15 @@ class DOMCdataSection {
     Variant insertBefore(const Variant &node, const Variant &child = {});
     Variant isDefaultNamespace(const Variant &_namespace);
     Variant isSameNode(const Variant &other_node);
+    Variant isEqualNode(const Variant &other_node);
     Variant isSupported(const Variant &feature, const Variant &version);
     Variant lookupNamespaceURI(const Variant &prefix);
     Variant lookupPrefix(const Variant &_namespace);
     Variant normalize();
     Variant removeChild(const Variant &child);
     Variant replaceChild(const Variant &node, const Variant &child);
+    Variant contains(const Variant &other);
+    Variant getRootNode(const Variant &options = {});
 };
 
 class DOMDocumentType {
@@ -390,12 +424,15 @@ class DOMDocumentType {
     Variant insertBefore(const Variant &node, const Variant &child = {});
     Variant isDefaultNamespace(const Variant &_namespace);
     Variant isSameNode(const Variant &other_node);
+    Variant isEqualNode(const Variant &other_node);
     Variant isSupported(const Variant &feature, const Variant &version);
     Variant lookupNamespaceURI(const Variant &prefix);
     Variant lookupPrefix(const Variant &_namespace);
     Variant normalize();
     Variant removeChild(const Variant &child);
     Variant replaceChild(const Variant &node, const Variant &child);
+    Variant contains(const Variant &other);
+    Variant getRootNode(const Variant &options = {});
 };
 
 class DOMNotation {
@@ -414,12 +451,15 @@ class DOMNotation {
     Variant insertBefore(const Variant &node, const Variant &child = {});
     Variant isDefaultNamespace(const Variant &_namespace);
     Variant isSameNode(const Variant &other_node);
+    Variant isEqualNode(const Variant &other_node);
     Variant isSupported(const Variant &feature, const Variant &version);
     Variant lookupNamespaceURI(const Variant &prefix);
     Variant lookupPrefix(const Variant &_namespace);
     Variant normalize();
     Variant removeChild(const Variant &child);
     Variant replaceChild(const Variant &node, const Variant &child);
+    Variant contains(const Variant &other);
+    Variant getRootNode(const Variant &options = {});
 };
 
 class DOMEntity {
@@ -438,12 +478,15 @@ class DOMEntity {
     Variant insertBefore(const Variant &node, const Variant &child = {});
     Variant isDefaultNamespace(const Variant &_namespace);
     Variant isSameNode(const Variant &other_node);
+    Variant isEqualNode(const Variant &other_node);
     Variant isSupported(const Variant &feature, const Variant &version);
     Variant lookupNamespaceURI(const Variant &prefix);
     Variant lookupPrefix(const Variant &_namespace);
     Variant normalize();
     Variant removeChild(const Variant &child);
     Variant replaceChild(const Variant &node, const Variant &child);
+    Variant contains(const Variant &other);
+    Variant getRootNode(const Variant &options = {});
 };
 
 class DOMEntityReference {
@@ -463,12 +506,15 @@ class DOMEntityReference {
     Variant insertBefore(const Variant &node, const Variant &child = {});
     Variant isDefaultNamespace(const Variant &_namespace);
     Variant isSameNode(const Variant &other_node);
+    Variant isEqualNode(const Variant &other_node);
     Variant isSupported(const Variant &feature, const Variant &version);
     Variant lookupNamespaceURI(const Variant &prefix);
     Variant lookupPrefix(const Variant &_namespace);
     Variant normalize();
     Variant removeChild(const Variant &child);
     Variant replaceChild(const Variant &node, const Variant &child);
+    Variant contains(const Variant &other);
+    Variant getRootNode(const Variant &options = {});
 };
 
 class DOMProcessingInstruction {
@@ -488,12 +534,15 @@ class DOMProcessingInstruction {
     Variant insertBefore(const Variant &node, const Variant &child = {});
     Variant isDefaultNamespace(const Variant &_namespace);
     Variant isSameNode(const Variant &other_node);
+    Variant isEqualNode(const Variant &other_node);
     Variant isSupported(const Variant &feature, const Variant &version);
     Variant lookupNamespaceURI(const Variant &prefix);
     Variant lookupPrefix(const Variant &_namespace);
     Variant normalize();
     Variant removeChild(const Variant &child);
     Variant replaceChild(const Variant &node, const Variant &child);
+    Variant contains(const Variant &other);
+    Variant getRootNode(const Variant &options = {});
 };
 
 class DOMXPath {

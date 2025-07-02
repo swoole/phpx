@@ -647,6 +647,11 @@ Variant SensitiveParameterValue::__debugInfo() {
 }
 
 
+Override::Override() {
+    this_ = newObject("Override");
+}
+
+
 Fiber::Fiber(const Variant &callback) {
     this_ = newObject("Fiber", callback);
 }

@@ -28,6 +28,7 @@ Variant posix_getcwd{ZEND_STRL("posix_getcwd"), true};
 Variant posix_mkfifo{ZEND_STRL("posix_mkfifo"), true};
 Variant posix_mknod{ZEND_STRL("posix_mknod"), true};
 Variant posix_access{ZEND_STRL("posix_access"), true};
+Variant posix_eaccess{ZEND_STRL("posix_eaccess"), true};
 Variant posix_getgrnam{ZEND_STRL("posix_getgrnam"), true};
 Variant posix_getgrgid{ZEND_STRL("posix_getgrgid"), true};
 Variant posix_getpwnam{ZEND_STRL("posix_getpwnam"), true};
@@ -38,4 +39,7 @@ Variant posix_get_last_error{ZEND_STRL("posix_get_last_error"), true};
 Variant posix_errno{ZEND_STRL("posix_errno"), true};
 Variant posix_strerror{ZEND_STRL("posix_strerror"), true};
 Variant posix_initgroups{ZEND_STRL("posix_initgroups"), true};
+Variant posix_sysconf{ZEND_STRL("posix_sysconf"), true};
+Variant posix_pathconf{ZEND_STRL("posix_pathconf"), true};
+Variant posix_fpathconf{ZEND_STRL("posix_fpathconf"), true};
 }

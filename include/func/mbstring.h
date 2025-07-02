@@ -42,6 +42,7 @@ extern Variant mb_check_encoding;
 extern Variant mb_scrub;
 extern Variant mb_ord;
 extern Variant mb_chr;
+extern Variant mb_str_pad;
 extern Variant mb_regex_encoding;
 extern Variant mb_ereg;
 extern Variant mb_eregi;

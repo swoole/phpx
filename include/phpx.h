@@ -584,23 +584,6 @@ Variant newResource(const char *name, T *v) {
 
 PHPX_API Variant include(const std::string &file);
 
-static String ini_get(const String &varname) {
-    char *value = zend_ini_string(varname.c_str(), varname.length(), 0);
-    if (!value) {
-        return "";
-    }
-    return value;
-}
-
-static Variant get_cfg_name(const String &varname) {
-    zval *retval = cfg_get_entry(varname.c_str(), varname.length());
-    if (retval) {
-        return retval;
-    } else {
-        return false;
-    }
-}
-
 #ifndef ZEND_HASH_ELEMENT
 #define ZEND_HASH_ELEMENT(ht, idx) &HT_HASH_TO_BUCKET(ht, idx)->val
 #endif
@@ -634,7 +617,7 @@ class ArrayIterator {
         {
             auto *bucket = HT_HASH_TO_BUCKET(array_, idx_);
             if (bucket->key) {
-                return bucket->key;
+                return zend_string_copy(bucket->key);
             } else {
                 return (zend_long) bucket->h;
             }
@@ -750,10 +733,14 @@ class Array : public Variant {
         add_assoc_bool(ptr(), key, v);
     }
     void set(const String &s, const Variant &v) {
-        set(s.c_str(), v);
+        const_cast<Variant &>(v).addRef();
+        add_assoc_zval_ex(ptr(), s.c_str(), s.length(), const_cast<Variant &>(v).ptr());
     }
     void del(const char *key) {
         zend_hash_str_del(Z_ARRVAL_P(ptr()), key, strlen(key));
+    }
+    void del(const std::string &key) {
+        zend_hash_str_del(Z_ARRVAL_P(ptr()), key.c_str(), key.length());
     }
     void del(const String &key) {
         zend_hash_del(Z_ARRVAL_P(ptr()), key.ptr());
@@ -1160,7 +1147,7 @@ class Function {
     class phpx_function_##func : Function {                                                                            \
       public:                                                                                                          \
         Variant impl(Args &);                                                                                          \
-        phpx_function_##func(const char *name) : Function(name) {                                                      \
+        explicit phpx_function_##func(const char *name) : Function(name) {                                             \
             function_map[name] = this;                                                                                 \
         }                                                                                                              \
         ~phpx_function_##func() {}                                                                                     \

@@ -23,7 +23,6 @@ class Generator
         'hash_hmac',
         'sizeof',
         'constant',
-        'ini_get',
         'crc32',
         'md5',
         'sha1',

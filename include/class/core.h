@@ -264,6 +264,12 @@ class SensitiveParameterValue {
     Variant __debugInfo();
 };
 
+class Override {
+    Object this_;
+  public:
+    Override();
+};
+
 class Fiber {
     Object this_;
   public:

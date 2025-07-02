@@ -88,13 +88,22 @@ class Random_Randomizer {
   public:
     Random_Randomizer(const Variant &engine = {});
     Variant nextInt();
+    Variant nextFloat();
+    Variant getFloat(const Variant &min, const Variant &max, const Object &boundary = {});
     Variant getInt(const Variant &min, const Variant &max);
     Variant getBytes(const Variant &length);
+    Variant getBytesFromString(const Variant &string, const Variant &length);
     Variant shuffleArray(const Variant &array);
     Variant shuffleBytes(const Variant &bytes);
     Variant pickArrayKeys(const Variant &array, const Variant &num);
     Variant __serialize();
     Variant __unserialize(const Variant &data);
+};
+
+class Random_IntervalBoundary {
+    Object this_;
+  public:
+    static Variant cases();
 };
 
 }

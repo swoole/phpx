@@ -54,6 +54,10 @@ Variant Redis::bgrewriteaof() {
     return this_.exec("bgrewriteaof");
 }
 
+Variant Redis::waitaof(const Variant &numlocal, const Variant &numreplicas, const Variant &timeout) {
+    return this_.exec("waitaof", numlocal, numreplicas, timeout);
+}
+
 Variant Redis::bitcount(const Variant &key, const Variant &start, const Variant &end, const Variant &bybit) {
     return this_.exec("bitcount", key, start, end, bybit);
 }
@@ -274,6 +278,10 @@ Variant Redis::get(const Variant &key) {
     return this_.exec("get", key);
 }
 
+Variant Redis::getWithMeta(const Variant &key) {
+    return this_.exec("getWithMeta", key);
+}
+
 Variant Redis::getAuth() {
     return this_.exec("getAuth");
 }
@@ -316,6 +324,14 @@ Variant Redis::getPersistentID() {
 
 Variant Redis::getPort() {
     return this_.exec("getPort");
+}
+
+Variant Redis::serverName() {
+    return this_.exec("serverName");
+}
+
+Variant Redis::serverVersion() {
+    return this_.exec("serverVersion");
 }
 
 Variant Redis::getRange(const Variant &key, const Variant &start, const Variant &end) {
@@ -390,8 +406,8 @@ Variant Redis::hRandField(const Variant &key, const Variant &options) {
     return this_.exec("hRandField", key, options);
 }
 
-Variant Redis::hSet(const Variant &key, const Variant &member, const Variant &value) {
-    return this_.exec("hSet", key, member, value);
+Variant Redis::hSet(const Variant &key, const Variant &fields_and_vals) {
+    return this_.exec("hSet", key, fields_and_vals);
 }
 
 Variant Redis::hSetNx(const Variant &key, const Variant &field, const Variant &value) {
@@ -408,6 +424,14 @@ Variant Redis::hVals(const Variant &key) {
 
 Variant Redis::hscan(const Variant &key, const Variant &iterator, const Variant &pattern, const Variant &count) {
     return this_.exec("hscan", key, iterator, pattern, count);
+}
+
+Variant Redis::expiremember(const Variant &key, const Variant &field, const Variant &ttl, const Variant &unit) {
+    return this_.exec("expiremember", key, field, ttl, unit);
+}
+
+Variant Redis::expirememberat(const Variant &key, const Variant &field, const Variant &timestamp) {
+    return this_.exec("expirememberat", key, field, timestamp);
 }
 
 Variant Redis::incr(const Variant &key, const Variant &by) {
@@ -1192,6 +1216,10 @@ Variant RedisCluster::bgrewriteaof(const Variant &key_or_address) {
     return this_.exec("bgrewriteaof", key_or_address);
 }
 
+Variant RedisCluster::waitaof(const Variant &key_or_address, const Variant &numlocal, const Variant &numreplicas, const Variant &timeout) {
+    return this_.exec("waitaof", key_or_address, numlocal, numreplicas, timeout);
+}
+
 Variant RedisCluster::bgsave(const Variant &key_or_address) {
     return this_.exec("bgsave", key_or_address);
 }
@@ -1408,6 +1436,18 @@ Variant RedisCluster::get(const Variant &key) {
     return this_.exec("get", key);
 }
 
+Variant RedisCluster::getdel(const Variant &key) {
+    return this_.exec("getdel", key);
+}
+
+Variant RedisCluster::getWithMeta(const Variant &key) {
+    return this_.exec("getWithMeta", key);
+}
+
+Variant RedisCluster::getex(const Variant &key, const Array &options) {
+    return this_.exec("getex", key, options);
+}
+
 Variant RedisCluster::getbit(const Variant &key, const Variant &value) {
     return this_.exec("getbit", key, value);
 }
@@ -1486,6 +1526,14 @@ Variant RedisCluster::hmset(const Variant &key, const Variant &key_values) {
 
 Variant RedisCluster::hscan(const Variant &key, const Variant &iterator, const Variant &pattern, const Variant &count) {
     return this_.exec("hscan", key, iterator, pattern, count);
+}
+
+Variant RedisCluster::expiremember(const Variant &key, const Variant &field, const Variant &ttl, const Variant &unit) {
+    return this_.exec("expiremember", key, field, ttl, unit);
+}
+
+Variant RedisCluster::expirememberat(const Variant &key, const Variant &field, const Variant &timestamp) {
+    return this_.exec("expirememberat", key, field, timestamp);
 }
 
 Variant RedisCluster::hrandfield(const Variant &key, const Variant &options) {

@@ -1,4 +1,19 @@
 namespace php {
+class SQLite3Exception {
+    Object this_;
+  public:
+    SQLite3Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Variant __wakeup();
+    Variant getMessage();
+    Variant getCode();
+    Variant getFile();
+    Variant getLine();
+    Variant getTrace();
+    Variant getPrevious();
+    Variant getTraceAsString();
+    Variant __toString();
+};
+
 class SQLite3 {
     Object this_;
   public:

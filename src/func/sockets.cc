@@ -26,6 +26,7 @@ Variant socket_set_option{ZEND_STRL("socket_set_option"), true};
 Variant socket_setopt{ZEND_STRL("socket_setopt"), true};
 Variant socket_create_pair{ZEND_STRL("socket_create_pair"), true};
 Variant socket_shutdown{ZEND_STRL("socket_shutdown"), true};
+Variant socket_atmark{ZEND_STRL("socket_atmark"), true};
 Variant socket_last_error{ZEND_STRL("socket_last_error"), true};
 Variant socket_clear_error{ZEND_STRL("socket_clear_error"), true};
 Variant socket_import_stream{ZEND_STRL("socket_import_stream"), true};

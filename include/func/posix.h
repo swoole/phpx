@@ -26,6 +26,7 @@ extern Variant posix_getcwd;
 extern Variant posix_mkfifo;
 extern Variant posix_mknod;
 extern Variant posix_access;
+extern Variant posix_eaccess;
 extern Variant posix_getgrnam;
 extern Variant posix_getgrgid;
 extern Variant posix_getpwnam;
@@ -36,4 +37,7 @@ extern Variant posix_get_last_error;
 extern Variant posix_errno;
 extern Variant posix_strerror;
 extern Variant posix_initgroups;
+extern Variant posix_sysconf;
+extern Variant posix_pathconf;
+extern Variant posix_fpathconf;
 }

@@ -49,7 +49,6 @@ extern Variant debug_backtrace;
 extern Variant debug_print_backtrace;
 extern Variant extension_loaded;
 extern Variant get_extension_funcs;
-extern Variant zend_thread_id;
 extern Variant gc_mem_caches;
 extern Variant gc_collect_cycles;
 extern Variant gc_enabled;

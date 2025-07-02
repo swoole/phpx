@@ -2,6 +2,47 @@
 #include "class/sqlite3.h"
 
 namespace php {
+SQLite3Exception::SQLite3Exception(const Variant &message, const Variant &code, const Variant &previous) {
+    this_ = newObject("SQLite3Exception", message, code, previous);
+}
+
+Variant SQLite3Exception::__wakeup() {
+    return this_.exec("__wakeup");
+}
+
+Variant SQLite3Exception::getMessage() {
+    return this_.exec("getMessage");
+}
+
+Variant SQLite3Exception::getCode() {
+    return this_.exec("getCode");
+}
+
+Variant SQLite3Exception::getFile() {
+    return this_.exec("getFile");
+}
+
+Variant SQLite3Exception::getLine() {
+    return this_.exec("getLine");
+}
+
+Variant SQLite3Exception::getTrace() {
+    return this_.exec("getTrace");
+}
+
+Variant SQLite3Exception::getPrevious() {
+    return this_.exec("getPrevious");
+}
+
+Variant SQLite3Exception::getTraceAsString() {
+    return this_.exec("getTraceAsString");
+}
+
+Variant SQLite3Exception::__toString() {
+    return this_.exec("__toString");
+}
+
+
 SQLite3::SQLite3(const Variant &filename, const Variant &flags, const Variant &encryption_key) {
     this_ = newObject("SQLite3", filename, flags, encryption_key);
 }

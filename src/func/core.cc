@@ -51,7 +51,6 @@ Variant debug_backtrace{ZEND_STRL("debug_backtrace"), true};
 Variant debug_print_backtrace{ZEND_STRL("debug_print_backtrace"), true};
 Variant extension_loaded{ZEND_STRL("extension_loaded"), true};
 Variant get_extension_funcs{ZEND_STRL("get_extension_funcs"), true};
-Variant zend_thread_id{ZEND_STRL("zend_thread_id"), true};
 Variant gc_mem_caches{ZEND_STRL("gc_mem_caches"), true};
 Variant gc_collect_cycles{ZEND_STRL("gc_collect_cycles"), true};
 Variant gc_enabled{ZEND_STRL("gc_enabled"), true};
