@@ -45,7 +45,6 @@ TEST(variant, decr) {
     ASSERT_EQ(v.toInt(), 9);
 }
 
-
 TEST(variant, pre_incr) {
     Variant v(10);
     ASSERT_EQ((++v).toInt(), 11);
@@ -65,6 +64,9 @@ TEST(variant, calc) {
 
     v -= 3;
     ASSERT_EQ(v.toInt(), 12);
+
+    ASSERT_EQ(v.length(), 0);
+    ASSERT_EQ(v.getRefCount(), 0);
 }
 
 TEST(variant, json) {
@@ -76,6 +78,10 @@ TEST(variant, json) {
     auto v3 = json.jsonDecode();
     ASSERT_TRUE(v3.isArray());
     ASSERT_TRUE(v3.equals(arr1));
+
+    Variant v4("");
+    ASSERT_TRUE(v4.jsonDecode().isNull());
+    ASSERT_EQ(JSON_G(error_code), PHP_JSON_ERROR_SYNTAX);
 }
 
 TEST(variant, ref0) {
@@ -146,6 +152,9 @@ TEST(variant, object) {
 
     auto o2 = newObject("class_not_exists");
     ASSERT_FALSE(o2.isUndef());
+
+    auto o3 = newObject("class_not_exists", {1234, "hello world"});
+    ASSERT_FALSE(o3.isUndef());
 }
 
 TEST(variant, callable) {
@@ -201,4 +210,10 @@ TEST(variant, resource) {
     auto *s = new String("hello world");
     auto rs3 = newResource<String>("string", s);
     ASSERT_TRUE(rs3.isNull());
+}
+
+TEST(variant, self) {
+    Variant v1("hello world");
+    Variant v2 = v1;
+    ASSERT_TRUE(v1.equals(v2, true));
 }

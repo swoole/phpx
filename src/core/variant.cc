@@ -103,11 +103,10 @@ void Variant::debug() {
 #endif
 
 int Variant::getRefCount() const {
-    const zend_refcounted *counted = Z_COUNTED_P(const_ptr());
-    if (!counted) {
-        return 0;
+    if (Z_REFCOUNTED_P(const_ptr())) {
+        return Z_REFCOUNT_P(const_ptr());
     }
-    return GC_REFCOUNT(counted);
+    return 0;
 }
 
 bool Variant::empty() {
