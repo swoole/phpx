@@ -15,7 +15,6 @@
 */
 
 #include "phpx.h"
-#include "class/spl.h"
 
 BEGIN_EXTERN_C()
 #include "extension_arginfo.h"
@@ -48,6 +47,11 @@ PHPX_FUNCTION(cpp_ext_test2) {
 
 PHPX_FUNCTION(cpp_throw_error) {
     throwException("RuntimeException", "phpx exception: test");
+    return {};
+}
+
+PHPX_FUNCTION(phpx_test3) {
+    // pass
     return {};
 }
 

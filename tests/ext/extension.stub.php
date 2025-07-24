@@ -11,6 +11,10 @@ function cpp_ext_test2(mixed ...$args) : array {
 
 }
 
+function phpx_test3():void {
+
+}
+
 function cpp_throw_error(): void {
 }
 

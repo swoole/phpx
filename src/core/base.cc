@@ -135,16 +135,25 @@ static inline ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int num_
     return SUCCESS;
 }
 
+#define FUNC_RESERVE_INDEX 3
+
 void _exec_function(zend_execute_data *data, zval *return_value) {
-    auto iter_func = function_map.find(data->func->common.function_name->val);
-    if (iter_func == function_map.end()) {
-        error(E_WARNING, "[phpx::_exec_function] function '%s' not found", data->func->common.function_name->val);
-        return;
+    Function *func = nullptr;
+    const auto fn_reserved = data->func->internal_function.reserved;
+    const auto fn_name = data->func->common.function_name->val;
+    if (fn_reserved[FUNC_RESERVE_INDEX]) {
+        func = static_cast<Function *>(fn_reserved[FUNC_RESERVE_INDEX]);
+    } else {
+        auto iter_func = function_map.find(fn_name);
+        if (iter_func == function_map.end()) {
+            error(E_WARNING, "[phpx::_exec_function] function '%s' not found", fn_name);
+            return;
+        }
+        func = iter_func->second;
+        fn_reserved[FUNC_RESERVE_INDEX] = func;
     }
 
-    Function *func = iter_func->second;
     Args args;
-
     zval *param_ptr = ZEND_CALL_ARG(EG(current_execute_data), 1);
     int arg_count = ZEND_CALL_NUM_ARGS(EG(current_execute_data));
 
@@ -161,20 +170,29 @@ void _exec_function(zend_execute_data *data, zval *return_value) {
 }
 
 void _exec_method(zend_execute_data *data, zval *return_value) {
-    auto iter_class = method_map.find(data->func->common.scope->name->val);
-    if (iter_class == method_map.end()) {
-        error(E_WARNING, "[phpx::_exec_method] class '%s' not found", data->func->common.scope->name->val);
-        return;
-    }
-    auto iter_method = iter_class->second.find((const char *) data->func->common.function_name->val);
-    if (iter_method == iter_class->second.end()) {
-        error(E_WARNING, "[phpx::_exec_method] method '%s' not found", data->func->common.function_name->val);
-        return;
+    Method *method = nullptr;
+    const auto fn_reserved = data->func->internal_function.reserved;
+    const auto class_name = data->func->common.scope->name->val;
+    const auto method_name = data->func->common.function_name->val;
+    if (fn_reserved[FUNC_RESERVE_INDEX]) {
+        method = static_cast<Method *>(fn_reserved[FUNC_RESERVE_INDEX]);
+    } else {
+        const auto iter_class = method_map.find(class_name);
+        if (iter_class == method_map.end()) {
+            error(E_WARNING, "[phpx::_exec_method] class '%s' not found", class_name);
+            return;
+        }
+        auto iter_method = iter_class->second.find(method_name);
+        if (iter_method == iter_class->second.end()) {
+            error(E_WARNING, "[phpx::_exec_method] method '%s' not found", method_name);
+            return;
+        }
+
+        method = iter_method->second;
+        fn_reserved[FUNC_RESERVE_INDEX] = method;
     }
 
-    auto me = iter_method->second;
     Args args;
-
     Object _this(&data->This);
 
     zval *param_ptr = ZEND_CALL_ARG(EG(current_execute_data), 1);
@@ -188,7 +206,7 @@ void _exec_method(zend_execute_data *data, zval *return_value) {
         args.append(param_ptr);
         param_ptr++;
     }
-    auto retval = me->impl(_this, args);
+    auto retval = method->impl(_this, args);
     retval.moveTo(return_value);
 }
 
