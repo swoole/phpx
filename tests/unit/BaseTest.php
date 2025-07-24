@@ -80,4 +80,13 @@ class BaseTest extends TestCase
             $this->assertStringContainsString("phpx exception", $e->getMessage());
         }
     }
+
+    public function testCallCache() {
+        $n = 32;
+        $obj = new MyClass;
+        while($n--) {
+            phpx_test3();
+            $obj->count();
+        }
+    }
 }
