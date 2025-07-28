@@ -157,7 +157,7 @@ class String {
     bool equals(const char *s) const {
         return equals(s, strlen(s));
     }
-    bool equals(const String &s, const bool ci = false) const;
+    bool equals(const String &s, bool ci = false) const;
     bool operator==(const String &v) const {
         return equals(v);
     }
@@ -257,6 +257,12 @@ class Variant {
     Variant(const zval *v) noexcept {
         ZVAL_COPY_VALUE(&val, v);
         addRef();
+    }
+    Variant(const zval *v, bool forward) noexcept {
+        ZVAL_COPY_VALUE(&val, v);
+        if (!forward) {
+            addRef();
+        }
     }
     Variant(const Variant &v) : Variant(v.const_ptr()) {}
     Variant(Variant &&v) noexcept {

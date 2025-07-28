@@ -141,7 +141,7 @@ void _exec_function(zend_execute_data *data, zval *return_value) {
     Function *func = nullptr;
     const auto fn_reserved = data->func->internal_function.reserved;
     const auto fn_name = data->func->common.function_name->val;
-    if (fn_reserved[FUNC_RESERVE_INDEX]) {
+    if (EXPECTED(fn_reserved[FUNC_RESERVE_INDEX])) {
         func = static_cast<Function *>(fn_reserved[FUNC_RESERVE_INDEX]);
     } else {
         auto iter_func = function_map.find(fn_name);
@@ -174,7 +174,7 @@ void _exec_method(zend_execute_data *data, zval *return_value) {
     const auto fn_reserved = data->func->internal_function.reserved;
     const auto class_name = data->func->common.scope->name->val;
     const auto method_name = data->func->common.function_name->val;
-    if (fn_reserved[FUNC_RESERVE_INDEX]) {
+    if (EXPECTED(fn_reserved[FUNC_RESERVE_INDEX])) {
         method = static_cast<Method *>(fn_reserved[FUNC_RESERVE_INDEX]);
     } else {
         const auto iter_class = method_map.find(class_name);

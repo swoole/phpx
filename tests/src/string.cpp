@@ -13,6 +13,9 @@ TEST(string, equals) {
     String str2(str.c_str(), str.length());
     ASSERT_TRUE(str.equals(str2, true));
     ASSERT_EQ(str2.getRefCount(), 1);
+
+    String s3("hello world");
+    ASSERT_FALSE(str2.equals(s3, true));
 }
 
 TEST(string, substr) {
