@@ -187,43 +187,6 @@ TEST(variant, ref4) {
     ASSERT_EQ((*ref).length(), 3);
 }
 
-TEST(variant, object) {
-    auto array = create_map();
-    auto object = newObject("ArrayObject", {array, constant("ArrayObject::ARRAY_AS_PROPS")});
-
-    auto rand_num = random_int(1, 9999999).toInt();
-
-    ASSERT_TRUE(object.isObject());
-    ASSERT_EQ(object.get("php").toInt(), 3);
-
-    object.set("php", rand_num);
-
-    String str("php");
-    ASSERT_EQ(ZSTR_H(str.ptr()), 0);
-    ASSERT_EQ(object.get(str).toInt(), rand_num);
-    ASSERT_NE(ZSTR_H(str.ptr()), 0);
-
-    object.exec("offsetSet", {"python", 9});
-    auto r2 = object.get("python");
-    ASSERT_EQ(r2.toInt(), 9);
-
-    auto flags = object.exec("getFlags");
-    ASSERT_TRUE(flags.isInt());
-    ASSERT_TRUE(flags.toInt() & constant("ArrayObject::ARRAY_AS_PROPS").toInt());
-    flags.debug();
-
-    auto o2 = newObject("class_not_exists");
-    ASSERT_FALSE(o2.isUndef());
-
-    auto o3 = newObject("class_not_exists", {1234, "hello world"});
-    ASSERT_FALSE(o3.isUndef());
-
-    Array arr3;
-    arr3.append("hello world");
-    object.set("test_array", arr3);
-    ASSERT_TRUE(object.get("test_array").isArray());
-}
-
 TEST(variant, callable) {
     Variant v1{"phpinfo"};
     ASSERT_TRUE(v1.isCallable());

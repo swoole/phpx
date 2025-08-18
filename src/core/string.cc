@@ -23,7 +23,7 @@ String::String(Variant &v) {
 
 void String::print() const {
     if (str) {
-        php_printf("(string) \"%.*s\"\n", (int) str->len, str->val);
+        php_printf("(string[%zu]) \"%.*s\"\n", str->len, (int) str->len, str->val);
     } else {
         php_printf("(null)");
     }

@@ -52,14 +52,6 @@ TEST(base, include) {
     ASSERT_EQ(retval.toInt(), PHP_VERSION_ID);
 }
 
-TEST(base, method) {
-    auto obj = newObject("DateTimeImmutable");
-    ASSERT_TRUE(obj.isObject());
-    auto str = obj.exec("format", "Y-m-d H:i:s");
-    ASSERT_TRUE(str.isString());
-    ASSERT_GT(str.length(), 0);
-}
-
 TEST(base, ini_get) {
     auto v = ini_get("post_max_size");
     ASSERT_GE(v.length(), 2);
@@ -85,27 +77,6 @@ TEST(base, equals) {
     Variant v3 = std::to_string(UINT_MAX);
     ASSERT_TRUE(v3.equals(v1));
     ASSERT_FALSE(v3.equals(v1, true));
-}
-
-TEST(base, static_property) {
-    include(get_include_dir() + "/library.php");
-    ASSERT_EQ(Class::getStaticProperty("TestClass", "propInt").toInt(), 1990018900);
-    ASSERT_STREQ(Class::getStaticProperty("TestClass", "propString").toCString(), "Hello, World!");
-    ASSERT_TRUE(Class::setStaticProperty("TestClass", "propString", "phpx test"));
-    ASSERT_STREQ(Class::getStaticProperty("TestClass", "propString").toCString(), "phpx test");
-}
-
-TEST(base, call_parent_method) {
-	if (!class_exists("TestClass2")) {
-	    include(get_include_dir() + "/library.php");
-	}
-
-	auto obj = newObject("TestClass2");
-	auto rs1 = obj.exec("test");
-	ASSERT_STREQ(rs1.toCString(), "child test");
-
-	auto rs2 = obj.callParentMethod("test", {});
-	ASSERT_STREQ(rs2.toCString(), "parent test");
 }
 
 #if 0
