@@ -68,7 +68,7 @@ typedef int zend_result;
 #define ZEND_ABSTRACT_ME_WITH_FLAGS(classname, name, arg_info, flags) ZEND_RAW_FENTRY(#name, NULL, arg_info, flags)
 #endif
 
-#define PHPX_API
+#define PHPX_API PHPAPI
 
 namespace php {
 typedef zend_long Int;
@@ -88,6 +88,12 @@ extern std::map<int, void *> object_array;
 class Variant;
 class Array;
 class Object;
+
+enum TrimMode {
+    TRIM_LEFT = 1,
+    TRIM_RIGHT = 2,
+    TRIM_BOTH = 3,
+};
 
 class String {
     zend_string *str;
@@ -114,7 +120,7 @@ class String {
     String(const std::string &v) {
         str = zend_string_init(v.c_str(), v.length(), false);
     }
-    String(zend_string *v, bool forward) {
+    String(zend_string *v, bool forward = true) {
         if (forward) {
             str = v;
         } else {
@@ -175,26 +181,26 @@ class String {
         va_end(args);
         return {s, true};
     }
-    String trim(const char *what = " \t\n\r\v\0", int mode = 3) const {
+    String trim(const char *what = " \t\n\r\v\0", int mode = TRIM_BOTH) const {
         return {php_trim(str, what, strlen(what), mode), true};
     }
     String lower() const {
-        return {zend_string_tolower(str), true};
+        return zend_string_tolower(str);
     }
     String upper() const {
-        return {zend_string_toupper(str), true};
+        return zend_string_toupper(str);
     }
     String base64Encode() const {
-        return {php_base64_encode_str(str), true};
+        return php_base64_encode_str(str);
     }
     String base64Decode() const {
-        return {php_base64_decode_str(str), true};
+        return php_base64_decode_str(str);
     }
-    String escape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = SG(default_charset)) const {
-        return {php_escape_html_entities((uchar *) str->val, str->len, 0, flags, charset), true};
+    String escape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
+        return php_escape_html_entities((uchar *) str->val, str->len, 0, flags, charset);
     }
-    String unescape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = SG(default_charset)) const {
-        return {php_unescape_html_entities(str, 1, flags, charset), true};
+    String unescape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
+        return php_unescape_html_entities(str, 1, flags, charset);
     }
 
     Variant split(const String &delim, long = ZEND_LONG_MAX) const;
