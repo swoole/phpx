@@ -165,6 +165,11 @@ TEST(variant, object) {
 
     auto o3 = newObject("class_not_exists", {1234, "hello world"});
     ASSERT_FALSE(o3.isUndef());
+
+    Array arr3;
+    arr3.append("hello world");
+    object.set("test_array", arr3);
+    ASSERT_TRUE(object.get("test_array").isArray());
 }
 
 TEST(variant, callable) {

@@ -53,6 +53,14 @@ std::string Variant::toString() {
     return retval;
 }
 
+Array Variant::toArray() {
+    return *this;
+}
+
+Object Variant::toObject() {
+    return *this;
+}
+
 size_t Variant::length() const {
     if (isString()) {
         return Z_STRLEN_P(const_ptr());
@@ -248,7 +256,7 @@ Variant Variant::jsonEncode(zend_long options, zend_long depth) {
         return false;
     } else {
         smart_str_0(&buf);
-        return buf.s;
+        return {buf.s, true};
     }
 }
 
@@ -281,7 +289,9 @@ Object newObject(const char *name) {
         return object;
     }
     Args args;
-    object.call(__construct, args);
+    if (ce->constructor) {
+        object.call(__construct, args);
+    }
     return object;
 }
 
@@ -299,7 +309,9 @@ Object newObject(const char *name, const std::initializer_list<Variant> &args) {
     for (const auto &arg : args) {
         _args.append(const_cast<Variant &>(arg).ptr());
     }
-    object.call(__construct, _args);
+    if (ce->constructor) {
+        object.call(__construct, _args);
+    }
     return object;
 }
 

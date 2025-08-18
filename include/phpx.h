@@ -82,6 +82,8 @@ extern std::unordered_map<std::string, Resource *> resource_map;
 extern std::map<int, void *> object_array;
 
 class Variant;
+class Array;
+class Object;
 
 class String {
     zend_string *str;
@@ -252,13 +254,20 @@ class Variant {
         ZVAL_BOOL(&val, v);
     }
     Variant(const zval *v, bool forward = false) noexcept {
-    	if (!v) {
-    		ZVAL_NULL(&val);
-    		return;
-    	}
+        if (!v) {
+            ZVAL_NULL(&val);
+            return;
+        }
         ZVAL_COPY_VALUE(&val, v);
         if (!forward) {
             addRef();
+        }
+    }
+    Variant(zend_string *s, bool forward) noexcept {
+        if (forward) {
+            ZVAL_STR(&val, s);
+        } else {
+            ZVAL_STR(&val, zend_string_copy(s));
         }
     }
     Variant(const Variant &v) : Variant(v.const_ptr()) {}
@@ -331,10 +340,10 @@ class Variant {
         return &val;
     }
     void addRef() {
-    	Z_TRY_ADDREF_P(ptr());
+        Z_TRY_ADDREF_P(ptr());
     }
     void delRef() {
-    	Z_TRY_DELREF_P(ptr());
+        Z_TRY_DELREF_P(ptr());
     }
     int getRefCount() const;
     int type() const {
@@ -394,6 +403,8 @@ class Variant {
     bool toBool() {
         return zval_is_true(ptr());
     }
+    Array toArray();
+    Object toObject();
     size_t length() const;
     template <class T>
     T *toResource(const char *name) {
@@ -568,7 +579,7 @@ class ArrayIterator {
         } else {
             auto *bucket = HT_HASH_TO_BUCKET(array_, idx_);
             if (bucket->key) {
-                return zend_string_copy(bucket->key);
+                return {bucket->key, false};
             } else {
                 return (zend_long) bucket->h;
             }
@@ -632,20 +643,20 @@ class Array : public Variant {
         add_index_zval(ptr(), i, const_cast<Variant &>(v).ptr());
     }
     Variant get(const String &key) const {
-    	return zend_hash_find(Z_ARRVAL_P(const_ptr()), key.ptr());
+        return zend_hash_find(Z_ARRVAL_P(const_ptr()), key.ptr());
     }
     Variant get(zend_ulong i) const {
         return zend_hash_index_find(Z_ARRVAL_P(const_ptr()), i);
     }
-	Variant operator[](zend_ulong i) const {
-		return get(i);
-	}
-	Variant operator[](int i) const {
-		return get(i);
-	}
-	Variant operator[](const String &key) const {
-		return get(key);
-	}
+    Variant operator[](zend_ulong i) const {
+        return get(i);
+    }
+    Variant operator[](int i) const {
+        return get(i);
+    }
+    Variant operator[](const String &key) const {
+        return get(key);
+    }
 #if 0
 	class UpdateProxy {
 	private:
@@ -727,20 +738,20 @@ class Array : public Variant {
     }
     bool exists(const std::string &key) const {
         return zend_hash_str_exists(Z_ARRVAL_P(const_ptr()), key.c_str(), key.length());
-	}
+    }
     bool exists(const String &key) const {
         return zend_hash_exists(Z_ARRVAL_P(const_ptr()), key.ptr());
-	}
-	ArrayIterator begin() const {
-		return {Z_ARRVAL_P(const_ptr()), 0};
-	}
-	ArrayIterator end() const {
-		const auto ht = Z_ARRVAL_P(const_ptr());
-		return {ht, ht->nNumUsed};
-	}
-	size_t count() const {
-		return zend_hash_num_elements(Z_ARRVAL_P(const_ptr()));
-	}
+    }
+    ArrayIterator begin() const {
+        return {Z_ARRVAL_P(const_ptr()), 0};
+    }
+    ArrayIterator end() const {
+        const auto ht = Z_ARRVAL_P(const_ptr());
+        return {ht, ht->nNumUsed};
+    }
+    size_t count() const {
+        return zend_hash_num_elements(Z_ARRVAL_P(const_ptr()));
+    }
     bool empty() const {
         return count() == 0;
     }
@@ -833,7 +844,7 @@ class Object : public Variant {
   public:
     Object(const zval *v) : Variant(v) {
         if (!isUndef() && !isObject()) {
-            error(E_ERROR, "parameter 1 must be object.");
+            error(E_ERROR, "parameter 1 must be `object`, got `%s`", zend_get_type_by_const(Z_TYPE_P(v)));
             return;
         }
     }
@@ -942,7 +953,7 @@ class Object : public Variant {
     }
     template <class T>
     T *oGet(const String &name, const char *resource_name) {
-    	auto prop = get(name);
+        auto prop = get(name);
         return prop.toResource<T>(resource_name);
     }
     template <class T>

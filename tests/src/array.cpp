@@ -38,6 +38,12 @@ TEST(array, map) {
     auto arr2 = array.slice(2, 2);
     ASSERT_EQ(arr2.count(), 2);
     ASSERT_EQ(arr2["php"].toInt(), 3);
+
+    auto obj1 = newObject("stdClass");
+    array.set("object", obj1);
+
+    auto obj2 = array.get("object").toObject();
+    ASSERT_EQ(obj1.getId(), obj2.getId());
 }
 
 TEST(array, init) {
