@@ -1020,16 +1020,16 @@ class Object : public Variant {
                  const Variant &v10);
     /* generator */
 
+    Variant get(const char *name, size_t len);
+    Variant get(zend_string *name);
     Variant get(const char *name) {
-        Variant retval;
-        zval rv;
-        zval *member_p = zend_read_property(ce(), object(), name, strlen(name), false, &rv);
-        if (member_p != &rv) {
-            ZVAL_COPY(retval.ptr(), member_p);
-        } else {
-            ZVAL_COPY_VALUE(retval.ptr(), member_p);
-        }
-        return retval;
+    	return get(name, strlen(name));
+    }
+    Variant get(const std::string &name) {
+    	return get(name.c_str(), name.length());
+    }
+    Variant get(const String &name) {
+    	return get(name.ptr());
     }
     void set(const char *name, const Variant &v) {
         zend_update_property(ce(), object(), name, strlen(name), const_cast<Variant &>(v).ptr());

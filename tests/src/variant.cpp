@@ -138,8 +138,18 @@ TEST(variant, ref4) {
 TEST(variant, object) {
     auto array = create_map();
     auto object = newObject("ArrayObject", {array, constant("ArrayObject::ARRAY_AS_PROPS")});
+
+    auto rand_num = random_int(1, 9999999).toInt();
+
     ASSERT_TRUE(object.isObject());
     ASSERT_EQ(object.get("php").toInt(), 3);
+
+    object.set("php", rand_num);
+
+    String str("php");
+    ASSERT_EQ(ZSTR_H(str.ptr()), 0);
+    ASSERT_EQ(object.get(str).toInt(), rand_num);
+    ASSERT_NE(ZSTR_H(str.ptr()), 0);
 
     object.exec("offsetSet", {"python", 9});
     auto r2 = object.get("python");

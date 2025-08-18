@@ -309,4 +309,28 @@ Variant Object::exec(const Variant &fn, const std::initializer_list<Variant> &ar
     }
     return _call(ptr(), fn.const_ptr(), _args);
 }
+
+Variant Object::get(const char *name, size_t len) {
+    Variant retval;
+    zval rv;
+    zval *member_p = zend_read_property(ce(), object(), name, len, false, &rv);
+    if (member_p != &rv) {
+        ZVAL_COPY(retval.ptr(), member_p);
+    } else {
+        ZVAL_COPY_VALUE(retval.ptr(), member_p);
+    }
+    return retval;
+}
+
+Variant Object::get(zend_string *name) {
+    Variant retval;
+    zval rv;
+    zval *member_p = zend_read_property_ex(ce(), object(), name, false, &rv);
+    if (member_p != &rv) {
+        ZVAL_COPY(retval.ptr(), member_p);
+    } else {
+        ZVAL_COPY_VALUE(retval.ptr(), member_p);
+    }
+    return retval;
+}
 }  // namespace php
