@@ -30,6 +30,12 @@ TEST(array, list) {
 
     array.append(3.14);
     ASSERT_EQ(array.count(), 6);
+
+    ASSERT_TRUE(array.exists(4));
+    ASSERT_FALSE(array.exists(999));
+
+    array.clean();
+    ASSERT_EQ(array.count(), 0);
 }
 
 TEST(array, map) {
@@ -44,6 +50,18 @@ TEST(array, map) {
 
     auto obj2 = array.get("object").toObject();
     ASSERT_EQ(obj1.getId(), obj2.getId());
+
+    ASSERT_TRUE(array.exists("object"));
+    ASSERT_FALSE(array.exists(1990));
+
+    array.set(1990, "world");
+    ASSERT_TRUE(array.exists(1990));
+
+    array.del(1990);
+    ASSERT_FALSE(array.exists(1990));
+
+    array.del("object");
+    ASSERT_FALSE(array.exists("object"));
 }
 
 TEST(array, init) {

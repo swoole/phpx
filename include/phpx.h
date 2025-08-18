@@ -42,6 +42,10 @@ extern "C" {
 #include <ext/spl/php_spl.h>
 }
 
+#if PHP_VERSION_ID < 80200
+#define zend_string_toupper php_string_toupper
+#endif
+
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -728,17 +732,8 @@ class Array : public Variant {
 		return UpdateProxy(*this, 0, key.ptr());
 	}
 #endif
-    bool del(int index) {
-        return zend_hash_index_del(Z_ARRVAL_P(ptr()), index) == SUCCESS;
-    }
     bool del(zend_ulong index) {
         return zend_hash_index_del(Z_ARRVAL_P(ptr()), index) == SUCCESS;
-    }
-    bool del(const char *key) {
-        return zend_hash_str_del(Z_ARRVAL_P(ptr()), key, strlen(key)) == SUCCESS;
-    }
-    bool del(const std::string &key) {
-        return zend_hash_str_del(Z_ARRVAL_P(ptr()), key.c_str(), key.length()) == SUCCESS;
     }
     bool del(const String &key) {
         return zend_hash_del(Z_ARRVAL_P(ptr()), key.ptr()) == SUCCESS;
@@ -748,15 +743,6 @@ class Array : public Variant {
     }
     bool exists(zend_ulong index) const {
         return zend_hash_index_exists(Z_ARRVAL_P(const_ptr()), index);
-    }
-    bool exists(int index) const {
-        return zend_hash_index_exists(Z_ARRVAL_P(const_ptr()), index);
-    }
-    bool exists(const char *key) const {
-        return zend_hash_str_exists(Z_ARRVAL_P(const_ptr()), key, strlen(key));
-    }
-    bool exists(const std::string &key) const {
-        return zend_hash_str_exists(Z_ARRVAL_P(const_ptr()), key.c_str(), key.length());
     }
     bool exists(const String &key) const {
         return zend_hash_exists(Z_ARRVAL_P(const_ptr()), key.ptr());
