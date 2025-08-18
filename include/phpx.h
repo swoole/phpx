@@ -74,26 +74,30 @@ namespace php {
 typedef zend_long Int;
 typedef double Float;
 
-PHPX_API void error(int level, const char *format, ...);
-PHPX_API void echo(const char *format, ...);
-
 struct Resource {
     const char *name;
     int type;
 };
 
-extern std::unordered_map<std::string, Resource *> resource_map;
-extern std::map<int, void *> object_array;
-
 class Variant;
 class Array;
 class Object;
+class String;
 
 enum TrimMode {
     TRIM_LEFT = 1,
     TRIM_RIGHT = 2,
     TRIM_BOTH = 3,
 };
+
+PHPX_API void error(int level, const char *format, ...);
+PHPX_API void echo(const char *format, ...);
+PHPX_API Variant global(const String &name);
+PHPX_API Variant include(const String &file);
+PHPX_API Variant call(const Variant &func, const Array &args);
+PHPX_API Variant call(const Variant &func, const std::initializer_list<Variant> &args);
+PHPX_API void throwException(const char *name, const char *message, int code = 0);
+Resource *getResource(const std::string &name);
 
 class String {
     zend_string *str;
@@ -436,9 +440,8 @@ class Variant {
             return nullptr;
         }
         void *_ptr = nullptr;
-        Resource *_c = resource_map[name];
+        Resource *_c = getResource(name);
         if (_c == nullptr) {
-            error(E_WARNING, "The `%s` type of resource is undefined.", name);
             return nullptr;
         }
         if ((_ptr = zend_fetch_resource(Z_RES_P(ptr()), name, _c->type)) == nullptr) {
@@ -567,7 +570,7 @@ extern Variant null;
 
 template <typename T>
 Variant newResource(const char *name, T *v) {
-    const Resource *_c = resource_map[name];
+    const auto _c = getResource(name);
     if (!_c) {
         error(E_WARNING, "%s type of resource is undefined.", name);
         return {};
@@ -575,8 +578,6 @@ Variant newResource(const char *name, T *v) {
     zend_resource *res = zend_register_resource(static_cast<void *>(v), _c->type);
     return {res};
 }
-
-PHPX_API Variant include(const std::string &file);
 
 #ifndef ZEND_HASH_ELEMENT
 #define ZEND_HASH_ELEMENT(ht, idx) &HT_HASH_TO_BUCKET(ht, idx)->val
@@ -821,38 +822,15 @@ static Variant call(const Variant &func) {
     return _call(nullptr, func.const_ptr());
 }
 
-extern Variant call(const Variant &func, const Array &args);
-extern Variant call(const Variant &func, const std::initializer_list<Variant> &args);
-
 static zend_class_entry *getClassEntry(const char *name) {
     String class_name(name, strlen(name));
     return zend_lookup_class(class_name.ptr());
-}
-
-static void throwException(const char *name, const char *message, int code = 0) {
-    zend_class_entry *ce = getClassEntry(name);
-    if (ce == nullptr) {
-        php_error_docref(nullptr, E_WARNING, "class '%s' undefined.", name);
-        return;
-    }
-    zend_throw_exception(ce, message, code);
 }
 
 static Variant getException() {
     zval zv;
     ZVAL_OBJ(&zv, EG(exception));
     return {&zv};
-}
-
-static Variant global(const char *name) {
-    zend_string *key = zend_string_init(name, strlen(name), false);
-    zend_is_auto_global(key);
-    zval *var = zend_hash_find_ind(&EG(symbol_table), key);
-    zend_string_free(key);
-    if (!var) {
-        return false;
-    }
-    return {var};
 }
 
 class Object : public Variant {
@@ -1157,9 +1135,6 @@ class Interface {
     const zend_function_entry *functions;
 };
 
-extern std::unordered_map<std::string, Class *> class_map;
-extern std::unordered_map<std::string, Interface *> interface_map;
-
 extern zend_result extension_startup(int type, int module_number);
 extern void extension_info(zend_module_entry *module);
 extern zend_result extension_shutdown(int type, int module_number);
@@ -1246,9 +1221,6 @@ class Extension {
     // modifiable can be one of these:PHP_INI_SYSTEM/PHP_INI_PERDIR/PHP_INI_USER/PHP_INI_ALL
     void addIniEntry(const char *name, const char *default_value = "", int modifiable = PHP_INI_ALL);
 };
-
-extern std::unordered_map<std::string, std::shared_ptr<Extension>> _name_to_extension;
-extern std::unordered_map<int, std::shared_ptr<Extension>> _module_number_to_extension;
 
 extern Object newObject(const char *name);
 extern Object newObject(const char *name, const std::initializer_list<Variant> &args);

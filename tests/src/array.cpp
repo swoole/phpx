@@ -100,6 +100,18 @@ TEST(array, search) {
     Array arr2 = create_map();
     Variant v4{3};
     ASSERT_STREQ(arr2.search(v4).toCString(), "php");
+
+    Array arr3;
+    Variant v5("hello");
+    arr3.set(1990, v5);
+    ASSERT_EQ(arr3.search(v5).toInt(), 1990);
+}
+
+TEST(array, nesting) {
+	Array list = create_list();
+	Array map = create_map();
+	list.append(map);
+	ASSERT_EQ(list.count(), 6);
 }
 
 TEST(array, foreach) {

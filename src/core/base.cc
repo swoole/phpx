@@ -17,14 +17,8 @@
 #include "phpx.h"
 
 namespace php {
-std::unordered_map<std::string, Resource *> resource_map;
-std::unordered_map<std::string, Class *> class_map;
-std::unordered_map<std::string, Interface *> interface_map;
 std::map<const char *, std::map<const char *, Method *, StrCmp>, StrCmp> method_map;
 std::map<const char *, Function *, StrCmp> function_map;
-std::map<int, void *> object_array;
-std::unordered_map<std::string, std::shared_ptr<Extension>> _name_to_extension;
-std::unordered_map<int, std::shared_ptr<Extension>> _module_number_to_extension;
 
 void error(int level, const char *format, ...) {
     va_list args;
@@ -44,83 +38,22 @@ void echo(const char *format, ...) {
     va_end(args);
 }
 
-zend_result extension_startup(int type, int module_number) {
-    void *ptr;
-    ZEND_HASH_FOREACH_PTR(&module_registry, ptr) {
-        auto *module = static_cast<zend_module_entry *>(ptr);
-        if (module_number == module->module_number) {
-            auto extension = _name_to_extension[module->name];
-            extension->started = true;
-            extension->registerIniEntries(module_number);
-            if (extension->onStart) {
-                extension->onStart();
-            }
-            _module_number_to_extension[module_number] = extension;
-            break;
-        }
+Variant global(const String &name) {
+    zend_is_auto_global(name.ptr());
+    zval *var = zend_hash_find_ind(&EG(symbol_table), name.ptr());
+    if (!var) {
+        return false;
     }
-    ZEND_HASH_FOREACH_END();
-    return SUCCESS;
+    return {var};
 }
 
-void extension_info(zend_module_entry *module) {
-    auto extension = _module_number_to_extension[module->module_number];
-    if (!extension->header.empty() && !extension->body.empty()) {
-        php_info_print_table_start();
-        auto header = extension->header;
-        size_t size = header.size();
-        switch (size) {
-        case 2:
-            php_info_print_table_header(size, header[0].c_str(), header[1].c_str());
-            break;
-        case 3:
-            php_info_print_table_header(size, header[0].c_str(), header[1].c_str(), header[2].c_str());
-            break;
-        default:
-            error(E_WARNING, "invalid info header size.");
-            return;
-        }
-        for (auto row : extension->body) {
-            size = row.size();
-            switch (size) {
-            case 2:
-                php_info_print_table_row(size, row[0].c_str(), row[1].c_str());
-                break;
-            case 3:
-                php_info_print_table_row(size, row[0].c_str(), row[1].c_str(), row[2].c_str());
-                break;
-            default:
-                error(E_WARNING, "invalid info row size.");
-                return;
-            }
-        }
-        php_info_print_table_end();
+void throwException(const char *name, const char *message, int code) {
+    zend_class_entry *ce = getClassEntry(name);
+    if (ce == nullptr) {
+        php_error_docref(nullptr, E_WARNING, "class '%s' undefined.", name);
+        return;
     }
-}
-
-zend_result extension_shutdown(int type, int module_number) {
-    auto extension = _module_number_to_extension[module_number];
-    if (extension->onShutdown) {
-        extension->onShutdown();
-    }
-    extension->unregisterIniEntries(module_number);
-    return SUCCESS;
-}
-
-zend_result extension_before_request(int type, int module_number) {
-    auto extension = _module_number_to_extension[module_number];
-    if (extension->onBeforeRequest) {
-        extension->onBeforeRequest();
-    }
-    return SUCCESS;
-}
-
-zend_result extension_after_request(int type, int module_number) {
-    auto extension = _module_number_to_extension[module_number];
-    if (extension->onAfterRequest) {
-        extension->onAfterRequest();
-    }
-    return SUCCESS;
+    zend_throw_exception(ce, message, code);
 }
 
 static inline ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int num_args) {
@@ -269,7 +202,7 @@ Variant call(const Variant &func, const std::initializer_list<Variant> &args) {
     return _call(nullptr, func.const_ptr(), _args);
 }
 
-Variant include(const std::string &file) {
+Variant include(const String &file) {
     zend_file_handle file_handle;
     zend_stream_init_filename(&file_handle, file.c_str());
     int ret = php_stream_open_for_zend_ex(&file_handle, USE_PATH | STREAM_OPEN_FOR_INCLUDE);
@@ -278,7 +211,7 @@ Variant include(const std::string &file) {
     }
 
     if (!file_handle.opened_path) {
-        file_handle.opened_path = zend_string_init(file.c_str(), file.length(), false);
+        file_handle.opened_path = zend_string_copy(file.ptr());
     }
     zend_string *opened_path = zend_string_copy(file_handle.opened_path);
     zval dummy;
