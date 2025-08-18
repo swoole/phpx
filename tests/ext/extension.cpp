@@ -117,6 +117,7 @@ PHPX_EXTENSION() {
         auto *i = new Interface("MyInterface");
         i->registerFunctions(class_MyInterface_methods);
         extension->registerInterface(i);
+
         extension->registerResource("ResourceString", string_dtor);
         const auto ce = i->ptr();
         printf("ce=%p\n", ce);

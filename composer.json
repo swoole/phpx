@@ -13,6 +13,9 @@
         "cs-fix": "php-cs-fixer fix $1",
         "analyse": "phpstan analyse --memory-limit 512M -l 5 -c phpstan.neon",
         "rector": "rector process --clear-cache",
-        "phpx": "php bin/phpx.php $1"
+        "phpx": "phpx $1"
+    },
+    "require": {
+        "league/climate": "^3.10"
     }
 }

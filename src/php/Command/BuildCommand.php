@@ -3,61 +3,43 @@
 namespace Phpx\Command;
 
 use League\CLImate\CLImate;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Descriptor\ApplicationDescription;
 use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class BuildCommand extends Command
+class BuildCommand extends BaseCommand
 {
-    private Command $command;
-
     protected function configure(): void
     {
         $this->ignoreValidationErrors();
-
-        $this
-            ->setName('build')
-            ->setDefinition([
-                new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help', fn () => array_keys((new ApplicationDescription($this->getApplication()))->getCommands())),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt', fn () => (new DescriptorHelper())->getFormats()),
-                new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command help'),
-            ])
-            ->setDescription('Display help for a command')
-            ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command displays help for a given command:
-
-  <info>%command.full_name% list</info>
-
-You can also output the help in other formats by using the <comment>--format</comment> option:
-
-  <info>%command.full_name% --format=xml list</info>
-
-To display the list of available commands, please use the <info>list</info> command.
-EOF
-            )
-        ;
-    }
-
-    public function setCommand(Command $command): void
-    {
-        $this->command = $command;
+        $this->setName('build')->setDescription('Build the phpx extension');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->command ??= $this->getApplication()->find($input->getArgument('command_name'));
+        $info = $this->getPhpConfigInfo($input);
+        $libphpx = $info['prefix'] . '/lib/libphpx.so';
 
-        $helper = new DescriptorHelper();
-        $helper->describe($output, $this->command, [
-            'format' => $input->getOption('format'),
-            'raw_text' => $input->getOption('raw'),
-        ]);
+        // build libphpx.so if it does not exist
+        if (!file_exists($libphpx)) {
+            $output->writeln("<comment>Building PHPX</comment>");
+            system('cd vendor/swoole/phpx && cmake . -D php_dir=' . $info['prefix'] . ' && make -j ' . $this->nproc . ' phpx && cd -');
+            $tmpLibphpx = 'vendor/swoole/phpx/lib/libphpx.so';
+            if (!is_file($tmpLibphpx)) {
+                throw  new \RuntimeException("libphpx.so not found, please run 'cmake .' in the PHPX root directory.");
+            }
+            system("cp $tmpLibphpx {$info['prefix']}/lib");
+            system('cp -r vendor/swoole/phpx/include ' . $info['prefix'] . '/include/phpx');
+            $output->writeln("<info>PHPX installation successful</info>");
+        }
 
-        unset($this->command);
+        $output->writeln("<comment>Generating function argument information stubs</comment>");
+        system('php vendor/swoole/phpx/bin/gen_stub.php ' . $this->cwd . '/src');
+
+        system('cmake .');
+        system('make -j' . $this->nproc);
 
         return 0;
     }

@@ -334,10 +334,10 @@ class Variant {
         return &val;
     }
     void addRef() {
-        zval_add_ref(ptr());
+    	Z_TRY_ADDREF_P(ptr());
     }
     void delRef() {
-        zval_delref_p(ptr());
+    	Z_TRY_DELREF_P(ptr());
     }
     int getRefCount() const;
     int type() const {
@@ -619,9 +619,6 @@ class Array : public Variant {
     Array(const std::initializer_list<const Variant> &list);
     Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     Array(const std::initializer_list<std::pair<Int, const Variant>> &list);
-    void separate() {
-        SEPARATE_ARRAY(ptr());
-    }
     void append(const Variant &v) {
         const_cast<Variant &>(v).addRef();
         add_next_index_zval(ptr(), const_cast<Variant &>(v).ptr());
@@ -657,7 +654,6 @@ class Array : public Variant {
         ZVAL_ARR(&array, arr);
         add_next_index_zval(ptr(), &array);
     }
-    //------------------assoc-array------------------
     void set(const char *key, const Variant &v) {
         const_cast<Variant &>(v).addRef();
         add_assoc_zval(ptr(), key, const_cast<Variant &>(v).ptr());
@@ -687,24 +683,17 @@ class Array : public Variant {
         const_cast<Variant &>(v).addRef();
         add_assoc_zval_ex(ptr(), s.c_str(), s.length(), const_cast<Variant &>(v).ptr());
     }
-    void del(const char *key) {
-        zend_hash_str_del(Z_ARRVAL_P(ptr()), key, strlen(key));
-    }
-    void del(const std::string &key) {
-        zend_hash_str_del(Z_ARRVAL_P(ptr()), key.c_str(), key.length());
-    }
-    void del(const String &key) {
-        zend_hash_del(Z_ARRVAL_P(ptr()), key.ptr());
-    }
-    //------------------index-array------------------
     void set(zend_ulong i, const Variant &v) {
         const_cast<Variant &>(v).addRef();
         add_index_zval(ptr(), i, const_cast<Variant &>(v).ptr());
     }
-    void del(zend_ulong i) {
-        zend_hash_index_del(Z_ARRVAL_P(ptr()), i);
+    Variant get(const std::string &key) const {
+        zval *ret = zend_hash_str_find(Z_ARRVAL_P(const_ptr()), key.c_str(), key.length());
+        if (ret == nullptr) {
+            return {};
+        }
+        return ret;
     }
-    //-------------------------------------------
     Variant get(const char *key) const {
         zval *ret = zend_hash_str_find(Z_ARRVAL_P(const_ptr()), key, strlen(key));
         if (ret == nullptr) {
@@ -712,42 +701,130 @@ class Array : public Variant {
         }
         return ret;
     }
-    Variant get(int i) const {
+    Variant get(const String &key) const {
+        zval *ret = zend_hash_find(Z_ARRVAL_P(const_ptr()), key.ptr());
+        if (ret == nullptr) {
+            return {};
+        }
+        return ret;
+    }
+    Variant get(zend_ulong i) const {
         zval *ret = zend_hash_index_find(Z_ARRVAL_P(const_ptr()), i);
         if (ret == nullptr) {
             return {};
         }
         return ret;
     }
-    Variant operator[](int i) const {
-        return get(i);
+	Variant operator[](zend_ulong i) const {
+		return get(i);
+	}
+	Variant operator[](int i) const {
+		return get(i);
+	}
+	Variant operator[](const char *key) const {
+		return get(key);
+	}
+	Variant operator[](const std::string &key) const {
+		return get(key);
+	}
+	Variant operator[](const String &key) const {
+		return get(key);
+	}
+#if 0
+	class UpdateProxy {
+	private:
+		Array &array;
+		zend_ulong index;
+		zend_string *key;
+
+	public:
+		UpdateProxy(Array &_array, zend_ulong _index, zend_string *_key) :
+				array(_array), index(_index), key(
+						_key ? zend_string_copy(_key) : nullptr) {
+		}
+		~UpdateProxy() {
+			if (key) {
+				zend_string_release(key);
+			}
+		}
+		UpdateProxy& operator=(Variant &v) {
+			v.addRef();
+			if (key) {
+				zend_symtable_update(Z_ARRVAL_P(array.ptr()), key, v.ptr());
+			} else {
+				zend_hash_index_update(Z_ARRVAL_P(array.ptr()), index, v.ptr());
+			}
+			return *this;
+		}
+		operator Variant() const {
+			if (key) {
+				return array.get(key);
+			} else {
+				return array.get(index);
+			}
+		}
+	};
+	UpdateProxy operator[](zend_ulong i) {
+		return UpdateProxy(*this, i, nullptr);
+	}
+	UpdateProxy operator[](int i) {
+		return UpdateProxy(*this, i, nullptr);
+	}
+	UpdateProxy operator[](const char *key) {
+		String _key(key);
+		return UpdateProxy(*this, 0, _key.ptr());
+	}
+	UpdateProxy operator[](const std::string &key) {
+		String _key(key);
+		return UpdateProxy(*this, 0, _key.ptr());
+	}
+	UpdateProxy operator[](const String &key) {
+		return UpdateProxy(*this, 0, key.ptr());
+	}
+#endif
+    bool del(int index) {
+        return zend_hash_index_del(Z_ARRVAL_P(ptr()), index) == SUCCESS;
     }
-    Variant operator[](const char *key) const {
-        return get(key);
+    bool del(zend_ulong index) {
+        return zend_hash_index_del(Z_ARRVAL_P(ptr()), index) == SUCCESS;
     }
-    bool remove(const char *key) {
-        String _key(key);
-        return zend_hash_del(Z_ARRVAL_P(ptr()), _key.ptr()) == SUCCESS;
+    bool del(const char *key) {
+        return zend_hash_str_del(Z_ARRVAL_P(ptr()), key, strlen(key)) == SUCCESS;
+    }
+    bool del(const std::string &key) {
+        return zend_hash_str_del(Z_ARRVAL_P(ptr()), key.c_str(), key.length()) == SUCCESS;
+    }
+    bool del(const String &key) {
+        return zend_hash_del(Z_ARRVAL_P(ptr()), key.ptr()) == SUCCESS;
     }
     void clean() {
         zend_hash_clean(Z_ARRVAL_P(ptr()));
     }
-    bool exists(const char *key) {
-        return zend_hash_str_exists(Z_ARRVAL_P(ptr()), key, strlen(key));
+    bool exists(zend_ulong index) const {
+        return zend_hash_index_exists(Z_ARRVAL_P(const_ptr()), index);
     }
-    bool exists(const std::string &key) {
-        return zend_hash_str_exists(Z_ARRVAL_P(ptr()), key.c_str(), key.length());
+    bool exists(int index) const {
+        return zend_hash_index_exists(Z_ARRVAL_P(const_ptr()), index);
     }
-    ArrayIterator begin() {
-        return {Z_ARRVAL_P(ptr()), 0};
+    bool exists(const char *key) const {
+        return zend_hash_str_exists(Z_ARRVAL_P(const_ptr()), key, strlen(key));
     }
-    ArrayIterator end() {
-        const auto ht = Z_ARRVAL_P(ptr());
-        return {ht, ht->nNumUsed};
-    }
-    size_t count() const {
-        return zend_hash_num_elements(Z_ARRVAL_P(const_ptr()));
-    }
+    bool exists(const std::string &key) const {
+        return zend_hash_str_exists(Z_ARRVAL_P(const_ptr()), key.c_str(), key.length());
+	}
+    bool exists(const String &key) const {
+        return zend_hash_exists(Z_ARRVAL_P(const_ptr()), key.ptr());
+	}
+	ArrayIterator begin() const {
+		return {Z_ARRVAL_P(const_ptr()), 0};
+	}
+	ArrayIterator end() const {
+		const auto ht = Z_ARRVAL_P(const_ptr());
+		return {ht, ht->nNumUsed};
+	}
+	size_t count() const {
+		return zend_hash_num_elements(Z_ARRVAL_P(const_ptr()));
+	}
     bool empty() const {
         return count() == 0;
     }

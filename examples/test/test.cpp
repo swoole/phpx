@@ -19,10 +19,11 @@
 
 #include "phpx.h"
 #include <ext/spl/spl_iterators.h>
-#include <Server.h>
+#include <swoole_server.h>
 
 using namespace std;
 using namespace php;
+using namespace swoole;
 
 void cpp_hello_world(Args &args, Variant &retval);
 PHPX_FUNCTION(cpp_hello_world2);
@@ -37,20 +38,24 @@ void CppClass_test(Object &_this, Args &args, Variant &retval);
 void CppClass_test2(Object &_this, Args &args, Variant &retval);
 void CppClass_count(Object &_this, Args &args, Variant &retval);
 
-int test_get_length(swProtocol *protocol, swConnection *conn, char *data, uint32_t length);
-int dispatch_function(swServer *serv, swConnection *conn, swEventData *data);
+int test_get_length(Protocol *protocol, Connection *conn, char *data, uint32_t length);
+int dispatch_function(Server *serv, Connection *conn, EventData *data);
 
 PHPX_FUNCTION(cpp_test3)
 {
     auto a = args[0];
     cout << "type=" << a.type() << endl;
     a = 456;
+
+    return {};
 }
 
 PHPX_FUNCTION(cpp_test4)
 {
     Object a = args[0];
     var_dump(a);
+
+    return {};
 }
 
 PHPX_FUNCTION(cpp_test5)
@@ -63,6 +68,8 @@ PHPX_FUNCTION(cpp_test5)
 
     auto v = a.get("name");
     var_dump(v);
+
+    return {};
 }
 
 PHPX_EXTENSION()
