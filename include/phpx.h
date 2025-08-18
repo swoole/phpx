@@ -215,6 +215,9 @@ class Variant {
     Variant() {
         ZVAL_NULL(&val);
     }
+    Variant(nullptr_t) {
+        ZVAL_NULL(&val);
+    }
     Variant(long v) {
         ZVAL_LONG(&val, v);
     }
@@ -332,6 +335,11 @@ class Variant {
         zval_add_ref(Z_REFVAL(val));
     }
     Variant &operator=(const Variant *v);
+    Variant &operator=(nullptr_t) {
+        destroy();
+        ZVAL_NULL(&val);
+        return *this;
+    }
     zval *ptr() {
         return &val;
     }
@@ -626,20 +634,24 @@ class Array : public Variant {
     Array(const std::initializer_list<std::pair<Int, const Variant>> &list);
     void append(const Variant &v) {
         const_cast<Variant &>(v).addRef();
+        SEPARATE_ARRAY(ptr());
         add_next_index_zval(ptr(), const_cast<Variant &>(v).ptr());
     }
     void append(Array &v) {
         zend_array *arr = zend_array_dup(Z_ARR_P(v.ptr()));
         zval array;
         ZVAL_ARR(&array, arr);
+        SEPARATE_ARRAY(ptr());
         add_next_index_zval(ptr(), &array);
     }
     void set(const String &s, const Variant &v) {
         const_cast<Variant &>(v).addRef();
+        SEPARATE_ARRAY(ptr());
         zend_symtable_update(Z_ARRVAL_P(ptr()), s.ptr(), const_cast<Variant &>(v).ptr());
     }
     void set(zend_ulong i, const Variant &v) {
         const_cast<Variant &>(v).addRef();
+        SEPARATE_ARRAY(ptr());
         add_index_zval(ptr(), i, const_cast<Variant &>(v).ptr());
     }
     Variant get(const String &key) const {

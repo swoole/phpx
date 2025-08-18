@@ -3,6 +3,24 @@
 
 using namespace php;
 
+TEST(variant, base) {
+    Variant v{nullptr};
+    ASSERT_TRUE(v.isNull());
+
+    zval zv;
+    array_init(&zv);
+    Variant v2{&zv, true};
+
+    ASSERT_TRUE(v2.isArray());
+    auto arr = v2.toArray();
+    arr.append("hello world");
+    arr.append(1922);
+    ASSERT_EQ(arr.count(), 2);
+
+    v2 = nullptr;
+    ASSERT_TRUE(v2.isNull());
+}
+
 TEST(variant, toCString) {
     std::string s1("hello world");
     Variant s2("hello world");
