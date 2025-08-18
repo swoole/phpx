@@ -113,8 +113,12 @@ class String {
     String(const std::string &v) {
         str = zend_string_init(v.c_str(), v.length(), false);
     }
-    String(zend_string *v) {
-        str = zend_string_copy(v);
+    String(zend_string *v, bool forward = true) {
+        if (forward) {
+            str = v;
+        } else {
+            str = zend_string_copy(v);
+        }
     }
     String(const zval *v) {
         str = zend_string_copy(Z_STR_P(v));
@@ -168,13 +172,16 @@ class String {
         va_start(args, format);
         zend_string *s = vstrpprintf(0, format, args);
         va_end(args);
-        return s;
+        return {s, true};
     }
     String trim(const String &what, int mode = 3) const {
         return php_trim(str, what.c_str(), what.length(), mode);
     }
-    void tolower() const {
-        zend_str_tolower(str->val, str->len);
+    String lower() const {
+    	return {zend_string_tolower(str), true};
+    }
+    String upper() const {
+        return {zend_string_toupper(str), true};
     }
     String base64Encode(bool raw = false) const {
         return php_base64_decode_ex((uchar *) str->val, str->len, raw);
@@ -303,9 +310,9 @@ class Variant {
         ZVAL_STRINGL(ptr(), str.c_str(), str.length());
         return *this;
     }
-    Variant &operator=(zend_string *str) {
+    Variant &operator=(const String &str) {
         destroy();
-        ZVAL_STR(ptr(), str);
+        ZVAL_STR(ptr(), zend_string_copy(str.ptr()));
         return *this;
     }
     Variant &operator=(const char *str) {

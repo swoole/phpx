@@ -3,6 +3,39 @@
 
 using namespace php;
 
+TEST(string, number) {
+	String s0(1990);
+	ASSERT_TRUE(s0.equals("1990"));
+
+	String s1(19902019L);
+	ASSERT_TRUE(s1.equals("19902019"));
+
+	String s2(1990.2019);
+	ASSERT_TRUE(s2.equals("1990.2019"));
+
+	String s3(true);
+	ASSERT_TRUE(s3.equals("1"));
+
+	String s4(false);
+	ASSERT_TRUE(s4.equals("0"));
+
+	String s5(s1);
+	ASSERT_EQ(s5.length(), s1.length());
+	ASSERT_STREQ(s1.c_str(), s5.c_str());
+
+	ASSERT_GT(s5.hashCode(), 0);
+
+	auto s6 = String::format("str=%s, float=%f, int=%d\n", "hello", 1990.2019, 1990);
+	ASSERT_GT(s6.length(), 32);
+
+	String s7("hello");
+	auto s8 = s7.upper();
+	ASSERT_STREQ(s8.c_str(), "HELLO");
+
+	auto s9 = s8.lower();
+	ASSERT_STREQ(s9.c_str(), s7.c_str());
+}
+
 TEST(string, equals) {
     auto s = random_bytes(1000);
     String str(s);

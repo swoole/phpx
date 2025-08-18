@@ -3,6 +3,8 @@
 
 using namespace php;
 
+constexpr double PI = 3.1415926;
+
 TEST(variant, base) {
     Variant v{nullptr};
     ASSERT_TRUE(v.isNull());
@@ -19,6 +21,34 @@ TEST(variant, base) {
 
     v2 = nullptr;
     ASSERT_TRUE(v2.isNull());
+
+    zval *zv2 = nullptr;
+    Variant v3{zv2};
+    ASSERT_TRUE(v3.isNull());
+
+    v3 = 199000L;
+    ASSERT_TRUE(v3.isInt());
+    ASSERT_TRUE(v3 == 199000L);
+
+    v3 = std::string("hello");
+    ASSERT_TRUE(v3.isString());
+    ASSERT_EQ(v3.length(), 5);
+    ASSERT_TRUE(v3 == "hello");
+
+    String s("hello world!");
+    v3 = s;
+    ASSERT_TRUE(v3.isString());
+    ASSERT_EQ(v3.length(), s.length());
+
+    v3 = PI;
+    ASSERT_TRUE(v3.isFloat());
+    ASSERT_TRUE(v3 == PI);
+
+    ASSERT_EQ(s.length(), 12);
+
+    v3 = false;
+    ASSERT_TRUE(v3.isBool());
+    ASSERT_TRUE(v3 == false);
 }
 
 TEST(variant, toCString) {
