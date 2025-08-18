@@ -3,15 +3,43 @@
 
 using namespace php;
 
+TEST(string, base) {
+	auto s = zend_string_init(ZEND_STRL("hello world"), false);
+	String s1 {s, false};
+	zend_string_release(s);
+
+	ASSERT_GT(s1.length(), 10);
+
+	s1.extend(128);
+	ASSERT_EQ(s1.length(), 128);
+
+	String s2("   hello  \n");
+	auto s3 = s2.trim();
+	ASSERT_STREQ(s3.c_str(), "hello");
+
+	String s4 = "This is an encoded string";
+	auto s5 = s4.base64Encode();
+
+	ASSERT_GT(s5.length(), s4.length());
+	ASSERT_TRUE(s5.base64Decode().equals(s4));
+
+	String s6 = "I'll \"walk\" the <b>dog</b> now";
+	auto s7 = s6.escape();
+	ASSERT_GT(s7.length(), s6.length());
+	ASSERT_TRUE(s7.unescape().equals(s6));
+}
+
 TEST(string, number) {
 	String s0(1990);
 	ASSERT_TRUE(s0.equals("1990"));
+	ASSERT_EQ(s0.toInt(), 1990);
 
 	String s1(19902019L);
 	ASSERT_TRUE(s1.equals("19902019"));
 
 	String s2(1990.2019);
 	ASSERT_TRUE(s2.equals("1990.2019"));
+	ASSERT_EQ(s2.toFloat(), 1990.2019);
 
 	String s3(true);
 	ASSERT_TRUE(s3.equals("1"));

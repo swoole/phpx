@@ -114,7 +114,7 @@ class String {
     String(const std::string &v) {
         str = zend_string_init(v.c_str(), v.length(), false);
     }
-    String(zend_string *v, bool forward = true) {
+    String(zend_string *v, bool forward) {
         if (forward) {
             str = v;
         } else {
@@ -175,8 +175,8 @@ class String {
         va_end(args);
         return {s, true};
     }
-    String trim(const String &what, int mode = 3) const {
-        return php_trim(str, what.c_str(), what.length(), mode);
+    String trim(const char *what = " \t\n\r\v\0", int mode = 3) const {
+        return {php_trim(str, what, strlen(what), mode), true};
     }
     String lower() const {
         return {zend_string_tolower(str), true};
@@ -184,14 +184,17 @@ class String {
     String upper() const {
         return {zend_string_toupper(str), true};
     }
-    String base64Encode(bool raw = false) const {
-        return php_base64_decode_ex((uchar *) str->val, str->len, raw);
+    String base64Encode() const {
+        return {php_base64_encode_str(str), true};
     }
-    String escape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, const std::string &charset = SG(default_charset)) const {
-        return php_escape_html_entities((uchar *) str->val, str->len, 0, flags, charset.c_str());
+    String base64Decode() const {
+        return {php_base64_decode_str(str), true};
     }
-    String unescape(int flags, const std::string &charset) const {
-        return php_unescape_html_entities(str, 1, flags, charset.c_str());
+    String escape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = SG(default_charset)) const {
+        return {php_escape_html_entities((uchar *) str->val, str->len, 0, flags, charset), true};
+    }
+    String unescape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = SG(default_charset)) const {
+        return {php_unescape_html_entities(str, 1, flags, charset), true};
     }
 
     Variant split(const String &delim, long = ZEND_LONG_MAX) const;
@@ -206,7 +209,6 @@ class String {
     uint32_t getRefCount() const {
         return zend_string_refcount(ptr());
     }
-
     zend_string *ptr() const {
         return str;
     }
