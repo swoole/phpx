@@ -53,11 +53,11 @@ std::string Variant::toString() {
     return retval;
 }
 
-Array Variant::toArray() {
+Array Variant::toArray() const {
     return *this;
 }
 
-Object Variant::toObject() {
+Object Variant::toObject() const {
     return *this;
 }
 
@@ -116,25 +116,6 @@ int Variant::getRefCount() const {
         return Z_REFCOUNT_P(const_ptr());
     }
     return 0;
-}
-
-bool Variant::empty() {
-    switch (type()) {
-    case IS_UNDEF:
-    case IS_NULL:
-    case IS_FALSE:
-        return true;
-    case IS_LONG:
-        return toInt() == 0;
-    case IS_DOUBLE:
-        return toFloat() == 0.0;
-    case IS_STRING:
-        return length() == 0;
-    case IS_ARRAY:
-        return Z_ARRVAL_P(const_ptr())->nNumOfElements == 0;
-    default:
-        return false;
-    }
 }
 
 Variant Variant::getRefValue() const {

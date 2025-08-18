@@ -401,23 +401,25 @@ class Variant {
     bool isReference() const {
         return Z_TYPE_P(const_ptr()) == IS_REFERENCE;
     }
-    bool empty();
+    bool empty() {
+        return toBool() == false;
+    }
     std::string toString();
     const char *toCString() {
         convert_to_string(&val);
         return Z_STRVAL(val);
     }
-    long toInt() {
-        return zval_get_long(ptr());
+    long toInt() const {
+        return zval_get_long(&val);
     }
-    double toFloat() {
-        return zval_get_double(ptr());
+    double toFloat() const {
+        return zval_get_double(&val);
     }
-    bool toBool() {
-        return zval_is_true(ptr());
+    bool toBool() const {
+        return zval_is_true(&val);
     }
-    Array toArray();
-    Object toObject();
+    Array toArray() const;
+    Object toObject() const;
     size_t length() const;
     template <class T>
     T *toResource(const char *name) {
@@ -495,11 +497,11 @@ class Variant {
     Variant &operator+=(Int v);
     Variant &operator-=(Int v);
     Variant operator()() const;
-	explicit operator bool() const noexcept {
-		return i_zend_is_true(const_ptr());
-	}
+    explicit operator bool() const noexcept {
+        return toBool();
+    }
     bool operator!() const {
-    	return !static_cast<bool>(*this);
+        return !toBool();
     }
     Variant operator()(const std::initializer_list<Variant> &args) const;
 
