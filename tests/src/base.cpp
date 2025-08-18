@@ -95,6 +95,19 @@ TEST(base, static_property) {
     ASSERT_STREQ(Class::getStaticProperty("TestClass", "propString").toCString(), "phpx test");
 }
 
+TEST(base, call_parent_method) {
+	if (!class_exists("TestClass2")) {
+	    include(get_include_dir() + "/library.php");
+	}
+
+	auto obj = newObject("TestClass2");
+	auto rs1 = obj.exec("test");
+	ASSERT_STREQ(rs1.toCString(), "child test");
+
+	auto rs2 = obj.callParentMethod("test", {});
+	ASSERT_STREQ(rs2.toCString(), "parent test");
+}
+
 #if 0
 TEST(base, exception) {
     zend_try {

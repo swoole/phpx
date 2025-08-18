@@ -102,9 +102,6 @@ class String {
     String(long v) {
         str = zend_long_to_str(v);
     }
-    String(float v) {
-        str = zend_strpprintf(0, "%.*G", (int) EG(precision), v);
-    }
     String(double v) {
         str = zend_strpprintf(0, "%.*G", (int) EG(precision), v);
     }
@@ -182,7 +179,7 @@ class String {
         return php_trim(str, what.c_str(), what.length(), mode);
     }
     String lower() const {
-    	return {zend_string_tolower(str), true};
+        return {zend_string_tolower(str), true};
     }
     String upper() const {
         return {zend_string_toupper(str), true};
@@ -260,9 +257,6 @@ class Variant {
     }
     Variant(double v) {
         ZVAL_DOUBLE(&val, v);
-    }
-    Variant(float v) {
-        ZVAL_DOUBLE(&val, (double) v);
     }
     Variant(bool v) {
         ZVAL_BOOL(&val, v);
@@ -501,6 +495,12 @@ class Variant {
     Variant &operator+=(Int v);
     Variant &operator-=(Int v);
     Variant operator()() const;
+	explicit operator bool() const noexcept {
+		return i_zend_is_true(const_ptr());
+	}
+    bool operator!() const {
+    	return !static_cast<bool>(*this);
+    }
     Variant operator()(const std::initializer_list<Variant> &args) const;
 
     /* generator */
@@ -867,28 +867,7 @@ class Object : public Variant {
     zend_class_entry *ce() {
         return Z_OBJCE_P(ptr());
     }
-    Variant callParentMethod(const char *func) {
-        Variant retval;
-        zend_call_method_with_0_params(object(), parent_ce(), nullptr, func, retval.ptr());
-        return retval;
-    }
-    Variant callParentMethod(const char *func, const Variant &v1) {
-        Variant retval;
-        zend_call_method_with_1_params(
-            object(), parent_ce(), nullptr, func, retval.ptr(), const_cast<Variant &>(v1).ptr());
-        return retval;
-    }
-    Variant callParentMethod(const char *func, const Variant &v1, const Variant &v2) {
-        Variant retval;
-        zend_call_method_with_2_params(object(),
-                                       parent_ce(),
-                                       nullptr,
-                                       func,
-                                       retval.ptr(),
-                                       const_cast<Variant &>(v1).ptr(),
-                                       const_cast<Variant &>(v2).ptr());
-        return retval;
-    }
+    Variant callParentMethod(const String &func, const std::initializer_list<Variant> &args);
     Variant exec(const Variant &fn) {
         return _call(ptr(), fn.const_ptr());
     }

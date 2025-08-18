@@ -323,6 +323,24 @@ Variant Object::exec(const Variant &fn, const std::initializer_list<Variant> &ar
     return _call(ptr(), fn.const_ptr(), _args);
 }
 
+Variant Object::callParentMethod(const String &func, const std::initializer_list<Variant> &args) {
+    Args _args;
+    for (const auto &arg : args) {
+        _args.append(const_cast<Variant &>(arg).ptr());
+    }
+
+    Variant retval;
+    auto fn = (zend_function *) zend_hash_find_ptr_lc(&parent_ce()->function_table, func.ptr());
+    if (UNEXPECTED(fn == NULL)) {
+        /* error at c-level */
+        zend_error_noreturn(
+            E_CORE_ERROR, "Couldn't find implementation for method %s::%s", ZSTR_VAL(parent_ce()->name), func.c_str());
+    } else {
+        zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), NULL);
+    }
+    return retval;
+}
+
 Variant Object::get(const String &name) {
     Variant retval;
     zval rv;

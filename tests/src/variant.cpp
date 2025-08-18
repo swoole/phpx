@@ -48,7 +48,11 @@ TEST(variant, base) {
 
     v3 = false;
     ASSERT_TRUE(v3.isBool());
-    ASSERT_TRUE(v3 == false);
+	ASSERT_TRUE(v3 == false);
+
+	float fv1 = PI;
+	Variant v4(fv1);
+	ASSERT_TRUE(v4 == (float )PI);
 }
 
 TEST(variant, toCString) {
