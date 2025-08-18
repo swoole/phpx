@@ -409,13 +409,13 @@ class Variant {
         convert_to_string(&val);
         return Z_STRVAL(val);
     }
-    long toInt() const {
+    long toInt() {
         return zval_get_long(&val);
     }
-    double toFloat() const {
+    double toFloat() {
         return zval_get_double(&val);
     }
-    bool toBool() const {
+    bool toBool() {
         return zval_is_true(&val);
     }
     Array toArray() const;
@@ -497,10 +497,10 @@ class Variant {
     Variant &operator+=(Int v);
     Variant &operator-=(Int v);
     Variant operator()() const;
-    explicit operator bool() const noexcept {
+    explicit operator bool() noexcept {
         return toBool();
     }
-    bool operator!() const {
+    bool operator!() {
         return !toBool();
     }
     Variant operator()(const std::initializer_list<Variant> &args) const;
