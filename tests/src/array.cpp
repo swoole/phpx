@@ -11,6 +11,9 @@ TEST(array, list) {
     array.append(10);
     array.append(90);
 
+    ASSERT_EQ(array.get(2).toInt(), 100);
+    ASSERT_EQ(array[3].toInt(), 10);
+
     zend_ulong j = 0;
     for (auto i = array.begin(); i != array.end(); i++) {
         ASSERT_EQ(i.key().toInt(), j);

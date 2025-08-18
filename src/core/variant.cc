@@ -20,6 +20,7 @@
 
 namespace php {
 Variant null = {};
+static Variant __construct{ZEND_STRL("__construct"), true};
 
 Variant &Variant::operator=(const zval *v) {
     destroy();
@@ -280,7 +281,7 @@ Object newObject(const char *name) {
         return object;
     }
     Args args;
-    object.call("__construct", args);
+    object.call(__construct, args);
     return object;
 }
 
@@ -298,7 +299,7 @@ Object newObject(const char *name, const std::initializer_list<Variant> &args) {
     for (const auto &arg : args) {
         _args.append(const_cast<Variant &>(arg).ptr());
     }
-    object.call("__construct", _args);
+    object.call(__construct, _args);
     return object;
 }
 
@@ -310,22 +311,10 @@ Variant Object::exec(const Variant &fn, const std::initializer_list<Variant> &ar
     return _call(ptr(), fn.const_ptr(), _args);
 }
 
-Variant Object::get(const char *name, size_t len) {
+Variant Object::get(const String &name) {
     Variant retval;
     zval rv;
-    zval *member_p = zend_read_property(ce(), object(), name, len, false, &rv);
-    if (member_p != &rv) {
-        ZVAL_COPY(retval.ptr(), member_p);
-    } else {
-        ZVAL_COPY_VALUE(retval.ptr(), member_p);
-    }
-    return retval;
-}
-
-Variant Object::get(zend_string *name) {
-    Variant retval;
-    zval rv;
-    zval *member_p = zend_read_property_ex(ce(), object(), name, false, &rv);
+    zval *member_p = zend_read_property_ex(ce(), object(), name.ptr(), false, &rv);
     if (member_p != &rv) {
         ZVAL_COPY(retval.ptr(), member_p);
     } else {

@@ -37,6 +37,7 @@ TEST(string, split) {
     Array result = str.split(dim, 2);
     ASSERT_EQ(result.length(), 2);
     ASSERT_STREQ(result[0].toCString(), "one");
+    ASSERT_STREQ(result.get(0).toCString(), "one");
     ASSERT_STREQ(result[1].toCString(), "two,three,four");
 
     result = str.split(dim);

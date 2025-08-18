@@ -242,9 +242,6 @@ class Variant {
     Variant(const std::string &str) {
         ZVAL_STRINGL(&val, str.c_str(), str.length());
     }
-    Variant(zend_string *str) {
-        ZVAL_STR(&val, str);
-    }
     Variant(double v) {
         ZVAL_DOUBLE(&val, v);
     }
@@ -254,11 +251,11 @@ class Variant {
     Variant(bool v) {
         ZVAL_BOOL(&val, v);
     }
-    Variant(const zval *v) noexcept {
-        ZVAL_COPY_VALUE(&val, v);
-        addRef();
-    }
-    Variant(const zval *v, bool forward) noexcept {
+    Variant(const zval *v, bool forward = false) noexcept {
+    	if (!v) {
+    		ZVAL_NULL(&val);
+    		return;
+    	}
         ZVAL_COPY_VALUE(&val, v);
         if (!forward) {
             addRef();
@@ -566,12 +563,9 @@ class ArrayIterator {
         return b.index() == index();
     }
     Variant key() const {
-#if PHP_VERSION_ID >= 80100
         if (HT_IS_PACKED(array_)) {
             return (zend_long) idx_;
-        } else
-#endif
-        {
+        } else {
             auto *bucket = HT_HASH_TO_BUCKET(array_, idx_);
             if (bucket->key) {
                 return zend_string_copy(bucket->key);
@@ -623,109 +617,31 @@ class Array : public Variant {
         const_cast<Variant &>(v).addRef();
         add_next_index_zval(ptr(), const_cast<Variant &>(v).ptr());
     }
-    void append(const char *str) {
-        add_next_index_string(ptr(), str);
-    }
-    void append(const std::string &str) {
-        add_next_index_stringl(ptr(), str.c_str(), str.length());
-    }
-    void append(long v) {
-        add_next_index_long(ptr(), v);
-    }
-    void append(int v) {
-        add_next_index_long(ptr(), (long) v);
-    }
-    void append(bool v) {
-        add_next_index_bool(ptr(), v);
-    }
-    void append(double v) {
-        add_next_index_double(ptr(), (double) v);
-    }
-    void append(zval *v) {
-        zval_add_ref(v);
-        add_next_index_zval(ptr(), v);
-    }
-    void append(void *v) {
-        add_next_index_null(ptr());
-    }
     void append(Array &v) {
         zend_array *arr = zend_array_dup(Z_ARR_P(v.ptr()));
         zval array;
         ZVAL_ARR(&array, arr);
         add_next_index_zval(ptr(), &array);
     }
-    void set(const char *key, const Variant &v) {
-        const_cast<Variant &>(v).addRef();
-        add_assoc_zval(ptr(), key, const_cast<Variant &>(v).ptr());
-    }
-    void set(const char *key, int v) {
-        add_assoc_long(ptr(), key, (long) v);
-    }
-    void set(const char *key, long v) {
-        add_assoc_long(ptr(), key, v);
-    }
-    void set(const char *key, const char *v) {
-        add_assoc_string(ptr(), key, v);
-    }
-    void set(const char *key, const std::string &v) {
-        add_assoc_stringl(ptr(), key, v.c_str(), v.length());
-    }
-    void set(const char *key, double v) {
-        add_assoc_double(ptr(), key, v);
-    }
-    void set(const char *key, float v) {
-        add_assoc_double(ptr(), key, v);
-    }
-    void set(const char *key, bool v) {
-        add_assoc_bool(ptr(), key, v);
-    }
     void set(const String &s, const Variant &v) {
         const_cast<Variant &>(v).addRef();
-        add_assoc_zval_ex(ptr(), s.c_str(), s.length(), const_cast<Variant &>(v).ptr());
+        zend_symtable_update(Z_ARRVAL_P(ptr()), s.ptr(), const_cast<Variant &>(v).ptr());
     }
     void set(zend_ulong i, const Variant &v) {
         const_cast<Variant &>(v).addRef();
         add_index_zval(ptr(), i, const_cast<Variant &>(v).ptr());
     }
-    Variant get(const std::string &key) const {
-        zval *ret = zend_hash_str_find(Z_ARRVAL_P(const_ptr()), key.c_str(), key.length());
-        if (ret == nullptr) {
-            return {};
-        }
-        return ret;
-    }
-    Variant get(const char *key) const {
-        zval *ret = zend_hash_str_find(Z_ARRVAL_P(const_ptr()), key, strlen(key));
-        if (ret == nullptr) {
-            return {};
-        }
-        return ret;
-    }
     Variant get(const String &key) const {
-        zval *ret = zend_hash_find(Z_ARRVAL_P(const_ptr()), key.ptr());
-        if (ret == nullptr) {
-            return {};
-        }
-        return ret;
+    	return zend_hash_find(Z_ARRVAL_P(const_ptr()), key.ptr());
     }
     Variant get(zend_ulong i) const {
-        zval *ret = zend_hash_index_find(Z_ARRVAL_P(const_ptr()), i);
-        if (ret == nullptr) {
-            return {};
-        }
-        return ret;
+        return zend_hash_index_find(Z_ARRVAL_P(const_ptr()), i);
     }
 	Variant operator[](zend_ulong i) const {
 		return get(i);
 	}
 	Variant operator[](int i) const {
 		return get(i);
-	}
-	Variant operator[](const char *key) const {
-		return get(key);
-	}
-	Variant operator[](const std::string &key) const {
-		return get(key);
 	}
 	Variant operator[](const String &key) const {
 		return get(key);
@@ -1020,90 +936,33 @@ class Object : public Variant {
                  const Variant &v10);
     /* generator */
 
-    Variant get(const char *name, size_t len);
-    Variant get(zend_string *name);
-    Variant get(const char *name) {
-    	return get(name, strlen(name));
-    }
-    Variant get(const std::string &name) {
-    	return get(name.c_str(), name.length());
-    }
-    Variant get(const String &name) {
-    	return get(name.ptr());
-    }
-    void set(const char *name, const Variant &v) {
-        zend_update_property(ce(), object(), name, strlen(name), const_cast<Variant &>(v).ptr());
-    }
-    void set(const char *name, Array &v) {
-        zend_update_property(ce(), object(), name, strlen(name), v.ptr());
-    }
-    void set(const char *name, const std::string &v) {
-        zend_update_property_stringl(ce(), object(), name, strlen(name), v.c_str(), v.length());
-    }
-    void set(const char *name, const char *v) {
-        zend_update_property_string(ce(), object(), name, strlen(name), v);
-    }
-    void set(const char *name, int v) {
-        zend_update_property_long(ce(), object(), name, strlen(name), v);
-    }
-    void set(const char *name, long v) {
-        zend_update_property_long(ce(), object(), name, strlen(name), v);
-    }
-    void set(const char *name, double v) {
-        zend_update_property_double(ce(), object(), name, strlen(name), v);
-    }
-    void set(const char *name, float v) {
-        zend_update_property_double(ce(), object(), name, strlen(name), (double) v);
-    }
-    void set(const char *name, bool v) {
-        zend_update_property_bool(ce(), object(), name, strlen(name), v ? 1 : 0);
+    Variant get(const String &name);
+    void set(const String &name, const Variant &v) {
+        zend_update_property_ex(ce(), object(), name.ptr(), const_cast<Variant &>(v).ptr());
     }
     template <class T>
-    T *oGet(const char *key, const char *resource_name) {
-        Variant p = this->get(key);
-        return p.toResource<T>(resource_name);
+    T *oGet(const String &name, const char *resource_name) {
+    	auto prop = get(name);
+        return prop.toResource<T>(resource_name);
     }
     template <class T>
-    void oSet(const char *key, const char *resource_name, T *ptr) {
-        Variant res = newResource<T>(resource_name, ptr);
-        this->set(key, res);
+    void oSet(const String &name, const char *resource_name, T *ptr) {
+        set(name, newResource<T>(resource_name, ptr));
     }
-    template <class T>
-    T *oPtr(const char *key, const char *resource_name) {
-        Variant p = this->get(key);
-        return p.toResource<T>(resource_name);
-    }
-    template <class T>
-    void store(T *ptr) {
-        if (ptr == nullptr) {
-            object_array.erase(getId());
-            delete ptr;
-        } else {
-            object_array[getId()] = ptr;
-        }
-    }
-    template <class T>
-    T *fetch() {
-        return static_cast<T *>(object_array[this->getId()]);
-    }
-    std::string getClassName() {
-        return {Z_OBJCE_P(ptr())->name->val, Z_OBJCE_P(ptr())->name->len};
+    String getClassName() {
+        return Z_OBJCE_P(ptr())->name;
     }
     uint32_t getId() {
         return Z_OBJ_HANDLE(*ptr());
     }
     String hash() {
-#if PHP_VERSION_ID >= 80100
         return php_spl_object_hash(Z_OBJ_P(ptr()));
-#else
-        return php_spl_object_hash(ptr());
-#endif
     }
-    bool methodExists(const char *name) {
-        return zend_hash_str_exists(&Z_OBJCE_P(ptr())->function_table, name, strlen(name));
+    bool methodExists(const String &name) {
+        return zend_hash_exists(&Z_OBJCE_P(ptr())->function_table, name.ptr());
     }
-    bool propertyExists(const char *name) {
-        return zend_hash_str_exists(&Z_OBJCE_P(ptr())->properties_info, name, strlen(name));
+    bool propertyExists(const String &name) {
+        return zend_hash_exists(&Z_OBJCE_P(ptr())->properties_info, name.ptr());
     }
 };
 
