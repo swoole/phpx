@@ -483,33 +483,17 @@ class Variant {
         ZVAL_COPY_VALUE(dest, &val);
         val = {};
     }
-    bool operator==(Variant &v) const {
+    bool operator==(const Variant &v) const {
         return equals(v);
     }
-    bool operator==(bool v) const {
-        Variant _tmp(v);
-        return equals(_tmp);
+    bool operator!=(const Variant &v) const {
+        return !equals(v);
     }
-    bool operator==(int v) const {
-        Variant _tmp(v);
-        return equals(_tmp);
-    }
-    bool operator==(long v) const {
-        Variant _tmp(v);
-        return equals(_tmp);
-    }
-    bool operator==(float v) const {
-        Variant _tmp(v);
-        return equals(_tmp);
-    }
-    bool operator==(double v) const {
-        Variant _tmp(v);
-        return equals(_tmp);
-    }
-    bool operator==(const std::string &v) const {
-        Variant _tmp(v);
-        return equals(_tmp);
-    }
+    bool operator<(const Variant &v) const;
+    bool operator>(const Variant &v) const;
+    bool operator<=(const Variant &v) const;
+    bool operator>=(const Variant &v) const;
+
     bool equals(const Variant &v, bool strict = false) const;
     bool same(const Variant &v) const {
         return equals(v, true);
@@ -522,10 +506,10 @@ class Variant {
 
     Variant &operator++();
     Variant &operator--();
-    Int operator++(int);
-    Int operator--(int);
-    Variant &operator+=(Int v);
-    Variant &operator-=(Int v);
+    Variant operator++(int);
+    Variant operator--(int);
+    Variant &operator+=(const Variant &);
+    Variant &operator-=(const Variant &);
     Variant operator+(const Variant &) const;
     Variant operator-(const Variant &) const;
     Variant operator*(const Variant &) const;
@@ -537,6 +521,7 @@ class Variant {
     Variant operator|(const Variant &) const;
     Variant operator^(const Variant &) const;
     Variant operator~() const;
+    Variant pow(const Variant &) const;
 
     Variant operator()() const;
     explicit operator bool() noexcept {

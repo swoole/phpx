@@ -156,6 +156,8 @@ TEST(variant, calc) {
 	var f2 = b / f1;
 	ASSERT_TRUE(f2.equals(9));
 
+	ASSERT_TRUE(f1.pow(16).equals(std::pow(2, 16)));
+
 	var f3 = b / 0.3;
 	ASSERT_TRUE(f3.equals(19 / 0.3));
 
@@ -168,6 +170,36 @@ TEST(variant, calc) {
 	ASSERT_EQ(h1 | h2, 31 | 3);
 	ASSERT_EQ(h1 ^ h2, 31 ^ 3);
 	ASSERT_EQ(~h1, ~31);
+}
+
+TEST(variant, compare) {
+	{
+		var a = 11;
+		var b = 19;
+
+		ASSERT_TRUE(a != b);
+		ASSERT_FALSE(a == b);
+
+		ASSERT_TRUE(a < b);
+		ASSERT_TRUE(b > a);
+		ASSERT_TRUE(a <= b);
+		ASSERT_TRUE(b >= a);
+		ASSERT_TRUE(b >= b);
+	}
+
+	{
+		var a = 11.23;
+		var b = 19.90;
+
+		ASSERT_TRUE(a != b);
+		ASSERT_FALSE(a == b);
+
+		ASSERT_TRUE(a < b);
+		ASSERT_TRUE(b > a);
+		ASSERT_TRUE(a <= b);
+		ASSERT_TRUE(b >= a);
+		ASSERT_TRUE(b >= b);
+	}
 }
 
 TEST(variant, json) {

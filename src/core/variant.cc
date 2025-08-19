@@ -15,8 +15,9 @@
 */
 
 #include "phpx.h"
-
 #include "zend_smart_str.h"
+
+#include <cmath>
 
 namespace php {
 Variant null = {};
@@ -168,43 +169,79 @@ Variant Variant::serialize() {
 }
 
 Variant &Variant::operator++() {
-    convert_to_long(ptr());
-    ++Z_LVAL_P(ptr());
+    if (isFloat()) {
+        ++Z_DVAL_P(ptr());
+    } else {
+        convert_to_long(ptr());
+        ++Z_LVAL_P(ptr());
+    }
     return *this;
 }
 
 Variant &Variant::operator--() {
-    convert_to_long(ptr());
-    --Z_LVAL_P(ptr());
+    if (isFloat()) {
+        --Z_DVAL_P(ptr());
+    } else {
+        convert_to_long(ptr());
+        --Z_LVAL_P(ptr());
+    }
     return *this;
 }
 
-Int Variant::operator++(int) {
-    convert_to_long(ptr());
-    auto val = toInt();
-    ++Z_LVAL_P(ptr());
-    return val;
+Variant Variant::operator++(int) {
+    if (isFloat()) {
+        auto dval = Z_DVAL_P(ptr());
+        ++Z_DVAL_P(ptr());
+        return dval;
+    } else {
+        convert_to_long(ptr());
+        auto lval = Z_LVAL_P(ptr());
+        ++Z_LVAL_P(ptr());
+        return lval;
+    }
 }
 
-Int Variant::operator--(int) {
-    convert_to_long(ptr());
-    auto val = toInt();
-    --Z_LVAL_P(ptr());
-    return val;
+Variant Variant::operator--(int) {
+    if (isFloat()) {
+        auto dval = Z_DVAL_P(ptr());
+        --Z_DVAL_P(ptr());
+        return dval;
+    } else {
+        convert_to_long(ptr());
+        auto lval = Z_LVAL_P(ptr());
+        --Z_LVAL_P(ptr());
+        return lval;
+    }
 }
 
-Variant &Variant::operator+=(Int v) {
-    convert_to_long(ptr());
-    Z_LVAL_P(ptr()) += v;
+Variant &Variant::operator+=(const Variant &v) {
+    if (isFloat() || v.isFloat()) {
+        convert_to_double(ptr());
+        Z_DVAL_P(ptr()) += v.toFloat();
+    } else {
+        convert_to_long(ptr());
+        Z_LVAL_P(ptr()) += v.toInt();
+    }
     return *this;
 }
 
-#define CALC_OP(val, op)                                                                                               \
+Variant &Variant::operator-=(const Variant &v) {
+    if (isFloat() || v.isFloat()) {
+        convert_to_double(ptr());
+        Z_DVAL_P(ptr()) -= v.toFloat();
+    } else {
+        convert_to_long(ptr());
+        Z_LVAL_P(ptr()) -= v.toInt();
+    }
+    return *this;
+}
+
+#define CALC_OP(v, op)                                                                                                 \
     do {                                                                                                               \
-        if (val.isFloat() || isFloat()) {                                                                              \
+        if (v.isFloat() || isFloat()) {                                                                                \
             return toFloat() op v.toFloat();                                                                           \
         } else {                                                                                                       \
-            return toInt() op val.toInt();                                                                             \
+            return toInt() op v.toInt();                                                                               \
         }                                                                                                              \
     } while (0)
 
@@ -225,7 +262,11 @@ Variant Variant::operator/(const Variant &v) const {
 }
 
 Variant Variant::operator%(const Variant &v) const {
-    return toInt() % v.toInt();
+    if (v.isFloat() || isFloat()) {
+        return std::fmod(toFloat(), v.toFloat());
+    } else {
+        return toInt() % v.toInt();
+    }
 }
 
 Variant Variant::operator<<(const Variant &v) const {
@@ -252,10 +293,37 @@ Variant Variant::operator~() const {
     return ~toInt();
 }
 
-Variant &Variant::operator-=(Int v) {
-    convert_to_long(ptr());
-    Z_LVAL_P(ptr()) -= v;
-    return *this;
+#define COMPARE_OP(v, op)                                                                                              \
+    do {                                                                                                               \
+        if (isFloat()) {                                                                                               \
+            return toFloat() op v.toFloat();                                                                           \
+        } else {                                                                                                       \
+            return toInt() op v.toInt();                                                                               \
+        }                                                                                                              \
+    } while (0)
+
+bool Variant::operator<(const Variant &v) const {
+    COMPARE_OP(v, <);
+}
+
+bool Variant::operator>(const Variant &v) const {
+    COMPARE_OP(v, >);
+}
+
+bool Variant::operator<=(const Variant &v) const {
+    COMPARE_OP(v, <=);
+}
+
+bool Variant::operator>=(const Variant &v) const {
+    COMPARE_OP(v, >=);
+}
+
+Variant Variant::pow(const Variant &v) const {
+    if (v.isFloat() || isFloat()) {
+        return std::pow(toFloat(), v.toFloat());
+    } else {
+        return std::pow(toInt(), v.toInt());
+    }
 }
 
 Variant Variant::operator()() const {
