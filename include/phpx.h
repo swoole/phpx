@@ -737,15 +737,6 @@ class Array : public Variant {
     ArrayItem operator[](const String &key) {
         return ArrayItem(*this, 0, key.ptr());
     }
-    Variant operator[](zend_ulong i) const {
-        return get(i);
-    }
-    Variant operator[](int i) const {
-        return get(i);
-    }
-    Variant operator[](const String &key) const {
-        return get(key);
-    }
     bool del(zend_ulong index) {
         return zend_hash_index_del(Z_ARRVAL_P(ptr()), index) == SUCCESS;
     }
@@ -778,7 +769,8 @@ class Array : public Variant {
     bool contains(const Variant &_other_var, bool strict = false) const;
     String join(const String &delim);
     void merge(Array &source, bool overwrite = false) {
-        zend_hash_merge(Z_ARRVAL_P(ptr()), Z_ARRVAL_P(source.ptr()), zval_add_ref, overwrite);
+    	SEPARATE_ARRAY(ptr());
+    	php_array_merge(array(), source.array());
     }
     void sort(bool renumber = true) {
         zend_hash_sort(Z_ARRVAL_P(ptr()), array_data_compare, renumber);

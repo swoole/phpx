@@ -203,3 +203,24 @@ TEST(array, slice) {
     auto arr5 = arr.slice(2, -3, false);
     ASSERT_EQ(arr5.count(), 3);
 }
+
+TEST(array, subscript) {
+    Array arr = create_list();
+
+    auto v1 = arr[0];
+    ASSERT_EQ(v1, "php");
+
+    Array map = create_map();
+    String key = "php";
+    auto v2 = map[key];
+    ASSERT_EQ(v2, 3);
+}
+
+TEST(array, merge) {
+   Array arr1 = create_list();
+   Array arr2 = {"erlang", "ruby", "lua"};
+   arr1.merge(arr2, false);
+   ASSERT_EQ(arr2.count(), 3);
+   ASSERT_EQ(arr1.count(), 8);
+
+}
