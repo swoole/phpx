@@ -16,6 +16,18 @@ TEST(variant, base) {
     zval zv;
     array_init(&zv);
     Variant v2{&zv, true};
+    ASSERT_TRUE(v2.isArray());
+
+    // Assignment to itself
+    v2 = v2;
+
+    Variant ref { &v2 };
+	Variant ref2 { ref };
+	auto ref2_val = ref2.getRefValue();
+    ASSERT_TRUE(ref2_val.isArray());
+
+    auto refval_v2 = v2.getRefValue();
+    ASSERT_TRUE(refval_v2.isArray());
 
     ASSERT_TRUE(v2.isArray());
     auto arr = v2.toArray();
@@ -161,6 +173,23 @@ TEST(variant, calc) {
 	var f3 = b / 0.3;
 	ASSERT_TRUE(f3.equals(19 / 0.3));
 
+	var g = PI;
+	ASSERT_EQ(g++, PI);
+	ASSERT_EQ(g, PI + 1.0);
+	ASSERT_EQ(g--, PI + 1.0);
+	ASSERT_EQ(g, PI);
+
+	ASSERT_EQ(++g, PI + 1.0);
+	ASSERT_EQ(g, PI + 1.0);
+	ASSERT_EQ(--g, PI);
+	ASSERT_EQ(g, PI);
+
+	g += 7;
+	ASSERT_EQ(g, PI + 7);
+
+	g -= 7.0;
+	ASSERT_TRUE(g.almostEquals(PI, 1e-5));
+
 	var h1 = 31;
 	var h2 = 3;
 	ASSERT_EQ(h1 % h2, 31 % 3);
@@ -170,6 +199,13 @@ TEST(variant, calc) {
 	ASSERT_EQ(h1 | h2, 31 | 3);
 	ASSERT_EQ(h1 ^ h2, 31 ^ 3);
 	ASSERT_EQ(~h1, ~31);
+
+	var i = PI;
+	var i2 = i % 2.0;
+	ASSERT_TRUE(i2.almostEquals(std::fmod(PI, 2.0), 1e-5));
+
+	var i3 = i2.pow(1.3);
+	ASSERT_TRUE(i3.almostEquals(std::pow(i2.toFloat(), 1.3), 1e-5));
 }
 
 TEST(variant, compare) {

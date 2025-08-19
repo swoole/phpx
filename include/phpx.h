@@ -495,6 +495,10 @@ class Variant {
     bool operator>=(const Variant &v) const;
 
     bool equals(const Variant &v, bool strict = false) const;
+    bool almostEquals(const Variant &v, double eps = 1e-9) {
+        return std::fabs(toFloat() - v.toFloat()) <= eps;
+    }
+
     bool same(const Variant &v) const {
         return equals(v, true);
     }
