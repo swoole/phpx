@@ -142,7 +142,7 @@ Array::Array(const std::initializer_list<std::pair<Int, const Variant>> &list) {
     }
 }
 
-Variant Array::search(Variant &_other_var, bool strict) {
+Variant Array::search(const Variant &_other_var, bool strict) const {
     for (auto i = begin(); i != end(); i++) {
         if (i.value().equals(_other_var, strict)) {
             return i.key();
@@ -151,7 +151,7 @@ Variant Array::search(Variant &_other_var, bool strict) {
     return false;
 }
 
-bool Array::contains(Variant &_other_var, bool strict) {
+bool Array::contains(const Variant &_other_var, bool strict) const {
     for (auto i = begin(); i != end(); i++) {
         if (i.value().equals(_other_var, strict)) {
             return true;
@@ -166,5 +166,28 @@ String Array::join(const String &delim) {
     String result(&retval);
     zval_ptr_dtor(&retval);
     return result;
+}
+
+ArrayItem::ArrayItem(Array &_array, zend_ulong _index, zend_string *_key) : array_(_array), index_(_index) {
+    zval *value_;
+    if (_key) {
+        key_ = zend_string_copy(_key);
+        value_ = zend_hash_find(_array.array(), key_);
+    } else {
+        value_ = zend_hash_index_find(_array.array(), index_);
+        key_ = nullptr;
+    }
+    val = *value_;
+    addRef();
+}
+
+ArrayItem &ArrayItem::operator=(const Variant &v) {
+    const_cast<Variant &>(v).addRef();
+    if (key_) {
+        zend_symtable_update(Z_ARRVAL_P(array_.ptr()), key_, const_cast<Variant &>(v).ptr());
+    } else {
+        zend_hash_index_update(Z_ARRVAL_P(array_.ptr()), index_, const_cast<Variant &>(v).ptr());
+    }
+    return *this;
 }
 }  // namespace php

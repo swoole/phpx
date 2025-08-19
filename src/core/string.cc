@@ -21,6 +21,14 @@ String::String(Variant &v) {
     str = zval_get_string(v.ptr());
 }
 
+String::String(zend_string *v, bool forward) {
+    if (forward) {
+        str = v;
+    } else {
+        str = zend_string_copy(v);
+    }
+}
+
 void String::print() const {
     if (str) {
         php_printf("(string[%zu]) \"%.*s\"\n", str->len, (int) str->len, str->val);

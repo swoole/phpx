@@ -186,7 +186,7 @@ Variant _call(const zval *object, const zval *func) {
     }
 }
 
-Variant call(const Variant &func, const Array &args) {
+Variant call(const Variant &func, Array &args) {
     Args _args;
     for (size_t i = 0; i < args.count(); i++) {
         _args.append(args[i]);

@@ -108,7 +108,7 @@ PHPX_API void error(int level, const char *format, ...);
 PHPX_API void echo(const char *format, ...);
 PHPX_API Variant global(const String &name);
 PHPX_API Variant include(const String &file);
-PHPX_API Variant call(const Variant &func, const Array &args);
+PHPX_API Variant call(const Variant &func, Array &args);
 PHPX_API Variant call(const Variant &func, const std::initializer_list<Variant> &args);
 PHPX_API void eval(const String &script);
 PHPX_API void throwException(const char *name, const char *message, int code = 0);
@@ -139,13 +139,7 @@ class String {
     String(const std::string &v) {
         str = zend_string_init(v.c_str(), v.length(), false);
     }
-    String(zend_string *v, bool forward = true) {
-        if (forward) {
-            str = v;
-        } else {
-            str = zend_string_copy(v);
-        }
-    }
+    String(zend_string *v, bool forward = true);
     String(const zval *v) {
         str = zend_string_copy(Z_STR_P(v));
     }
@@ -241,7 +235,7 @@ class String {
 
 class Variant {
   protected:
-    zval val = {};
+    zval val;
     void destroy() {
         zval_ptr_dtor(&val);
     }
@@ -350,11 +344,6 @@ class Variant {
         ZVAL_DOUBLE(ptr(), v);
         return *this;
     }
-    Variant &operator=(float v) {
-        destroy();
-        ZVAL_DOUBLE(ptr(), (double) v);
-        return *this;
-    }
     Variant &operator=(bool v) {
         destroy();
         ZVAL_BOOL(ptr(), v);
@@ -375,7 +364,15 @@ class Variant {
     zval *ptr() {
         return &val;
     }
-    void debug();
+    zend_array *array() {
+        return Z_ARRVAL_P(ptr());
+    }
+    zend_class_entry *ce() {
+        return Z_OBJCE_P(ptr());
+    }
+    zend_object *object() {
+        return Z_OBJ_P(ptr());
+    }
     const zval *const_ptr() const {
         return &val;
     }
@@ -385,15 +382,13 @@ class Variant {
     void delRef() {
         Z_TRY_DELREF_P(ptr());
     }
+    void debug();
     int getRefCount() const;
     int type() const {
         return Z_TYPE_P(const_ptr());
     }
     const char *typeStr() const {
         return zend_get_type_by_const(type());
-    }
-    uint32_t refcount() {
-        return Z_REFCOUNT(val);
     }
     bool isString() const {
         return Z_TYPE_P(const_ptr()) == IS_STRING;
@@ -482,35 +477,35 @@ class Variant {
         ZVAL_COPY_VALUE(dest, &val);
         val = {};
     }
-    bool operator==(Variant &v) {
+    bool operator==(Variant &v) const {
         return equals(v);
     }
-    bool operator==(bool v) {
+    bool operator==(bool v) const {
         Variant _tmp(v);
         return equals(_tmp);
     }
-    bool operator==(int v) {
+    bool operator==(int v) const {
         Variant _tmp(v);
         return equals(_tmp);
     }
-    bool operator==(long v) {
+    bool operator==(long v) const {
         Variant _tmp(v);
         return equals(_tmp);
     }
-    bool operator==(float v) {
+    bool operator==(float v) const {
         Variant _tmp(v);
         return equals(_tmp);
     }
-    bool operator==(double v) {
+    bool operator==(double v) const {
         Variant _tmp(v);
         return equals(_tmp);
     }
-    bool operator==(const std::string &v) {
+    bool operator==(const std::string &v) const {
         Variant _tmp(v);
         return equals(_tmp);
     }
-    bool equals(Variant &v, bool strict = false);
-    bool same(Variant &v) {
+    bool equals(const Variant &v, bool strict = false) const;
+    bool same(const Variant &v) const {
         return equals(v, true);
     }
     Variant jsonEncode(zend_long options = 0, zend_long depth = PHP_JSON_PARSER_DEFAULT_DEPTH);
@@ -655,6 +650,22 @@ class ArrayIterator {
     }
 };
 
+class ArrayItem : public Variant {
+  private:
+    Array &array_;
+    zend_ulong index_;
+    zend_string *key_;
+
+  public:
+    ArrayItem(Array &_array, zend_ulong _index, zend_string *_key);
+    ~ArrayItem() {
+        if (key_) {
+            zend_string_release(key_);
+        }
+    }
+    ArrayItem &operator=(const Variant &v);
+};
+
 extern int array_data_compare(Bucket *f, Bucket *s);
 
 class Array : public Variant {
@@ -700,6 +711,15 @@ class Array : public Variant {
     Variant get(zend_ulong i) const {
         return zend_hash_index_find(Z_ARRVAL_P(const_ptr()), i);
     }
+    ArrayItem operator[](zend_ulong i) {
+        return ArrayItem(*this, i, nullptr);
+    }
+    ArrayItem operator[](int i) {
+        return ArrayItem(*this, i, nullptr);
+    }
+    ArrayItem operator[](const String &key) {
+        return ArrayItem(*this, 0, key.ptr());
+    }
     Variant operator[](zend_ulong i) const {
         return get(i);
     }
@@ -709,58 +729,6 @@ class Array : public Variant {
     Variant operator[](const String &key) const {
         return get(key);
     }
-#if 0
-	class UpdateProxy {
-	private:
-		Array &array;
-		zend_ulong index;
-		zend_string *key;
-
-	public:
-		UpdateProxy(Array &_array, zend_ulong _index, zend_string *_key) :
-				array(_array), index(_index), key(
-						_key ? zend_string_copy(_key) : nullptr) {
-		}
-		~UpdateProxy() {
-			if (key) {
-				zend_string_release(key);
-			}
-		}
-		UpdateProxy& operator=(Variant &v) {
-			v.addRef();
-			if (key) {
-				zend_symtable_update(Z_ARRVAL_P(array.ptr()), key, v.ptr());
-			} else {
-				zend_hash_index_update(Z_ARRVAL_P(array.ptr()), index, v.ptr());
-			}
-			return *this;
-		}
-		operator Variant() const {
-			if (key) {
-				return array.get(key);
-			} else {
-				return array.get(index);
-			}
-		}
-	};
-	UpdateProxy operator[](zend_ulong i) {
-		return UpdateProxy(*this, i, nullptr);
-	}
-	UpdateProxy operator[](int i) {
-		return UpdateProxy(*this, i, nullptr);
-	}
-	UpdateProxy operator[](const char *key) {
-		String _key(key);
-		return UpdateProxy(*this, 0, _key.ptr());
-	}
-	UpdateProxy operator[](const std::string &key) {
-		String _key(key);
-		return UpdateProxy(*this, 0, _key.ptr());
-	}
-	UpdateProxy operator[](const String &key) {
-		return UpdateProxy(*this, 0, key.ptr());
-	}
-#endif
     bool del(zend_ulong index) {
         return zend_hash_index_del(Z_ARRVAL_P(ptr()), index) == SUCCESS;
     }
@@ -789,8 +757,8 @@ class Array : public Variant {
     bool empty() const {
         return count() == 0;
     }
-    Variant search(Variant &_other_var, bool strict = false);
-    bool contains(Variant &_other_var, bool strict = false);
+    Variant search(const Variant &_other_var, bool strict = false) const;
+    bool contains(const Variant &_other_var, bool strict = false) const;
     String join(const String &delim);
     void merge(Array &source, bool overwrite = false) {
         zend_hash_merge(Z_ARRVAL_P(ptr()), Z_ARRVAL_P(source.ptr()), zval_add_ref, overwrite);
@@ -864,14 +832,8 @@ class Object : public Variant {
     Variant call(const Variant &func, Args &args) {
         return _call(ptr(), func.const_ptr(), args);
     }
-    zend_object *object() {
-        return Z_OBJ_P(ptr());
-    }
     zend_class_entry *parent_ce() {
         return Z_OBJCE_P(ptr())->parent;
-    }
-    zend_class_entry *ce() {
-        return Z_OBJCE_P(ptr());
     }
     Variant callParentMethod(const String &func, const std::initializer_list<Variant> &args);
     Variant exec(const Variant &fn) {

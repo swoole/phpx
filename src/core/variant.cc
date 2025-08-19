@@ -127,22 +127,24 @@ Variant Variant::getRefValue() const {
     return {&zv};
 }
 
-bool Variant::equals(Variant &v, bool strict) {
+bool Variant::equals(const Variant &v, bool strict) const {
+    zval *op1 = const_cast<zval *>(v.const_ptr());
+    zval *op2 = const_cast<zval *>(const_ptr());
     if (strict) {
-        if (fast_is_identical_function(v.ptr(), ptr())) {
+        if (fast_is_identical_function(op1, op2)) {
             return true;
         }
     } else {
         if (v.isInt()) {
-            if (fast_equal_check_long(v.ptr(), ptr())) {
+            if (fast_equal_check_long(op1, op2)) {
                 return true;
             }
         } else if (v.isString()) {
-            if (fast_equal_check_string(v.ptr(), ptr())) {
+            if (fast_equal_check_string(op1, op2)) {
                 return true;
             }
         } else {
-            if (fast_equal_check_function(v.ptr(), ptr())) {
+            if (fast_equal_check_function(op1, op2)) {
                 return true;
             }
         }

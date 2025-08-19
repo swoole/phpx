@@ -9,6 +9,8 @@ TEST(variant, base) {
     Variant v{nullptr};
     ASSERT_TRUE(v.isNull());
     ASSERT_STREQ(v.typeStr(), "null");
+    // no gc
+    ASSERT_EQ(v.getRefCount(), 0);
 
     zval zv;
     array_init(&zv);
@@ -20,6 +22,12 @@ TEST(variant, base) {
     arr.append(1922);
     ASSERT_EQ(arr.count(), 2);
     ASSERT_STREQ(arr.typeStr(), "array");
+
+    ASSERT_EQ(arr.getRefCount(), 1);
+    arr.addRef();
+    ASSERT_EQ(arr.getRefCount(), 2);
+    arr.delRef();
+    ASSERT_EQ(arr.getRefCount(), 1);
 
     v2 = nullptr;
     ASSERT_TRUE(v2.isNull());
