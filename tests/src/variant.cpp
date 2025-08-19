@@ -131,7 +131,7 @@ TEST(variant, pre_decr) {
 }
 
 TEST(variant, calc) {
-    Variant v(10);
+    var v(10);
     v += 5;
     ASSERT_EQ(v.toInt(), 15);
 
@@ -140,6 +140,34 @@ TEST(variant, calc) {
 
     ASSERT_EQ(v.length(), 0);
     ASSERT_EQ(v.getRefCount(), 0);
+
+	var a = 11;
+	var b = 19;
+	var c = a + b;
+	ASSERT_TRUE(c.equals(30));
+
+	var d = b - a;
+	ASSERT_TRUE(d.equals(8));
+
+	var e = b * a;
+	ASSERT_TRUE(e.equals(209));
+
+	var f1 = 2;
+	var f2 = b / f1;
+	ASSERT_TRUE(f2.equals(9));
+
+	var f3 = b / 0.3;
+	ASSERT_TRUE(f3.equals(19 / 0.3));
+
+	var h1 = 31;
+	var h2 = 3;
+	ASSERT_EQ(h1 % h2, 31 % 3);
+	ASSERT_EQ(h1 << h2, 31 << 3);
+	ASSERT_EQ(h1 >> h2, 31 >> 3);
+	ASSERT_EQ(h1 & h2, 31 & 3);
+	ASSERT_EQ(h1 | h2, 31 | 3);
+	ASSERT_EQ(h1 ^ h2, 31 ^ 3);
+	ASSERT_EQ(~h1, ~31);
 }
 
 TEST(variant, json) {

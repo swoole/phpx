@@ -440,14 +440,14 @@ class Variant {
         convert_to_string(&val);
         return Z_STRVAL(val);
     }
-    Int toInt() {
-        return zval_get_long(&val);
+    Int toInt() const {
+        return zval_get_long(const_cast<zval *>(&val));
     }
-    double toFloat() {
-        return zval_get_double(&val);
+    double toFloat() const {
+        return zval_get_double(const_cast<zval *>(&val));
     }
     bool toBool() {
-        return zval_is_true(&val);
+        return zval_is_true(const_cast<zval *>(&val));
     }
     Array toArray() const;
     Object toObject() const;
@@ -526,6 +526,18 @@ class Variant {
     Int operator--(int);
     Variant &operator+=(Int v);
     Variant &operator-=(Int v);
+    Variant operator+(const Variant &) const;
+    Variant operator-(const Variant &) const;
+    Variant operator*(const Variant &) const;
+    Variant operator/(const Variant &) const;
+    Variant operator%(const Variant &) const;
+    Variant operator<<(const Variant &) const;
+    Variant operator>>(const Variant &) const;
+    Variant operator&(const Variant &) const;
+    Variant operator|(const Variant &) const;
+    Variant operator^(const Variant &) const;
+    Variant operator~() const;
+
     Variant operator()() const;
     explicit operator bool() noexcept {
         return toBool();

@@ -199,6 +199,59 @@ Variant &Variant::operator+=(Int v) {
     return *this;
 }
 
+#define CALC_OP(val, op)                                                                                               \
+    do {                                                                                                               \
+        if (val.isFloat() || isFloat()) {                                                                              \
+            return toFloat() op v.toFloat();                                                                           \
+        } else {                                                                                                       \
+            return toInt() op val.toInt();                                                                             \
+        }                                                                                                              \
+    } while (0)
+
+Variant Variant::operator+(const Variant &v) const {
+    CALC_OP(v, +);
+}
+
+Variant Variant::operator-(const Variant &v) const {
+    CALC_OP(v, -);
+}
+
+Variant Variant::operator*(const Variant &v) const {
+    CALC_OP(v, *);
+}
+
+Variant Variant::operator/(const Variant &v) const {
+    CALC_OP(v, /);
+}
+
+Variant Variant::operator%(const Variant &v) const {
+    return toInt() % v.toInt();
+}
+
+Variant Variant::operator<<(const Variant &v) const {
+    return toInt() << v.toInt();
+}
+
+Variant Variant::operator>>(const Variant &v) const {
+    return toInt() >> v.toInt();
+}
+
+Variant Variant::operator&(const Variant &v) const {
+    return toInt() & v.toInt();
+}
+
+Variant Variant::operator|(const Variant &v) const {
+    return toInt() | v.toInt();
+}
+
+Variant Variant::operator^(const Variant &v) const {
+    return toInt() ^ v.toInt();
+}
+
+Variant Variant::operator~() const {
+    return ~toInt();
+}
+
 Variant &Variant::operator-=(Int v) {
     convert_to_long(ptr());
     Z_LVAL_P(ptr()) -= v;
