@@ -220,11 +220,14 @@ Variant Variant::operator()(const std::initializer_list<Variant> &args) const {
 Variant Variant::unserialize() {
     php_unserialize_data_t var_hash;
     Variant retval;
-    PHP_VAR_UNSERIALIZE_INIT(var_hash);
 
+    PHP_VAR_UNSERIALIZE_INIT(var_hash);
     char *data = Z_STRVAL_P(ptr());
     size_t length = Z_STRLEN_P(ptr());
-    if (php_var_unserialize(retval.ptr(), (const uchar **) &data, (const uchar *) data + length, &var_hash)) {
+    auto rs = php_var_unserialize(retval.ptr(), (const uchar **) &data, (const uchar *) data + length, &var_hash);
+    PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
+
+    if (rs) {
         return retval;
     } else {
         return {};

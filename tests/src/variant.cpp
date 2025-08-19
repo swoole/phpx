@@ -1,5 +1,6 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
+#include "const/json.h"
 
 using namespace php;
 
@@ -100,6 +101,9 @@ TEST(variant, serialize) {
     Variant v3 = v2.unserialize();
     ASSERT_TRUE(v3.isArray());
     ASSERT_TRUE(v3.equals(v1));
+
+    var v4 = "-----";
+    ASSERT_TRUE(v4.unserialize().isNull());
 }
 
 TEST(variant, incr) {
@@ -151,6 +155,12 @@ TEST(variant, json) {
     Variant v4("");
     ASSERT_TRUE(v4.jsonDecode().isNull());
     ASSERT_EQ(JSON_G(error_code), PHP_JSON_ERROR_SYNTAX);
+
+    var v5 = "\xB1\x31";
+    ASSERT_EQ(v5.jsonEncode().toBool(), false);
+
+    var error = json_last_error();
+    ASSERT_TRUE(error.equals(JSON_ERROR_UTF8));
 }
 
 TEST(variant, ref0) {

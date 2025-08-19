@@ -66,6 +66,9 @@ TEST(base, global) {
 
     auto time = array["REQUEST_TIME"];
     ASSERT_TRUE(time.isInt());
+
+    auto v2 = global("global_var_not_exists");
+    ASSERT_FALSE(v2.toBool());
 }
 
 TEST(base, equals) {
@@ -105,3 +108,8 @@ TEST(base, exception) {
     }
     zend_end_try();
 }
+
+TEST(base, throwException) {
+	throwException("NotExistsException", "hello world", 19900);
+}
+

@@ -84,6 +84,8 @@ class Array;
 class Object;
 class String;
 
+typedef Variant var;
+
 enum TrimMode {
     TRIM_LEFT = 1,
     TRIM_RIGHT = 2,
