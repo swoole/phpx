@@ -692,11 +692,6 @@ class Array : public Variant {
     }
     Array(const zval *v);
     Array(const Variant &v);
-    Array(Variant &&v) : Variant(std::move(v)) {
-        if (!isArray()) {
-            error(E_ERROR, "parameter 1 must be `array`, got `%s`", typeStr());
-        }
-    }
     Array(const std::initializer_list<const Variant> &list);
     Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     Array(const std::initializer_list<std::pair<Int, const Variant>> &list);
@@ -769,8 +764,8 @@ class Array : public Variant {
     bool contains(const Variant &_other_var, bool strict = false) const;
     String join(const String &delim);
     void merge(Array &source, bool overwrite = false) {
-    	SEPARATE_ARRAY(ptr());
-    	php_array_merge(array(), source.array());
+        SEPARATE_ARRAY(ptr());
+        php_array_merge(array(), source.array());
     }
     void sort(bool renumber = true) {
         zend_hash_sort(Z_ARRVAL_P(ptr()), array_data_compare, renumber);

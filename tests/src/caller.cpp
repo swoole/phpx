@@ -7,6 +7,25 @@ using namespace php;
 
 static const char *g_date = "2009-02-15";
 
+TEST(caller, args) {
+	auto arr1 = create_list();
+	Args args;
+	for (auto kv : arr1) {
+		args.append(kv.value);
+	}
+
+	ASSERT_TRUE(args.exists(2));
+	ASSERT_FALSE(args.exists(args.count()));
+
+	ASSERT_FALSE(args.empty());
+
+	Args args2;
+	ASSERT_TRUE(args2.empty());
+
+	auto arr2 = args.toArray();
+	ASSERT_TRUE(arr2.equals(arr1));
+}
+
 TEST(caller, func) {
     auto retval = is_dir({"/tmp"});
     ASSERT_TRUE(retval.toBool());

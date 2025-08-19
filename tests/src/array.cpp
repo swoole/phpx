@@ -222,5 +222,15 @@ TEST(array, merge) {
    arr1.merge(arr2, false);
    ASSERT_EQ(arr2.count(), 3);
    ASSERT_EQ(arr1.count(), 8);
+}
 
+TEST(array, bad_type) {
+	auto arr1 = create_list();
+	ChildResult r = run_in_child_capture_stdout([&arr1]() -> int {
+		auto v = arr1.get(2);
+		Array o(v);
+		return 0;
+	});
+	var s(r.output);
+	ASSERT_TRUE(str_contains(s, "parameter 1 must be `array`, got `string`").toBool());
 }

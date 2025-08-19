@@ -86,3 +86,14 @@ TEST(object, call_parent_method) {
 
 	ASSERT_STREQ(obj.getClassName().c_str(), "TestClass2");
 }
+
+TEST(object, bad_type) {
+	auto arr1 = create_list();
+	ChildResult r = run_in_child_capture_stdout([&arr1]() -> int {
+		auto v = arr1.get(2);
+		Object o(v);
+		return 0;
+	});
+	var s(r.output);
+	ASSERT_TRUE(str_contains(s, "parameter 1 must be `object`, got `string`").toBool());
+}

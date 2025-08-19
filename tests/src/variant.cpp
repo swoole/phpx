@@ -389,3 +389,4 @@ TEST(variant, move_ctor) {
     s.print();
     t.print();
 }
+

@@ -26,7 +26,8 @@ using namespace php;
 using namespace std;
 
 PHPX_FUNCTION(cpp_ext_test) {
-    for (int i = 0; i < args.count(); i++) {
+	auto argc = args.count();
+    for (int i = 0; i < argc; i++) {
         cout << args[i].type() << endl;
     }
     return 1234;
