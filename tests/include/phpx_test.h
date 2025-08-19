@@ -1,7 +1,7 @@
 #pragma once
 
 #include "phpx.h"
-#include "phpx_embed.h"
+#include "sapi/embed/php_embed.h"
 
 #include <gtest/gtest.h>
 

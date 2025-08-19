@@ -79,17 +79,29 @@ TEST(base, equals) {
     ASSERT_FALSE(v3.equals(v1, true));
 }
 
-#if 0
+TEST(base, eval) {
+	ob_start();
+	eval("print_r($_ENV);");
+	auto rs = ob_get_clean();
+
+	ASSERT_TRUE(rs.isString());
+	ASSERT_TRUE(str_contains(rs, "phpx-tests").toBool());
+}
+
 TEST(base, exception) {
     zend_try {
-        throwException("RuntimeException", "phpx exception test");
+        eval("throw new RuntimeException('phpx exception test');");
+        zend_bailout();
     }
     zend_catch {
         auto e = Object(getException());
+        ASSERT_TRUE(e.getClassName().equals("RuntimeException"));
+#if 0
         auto msg = e.exec("getMessage");
         ASSERT_TRUE(msg.isString());
         ASSERT_TRUE(str_contains(msg, "phpx exception test").isTrue());
+        std::cout << "DONE\n";
+#endif
     }
     zend_end_try();
 }
-#endif

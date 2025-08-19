@@ -237,6 +237,10 @@ Variant include(const String &file) {
     return retval;
 }
 
+PHPX_API void eval(const String &script) {
+    zend_eval_stringl((char *) script.c_str(), script.length(), nullptr, "eval()'d code");
+}
+
 zend_function_entry *copy_function_entries(const zend_function_entry *_functions) {
     const zend_function_entry *ptr = _functions;
     size_t count = 0;

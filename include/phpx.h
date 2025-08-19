@@ -96,6 +96,7 @@ PHPX_API Variant global(const String &name);
 PHPX_API Variant include(const String &file);
 PHPX_API Variant call(const Variant &func, const Array &args);
 PHPX_API Variant call(const Variant &func, const std::initializer_list<Variant> &args);
+PHPX_API void eval(const String &script);
 PHPX_API void throwException(const char *name, const char *message, int code = 0);
 Resource *getResource(const std::string &name);
 

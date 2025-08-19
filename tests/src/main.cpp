@@ -35,13 +35,21 @@ string get_include_dir() {
 }
 
 int main(int argc, char **argv) {
-    php::VM vm(argc, argv);
+	php_embed_init(argc, argv);
     init_root_path(argv[0]);
+	::testing::InitGoogleTest(&argc, argv);
+
+	int rc;
     zend_first_try {
-        ::testing::InitGoogleTest(&argc, argv);
-    } zend_end_try();
-    int retval = RUN_ALL_TESTS();
-    return retval;
+		rc = RUN_ALL_TESTS();
+    } zend_catch {
+    	rc = EG(exit_status);
+    }
+    zend_end_try();
+
+    php_embed_shutdown();
+
+    return rc;
 }
 
 php::Array create_map() {

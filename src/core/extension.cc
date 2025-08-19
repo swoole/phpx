@@ -197,7 +197,6 @@ bool Interface::activate() {
     return true;
 }
 
-
 zend_result extension_startup(int type, int module_number) {
     void *ptr;
     ZEND_HASH_FOREACH_PTR(&module_registry, ptr) {
