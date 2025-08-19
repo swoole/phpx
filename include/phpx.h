@@ -828,7 +828,6 @@ class Object : public Variant {
     Object(const zval *v) : Variant(v) {
         if (!isUndef() && !isObject()) {
             error(E_ERROR, "parameter 1 must be `object`, got `%s`", typeStr());
-            return;
         }
     }
     Object(const Variant &v) : Object(v.const_ptr()) {}

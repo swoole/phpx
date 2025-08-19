@@ -110,3 +110,21 @@ TEST(object, call_parent_method_error) {
     var s(r.output);
     ASSERT_TRUE(str_contains(s, "Couldn't find implementation for method").toBool());
 }
+
+TEST(object, static_property_error1) {
+    ChildResult r = run_in_child_capture_stdout([]() -> int {
+        Class::getStaticProperty("TestClassNotFound", "propInt");
+        return 0;
+    });
+    var s(r.output);
+    ASSERT_TRUE(str_contains(s, "class 'TestClassNotFound' is undefined.").toBool());
+}
+
+TEST(object, static_property_error2) {
+    ChildResult r = run_in_child_capture_stdout([]() -> int {
+        Class::setStaticProperty("TestClassNotFound", "propInt", 1990);
+        return 0;
+    });
+    var s(r.output);
+    ASSERT_TRUE(str_contains(s, "class 'TestClassNotFound' is undefined.").toBool());
+}
