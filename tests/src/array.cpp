@@ -146,6 +146,14 @@ TEST(array, foreach) {
     ASSERT_EQ(list.size(), 4);
 }
 
+TEST(array, foreach2) {
+	Array arr = create_list();
+	for (auto i : arr) {
+		ASSERT_TRUE(i.key.isInt());
+		ASSERT_TRUE(i.value.isString());
+	}
+}
+
 TEST(array, contains) {
     Array arr = create_list();
     Variant v1{"php"};

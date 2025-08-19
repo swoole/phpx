@@ -168,6 +168,30 @@ String Array::join(const String &delim) {
     return result;
 }
 
+Variant ArrayIterator::key() const {
+    if (HT_IS_PACKED(array_)) {
+        return (zend_long) idx_;
+    } else {
+        auto *bucket = HT_HASH_TO_BUCKET(array_, idx_);
+        if (bucket->key) {
+            return {bucket->key, false};
+        } else {
+            return (zend_long) bucket->h;
+        }
+    }
+}
+
+void ArrayIterator::skipUndefBucket() {
+    while (idx_ < array_->nNumUsed) {
+        zval *cur = current();
+        if (!cur || Z_TYPE_P(cur) == IS_UNDEF) {
+            ++idx_;
+            continue;
+        }
+        break;
+    }
+}
+
 ArrayItem::ArrayItem(Array &_array, zend_ulong _index, zend_string *_key) : array_(_array), index_(_index) {
     zval *value_;
     if (_key) {

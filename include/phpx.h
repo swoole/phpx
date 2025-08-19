@@ -603,58 +603,68 @@ Variant newResource(const char *name, T *v) {
 #define ZEND_HASH_ELEMENT(ht, idx) &HT_HASH_TO_BUCKET(ht, idx)->val
 #endif
 
+class ArrayKeyValue {
+  public:
+    Variant key;
+    Variant value;
+    ArrayKeyValue(Variant _key, Variant _value) : key(std::move(_key)), value(std::move(_value)) {}
+};
+
 class ArrayIterator {
     zend_array *array_;
     zend_ulong idx_;
 
   public:
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = ArrayKeyValue;
+    using difference_type = std::ptrdiff_t;
+    using reference = value_type;
+    using pointer = void;
+
     ArrayIterator(zend_array *array, zend_ulong idx) {
         array_ = array;
         idx_ = idx;
         skipUndefBucket();
     }
-    void operator++(int i) {
-        ++idx_;
-        skipUndefBucket();
+    ArrayIterator operator++(int) {
+        ArrayIterator tmp = *this;
+        next();
+        return tmp;
     }
-    bool operator!=(const ArrayIterator b) const {
+    ArrayIterator &operator++() {
+        next();
+        return *this;
+    }
+    value_type operator*() const {
+        return {key(), value()};
+    }
+    bool operator!=(const ArrayIterator &b) const {
         return b.index() != index();
     }
-    bool operator==(const ArrayIterator b) const {
+    bool operator==(const ArrayIterator &b) const {
         return b.index() == index();
     }
-    Variant key() const {
-        if (HT_IS_PACKED(array_)) {
-            return (zend_long) idx_;
-        } else {
-            auto *bucket = HT_HASH_TO_BUCKET(array_, idx_);
-            if (bucket->key) {
-                return {bucket->key, false};
-            } else {
-                return (zend_long) bucket->h;
-            }
-        }
-    }
+    Variant key() const;
     Variant value() const {
         return current();
     }
     zend_ulong index() const {
         return idx_;
     }
+    void next() {
+        ++idx_;
+        skipUndefBucket();
+    }
     zval *current() const {
-        return ZEND_HASH_ELEMENT(array_, idx_);
+        if (UNEXPECTED(!array_ || idx_ >= array_->nNumUsed)) {
+            return nullptr;
+        } else {
+            return ZEND_HASH_ELEMENT(array_, idx_);
+        }
     }
 
   private:
-    void skipUndefBucket() {
-        while (idx_ < array_->nNumUsed - 1) {
-            if (Z_TYPE_P(current()) == IS_UNDEF) {
-                idx_++;
-            } else {
-                break;
-            }
-        }
-    }
+    void skipUndefBucket();
 };
 
 class ArrayItem : public Variant {

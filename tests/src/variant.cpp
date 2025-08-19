@@ -281,6 +281,12 @@ TEST(variant, ref1) {
     parse_str("first=value1&second=value2", ref);
     Array v3 = ref.getRefValue();
     ASSERT_EQ(v3.count(), 2);
+
+    ASSERT_EQ(ref.getRefCount(), 1);
+
+    auto ref2 = ref.toReference();
+    ASSERT_TRUE(ref2.isReference());
+    ASSERT_EQ(ref2.getRefCount(), 2);
 }
 
 TEST(variant, ref2) {
