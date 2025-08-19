@@ -375,6 +375,9 @@ class Variant {
     int type() const {
         return Z_TYPE_P(const_ptr());
     }
+    const char *type_str() const{
+    	return zend_get_type_by_const(type());
+    }
     uint32_t refcount() {
         return Z_REFCOUNT(val);
     }
@@ -649,7 +652,7 @@ class Array : public Variant {
     Array(const Variant &v);
     Array(Variant &&v) : Variant(std::move(v)) {
         if (!isArray()) {
-            error(E_ERROR, "parameter 1 must be zend_array.");
+            error(E_ERROR, "parameter 1 must be `array`, got `%s`", type_str());
         }
     }
     Array(const std::initializer_list<const Variant> &list);
@@ -838,7 +841,7 @@ class Object : public Variant {
   public:
     Object(const zval *v) : Variant(v) {
         if (!isUndef() && !isObject()) {
-            error(E_ERROR, "parameter 1 must be `object`, got `%s`", zend_get_type_by_const(Z_TYPE_P(v)));
+            error(E_ERROR, "parameter 1 must be `object`, got `%s`", type_str());
             return;
         }
     }

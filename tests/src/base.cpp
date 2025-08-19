@@ -83,9 +83,8 @@ TEST(base, eval) {
 	ob_start();
 	eval("print_r($_ENV);");
 	auto rs = ob_get_clean();
-
 	ASSERT_TRUE(rs.isString());
-	ASSERT_TRUE(str_contains(rs, "phpx-tests").toBool());
+	ASSERT_TRUE(str_contains(rs, "[HOME]").toBool());
 }
 
 TEST(base, exception) {
