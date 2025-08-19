@@ -97,6 +97,9 @@ ChildResult run_in_child_capture_stdout(const std::function<int(void)> &func) {
         if (dup2(pipefd[1], STDOUT_FILENO) == -1) {
             _exit(127);
         }
+        if (dup2(pipefd[1], STDERR_FILENO) == -1) {
+            _exit(127);
+        }
         ::close(pipefd[0]);
         ::close(pipefd[1]);
 
