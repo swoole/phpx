@@ -100,7 +100,7 @@ TEST(caller, http_build_query) {
     ASSERT_GT(query.length(), 10);
 
     String expected = "hello=world&count=182";
-    ASSERT_STREQ(query.toCString(), expected.c_str());
+    ASSERT_STREQ(query.toCString(), expected.data());
 }
 
 TEST(caller, md5) {

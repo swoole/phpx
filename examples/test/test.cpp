@@ -171,7 +171,7 @@ void testRedis()
 
 void CppClass_construct(Object &_this, Args &args, Variant &retval)
 {
-    printf("%s _construct\n", _this.getClassName().c_str());
+    printf("%s _construct\n", _this.getClassName().data());
     Array arr;
     arr.append(1234);
     _this.set("name", arr);

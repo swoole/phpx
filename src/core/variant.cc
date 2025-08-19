@@ -102,12 +102,12 @@ void Variant::debug() {
     } else if (Z_TYPE_P(_val) == IS_ARRAY) {
         printf("array[rc=%d]=%p, count=%u\n",
                Z_REFCOUNT_P(_val),
-               _val->value.arr,
+               Z_ARRVAL_P(_val),
                zend_hash_num_elements(Z_ARRVAL_P(_val)));
     } else if (Z_TYPE_P(_val) == IS_OBJECT) {
-        printf("object[rc=%d]=%p, class=%s\n", Z_REFCOUNT_P(_val), _val->value.obj, ZSTR_VAL(Z_OBJCE_P(_val)->name));
+        printf("object[rc=%d]=%p, class=%s\n", Z_REFCOUNT_P(_val), Z_OBJ_P(_val), ZSTR_VAL(Z_OBJCE_P(_val)->name));
     } else if (Z_TYPE_P(_val) == IS_RESOURCE) {
-        printf("resource=%p, type=%d\n", _val->value.res, _val->value.res->type);
+        printf("resource=%p, type=%d\n", Z_RES_P(_val), Z_RES_P(_val)->type);
     }
 }
 #else
@@ -445,7 +445,7 @@ Variant Object::callParentMethod(const String &func, const std::initializer_list
     if (UNEXPECTED(fn == NULL)) {
         /* error at c-level */
         zend_error_noreturn(
-            E_CORE_ERROR, "Couldn't find implementation for method %s::%s", ZSTR_VAL(parent_ce()->name), func.c_str());
+            E_CORE_ERROR, "Couldn't find implementation for method %s::%s", ZSTR_VAL(parent_ce()->name), func.data());
     } else {
         zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), NULL);
     }

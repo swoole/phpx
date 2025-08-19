@@ -167,7 +167,7 @@ class String {
     size_t length() const {
         return str->len;
     }
-    char *c_str() const {
+    char *data() const {
         return str->val;
     }
     uint64_t hashCode() const {

@@ -84,7 +84,7 @@ TEST(object, call_parent_method) {
     auto rs2 = obj.callParentMethod("test", {"hello", "world"});
     ASSERT_STREQ(rs2.toCString(), "parent test");
 
-    ASSERT_STREQ(obj.getClassName().c_str(), "TestClass2");
+    ASSERT_STREQ(obj.getClassName().data(), "TestClass2");
 }
 
 TEST(object, bad_type) {

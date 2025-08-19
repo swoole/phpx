@@ -15,7 +15,7 @@ TEST(string, base) {
 
     String s2("   hello  \n");
     auto s3 = s2.trim();
-    ASSERT_STREQ(s3.c_str(), "hello");
+    ASSERT_STREQ(s3.data(), "hello");
 
     String s4 = "This is an encoded string";
     auto s5 = s4.base64Encode();
@@ -49,7 +49,7 @@ TEST(string, number) {
 
     String s5(s1);
     ASSERT_EQ(s5.length(), s1.length());
-    ASSERT_STREQ(s1.c_str(), s5.c_str());
+    ASSERT_STREQ(s1.data(), s5.data());
 
     ASSERT_GT(s5.hashCode(), 0);
 
@@ -58,10 +58,10 @@ TEST(string, number) {
 
     String s7("hello");
     auto s8 = s7.upper();
-    ASSERT_STREQ(s8.c_str(), "HELLO");
+    ASSERT_STREQ(s8.data(), "HELLO");
 
     auto s9 = s8.lower();
-    ASSERT_STREQ(s9.c_str(), s7.c_str());
+    ASSERT_STREQ(s9.data(), s7.data());
 }
 
 TEST(string, equals) {
@@ -71,7 +71,7 @@ TEST(string, equals) {
     ASSERT_EQ(str.length(), 1000);
     ASSERT_EQ(str.getRefCount(), 2);
 
-    String str2(str.c_str(), str.length());
+    String str2(str.data(), str.length());
     ASSERT_TRUE(str.equals(str2, true));
     ASSERT_EQ(str2.getRefCount(), 1);
 
@@ -140,6 +140,6 @@ TEST(string, dirname) {
 TEST(string, move_ctor) {
     String s("abc");
     String t(std::move(s));
-    EXPECT_STREQ(t.c_str(), "abc");
+    EXPECT_STREQ(t.data(), "abc");
     EXPECT_EQ(s.ptr(), nullptr);
 }

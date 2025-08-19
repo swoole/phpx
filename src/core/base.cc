@@ -204,7 +204,7 @@ Variant call(const Variant &func, const std::initializer_list<Variant> &args) {
 
 Variant include(const String &file) {
     zend_file_handle file_handle;
-    zend_stream_init_filename(&file_handle, file.c_str());
+    zend_stream_init_filename(&file_handle, file.data());
     int ret = php_stream_open_for_zend_ex(&file_handle, USE_PATH | STREAM_OPEN_FOR_INCLUDE);
     if (ret != SUCCESS) {
         return false;
@@ -238,7 +238,7 @@ Variant include(const String &file) {
 }
 
 PHPX_API void eval(const String &script) {
-    zend_eval_stringl((char *) script.c_str(), script.length(), nullptr, "eval()'d code");
+    zend_eval_stringl((char *) script.data(), script.length(), nullptr, "eval()'d code");
 }
 
 zend_function_entry *copy_function_entries(const zend_function_entry *_functions) {

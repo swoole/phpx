@@ -42,7 +42,7 @@ bool String::equals(const String &s, const bool ci) const {
         return false;
     }
     if (ci) {
-        return s.length() == length() && zend_binary_strcasecmp(c_str(), length(), s.c_str(), s.length()) == 0;
+        return s.length() == length() && zend_binary_strcasecmp(data(), length(), s.data(), s.length()) == 0;
     }
     return zend_string_equals(s.ptr(), str);
 }
@@ -84,7 +84,7 @@ Variant String::split(const String &delim, const long limit) const {
 }
 
 void String::stripTags(const String &allow, bool allow_tag_spaces) const {
-    str->len = php_strip_tags_ex(c_str(), length(), allow.c_str(), allow.length(), allow_tag_spaces);
+    str->len = php_strip_tags_ex(data(), length(), allow.data(), allow.length(), allow_tag_spaces);
 }
 
 String String::addSlashes() const {
@@ -92,12 +92,12 @@ String String::addSlashes() const {
 }
 
 String String::basename(const String &suffix) const {
-    return php_basename(c_str(), length(), suffix.c_str(), suffix.length());
+    return php_basename(data(), length(), suffix.data(), suffix.length());
 }
 
 String String::dirname() const {
-    size_t n = php_dirname(c_str(), length());
-    return {c_str(), n};
+    size_t n = php_dirname(data(), length());
+    return {data(), n};
 }
 
 void String::stripSlashes() const {
