@@ -81,10 +81,10 @@ TEST(base, equals) {
 
 TEST(base, eval) {
 	ob_start();
-	eval("print_r($_ENV);");
+	eval("print_r(PHP_VERSION);");
 	auto rs = ob_get_clean();
 	ASSERT_TRUE(rs.isString());
-	ASSERT_TRUE(str_contains(rs, "[HOME]").toBool());
+	ASSERT_TRUE(str_contains(rs, PHP_VERSION).toBool());
 }
 
 TEST(base, exception) {

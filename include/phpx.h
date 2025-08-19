@@ -90,6 +90,20 @@ enum TrimMode {
     TRIM_BOTH = 3,
 };
 
+enum ZvalType {
+    TYPE_UNDEF = IS_UNDEF,
+    TYPE_NULL = IS_NULL,
+    TYPE_FALSE = IS_FALSE,
+    TYPE_TRUE = IS_TRUE,
+    TYPE_LONG = IS_LONG,
+    TYPE_DOUBLE = IS_DOUBLE,
+    TYPE_STRING = IS_STRING,
+    TYPE_ARRAY = IS_ARRAY,
+    TYPE_OBJECT = IS_OBJECT,
+    TYPE_RESOURCE = IS_RESOURCE,
+    TYPE_REFERENCE = IS_REFERENCE,
+};
+
 PHPX_API void error(int level, const char *format, ...);
 PHPX_API void echo(const char *format, ...);
 PHPX_API Variant global(const String &name);
@@ -375,8 +389,8 @@ class Variant {
     int type() const {
         return Z_TYPE_P(const_ptr());
     }
-    const char *type_str() const{
-    	return zend_get_type_by_const(type());
+    const char *typeStr() const {
+        return zend_get_type_by_const(type());
     }
     uint32_t refcount() {
         return Z_REFCOUNT(val);
@@ -652,7 +666,7 @@ class Array : public Variant {
     Array(const Variant &v);
     Array(Variant &&v) : Variant(std::move(v)) {
         if (!isArray()) {
-            error(E_ERROR, "parameter 1 must be `array`, got `%s`", type_str());
+            error(E_ERROR, "parameter 1 must be `array`, got `%s`", typeStr());
         }
     }
     Array(const std::initializer_list<const Variant> &list);
@@ -841,7 +855,7 @@ class Object : public Variant {
   public:
     Object(const zval *v) : Variant(v) {
         if (!isUndef() && !isObject()) {
-            error(E_ERROR, "parameter 1 must be `object`, got `%s`", type_str());
+            error(E_ERROR, "parameter 1 must be `object`, got `%s`", typeStr());
             return;
         }
     }

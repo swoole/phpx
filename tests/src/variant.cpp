@@ -8,7 +8,7 @@ constexpr double PI = 3.1415926;
 TEST(variant, base) {
     Variant v{nullptr};
     ASSERT_TRUE(v.isNull());
-    ASSERT_STREQ(v.type_str(), "null");
+    ASSERT_STREQ(v.typeStr(), "null");
 
     zval zv;
     array_init(&zv);
@@ -19,7 +19,7 @@ TEST(variant, base) {
     arr.append("hello world");
     arr.append(1922);
     ASSERT_EQ(arr.count(), 2);
-    ASSERT_STREQ(arr.type_str(), "array");
+    ASSERT_STREQ(arr.typeStr(), "array");
 
     v2 = nullptr;
     ASSERT_TRUE(v2.isNull());
