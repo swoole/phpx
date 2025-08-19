@@ -136,3 +136,10 @@ TEST(string, dirname) {
     ASSERT_EQ(path.dirname(), "/path/to");
     path.print();
 }
+
+TEST(string, move_ctor) {
+    String s("abc");
+    String t(std::move(s));
+    EXPECT_STREQ(t.c_str(), "abc");
+    EXPECT_EQ(s.ptr(), nullptr);
+}

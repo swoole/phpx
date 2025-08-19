@@ -279,7 +279,7 @@ zend_result extension_after_request(int type, int module_number) {
 Resource *getResource(const std::string &name) {
     auto iter = resource_map.find(name);
     if (iter == resource_map.end()) {
-        error(E_WARNING, "The `%s` type of resource is undefined.", name);
+        error(E_WARNING, "The `%s` type of resource is undefined.", name.c_str());
         return nullptr;
     }
     return iter->second;

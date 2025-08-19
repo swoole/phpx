@@ -363,10 +363,23 @@ TEST(variant, resource) {
     auto *s = new String("hello world");
     auto rs3 = newResource<String>("string", s);
     ASSERT_TRUE(rs3.isNull());
+    delete s;
+
+    auto rs4 = fp.toResource<String>("string_not_exists");
+    ASSERT_EQ(rs4, nullptr);
 }
 
 TEST(variant, self) {
     Variant v1("hello world");
     Variant v2 = v1;
     ASSERT_TRUE(v1.equals(v2, true));
+}
+
+TEST(variant, move_ctor) {
+	Variant s("abc");
+	Variant t(std::move(s));
+    EXPECT_STREQ(t.toCString(), "abc");
+    EXPECT_TRUE(s.isUndef());
+    s.print();
+    t.print();
 }
