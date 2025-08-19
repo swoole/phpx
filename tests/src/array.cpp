@@ -11,6 +11,9 @@ TEST(array, list) {
     array.append(10);
     array.append(90);
 
+    ASSERT_EQ(array.get(2).toInt(), 100);
+    ASSERT_EQ(array[3].toInt(), 10);
+
     zend_ulong j = 0;
     for (auto i = array.begin(); i != array.end(); i++) {
         ASSERT_EQ(i.key().toInt(), j);
@@ -27,6 +30,12 @@ TEST(array, list) {
 
     array.append(3.14);
     ASSERT_EQ(array.count(), 6);
+
+    ASSERT_TRUE(array.exists(4));
+    ASSERT_FALSE(array.exists(999));
+
+    array.clean();
+    ASSERT_EQ(array.count(), 0);
 }
 
 TEST(array, map) {
@@ -35,6 +44,24 @@ TEST(array, map) {
     auto arr2 = array.slice(2, 2);
     ASSERT_EQ(arr2.count(), 2);
     ASSERT_EQ(arr2["php"].toInt(), 3);
+
+    auto obj1 = newObject("stdClass");
+    array.set("object", obj1);
+
+    auto obj2 = array.get("object").toObject();
+    ASSERT_EQ(obj1.getId(), obj2.getId());
+
+    ASSERT_TRUE(array.exists("object"));
+    ASSERT_FALSE(array.exists(1990));
+
+    array.set(1990, "world");
+    ASSERT_TRUE(array.exists(1990));
+
+    array.del(1990);
+    ASSERT_FALSE(array.exists(1990));
+
+    array.del("object");
+    ASSERT_FALSE(array.exists("object"));
 }
 
 TEST(array, init) {
@@ -58,6 +85,9 @@ TEST(array, init) {
     ASSERT_STREQ(a3[1111].toCString(), "hello");
     ASSERT_EQ(a3[2222].toFloat(), 3.14);
     ASSERT_EQ(a3[3333].toFloat(), 100);
+
+    Array a4(null.ptr());
+    ASSERT_EQ(a4.count(), 0);
 }
 
 TEST(array, search) {
@@ -73,22 +103,55 @@ TEST(array, search) {
     Array arr2 = create_map();
     Variant v4{3};
     ASSERT_STREQ(arr2.search(v4).toCString(), "php");
+
+    Array arr3;
+    Variant v5("hello");
+    arr3.set(1990, v5);
+    ASSERT_EQ(arr3.search(v5).toInt(), 1990);
+}
+
+TEST(array, update) {
+    Array arr = create_map();
+    arr["php"] = 999;
+    ASSERT_EQ(arr.get("php").toInt(), 999);
+
+    arr.set("java", 666);
+    ASSERT_EQ(arr.get("java").toInt(), 666);
+
+    Array arr2 = create_list();
+    arr2[2] = "golang";
+    ASSERT_STREQ(arr2.get(2).toCString(), "golang");
+}
+
+TEST(array, nesting) {
+    Array list = create_list();
+    Array map = create_map();
+    list.append(map);
+    ASSERT_EQ(list.count(), 6);
 }
 
 TEST(array, foreach) {
     Array arr = create_list();
     std::vector<std::string> list;
     for (auto i = arr.begin(); i != arr.end(); i++) {
-        list.push_back(i.value().toString());
+        list.push_back(i.value().toStdString());
     }
     ASSERT_EQ(list.size(), 5);
 
     arr.del(3);
     list.clear();
     for (auto i = arr.begin(); i != arr.end(); i++) {
-        list.push_back(i.value().toString());
+        list.push_back(i.value().toStdString());
     }
     ASSERT_EQ(list.size(), 4);
+}
+
+TEST(array, foreach2) {
+    Array arr = create_list();
+    for (auto i : arr) {
+        ASSERT_TRUE(i.key.isInt());
+        ASSERT_TRUE(i.value.isString());
+    }
 }
 
 TEST(array, contains) {
@@ -118,4 +181,56 @@ TEST(array, swap) {
     Array arr(v);
     ASSERT_EQ(arr[0].toInt(), 199);
     ASSERT_EQ(arr[1].toInt(), 189);
+}
+
+TEST(array, slice) {
+    Array arr = create_list();
+    arr.append("erlang");
+    arr.append("ruby");
+    arr.append("lua");
+
+    auto arr2 = arr.slice(2, 4, true);
+    ASSERT_EQ(arr2.count(), 4);
+    ASSERT_TRUE(arr2.get(2).equals("go"));
+
+    auto arr3 = arr.slice(2, 4, false);
+    ASSERT_EQ(arr3.count(), 4);
+    ASSERT_TRUE(arr3[1].equals("python"));
+
+    auto arr4 = arr.slice(arr.count() + 1);
+    ASSERT_TRUE(arr4.empty());
+
+    auto arr5 = arr.slice(2, -3, false);
+    ASSERT_EQ(arr5.count(), 3);
+}
+
+TEST(array, subscript) {
+    Array arr = create_list();
+
+    auto v1 = arr[0];
+    ASSERT_EQ(v1, "php");
+
+    Array map = create_map();
+    String key = "php";
+    auto v2 = map[key];
+    ASSERT_EQ(v2, 3);
+}
+
+TEST(array, merge) {
+    Array arr1 = create_list();
+    Array arr2 = {"erlang", "ruby", "lua"};
+    arr1.merge(arr2, false);
+    ASSERT_EQ(arr2.count(), 3);
+    ASSERT_EQ(arr1.count(), 8);
+}
+
+TEST(array, bad_type) {
+    auto arr1 = create_list();
+    ChildResult r = run_in_child_capture_stdout([&arr1]() -> int {
+        auto v = arr1.get(2);
+        Array o(v);
+        return 0;
+    });
+    var s(r.output);
+    ASSERT_TRUE(str_contains(s, "parameter 1 must be `array`, got `string`").toBool());
 }

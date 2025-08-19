@@ -116,5 +116,5 @@ target_link_libraries(ext phpx)
 
 # install
 install(CODE "MESSAGE(\"Are you run command using root user?\")")
-install(TARGETS phpx LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
-install(FILES ${HEADER_FILES} DESTINATION include)
+install(TARGETS phpx LIBRARY DESTINATION ${PHP_PREFIX}/lib)
+install(FILES ${HEADER_FILES} DESTINATION ${PHP_PREFIX}/include/phpx)

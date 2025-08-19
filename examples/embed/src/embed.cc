@@ -110,12 +110,12 @@ int main(int argc, char *argv[]) {
     auto obj = newObject("Test");
     auto ret = obj.exec("getName");
 
-    cout << ret.toString() << endl;
+    cout << ret.toStdString() << endl;
 
     obj.set("name", "Tianfeng");
 
     auto ret2 = obj.exec("getName");
-    cout << ret2.toString() << endl;
+    cout << ret2.toStdString() << endl;
 
     Array arr;
     arr.append(1234);

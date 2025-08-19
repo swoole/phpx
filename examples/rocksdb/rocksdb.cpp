@@ -43,8 +43,8 @@ PHPX_METHOD(rocksDB, construct) {
 	if (_ttl.isInt() && _ttl.toInt() > 0) {
 		ttl = (int32_t) _ttl.toInt();
 	}
-	string path = _path.toString();
-	string secondary_path = _secondary_path.toString();
+	string path = _path.toStdString();
+	string secondary_path = _secondary_path.toStdString();
 	if (!_option.isArray()) {
 		throwException("\\Exception",
 				"RocksDB construct function parameter 2 open option should be array.");
@@ -163,8 +163,8 @@ PHPX_METHOD(rocksDB, put) {
 
 	auto _key = args[0];
 	auto _value = args[1];
-	string key = _key.toString();
-	string value = _value.toString();
+	string key = _key.toStdString();
+	string value = _value.toStdString();
 	Status s = db->Put(*wop, key, value);
 	if (!s.ok()) {
 		retval = false;
@@ -181,8 +181,8 @@ PHPX_METHOD(rocksDB, merge) {
 
 	auto _key = args[0];
 	auto _val = args[1];
-	string key = _key.toString();
-	string val = _val.toString();
+	string key = _key.toStdString();
+	string val = _val.toStdString();
 	Status s = db->Merge(*wop, key, val);
 	if (!s.ok()) {
 		retval = false;
@@ -197,7 +197,7 @@ PHPX_METHOD(rocksDB, get) {
 	DB* db = _this.oGet<DB>("rocksdb","dbResource");
 
 	auto _key = args[0];
-	string key = _key.toString();
+	string key = _key.toStdString();
 	string value;
 	Status s = db->Get(*rop, key, &value);
 	if (!s.ok()) {
@@ -213,7 +213,7 @@ PHPX_METHOD(rocksDB, delete) {
 	DB* db = _this.get("rocksdb").toResource<DB>("dbResource");
 
 	auto _key = args[0];
-	string key = _key.toString();
+	string key = _key.toStdString();
 	Status s = db->Delete(*wop, key);
 	if (!s.ok()) {
 		retval = false;

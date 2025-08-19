@@ -15,11 +15,13 @@
 */
 
 #include "phpx.h"
-
 #include "zend_smart_str.h"
+
+#include <cmath>
 
 namespace php {
 Variant null = {};
+static Variant __construct{ZEND_STRL("__construct"), true};
 
 Variant &Variant::operator=(const zval *v) {
     destroy();
@@ -45,11 +47,23 @@ Variant &Variant::operator=(const Variant *v) {
     return *this;
 }
 
-std::string Variant::toString() {
+std::string Variant::toStdString() {
     zend_string *str = zval_get_string(ptr());
     auto retval = std::string(ZSTR_VAL(str), ZSTR_LEN(str));
     zend_string_release(str);
     return retval;
+}
+
+String Variant::toString() {
+    return String{zval_get_string(ptr()), true};
+}
+
+Array Variant::toArray() const {
+    return *this;
+}
+
+Object Variant::toObject() const {
+    return *this;
 }
 
 size_t Variant::length() const {
@@ -88,12 +102,12 @@ void Variant::debug() {
     } else if (Z_TYPE_P(_val) == IS_ARRAY) {
         printf("array[rc=%d]=%p, count=%u\n",
                Z_REFCOUNT_P(_val),
-               _val->value.arr,
+               Z_ARRVAL_P(_val),
                zend_hash_num_elements(Z_ARRVAL_P(_val)));
     } else if (Z_TYPE_P(_val) == IS_OBJECT) {
-        printf("object[rc=%d]=%p, class=%s\n", Z_REFCOUNT_P(_val), _val->value.obj, ZSTR_VAL(Z_OBJCE_P(_val)->name));
+        printf("object[rc=%d]=%p, class=%s\n", Z_REFCOUNT_P(_val), Z_OBJ_P(_val), ZSTR_VAL(Z_OBJCE_P(_val)->name));
     } else if (Z_TYPE_P(_val) == IS_RESOURCE) {
-        printf("resource=%p, type=%d\n", _val->value.res, _val->value.res->type);
+        printf("resource=%p, type=%d\n", Z_RES_P(_val), Z_RES_P(_val)->type);
     }
 }
 #else
@@ -109,25 +123,6 @@ int Variant::getRefCount() const {
     return 0;
 }
 
-bool Variant::empty() {
-    switch (type()) {
-    case IS_UNDEF:
-    case IS_NULL:
-    case IS_FALSE:
-        return true;
-    case IS_LONG:
-        return toInt() == 0;
-    case IS_DOUBLE:
-        return toFloat() == 0.0;
-    case IS_STRING:
-        return length() == 0;
-    case IS_ARRAY:
-        return Z_ARRVAL_P(const_ptr())->nNumOfElements == 0;
-    default:
-        return false;
-    }
-}
-
 Variant Variant::getRefValue() const {
     if (!isReference()) {
         return *this;
@@ -137,22 +132,24 @@ Variant Variant::getRefValue() const {
     return {&zv};
 }
 
-bool Variant::equals(Variant &v, bool strict) {
+bool Variant::equals(const Variant &v, bool strict) const {
+    zval *op1 = const_cast<zval *>(v.const_ptr());
+    zval *op2 = const_cast<zval *>(const_ptr());
     if (strict) {
-        if (fast_is_identical_function(v.ptr(), ptr())) {
+        if (fast_is_identical_function(op1, op2)) {
             return true;
         }
     } else {
         if (v.isInt()) {
-            if (fast_equal_check_long(v.ptr(), ptr())) {
+            if (fast_equal_check_long(op1, op2)) {
                 return true;
             }
         } else if (v.isString()) {
-            if (fast_equal_check_string(v.ptr(), ptr())) {
+            if (fast_equal_check_string(op1, op2)) {
                 return true;
             }
         } else {
-            if (fast_equal_check_function(v.ptr(), ptr())) {
+            if (fast_equal_check_function(op1, op2)) {
                 return true;
             }
         }
@@ -172,41 +169,161 @@ Variant Variant::serialize() {
 }
 
 Variant &Variant::operator++() {
-    convert_to_long(ptr());
-    ++Z_LVAL_P(ptr());
+    if (isFloat()) {
+        ++Z_DVAL_P(ptr());
+    } else {
+        convert_to_long(ptr());
+        ++Z_LVAL_P(ptr());
+    }
     return *this;
 }
 
 Variant &Variant::operator--() {
-    convert_to_long(ptr());
-    --Z_LVAL_P(ptr());
+    if (isFloat()) {
+        --Z_DVAL_P(ptr());
+    } else {
+        convert_to_long(ptr());
+        --Z_LVAL_P(ptr());
+    }
     return *this;
 }
 
-Int Variant::operator++(int) {
-    convert_to_long(ptr());
-    auto val = toInt();
-    ++Z_LVAL_P(ptr());
-    return val;
+Variant Variant::operator++(int) {
+    if (isFloat()) {
+        auto dval = Z_DVAL_P(ptr());
+        ++Z_DVAL_P(ptr());
+        return dval;
+    } else {
+        convert_to_long(ptr());
+        auto lval = Z_LVAL_P(ptr());
+        ++Z_LVAL_P(ptr());
+        return lval;
+    }
 }
 
-Int Variant::operator--(int) {
-    convert_to_long(ptr());
-    auto val = toInt();
-    --Z_LVAL_P(ptr());
-    return val;
+Variant Variant::operator--(int) {
+    if (isFloat()) {
+        auto dval = Z_DVAL_P(ptr());
+        --Z_DVAL_P(ptr());
+        return dval;
+    } else {
+        convert_to_long(ptr());
+        auto lval = Z_LVAL_P(ptr());
+        --Z_LVAL_P(ptr());
+        return lval;
+    }
 }
 
-Variant &Variant::operator+=(Int v) {
-    convert_to_long(ptr());
-    Z_LVAL_P(ptr()) += v;
+Variant &Variant::operator+=(const Variant &v) {
+    if (isFloat() || v.isFloat()) {
+        convert_to_double(ptr());
+        Z_DVAL_P(ptr()) += v.toFloat();
+    } else {
+        convert_to_long(ptr());
+        Z_LVAL_P(ptr()) += v.toInt();
+    }
     return *this;
 }
 
-Variant &Variant::operator-=(Int v) {
-    convert_to_long(ptr());
-    Z_LVAL_P(ptr()) -= v;
+Variant &Variant::operator-=(const Variant &v) {
+    if (isFloat() || v.isFloat()) {
+        convert_to_double(ptr());
+        Z_DVAL_P(ptr()) -= v.toFloat();
+    } else {
+        convert_to_long(ptr());
+        Z_LVAL_P(ptr()) -= v.toInt();
+    }
     return *this;
+}
+
+#define CALC_OP(v, op)                                                                                                 \
+    do {                                                                                                               \
+        if (v.isFloat() || isFloat()) {                                                                                \
+            return toFloat() op v.toFloat();                                                                           \
+        } else {                                                                                                       \
+            return toInt() op v.toInt();                                                                               \
+        }                                                                                                              \
+    } while (0)
+
+Variant Variant::operator+(const Variant &v) const {
+    CALC_OP(v, +);
+}
+
+Variant Variant::operator-(const Variant &v) const {
+    CALC_OP(v, -);
+}
+
+Variant Variant::operator*(const Variant &v) const {
+    CALC_OP(v, *);
+}
+
+Variant Variant::operator/(const Variant &v) const {
+    CALC_OP(v, /);
+}
+
+Variant Variant::operator%(const Variant &v) const {
+    if (v.isFloat() || isFloat()) {
+        return std::fmod(toFloat(), v.toFloat());
+    } else {
+        return toInt() % v.toInt();
+    }
+}
+
+Variant Variant::operator<<(const Variant &v) const {
+    return toInt() << v.toInt();
+}
+
+Variant Variant::operator>>(const Variant &v) const {
+    return toInt() >> v.toInt();
+}
+
+Variant Variant::operator&(const Variant &v) const {
+    return toInt() & v.toInt();
+}
+
+Variant Variant::operator|(const Variant &v) const {
+    return toInt() | v.toInt();
+}
+
+Variant Variant::operator^(const Variant &v) const {
+    return toInt() ^ v.toInt();
+}
+
+Variant Variant::operator~() const {
+    return ~toInt();
+}
+
+#define COMPARE_OP(v, op)                                                                                              \
+    do {                                                                                                               \
+        if (isFloat()) {                                                                                               \
+            return toFloat() op v.toFloat();                                                                           \
+        } else {                                                                                                       \
+            return toInt() op v.toInt();                                                                               \
+        }                                                                                                              \
+    } while (0)
+
+bool Variant::operator<(const Variant &v) const {
+    COMPARE_OP(v, <);
+}
+
+bool Variant::operator>(const Variant &v) const {
+    COMPARE_OP(v, >);
+}
+
+bool Variant::operator<=(const Variant &v) const {
+    COMPARE_OP(v, <=);
+}
+
+bool Variant::operator>=(const Variant &v) const {
+    COMPARE_OP(v, >=);
+}
+
+Variant Variant::pow(const Variant &v) const {
+    if (v.isFloat() || isFloat()) {
+        return std::pow(toFloat(), v.toFloat());
+    } else {
+        return std::pow(toInt(), v.toInt());
+    }
 }
 
 Variant Variant::operator()() const {
@@ -224,11 +341,14 @@ Variant Variant::operator()(const std::initializer_list<Variant> &args) const {
 Variant Variant::unserialize() {
     php_unserialize_data_t var_hash;
     Variant retval;
-    PHP_VAR_UNSERIALIZE_INIT(var_hash);
 
+    PHP_VAR_UNSERIALIZE_INIT(var_hash);
     char *data = Z_STRVAL_P(ptr());
     size_t length = Z_STRLEN_P(ptr());
-    if (php_var_unserialize(retval.ptr(), (const uchar **) &data, (const uchar *) data + length, &var_hash)) {
+    auto rs = php_var_unserialize(retval.ptr(), (const uchar **) &data, (const uchar *) data + length, &var_hash);
+    PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
+
+    if (rs) {
         return retval;
     } else {
         return {};
@@ -247,7 +367,7 @@ Variant Variant::jsonEncode(zend_long options, zend_long depth) {
         return false;
     } else {
         smart_str_0(&buf);
-        return buf.s;
+        return {buf.s, true};
     }
 }
 
@@ -280,7 +400,9 @@ Object newObject(const char *name) {
         return object;
     }
     Args args;
-    object.call("__construct", args);
+    if (ce->constructor) {
+        object.call(__construct, args);
+    }
     return object;
 }
 
@@ -298,7 +420,9 @@ Object newObject(const char *name, const std::initializer_list<Variant> &args) {
     for (const auto &arg : args) {
         _args.append(const_cast<Variant &>(arg).ptr());
     }
-    object.call("__construct", _args);
+    if (ce->constructor) {
+        object.call(__construct, _args);
+    }
     return object;
 }
 
@@ -308,5 +432,35 @@ Variant Object::exec(const Variant &fn, const std::initializer_list<Variant> &ar
         _args.append(const_cast<Variant &>(arg).ptr());
     }
     return _call(ptr(), fn.const_ptr(), _args);
+}
+
+Variant Object::callParentMethod(const String &func, const std::initializer_list<Variant> &args) {
+    Args _args;
+    for (const auto &arg : args) {
+        _args.append(const_cast<Variant &>(arg).ptr());
+    }
+
+    Variant retval;
+    auto fn = (zend_function *) zend_hash_find_ptr_lc(&parent_ce()->function_table, func.ptr());
+    if (UNEXPECTED(fn == NULL)) {
+        /* error at c-level */
+        zend_error_noreturn(
+            E_CORE_ERROR, "Couldn't find implementation for method %s::%s", ZSTR_VAL(parent_ce()->name), func.data());
+    } else {
+        zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), NULL);
+    }
+    return retval;
+}
+
+Variant Object::get(const String &name) {
+    Variant retval;
+    zval rv;
+    zval *member_p = zend_read_property_ex(ce(), object(), name.ptr(), false, &rv);
+    if (member_p != &rv) {
+        ZVAL_COPY(retval.ptr(), member_p);
+    } else {
+        ZVAL_COPY_VALUE(retval.ptr(), member_p);
+    }
+    return retval;
 }
 }  // namespace php

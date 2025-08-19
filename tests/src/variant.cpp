@@ -1,7 +1,82 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
+#include "const/json.h"
 
 using namespace php;
+
+constexpr double PI = 3.1415926;
+
+TEST(variant, base) {
+    Variant v{nullptr};
+    ASSERT_TRUE(v.isNull());
+    ASSERT_STREQ(v.typeStr(), "null");
+    // no gc
+    ASSERT_EQ(v.getRefCount(), 0);
+
+    zval zv;
+    array_init(&zv);
+    Variant v2{&zv, true};
+    ASSERT_TRUE(v2.isArray());
+
+    // Assignment to itself
+    v2 = v2;
+
+    Variant ref{&v2};
+    Variant ref2{ref};
+    auto ref2_val = ref2.getRefValue();
+    ASSERT_TRUE(ref2_val.isArray());
+
+    auto refval_v2 = v2.getRefValue();
+    ASSERT_TRUE(refval_v2.isArray());
+
+    ASSERT_TRUE(v2.isArray());
+    auto arr = v2.toArray();
+    arr.append("hello world");
+    arr.append(1922);
+    ASSERT_EQ(arr.count(), 2);
+    ASSERT_STREQ(arr.typeStr(), "array");
+
+    ASSERT_EQ(arr.getRefCount(), 1);
+    arr.addRef();
+    ASSERT_EQ(arr.getRefCount(), 2);
+    arr.delRef();
+    ASSERT_EQ(arr.getRefCount(), 1);
+
+    v2 = nullptr;
+    ASSERT_TRUE(v2.isNull());
+
+    zval *zv2 = nullptr;
+    Variant v3{zv2};
+    ASSERT_TRUE(v3.isNull());
+
+    v3 = 199000L;
+    ASSERT_TRUE(v3.isInt());
+    ASSERT_TRUE(v3 == 199000L);
+
+    v3 = std::string("hello");
+    ASSERT_TRUE(v3.isString());
+    ASSERT_EQ(v3.length(), 5);
+    ASSERT_TRUE(v3 == "hello");
+
+    String s("hello world!");
+    v3 = s;
+    ASSERT_TRUE(v3.isString());
+    ASSERT_EQ(v3.length(), s.length());
+
+    v3 = PI;
+    ASSERT_TRUE(v3.isFloat());
+    ASSERT_TRUE(v3 == PI);
+
+    ASSERT_EQ(s.length(), 12);
+
+    v3 = false;
+    ASSERT_TRUE(v3.isBool());
+    ASSERT_TRUE(v3 == false);
+
+    float fv1 = PI;
+    Variant v4(fv1);
+    ASSERT_TRUE(v4 == (float) PI);
+}
 
 TEST(variant, toCString) {
     std::string s1("hello world");
@@ -9,16 +84,23 @@ TEST(variant, toCString) {
     ASSERT_STREQ(s1.c_str(), s2.toCString());
 }
 
-TEST(variant, toString) {
+TEST(variant, toStdString) {
     std::string s1("hello world");
     Variant s2("hello world");
-    ASSERT_STREQ(s1.c_str(), s2.toString().c_str());
+    ASSERT_STREQ(s1.c_str(), s2.toStdString().c_str());
+}
+
+TEST(variant, toString) {
+    Variant s("hello world");
+    auto s2 = s.toString();
+    ASSERT_EQ(s2.getRefCount(), 2);
+    ASSERT_TRUE(s2.equals("hello world"));
 }
 
 TEST(variant, toStringWithLength) {
     std::string s1("hello world");
     Variant s2("hello world");
-    ASSERT_EQ(s1.length(), s2.toString().length());
+    ASSERT_EQ(s1.length(), s2.toStdString().length());
 }
 
 TEST(variant, serialize) {
@@ -31,6 +113,9 @@ TEST(variant, serialize) {
     Variant v3 = v2.unserialize();
     ASSERT_TRUE(v3.isArray());
     ASSERT_TRUE(v3.equals(v1));
+
+    var v4 = "-----";
+    ASSERT_TRUE(v4.unserialize().isNull());
 }
 
 TEST(variant, incr) {
@@ -58,7 +143,7 @@ TEST(variant, pre_decr) {
 }
 
 TEST(variant, calc) {
-    Variant v(10);
+    var v(10);
     v += 5;
     ASSERT_EQ(v.toInt(), 15);
 
@@ -67,6 +152,90 @@ TEST(variant, calc) {
 
     ASSERT_EQ(v.length(), 0);
     ASSERT_EQ(v.getRefCount(), 0);
+
+    var a = 11;
+    var b = 19;
+    var c = a + b;
+    ASSERT_TRUE(c.equals(30));
+
+    var d = b - a;
+    ASSERT_TRUE(d.equals(8));
+
+    var e = b * a;
+    ASSERT_TRUE(e.equals(209));
+
+    var f1 = 2;
+    var f2 = b / f1;
+    ASSERT_TRUE(f2.equals(9));
+
+    ASSERT_TRUE(f1.pow(16).equals(std::pow(2, 16)));
+
+    var f3 = b / 0.3;
+    ASSERT_TRUE(f3.equals(19 / 0.3));
+
+    var g = PI;
+    ASSERT_EQ(g++, PI);
+    ASSERT_EQ(g, PI + 1.0);
+    ASSERT_EQ(g--, PI + 1.0);
+    ASSERT_EQ(g, PI);
+
+    ASSERT_EQ(++g, PI + 1.0);
+    ASSERT_EQ(g, PI + 1.0);
+    ASSERT_EQ(--g, PI);
+    ASSERT_EQ(g, PI);
+
+    g += 7;
+    ASSERT_EQ(g, PI + 7);
+
+    g -= 7.0;
+    ASSERT_TRUE(g.almostEquals(PI, 1e-5));
+
+    var h1 = 31;
+    var h2 = 3;
+    ASSERT_EQ(h1 % h2, 31 % 3);
+    ASSERT_EQ(h1 << h2, 31 << 3);
+    ASSERT_EQ(h1 >> h2, 31 >> 3);
+    ASSERT_EQ(h1 & h2, 31 & 3);
+    ASSERT_EQ(h1 | h2, 31 | 3);
+    ASSERT_EQ(h1 ^ h2, 31 ^ 3);
+    ASSERT_EQ(~h1, ~31);
+
+    var i = PI;
+    var i2 = i % 2.0;
+    ASSERT_TRUE(i2.almostEquals(std::fmod(PI, 2.0), 1e-5));
+
+    var i3 = i2.pow(1.3);
+    ASSERT_TRUE(i3.almostEquals(std::pow(i2.toFloat(), 1.3), 1e-5));
+}
+
+TEST(variant, compare) {
+    {
+        var a = 11;
+        var b = 19;
+
+        ASSERT_TRUE(a != b);
+        ASSERT_FALSE(a == b);
+
+        ASSERT_TRUE(a < b);
+        ASSERT_TRUE(b > a);
+        ASSERT_TRUE(a <= b);
+        ASSERT_TRUE(b >= a);
+        ASSERT_TRUE(b >= b);
+    }
+
+    {
+        var a = 11.23;
+        var b = 19.90;
+
+        ASSERT_TRUE(a != b);
+        ASSERT_FALSE(a == b);
+
+        ASSERT_TRUE(a < b);
+        ASSERT_TRUE(b > a);
+        ASSERT_TRUE(a <= b);
+        ASSERT_TRUE(b >= a);
+        ASSERT_TRUE(b >= b);
+    }
 }
 
 TEST(variant, json) {
@@ -82,6 +251,12 @@ TEST(variant, json) {
     Variant v4("");
     ASSERT_TRUE(v4.jsonDecode().isNull());
     ASSERT_EQ(JSON_G(error_code), PHP_JSON_ERROR_SYNTAX);
+
+    var v5 = "\xB1\x31";
+    ASSERT_EQ(v5.jsonEncode().toBool(), false);
+
+    var error = json_last_error();
+    ASSERT_TRUE(error.equals(JSON_ERROR_UTF8));
 }
 
 TEST(variant, ref0) {
@@ -106,6 +281,12 @@ TEST(variant, ref1) {
     parse_str("first=value1&second=value2", ref);
     Array v3 = ref.getRefValue();
     ASSERT_EQ(v3.count(), 2);
+
+    ASSERT_EQ(ref.getRefCount(), 1);
+
+    auto ref2 = ref.toReference();
+    ASSERT_TRUE(ref2.isReference());
+    ASSERT_EQ(ref2.getRefCount(), 2);
 }
 
 TEST(variant, ref2) {
@@ -133,28 +314,6 @@ TEST(variant, ref4) {
 
     array_push(ref, "php", "java", "go");
     ASSERT_EQ((*ref).length(), 3);
-}
-
-TEST(variant, object) {
-    auto array = create_map();
-    auto object = newObject("ArrayObject", {array, constant("ArrayObject::ARRAY_AS_PROPS")});
-    ASSERT_TRUE(object.isObject());
-    ASSERT_EQ(object.get("php").toInt(), 3);
-
-    object.exec("offsetSet", {"python", 9});
-    auto r2 = object.get("python");
-    ASSERT_EQ(r2.toInt(), 9);
-
-    auto flags = object.exec("getFlags");
-    ASSERT_TRUE(flags.isInt());
-    ASSERT_TRUE(flags.toInt() & constant("ArrayObject::ARRAY_AS_PROPS").toInt());
-    flags.debug();
-
-    auto o2 = newObject("class_not_exists");
-    ASSERT_FALSE(o2.isUndef());
-
-    auto o3 = newObject("class_not_exists", {1234, "hello world"});
-    ASSERT_FALSE(o3.isUndef());
 }
 
 TEST(variant, callable) {
@@ -210,10 +369,23 @@ TEST(variant, resource) {
     auto *s = new String("hello world");
     auto rs3 = newResource<String>("string", s);
     ASSERT_TRUE(rs3.isNull());
+    delete s;
+
+    auto rs4 = fp.toResource<String>("string_not_exists");
+    ASSERT_EQ(rs4, nullptr);
 }
 
 TEST(variant, self) {
     Variant v1("hello world");
     Variant v2 = v1;
     ASSERT_TRUE(v1.equals(v2, true));
+}
+
+TEST(variant, move_ctor) {
+    Variant s("abc");
+    Variant t(std::move(s));
+    EXPECT_STREQ(t.toCString(), "abc");
+    EXPECT_TRUE(s.isUndef());
+    s.print();
+    t.print();
 }

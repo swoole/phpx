@@ -17,6 +17,12 @@
 #include "phpx.h"
 
 namespace php {
+static std::unordered_map<std::string, Resource *> resource_map;
+static std::unordered_map<std::string, Class *> class_map;
+static std::unordered_map<std::string, Interface *> interface_map;
+static std::unordered_map<std::string, std::shared_ptr<Extension>> _name_to_extension;
+static std::unordered_map<int, std::shared_ptr<Extension>> _module_number_to_extension;
+
 Extension::Extension(const char *_name, const char *_version) {
     module.name = _name;
     module.version = _version;
@@ -189,5 +195,93 @@ bool Interface::activate() {
     }
     activated = true;
     return true;
+}
+
+zend_result extension_startup(int type, int module_number) {
+    void *ptr;
+    ZEND_HASH_FOREACH_PTR(&module_registry, ptr) {
+        auto *module = static_cast<zend_module_entry *>(ptr);
+        if (module_number == module->module_number) {
+            auto extension = _name_to_extension[module->name];
+            extension->started = true;
+            extension->registerIniEntries(module_number);
+            if (extension->onStart) {
+                extension->onStart();
+            }
+            _module_number_to_extension[module_number] = extension;
+            break;
+        }
+    }
+    ZEND_HASH_FOREACH_END();
+    return SUCCESS;
+}
+
+void extension_info(zend_module_entry *module) {
+    auto extension = _module_number_to_extension[module->module_number];
+    if (!extension->header.empty() && !extension->body.empty()) {
+        php_info_print_table_start();
+        auto header = extension->header;
+        size_t size = header.size();
+        switch (size) {
+        case 2:
+            php_info_print_table_header(size, header[0].c_str(), header[1].c_str());
+            break;
+        case 3:
+            php_info_print_table_header(size, header[0].c_str(), header[1].c_str(), header[2].c_str());
+            break;
+        default:
+            error(E_WARNING, "invalid info header size.");
+            return;
+        }
+        for (auto row : extension->body) {
+            size = row.size();
+            switch (size) {
+            case 2:
+                php_info_print_table_row(size, row[0].c_str(), row[1].c_str());
+                break;
+            case 3:
+                php_info_print_table_row(size, row[0].c_str(), row[1].c_str(), row[2].c_str());
+                break;
+            default:
+                error(E_WARNING, "invalid info row size.");
+                return;
+            }
+        }
+        php_info_print_table_end();
+    }
+}
+
+zend_result extension_shutdown(int type, int module_number) {
+    auto extension = _module_number_to_extension[module_number];
+    if (extension->onShutdown) {
+        extension->onShutdown();
+    }
+    extension->unregisterIniEntries(module_number);
+    return SUCCESS;
+}
+
+zend_result extension_before_request(int type, int module_number) {
+    auto extension = _module_number_to_extension[module_number];
+    if (extension->onBeforeRequest) {
+        extension->onBeforeRequest();
+    }
+    return SUCCESS;
+}
+
+zend_result extension_after_request(int type, int module_number) {
+    auto extension = _module_number_to_extension[module_number];
+    if (extension->onAfterRequest) {
+        extension->onAfterRequest();
+    }
+    return SUCCESS;
+}
+
+Resource *getResource(const std::string &name) {
+    auto iter = resource_map.find(name);
+    if (iter == resource_map.end()) {
+        error(E_WARNING, "The `%s` type of resource is undefined.", name.c_str());
+        return nullptr;
+    }
+    return iter->second;
 }
 }  // namespace php

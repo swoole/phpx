@@ -3,39 +3,53 @@
  * @generate-function-entries
  */
 
-function cpp_ext_test(mixed ...$args) : int {
+function cpp_ext_test(mixed ...$args): int
+{
 
 }
 
-function cpp_ext_test2(mixed ...$args) : array {
+function cpp_ext_test2(mixed ...$args): array
+{
 
 }
 
-function phpx_test3():void {
+function phpx_test3(): void
+{
 
 }
 
-function cpp_throw_error(): void {
+function cpp_throw_error(): void
+{
 }
 
-class MyClass implements Countable {
-    public static function test() : float {
-        
-    }
-    
-    public function pget() : string {
-        
-    }
-    
-    public function pset() : void {
-        
+class MyClass implements Countable
+{
+    public static function test(): float
+    {
+
     }
 
-    public function count() : int {
+    public function pget(): string
+    {
+
+    }
+
+    public function pset(): void
+    {
+
+    }
+
+    public function add(int $a, string $b): int
+    {
+    }
+
+    public function count(): int
+    {
 
     }
 }
 
-interface MyInterface {
-    public function test(int $a, string $b) : bool;
+interface MyInterface
+{
+    public function test(int $a, string $b): bool;
 }

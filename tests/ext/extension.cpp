@@ -26,7 +26,8 @@ using namespace php;
 using namespace std;
 
 PHPX_FUNCTION(cpp_ext_test) {
-    for (int i = 0; i < args.count(); i++) {
+	auto argc = args.count();
+    for (int i = 0; i < argc; i++) {
         cout << args[i].type() << endl;
     }
     return 1234;
@@ -73,6 +74,10 @@ PHPX_METHOD(MyClass, pset) {
     return {};
 }
 
+PHPX_METHOD(MyClass, add) {
+    return args[0].toInt() + args[1].toInt();
+}
+
 PHPX_METHOD(MyClass, count) {
     return 100;
 }
@@ -117,6 +122,7 @@ PHPX_EXTENSION() {
         auto *i = new Interface("MyInterface");
         i->registerFunctions(class_MyInterface_methods);
         extension->registerInterface(i);
+
         extension->registerResource("ResourceString", string_dtor);
         const auto ce = i->ptr();
         printf("ce=%p\n", ce);

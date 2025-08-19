@@ -19,10 +19,11 @@
 
 #include "phpx.h"
 #include <ext/spl/spl_iterators.h>
-#include <Server.h>
+#include <swoole_server.h>
 
 using namespace std;
 using namespace php;
+using namespace swoole;
 
 void cpp_hello_world(Args &args, Variant &retval);
 PHPX_FUNCTION(cpp_hello_world2);
@@ -37,20 +38,24 @@ void CppClass_test(Object &_this, Args &args, Variant &retval);
 void CppClass_test2(Object &_this, Args &args, Variant &retval);
 void CppClass_count(Object &_this, Args &args, Variant &retval);
 
-int test_get_length(swProtocol *protocol, swConnection *conn, char *data, uint32_t length);
-int dispatch_function(swServer *serv, swConnection *conn, swEventData *data);
+int test_get_length(Protocol *protocol, Connection *conn, char *data, uint32_t length);
+int dispatch_function(Server *serv, Connection *conn, EventData *data);
 
 PHPX_FUNCTION(cpp_test3)
 {
     auto a = args[0];
     cout << "type=" << a.type() << endl;
     a = 456;
+
+    return {};
 }
 
 PHPX_FUNCTION(cpp_test4)
 {
     Object a = args[0];
     var_dump(a);
+
+    return {};
 }
 
 PHPX_FUNCTION(cpp_test5)
@@ -63,6 +68,8 @@ PHPX_FUNCTION(cpp_test5)
 
     auto v = a.get("name");
     var_dump(v);
+
+    return {};
 }
 
 PHPX_EXTENSION()
@@ -164,7 +171,7 @@ void testRedis()
 
 void CppClass_construct(Object &_this, Args &args, Variant &retval)
 {
-    printf("%s _construct\n", _this.getClassName().c_str());
+    printf("%s _construct\n", _this.getClassName().data());
     Array arr;
     arr.append(1234);
     _this.set("name", arr);
@@ -254,7 +261,7 @@ PHPX_FUNCTION(cpp_test)
         Array arr(retval);
         for (int i = 0; i < arr.count(); i++)
         {
-            printf("key[%d] = %s\n", i, arr[i].toString().c_str());
+            printf("key[%d] = %s\n", i, arr[i].toStdString().c_str());
         }
     }
     /**
@@ -322,13 +329,13 @@ PHPX_FUNCTION(cpp_test)
         {
             //把return的变量转成数组
             Array arr2(retval2);
-            cout << "key: " << arr2["key"].toString() << ", value: " << arr2["value"].toString() << endl;
+            cout << "key: " << arr2["key"].toStdString() << ", value: " << arr2["value"].toStdString() << endl;
         }
         /**
          * 读取对象属性
          */
         Variant name = obj.get("name");
-        cout << "name property: " << name.toString() << endl;
+        cout << "name property: " << name.toStdString() << endl;
 
         /**
          * 创建一个Test2类的对象
@@ -343,7 +350,7 @@ PHPX_FUNCTION(cpp_test)
     }
     else
     {
-        cout << "return value=" << _retval.toString() << endl;
+        cout << "return value=" << _retval.toStdString() << endl;
     }
 }
 

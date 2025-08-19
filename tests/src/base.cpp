@@ -46,18 +46,11 @@ TEST(base, include) {
     std::string tmp_file = "/tmp/include_test.php";
     std::string tmp_file2 = "/tmp/tmp_file.txt";
 
-    file_put_contents(tmp_file, "<?php file_put_contents('" + tmp_file2 + "', 'hello phpx'); return PHP_VERSION_ID; ?>");
+    file_put_contents(tmp_file,
+                      "<?php file_put_contents('" + tmp_file2 + "', 'hello phpx'); return PHP_VERSION_ID; ?>");
     auto retval = include(tmp_file);
     ASSERT_TRUE(retval.isInt());
     ASSERT_EQ(retval.toInt(), PHP_VERSION_ID);
-}
-
-TEST(base, method) {
-    auto obj = newObject("DateTimeImmutable");
-    ASSERT_TRUE(obj.isObject());
-    auto str = obj.exec("format", "Y-m-d H:i:s");
-    ASSERT_TRUE(str.isString());
-    ASSERT_GT(str.length(), 0);
 }
 
 TEST(base, ini_get) {
@@ -74,6 +67,9 @@ TEST(base, global) {
 
     auto time = array["REQUEST_TIME"];
     ASSERT_TRUE(time.isInt());
+
+    auto v2 = global("global_var_not_exists");
+    ASSERT_FALSE(v2.toBool());
 }
 
 TEST(base, equals) {
@@ -87,25 +83,33 @@ TEST(base, equals) {
     ASSERT_FALSE(v3.equals(v1, true));
 }
 
-TEST(base, static_property) {
-    include(get_include_dir() + "/library.php");
-    ASSERT_EQ(Class::getStaticProperty("TestClass", "propInt").toInt(), 1990018900);
-    ASSERT_STREQ(Class::getStaticProperty("TestClass", "propString").toCString(), "Hello, World!");
-    ASSERT_TRUE(Class::setStaticProperty("TestClass", "propString", "phpx test"));
-    ASSERT_STREQ(Class::getStaticProperty("TestClass", "propString").toCString(), "phpx test");
+TEST(base, eval) {
+    ob_start();
+    eval("print_r(PHP_VERSION);");
+    auto rs = ob_get_clean();
+    ASSERT_TRUE(rs.isString());
+    ASSERT_TRUE(str_contains(rs, PHP_VERSION).toBool());
 }
 
-#if 0
 TEST(base, exception) {
     zend_try {
-        throwException("RuntimeException", "phpx exception test");
+        eval("throw new RuntimeException('phpx exception test');");
+        zend_bailout();
     }
     zend_catch {
         auto e = Object(getException());
+        ASSERT_TRUE(e.getClassName().equals("RuntimeException"));
+        zend_clear_exception();
+#if 0
         auto msg = e.exec("getMessage");
         ASSERT_TRUE(msg.isString());
         ASSERT_TRUE(str_contains(msg, "phpx exception test").isTrue());
+        std::cout << "DONE\n";
+#endif
     }
     zend_end_try();
 }
-#endif
+
+TEST(base, throwException) {
+    throwException("NotExistsException", "hello world", 19900);
+}

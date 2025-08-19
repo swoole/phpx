@@ -104,7 +104,6 @@ bool Class::registerFunctions(const zend_function_entry *_functions) {
 
 bool Class::alias(const char *alias_name) {
     if (activated) {
-        error(E_WARNING, "Please execute alias method before activate.");
         return false;
     }
     aliases.emplace_back(alias_name);
