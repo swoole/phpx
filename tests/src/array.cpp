@@ -107,6 +107,15 @@ TEST(array, search) {
     ASSERT_EQ(arr3.search(v5).toInt(), 1990);
 }
 
+TEST(array, update) {
+	Array arr = create_map();
+	arr["php"] = 999;
+	ASSERT_EQ(arr.get("php").toInt(), 999);
+
+	arr.set("java", 666);
+	ASSERT_EQ(arr.get("java").toInt(), 666);
+}
+
 TEST(array, nesting) {
 	Array list = create_list();
 	Array map = create_map();
@@ -157,4 +166,25 @@ TEST(array, swap) {
     Array arr(v);
     ASSERT_EQ(arr[0].toInt(), 199);
     ASSERT_EQ(arr[1].toInt(), 189);
+}
+
+TEST(array, slice) {
+    Array arr = create_list();
+    arr.append("erlang");
+    arr.append("ruby");
+    arr.append("lua");
+
+    auto arr2 = arr.slice(2, 4, true);
+    ASSERT_EQ(arr2.count(), 4);
+    ASSERT_TRUE(arr2.get(2).equals("go"));
+
+    auto arr3 = arr.slice(2, 4, false);
+    ASSERT_EQ(arr3.count(), 4);
+    ASSERT_TRUE(arr3[1].equals("python"));
+
+    auto arr4 = arr.slice(arr.count() + 1);
+    ASSERT_TRUE(arr4.empty());
+
+    auto arr5 = arr.slice(2, -3, false);
+    ASSERT_EQ(arr5.count(), 3);
 }

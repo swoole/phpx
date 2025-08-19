@@ -383,6 +383,9 @@ class Variant {
         Z_TRY_DELREF_P(ptr());
     }
     void debug();
+    void print() {
+    	php_var_dump(&val, 10);
+    }
     int getRefCount() const;
     int type() const {
         return Z_TYPE_P(const_ptr());
