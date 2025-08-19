@@ -60,40 +60,53 @@ TEST(object, static_property) {
 }
 
 TEST(object, call_parent_method) {
-	if (!class_exists("TestClass2")) {
-	    include(get_include_dir() + "/library.php");
-	}
+    if (!class_exists("TestClass2")) {
+        include(get_include_dir() + "/library.php");
+    }
 
-	auto obj = newObject("TestClass2");
-	ASSERT_TRUE(obj.methodExists("test"));
-	ASSERT_FALSE(obj.methodExists("testNotExists"));
+    auto obj = newObject("TestClass2");
+    ASSERT_TRUE(obj.methodExists("test"));
+    ASSERT_FALSE(obj.methodExists("testNotExists"));
 
-	ASSERT_TRUE(obj.propertyExists("propArray"));
-	ASSERT_FALSE(obj.propertyExists("propNotExists"));
-	ASSERT_TRUE(obj.propertyExists("propBool"));
+    ASSERT_TRUE(obj.propertyExists("propArray"));
+    ASSERT_FALSE(obj.propertyExists("propNotExists"));
+    ASSERT_TRUE(obj.propertyExists("propBool"));
 
-	// This method inherits from the parent class and is not defined in the child class
-	ASSERT_TRUE(obj.methodExists("fun"));
-	auto rs0 = obj.exec("fun");
-	ASSERT_TRUE(rs0.isFloat());
+    // This method inherits from the parent class and is not defined in the child class
+    ASSERT_TRUE(obj.methodExists("fun"));
+    auto rs0 = obj.exec("fun");
+    ASSERT_TRUE(rs0.isFloat());
 
-	auto rs1 = obj.exec("test");
-	ASSERT_STREQ(rs1.toCString(), "child test");
+    auto rs1 = obj.exec("test");
+    ASSERT_STREQ(rs1.toCString(), "child test");
 
-	// The child class and parent class have methods with the same name
-	auto rs2 = obj.callParentMethod("test", {});
-	ASSERT_STREQ(rs2.toCString(), "parent test");
+    // The child class and parent class have methods with the same name
+    auto rs2 = obj.callParentMethod("test", {"hello", "world"});
+    ASSERT_STREQ(rs2.toCString(), "parent test");
 
-	ASSERT_STREQ(obj.getClassName().c_str(), "TestClass2");
+    ASSERT_STREQ(obj.getClassName().c_str(), "TestClass2");
 }
 
 TEST(object, bad_type) {
-	auto arr1 = create_list();
-	ChildResult r = run_in_child_capture_stdout([&arr1]() -> int {
-		auto v = arr1.get(2);
-		Object o(v);
-		return 0;
-	});
-	var s(r.output);
-	ASSERT_TRUE(str_contains(s, "parameter 1 must be `object`, got `string`").toBool());
+    auto arr1 = create_list();
+    ChildResult r = run_in_child_capture_stdout([&arr1]() -> int {
+        auto v = arr1.get(2);
+        Object o(v);
+        return 0;
+    });
+    var s(r.output);
+    ASSERT_TRUE(str_contains(s, "parameter 1 must be `object`, got `string`").toBool());
+}
+
+TEST(object, call_parent_method_error) {
+    ChildResult r = run_in_child_capture_stdout([]() -> int {
+        if (!class_exists("TestClass2")) {
+            include(get_include_dir() + "/library.php");
+        }
+        auto obj = newObject("TestClass2");
+        auto rs2 = obj.callParentMethod("test1990", {});
+        return 0;
+    });
+    var s(r.output);
+    ASSERT_TRUE(str_contains(s, "Couldn't find implementation for method").toBool());
 }

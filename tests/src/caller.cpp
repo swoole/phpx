@@ -8,22 +8,22 @@ using namespace php;
 static const char *g_date = "2009-02-15";
 
 TEST(caller, args) {
-	auto arr1 = create_list();
-	Args args;
-	for (auto kv : arr1) {
-		args.append(kv.value);
-	}
+    auto arr1 = create_list();
+    Args args;
+    for (auto kv : arr1) {
+        args.append(kv.value);
+    }
 
-	ASSERT_TRUE(args.exists(2));
-	ASSERT_FALSE(args.exists(args.count()));
+    ASSERT_TRUE(args.exists(2));
+    ASSERT_FALSE(args.exists(args.count()));
 
-	ASSERT_FALSE(args.empty());
+    ASSERT_FALSE(args.empty());
 
-	Args args2;
-	ASSERT_TRUE(args2.empty());
+    Args args2;
+    ASSERT_TRUE(args2.empty());
 
-	auto arr2 = args.toArray();
-	ASSERT_TRUE(arr2.equals(arr1));
+    auto arr2 = args.toArray();
+    ASSERT_TRUE(arr2.equals(arr1));
 }
 
 TEST(caller, func) {
@@ -43,7 +43,7 @@ TEST(caller, method) {
 }
 
 TEST(caller, redis) {
-    Redis redis {};
+    Redis redis{};
     Array context{};
     auto ref_context = context.toReference();
     auto rv = redis.connect("127.0.0.1", 6379, 2.5, null, 0, 0, ref_context);
@@ -117,6 +117,6 @@ TEST(caller, sha1) {
     auto rdata = random_bytes({l});
     ASSERT_EQ(rdata.length(), l);
     auto hash1 = sha1(rdata);
-    auto hash2 = hash({ "sha1", rdata});
+    auto hash2 = hash({"sha1", rdata});
     ASSERT_STREQ(hash1.toCString(), hash2.toCString());
 }

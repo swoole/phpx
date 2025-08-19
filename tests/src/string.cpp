@@ -4,64 +4,64 @@
 using namespace php;
 
 TEST(string, base) {
-	auto s = zend_string_init(ZEND_STRL("hello world"), false);
-	String s1 {s, false};
-	zend_string_release(s);
+    auto s = zend_string_init(ZEND_STRL("hello world"), false);
+    String s1{s, false};
+    zend_string_release(s);
 
-	ASSERT_GT(s1.length(), 10);
+    ASSERT_GT(s1.length(), 10);
 
-	s1.extend(128);
-	ASSERT_EQ(s1.length(), 128);
+    s1.extend(128);
+    ASSERT_EQ(s1.length(), 128);
 
-	String s2("   hello  \n");
-	auto s3 = s2.trim();
-	ASSERT_STREQ(s3.c_str(), "hello");
+    String s2("   hello  \n");
+    auto s3 = s2.trim();
+    ASSERT_STREQ(s3.c_str(), "hello");
 
-	String s4 = "This is an encoded string";
-	auto s5 = s4.base64Encode();
+    String s4 = "This is an encoded string";
+    auto s5 = s4.base64Encode();
 
-	ASSERT_GT(s5.length(), s4.length());
-	ASSERT_TRUE(s5.base64Decode().equals(s4));
+    ASSERT_GT(s5.length(), s4.length());
+    ASSERT_TRUE(s5.base64Decode().equals(s4));
 
-	String s6 = "I'll \"walk\" the <b>dog</b> now";
-	auto s7 = s6.escape();
-	ASSERT_GT(s7.length(), s6.length());
-	ASSERT_TRUE(s7.unescape().equals(s6));
+    String s6 = "I'll \"walk\" the <b>dog</b> now";
+    auto s7 = s6.escape();
+    ASSERT_GT(s7.length(), s6.length());
+    ASSERT_TRUE(s7.unescape().equals(s6));
 }
 
 TEST(string, number) {
-	String s0(1990);
-	ASSERT_TRUE(s0.equals("1990"));
-	ASSERT_EQ(s0.toInt(), 1990);
+    String s0(1990);
+    ASSERT_TRUE(s0.equals("1990"));
+    ASSERT_EQ(s0.toInt(), 1990);
 
-	String s1(19902019L);
-	ASSERT_TRUE(s1.equals("19902019"));
+    String s1(19902019L);
+    ASSERT_TRUE(s1.equals("19902019"));
 
-	String s2(1990.2019);
-	ASSERT_TRUE(s2.equals("1990.2019"));
-	ASSERT_EQ(s2.toFloat(), 1990.2019);
+    String s2(1990.2019);
+    ASSERT_TRUE(s2.equals("1990.2019"));
+    ASSERT_EQ(s2.toFloat(), 1990.2019);
 
-	String s3(true);
-	ASSERT_TRUE(s3.equals("1"));
+    String s3(true);
+    ASSERT_TRUE(s3.equals("1"));
 
-	String s4(false);
-	ASSERT_TRUE(s4.equals("0"));
+    String s4(false);
+    ASSERT_TRUE(s4.equals("0"));
 
-	String s5(s1);
-	ASSERT_EQ(s5.length(), s1.length());
-	ASSERT_STREQ(s1.c_str(), s5.c_str());
+    String s5(s1);
+    ASSERT_EQ(s5.length(), s1.length());
+    ASSERT_STREQ(s1.c_str(), s5.c_str());
 
-	ASSERT_GT(s5.hashCode(), 0);
+    ASSERT_GT(s5.hashCode(), 0);
 
-	auto s6 = String::format("str=%s, float=%f, int=%d\n", "hello", 1990.2019, 1990);
-	ASSERT_GT(s6.length(), 32);
+    auto s6 = String::format("str=%s, float=%f, int=%d\n", "hello", 1990.2019, 1990);
+    ASSERT_GT(s6.length(), 32);
 
-	String s7("hello");
-	auto s8 = s7.upper();
-	ASSERT_STREQ(s8.c_str(), "HELLO");
+    String s7("hello");
+    auto s8 = s7.upper();
+    ASSERT_STREQ(s8.c_str(), "HELLO");
 
-	auto s9 = s8.lower();
-	ASSERT_STREQ(s9.c_str(), s7.c_str());
+    auto s9 = s8.lower();
+    ASSERT_STREQ(s9.c_str(), s7.c_str());
 }
 
 TEST(string, equals) {

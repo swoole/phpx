@@ -21,9 +21,9 @@ TEST(variant, base) {
     // Assignment to itself
     v2 = v2;
 
-    Variant ref { &v2 };
-	Variant ref2 { ref };
-	auto ref2_val = ref2.getRefValue();
+    Variant ref{&v2};
+    Variant ref2{ref};
+    auto ref2_val = ref2.getRefValue();
     ASSERT_TRUE(ref2_val.isArray());
 
     auto refval_v2 = v2.getRefValue();
@@ -71,11 +71,11 @@ TEST(variant, base) {
 
     v3 = false;
     ASSERT_TRUE(v3.isBool());
-	ASSERT_TRUE(v3 == false);
+    ASSERT_TRUE(v3 == false);
 
-	float fv1 = PI;
-	Variant v4(fv1);
-	ASSERT_TRUE(v4 == (float )PI);
+    float fv1 = PI;
+    Variant v4(fv1);
+    ASSERT_TRUE(v4 == (float) PI);
 }
 
 TEST(variant, toCString) {
@@ -153,89 +153,89 @@ TEST(variant, calc) {
     ASSERT_EQ(v.length(), 0);
     ASSERT_EQ(v.getRefCount(), 0);
 
-	var a = 11;
-	var b = 19;
-	var c = a + b;
-	ASSERT_TRUE(c.equals(30));
+    var a = 11;
+    var b = 19;
+    var c = a + b;
+    ASSERT_TRUE(c.equals(30));
 
-	var d = b - a;
-	ASSERT_TRUE(d.equals(8));
+    var d = b - a;
+    ASSERT_TRUE(d.equals(8));
 
-	var e = b * a;
-	ASSERT_TRUE(e.equals(209));
+    var e = b * a;
+    ASSERT_TRUE(e.equals(209));
 
-	var f1 = 2;
-	var f2 = b / f1;
-	ASSERT_TRUE(f2.equals(9));
+    var f1 = 2;
+    var f2 = b / f1;
+    ASSERT_TRUE(f2.equals(9));
 
-	ASSERT_TRUE(f1.pow(16).equals(std::pow(2, 16)));
+    ASSERT_TRUE(f1.pow(16).equals(std::pow(2, 16)));
 
-	var f3 = b / 0.3;
-	ASSERT_TRUE(f3.equals(19 / 0.3));
+    var f3 = b / 0.3;
+    ASSERT_TRUE(f3.equals(19 / 0.3));
 
-	var g = PI;
-	ASSERT_EQ(g++, PI);
-	ASSERT_EQ(g, PI + 1.0);
-	ASSERT_EQ(g--, PI + 1.0);
-	ASSERT_EQ(g, PI);
+    var g = PI;
+    ASSERT_EQ(g++, PI);
+    ASSERT_EQ(g, PI + 1.0);
+    ASSERT_EQ(g--, PI + 1.0);
+    ASSERT_EQ(g, PI);
 
-	ASSERT_EQ(++g, PI + 1.0);
-	ASSERT_EQ(g, PI + 1.0);
-	ASSERT_EQ(--g, PI);
-	ASSERT_EQ(g, PI);
+    ASSERT_EQ(++g, PI + 1.0);
+    ASSERT_EQ(g, PI + 1.0);
+    ASSERT_EQ(--g, PI);
+    ASSERT_EQ(g, PI);
 
-	g += 7;
-	ASSERT_EQ(g, PI + 7);
+    g += 7;
+    ASSERT_EQ(g, PI + 7);
 
-	g -= 7.0;
-	ASSERT_TRUE(g.almostEquals(PI, 1e-5));
+    g -= 7.0;
+    ASSERT_TRUE(g.almostEquals(PI, 1e-5));
 
-	var h1 = 31;
-	var h2 = 3;
-	ASSERT_EQ(h1 % h2, 31 % 3);
-	ASSERT_EQ(h1 << h2, 31 << 3);
-	ASSERT_EQ(h1 >> h2, 31 >> 3);
-	ASSERT_EQ(h1 & h2, 31 & 3);
-	ASSERT_EQ(h1 | h2, 31 | 3);
-	ASSERT_EQ(h1 ^ h2, 31 ^ 3);
-	ASSERT_EQ(~h1, ~31);
+    var h1 = 31;
+    var h2 = 3;
+    ASSERT_EQ(h1 % h2, 31 % 3);
+    ASSERT_EQ(h1 << h2, 31 << 3);
+    ASSERT_EQ(h1 >> h2, 31 >> 3);
+    ASSERT_EQ(h1 & h2, 31 & 3);
+    ASSERT_EQ(h1 | h2, 31 | 3);
+    ASSERT_EQ(h1 ^ h2, 31 ^ 3);
+    ASSERT_EQ(~h1, ~31);
 
-	var i = PI;
-	var i2 = i % 2.0;
-	ASSERT_TRUE(i2.almostEquals(std::fmod(PI, 2.0), 1e-5));
+    var i = PI;
+    var i2 = i % 2.0;
+    ASSERT_TRUE(i2.almostEquals(std::fmod(PI, 2.0), 1e-5));
 
-	var i3 = i2.pow(1.3);
-	ASSERT_TRUE(i3.almostEquals(std::pow(i2.toFloat(), 1.3), 1e-5));
+    var i3 = i2.pow(1.3);
+    ASSERT_TRUE(i3.almostEquals(std::pow(i2.toFloat(), 1.3), 1e-5));
 }
 
 TEST(variant, compare) {
-	{
-		var a = 11;
-		var b = 19;
+    {
+        var a = 11;
+        var b = 19;
 
-		ASSERT_TRUE(a != b);
-		ASSERT_FALSE(a == b);
+        ASSERT_TRUE(a != b);
+        ASSERT_FALSE(a == b);
 
-		ASSERT_TRUE(a < b);
-		ASSERT_TRUE(b > a);
-		ASSERT_TRUE(a <= b);
-		ASSERT_TRUE(b >= a);
-		ASSERT_TRUE(b >= b);
-	}
+        ASSERT_TRUE(a < b);
+        ASSERT_TRUE(b > a);
+        ASSERT_TRUE(a <= b);
+        ASSERT_TRUE(b >= a);
+        ASSERT_TRUE(b >= b);
+    }
 
-	{
-		var a = 11.23;
-		var b = 19.90;
+    {
+        var a = 11.23;
+        var b = 19.90;
 
-		ASSERT_TRUE(a != b);
-		ASSERT_FALSE(a == b);
+        ASSERT_TRUE(a != b);
+        ASSERT_FALSE(a == b);
 
-		ASSERT_TRUE(a < b);
-		ASSERT_TRUE(b > a);
-		ASSERT_TRUE(a <= b);
-		ASSERT_TRUE(b >= a);
-		ASSERT_TRUE(b >= b);
-	}
+        ASSERT_TRUE(a < b);
+        ASSERT_TRUE(b > a);
+        ASSERT_TRUE(a <= b);
+        ASSERT_TRUE(b >= a);
+        ASSERT_TRUE(b >= b);
+    }
 }
 
 TEST(variant, json) {
@@ -382,11 +382,10 @@ TEST(variant, self) {
 }
 
 TEST(variant, move_ctor) {
-	Variant s("abc");
-	Variant t(std::move(s));
+    Variant s("abc");
+    Variant t(std::move(s));
     EXPECT_STREQ(t.toCString(), "abc");
     EXPECT_TRUE(s.isUndef());
     s.print();
     t.print();
 }
-

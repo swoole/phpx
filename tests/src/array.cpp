@@ -111,23 +111,23 @@ TEST(array, search) {
 }
 
 TEST(array, update) {
-	Array arr = create_map();
-	arr["php"] = 999;
-	ASSERT_EQ(arr.get("php").toInt(), 999);
+    Array arr = create_map();
+    arr["php"] = 999;
+    ASSERT_EQ(arr.get("php").toInt(), 999);
 
-	arr.set("java", 666);
-	ASSERT_EQ(arr.get("java").toInt(), 666);
+    arr.set("java", 666);
+    ASSERT_EQ(arr.get("java").toInt(), 666);
 
-	Array arr2 = create_list();
-	arr2[2] = "golang";
-	ASSERT_STREQ(arr2.get(2).toCString(), "golang");
+    Array arr2 = create_list();
+    arr2[2] = "golang";
+    ASSERT_STREQ(arr2.get(2).toCString(), "golang");
 }
 
 TEST(array, nesting) {
-	Array list = create_list();
-	Array map = create_map();
-	list.append(map);
-	ASSERT_EQ(list.count(), 6);
+    Array list = create_list();
+    Array map = create_map();
+    list.append(map);
+    ASSERT_EQ(list.count(), 6);
 }
 
 TEST(array, foreach) {
@@ -147,11 +147,11 @@ TEST(array, foreach) {
 }
 
 TEST(array, foreach2) {
-	Array arr = create_list();
-	for (auto i : arr) {
-		ASSERT_TRUE(i.key.isInt());
-		ASSERT_TRUE(i.value.isString());
-	}
+    Array arr = create_list();
+    for (auto i : arr) {
+        ASSERT_TRUE(i.key.isInt());
+        ASSERT_TRUE(i.value.isString());
+    }
 }
 
 TEST(array, contains) {
@@ -217,20 +217,20 @@ TEST(array, subscript) {
 }
 
 TEST(array, merge) {
-   Array arr1 = create_list();
-   Array arr2 = {"erlang", "ruby", "lua"};
-   arr1.merge(arr2, false);
-   ASSERT_EQ(arr2.count(), 3);
-   ASSERT_EQ(arr1.count(), 8);
+    Array arr1 = create_list();
+    Array arr2 = {"erlang", "ruby", "lua"};
+    arr1.merge(arr2, false);
+    ASSERT_EQ(arr2.count(), 3);
+    ASSERT_EQ(arr1.count(), 8);
 }
 
 TEST(array, bad_type) {
-	auto arr1 = create_list();
-	ChildResult r = run_in_child_capture_stdout([&arr1]() -> int {
-		auto v = arr1.get(2);
-		Array o(v);
-		return 0;
-	});
-	var s(r.output);
-	ASSERT_TRUE(str_contains(s, "parameter 1 must be `array`, got `string`").toBool());
+    auto arr1 = create_list();
+    ChildResult r = run_in_child_capture_stdout([&arr1]() -> int {
+        auto v = arr1.get(2);
+        Array o(v);
+        return 0;
+    });
+    var s(r.output);
+    ASSERT_TRUE(str_contains(s, "parameter 1 must be `array`, got `string`").toBool());
 }

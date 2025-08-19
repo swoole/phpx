@@ -46,7 +46,8 @@ TEST(base, include) {
     std::string tmp_file = "/tmp/include_test.php";
     std::string tmp_file2 = "/tmp/tmp_file.txt";
 
-    file_put_contents(tmp_file, "<?php file_put_contents('" + tmp_file2 + "', 'hello phpx'); return PHP_VERSION_ID; ?>");
+    file_put_contents(tmp_file,
+                      "<?php file_put_contents('" + tmp_file2 + "', 'hello phpx'); return PHP_VERSION_ID; ?>");
     auto retval = include(tmp_file);
     ASSERT_TRUE(retval.isInt());
     ASSERT_EQ(retval.toInt(), PHP_VERSION_ID);
@@ -83,11 +84,11 @@ TEST(base, equals) {
 }
 
 TEST(base, eval) {
-	ob_start();
-	eval("print_r(PHP_VERSION);");
-	auto rs = ob_get_clean();
-	ASSERT_TRUE(rs.isString());
-	ASSERT_TRUE(str_contains(rs, PHP_VERSION).toBool());
+    ob_start();
+    eval("print_r(PHP_VERSION);");
+    auto rs = ob_get_clean();
+    ASSERT_TRUE(rs.isString());
+    ASSERT_TRUE(str_contains(rs, PHP_VERSION).toBool());
 }
 
 TEST(base, exception) {
@@ -110,6 +111,5 @@ TEST(base, exception) {
 }
 
 TEST(base, throwException) {
-	throwException("NotExistsException", "hello world", 19900);
+    throwException("NotExistsException", "hello world", 19900);
 }
-
