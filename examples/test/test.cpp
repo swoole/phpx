@@ -261,7 +261,7 @@ PHPX_FUNCTION(cpp_test)
         Array arr(retval);
         for (int i = 0; i < arr.count(); i++)
         {
-            printf("key[%d] = %s\n", i, arr[i].toString().c_str());
+            printf("key[%d] = %s\n", i, arr[i].toStdString().c_str());
         }
     }
     /**
@@ -329,13 +329,13 @@ PHPX_FUNCTION(cpp_test)
         {
             //把return的变量转成数组
             Array arr2(retval2);
-            cout << "key: " << arr2["key"].toString() << ", value: " << arr2["value"].toString() << endl;
+            cout << "key: " << arr2["key"].toStdString() << ", value: " << arr2["value"].toStdString() << endl;
         }
         /**
          * 读取对象属性
          */
         Variant name = obj.get("name");
-        cout << "name property: " << name.toString() << endl;
+        cout << "name property: " << name.toStdString() << endl;
 
         /**
          * 创建一个Test2类的对象
@@ -350,7 +350,7 @@ PHPX_FUNCTION(cpp_test)
     }
     else
     {
-        cout << "return value=" << _retval.toString() << endl;
+        cout << "return value=" << _retval.toStdString() << endl;
     }
 }
 

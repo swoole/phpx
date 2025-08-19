@@ -156,7 +156,7 @@ class String {
             zend_string_release(str);
         }
     }
-    long toInt() const {
+    Int toInt() const {
         return ZEND_STRTOL(ZSTR_VAL(str), nullptr, 10);
     }
     double toFloat() const {
@@ -384,7 +384,7 @@ class Variant {
     }
     void debug();
     void print() {
-    	php_var_dump(&val, 10);
+        php_var_dump(&val, 10);
     }
     int getRefCount() const;
     int type() const {
@@ -432,12 +432,13 @@ class Variant {
     bool empty() {
         return toBool() == false;
     }
-    std::string toString();
+    std::string toStdString();
+    String toString();
     const char *toCString() {
         convert_to_string(&val);
         return Z_STRVAL(val);
     }
-    long toInt() {
+    Int toInt() {
         return zval_get_long(&val);
     }
     double toFloat() {

@@ -115,7 +115,7 @@ Array::Array(const zval *v) : Variant(v) {
     if (isNull()) {
         array_init(ptr());
     } else if (!isArray()) {
-        error(E_ERROR, "parameter 1 must be zend_array.");
+        error(E_ERROR, "parameter 1 must be `array`, got `%s`", typeStr());
     }
 }
 

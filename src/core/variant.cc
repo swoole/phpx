@@ -46,11 +46,15 @@ Variant &Variant::operator=(const Variant *v) {
     return *this;
 }
 
-std::string Variant::toString() {
+std::string Variant::toStdString() {
     zend_string *str = zval_get_string(ptr());
     auto retval = std::string(ZSTR_VAL(str), ZSTR_LEN(str));
     zend_string_release(str);
     return retval;
+}
+
+String Variant::toString() {
+    return String{zval_get_string(ptr()), true};
 }
 
 Array Variant::toArray() const {

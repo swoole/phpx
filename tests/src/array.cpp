@@ -85,6 +85,9 @@ TEST(array, init) {
     ASSERT_STREQ(a3[1111].toCString(), "hello");
     ASSERT_EQ(a3[2222].toFloat(), 3.14);
     ASSERT_EQ(a3[3333].toFloat(), 100);
+
+    Array a4(null.ptr());
+    ASSERT_EQ(a4.count(), 0);
 }
 
 TEST(array, search) {
@@ -114,6 +117,10 @@ TEST(array, update) {
 
 	arr.set("java", 666);
 	ASSERT_EQ(arr.get("java").toInt(), 666);
+
+	Array arr2 = create_list();
+	arr2[2] = "golang";
+	ASSERT_STREQ(arr2.get(2).toCString(), "golang");
 }
 
 TEST(array, nesting) {
@@ -127,14 +134,14 @@ TEST(array, foreach) {
     Array arr = create_list();
     std::vector<std::string> list;
     for (auto i = arr.begin(); i != arr.end(); i++) {
-        list.push_back(i.value().toString());
+        list.push_back(i.value().toStdString());
     }
     ASSERT_EQ(list.size(), 5);
 
     arr.del(3);
     list.clear();
     for (auto i = arr.begin(); i != arr.end(); i++) {
-        list.push_back(i.value().toString());
+        list.push_back(i.value().toStdString());
     }
     ASSERT_EQ(list.size(), 4);
 }

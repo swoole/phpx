@@ -71,16 +71,23 @@ TEST(variant, toCString) {
     ASSERT_STREQ(s1.c_str(), s2.toCString());
 }
 
-TEST(variant, toString) {
+TEST(variant, toStdString) {
     std::string s1("hello world");
     Variant s2("hello world");
-    ASSERT_STREQ(s1.c_str(), s2.toString().c_str());
+    ASSERT_STREQ(s1.c_str(), s2.toStdString().c_str());
+}
+
+TEST(variant, toString) {
+    Variant s("hello world");
+    auto s2 = s.toString();
+    ASSERT_EQ(s2.getRefCount(), 2);
+    ASSERT_TRUE(s2.equals("hello world"));
 }
 
 TEST(variant, toStringWithLength) {
     std::string s1("hello world");
     Variant s2("hello world");
-    ASSERT_EQ(s1.length(), s2.toString().length());
+    ASSERT_EQ(s1.length(), s2.toStdString().length());
 }
 
 TEST(variant, serialize) {

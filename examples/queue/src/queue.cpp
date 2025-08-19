@@ -62,11 +62,11 @@ PHPX_METHOD(Queue, push) {
         Array arr(args[0]);
         cout << '[';
         for (auto it = arr.begin(); it != arr.end(); it++) {
-            cout << it.value().toString();
+            cout << it.value().toStdString();
         }
         cout << ']' << endl;
     } else {
-        cout << args[0].toString() << endl;
+        cout << args[0].toStdString() << endl;
     }
     queue->storage.emplace_back(args[0]);
 
@@ -100,11 +100,11 @@ PHPX_METHOD(Queue, traverse) {
             cout << '[';
             Array arr(*iter);
             for (auto it = arr.begin(); it != arr.end(); it++) {
-                cout << it.value().toString() << ' ';
+                cout << it.value().toStdString() << ' ';
             }
             cout << "] ";
         } else {
-            cout << iter->toString() << ' ';
+            cout << iter->toStdString() << ' ';
         }
     }
     cout << endl;
