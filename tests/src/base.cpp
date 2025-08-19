@@ -96,6 +96,7 @@ TEST(base, exception) {
     zend_catch {
         auto e = Object(getException());
         ASSERT_TRUE(e.getClassName().equals("RuntimeException"));
+        zend_clear_exception();
 #if 0
         auto msg = e.exec("getMessage");
         ASSERT_TRUE(msg.isString());
