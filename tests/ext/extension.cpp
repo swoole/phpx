@@ -73,6 +73,10 @@ PHPX_METHOD(MyClass, pset) {
     return {};
 }
 
+PHPX_METHOD(MyClass, add) {
+    return args[0].toInt() + args[1].toInt();
+}
+
 PHPX_METHOD(MyClass, count) {
     return 100;
 }

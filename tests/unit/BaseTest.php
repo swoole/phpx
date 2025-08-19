@@ -32,6 +32,8 @@ class BaseTest extends TestCase
         $this->assertEquals($o->testPropertyInt, 9988);
         $this->assertEquals(MyClass::$testStaticProperty, '(static) hello world');
         $this->assertEquals(count($o), 100);
+        
+        $this->assertEquals($o->add(100, "99"), 199);
 
     }
 
