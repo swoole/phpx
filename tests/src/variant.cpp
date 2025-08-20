@@ -166,7 +166,7 @@ TEST(variant, calc) {
 
     var f1 = 2;
     var f2 = b / f1;
-    ASSERT_TRUE(f2.equals(9));
+    ASSERT_TRUE(f2.equals(9.5));
 
     ASSERT_TRUE(f1.pow(16).equals(std::pow(2, 16)));
 
@@ -202,7 +202,7 @@ TEST(variant, calc) {
 
     var i = PI;
     var i2 = i % 2.0;
-    ASSERT_TRUE(i2.almostEquals(std::fmod(PI, 2.0), 1e-5));
+    ASSERT_TRUE(i2.equals(1));
 
     var i3 = i2.pow(1.3);
     ASSERT_TRUE(i3.almostEquals(std::pow(i2.toFloat(), 1.3), 1e-5));
@@ -389,3 +389,33 @@ TEST(variant, move_ctor) {
     s.print();
     t.print();
 }
+
+TEST(variant, concat) {
+    var s("abc");
+
+    s += " hello ";
+    ASSERT_STREQ(s.toCString(), "abc hello ");
+
+    s += 1990;
+    ASSERT_STREQ(s.toCString(), "abc hello 1990");
+
+    s += " ";
+
+    s += 2020.2009;
+    ASSERT_STREQ(s.toCString(), "abc hello 1990 2020.2009");
+}
+
+TEST(variant, concat2) {
+    var s("abc");
+
+    auto s2 = s + var(" hello ");
+    ASSERT_STREQ(s2.toCString(), "abc hello ");
+
+    auto s3 = s2 + var(1990);
+    ASSERT_STREQ(s3.toCString(), "abc hello 1990");
+
+    auto s4 = s3 + var(" ") + var(2020.2009);
+    ASSERT_STREQ(s4.toCString(), "abc hello 1990 2020.2009");
+}
+
+TEST(variant, binary_op) {}

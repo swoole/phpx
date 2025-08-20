@@ -70,6 +70,14 @@ typedef int zend_result;
 
 #define PHPX_API PHPAPI
 
+/**
+ * !!! Unsafe conversion, discarding const modifier. There are many errors in the php src source code.
+ * Many function parameters are read-only zvals, and the const modifier should be added.
+ * However, the php code does not do this, resulting in C++ code unable to implement safe const functions.
+ */
+#define NO_CONST_V(_v) const_cast<zval *>(_v.const_ptr())
+#define NO_CONST_Z(_z) const_cast<zval *>(_z)
+
 namespace php {
 typedef zend_long Int;
 typedef double Float;
@@ -508,12 +516,23 @@ class Variant {
     Variant unserialize();
     bool isCallable();
 
+    // Incrementing/Decrementing Operators
     Variant &operator++();
     Variant &operator--();
     Variant operator++(int);
     Variant operator--(int);
+    // Binary operators
     Variant &operator+=(const Variant &);
     Variant &operator-=(const Variant &);
+    Variant &operator/=(const Variant &);
+    Variant &operator*=(const Variant &);
+    Variant &operator%=(const Variant &);
+    Variant &operator<<=(const Variant &);
+    Variant &operator>>=(const Variant &);
+    Variant &operator&=(const Variant &);
+    Variant &operator|=(const Variant &);
+    Variant &operator^=(const Variant &);
+    // Unary operators
     Variant operator+(const Variant &) const;
     Variant operator-(const Variant &) const;
     Variant operator*(const Variant &) const;
@@ -525,6 +544,7 @@ class Variant {
     Variant operator|(const Variant &) const;
     Variant operator^(const Variant &) const;
     Variant operator~() const;
+    // Exponential expression
     Variant pow(const Variant &) const;
 
     Variant operator()() const;

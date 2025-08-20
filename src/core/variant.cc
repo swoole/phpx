@@ -132,29 +132,40 @@ Variant Variant::getRefValue() const {
     return {&zv};
 }
 
+/**
+ * The comparison function never returns a failure
+ * Including:
+ * is_identical_function
+ * is_equal_function
+ * is_smaller_function
+ * is_smaller_or_equal_function
+ */
+static inline bool compare_op(binary_op_type op, const zval *op1, const zval *op2) {
+    zval result;
+    op(&result, NO_CONST_Z(op1), NO_CONST_Z(op2));
+    return Z_TYPE(result) == IS_TRUE;
+}
+
+static inline Variant calc_op(binary_op_type op, const zval *op1, const zval *op2) {
+    Variant result;
+    op(result.ptr(), NO_CONST_Z(op1), NO_CONST_Z(op2));
+    return result;
+}
+
+static zend_result ZEND_FASTCALL is_greater_function(zval *result, zval *op1, zval *op2) {
+    return is_smaller_function(result, op2, op1);
+}
+
+static zend_result ZEND_FASTCALL is_greater_or_equal_function(zval *result, zval *op1, zval *op2) {
+    return is_smaller_or_equal_function(result, op2, op1);
+}
+
 bool Variant::equals(const Variant &v, bool strict) const {
-    zval *op1 = const_cast<zval *>(v.const_ptr());
-    zval *op2 = const_cast<zval *>(const_ptr());
     if (strict) {
-        if (fast_is_identical_function(op1, op2)) {
-            return true;
-        }
+        return compare_op(is_identical_function, const_ptr(), v.const_ptr());
     } else {
-        if (v.isInt()) {
-            if (fast_equal_check_long(op1, op2)) {
-                return true;
-            }
-        } else if (v.isString()) {
-            if (fast_equal_check_string(op1, op2)) {
-                return true;
-            }
-        } else {
-            if (fast_equal_check_function(op1, op2)) {
-                return true;
-            }
-        }
+        return compare_op(is_equal_function, const_ptr(), v.const_ptr());
     }
-    return false;
 }
 
 Variant Variant::serialize() {
@@ -215,115 +226,129 @@ Variant Variant::operator--(int) {
 }
 
 Variant &Variant::operator+=(const Variant &v) {
-    if (isFloat() || v.isFloat()) {
-        convert_to_double(ptr());
-        Z_DVAL_P(ptr()) += v.toFloat();
+    if (isString() || v.isString()) {
+        concat_function(ptr(), ptr(), NO_CONST_V(v));
     } else {
-        convert_to_long(ptr());
-        Z_LVAL_P(ptr()) += v.toInt();
+        add_function(ptr(), ptr(), NO_CONST_V(v));
     }
     return *this;
 }
 
 Variant &Variant::operator-=(const Variant &v) {
-    if (isFloat() || v.isFloat()) {
-        convert_to_double(ptr());
-        Z_DVAL_P(ptr()) -= v.toFloat();
-    } else {
-        convert_to_long(ptr());
-        Z_LVAL_P(ptr()) -= v.toInt();
-    }
+    sub_function(ptr(), ptr(), NO_CONST_V(v));
     return *this;
 }
 
-#define CALC_OP(v, op)                                                                                                 \
-    do {                                                                                                               \
-        if (v.isFloat() || isFloat()) {                                                                                \
-            return toFloat() op v.toFloat();                                                                           \
-        } else {                                                                                                       \
-            return toInt() op v.toInt();                                                                               \
-        }                                                                                                              \
-    } while (0)
+Variant &Variant::operator/=(const Variant &v) {
+    div_function(ptr(), ptr(), NO_CONST_V(v));
+    return *this;
+}
+
+Variant &Variant::operator*=(const Variant &v) {
+    mul_function(ptr(), ptr(), NO_CONST_V(v));
+    return *this;
+}
+
+Variant &Variant::operator%=(const Variant &v) {
+    mod_function(ptr(), ptr(), NO_CONST_V(v));
+    return *this;
+}
+
+Variant &Variant::operator<<=(const Variant &v) {
+    shift_left_function(ptr(), ptr(), NO_CONST_V(v));
+    return *this;
+}
+
+Variant &Variant::operator>>=(const Variant &v) {
+    shift_right_function(ptr(), ptr(), NO_CONST_V(v));
+    return *this;
+}
+
+Variant &Variant::operator&=(const Variant &v) {
+    bitwise_and_function(ptr(), ptr(), NO_CONST_V(v));
+    return *this;
+}
+
+Variant &Variant::operator|=(const Variant &v) {
+    bitwise_or_function(ptr(), ptr(), NO_CONST_V(v));
+    return *this;
+}
+
+Variant &Variant::operator^=(const Variant &v) {
+    bitwise_xor_function(ptr(), ptr(), NO_CONST_V(v));
+    return *this;
+}
 
 Variant Variant::operator+(const Variant &v) const {
-    CALC_OP(v, +);
+    Variant result;
+    if (isString() || v.isString()) {
+        concat_function(result.ptr(), NO_CONST_Z(const_ptr()), NO_CONST_V(v));
+    } else {
+        add_function(result.ptr(), NO_CONST_Z(const_ptr()), NO_CONST_V(v));
+    }
+    return result;
 }
 
 Variant Variant::operator-(const Variant &v) const {
-    CALC_OP(v, -);
+    return calc_op(sub_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator*(const Variant &v) const {
-    CALC_OP(v, *);
+    return calc_op(mul_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator/(const Variant &v) const {
-    CALC_OP(v, /);
+    return calc_op(div_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator%(const Variant &v) const {
-    if (v.isFloat() || isFloat()) {
-        return std::fmod(toFloat(), v.toFloat());
-    } else {
-        return toInt() % v.toInt();
-    }
+    return calc_op(mod_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator<<(const Variant &v) const {
-    return toInt() << v.toInt();
+    return calc_op(shift_left_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator>>(const Variant &v) const {
-    return toInt() >> v.toInt();
+    return calc_op(shift_right_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator&(const Variant &v) const {
-    return toInt() & v.toInt();
+    return calc_op(bitwise_and_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator|(const Variant &v) const {
-    return toInt() | v.toInt();
+    return calc_op(bitwise_or_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator^(const Variant &v) const {
-    return toInt() ^ v.toInt();
+    return calc_op(bitwise_xor_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator~() const {
-    return ~toInt();
-}
-
-#define COMPARE_OP(v, op)                                                                                              \
-    do {                                                                                                               \
-        if (isFloat()) {                                                                                               \
-            return toFloat() op v.toFloat();                                                                           \
-        } else {                                                                                                       \
-            return toInt() op v.toInt();                                                                               \
-        }                                                                                                              \
-    } while (0)
-
-bool Variant::operator<(const Variant &v) const {
-    COMPARE_OP(v, <);
-}
-
-bool Variant::operator>(const Variant &v) const {
-    COMPARE_OP(v, >);
-}
-
-bool Variant::operator<=(const Variant &v) const {
-    COMPARE_OP(v, <=);
-}
-
-bool Variant::operator>=(const Variant &v) const {
-    COMPARE_OP(v, >=);
+    Variant result{};
+    bitwise_not_function(result.ptr(), NO_CONST_Z(const_ptr()));
+    return result;
 }
 
 Variant Variant::pow(const Variant &v) const {
-    if (v.isFloat() || isFloat()) {
-        return std::pow(toFloat(), v.toFloat());
-    } else {
-        return std::pow(toInt(), v.toInt());
-    }
+    return calc_op(pow_function, const_ptr(), v.const_ptr());
+}
+
+bool Variant::operator<(const Variant &v) const {
+    return compare_op(is_smaller_function, const_ptr(), v.const_ptr());
+}
+
+bool Variant::operator<=(const Variant &v) const {
+    return compare_op(is_smaller_or_equal_function, const_ptr(), v.const_ptr());
+}
+
+bool Variant::operator>(const Variant &v) const {
+    return compare_op(is_greater_function, const_ptr(), v.const_ptr());
+}
+
+bool Variant::operator>=(const Variant &v) const {
+    return compare_op(is_greater_or_equal_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator()() const {
@@ -333,7 +358,7 @@ Variant Variant::operator()() const {
 Variant Variant::operator()(const std::initializer_list<Variant> &args) const {
     Args _args;
     for (const auto &arg : args) {
-        _args.append(const_cast<Variant &>(arg).ptr());
+        _args.append(NO_CONST_V(arg));
     }
     return _call(nullptr, const_ptr(), _args);
 }
