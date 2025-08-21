@@ -206,6 +206,15 @@ TEST(variant, calc) {
 
     var i3 = i2.pow(1.3);
     ASSERT_TRUE(i3.almostEquals(std::pow(i2.toFloat(), 1.3), 1e-5));
+
+    var i4 = 2;
+    var i5 = i4.pow(8);
+    ASSERT_TRUE(i5.equals(std::pow(2, 8)));
+
+    var x = 5.7;
+    var y = 1.3;
+    var r = php::fmod(x, y);
+    ASSERT_TRUE(r.equals(std::fmod(5.7, 1.3)));
 }
 
 TEST(variant, compare) {
@@ -454,4 +463,11 @@ TEST(variant, binary_op) {
 
     a ^= 64;
     ASSERT_EQ(a.toInt(), 192);
+}
+
+TEST(variant, logical_op) {
+    const Array a;
+    const var b = "1";
+    ASSERT_TRUE(a || b);
+    ASSERT_FALSE(a && b);
 }

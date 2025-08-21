@@ -439,7 +439,7 @@ class Variant {
     bool isReference() const {
         return Z_TYPE_P(const_ptr()) == IS_REFERENCE;
     }
-    bool empty() {
+    bool empty() const {
         return toBool() == false;
     }
     std::string toStdString();
@@ -454,7 +454,7 @@ class Variant {
     double toFloat() const {
         return zval_get_double(const_cast<zval *>(&val));
     }
-    bool toBool() {
+    bool toBool() const {
         return zval_is_true(const_cast<zval *>(&val));
     }
     Array toArray() const;
@@ -552,10 +552,10 @@ class Variant {
     void append(const Variant &);
 
     Variant operator()() const;
-    explicit operator bool() noexcept {
+    explicit operator bool() const noexcept {
         return toBool();
     }
-    bool operator!() {
+    bool operator!() const noexcept {
         return !toBool();
     }
     Variant operator()(const std::initializer_list<Variant> &args) const;
