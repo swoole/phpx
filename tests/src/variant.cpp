@@ -392,9 +392,16 @@ TEST(variant, move_ctor) {
 
 TEST(variant, concat1) {
     var s("abc");
+    // s2 and s point to the same zend_string object
+    var s2 = s;
+
+    ASSERT_EQ(s2.toString().getRefCount(), 3);
 
     s.append(" hello ");
+    // copy on write: `s` will be separated, and a new zend_string object will be allocated
     ASSERT_STREQ(s.toCString(), "abc hello ");
+    ASSERT_STREQ(s2.toCString(), "abc");
+    ASSERT_EQ(s2.toString().getRefCount(), 2);
 
     s.append(1990);
     ASSERT_STREQ(s.toCString(), "abc hello 1990");
