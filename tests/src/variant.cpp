@@ -418,4 +418,33 @@ TEST(variant, concat2) {
     ASSERT_STREQ(s4.toCString(), "abc hello 1990 2020.2009");
 }
 
-TEST(variant, binary_op) {}
+TEST(variant, binary_op) {
+    var a = 256;
+    a /= 2;
+    ASSERT_EQ(a.toInt(), 128);
+
+    a *= 3;
+    ASSERT_EQ(a.toInt(), 384);
+
+    a %= 31;
+    ASSERT_EQ(a.toInt(), 12);
+
+    a = 16;
+    a <<= 2;
+    ASSERT_EQ(a.toInt(), 64);
+
+    a >>= 3;
+    ASSERT_EQ(a.toInt(), 8);
+
+    a &= 8;
+    ASSERT_EQ(a.toInt(), 8);
+
+    a &= 4;
+    ASSERT_EQ(a.toInt(), 0);
+
+    a |= 128;
+    ASSERT_EQ(a.toInt(), 128);
+
+    a ^= 64;
+    ASSERT_EQ(a.toInt(), 192);
+}
