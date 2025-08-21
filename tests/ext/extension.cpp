@@ -56,6 +56,10 @@ PHPX_FUNCTION(phpx_test3) {
     return {};
 }
 
+PHPX_FUNCTION(phpx_add) {
+    return args[0].toInt() + args[1].toInt();
+}
+
 PHPX_METHOD(MyClass, test) {
     cout << "MyClass::test" << endl;
     return 1234.56;
@@ -109,7 +113,6 @@ PHPX_EXTENSION() {
         c->addStaticProperty("testStaticProperty", "(static) hello world", ZEND_ACC_PUBLIC);
         c->implements(zend_ce_countable);
         c->alias("MyClassAlias");
-        extension->registerClass(c);
 
         auto *e = new Class("MyException");
         e->extends(zend_ce_exception);
@@ -122,6 +125,9 @@ PHPX_EXTENSION() {
         auto *i = new Interface("MyInterface");
         i->registerFunctions(class_MyInterface_methods);
         extension->registerInterface(i);
+
+        c->implements(i);
+        extension->registerClass(c);
 
         extension->registerResource("ResourceString", string_dtor);
         const auto ce = i->ptr();

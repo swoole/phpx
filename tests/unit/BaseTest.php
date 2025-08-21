@@ -91,4 +91,23 @@ class BaseTest extends TestCase
             $obj->count();
         }
     }
+
+    public function testErrorArgs1()
+    {
+        try {
+            phpx_add(1);
+        } catch (\Throwable $e) {
+            $this->assertStringContainsString("expects exactly 2 argument", $e->getMessage());
+        }
+    }
+
+    public function testErrorArgs2()
+    {
+        try {
+            $o = new myClass;
+            $o->add(1);
+        } catch (\Throwable $e) {
+            $this->assertStringContainsString("expects exactly 2 argument", $e->getMessage());
+        }
+    }
 }
