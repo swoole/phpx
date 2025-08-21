@@ -202,6 +202,20 @@ TEST(array, slice) {
 
     auto arr5 = arr.slice(2, -3, false);
     ASSERT_EQ(arr5.count(), 3);
+
+    Array arr6;
+    arr6[1990] = "hello";
+    arr6[1991] = "world";
+    arr6[2029] = "php";
+    arr6[2099] = "swoole";
+
+    auto arr7 = arr6.slice(1, -1, false);
+    ASSERT_EQ(arr7.count(), 2);
+    ASSERT_STREQ(arr7[0].toCString(), "world");
+    ASSERT_STREQ(arr7[1].toCString(), "php");
+
+    auto arr8 = arr7.slice(1, -4);
+    ASSERT_EQ(arr8.count(), 0);
 }
 
 TEST(array, subscript) {

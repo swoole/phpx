@@ -201,8 +201,12 @@ ArrayItem::ArrayItem(Array &_array, zend_ulong _index, zend_string *_key) : arra
         value_ = zend_hash_index_find(_array.array(), index_);
         key_ = nullptr;
     }
-    val = *value_;
-    addRef();
+    if (value_) {
+        val = *value_;
+        addRef();
+    } else {
+        ZVAL_NULL(&val);
+    }
 }
 
 ArrayItem &ArrayItem::operator=(const Variant &v) {
