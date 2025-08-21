@@ -224,6 +224,28 @@ TEST(array, merge) {
     ASSERT_EQ(arr1.count(), 8);
 }
 
+TEST(array, add) {
+    Array a = {{"a", "apple"}, {"b", "banana"}};
+    Array b = {{"a", "pear"}, {"b", "strawberry"}, {"c", "cherry"}};
+    Array c = a + b;
+    ASSERT_EQ(c.length(), 3);
+    ASSERT_TRUE(c.get("c").equals("cherry"));
+
+    Array d = a;
+    ASSERT_EQ(a.length(), 2);
+    d += b;
+    ASSERT_EQ(a.length(), 2);
+    ASSERT_EQ(d.length(), 3);
+    ASSERT_TRUE(d.get("b").equals("banana"));
+
+    Array e = b;
+    ASSERT_EQ(b.length(), 3);
+    e += a;
+    ASSERT_EQ(b.length(), 3);
+    ASSERT_EQ(e.length(), 3);
+    ASSERT_TRUE(e.get("b").equals("strawberry"));
+}
+
 TEST(array, bad_type) {
     auto arr1 = create_list();
     ChildResult r = run_in_child_capture_stdout([&arr1]() -> int {

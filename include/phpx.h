@@ -503,7 +503,7 @@ class Variant {
     bool operator>=(const Variant &v) const;
 
     bool equals(const Variant &v, bool strict = false) const;
-    bool almostEquals(const Variant &v, double eps = 1e-9) {
+    bool almostEquals(const Variant &v, double eps = 1e-9) const {
         return std::fabs(toFloat() - v.toFloat()) <= eps;
     }
 
@@ -546,6 +546,10 @@ class Variant {
     Variant operator~() const;
     // Exponential expression
     Variant pow(const Variant &) const;
+    // Concatenates two strings, return new string.
+    Variant concat(const Variant &) const;
+    // Concatenates the specified string to the end of this string.
+    void append(const Variant &);
 
     Variant operator()() const;
     explicit operator bool() noexcept {
@@ -715,18 +719,6 @@ class Array : public Variant {
     Array(const std::initializer_list<const Variant> &list);
     Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     Array(const std::initializer_list<std::pair<Int, const Variant>> &list);
-    void append(const Variant &v) {
-        const_cast<Variant &>(v).addRef();
-        SEPARATE_ARRAY(ptr());
-        add_next_index_zval(ptr(), const_cast<Variant &>(v).ptr());
-    }
-    void append(Array &v) {
-        zend_array *arr = zend_array_dup(Z_ARR_P(v.ptr()));
-        zval array;
-        ZVAL_ARR(&array, arr);
-        SEPARATE_ARRAY(ptr());
-        add_next_index_zval(ptr(), &array);
-    }
     void set(const String &s, const Variant &v) {
         const_cast<Variant &>(v).addRef();
         SEPARATE_ARRAY(ptr());
@@ -744,13 +736,13 @@ class Array : public Variant {
         return zend_hash_index_find(Z_ARRVAL_P(const_ptr()), i);
     }
     ArrayItem operator[](zend_ulong i) {
-        return ArrayItem(*this, i, nullptr);
+        return {*this, i, nullptr};
     }
     ArrayItem operator[](int i) {
-        return ArrayItem(*this, i, nullptr);
+        return {*this, (zend_ulong) i, nullptr};
     }
     ArrayItem operator[](const String &key) {
-        return ArrayItem(*this, 0, key.ptr());
+        return {*this, 0, key.ptr()};
     }
     bool del(zend_ulong index) {
         return zend_hash_index_del(Z_ARRVAL_P(ptr()), index) == SUCCESS;

@@ -56,9 +56,9 @@ void throwException(const char *name, const char *message, int code) {
     zend_throw_exception(ce, message, code);
 }
 
-static inline ZEND_RESULT_CODE _check_args_num(zend_execute_data *data, int num_args) {
-    uint32_t min_num_args = data->func->common.required_num_args;
-    uint32_t max_num_args = data->func->common.num_args;
+static inline ZEND_RESULT_CODE _check_args_num(const zend_execute_data *data, const int num_args) {
+    const uint32_t min_num_args = data->func->common.required_num_args;
+    const uint32_t max_num_args = data->func->common.num_args;
 
     if (num_args < min_num_args || (num_args > max_num_args && max_num_args > 0)) {
         zend_wrong_parameters_count_error(min_num_args, max_num_args);
@@ -169,21 +169,15 @@ zend_result _call_user_function_impl(const zval *object,
 }
 
 Variant _call(const zval *object, const zval *func, Args &args) {
-    Variant retval;
-    if (_call_user_function_impl(object, func, retval.ptr(), args.count(), args.ptr(), nullptr) == SUCCESS) {
-        return retval;
-    } else {
-        return {};
-    }
+    Variant retval{};
+    _call_user_function_impl(object, func, retval.ptr(), args.count(), args.ptr(), nullptr);
+    return retval;
 }
 
 Variant _call(const zval *object, const zval *func) {
-    Variant retval = false;
-    if (_call_user_function_impl(object, func, retval.ptr(), 0, nullptr, nullptr) == 0) {
-        return retval;
-    } else {
-        return {};
-    }
+    Variant retval{};
+    _call_user_function_impl(object, func, retval.ptr(), 0, nullptr, nullptr);
+    return retval;
 }
 
 Variant call(const Variant &func, Array &args) {

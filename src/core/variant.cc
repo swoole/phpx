@@ -140,13 +140,13 @@ Variant Variant::getRefValue() const {
  * is_smaller_function
  * is_smaller_or_equal_function
  */
-static inline bool compare_op(binary_op_type op, const zval *op1, const zval *op2) {
+static inline bool compare_op(const binary_op_type op, const zval *op1, const zval *op2) {
     zval result;
     op(&result, NO_CONST_Z(op1), NO_CONST_Z(op2));
     return Z_TYPE(result) == IS_TRUE;
 }
 
-static inline Variant calc_op(binary_op_type op, const zval *op1, const zval *op2) {
+static inline Variant calc_op(const binary_op_type op, const zval *op1, const zval *op2) {
     Variant result;
     op(result.ptr(), NO_CONST_Z(op1), NO_CONST_Z(op2));
     return result;
@@ -226,11 +226,7 @@ Variant Variant::operator--(int) {
 }
 
 Variant &Variant::operator+=(const Variant &v) {
-    if (isString() || v.isString()) {
-        concat_function(ptr(), ptr(), NO_CONST_V(v));
-    } else {
-        add_function(ptr(), ptr(), NO_CONST_V(v));
-    }
+    add_function(ptr(), ptr(), NO_CONST_V(v));
     return *this;
 }
 
@@ -280,13 +276,7 @@ Variant &Variant::operator^=(const Variant &v) {
 }
 
 Variant Variant::operator+(const Variant &v) const {
-    Variant result;
-    if (isString() || v.isString()) {
-        concat_function(result.ptr(), NO_CONST_Z(const_ptr()), NO_CONST_V(v));
-    } else {
-        add_function(result.ptr(), NO_CONST_Z(const_ptr()), NO_CONST_V(v));
-    }
-    return result;
+    return calc_op(add_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator-(const Variant &v) const {
@@ -333,6 +323,21 @@ Variant Variant::operator~() const {
 
 Variant Variant::pow(const Variant &v) const {
     return calc_op(pow_function, const_ptr(), v.const_ptr());
+}
+
+Variant Variant::concat(const Variant &v) const {
+    return calc_op(concat_function, const_ptr(), v.const_ptr());
+}
+
+void Variant::append(const Variant &v) {
+    if (isArray()) {
+        const_cast<Variant &>(v).addRef();
+        SEPARATE_ARRAY(ptr());
+        add_next_index_zval(ptr(), const_cast<Variant &>(v).ptr());
+    } else {
+        convert_to_string(ptr());
+        concat_function(ptr(), ptr(), NO_CONST_V(v));
+    }
 }
 
 bool Variant::operator<(const Variant &v) const {
@@ -424,9 +429,8 @@ Object newObject(const char *name) {
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
-    Args args;
     if (ce->constructor) {
-        object.call(__construct, args);
+        _call(object.ptr(), __construct.ptr());
     }
     return object;
 }
@@ -467,12 +471,12 @@ Variant Object::callParentMethod(const String &func, const std::initializer_list
 
     Variant retval;
     auto fn = (zend_function *) zend_hash_find_ptr_lc(&parent_ce()->function_table, func.ptr());
-    if (UNEXPECTED(fn == NULL)) {
+    if (UNEXPECTED(fn == nullptr)) {
         /* error at c-level */
         zend_error_noreturn(
             E_CORE_ERROR, "Couldn't find implementation for method %s::%s", ZSTR_VAL(parent_ce()->name), func.data());
     } else {
-        zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), NULL);
+        zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), nullptr);
     }
     return retval;
 }

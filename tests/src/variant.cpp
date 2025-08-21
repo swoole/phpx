@@ -390,31 +390,31 @@ TEST(variant, move_ctor) {
     t.print();
 }
 
-TEST(variant, concat) {
+TEST(variant, concat1) {
     var s("abc");
 
-    s += " hello ";
+    s.append(" hello ");
     ASSERT_STREQ(s.toCString(), "abc hello ");
 
-    s += 1990;
+    s.append(1990);
     ASSERT_STREQ(s.toCString(), "abc hello 1990");
 
-    s += " ";
+    s.append(" ");
 
-    s += 2020.2009;
+    s.append(2020.2009);
     ASSERT_STREQ(s.toCString(), "abc hello 1990 2020.2009");
 }
 
 TEST(variant, concat2) {
     var s("abc");
 
-    auto s2 = s + var(" hello ");
+    auto s2 = s.concat(" hello ");
     ASSERT_STREQ(s2.toCString(), "abc hello ");
 
-    auto s3 = s2 + var(1990);
+    auto s3 = s2.concat(1990);
     ASSERT_STREQ(s3.toCString(), "abc hello 1990");
 
-    auto s4 = s3 + var(" ") + var(2020.2009);
+    auto s4 = s3.concat(" ").concat(2020.2009);
     ASSERT_STREQ(s4.toCString(), "abc hello 1990 2020.2009");
 }
 
