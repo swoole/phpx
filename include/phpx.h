@@ -953,7 +953,7 @@ extern std::map<const char *, std::map<const char *, Method *, StrCmp>, StrCmp> 
 extern std::map<const char *, Function *, StrCmp> function_map;
 
 #define PHPX_FN(n) #n, n
-#define PHPX_ME(c, m) #m, c## _## m
+#define PHPX_ME(c, m) #m, c##_##m
 
 class Function {
     const char *name_;
@@ -967,17 +967,17 @@ class Function {
 };
 
 #define PHPX_FUNCTION(func)                                                                                            \
-    class phpx_function_## func : Function {                                                                            \
+    class phpx_function_##func : Function {                                                                            \
       public:                                                                                                          \
         Variant impl(Args &);                                                                                          \
-        explicit phpx_function_## func(const char *name) : Function(name) {                                             \
+        explicit phpx_function_##func(const char *name) : Function(name) {                                             \
             function_map[name] = this;                                                                                 \
         }                                                                                                              \
-        ~phpx_function_## func() {}                                                                                     \
+        ~phpx_function_##func() {}                                                                                     \
     };                                                                                                                 \
-    static phpx_function_## func f_## func(#func);                                                                       \
+    static phpx_function_##func f_##func(#func);                                                                       \
     PHP_FUNCTION(func) {}                                                                                              \
-    Variant phpx_function_## func::impl(Args &args)
+    Variant phpx_function_##func::impl(Args &args)
 
 class Method {
     const char *class_;
@@ -993,17 +993,17 @@ class Method {
 };
 
 #define PHPX_METHOD(class_, method)                                                                                    \
-    class phpx_method_## class_## _## method : Method {                                                                   \
+    class phpx_method_##class_##_##method : Method {                                                                   \
       public:                                                                                                          \
         Variant impl(Object &_this, Args &);                                                                           \
-        phpx_method_## class_## _## method(const char *_class, const char *_name) : Method(_class, _name) {               \
+        phpx_method_##class_##_##method(const char *_class, const char *_name) : Method(_class, _name) {               \
             method_map[_class][_name] = this;                                                                          \
         }                                                                                                              \
-        ~phpx_method_## class_## _## method() {}                                                                          \
+        ~phpx_method_##class_##_##method() {}                                                                          \
     };                                                                                                                 \
-    static phpx_method_## class_## _## method m_## class_## _## method(#class_, #method);                                    \
+    static phpx_method_##class_##_##method m_##class_##_##method(#class_, #method);                                    \
     PHP_METHOD(class_, method) {}                                                                                      \
-    Variant phpx_method_## class_## _## method::impl(Object &_this, Args &args)
+    Variant phpx_method_##class_##_##method::impl(Object &_this, Args &args)
 
 extern void _exec_function(zend_execute_data *data, zval *return_value);
 extern void _exec_method(zend_execute_data *data, zval *return_value);

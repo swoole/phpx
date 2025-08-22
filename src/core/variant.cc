@@ -56,7 +56,7 @@ std::string Variant::toStdString() {
 
 String Variant::toString() {
     const auto s = zval_get_string(ptr());
-    String result {s};
+    String result{s};
     zend_string_release(s);
     return result;
 }

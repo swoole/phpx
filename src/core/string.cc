@@ -26,7 +26,7 @@ String String::format(const char *format, ...) {
     va_start(args, format);
     zend_string *s = vstrpprintf(0, format, args);
     va_end(args);
-    String result {s};
+    String result{s};
     zend_string_release(s);
     return result;
 }
