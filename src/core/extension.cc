@@ -177,6 +177,39 @@ void Extension::addIniEntry(const char *name, const char *default_value, int mod
     ini_entries.push_back(entry);
 }
 
+void Extension::printInfo() const {
+    if (!header.empty() && !body.empty()) {
+        php_info_print_table_start();
+        size_t size = header.size();
+        switch (size) {
+        case 2:
+            php_info_print_table_header(size, header[0].c_str(), header[1].c_str());
+            break;
+        case 3:
+            php_info_print_table_header(size, header[0].c_str(), header[1].c_str(), header[2].c_str());
+            break;
+        default:
+            error(E_WARNING, "invalid info header size.");
+            return;
+        }
+        for (auto row : body) {
+            size = row.size();
+            switch (size) {
+            case 2:
+                php_info_print_table_row(size, row[0].c_str(), row[1].c_str());
+                break;
+            case 3:
+                php_info_print_table_row(size, row[0].c_str(), row[1].c_str(), row[2].c_str());
+                break;
+            default:
+                error(E_WARNING, "invalid info row size.");
+                return;
+            }
+        }
+        php_info_print_table_end();
+    }
+}
+
 Interface::Interface(const char *name) {
     this->name = name;
     INIT_CLASS_ENTRY_EX(_ce, name, strlen(name), nullptr);
@@ -217,38 +250,8 @@ zend_result extension_startup(int type, int module_number) {
 }
 
 void extension_info(zend_module_entry *module) {
-    auto extension = _module_number_to_extension[module->module_number];
-    if (!extension->header.empty() && !extension->body.empty()) {
-        php_info_print_table_start();
-        auto header = extension->header;
-        size_t size = header.size();
-        switch (size) {
-        case 2:
-            php_info_print_table_header(size, header[0].c_str(), header[1].c_str());
-            break;
-        case 3:
-            php_info_print_table_header(size, header[0].c_str(), header[1].c_str(), header[2].c_str());
-            break;
-        default:
-            error(E_WARNING, "invalid info header size.");
-            return;
-        }
-        for (auto row : extension->body) {
-            size = row.size();
-            switch (size) {
-            case 2:
-                php_info_print_table_row(size, row[0].c_str(), row[1].c_str());
-                break;
-            case 3:
-                php_info_print_table_row(size, row[0].c_str(), row[1].c_str(), row[2].c_str());
-                break;
-            default:
-                error(E_WARNING, "invalid info row size.");
-                return;
-            }
-        }
-        php_info_print_table_end();
-    }
+    const auto extension = _module_number_to_extension[module->module_number];
+    extension->printInfo();
 }
 
 zend_result extension_shutdown(int type, int module_number) {

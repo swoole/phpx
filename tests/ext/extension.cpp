@@ -87,7 +87,7 @@ PHPX_METHOD(MyClass, count) {
 }
 
 void string_dtor(zend_resource *res) {
-    String *s = static_cast<String *>(res->ptr);
+    auto *s = static_cast<String *>(res->ptr);
     delete s;
 }
 
@@ -132,6 +132,34 @@ PHPX_EXTENSION() {
         extension->registerResource("ResourceString", string_dtor);
         const auto ce = i->ptr();
         printf("ce=%p\n", ce);
+
+        auto ori_info_header = extension->header;
+        auto ori_info_body = extension->body;
+
+        // test print info
+        extension->info({"phpx_test support", "enabled", "v1.0.0"},
+                {
+                    {"test", "hello", "world"},
+                });
+        extension->printInfo();
+
+        // invalid header size test
+        extension->info({"phpx_test support", "enabled", "v1.0.0", "more info"},
+        {
+            {"test", "hello", "world", "swoole", "is", "best"},
+        });
+        extension->printInfo();
+
+        // invalid row size test
+        extension->info({"phpx_test support", "enabled"},
+                        {
+                            {"test", "hello", "world", "swoole", "is", "best"},
+                        });
+        extension->printInfo();
+
+        // reset info
+        extension->info(ori_info_header, ori_info_body);
+        extension->printInfo();
     };
 
     extension->onShutdown = [extension]() noexcept { cout << extension->name << "shutdown" << endl; };
