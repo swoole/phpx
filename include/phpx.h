@@ -309,6 +309,10 @@ class Variant {
         memcpy(&val, &v.val, sizeof(zval));
         v.val = {};
     }
+    Variant(const Variant *v) {
+        ZVAL_NEW_REF(&val, v->const_ptr());
+        zval_add_ref(Z_REFVAL(val));
+    }
     /**
      * !!! [UNSAFE]
      * This constructor is unsafe and should be used with caution.
@@ -363,10 +367,6 @@ class Variant {
     }
     Variant &operator=(const zval *v);
     Variant &operator=(const Variant &v);
-    Variant(const Variant *v) {
-        ZVAL_NEW_REF(&val, v->const_ptr());
-        zval_add_ref(Z_REFVAL(val));
-    }
     Variant &operator=(const Variant *v);
     Variant &operator=(nullptr_t) {
         destroy();

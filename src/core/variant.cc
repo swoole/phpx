@@ -396,9 +396,7 @@ Variant Variant::jsonEncode(zend_long options, zend_long depth) {
     Variant result;
     php_json_encode(&buf, ptr(), (int) options);
 
-    if (JSON_G(error_code) != PHP_JSON_ERROR_NONE && !(options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR)) {
-        result = nullptr;
-    } else {
+    if (EXPECTED(JSON_G(error_code) == PHP_JSON_ERROR_NONE || !(options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR))) {
         smart_str_0(&buf);
         result = buf.s;
     }
