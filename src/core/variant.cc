@@ -400,6 +400,7 @@ Variant Variant::jsonEncode(zend_long options, zend_long depth) {
         result = nullptr;
     } else {
         smart_str_0(&buf);
+        result = buf.s;
     }
     smart_str_free(&buf);
     return result;

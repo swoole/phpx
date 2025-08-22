@@ -270,7 +270,9 @@ class Variant {
         ZVAL_STRINGL(&val, str, len);
     }
     /**
-     * !!! Please note that this approach is intended solely for global constant objects.
+     * !!! [UNSAFE] `persistent` argument
+     * When `persistent` is `true`, it will never be released until the process exits.
+     * Please note that this approach is intended solely for global constant objects.
      */
     Variant(const char *str, size_t len, bool persistent) {
         ZVAL_NEW_STR(&val, zend_string_init(str, len, persistent));
@@ -293,12 +295,11 @@ class Variant {
         ZVAL_BOOL(&val, v);
     }
     Variant(const zval *v) noexcept {
-        if (!v) {
+        if (UNEXPECTED(!v)) {
             ZVAL_NULL(&val);
-            return;
+        } else {
+            ZVAL_COPY(&val, v);
         }
-        ZVAL_COPY_VALUE(&val, v);
-        addRef();
     }
     Variant(zend_string *s) noexcept {
         ZVAL_STR(&val, zend_string_copy(s));
@@ -309,7 +310,9 @@ class Variant {
         v.val = {};
     }
     /**
-     * res is a new reference passed in from outside;
+     * !!! [UNSAFE]
+     * This constructor is unsafe and should be used with caution.
+     * The `res` Must be a new reference passed in from outside;
      * it no longer requires adding application logic and is solely used for the newResource invocation.
      */
     Variant(zend_resource *res) {
@@ -351,6 +354,11 @@ class Variant {
     Variant &operator=(bool v) {
         destroy();
         ZVAL_BOOL(ptr(), v);
+        return *this;
+    }
+    Variant &operator=(zend_string *v) {
+        destroy();
+        ZVAL_STR(ptr(), zend_string_copy(v));
         return *this;
     }
     Variant &operator=(const zval *v);
