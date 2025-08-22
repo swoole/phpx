@@ -326,6 +326,18 @@ TEST(variant, ref4) {
     ASSERT_EQ((*ref).length(), 3);
 }
 
+TEST(variant, ref5) {
+    var s = "hello world";
+    var ref = &s;
+    s = "hello php";
+
+    auto b = ref.toString();
+    ASSERT_TRUE(ref.isReference());
+    ASSERT_STREQ(b.data(), "hello world");
+    ASSERT_STREQ(ref.toCString(), "hello world");
+    ASSERT_TRUE(ref.isString());
+}
+
 TEST(variant, callable) {
     Variant v1{"phpinfo"};
     ASSERT_TRUE(v1.isCallable());

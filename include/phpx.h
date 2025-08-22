@@ -438,8 +438,12 @@ class Variant {
     bool empty() const {
         return toBool() == false;
     }
-    std::string toStdString();
-    String toString();
+    std::string toStdString() const;
+    String toString() const;
+    /**
+     * This function is not read-only.
+     * If the current variable is not a string, it will be auto converted to a string
+     */
     const char *toCString() {
         convert_to_string(&val);
         return Z_STRVAL(val);

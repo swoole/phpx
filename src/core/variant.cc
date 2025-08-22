@@ -47,22 +47,26 @@ Variant &Variant::operator=(const Variant *v) {
     return *this;
 }
 
-std::string Variant::toStdString() {
-    zend_string *str = zval_get_string(ptr());
+std::string Variant::toStdString() const {
+    zend_string *str = zval_get_string(NO_CONST_Z(const_ptr()));
     auto retval = std::string(ZSTR_VAL(str), ZSTR_LEN(str));
     zend_string_release(str);
     return retval;
 }
 
-String Variant::toString() {
-    const auto s = zval_get_string(ptr());
+String Variant::toString() const {
+    const auto s = zval_get_string(NO_CONST_Z(const_ptr()));
     String result{s};
     zend_string_release(s);
     return result;
 }
 
 Array Variant::toArray() const {
-    return *this;
+    if (UNEXPECTED(Z_ISREF_P(const_ptr()))) {
+        return Array(Z_REFVAL(val));
+    } else {
+        return *this;
+    }
 }
 
 Object Variant::toObject() const {
@@ -395,8 +399,7 @@ Variant Variant::jsonEncode(zend_long options, zend_long depth) {
 
     Variant result;
     php_json_encode(&buf, ptr(), (int) options);
-
-    if (EXPECTED(JSON_G(error_code) == PHP_JSON_ERROR_NONE || !(options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR))) {
+    if (EXPECTED(JSON_G(error_code) == PHP_JSON_ERROR_NONE || (options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR))) {
         smart_str_0(&buf);
         result = buf.s;
     }

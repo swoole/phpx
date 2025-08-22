@@ -270,3 +270,17 @@ TEST(array, bad_type) {
     var s(r.output);
     ASSERT_TRUE(str_contains(s, "parameter 1 must be `array`, got `string`").toBool());
 }
+
+TEST(array, ref) {
+    Array a = {{"a", "apple"}, {"b", "banana"}};
+    var ref = &a;
+    a.set("c", "cherry");
+    ASSERT_EQ(a.count(), 3);
+    auto b = ref.toArray();
+    ASSERT_EQ(b.count(), 2);
+    ASSERT_EQ(b.length(), 2);
+    ASSERT_EQ(ref.length(), 0);
+
+    auto c = ref.getRefValue();
+    ASSERT_EQ(c.length(), 2);
+}
