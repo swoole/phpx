@@ -21,12 +21,21 @@ String::String(Variant &v) {
     str = zval_get_string(v.ptr());
 }
 
-String::String(zend_string *v, bool forward) {
-    if (forward) {
-        str = v;
-    } else {
-        str = zend_string_copy(v);
-    }
+String String::format(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+    zend_string *s = vstrpprintf(0, format, args);
+    va_end(args);
+    String result {s};
+    zend_string_release(s);
+    return result;
+}
+
+String String::trim(const char *what, TrimMode mode) const {
+    auto s = php_trim(str, what, strlen(what), mode);
+    String result{s};
+    zend_string_release(s);
+    return result;
 }
 
 void String::print() const {

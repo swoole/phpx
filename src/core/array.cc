@@ -142,6 +142,20 @@ Array::Array(const std::initializer_list<std::pair<Int, const Variant>> &list) {
     }
 }
 
+void Array::set(const String &s, const Variant &v) {
+    auto zv = NO_CONST_V(v);
+    Z_TRY_ADDREF_P(zv);
+    SEPARATE_ARRAY(ptr());
+    zend_symtable_update(Z_ARRVAL_P(ptr()), s.ptr(), zv);
+}
+
+void Array::set(zend_ulong i, const Variant &v) {
+    auto zv = NO_CONST_V(v);
+    Z_TRY_ADDREF_P(zv);
+    SEPARATE_ARRAY(ptr());
+    add_index_zval(ptr(), i, zv);
+}
+
 Variant Array::search(const Variant &_other_var, bool strict) const {
     for (auto i = begin(); i != end(); i++) {
         if (i.value().equals(_other_var, strict)) {
@@ -174,9 +188,9 @@ Variant ArrayIterator::key() const {
     } else {
         auto *bucket = HT_HASH_TO_BUCKET(array_, idx_);
         if (bucket->key) {
-            return {bucket->key, false};
+            return {bucket->key};
         } else {
-            return (zend_long) bucket->h;
+            return {static_cast<zend_long>(bucket->h)};
         }
     }
 }
@@ -210,11 +224,12 @@ ArrayItem::ArrayItem(Array &_array, zend_ulong _index, zend_string *_key) : arra
 }
 
 ArrayItem &ArrayItem::operator=(const Variant &v) {
-    const_cast<Variant &>(v).addRef();
+    const auto zv = NO_CONST_V(v);
+    Z_TRY_ADDREF_P(zv);
     if (key_) {
-        zend_symtable_update(Z_ARRVAL_P(array_.ptr()), key_, const_cast<Variant &>(v).ptr());
+        zend_symtable_update(Z_ARRVAL_P(array_.ptr()), key_, zv);
     } else {
-        zend_hash_index_update(Z_ARRVAL_P(array_.ptr()), index_, const_cast<Variant &>(v).ptr());
+        zend_hash_index_update(Z_ARRVAL_P(array_.ptr()), index_, zv);
     }
     return *this;
 }

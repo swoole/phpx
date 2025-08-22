@@ -5,7 +5,7 @@ using namespace php;
 
 TEST(string, base) {
     auto s = zend_string_init(ZEND_STRL("hello world"), false);
-    String s1{s, false};
+    String s1{s};
     zend_string_release(s);
 
     ASSERT_GT(s1.length(), 10);

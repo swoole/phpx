@@ -149,7 +149,9 @@ class String {
     String(const std::string &v) {
         str = zend_string_init(v.c_str(), v.length(), false);
     }
-    String(zend_string *v, bool forward = true);
+    String(zend_string *v) {
+        str = zend_string_copy(v);
+    }
     String(const zval *v) {
         str = zend_string_copy(Z_STR_P(v));
     }
@@ -197,16 +199,8 @@ class String {
     bool operator==(const String &v) const {
         return equals(v);
     }
-    static String format(const char *format, ...) {
-        va_list args;
-        va_start(args, format);
-        zend_string *s = vstrpprintf(0, format, args);
-        va_end(args);
-        return {s, true};
-    }
-    String trim(const char *what = " \t\n\r\v\0", int mode = TRIM_BOTH) const {
-        return {php_trim(str, what, strlen(what), mode), true};
-    }
+    static String format(const char *format, ...);
+    String trim(const char *what = " \t\n\r\v\0", TrimMode mode = TRIM_BOTH) const;
     String lower() const {
         return zend_string_tolower(str);
     }
@@ -248,6 +242,12 @@ class Variant {
     zval val;
     void destroy() {
         zval_ptr_dtor(&val);
+    }
+    void addRef() {
+        Z_TRY_ADDREF_P(ptr());
+    }
+    void delRef() {
+        Z_TRY_DELREF_P(ptr());
     }
 
   public:
@@ -292,22 +292,16 @@ class Variant {
     Variant(bool v) {
         ZVAL_BOOL(&val, v);
     }
-    Variant(const zval *v, bool forward = false) noexcept {
+    Variant(const zval *v) noexcept {
         if (!v) {
             ZVAL_NULL(&val);
             return;
         }
         ZVAL_COPY_VALUE(&val, v);
-        if (!forward) {
-            addRef();
-        }
+        addRef();
     }
-    Variant(zend_string *s, bool forward) noexcept {
-        if (forward) {
-            ZVAL_STR(&val, s);
-        } else {
-            ZVAL_STR(&val, zend_string_copy(s));
-        }
+    Variant(zend_string *s) noexcept {
+        ZVAL_STR(&val, zend_string_copy(s));
     }
     Variant(const Variant &v) : Variant(v.const_ptr()) {}
     Variant(Variant &&v) noexcept {
@@ -385,12 +379,6 @@ class Variant {
     }
     const zval *const_ptr() const {
         return &val;
-    }
-    void addRef() {
-        Z_TRY_ADDREF_P(ptr());
-    }
-    void delRef() {
-        Z_TRY_DELREF_P(ptr());
     }
     void debug();
     void print() {
@@ -719,16 +707,8 @@ class Array : public Variant {
     Array(const std::initializer_list<const Variant> &list);
     Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     Array(const std::initializer_list<std::pair<Int, const Variant>> &list);
-    void set(const String &s, const Variant &v) {
-        const_cast<Variant &>(v).addRef();
-        SEPARATE_ARRAY(ptr());
-        zend_symtable_update(Z_ARRVAL_P(ptr()), s.ptr(), const_cast<Variant &>(v).ptr());
-    }
-    void set(zend_ulong i, const Variant &v) {
-        const_cast<Variant &>(v).addRef();
-        SEPARATE_ARRAY(ptr());
-        add_index_zval(ptr(), i, const_cast<Variant &>(v).ptr());
-    }
+    void set(const String &s, const Variant &v);
+    void set(zend_ulong i, const Variant &v);
     Variant get(const String &key) const {
         return zend_hash_find(Z_ARRVAL_P(const_ptr()), key.ptr());
     }
@@ -965,7 +945,7 @@ extern std::map<const char *, std::map<const char *, Method *, StrCmp>, StrCmp> 
 extern std::map<const char *, Function *, StrCmp> function_map;
 
 #define PHPX_FN(n) #n, n
-#define PHPX_ME(c, m) #m, c##_##m
+#define PHPX_ME(c, m) #m, c## _## m
 
 class Function {
     const char *name_;
@@ -979,17 +959,17 @@ class Function {
 };
 
 #define PHPX_FUNCTION(func)                                                                                            \
-    class phpx_function_##func : Function {                                                                            \
+    class phpx_function_## func : Function {                                                                            \
       public:                                                                                                          \
         Variant impl(Args &);                                                                                          \
-        explicit phpx_function_##func(const char *name) : Function(name) {                                             \
+        explicit phpx_function_## func(const char *name) : Function(name) {                                             \
             function_map[name] = this;                                                                                 \
         }                                                                                                              \
-        ~phpx_function_##func() {}                                                                                     \
+        ~phpx_function_## func() {}                                                                                     \
     };                                                                                                                 \
-    static phpx_function_##func f_##func(#func);                                                                       \
+    static phpx_function_## func f_## func(#func);                                                                       \
     PHP_FUNCTION(func) {}                                                                                              \
-    Variant phpx_function_##func::impl(Args &args)
+    Variant phpx_function_## func::impl(Args &args)
 
 class Method {
     const char *class_;
@@ -1005,17 +985,17 @@ class Method {
 };
 
 #define PHPX_METHOD(class_, method)                                                                                    \
-    class phpx_method_##class_##_##method : Method {                                                                   \
+    class phpx_method_## class_## _## method : Method {                                                                   \
       public:                                                                                                          \
         Variant impl(Object &_this, Args &);                                                                           \
-        phpx_method_##class_##_##method(const char *_class, const char *_name) : Method(_class, _name) {               \
+        phpx_method_## class_## _## method(const char *_class, const char *_name) : Method(_class, _name) {               \
             method_map[_class][_name] = this;                                                                          \
         }                                                                                                              \
-        ~phpx_method_##class_##_##method() {}                                                                          \
+        ~phpx_method_## class_## _## method() {}                                                                          \
     };                                                                                                                 \
-    static phpx_method_##class_##_##method m_##class_##_##method(#class_, #method);                                    \
+    static phpx_method_## class_## _## method m_## class_## _## method(#class_, #method);                                    \
     PHP_METHOD(class_, method) {}                                                                                      \
-    Variant phpx_method_##class_##_##method::impl(Object &_this, Args &args)
+    Variant phpx_method_## class_## _## method::impl(Object &_this, Args &args)
 
 extern void _exec_function(zend_execute_data *data, zval *return_value);
 extern void _exec_method(zend_execute_data *data, zval *return_value);

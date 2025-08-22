@@ -15,7 +15,8 @@ TEST(variant, base) {
 
     zval zv;
     array_init(&zv);
-    Variant v2{&zv, true};
+    Variant v2{&zv};
+    zval_ptr_dtor(&zv);
     ASSERT_TRUE(v2.isArray());
 
     // Assignment to itself
@@ -37,9 +38,9 @@ TEST(variant, base) {
     ASSERT_STREQ(arr.typeStr(), "array");
 
     ASSERT_EQ(arr.getRefCount(), 1);
-    arr.addRef();
+    var copy = arr;
     ASSERT_EQ(arr.getRefCount(), 2);
-    arr.delRef();
+    copy = nullptr;
     ASSERT_EQ(arr.getRefCount(), 1);
 
     v2 = nullptr;

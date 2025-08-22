@@ -55,7 +55,10 @@ std::string Variant::toStdString() {
 }
 
 String Variant::toString() {
-    return String{zval_get_string(ptr()), true};
+    const auto s = zval_get_string(ptr());
+    String result {s};
+    zend_string_release(s);
+    return result;
 }
 
 Array Variant::toArray() const {
@@ -390,15 +393,16 @@ Variant Variant::jsonEncode(zend_long options, zend_long depth) {
     JSON_G(error_code) = PHP_JSON_ERROR_NONE;
     JSON_G(encode_max_depth) = (int) depth;
 
+    Variant result;
     php_json_encode(&buf, ptr(), (int) options);
 
     if (JSON_G(error_code) != PHP_JSON_ERROR_NONE && !(options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR)) {
-        smart_str_free(&buf);
-        return false;
+        result = nullptr;
     } else {
         smart_str_0(&buf);
-        return {buf.s, true};
     }
+    smart_str_free(&buf);
+    return result;
 }
 
 Variant Variant::jsonDecode(zend_long options, zend_long depth) {

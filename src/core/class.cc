@@ -174,13 +174,13 @@ Variant Class::getStaticProperty(const char *name, const std::string &prop) {
     return rv;
 }
 
-bool Class::setStaticProperty(const char *name, const std::string &prop, const Variant &value) {
+bool Class::setStaticProperty(const char *name, const std::string &prop, const Variant &v) {
     const auto ce = getClassEntry(name);
     if (!ce) {
         zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
     }
-    auto v = const_cast<Variant &>(value);
-    v.addRef();
-    return zend_update_static_property(ce, prop.c_str(), prop.length(), v.ptr()) == SUCCESS;
+    const auto zv = NO_CONST_V(v);
+    Z_TRY_ADDREF_P(zv);
+    return zend_update_static_property(ce, prop.c_str(), prop.length(), zv) == SUCCESS;
 }
 }  // namespace php
