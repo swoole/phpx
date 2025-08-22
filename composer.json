@@ -1,4 +1,15 @@
 {
+    "name": "swoole/phpx",
+    "type": "library",
+    "keywords": [
+        "php",
+        "ZendAPI",
+        "extension",
+        "c++",
+        "embedded"
+    ],
+    "description": "C++ wrapper for Zend API",
+    "license": "Apache-2.0",
     "require-dev": {
         "phpunit/phpunit": "^10.0",
         "friendsofphp/php-cs-fixer": "^3.75"
