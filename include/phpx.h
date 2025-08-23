@@ -51,17 +51,6 @@ typedef unsigned char uchar;
 
 #define PHPX_MAX_ARGC 10
 #define PHPX_VAR_DUMP_LEVEL 10
-
-#if PHP_VERSION_ID >= 80000
-#define TSRMLS_CC
-#else
-typedef int zend_result;
-#endif
-
-#ifndef ZEND_ABSTRACT_ME_WITH_FLAGS
-#define ZEND_ABSTRACT_ME_WITH_FLAGS(classname, name, arg_info, flags) ZEND_RAW_FENTRY(#name, NULL, arg_info, flags)
-#endif
-
 #define PHPX_API PHPAPI
 
 /**

@@ -195,7 +195,7 @@ Variant Variant::serialize() {
     smart_str serialized_data = {};
     php_serialize_data_t var_hash;
     PHP_VAR_SERIALIZE_INIT(var_hash);
-    php_var_serialize(&serialized_data, ptr(), &var_hash TSRMLS_CC);
+    php_var_serialize(&serialized_data, ptr(), &var_hash);
     PHP_VAR_SERIALIZE_DESTROY(var_hash);
     Variant retval(serialized_data.s->val, serialized_data.s->len);
     smart_str_free(&serialized_data);

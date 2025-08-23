@@ -222,7 +222,7 @@ bool Interface::activate() {
         return false;
     }
     _ce.info.internal.builtin_functions = functions;
-    ce = zend_register_internal_interface(&_ce TSRMLS_CC);
+    ce = zend_register_internal_interface(&_ce);
     if (ce == nullptr) {
         return false;
     }

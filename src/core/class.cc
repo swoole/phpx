@@ -125,7 +125,7 @@ bool Class::activate() {
     if (parent_ce) {
         ce = zend_register_internal_class_ex(&_ce, parent_ce);
     } else {
-        ce = zend_register_internal_class(&_ce TSRMLS_CC);
+        ce = zend_register_internal_class(&_ce);
     }
     if (ce == nullptr) {
         return false;
