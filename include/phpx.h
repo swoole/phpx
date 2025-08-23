@@ -19,27 +19,21 @@
 extern "C" {
 #include "php.h"
 #include "php_ini.h"
-#include "php_globals.h"
 #include "php_main.h"
-
-#include "zend_API.h"
-#include "php_streams.h"
-#include "php_network.h"
 
 #if PHP_VERSION_ID < 80100
 #error "only supports PHP-8.1 or later."
 #endif
 
+#include "zend_API.h"
 #include "zend_interfaces.h"
 #include "zend_exceptions.h"
 #include "zend_variables.h"
-#include "zend_inheritance.h"
 #include "zend_types.h"
 
 #include <ext/json/php_json.h>
 #include <ext/standard/html.h>
 #include <ext/standard/php_standard.h>
-#include <ext/spl/php_spl.h>
 }
 
 #if PHP_VERSION_ID < 80200
@@ -379,14 +373,14 @@ class Variant {
     zval *ptr() {
         return &val;
     }
-    zend_array *array() {
-        return Z_ARRVAL_P(ptr());
+    zend_array *array() const {
+        return Z_ARRVAL_P(&val);
     }
-    zend_class_entry *ce() {
-        return Z_OBJCE_P(ptr());
+    zend_class_entry *ce() const {
+        return Z_OBJCE_P(&val);
     }
     zend_object *object() const {
-        return Z_OBJ_P(const_ptr());
+        return Z_OBJ_P(&val);
     }
     const zval *const_ptr() const {
         return &val;
@@ -771,7 +765,7 @@ class Array : public Variant {
     Variant search(const Variant &_other_var, bool strict = false) const;
     bool contains(const Variant &_other_var, bool strict = false) const;
     String join(const String &delim);
-    void merge(Array &source) {
+    void merge(const Array &source) {
         SEPARATE_ARRAY(ptr());
         php_array_merge(array(), source.array());
     }
@@ -909,8 +903,8 @@ class Object : public Variant {
                  const Variant &v10);
     /* generator */
 
-    Variant get(const String &name);
-    void set(const String &name, const Variant &v) {
+    Variant get(const String &name) const;
+    void set(const String &name, const Variant &v) const {
         zend_update_property_ex(ce(), object(), name.ptr(), const_cast<Variant &>(v).ptr());
     }
     template <class T>
@@ -922,25 +916,23 @@ class Object : public Variant {
     void oSet(const String &name, const char *resource_name, T *ptr) {
         set(name, newResource<T>(resource_name, ptr));
     }
-    String getClassName() {
-        return Z_OBJCE_P(ptr())->name;
+    String getClassName() const {
+        return ce()->name;
     }
-    uint32_t getId() {
-        return Z_OBJ_HANDLE(*ptr());
+    uint32_t getId() const {
+        return Z_OBJ_HANDLE(val);
     }
-    String hash() {
-        return php_spl_object_hash(Z_OBJ_P(ptr()));
+    String hash() const;
+    bool methodExists(const String &name) const {
+        return zend_hash_exists(&ce()->function_table, name.ptr());
     }
-    bool methodExists(const String &name) {
-        return zend_hash_exists(&Z_OBJCE_P(ptr())->function_table, name.ptr());
+    bool propertyExists(const String &name) const {
+        return zend_hash_exists(&ce()->properties_info, name.ptr());
     }
-    bool propertyExists(const String &name) {
-        return zend_hash_exists(&Z_OBJCE_P(ptr())->properties_info, name.ptr());
-    }
-    bool instanceOf(const String &name) {
+    bool instanceOf(const String &name) const {
         return instanceof_function(ce(), getClassEntry(name));
     }
-    bool instanceOf(const zend_class_entry *ce_) {
+    bool instanceOf(const zend_class_entry *ce_) const {
         return instanceof_function(ce(), ce_);
     }
     Object clone() const;

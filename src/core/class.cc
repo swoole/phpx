@@ -16,6 +16,10 @@
 
 #include "phpx.h"
 
+BEGIN_EXTERN_C()
+#include "zend_inheritance.h"
+END_EXTERN_C()
+
 namespace php {
 Class::Class(const char *name) {
     class_name = name;

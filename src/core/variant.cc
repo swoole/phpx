@@ -15,7 +15,11 @@
 */
 
 #include "phpx.h"
+
+BEGIN_EXTERN_C()
 #include "zend_smart_str.h"
+#include <ext/spl/php_spl.h>
+END_EXTERN_C()
 
 #include <cmath>
 
@@ -449,6 +453,10 @@ Object newObject(const char *name, const std::initializer_list<Variant> &args) {
     return object;
 }
 
+String Object::hash() const {
+    return php_spl_object_hash(object());
+}
+
 Variant Object::exec(const Variant &fn, const std::initializer_list<Variant> &args) {
     Args _args;
     for (const auto &arg : args) {
@@ -475,7 +483,7 @@ Variant Object::callParentMethod(const String &func, const std::initializer_list
     return retval;
 }
 
-Variant Object::get(const String &name) {
+Variant Object::get(const String &name) const {
     Variant retval;
     zval rv;
     zval *member_p = zend_read_property_ex(ce(), object(), name.ptr(), false, &rv);
