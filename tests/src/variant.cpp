@@ -53,6 +53,7 @@ TEST(variant, base) {
     v3 = 199000L;
     ASSERT_TRUE(v3.isInt());
     ASSERT_TRUE(v3 == 199000L);
+    ASSERT_TRUE(v3.isNumeric());
 
     v3 = std::string("hello");
     ASSERT_TRUE(v3.isString());
@@ -73,10 +74,15 @@ TEST(variant, base) {
     v3 = false;
     ASSERT_TRUE(v3.isBool());
     ASSERT_TRUE(v3 == false);
+    ASSERT_FALSE(v3.isNumeric());
 
     float fv1 = PI;
     Variant v4(fv1);
     ASSERT_TRUE(v4 == (float) PI);
+    ASSERT_TRUE(v4.isNumeric());
+
+    var v5 = "123.456";
+    ASSERT_TRUE(v5.isNumeric());
 }
 
 TEST(variant, toCString) {

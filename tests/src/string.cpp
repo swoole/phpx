@@ -27,6 +27,12 @@ TEST(string, base) {
     auto s7 = s6.escape();
     ASSERT_GT(s7.length(), s6.length());
     ASSERT_TRUE(s7.unescape().equals(s6));
+
+    String s8 = "127";
+    ASSERT_TRUE(s8.isNumeric());
+
+    String s9 = "hello world";
+    ASSERT_FALSE(s9.isNumeric());
 }
 
 TEST(string, number) {

@@ -83,6 +83,18 @@ size_t Variant::length() const {
     }
 }
 
+bool Variant::isNumeric() const {
+    switch (type()) {
+    case IS_LONG:
+    case IS_DOUBLE:
+        return true;
+    case IS_STRING:
+        return is_numeric_string(Z_STRVAL(val), Z_STRLEN(val), nullptr, nullptr, false);
+    default:
+        return false;
+    }
+}
+
 #if ZEND_DEBUG
 void Variant::debug() {
     printf("zval=%p, type=%d, refcount=%d, is_ref=%d\n", const_ptr(), type(), getRefCount(), isReference());
@@ -187,49 +199,25 @@ Variant Variant::serialize() {
 }
 
 Variant &Variant::operator++() {
-    if (isFloat()) {
-        ++Z_DVAL_P(ptr());
-    } else {
-        convert_to_long(ptr());
-        ++Z_LVAL_P(ptr());
-    }
+    increment_function(ptr());
     return *this;
 }
 
 Variant &Variant::operator--() {
-    if (isFloat()) {
-        --Z_DVAL_P(ptr());
-    } else {
-        convert_to_long(ptr());
-        --Z_LVAL_P(ptr());
-    }
+    decrement_function(ptr());
     return *this;
 }
 
 Variant Variant::operator++(int) {
-    if (isFloat()) {
-        auto dval = Z_DVAL_P(ptr());
-        ++Z_DVAL_P(ptr());
-        return dval;
-    } else {
-        convert_to_long(ptr());
-        auto lval = Z_LVAL_P(ptr());
-        ++Z_LVAL_P(ptr());
-        return lval;
-    }
+    auto original = *this;
+    increment_function(ptr());
+    return original;
 }
 
 Variant Variant::operator--(int) {
-    if (isFloat()) {
-        auto dval = Z_DVAL_P(ptr());
-        --Z_DVAL_P(ptr());
-        return dval;
-    } else {
-        convert_to_long(ptr());
-        auto lval = Z_LVAL_P(ptr());
-        --Z_LVAL_P(ptr());
-        return lval;
-    }
+    auto original = *this;
+    decrement_function(ptr());
+    return original;
 }
 
 Variant &Variant::operator+=(const Variant &v) {

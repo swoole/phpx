@@ -171,6 +171,9 @@ class String {
     Int toInt() const {
         return ZEND_STRTOL(ZSTR_VAL(str), nullptr, 10);
     }
+    bool isNumeric() const {
+        return is_numeric_string(ZSTR_VAL(str), ZSTR_LEN(str), nullptr, nullptr, false);
+    }
     double toFloat() const {
         return zend_strtod(ZSTR_VAL(str), nullptr);
     }
@@ -435,6 +438,7 @@ class Variant {
     bool isReference() const {
         return Z_TYPE_P(const_ptr()) == IS_REFERENCE;
     }
+    bool isNumeric() const;
     bool empty() const {
         return toBool() == false;
     }
@@ -816,9 +820,8 @@ static inline Variant call(const Variant &func) {
     return _call(nullptr, func.const_ptr());
 }
 
-static inline zend_class_entry *getClassEntry(const char *name) {
-    String class_name(name, strlen(name));
-    return zend_lookup_class(class_name.ptr());
+static inline zend_class_entry *getClassEntry(const String &name) {
+    return zend_lookup_class(name.ptr());
 }
 
 static inline Variant getException() {
@@ -933,6 +936,12 @@ class Object : public Variant {
     }
     bool propertyExists(const String &name) {
         return zend_hash_exists(&Z_OBJCE_P(ptr())->properties_info, name.ptr());
+    }
+    bool instanceOf(const String &name) {
+        return instanceof_function(ce(), getClassEntry(name));
+    }
+    bool instanceOf(const zend_class_entry *ce_) {
+        return instanceof_function(ce(), ce_);
     }
 };
 

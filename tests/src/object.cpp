@@ -87,6 +87,23 @@ TEST(object, call_parent_method) {
     ASSERT_STREQ(obj.getClassName().data(), "TestClass2");
 }
 
+TEST(object, instanceOf) {
+    if (!class_exists("TestClass2")) {
+        include(get_include_dir() + "/library.php");
+    }
+
+    auto obj = newObject("TestClass2");
+    ASSERT_TRUE(obj.instanceOf("TestClass"));
+    ASSERT_TRUE(obj.instanceOf("TestClass2"));
+    ASSERT_FALSE(obj.instanceOf("DateTimeImmutable"));
+
+    auto obj2 = newObject("ArrayObject");
+    ASSERT_TRUE(obj2.instanceOf(getClassEntry("ArrayObject")));
+    ASSERT_TRUE(obj2.instanceOf(zend_ce_countable));
+    ASSERT_TRUE(obj2.instanceOf(zend_ce_arrayaccess));
+    ASSERT_FALSE(obj2.instanceOf(zend_ce_exception));
+}
+
 TEST(object, bad_type) {
     auto arr1 = create_list();
     ChildResult r = run_in_child_capture_stdout([&arr1]() -> int {
