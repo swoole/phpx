@@ -61,3 +61,8 @@ bin/phpx
 /.phpunit.cache
 /composer.lock
 /bin/PHP-Parser-*
+/examples/gtk/Makefile
+/examples/gtk/cmake_install.cmake
+/examples/gtk/CMakeCache.txt
+/examples/embed/cmake_install.cmake
+/examples/embed/CMakeCache.txt

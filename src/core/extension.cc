@@ -20,15 +20,15 @@ namespace php {
 static std::unordered_map<std::string, Resource *> resource_map;
 static std::unordered_map<std::string, Class *> class_map;
 static std::unordered_map<std::string, Interface *> interface_map;
-static std::unordered_map<std::string, std::shared_ptr<Extension>> _name_to_extension;
-static std::unordered_map<int, std::shared_ptr<Extension>> _module_number_to_extension;
+static std::unordered_map<std::string, Extension *> _name_to_extension;
+static std::unordered_map<int, Extension *> _module_number_to_extension;
 
 Extension::Extension(const char *_name, const char *_version) {
     module.name = _name;
     module.version = _version;
     name = _name;
     version = _version;
-    _name_to_extension[_name] = std::shared_ptr<Extension>(this);
+    _name_to_extension[_name] = this;
     functions = nullptr;
 }
 

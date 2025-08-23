@@ -767,7 +767,7 @@ class Array : public Variant {
     Variant search(const Variant &_other_var, bool strict = false) const;
     bool contains(const Variant &_other_var, bool strict = false) const;
     String join(const String &delim);
-    void merge(Array &source, bool overwrite = false) {
+    void merge(Array &source) {
         SEPARATE_ARRAY(ptr());
         php_array_merge(array(), source.array());
     }
@@ -788,7 +788,7 @@ class Args {
         return params.size();
     }
     bool exists(int i) const {
-        return i < count();
+        return (size_t) i < count();
     }
     bool empty() const {
         return params.empty();
@@ -812,16 +812,16 @@ class Args {
 extern Variant _call(const zval *object, const zval *func, Args &args);
 extern Variant _call(const zval *object, const zval *func);
 
-static Variant call(const Variant &func) {
+static inline Variant call(const Variant &func) {
     return _call(nullptr, func.const_ptr());
 }
 
-static zend_class_entry *getClassEntry(const char *name) {
+static inline zend_class_entry *getClassEntry(const char *name) {
     String class_name(name, strlen(name));
     return zend_lookup_class(class_name.ptr());
 }
 
-static Variant getException() {
+static inline Variant getException() {
     zval zv;
     ZVAL_OBJ(&zv, EG(exception));
     return {&zv};

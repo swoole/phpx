@@ -233,7 +233,7 @@ TEST(array, subscript) {
 TEST(array, merge) {
     Array arr1 = create_list();
     Array arr2 = {"erlang", "ruby", "lua"};
-    arr1.merge(arr2, false);
+    arr1.merge(arr2);
     ASSERT_EQ(arr2.count(), 3);
     ASSERT_EQ(arr1.count(), 8);
 }
