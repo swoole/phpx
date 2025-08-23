@@ -11,6 +11,7 @@ abstract class BaseCommand extends Command
     protected string $cwd;
     protected string $extName;
     protected int $nproc;
+    protected string $phpDir = '';
 
     protected function parsePhpConfigOutput(string $output, bool $alwaysArray = false): array
     {
@@ -48,7 +49,7 @@ abstract class BaseCommand extends Command
         return $result;
     }
 
-    protected function getExtName()
+    protected function getExtName() : string
     {
         $dir = $this->cwd . '/src';
 
@@ -63,23 +64,30 @@ abstract class BaseCommand extends Command
                 return $m[1];
             }
         }
+
+        throw new \RuntimeException('No extension name found');
     }
 
-    protected function make()
+
+    protected function make(): void
     {
-        shell_exec('cmake .');
-        shell_exec('make -j' );
+        if ($this->phpDir) {
+            system('cmake . -D php_dir=' . $this->phpDir);
+        } else {
+            system('cmake .');
+        }
+        system('make -j' . $this->nproc);
     }
 
-    protected function getPhpConfigInfo(InputInterface $input)
+    protected function getPhpConfigInfo(InputInterface $input): array
     {
         $php_dir = $input->getOption('php-dir');
         if ($php_dir) {
             $php_config = realpath($php_dir) . '/bin/php-config';
+            $this->phpDir = $php_dir;
         } else {
             $php_config = 'php-config';
         }
-
 
         $output = shell_exec($php_config);
         return $this->parsePhpConfigOutput($output);

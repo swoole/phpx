@@ -24,7 +24,7 @@ class BuildCommand extends BaseCommand
 
         // build libphpx.so if it does not exist
         if (!file_exists($libphpx)) {
-            $output->writeln("<comment>Building PHPX</comment>");
+            $output->writeln("<comment>Building phpx library</comment>");
             system('cd vendor/swoole/phpx && cmake . -D php_dir=' . $info['prefix'] . ' && make -j ' . $this->nproc . ' phpx && cd -');
             $tmpLibphpx = 'vendor/swoole/phpx/lib/libphpx.so';
             if (!is_file($tmpLibphpx)) {
@@ -32,14 +32,14 @@ class BuildCommand extends BaseCommand
             }
             system("cp $tmpLibphpx {$info['prefix']}/lib");
             system('cp -r vendor/swoole/phpx/include ' . $info['prefix'] . '/include/phpx');
-            $output->writeln("<info>PHPX installation successful</info>");
+            $output->writeln("<info>Library phpx installation successful</info>");
         }
 
         $output->writeln("<comment>Generating function argument information stubs</comment>");
         system('php vendor/swoole/phpx/bin/gen_stub.php ' . $this->cwd . '/src');
 
-        system('cmake .');
-        system('make -j' . $this->nproc);
+        $output->writeln("<comment>Building extension</comment>");
+        $this->make();
 
         return 0;
     }
