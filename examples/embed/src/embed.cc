@@ -14,7 +14,9 @@
   +----------------------------------------------------------------------+
 */
 
-#include "phpx_embed.h"
+#include "sapi/embed/php_embed.h"
+#include "phpx.h"
+#include "phpx_func.h"
 
 //#include <swoole.h>
 #include <iostream>
@@ -27,27 +29,27 @@ void test() {
 }
 
 void md5test() {
-    echo("[0]hash=%s\n", md5("hello world").c_str());
+    echo("[0]hash=%s\n", md5("hello world").toCString());
     echo("[0]hash_hmac=%s\n",
-         hash_hmac("ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").c_str());
+         hash_hmac("ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").toCString());
 
     Variant a("hello world");
-    echo("[1]hash=%s\n", php::exec("md5", a).toCString());
-    echo("[1]hash=%s\n", php::exec("md5", "hello world").toCString());
+    echo("[1]hash=%s\n", md5(a).toCString());
+    echo("[1]hash=%s\n", md5("hello world").toCString());
 
     echo("[1]hash_hmac=%s\n",
-         php::exec("hash_hmac", "ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").toCString());
+         hash_hmac("ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").toCString());
 }
 
 void testRedis() {
     cout << "=====================Test Redis==================\n";
-    Object redis = php::newObject("redis");
+    Object redis = newObject("redis");
     var_dump(redis);
     auto ret1 = redis.exec("connect", "127.0.0.1", 6379);
     // connect success
     if (ret1.toBool()) {
         auto ret2 = redis.exec("get", "key");
-        printf("value=%s\n", ret2.toCString());
+        ::printf("value=%s\n", ret2.toCString());
     } else {
         cout << "connect to redis server failed." << endl;
     }
@@ -68,9 +70,8 @@ void jsontest() {
     var_dump(arr2);
 }
 
-int main(int argc, char *argv[]) {
-    php::VM vm(argc, argv);
-    String value = ini_get("output_buffering");
+void php_main() {
+    auto value = ini_get("output_buffering");
     cout << "ENV:" << value.toInt() << endl;
 
     Variant a = 1;
@@ -93,7 +94,7 @@ int main(int argc, char *argv[]) {
     _arg_list.append(redis);
 
     Variant func = "var_dump";
-    php::call(func, _arg_list);
+    call(func, _arg_list);
 
     auto url_query = http_build_query(url_params);
     var_dump(url_query);
@@ -101,7 +102,7 @@ int main(int argc, char *argv[]) {
     jsontest();
     md5test();
 
-    vm.eval("echo 'Hello World!';");
+    eval("echo 'Hello World!';");
     include("embed.php");
 
     auto c1 = constant("SWOOLE_BASE");
@@ -130,7 +131,12 @@ int main(int argc, char *argv[]) {
 
     String s1 = "hello world";
     String s2 = s1.substr(0, 5);
-    cout << "s2=" << s2.c_str() << endl;
+    cout << "s2=" << s2.data() << endl;
+}
 
+int main(int argc, char *argv[]) {
+    php_embed_init(argc, argv);
+    php_main();
+    php_embed_shutdown();
     return 0;
 }
