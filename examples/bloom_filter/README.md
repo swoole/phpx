@@ -9,13 +9,14 @@
 
 ## Require
 
-* `SWOOLE`
-* `PHP-X`
-* `PHP >= 7.0`
+* `ext-swoole`
+* `phpx >= 2.0`
+* `php >= 8.1`
 
 ## 安装使用
 
 ```bash
+cmake .
 make && make install
 ```
 

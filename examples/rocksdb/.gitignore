@@ -5,3 +5,6 @@
 *.so
 .project
 .settings
+/install_manifest.txt
+/CMakeCache.txt
+/cmake_install.cmake

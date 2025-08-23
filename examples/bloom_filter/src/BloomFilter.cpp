@@ -2,7 +2,7 @@
 #include "ext/swoole/include/swoole.h"
 #include "ext/swoole/include/swoole_lock.h"
 #include "ext/swoole/include/swoole_file.h"
-#include "ext/swoole/ext-src/php_swoole.h"
+#include "ext/swoole/php_swoole.h"
 
 extern "C" {
 extern void MurmurHash3_x64_128(const void *key, const int len, const uint32_t seed, void *out);
@@ -11,11 +11,7 @@ extern void SpookyHash128(
 }
 
 BEGIN_EXTERN_C()
-#if PHP_VERSION_ID < 80000
 #include "BloomFilter_arginfo.h"
-#else
-#include "BloomFilter_arginfo.h"
-#endif
 END_EXTERN_C()
 
 #include <iostream>
@@ -24,6 +20,8 @@ using namespace php;
 using namespace std;
 using swoole::File;
 using swoole::RWLock;
+
+static std::shared_ptr<Extension> s_bloomfilter_extension;
 
 struct BloomFilterObject {
     size_t capacity;
@@ -37,7 +35,7 @@ struct BloomFilterObject {
 #define RESOURCE_NAME "BloomFilterResource"
 #define PROPERTY_NAME "ptr"
 
-static void compute_hashes(uint32_t k_num, char *key, size_t len, uint64_t *hashes) {
+static void compute_hashes(uint32_t k_num, const char *key, size_t len, uint64_t *hashes) {
     uint64_t out[2];
     MurmurHash3_x64_128(key, len, 0, out);
 
@@ -91,6 +89,8 @@ PHPX_METHOD(BloomFilter, __construct) {
     bf->lock = new RWLock(1);
 
     _this.oSet(PROPERTY_NAME, RESOURCE_NAME, bf);
+
+    return nullptr;
 }
 
 PHPX_METHOD(BloomFilter, has) {
@@ -108,12 +108,11 @@ PHPX_METHOD(BloomFilter, has) {
         miss = !(bf->array[n / 8] & (1 << (n % 8)));
         if (miss) {
             bf->lock->unlock();
-            retval = false;
-            return;
+            return false;
         }
     }
     bf->lock->unlock();
-    retval = true;
+    return true;
 }
 
 PHPX_METHOD(BloomFilter, add) {
@@ -130,6 +129,8 @@ PHPX_METHOD(BloomFilter, add) {
         bf->array[n / 8] |= (1 << (n % 8));
     }
     bf->lock->unlock();
+
+    return nullptr;
 }
 
 PHPX_METHOD(BloomFilter, clear) {
@@ -137,6 +138,8 @@ PHPX_METHOD(BloomFilter, clear) {
     bf->lock->lock();
     bzero(bf->array, bf->capacity);
     bf->lock->unlock();
+
+    return nullptr;
 }
 
 PHPX_METHOD(BloomFilter, dump) {
@@ -148,8 +151,7 @@ PHPX_METHOD(BloomFilter, dump) {
     if (!fp.ready()) {
     fail:
         bf->lock->unlock();
-        retval = false;
-        return;
+        return false;
     }
     if (fp.write(&bf->capacity, sizeof(bf->capacity)) == 0) {
         goto fail;
@@ -158,7 +160,7 @@ PHPX_METHOD(BloomFilter, dump) {
         goto fail;
     }
     bf->lock->unlock();
-    retval = true;
+    return true;
 }
 
 PHPX_METHOD(BloomFilter, load) {
@@ -167,8 +169,7 @@ PHPX_METHOD(BloomFilter, load) {
     File fp(file, File::READ);
     if (!fp.ready()) {
     fail:
-        retval = false;
-        return;
+        return false;
     }
 
     size_t capacity = 0;
@@ -185,15 +186,17 @@ PHPX_METHOD(BloomFilter, load) {
     if (fp.read(bf->array, capacity) == 0) {
         goto fail;
     }
-    retval = o;
+    return o;
 }
 
 PHPX_EXTENSION() {
-    Extension *extension = new Extension("BloomFilter", "1.0.2");
+    s_bloomfilter_extension = std::make_shared<Extension>("BloomFilter", "1.0.2");
+    auto extension = s_bloomfilter_extension.get();
 
     extension->onStart = [extension]() noexcept {
         extension->registerConstant("BLOOMFILTER_VERSION", 10002);
         Class *c = new Class("BloomFilter");
+        c->addProperty("ptr", nullptr, ZEND_ACC_PUBLIC);
         c->registerFunctions(class_BloomFilter_methods);
         extension->registerClass(c);
         extension->registerResource(RESOURCE_NAME, BloomFilterResDtor);

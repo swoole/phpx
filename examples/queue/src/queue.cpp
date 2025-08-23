@@ -1,17 +1,14 @@
-#include "queue.h"
+#include "phpx.h"
+
+#include <iostream>
+#include <list>
 
 BEGIN_EXTERN_C()
-#if PHP_VERSION_ID < 80000
-#include "queue_legacy_arginfo.h"
-#else
 #include "queue_arginfo.h"
-#endif
 END_EXTERN_C()
 
 using namespace php;
 using namespace std;
-
-#include <list>
 
 struct QueueObject {
     size_t size;
@@ -19,6 +16,7 @@ struct QueueObject {
 };
 
 #define DEFAULT_QUEUE_SIZE 64
+#define VERBOSE 0
 
 // destructor
 void queueResDtor(zend_resource *res) {
@@ -29,25 +27,28 @@ void queueResDtor(zend_resource *res) {
 PHPX_METHOD(Queue, __construct) {
     QueueObject *queue = new QueueObject();
 
-    size_t size = args[0].toInt();
-    queue->size = size > 0 ? size : DEFAULT_QUEUE_SIZE;
-
+    if (args.exists(0)) {
+        queue->size = args[0].toInt();
+    } else {
+        queue->size = DEFAULT_QUEUE_SIZE;
+    }
     _this.oSet("queue_ptr", "QueueResource", queue);
+    return nullptr;
 }
 
 PHPX_METHOD(Queue, count) {
     QueueObject *queue = _this.oGet<QueueObject>("queue_ptr", "QueueResource");
-    retval = (long) queue->storage.size();
+    return static_cast<zend_long>(queue->storage.size());
 }
 
 PHPX_METHOD(Queue, isEmpty) {
     QueueObject *queue = _this.oGet<QueueObject>("queue_ptr", "QueueResource");
-    retval = queue->storage.empty();
+    return queue->storage.empty();
 }
 
 PHPX_METHOD(Queue, isFull) {
     QueueObject *queue = _this.oGet<QueueObject>("queue_ptr", "QueueResource");
-    retval = queue->storage.size() == queue->size;
+    return queue->storage.size() == queue->size;
 }
 
 PHPX_METHOD(Queue, push) {
@@ -55,9 +56,9 @@ PHPX_METHOD(Queue, push) {
 
     if (queue->storage.size() == queue->size) {
         zend_error(E_USER_WARNING, "Queue is full, queue's max size is limited to %d", DEFAULT_QUEUE_SIZE);
-        retval = false;
-        return;
+        return false;
     }
+#if VERBOSE
     if (args[0].type() == IS_ARRAY) {
         Array arr(args[0]);
         cout << '[';
@@ -68,28 +69,27 @@ PHPX_METHOD(Queue, push) {
     } else {
         cout << args[0].toStdString() << endl;
     }
+#endif
     queue->storage.emplace_back(args[0]);
 
-    retval = true;
+    return true;
 }
 
 PHPX_METHOD(Queue, pull) {
     QueueObject *queue = _this.oGet<QueueObject>("queue_ptr", "QueueResource");
     if (queue->storage.empty()) {
-        retval = false;
-        return;
+        return false;
     }
     queue->storage.pop_front();
-    retval = true;
+    return true;
 }
 
 PHPX_METHOD(Queue, first) {
     QueueObject *queue = _this.oGet<QueueObject>("queue_ptr", "QueueResource");
     if (queue->storage.empty()) {
-        retval = nullptr;
-        return;
+        return nullptr;
     }
-    retval = queue->storage.front();
+    return queue->storage.front();
 }
 
 PHPX_METHOD(Queue, traverse) {
@@ -108,6 +108,8 @@ PHPX_METHOD(Queue, traverse) {
         }
     }
     cout << endl;
+
+    return nullptr;
 }
 
 PHPX_EXTENSION() {
@@ -117,6 +119,7 @@ PHPX_EXTENSION() {
         extension->registerConstant("QUEUE_VERSION", 10002);
 
         Class *c = new Class("Queue");
+        c->addProperty("queue_ptr", nullptr, ZEND_ACC_PUBLIC);
         c->registerFunctions(class_Queue_methods);
         extension->registerClass(c);
         extension->registerResource("QueueResource", queueResDtor);

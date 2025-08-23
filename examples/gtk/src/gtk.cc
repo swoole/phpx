@@ -17,11 +17,7 @@
 #include "phpx.h"
 
 BEGIN_EXTERN_C()
-#if PHP_VERSION_ID < 80000
-#include "gtk_legacy_arginfo.h"
-#else
 #include "gtk_arginfo.h"
-#endif
 END_EXTERN_C()
 
 #include <gtk/gtk.h>
@@ -52,7 +48,7 @@ void on_main_window_destroy(GtkApplication *app, gpointer user_data) {
 PHPX_METHOD(Gtk_Application, __construct) {
     if (args.count() < 2) {
         error(E_ERROR, "invalid parameters.");
-        return;
+        return nullptr;
     }
 
     int argc = 0;
@@ -61,16 +57,16 @@ PHPX_METHOD(Gtk_Application, __construct) {
     GtkBuilder *builder = gtk_builder_new_from_file(args[0].toCString());
     if (builder == nullptr) {
         error(E_ERROR, "invalid parameters.");
-        return;
+        return nullptr;
     }
 
     GtkWindow *window = GTK_WINDOW(gtk_builder_get_object(builder, args[1].toCString()));
     if (window == nullptr) {
         error(E_ERROR, "main window[id=%s] is not eixsts.", args[1].toCString());
-        return;
+        return nullptr;
     }
 
-    auto app_object = _this.dup();
+    auto app_object = new Variant(_this);
     g_signal_connect(window, "destroy", G_CALLBACK(on_main_window_destroy), app_object);
     callbacks.push_back(app_object);
 
@@ -79,6 +75,8 @@ PHPX_METHOD(Gtk_Application, __construct) {
     app->main_window = window;
     auto res = newResource<PHP_Gtk_Application>("GtkApplication", app);
     _this.set("app", res);
+
+    return nullptr;
 }
 
 PHPX_METHOD(Gtk_Application, run) {
@@ -86,31 +84,34 @@ PHPX_METHOD(Gtk_Application, run) {
     PHP_Gtk_Application *app = _this.get("app").toResource<PHP_Gtk_Application>("GtkApplication");
     gtk_widget_show(GTK_WIDGET(app->main_window));
     gtk_main();
+    return nullptr;
 }
 
 PHPX_METHOD(Gtk_Application, setTitle) {
     PHP_Gtk_Application *app = _this.get("app").toResource<PHP_Gtk_Application>("GtkApplication");
     gtk_window_set_title(app->main_window, args[0].toCString());
+    return nullptr;
 }
 
 PHPX_METHOD(Gtk_Application, setIcon) {
     PHP_Gtk_Application *app = _this.get("app").toResource<PHP_Gtk_Application>("GtkApplication");
     GError *error = NULL;
     auto file = args[0].toCString();
+    bool retval;
     if (gtk_window_set_icon_from_file(app->main_window, file, &error)) {
         retval = true;
     } else {
         retval = false;
         php::error(E_WARNING, "%s [%d]", error->message, error->code);
     }
+    return retval;
 }
 
 PHPX_METHOD(Gtk_Application, find) {
     PHP_Gtk_Application *app = _this.get("app").toResource<PHP_Gtk_Application>("GtkApplication");
     GObject *gobject = gtk_builder_get_object(app->builder, args[0].toCString());
     if (gobject == nullptr) {
-        retval = false;
-        return;
+        return false;
     }
 
     String type(G_OBJECT_TYPE_NAME(gobject));
@@ -127,7 +128,7 @@ PHPX_METHOD(Gtk_Application, find) {
     Object widget = newObject(className);
     auto res = newResource<GObject>("GObject", gobject);
     widget.set("resource", res);
-    retval = widget;
+    return widget;
 }
 
 PHPX_METHOD(Gtk_Application, quit) {
@@ -136,29 +137,32 @@ PHPX_METHOD(Gtk_Application, quit) {
         auto callback = callbacks[i];
         delete callbacks[i];
     }
+    return nullptr;
 }
 
 PHPX_METHOD(Gtk_Widget, on) {
     GObject *object = _this.get("resource").toResource<GObject>("GObject");
-    auto callback = args[1].dup();
+    auto callback = new var(args[1]);
     g_signal_connect(object, args[0].toCString(), G_CALLBACK(PHP_Gtk_callback), callback);
     callbacks.push_back(callback);
+    return nullptr;
 }
 
 PHPX_METHOD(Gtk_Entry, getText) {
     GtkEntry *entry = GTK_ENTRY(_this.get("resource").toResource<GObject>("GObject"));
     auto text = gtk_entry_get_text(entry);
-    retval = Variant(text);
+    return text;
 }
 
 PHPX_METHOD(Gtk_Entry, setText) {
     GtkEntry *entry = GTK_ENTRY(_this.get("resource").toResource<GObject>("GObject"));
     gtk_entry_set_text(entry, args[0].toCString());
+    return nullptr;
 }
 
 PHPX_METHOD(Gtk_Label, getText) {
     GtkLabel *label = GTK_LABEL(_this.get("resource").toResource<GObject>("GObject"));
-    retval = Variant(gtk_label_get_text(label));
+    return gtk_label_get_text(label);
 }
 
 PHPX_METHOD(Gtk_Label, setText) {

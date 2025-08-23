@@ -9,5 +9,5 @@
 phpx build -v
 phpx install
 
-php -dextension=queue.so tests/main.php
+php -dextension=queue.so tests/main.phpt
 ```
