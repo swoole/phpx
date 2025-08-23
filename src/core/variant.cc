@@ -486,4 +486,11 @@ Variant Object::get(const String &name) {
     }
     return retval;
 }
+
+Object Object::clone() const {
+    const auto new_object = zend_objects_clone_obj(object());
+    Object retval;
+    ZVAL_OBJ(retval.ptr(), new_object);
+    return retval;
+}
 }  // namespace php

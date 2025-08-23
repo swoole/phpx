@@ -385,8 +385,8 @@ class Variant {
     zend_class_entry *ce() {
         return Z_OBJCE_P(ptr());
     }
-    zend_object *object() {
-        return Z_OBJ_P(ptr());
+    zend_object *object() const {
+        return Z_OBJ_P(const_ptr());
     }
     const zval *const_ptr() const {
         return &val;
@@ -943,6 +943,7 @@ class Object : public Variant {
     bool instanceOf(const zend_class_entry *ce_) {
         return instanceof_function(ce(), ce_);
     }
+    Object clone() const;
 };
 
 typedef void (*resource_dtor)(zend_resource *);

@@ -104,6 +104,21 @@ TEST(object, instanceOf) {
     ASSERT_FALSE(obj2.instanceOf(zend_ce_exception));
 }
 
+TEST(object, clone) {
+    auto o1 = newObject("stdClass");
+    o1.set("prop1", 1990);
+    ASSERT_TRUE(o1.get("prop1").equals(1990));
+
+    auto o2 = o1;
+    o1.set("prop1", 2019);
+    ASSERT_TRUE(o2.get("prop1").equals(2019));
+
+    auto o3 = o1.clone();
+    o1.set("prop1", 2024);
+    ASSERT_TRUE(o3.get("prop1").equals(2019));
+    ASSERT_TRUE(o1.get("prop1").equals(2024));
+}
+
 TEST(object, bad_type) {
     auto arr1 = create_list();
     ChildResult r = run_in_child_capture_stdout([&arr1]() -> int {
