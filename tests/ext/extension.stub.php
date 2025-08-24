@@ -15,6 +15,10 @@ function phpx_test3(): void
 {
 }
 
+function phpx_test4(): bool
+{
+}
+
 function phpx_add (int $a, string $b): int
 {
 }

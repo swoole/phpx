@@ -26,7 +26,7 @@ using namespace php;
 using namespace std;
 
 PHPX_FUNCTION(cpp_ext_test) {
-	auto argc = args.count();
+    auto argc = args.count();
     for (int i = 0; i < argc; i++) {
         cout << args[i].type() << endl;
     }
@@ -53,6 +53,30 @@ PHPX_FUNCTION(cpp_throw_error) {
 
 PHPX_FUNCTION(phpx_test3) {
     // pass
+    return {};
+}
+
+PHPX_FUNCTION(phpx_test4) {
+    auto id = args[0].toInt();
+    zend_try {
+        switch (id) {
+        case 0:
+            return include(args[1].toString());
+        case 1:
+            return include_once(args[1].toString());
+        case 2:
+            return require(args[1].toString());
+        case 3:
+            return require_once(args[1].toString());
+        default:
+            break;
+        }
+    }
+    zend_catch {
+        auto e = catchException();
+        return e;
+    }
+    zend_end_try();
     return {};
 }
 

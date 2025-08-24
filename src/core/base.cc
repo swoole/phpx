@@ -56,7 +56,15 @@ void throwException(const char *name, const char *message, int code) {
     zend_throw_exception(ce, message, code);
 }
 
-static inline ZEND_RESULT_CODE _check_args_num(const zend_execute_data *data, const int num_args) {
+Object catchException() {
+    zval zv;
+    ZVAL_OBJ(&zv, EG(exception));
+    Variant result{&zv};
+    zend_clear_exception();
+    return result;
+}
+
+static ZEND_RESULT_CODE _check_args_num(const zend_execute_data *data, const int num_args) {
     const uint32_t min_num_args = data->func->common.required_num_args;
     const uint32_t max_num_args = data->func->common.num_args;
 

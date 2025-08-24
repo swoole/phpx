@@ -107,6 +107,8 @@ PHPX_API Variant eval(const String &script);
 PHPX_API Variant call(const Variant &func, Array &args);
 PHPX_API Variant call(const Variant &func, const std::initializer_list<Variant> &args);
 PHPX_API void throwException(const char *name, const char *message, int code = 0);
+PHPX_API Object catchException();
+
 Resource *getResource(const std::string &name);
 
 class String {
@@ -776,8 +778,8 @@ class Args {
     size_t count() const {
         return params.size();
     }
-    bool exists(int i) const {
-        return (size_t) i < count();
+    bool exists(const size_t i) const {
+        return i < count();
     }
     bool empty() const {
         return params.empty();
@@ -785,16 +787,10 @@ class Args {
     zval *ptr() {
         return params.data();
     }
-    Array toArray() const {
-        Array array;
-        for (const auto &param : params) {
-            array.append(Variant(&param));
-        }
-        return array;
-    }
-    Variant operator[](int i) const {
-        auto zv = params.at(i);
-        return {&zv};
+    Variant get(size_t i) const;
+    Array toArray() const;
+    Variant operator[](size_t i) const {
+        return get(i);
     }
 };
 
@@ -807,12 +803,6 @@ static inline Variant call(const Variant &func) {
 
 static inline zend_class_entry *getClassEntry(const String &name) {
     return zend_lookup_class(name.ptr());
-}
-
-static inline Variant getException() {
-    zval zv;
-    ZVAL_OBJ(&zv, EG(exception));
-    return {&zv};
 }
 
 class Object : public Variant {

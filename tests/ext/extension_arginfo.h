@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: c3de832d4cb01c44cdf46a72f965d99281206f44 */
+ * Stub hash: f3f4556e5b4a6e82e3a802d455f4f75ce9cb11e3 */
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_cpp_ext_test, 0, 0, IS_LONG, 0)
 	ZEND_ARG_VARIADIC_TYPE_INFO(0, args, IS_MIXED, 0)
@@ -10,6 +10,9 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_cpp_ext_test2, 0, 0, IS_ARRAY, 0
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phpx_test3, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phpx_test4, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phpx_add, 0, 2, IS_LONG, 0)
@@ -38,6 +41,7 @@ ZEND_END_ARG_INFO()
 ZEND_FUNCTION(cpp_ext_test);
 ZEND_FUNCTION(cpp_ext_test2);
 ZEND_FUNCTION(phpx_test3);
+ZEND_FUNCTION(phpx_test4);
 ZEND_FUNCTION(phpx_add);
 ZEND_FUNCTION(cpp_throw_error);
 ZEND_METHOD(MyClass, test);
@@ -51,6 +55,7 @@ static const zend_function_entry ext_functions[] = {
 	ZEND_FE(cpp_ext_test, arginfo_cpp_ext_test)
 	ZEND_FE(cpp_ext_test2, arginfo_cpp_ext_test2)
 	ZEND_FE(phpx_test3, arginfo_phpx_test3)
+	ZEND_FE(phpx_test4, arginfo_phpx_test4)
 	ZEND_FE(phpx_add, arginfo_phpx_add)
 	ZEND_FE(cpp_throw_error, arginfo_cpp_throw_error)
 	ZEND_FE_END

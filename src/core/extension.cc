@@ -279,6 +279,22 @@ zend_result extension_after_request(int type, int module_number) {
     return SUCCESS;
 }
 
+Array Args::toArray() const {
+    Array array;
+    for (const auto &param : params) {
+        array.append(Variant(&param));
+    }
+    return array;
+}
+
+Variant Args::get(size_t i) const {
+    if (i >= count()) {
+        return nullptr;
+    }
+    auto zv = params.at(i);
+    return {&zv};
+}
+
 Resource *getResource(const std::string &name) {
     auto iter = resource_map.find(name);
     if (iter == resource_map.end()) {

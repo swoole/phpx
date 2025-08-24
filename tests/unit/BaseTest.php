@@ -110,4 +110,18 @@ class BaseTest extends TestCase
             $this->assertStringContainsString("expects exactly 2 argument", $e->getMessage());
         }
     }
+
+    public function testInclude() {
+        $includeDir = realpath(__DIR__ . '/../include');
+        $range = range(0, 3);
+
+        foreach($range as $i) {
+            try {
+                $rs = phpx_test4($i, $includeDir . '/throw_error.php');
+                $this->assertTrue($rs);
+            } catch (\Throwable $e) {
+               $this->assertStringContainsString("phpx test", $e->getMessage());
+            }
+        }
+    }
 }

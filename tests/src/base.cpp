@@ -54,26 +54,17 @@ TEST(base, include1) {
 }
 
 TEST(base, include2) {
-    zend_try {
-        auto version = include_once(get_include_dir() + "/../include/return_const.php");
-        ASSERT_STREQ(version.toCString(), PHP_VERSION);
+    auto version = include_once(get_include_dir() + "/../include/return_const.php");
+    ASSERT_STREQ(version.toCString(), PHP_VERSION);
 
-        auto rs1 = include_once(get_include_dir() + "/../include/return_const.php");
-        ASSERT_TRUE(rs1.toBool());
+    auto rs1 = include_once(get_include_dir() + "/../include/return_const.php");
+    ASSERT_TRUE(rs1.toBool());
 
-        auto rs2 = require_once(get_include_dir() + "/../include/return_const.php");
-        ASSERT_TRUE(rs2.toBool());
+    auto rs2 = require_once(get_include_dir() + "/../include/return_const.php");
+    ASSERT_TRUE(rs2.toBool());
 
-        ASSERT_EQ(include(get_include_dir() + "/throw_error.php"), false);
-        ASSERT_EQ(require_once(get_include_dir() + "/throw_error.php"), false);
-        ASSERT_EQ(require(get_include_dir() + "/../include/throw_error.php"), false);
-        zend_clear_exception();
-    }
-    zend_catch {
-        auto ex = getException();
-        ex.print();
-    }
-    zend_end_try();
+    auto rs3 = include_once(get_include_dir() + "/../include/not_exists.php");
+    ASSERT_FALSE(rs3.toBool());
 }
 
 TEST(base, ini_get) {
@@ -120,9 +111,8 @@ TEST(base, exception) {
         zend_bailout();
     }
     zend_catch {
-        auto e = Object(getException());
+        auto e = catchException();
         ASSERT_TRUE(e.getClassName().equals("RuntimeException"));
-        zend_clear_exception();
 #if 0
         auto msg = e.exec("getMessage");
         ASSERT_TRUE(msg.isString());
