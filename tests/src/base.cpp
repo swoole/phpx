@@ -42,7 +42,7 @@ TEST(base, define) {
     ASSERT_EQ(arr2["PHP_MAJOR_VERSION"].toInt(), PHP_MAJOR_VERSION);
 }
 
-TEST(base, include) {
+TEST(base, include1) {
     std::string tmp_file = "/tmp/include_test.php";
     std::string tmp_file2 = "/tmp/tmp_file.txt";
 
@@ -51,6 +51,29 @@ TEST(base, include) {
     auto retval = include(tmp_file);
     ASSERT_TRUE(retval.isInt());
     ASSERT_EQ(retval.toInt(), PHP_VERSION_ID);
+}
+
+TEST(base, include2) {
+    zend_try {
+        auto version = include_once(get_include_dir() + "/../include/return_const.php");
+        ASSERT_STREQ(version.toCString(), PHP_VERSION);
+
+        auto rs1 = include_once(get_include_dir() + "/../include/return_const.php");
+        ASSERT_TRUE(rs1.toBool());
+
+        auto rs2 = require_once(get_include_dir() + "/../include/return_const.php");
+        ASSERT_TRUE(rs2.toBool());
+
+        ASSERT_EQ(include(get_include_dir() + "/throw_error.php"), false);
+        ASSERT_EQ(require_once(get_include_dir() + "/throw_error.php"), false);
+        ASSERT_EQ(require(get_include_dir() + "/../include/throw_error.php"), false);
+        zend_clear_exception();
+    }
+    zend_catch {
+        auto ex = getException();
+        ex.print();
+    }
+    zend_end_try();
 }
 
 TEST(base, ini_get) {

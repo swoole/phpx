@@ -196,14 +196,10 @@ Variant call(const Variant &func, const std::initializer_list<Variant> &args) {
     return _call(nullptr, func.const_ptr(), _args);
 }
 
-#define ZEND_FAKE_OP_ARRAY ((zend_op_array*)(intptr_t)-1)
+#define ZEND_FAKE_OP_ARRAY ((zend_op_array *) (intptr_t) -1)
 
 static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_string *inc_filename, const int type) {
     zend_op_array *new_op_array = nullptr;
-    if (UNEXPECTED(!inc_filename)) {
-        return nullptr;
-    }
-
     switch (type) {
     case ZEND_INCLUDE_ONCE:
     case ZEND_REQUIRE_ONCE: {
@@ -216,10 +212,6 @@ static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_
                 break;
             }
         } else if (UNEXPECTED(EG(exception))) {
-            break;
-        } else if (UNEXPECTED(strlen(ZSTR_VAL(inc_filename)) != ZSTR_LEN(inc_filename))) {
-            zend_message_dispatcher((type == ZEND_INCLUDE_ONCE) ? ZMSG_FAILED_INCLUDE_FOPEN : ZMSG_FAILED_REQUIRE_FOPEN,
-                                    ZSTR_VAL(inc_filename));
             break;
         } else {
             resolved_path = zend_string_copy(inc_filename);
@@ -244,21 +236,20 @@ static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_
         zend_destroy_file_handle(&file_handle);
         zend_string_release_ex(resolved_path, false);
     } break;
-    case ZEND_INCLUDE:
-    case ZEND_REQUIRE:
-        if (UNEXPECTED(strlen(ZSTR_VAL(inc_filename)) != ZSTR_LEN(inc_filename))) {
-            zend_message_dispatcher((type == ZEND_INCLUDE) ? ZMSG_FAILED_INCLUDE_FOPEN : ZMSG_FAILED_REQUIRE_FOPEN,
-                                    ZSTR_VAL(inc_filename));
-            break;
-        }
-        new_op_array = compile_filename(type, inc_filename);
-        break;
     case ZEND_EVAL: {
         char *eval_desc = zend_make_compiled_string_description("eval()'d code");
+#if PHP_VERSION_ID < 80200
+        new_op_array = zend_compile_string(inc_filename, eval_desc);
+#else
         new_op_array = zend_compile_string(inc_filename, eval_desc, ZEND_COMPILE_POSITION_AFTER_OPEN_TAG);
+#endif
         efree(eval_desc);
     } break;
-        EMPTY_SWITCH_DEFAULT_CASE()
+    case ZEND_INCLUDE:
+    case ZEND_REQUIRE:
+    default:
+        new_op_array = compile_filename(type, inc_filename);
+        break;
     }
 
     return new_op_array;
