@@ -47,8 +47,6 @@ extern "C" {
 #include <map>
 #include <memory>
 
-typedef unsigned char uchar;
-
 #define PHPX_MAX_ARGC 10
 #define PHPX_VAR_DUMP_LEVEL 10
 #define PHPX_API PHPAPI
@@ -62,6 +60,7 @@ typedef unsigned char uchar;
 #define NO_CONST_Z(_z) const_cast<zval *>(_z)
 
 namespace php {
+typedef unsigned char uchar;
 typedef zend_long Int;
 typedef double Float;
 
@@ -101,9 +100,12 @@ PHPX_API void error(int level, const char *format, ...);
 PHPX_API void echo(const char *format, ...);
 PHPX_API Variant global(const String &name);
 PHPX_API Variant include(const String &file);
+PHPX_API Variant include_once(const String &file);
+PHPX_API Variant require(const String &file);
+PHPX_API Variant require_once(const String &file);
+PHPX_API Variant eval(const String &script);
 PHPX_API Variant call(const Variant &func, Array &args);
 PHPX_API Variant call(const Variant &func, const std::initializer_list<Variant> &args);
-PHPX_API void eval(const String &script);
 PHPX_API void throwException(const char *name, const char *message, int code = 0);
 Resource *getResource(const std::string &name);
 
@@ -199,10 +201,10 @@ class String {
     String base64Decode() const {
         return php_base64_decode_str(str);
     }
-    String escape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
+    String escape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
         return php_escape_html_entities((uchar *) str->val, str->len, 0, flags, charset);
     }
-    String unescape(int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
+    String unescape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
         return php_unescape_html_entities(str, 1, flags, charset);
     }
 

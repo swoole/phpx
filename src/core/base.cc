@@ -196,43 +196,111 @@ Variant call(const Variant &func, const std::initializer_list<Variant> &args) {
     return _call(nullptr, func.const_ptr(), _args);
 }
 
-Variant include(const String &file) {
-    zend_file_handle file_handle;
-    zend_stream_init_filename(&file_handle, file.data());
-    int ret = php_stream_open_for_zend_ex(&file_handle, USE_PATH | STREAM_OPEN_FOR_INCLUDE);
-    if (ret != SUCCESS) {
-        return false;
+#define ZEND_FAKE_OP_ARRAY ((zend_op_array*)(intptr_t)-1)
+
+static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_string *inc_filename, const int type) {
+    zend_op_array *new_op_array = nullptr;
+    if (UNEXPECTED(!inc_filename)) {
+        return nullptr;
     }
 
-    if (!file_handle.opened_path) {
-        file_handle.opened_path = zend_string_copy(file.ptr());
-    }
-    zend_string *opened_path = zend_string_copy(file_handle.opened_path);
-    zval dummy;
-    Variant retval = false;
-    zend_op_array *new_op_array;
-    ZVAL_NULL(&dummy);
-    if (zend_hash_add(&EG(included_files), opened_path, &dummy)) {
-        new_op_array = zend_compile_file(&file_handle, ZEND_REQUIRE);
-    } else {
-        new_op_array = nullptr;
-    }
-    zend_destroy_file_handle(&file_handle);
-    zend_string_release(opened_path);
-    if (!new_op_array) {
-        return false;
+    switch (type) {
+    case ZEND_INCLUDE_ONCE:
+    case ZEND_REQUIRE_ONCE: {
+        zend_file_handle file_handle;
+        zend_string *resolved_path = zend_resolve_path(inc_filename);
+        if (EXPECTED(resolved_path)) {
+            if (zend_hash_exists(&EG(included_files), resolved_path)) {
+                new_op_array = ZEND_FAKE_OP_ARRAY;
+                zend_string_release_ex(resolved_path, false);
+                break;
+            }
+        } else if (UNEXPECTED(EG(exception))) {
+            break;
+        } else if (UNEXPECTED(strlen(ZSTR_VAL(inc_filename)) != ZSTR_LEN(inc_filename))) {
+            zend_message_dispatcher((type == ZEND_INCLUDE_ONCE) ? ZMSG_FAILED_INCLUDE_FOPEN : ZMSG_FAILED_REQUIRE_FOPEN,
+                                    ZSTR_VAL(inc_filename));
+            break;
+        } else {
+            resolved_path = zend_string_copy(inc_filename);
+        }
+
+        zend_stream_init_filename_ex(&file_handle, resolved_path);
+        if (SUCCESS == zend_stream_open(&file_handle)) {
+            if (!file_handle.opened_path) {
+                file_handle.opened_path = zend_string_copy(resolved_path);
+            }
+
+            if (zend_hash_add_empty_element(&EG(included_files), file_handle.opened_path)) {
+                new_op_array =
+                    zend_compile_file(&file_handle, (type == ZEND_INCLUDE_ONCE ? ZEND_INCLUDE : ZEND_REQUIRE));
+            } else {
+                new_op_array = ZEND_FAKE_OP_ARRAY;
+            }
+        } else if (!EG(exception)) {
+            zend_message_dispatcher((type == ZEND_INCLUDE_ONCE) ? ZMSG_FAILED_INCLUDE_FOPEN : ZMSG_FAILED_REQUIRE_FOPEN,
+                                    ZSTR_VAL(inc_filename));
+        }
+        zend_destroy_file_handle(&file_handle);
+        zend_string_release_ex(resolved_path, false);
+    } break;
+    case ZEND_INCLUDE:
+    case ZEND_REQUIRE:
+        if (UNEXPECTED(strlen(ZSTR_VAL(inc_filename)) != ZSTR_LEN(inc_filename))) {
+            zend_message_dispatcher((type == ZEND_INCLUDE) ? ZMSG_FAILED_INCLUDE_FOPEN : ZMSG_FAILED_REQUIRE_FOPEN,
+                                    ZSTR_VAL(inc_filename));
+            break;
+        }
+        new_op_array = compile_filename(type, inc_filename);
+        break;
+    case ZEND_EVAL: {
+        char *eval_desc = zend_make_compiled_string_description("eval()'d code");
+        new_op_array = zend_compile_string(inc_filename, eval_desc, ZEND_COMPILE_POSITION_AFTER_OPEN_TAG);
+        efree(eval_desc);
+    } break;
+        EMPTY_SWITCH_DEFAULT_CASE()
     }
 
-    ZVAL_UNDEF(retval.ptr());
-    zend_execute(new_op_array, retval.ptr());
-
-    destroy_op_array(new_op_array);
-    efree(new_op_array);
-    return retval;
+    return new_op_array;
 }
 
-PHPX_API void eval(const String &script) {
-    zend_eval_stringl((char *) script.data(), script.length(), nullptr, "eval()'d code");
+static Variant _include(zend_string *filename, int type) {
+    zend_op_array *new_op_array = zend_include_or_eval(filename, type);
+    if (UNEXPECTED(EG(exception) != NULL)) {
+        if (new_op_array != ZEND_FAKE_OP_ARRAY && new_op_array != nullptr) {
+            destroy_op_array(new_op_array);
+            efree_size(new_op_array, sizeof(zend_op_array));
+        }
+        return nullptr;
+    } else if (new_op_array == ZEND_FAKE_OP_ARRAY) {
+        return true;
+    } else if (UNEXPECTED(new_op_array == nullptr)) {
+        return false;
+    } else {
+        Variant result;
+        zend_execute(new_op_array, result.ptr());
+        return result;
+    }
+}
+
+Variant include(const String &file) {
+    return _include(file.ptr(), ZEND_INCLUDE);
+}
+
+Variant include_once(const String &file) {
+    return _include(file.ptr(), ZEND_INCLUDE_ONCE);
+}
+
+Variant require(const String &file) {
+    return _include(file.ptr(), ZEND_REQUIRE);
+}
+
+Variant require_once(const String &file) {
+    return _include(file.ptr(), ZEND_REQUIRE_ONCE);
+}
+
+Variant eval(const String &script) {
+    return _include(script.ptr(), ZEND_EVAL);
 }
 
 zend_function_entry *copy_function_entries(const zend_function_entry *_functions) {

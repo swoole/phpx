@@ -52,7 +52,7 @@ TEST(object, method) {
 }
 
 TEST(object, static_property) {
-    include(get_include_dir() + "/library.php");
+    include_once(get_include_dir() + "/library.php");
     ASSERT_EQ(Class::getStaticProperty("TestClass", "propInt").toInt(), 1990018900);
     ASSERT_STREQ(Class::getStaticProperty("TestClass", "propString").toCString(), "Hello, World!");
     ASSERT_TRUE(Class::setStaticProperty("TestClass", "propString", "phpx test"));
@@ -60,9 +60,7 @@ TEST(object, static_property) {
 }
 
 TEST(object, call_parent_method) {
-    if (!class_exists("TestClass2")) {
-        include(get_include_dir() + "/library.php");
-    }
+    include_once(get_include_dir() + "/library.php");
 
     auto obj = newObject("TestClass2");
     ASSERT_TRUE(obj.methodExists("test"));
@@ -88,9 +86,7 @@ TEST(object, call_parent_method) {
 }
 
 TEST(object, instanceOf) {
-    if (!class_exists("TestClass2")) {
-        include(get_include_dir() + "/library.php");
-    }
+    include_once(get_include_dir() + "/library.php");
 
     auto obj = newObject("TestClass2");
     ASSERT_TRUE(obj.instanceOf("TestClass"));
