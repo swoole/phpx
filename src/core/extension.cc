@@ -291,8 +291,7 @@ Variant Args::get(size_t i) const {
     if (i >= count()) {
         return nullptr;
     }
-    auto zv = params.at(i);
-    return {&zv};
+    return params.at(i);
 }
 
 Resource *getResource(const std::string &name) {

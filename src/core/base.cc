@@ -214,6 +214,10 @@ Variant call(const Variant &func, Array &args) {
     return _call(nullptr, func.const_ptr(), _args);
 }
 
+Variant call(const Variant &func, Args &args) {
+    return _call(nullptr, func.const_ptr(), args);
+}
+
 Variant call(const Variant &func, const std::initializer_list<Variant> &args) {
     Args _args;
     for (const auto &arg : args) {
@@ -281,9 +285,9 @@ static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_
     return new_op_array;
 }
 
-static Variant _include(zend_string *filename, int type) {
+static Variant _include(zend_string *filename, const int type) {
     zend_op_array *new_op_array = zend_include_or_eval(filename, type);
-    if (UNEXPECTED(EG(exception) != NULL)) {
+    if (UNEXPECTED(EG(exception) != nullptr)) {
         if (new_op_array != ZEND_FAKE_OP_ARRAY && new_op_array != nullptr) {
             destroy_op_array(new_op_array);
             efree_size(new_op_array, sizeof(zend_op_array));

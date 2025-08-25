@@ -88,6 +88,12 @@ TEST(caller, call) {
     rs = call(php_uname, arr);
     ASSERT_TRUE(rs.isString());
     ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
+
+    Args args;
+    args.append("m");
+    rs = call(php_uname, args);
+    ASSERT_TRUE(rs.isString());
+    ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
 }
 
 TEST(caller, http_build_query) {

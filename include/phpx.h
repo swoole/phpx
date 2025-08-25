@@ -73,6 +73,7 @@ class Variant;
 class Array;
 class Object;
 class String;
+class Args;
 
 typedef Variant var;
 
@@ -104,6 +105,7 @@ PHPX_API Variant include_once(const String &file);
 PHPX_API Variant require(const String &file);
 PHPX_API Variant require_once(const String &file);
 PHPX_API Variant eval(const String &script);
+PHPX_API Variant call(const Variant &func, Args &args);
 PHPX_API Variant call(const Variant &func, Array &args);
 PHPX_API Variant call(const Variant &func, const std::initializer_list<Variant> &args);
 PHPX_API void throwException(const char *name, const char *message, int code = 0);
@@ -820,11 +822,11 @@ class Array : public Variant {
 };
 
 class Args {
-    std::vector<zval> params;
+    std::vector<Variant> params;
 
   public:
     void append(const Variant &v) {
-        params.push_back(*v.const_ptr());
+        params.emplace_back(v);
     }
     size_t count() const {
         return params.size();
@@ -836,7 +838,7 @@ class Args {
         return params.empty();
     }
     zval *ptr() {
-        return params.data();
+        return reinterpret_cast<zval *>(params.data());
     }
     Variant get(size_t i) const;
     Array toArray() const;
