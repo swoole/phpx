@@ -78,7 +78,7 @@ Int atoi(const String &str) {
     }
     return size;
 #else
-    return zend_atol(Z_STRVAL_P(zv), Z_STRLEN_P(zv));
+    return zend_atol(str.data(), str.length());
 #endif
 }
 
