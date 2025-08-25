@@ -16,6 +16,10 @@
 
 #include "phpx.h"
 
+BEGIN_EXTERN_C()
+#include "zend_ini.h"
+END_EXTERN_C()
+
 namespace php {
 std::map<const char *, std::map<const char *, Method *, StrCmp>, StrCmp> method_map;
 std::map<const char *, Function *, StrCmp> function_map;
@@ -62,6 +66,20 @@ Object catchException() {
     Variant result{&zv};
     zend_clear_exception();
     return result;
+}
+
+Int atoi(const String &str) {
+#if PHP_VERSION_ID >= 80200
+    zend_string *errstr;
+    Int size = zend_ini_parse_quantity(str.ptr(), &errstr);
+    if (errstr) {
+        error(E_WARNING, "failed to parse '%s' to size, Error: %s", str.data(), ZSTR_VAL(errstr));
+        zend_string_release(errstr);
+    }
+    return size;
+#else
+    return zend_atol(Z_STRVAL_P(zv), Z_STRLEN_P(zv));
+#endif
 }
 
 static ZEND_RESULT_CODE _check_args_num(const zend_execute_data *data, const int num_args) {

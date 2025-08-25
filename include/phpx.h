@@ -109,6 +109,7 @@ PHPX_API Variant call(const Variant &func, const std::initializer_list<Variant> 
 PHPX_API void throwException(const char *name, const char *message, int code = 0);
 PHPX_API Object catchException();
 
+Int atoi(const String &str);
 Resource *getResource(const std::string &name);
 
 class String {
@@ -617,6 +618,56 @@ Variant newResource(const char *name, T *v) {
 #ifndef ZEND_HASH_ELEMENT
 #define ZEND_HASH_ELEMENT(ht, idx) &HT_HASH_TO_BUCKET(ht, idx)->val
 #endif
+
+template <typename T>
+static inline Variant operator+(T a, const Variant &b) {
+    return Variant(a) + b;
+}
+
+template <typename T>
+static inline Variant operator-(T a, const Variant &b) {
+    return Variant(a) - b;
+}
+
+template <typename T>
+static inline Variant operator*(T a, const Variant &b) {
+    return Variant(a) * b;
+}
+
+template <typename T>
+static inline Variant operator/(T a, const Variant &b) {
+    return Variant(a) / b;
+}
+
+template <typename T>
+static inline Variant operator%(T a, const Variant &b) {
+    return Variant(a) % b;
+}
+
+template <typename T>
+static inline Variant operator<<(T a, const Variant &b) {
+    return Variant(a) << b;
+}
+
+template <typename T>
+static inline Variant operator>>(T a, const Variant &b) {
+    return Variant(a) >> b;
+}
+
+template <typename T>
+static inline Variant operator&(T a, const Variant &b) {
+    return Variant(a) & b;
+}
+
+template <typename T>
+static inline Variant operator|(T a, const Variant &b) {
+    return Variant(a) | b;
+}
+
+template <typename T>
+static inline Variant operator^(T a, const Variant &b) {
+    return Variant(a) ^ b;
+}
 
 class ArrayKeyValue {
   public:

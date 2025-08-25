@@ -490,3 +490,45 @@ TEST(variant, logical_op) {
     ASSERT_TRUE(a || b);
     ASSERT_FALSE(a && b);
 }
+
+TEST(variant, calc2) {
+	var a = 1990;
+	var b = 20 + a;
+
+	ASSERT_EQ(b.toInt(), 2010);
+
+	var c = 2025 - a;
+	ASSERT_EQ(c.toInt(), 35);
+
+	var d = 3 * a;
+	ASSERT_EQ(d.toInt(), 1990 * 3);
+
+	var e = 23023 / a;
+	ASSERT_EQ(e.toFloat(), 23023.0 / 1990.0);
+
+	var f = 23042 % a;
+	ASSERT_EQ(f.toInt(), 23042 % 1990);
+
+	var g0 = 16;
+
+	var g = 2 << g0;
+	ASSERT_EQ(g.toInt(), 2 << 16);
+
+	auto v = php::atoi("512k");
+	var h = v >> g0;
+	ASSERT_EQ(h.toInt(), v >> 16);
+
+	var g1 = 0xFFFF;
+
+	var i = 128 & g1;
+	ASSERT_EQ(i.toInt(), 128);
+
+	var j = g | g1;
+	ASSERT_EQ(j.toInt(), 196607);
+
+	var k = 128 ^ g1;
+	ASSERT_EQ(k.toInt(), 65407);
+
+	var l = 327 + a + 192;
+	ASSERT_EQ(l.toInt(), 327 + 1990 + 192);
+}
