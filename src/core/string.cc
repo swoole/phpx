@@ -26,16 +26,11 @@ String String::format(const char *format, ...) {
     va_start(args, format);
     zend_string *s = vstrpprintf(0, format, args);
     va_end(args);
-    String result{s};
-    zend_string_release(s);
-    return result;
+    return from(s);
 }
 
 String String::trim(const char *what, TrimMode mode) const {
-    auto s = php_trim(str, what, strlen(what), mode);
-    String result{s};
-    zend_string_release(s);
-    return result;
+    return from(php_trim(str, what, strlen(what), mode));
 }
 
 void String::print() const {

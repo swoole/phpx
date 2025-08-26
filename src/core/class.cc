@@ -172,10 +172,7 @@ Variant Class::getStaticProperty(const char *name, const std::string &prop) {
     if (!ce) {
         zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
     }
-    const auto retval = zend_read_static_property(ce, prop.c_str(), prop.length(), true);
-    Variant rv{retval};
-    zval_ptr_dtor(retval);
-    return rv;
+    return Variant::from(zend_read_static_property(ce, prop.c_str(), prop.length(), true));
 }
 
 bool Class::setStaticProperty(const char *name, const std::string &prop, const Variant &v) {

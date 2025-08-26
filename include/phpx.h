@@ -50,6 +50,7 @@ extern "C" {
 #define PHPX_MAX_ARGC 10
 #define PHPX_VAR_DUMP_LEVEL 10
 #define PHPX_API PHPAPI
+#define PHPX_NOAPI
 
 /**
  * !!! Unsafe conversion, discarding const modifier. There are many errors in the php src source code.
@@ -228,6 +229,16 @@ class String {
     zend_string *ptr() const {
         return str;
     }
+    PHPX_NOAPI static String from(zend_string *v) {
+        String result{v};
+        zend_string_release(v);
+        return result;
+    }
+    PHPX_NOAPI static String from(zval *v) {
+        String result{v};
+        zval_ptr_dtor(v);
+        return result;
+    }
 };
 
 class Variant {
@@ -368,6 +379,11 @@ class Variant {
     }
     zval *ptr() {
         return &val;
+    }
+    static PHPX_NOAPI Variant from(zval *v) {
+    	Variant retval{v};
+        zval_ptr_dtor(v);
+        return retval;
     }
     zend_array *array() const {
         return Z_ARRVAL_P(&val);

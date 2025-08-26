@@ -106,9 +106,7 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
         }
         ZEND_HASH_FOREACH_END();
     }
-    Array retval(&return_value);
-    zval_ptr_dtor(&return_value);
-    return retval;
+    return from(&return_value);
 }
 
 Array::Array(const zval *v) : Variant(v) {
@@ -177,9 +175,7 @@ bool Array::contains(const Variant &_other_var, bool strict) const {
 String Array::join(const String &delim) {
     zval retval;
     php_implode(delim.ptr(), HASH_OF(ptr()), &retval);
-    String result(&retval);
-    zval_ptr_dtor(&retval);
-    return result;
+    return String::from(&retval);
 }
 
 Variant ArrayIterator::key() const {

@@ -59,10 +59,7 @@ std::string Variant::toStdString() const {
 }
 
 String Variant::toString() const {
-    const auto s = zval_get_string(NO_CONST_Z(const_ptr()));
-    String result{s};
-    zend_string_release(s);
-    return result;
+    return String::from(zval_get_string(NO_CONST_Z(const_ptr())));
 }
 
 Array Variant::toArray() const {
@@ -454,7 +451,7 @@ Object newObject(const char *name, const std::initializer_list<Variant> &args) {
 }
 
 String Object::hash() const {
-    return php_spl_object_hash(object());
+    return String::from(php_spl_object_hash(object()));
 }
 
 Variant Object::exec(const Variant &fn, const std::initializer_list<Variant> &args) {

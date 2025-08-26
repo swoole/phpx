@@ -14,6 +14,16 @@ TEST(object, base) {
 
     object.set("php", rand_num);
 
+    auto rs = object.get("notExistsProp");
+    ASSERT_TRUE(rs.isNull());
+
+    auto propObj = newObject("ArrayObject");
+    propObj.set("key", "value");
+    object.set("object", propObj);
+
+    auto ro = object.get("object");
+    ASSERT_TRUE(ro.isObject());
+
     String str("php");
     ASSERT_EQ(ZSTR_H(str.ptr()), 0);
     ASSERT_EQ(object.get(str).toInt(), rand_num);
