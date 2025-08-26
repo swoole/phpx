@@ -523,7 +523,8 @@ TEST(variant, calc2) {
 	var i = 128 & g1;
 	ASSERT_EQ(i.toInt(), 128);
 
-	var j = g | g1;
+        Int j0 = g.toInt();
+	var j = j0 | g1;
 	ASSERT_EQ(j.toInt(), 196607);
 
 	var k = 128 ^ g1;

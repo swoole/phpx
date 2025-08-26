@@ -126,3 +126,8 @@ TEST(base, exception) {
 TEST(base, throwException) {
     throwException("NotExistsException", "hello world", 19900);
 }
+
+TEST(base, atoi) {
+    auto i = php::atoi("hello");
+    ASSERT_EQ(i, 0);
+}

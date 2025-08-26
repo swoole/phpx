@@ -115,6 +115,13 @@ void string_dtor(zend_resource *res) {
     delete s;
 }
 
+#define ASSERT_TRUE(rs)  if (!rs) { \
+    printf("[PHPX] assert failed, at line %s %d\n", __FILE__, __LINE__); \
+    exit(255); \
+}
+
+#define ASSERT_FALSE(rs) ASSERT_TRUE(!rs)
+
 PHPX_EXTENSION() {
     auto *extension = new Extension("phpx_test", "1.0.2");
 
@@ -152,6 +159,16 @@ PHPX_EXTENSION() {
 
         c->implements(i);
         extension->registerClass(c);
+
+        // Attributes and constants cannot be added after class registration.
+        // There is a protection mechanism at the bottom
+        ASSERT_FALSE(c->addConstant("TEST_CONSTANT_ERRgetClassEntry(", 9000));
+        ASSERT_FALSE(c->addProperty("prop4", null, PUBLIC));
+        ASSERT_FALSE(c->extends(e->ptr()));
+        ASSERT_FALSE(c->extends(e));
+        ASSERT_FALSE(c->implements(i));
+        ASSERT_FALSE(c->alias("TestClass5"));
+        ASSERT_FALSE(c->activate());
 
         extension->registerResource("ResourceString", string_dtor);
         const auto ce = i->ptr();
