@@ -100,6 +100,8 @@ enum ZvalType {
 
 PHPX_API void error(int level, const char *format, ...);
 PHPX_API void echo(const char *format, ...);
+PHPX_API void echo(const String &str);
+PHPX_API void echo(const Variant &val);
 PHPX_API Variant global(const String &name);
 PHPX_API Variant include(const String &file);
 PHPX_API Variant include_once(const String &file);
@@ -111,6 +113,7 @@ PHPX_API Variant call(const Variant &func, Array &args);
 PHPX_API Variant call(const Variant &func, const std::initializer_list<Variant> &args);
 PHPX_API void throwException(const char *name, const char *message, int code = 0);
 PHPX_API Object catchException();
+PHPX_API Variant concat(const Variant &a, const Variant &b);
 
 Int atoi(const String &str);
 Resource *getResource(const std::string &name);
@@ -381,7 +384,7 @@ class Variant {
         return &val;
     }
     static PHPX_NOAPI Variant from(zval *v) {
-    	Variant retval{v};
+        Variant retval{v};
         zval_ptr_dtor(v);
         return retval;
     }

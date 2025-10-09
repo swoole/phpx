@@ -366,13 +366,13 @@ PHPX_FUNCTION(cpp_test2)
     var_dump(arr);
 }
 
-int test_get_length(swProtocol *protocol, swConnection *conn, char *data, uint32_t length)
+int test_get_length(Protocol *protocol, Connection *conn, char *data, uint32_t length)
 {
     printf("cpp, size=%d\n", length);
     return 100;
 }
 
-int dispatch_function(swServer *serv, swConnection *conn, swEventData *data)
+int dispatch_function(Server *serv, Connection *conn, EventData *data)
 {
     int worker_id = rand() % serv->worker_num;
     printf("cpp, dst_worker_id=%d, type=%d, size=%d\n", worker_id, data->info.type, data->info.len);

@@ -42,6 +42,18 @@ void echo(const char *format, ...) {
     va_end(args);
 }
 
+void echo(const String &str) {
+    PHPWRITE(str.data(), str.length());
+}
+
+void echo(const Variant &val) {
+    echo(val.toString());
+}
+
+Variant concat(const Variant &a, const Variant &b) {
+    return a.concat(b);
+}
+
 Variant global(const String &name) {
     zend_is_auto_global(name.ptr());
     zval *var = zend_hash_find_ind(&EG(symbol_table), name.ptr());
