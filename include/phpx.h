@@ -77,6 +77,9 @@ class String;
 class Args;
 
 typedef Variant var;
+typedef Array array;
+typedef Object object;
+typedef String string;
 
 enum TrimMode {
     TRIM_LEFT = 1,
