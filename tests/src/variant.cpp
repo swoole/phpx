@@ -544,3 +544,55 @@ TEST(variant, same) {
     ASSERT_TRUE(c.equals(d));
     ASSERT_FALSE(c.same(d));
 }
+
+TEST(variant, offsetGet) {
+    Array a{1, 2, 3, 99, 1000};
+    ASSERT_EQ(a.offsetGet(3).toInt(), 99);
+    ASSERT_TRUE(a.offsetGet(100).isNull());
+
+    var s = "hello world";
+    ASSERT_STREQ(s.offsetGet(4).toCString(), "o");
+    ASSERT_TRUE(a.offsetExists(3));
+    ASSERT_TRUE(a.offsetGet(s.length()).isNull());
+    ASSERT_FALSE(a.offsetExists(s.length()));
+    ASSERT_STREQ(s.offsetGet(-1).toCString(), "d");
+
+    var b = false;
+    ASSERT_TRUE(b.offsetGet(0).isNull());
+
+    Array a2;
+    var sk = "hello";
+    a2.set(sk, 999);
+    a2.set("world", 888);
+    ASSERT_EQ(a2.offsetGet(sk).toInt(), 999);
+}
+
+TEST(variant, offsetGet2) {
+    var sk = "hello";
+    auto o = newObject("ArrayObject");
+    o.offsetSet(sk, 1987);
+    ASSERT_TRUE(o.offsetExists(sk));
+    ASSERT_EQ(o.offsetGet(sk).toInt(), 1987);
+
+    o.offsetUnset(sk);
+    ASSERT_FALSE(o.offsetExists(sk));
+}
+
+TEST(variant, setProperty) {
+    var sk = "hello";
+    auto o = newObject("ArrayObject");
+
+    o.setProperty(sk, 1987);
+    auto v = o.getProperty(sk);
+    ASSERT_EQ(v.toInt(), 1987);
+}
+
+TEST(variant, newReference) {
+    var ref = newReference();
+
+    var str = "first=value&arr[]=foo+bar&arr[]=baz";
+    parse_str(str, ref);
+
+    array arr(*ref);
+    ASSERT_STREQ(arr.offsetGet("first").toCString(), "value");
+}

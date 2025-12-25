@@ -50,8 +50,32 @@ void echo(const Variant &val) {
     echo(val.toString());
 }
 
+void echo(Int val) {
+    echo("%ld", val);
+}
+
+void echo(Float val) {
+    echo("%f", val);
+}
+
 Variant concat(const Variant &a, const Variant &b) {
     return a.concat(b);
+}
+
+Variant concat(const std::initializer_list<Variant> &args) {
+    if (args.size() == 0) {
+        return Variant();
+    }
+
+    auto it = args.begin();
+    Variant result = *it;
+    ++it;
+
+    for (; it != args.end(); ++it) {
+        result = result.concat(*it);
+    }
+
+    return result;
 }
 
 Variant global(const String &name) {
@@ -61,6 +85,17 @@ Variant global(const String &name) {
         return false;
     }
     return {var};
+}
+
+void exit(const Variant &status) {
+    if (status.isInt()) {
+        EG(exit_status) = status.toInt();
+    } else {
+        auto zv = NO_CONST_V(status);
+        zend_print_zval(zv, 0);
+        EG(exit_status) = 0;
+    }
+    zend_bailout();
 }
 
 void throwException(const char *name, const char *message, int code) {

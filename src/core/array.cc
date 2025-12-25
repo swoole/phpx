@@ -112,6 +112,9 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
 Array::Array(const zval *v) : Variant(v) {
     if (isNull()) {
         array_init(ptr());
+    }
+    if (isReference()) {
+        error(E_ERROR, "parameter 1 must be `array`, got `reference`");
     } else if (!isArray()) {
         error(E_ERROR, "parameter 1 must be `array`, got `%s`", typeStr());
     }

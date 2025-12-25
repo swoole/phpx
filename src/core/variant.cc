@@ -152,6 +152,174 @@ Variant Variant::getRefValue() const {
     return {&zv};
 }
 
+Variant Variant::offsetGet(zend_long offset) const {
+    if (isArray()) {
+        return zend_hash_index_find(Z_ARRVAL_P(const_ptr()), offset);
+    } else if (isString()) {
+        auto str = Z_STR_P(const_ptr());
+        if (UNEXPECTED(ZSTR_LEN(str) < ((offset < 0) ? -(size_t) offset : ((size_t) offset + 1)))) {
+            return Variant{"", 0};
+        } else {
+            auto real_offset = (UNEXPECTED(offset < 0)) /* Handle negative offset */
+                                   ? (zend_long) ZSTR_LEN(str) + offset
+                                   : offset;
+            return Variant{ZSTR_VAL(str) + real_offset, 1};
+        }
+    } else if (isObject()) {
+        Object tmp(const_ptr());
+        return tmp.exec("offsetGet", offset);
+    } else {
+        return Variant{};
+    }
+}
+
+Variant Variant::offsetGet(const Variant &key) const {
+    if (key.isInt() || key.isFloat() || isString()) {
+        return offsetGet(key.toInt());
+    }
+    if (isArray()) {
+        auto skey = key.toString();
+        return zend_hash_find(Z_ARRVAL_P(const_ptr()), skey.ptr());
+    } else if (isObject()) {
+        Object tmp(const_ptr());
+        return tmp.exec("offsetGet", key);
+    } else {
+        return Variant{};
+    }
+}
+
+bool Variant::offsetExists(zend_long offset) const {
+    if (isArray()) {
+        return zend_hash_index_exists(Z_ARRVAL_P(const_ptr()), offset);
+    } else if (isString()) {
+        auto str = Z_STR_P(const_ptr());
+        return ZSTR_LEN(str) < ((offset < 0) ? -(size_t) offset : ((size_t) offset + 1));
+    } else if (isObject()) {
+        Object tmp(const_ptr());
+        return tmp.exec("offsetExists", offset).toBool();
+    } else {
+        return false;
+    }
+}
+
+bool Variant::offsetExists(const Variant &key) const {
+    if (key.isInt() || key.isFloat() || isString()) {
+        return offsetExists(key.toInt());
+    }
+    if (isArray()) {
+        auto skey = key.toString();
+        return zend_hash_exists(Z_ARRVAL_P(const_ptr()), skey.ptr());
+    } else if (isObject()) {
+        Object tmp(const_ptr());
+        return tmp.exec("offsetExists", key).toBool();
+    } else {
+        return false;
+    }
+}
+
+void Variant::offsetSet(zend_long offset, const Variant &value) {
+    if (isArray()) {
+        auto zv = NO_CONST_V(value);
+        Z_TRY_ADDREF_P(zv);
+        SEPARATE_ARRAY(ptr());
+        zend_hash_index_update(Z_ARRVAL_P(const_ptr()), offset, zv);
+    } else if (isObject()) {
+        Object tmp(const_ptr());
+        tmp.exec("offsetSet", offset, value);
+    }
+}
+
+void Variant::offsetSet(const Variant &key, const Variant &value) {
+    if (isArray()) {
+        auto zv = NO_CONST_V(value);
+        Z_TRY_ADDREF_P(zv);
+        SEPARATE_ARRAY(ptr());
+        if (key.isInt() || key.isFloat()) {
+            zend_hash_index_update(Z_ARRVAL_P(const_ptr()), key.toInt(), zv);
+        } else {
+            auto skey = key.toString();
+            zend_symtable_update(Z_ARRVAL_P(const_ptr()), skey.ptr(), zv);
+        }
+    } else if (isObject()) {
+        Object tmp(const_ptr());
+        tmp.exec("offsetSet", key, value);
+    }
+}
+
+void Variant::offsetUnset(zend_long offset) {
+    if (isArray()) {
+        SEPARATE_ARRAY(ptr());
+        zend_hash_index_del(Z_ARRVAL_P(const_ptr()), offset);
+    } else if (isObject()) {
+        Object tmp(const_ptr());
+        tmp.exec("offsetUnset", offset);
+    }
+}
+
+void Variant::offsetUnset(const Variant &key) {
+    if (isArray()) {
+        SEPARATE_ARRAY(ptr());
+        if (key.isInt() || key.isFloat()) {
+            zend_hash_index_del(Z_ARRVAL_P(const_ptr()), key.toInt());
+        } else {
+            auto skey = key.toString();
+            zend_hash_del(Z_ARRVAL_P(const_ptr()), skey.ptr());
+        }
+    } else if (isObject()) {
+        Object tmp(const_ptr());
+        tmp.exec("offsetUnset", key);
+    }
+}
+
+Variant Variant::readProperty(zend_string *prop_name) const {
+    zval rv;
+    Variant retval;
+    zval *member_p = zend_read_property_ex(ce(), object(), prop_name, false, &rv);
+    if (member_p != &rv) {
+        ZVAL_COPY(retval.ptr(), member_p);
+    } else {
+        ZVAL_COPY_VALUE(retval.ptr(), member_p);
+    }
+    return retval;
+}
+
+void Variant::updateProperty(zend_string *prop_name, const Variant &value) const {
+    auto zv = NO_CONST_V(value);
+    zend_update_property_ex(ce(), object(), prop_name, zv);
+}
+
+Variant Variant::getProperty(const Variant &name) const {
+    if (UNEXPECTED(!isObject())) {
+        return {};
+    }
+    auto zk = NO_CONST_V(name);
+    auto prop_name = zval_get_string(zk);
+    auto prop_value = readProperty(prop_name);
+    zend_string_release(prop_name);
+    return prop_value;
+}
+
+void Variant::setProperty(const Variant &name, const Variant &value) const {
+    auto zk = NO_CONST_V(name);
+    auto prop_name = zval_get_string(zk);
+    updateProperty(prop_name, value);
+    zend_string_release(prop_name);
+}
+
+void Variant::deleteProperty(zend_string *prop_name) {
+    zend_class_entry *old_scope = EG(fake_scope);
+    EG(fake_scope) = ce();
+    object()->handlers->unset_property(object(), prop_name, 0);
+    EG(fake_scope) = old_scope;
+}
+
+void Variant::unsetProperty(const Variant &name) {
+    auto zk = NO_CONST_V(name);
+    auto prop_name = zval_get_string(zk);
+    deleteProperty(prop_name);
+    zend_string_release(prop_name);
+}
+
 /**
  * The comparison function never returns a failure
  * Including:
@@ -450,6 +618,12 @@ Object newObject(const char *name, const std::initializer_list<Variant> &args) {
     return object;
 }
 
+Variant newReference() {
+    Variant ref{};
+    ZVAL_NEW_EMPTY_REF(ref.ptr());
+    return ref;
+}
+
 String Object::hash() const {
     return String::from(php_spl_object_hash(object()));
 }
@@ -481,15 +655,7 @@ Variant Object::callParentMethod(const String &func, const std::initializer_list
 }
 
 Variant Object::get(const String &name) const {
-    Variant retval;
-    zval rv;
-    zval *member_p = zend_read_property_ex(ce(), object(), name.ptr(), false, &rv);
-    if (member_p != &rv) {
-        ZVAL_COPY(retval.ptr(), member_p);
-    } else {
-        ZVAL_COPY_VALUE(retval.ptr(), member_p);
-    }
-    return retval;
+    return readProperty(name.ptr());
 }
 
 Object Object::clone() const {

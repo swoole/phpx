@@ -105,6 +105,8 @@ PHPX_API void error(int level, const char *format, ...);
 PHPX_API void echo(const char *format, ...);
 PHPX_API void echo(const String &str);
 PHPX_API void echo(const Variant &val);
+PHPX_API void echo(Int val);
+PHPX_API void echo(Float val);
 PHPX_API Variant global(const String &name);
 PHPX_API Variant include(const String &file);
 PHPX_API Variant include_once(const String &file);
@@ -117,6 +119,8 @@ PHPX_API Variant call(const Variant &func, const std::initializer_list<Variant> 
 PHPX_API void throwException(const char *name, const char *message, int code = 0);
 PHPX_API Object catchException();
 PHPX_API Variant concat(const Variant &a, const Variant &b);
+PHPX_API Variant concat(const std::initializer_list<Variant> &args);
+PHPX_API void exit(const Variant &status);
 
 Int atoi(const String &str);
 Resource *getResource(const std::string &name);
@@ -383,6 +387,10 @@ class Variant {
         ZVAL_NULL(&val);
         return *this;
     }
+    void unset() {
+        destroy();
+        ZVAL_UNDEF(&val);
+    }
     zval *ptr() {
         return &val;
     }
@@ -507,6 +515,23 @@ class Variant {
         ZVAL_COPY_VALUE(dest, &val);
         val = {};
     }
+
+    Variant offsetGet(zend_long offset) const;
+    Variant offsetGet(const Variant &key) const;
+    bool offsetExists(zend_long offset) const;
+    bool offsetExists(const Variant &key) const;
+    void offsetSet(zend_long offset, const Variant &value);
+    void offsetSet(const Variant &key, const Variant &value);
+    void offsetUnset(zend_long offset);
+    void offsetUnset(const Variant &key);
+
+    Variant getProperty(const Variant &name) const;
+    void setProperty(const Variant &name, const Variant &value) const;
+    Variant readProperty(zend_string *prop_name) const;
+    void updateProperty(zend_string *prop_name, const Variant &value) const;
+    void unsetProperty(const Variant &name);
+    void deleteProperty(zend_string *prop_name);
+
     bool operator==(const Variant &v) const {
         return equals(v);
     }
@@ -639,6 +664,8 @@ Variant newResource(const char *name, T *v) {
     return {res};
 }
 
+Variant newReference();
+
 #ifndef ZEND_HASH_ELEMENT
 #define ZEND_HASH_ELEMENT(ht, idx) &HT_HASH_TO_BUCKET(ht, idx)->val
 #endif
@@ -691,6 +718,26 @@ static inline Variant operator|(T a, const Variant &b) {
 template <typename T>
 static inline Variant operator^(T a, const Variant &b) {
     return Variant(a) ^ b;
+}
+
+template <typename T>
+static inline Variant operator<=(T a, const Variant &b) {
+    return Variant(a) <= b;
+}
+
+template <typename T>
+static inline Variant operator<(T a, const Variant &b) {
+    return Variant(a) < b;
+}
+
+template <typename T>
+static inline Variant operator>=(T a, const Variant &b) {
+    return Variant(a) >= b;
+}
+
+template <typename T>
+static inline Variant operator>(T a, const Variant &b) {
+    return Variant(a) > b;
 }
 
 class ArrayKeyValue {
@@ -803,12 +850,15 @@ class Array : public Variant {
         return {*this, 0, key.ptr()};
     }
     bool del(zend_ulong index) {
+        SEPARATE_ARRAY(ptr());
         return zend_hash_index_del(Z_ARRVAL_P(ptr()), index) == SUCCESS;
     }
     bool del(const String &key) {
+        SEPARATE_ARRAY(ptr());
         return zend_hash_del(Z_ARRVAL_P(ptr()), key.ptr()) == SUCCESS;
     }
     void clean() {
+        SEPARATE_ARRAY(ptr());
         zend_hash_clean(Z_ARRVAL_P(ptr()));
     }
     bool exists(zend_ulong index) const {
@@ -838,6 +888,7 @@ class Array : public Variant {
         php_array_merge(array(), source.array());
     }
     void sort(bool renumber = true) {
+        SEPARATE_ARRAY(ptr());
         zend_hash_sort(Z_ARRVAL_P(ptr()), array_data_compare, renumber);
     }
     Array slice(long offset, long length = -1, bool preserve_keys = false);
@@ -961,7 +1012,7 @@ class Object : public Variant {
 
     Variant get(const String &name) const;
     void set(const String &name, const Variant &v) const {
-        zend_update_property_ex(ce(), object(), name.ptr(), const_cast<Variant &>(v).ptr());
+        updateProperty(name.ptr(), v);
     }
     template <class T>
     T *oGet(const String &name, const char *resource_name) {
@@ -1179,6 +1230,14 @@ class Interface {
     zend_class_entry *ce;
     const zend_function_entry *functions;
 };
+
+static inline Int to_int(Int v) {
+    return v;
+}
+
+static inline Int to_int(const Variant &v) {
+    return v.toInt();
+}
 
 extern zend_result extension_startup(int type, int module_number);
 extern void extension_info(zend_module_entry *module);
