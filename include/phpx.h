@@ -50,7 +50,7 @@ extern "C" {
 #define PHPX_MAX_ARGC 10
 #define PHPX_VAR_DUMP_LEVEL 10
 #define PHPX_API PHPAPI
-#define PHPX_NOAPI
+#define PHPX_UNSAFE_API
 
 /**
  * !!! Unsafe conversion, discarding const modifier. There are many errors in the php src source code.
@@ -64,6 +64,7 @@ namespace php {
 typedef unsigned char uchar;
 typedef zend_long Int;
 typedef double Float;
+typedef bool Bool;
 
 struct Resource {
     const char *name;
@@ -76,10 +77,13 @@ class Object;
 class String;
 class Args;
 
-typedef Variant var;
-typedef Array array;
-typedef Object object;
-typedef String string;
+using var = Variant;
+using array = Array;
+using object = Object;
+using string = String;
+
+using Var = Variant;
+using Str = String;
 
 enum TrimMode {
     TRIM_LEFT = 1,
@@ -124,132 +128,6 @@ PHPX_API void exit(const Variant &status);
 
 Int atoi(const String &str);
 Resource *getResource(const std::string &name);
-
-class String {
-    zend_string *str;
-
-  public:
-    String(const char *v) {
-        str = zend_string_init(v, strlen(v), false);
-    }
-    String(int v) {
-        str = zend_long_to_str(v);
-    }
-    String(long v) {
-        str = zend_long_to_str(v);
-    }
-    String(double v) {
-        str = zend_strpprintf(0, "%.*G", (int) EG(precision), v);
-    }
-    String(bool v) {
-        str = zend_string_init(v ? "1" : "0", 1, false);
-    }
-    String(const char *v, size_t len, bool persistent = false) {
-        str = zend_string_init(v, len, persistent);
-    }
-    String(const std::string &v) {
-        str = zend_string_init(v.c_str(), v.length(), false);
-    }
-    String(zend_string *v) {
-        str = zend_string_copy(v);
-    }
-    String(const zval *v) {
-        str = zend_string_copy(Z_STR_P(v));
-    }
-    String(Variant &v);
-    String(String &&s) noexcept {
-        str = s.str;
-        s.str = nullptr;
-    }
-    String(const String &s) {
-        str = zend_string_copy(s.str);
-    }
-    ~String() {
-        if (str) {
-            zend_string_release(str);
-        }
-    }
-    Int toInt() const {
-        return ZEND_STRTOL(ZSTR_VAL(str), nullptr, 10);
-    }
-    bool isNumeric() const {
-        return is_numeric_string(ZSTR_VAL(str), ZSTR_LEN(str), nullptr, nullptr, false);
-    }
-    double toFloat() const {
-        return zend_strtod(ZSTR_VAL(str), nullptr);
-    }
-    size_t length() const {
-        return str->len;
-    }
-    char *data() const {
-        return str->val;
-    }
-    uint64_t hashCode() const {
-        return zend_string_hash_val(str);
-    }
-    void extend(size_t new_size) {
-        str = zend_string_extend(str, new_size, false);
-    }
-    bool equals(const char *s, size_t slen) const {
-        return length() == slen && memcmp(ZSTR_VAL(str), s, slen) == 0;
-    }
-    bool equals(const std::string &s) const {
-        return equals(s.c_str(), s.length());
-    }
-    bool equals(const char *s) const {
-        return equals(s, strlen(s));
-    }
-    bool equals(const String &s, bool ci = false) const;
-    bool operator==(const String &v) const {
-        return equals(v);
-    }
-    static String format(const char *format, ...);
-    String trim(const char *what = " \t\n\r\v\0", TrimMode mode = TRIM_BOTH) const;
-    String lower() const {
-        return zend_string_tolower(str);
-    }
-    String upper() const {
-        return zend_string_toupper(str);
-    }
-    String base64Encode() const {
-        return php_base64_encode_str(str);
-    }
-    String base64Decode() const {
-        return php_base64_decode_str(str);
-    }
-    String escape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
-        return php_escape_html_entities((uchar *) str->val, str->len, 0, flags, charset);
-    }
-    String unescape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
-        return php_unescape_html_entities(str, 1, flags, charset);
-    }
-
-    Variant split(const String &delim, long = ZEND_LONG_MAX) const;
-    String substr(long _offset, long _length = -1) const;
-    void stripTags(const String &allow, bool allow_tag_spaces = false) const;
-    String addSlashes() const;
-    void stripSlashes() const;
-    String basename(const String &suffix) const;
-    String dirname() const;
-    void print() const;
-
-    uint32_t getRefCount() const {
-        return zend_string_refcount(ptr());
-    }
-    zend_string *ptr() const {
-        return str;
-    }
-    PHPX_NOAPI static String from(zend_string *v) {
-        String result{v};
-        zend_string_release(v);
-        return result;
-    }
-    PHPX_NOAPI static String from(zval *v) {
-        String result{v};
-        zval_ptr_dtor(v);
-        return result;
-    }
-};
 
 class Variant {
   protected:
@@ -354,11 +232,6 @@ class Variant {
         ZVAL_STRINGL(ptr(), str.c_str(), str.length());
         return *this;
     }
-    Variant &operator=(const String &str) {
-        destroy();
-        ZVAL_STR(ptr(), zend_string_copy(str.ptr()));
-        return *this;
-    }
     Variant &operator=(const char *str) {
         destroy();
         ZVAL_STRING(ptr(), str);
@@ -394,7 +267,7 @@ class Variant {
     zval *ptr() {
         return &val;
     }
-    static PHPX_NOAPI Variant from(zval *v) {
+    static PHPX_UNSAFE_API Variant from(zval *v) {
         Variant retval{v};
         zval_ptr_dtor(v);
         return retval;
@@ -740,6 +613,110 @@ static inline Variant operator>(T a, const Variant &b) {
     return Variant(a) > b;
 }
 
+class String : public Variant {
+  public:
+    String(const zval *v);
+    String(const Variant &v);
+    String(int v) {
+        ZVAL_STR(ptr(), zend_long_to_str(v));
+    }
+    String(long v) {
+        ZVAL_STR(ptr(), zend_long_to_str(v));
+    }
+    String(double v) {
+        ZVAL_STR(ptr(), zend_strpprintf(0, "%.*G", (int) EG(precision), v));
+    }
+    String(bool v) {
+        ZVAL_STR(ptr(), zend_string_init(v ? "1" : "0", 1, false));
+    }
+    String(zend_string *v) {
+        ZVAL_STR(ptr(), zend_string_copy(v));
+    }
+    String(const std::string &v) : Variant(v) {}
+    String(const char *v) : Variant(v) {}
+    String(const char *str, size_t len) : Variant(str, len) {}
+    String(const char *str, size_t len, bool persistent) : Variant(str, len, persistent) {}
+    bool isNumeric() const {
+        return is_numeric_string(data(), length(), nullptr, nullptr, false);
+    }
+    size_t length() const {
+        return Z_STRLEN(val);
+    }
+    const char *data() const {
+        return Z_STRVAL(val);
+    }
+    uint64_t hashCode() const {
+        return zend_string_hash_val(str());
+    }
+    void extend(size_t new_size) {
+        auto old_str = str();
+        ZVAL_STR(ptr(), zend_string_extend(old_str, new_size, false));
+        zend_string_release(old_str);
+    }
+    bool equals(const char *s, size_t slen) const {
+        return length() == slen && memcmp(data(), s, slen) == 0;
+    }
+    bool equals(const std::string &s) const {
+        return equals(s.c_str(), s.length());
+    }
+    bool equals(const char *s) const {
+        return equals(s, strlen(s));
+    }
+    bool equals(const String &s, bool ci = false) const;
+    bool operator==(const String &v) const {
+        return equals(v);
+    }
+    static String format(const char *format, ...);
+    String trim(const char *what = " \t\n\r\v\0", TrimMode mode = TRIM_BOTH) const;
+    String lower() const {
+        return zend_string_tolower(str());
+    }
+    String upper() const {
+        return from(zend_string_toupper(str()));
+    }
+    String base64Encode() const {
+        return from(php_base64_encode_str(str()));
+    }
+    String base64Decode() const {
+        return from(php_base64_decode_str(str()));
+    }
+    String escape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
+        return from(php_escape_html_entities((uchar *) data(), length(), 0, flags, charset));
+    }
+    String unescape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
+        return from(php_unescape_html_entities(str(), 1, flags, charset));
+    }
+
+    Array split(const String &delim, long = ZEND_LONG_MAX) const;
+    String substr(long _offset, long _length = -1) const;
+    String stripTags(const String &allow, bool allow_tag_spaces = false) const;
+    String addSlashes() const;
+    String stripSlashes() const;
+    String basename(const String &suffix) const;
+    String dirname() const;
+    void print() const;
+
+    zend_string *str() const {
+        return Z_STR(val);
+    }
+    /**
+     * This function is unsafe, lacks GC, and takes a new reference to a `zend_string`.
+     * The String object will acquire its ownership, and the external code must not use the `zend_string` pointer again.
+     * The second from method below behaves in the same way as this method,
+     * except it takes a new reference to a zval and is not repeated here.
+     */
+    PHPX_UNSAFE_API static String from(zend_string *v) {
+        String result{v};
+        zend_string_release(v);
+        return result;
+    }
+    PHPX_UNSAFE_API static String from(zval *v) {
+        String result{v};
+        zval_ptr_dtor(v);
+        return result;
+    }
+};
+
 class ArrayKeyValue {
   public:
     Variant key;
@@ -835,7 +812,7 @@ class Array : public Variant {
     void set(const String &s, const Variant &v);
     void set(zend_ulong i, const Variant &v);
     Variant get(const String &key) const {
-        return zend_hash_find(Z_ARRVAL_P(const_ptr()), key.ptr());
+        return zend_hash_find(Z_ARRVAL_P(const_ptr()), key.str());
     }
     Variant get(zend_ulong i) const {
         return zend_hash_index_find(Z_ARRVAL_P(const_ptr()), i);
@@ -847,7 +824,7 @@ class Array : public Variant {
         return {*this, (zend_ulong) i, nullptr};
     }
     ArrayItem operator[](const String &key) {
-        return {*this, 0, key.ptr()};
+        return {*this, 0, key.str()};
     }
     bool del(zend_ulong index) {
         SEPARATE_ARRAY(ptr());
@@ -855,7 +832,7 @@ class Array : public Variant {
     }
     bool del(const String &key) {
         SEPARATE_ARRAY(ptr());
-        return zend_hash_del(Z_ARRVAL_P(ptr()), key.ptr()) == SUCCESS;
+        return zend_hash_del(Z_ARRVAL_P(ptr()), key.str()) == SUCCESS;
     }
     void clean() {
         SEPARATE_ARRAY(ptr());
@@ -865,7 +842,7 @@ class Array : public Variant {
         return zend_hash_index_exists(Z_ARRVAL_P(const_ptr()), index);
     }
     bool exists(const String &key) const {
-        return zend_hash_exists(Z_ARRVAL_P(const_ptr()), key.ptr());
+        return zend_hash_exists(Z_ARRVAL_P(const_ptr()), key.str());
     }
     ArrayIterator begin() const {
         return {Z_ARRVAL_P(const_ptr()), 0};
@@ -928,7 +905,7 @@ static inline Variant call(const Variant &func) {
 }
 
 static inline zend_class_entry *getClassEntry(const String &name) {
-    return zend_lookup_class(name.ptr());
+    return zend_lookup_class(name.str());
 }
 
 class Object : public Variant {
@@ -1012,7 +989,7 @@ class Object : public Variant {
 
     Variant get(const String &name) const;
     void set(const String &name, const Variant &v) const {
-        updateProperty(name.ptr(), v);
+        updateProperty(name.str(), v);
     }
     template <class T>
     T *oGet(const String &name, const char *resource_name) {
@@ -1031,10 +1008,10 @@ class Object : public Variant {
     }
     String hash() const;
     bool methodExists(const String &name) const {
-        return zend_hash_exists(&ce()->function_table, name.ptr());
+        return zend_hash_exists(&ce()->function_table, name.str());
     }
     bool propertyExists(const String &name) const {
-        return zend_hash_exists(&ce()->properties_info, name.ptr());
+        return zend_hash_exists(&ce()->properties_info, name.str());
     }
     bool instanceOf(const String &name) const {
         return instanceof_function(ce(), getClassEntry(name));

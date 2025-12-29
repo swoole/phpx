@@ -25,9 +25,9 @@ TEST(object, base) {
     ASSERT_TRUE(ro.isObject());
 
     String str("php");
-    ASSERT_EQ(ZSTR_H(str.ptr()), 0);
+    ASSERT_EQ(ZSTR_H(str.str()), 0);
     ASSERT_EQ(object.get(str).toInt(), rand_num);
-    ASSERT_NE(ZSTR_H(str.ptr()), 0);
+    ASSERT_NE(ZSTR_H(str.str()), 0);
 
     object.exec("offsetSet", {"python", 9});
     auto r2 = object.get("python");

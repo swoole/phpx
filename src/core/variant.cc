@@ -179,7 +179,7 @@ Variant Variant::offsetGet(const Variant &key) const {
     }
     if (isArray()) {
         auto skey = key.toString();
-        return zend_hash_find(Z_ARRVAL_P(const_ptr()), skey.ptr());
+        return zend_hash_find(Z_ARRVAL_P(const_ptr()), skey.str());
     } else if (isObject()) {
         Object tmp(const_ptr());
         return tmp.exec("offsetGet", key);
@@ -208,7 +208,7 @@ bool Variant::offsetExists(const Variant &key) const {
     }
     if (isArray()) {
         auto skey = key.toString();
-        return zend_hash_exists(Z_ARRVAL_P(const_ptr()), skey.ptr());
+        return zend_hash_exists(Z_ARRVAL_P(const_ptr()), skey.str());
     } else if (isObject()) {
         Object tmp(const_ptr());
         return tmp.exec("offsetExists", key).toBool();
@@ -238,7 +238,7 @@ void Variant::offsetSet(const Variant &key, const Variant &value) {
             zend_hash_index_update(Z_ARRVAL_P(const_ptr()), key.toInt(), zv);
         } else {
             auto skey = key.toString();
-            zend_symtable_update(Z_ARRVAL_P(const_ptr()), skey.ptr(), zv);
+            zend_symtable_update(Z_ARRVAL_P(const_ptr()), skey.str(), zv);
         }
     } else if (isObject()) {
         Object tmp(const_ptr());
@@ -263,7 +263,7 @@ void Variant::offsetUnset(const Variant &key) {
             zend_hash_index_del(Z_ARRVAL_P(const_ptr()), key.toInt());
         } else {
             auto skey = key.toString();
-            zend_hash_del(Z_ARRVAL_P(const_ptr()), skey.ptr());
+            zend_hash_del(Z_ARRVAL_P(const_ptr()), skey.str());
         }
     } else if (isObject()) {
         Object tmp(const_ptr());
@@ -643,7 +643,7 @@ Variant Object::callParentMethod(const String &func, const std::initializer_list
     }
 
     Variant retval;
-    auto fn = (zend_function *) zend_hash_find_ptr_lc(&parent_ce()->function_table, func.ptr());
+    auto fn = (zend_function *) zend_hash_find_ptr_lc(&parent_ce()->function_table, func.str());
     if (UNEXPECTED(fn == nullptr)) {
         /* error at c-level */
         zend_error_noreturn(
@@ -655,7 +655,7 @@ Variant Object::callParentMethod(const String &func, const std::initializer_list
 }
 
 Variant Object::get(const String &name) const {
-    return readProperty(name.ptr());
+    return readProperty(name.str());
 }
 
 Object Object::clone() const {

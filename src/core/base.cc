@@ -79,8 +79,8 @@ Variant concat(const std::initializer_list<Variant> &args) {
 }
 
 Variant global(const String &name) {
-    zend_is_auto_global(name.ptr());
-    zval *var = zend_hash_find_ind(&EG(symbol_table), name.ptr());
+    zend_is_auto_global(name.str());
+    zval *var = zend_hash_find_ind(&EG(symbol_table), name.str());
     if (!var) {
         return false;
     }
@@ -118,7 +118,7 @@ Object catchException() {
 Int atoi(const String &str) {
 #if PHP_VERSION_ID >= 80200
     zend_string *errstr;
-    Int size = zend_ini_parse_quantity(str.ptr(), &errstr);
+    Int size = zend_ini_parse_quantity(str.str(), &errstr);
     if (errstr) {
         error(E_WARNING, "failed to parse '%s' to size, Error: %s", str.data(), ZSTR_VAL(errstr));
         zend_string_release(errstr);
@@ -352,23 +352,23 @@ static Variant _include(zend_string *filename, const int type) {
 }
 
 Variant include(const String &file) {
-    return _include(file.ptr(), ZEND_INCLUDE);
+    return _include(file.str(), ZEND_INCLUDE);
 }
 
 Variant include_once(const String &file) {
-    return _include(file.ptr(), ZEND_INCLUDE_ONCE);
+    return _include(file.str(), ZEND_INCLUDE_ONCE);
 }
 
 Variant require(const String &file) {
-    return _include(file.ptr(), ZEND_REQUIRE);
+    return _include(file.str(), ZEND_REQUIRE);
 }
 
 Variant require_once(const String &file) {
-    return _include(file.ptr(), ZEND_REQUIRE_ONCE);
+    return _include(file.str(), ZEND_REQUIRE_ONCE);
 }
 
 Variant eval(const String &script) {
-    return _include(script.ptr(), ZEND_EVAL);
+    return _include(script.str(), ZEND_EVAL);
 }
 
 zend_function_entry *copy_function_entries(const zend_function_entry *_functions) {

@@ -147,7 +147,7 @@ void Array::set(const String &s, const Variant &v) {
     auto zv = NO_CONST_V(v);
     Z_TRY_ADDREF_P(zv);
     SEPARATE_ARRAY(ptr());
-    zend_symtable_update(Z_ARRVAL_P(ptr()), s.ptr(), zv);
+    zend_symtable_update(Z_ARRVAL_P(ptr()), s.str(), zv);
 }
 
 void Array::set(zend_ulong i, const Variant &v) {
@@ -177,7 +177,7 @@ bool Array::contains(const Variant &_other_var, bool strict) const {
 
 String Array::join(const String &delim) {
     zval retval;
-    php_implode(delim.ptr(), HASH_OF(ptr()), &retval);
+    php_implode(delim.str(), HASH_OF(ptr()), &retval);
     return String::from(&retval);
 }
 

@@ -17,9 +17,13 @@
 #include "phpx.h"
 
 namespace php {
-String::String(Variant &v) {
-    str = zval_get_string(v.ptr());
+String::String(const zval *v) : Variant(v) {
+    if (!isString()) {
+        from(zval_get_string(ptr()));
+    }
 }
+
+String::String(const Variant &v) : String(v.const_ptr()) {}
 
 String String::format(const char *format, ...) {
     va_list args;
@@ -30,12 +34,12 @@ String String::format(const char *format, ...) {
 }
 
 String String::trim(const char *what, TrimMode mode) const {
-    return from(php_trim(str, what, strlen(what), mode));
+    return from(php_trim(str(), what, strlen(what), mode));
 }
 
 void String::print() const {
-    if (str) {
-        php_printf("(string[%zu]) \"%.*s\"\n", str->len, (int) str->len, str->val);
+    if (str()) {
+        php_printf("(string[%zu]) \"%.*s\"\n", length(), (int) length(), data());
     } else {
         php_printf("(null)");
     }
@@ -48,7 +52,7 @@ bool String::equals(const String &s, const bool ci) const {
     if (ci) {
         return s.length() == length() && zend_binary_strcasecmp(data(), length(), s.data(), s.length()) == 0;
     }
-    return zend_string_equals(s.ptr(), str);
+    return zend_string_equals(s.str(), str());
 }
 
 String String::substr(long f, long l) const {
@@ -78,21 +82,24 @@ String String::substr(long f, long l) const {
         l = (zend_long) length() - f;
     }
 
-    return {str->val + f, (size_t) l};
+    return {data() + f, (size_t) l};
 }
 
-Variant String::split(const String &delim, const long limit) const {
+Array String::split(const String &delim, const long limit) const {
     Array retval;
-    php_explode(delim.ptr(), str, retval.ptr(), limit);
+    php_explode(delim.str(), str(), retval.ptr(), limit);
     return retval;
 }
 
-void String::stripTags(const String &allow, bool allow_tag_spaces) const {
-    str->len = php_strip_tags_ex(data(), length(), allow.data(), allow.length(), allow_tag_spaces);
+String String::stripTags(const String &allow, bool allow_tag_spaces) const {
+    auto new_str = zend_string_copy(str());
+    new_str->len = php_strip_tags_ex(new_str->val, new_str->len, allow.data(), allow.length(), allow_tag_spaces);
+    new_str->val[new_str->len] = '\0';
+    return from(new_str);
 }
 
 String String::addSlashes() const {
-    return php_addslashes(str);
+    return php_addslashes(str());
 }
 
 String String::basename(const String &suffix) const {
@@ -100,12 +107,16 @@ String String::basename(const String &suffix) const {
 }
 
 String String::dirname() const {
-    size_t n = php_dirname(data(), length());
-    return {data(), n};
+    auto new_str = zend_string_copy(str());
+    new_str->len = php_dirname(new_str->val, new_str->len);
+    new_str->val[new_str->len] = '\0';
+    return from(new_str);
 }
 
-void String::stripSlashes() const {
-    php_stripslashes(str);
+String String::stripSlashes() const {
+    auto new_str = zend_string_copy(str());
+    php_stripslashes(new_str);
+    return from(new_str);
 }
 
 }  // namespace php

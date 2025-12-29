@@ -159,7 +159,7 @@ bool Class::activate() {
         }
     }
     for (const auto &alias : aliases) {
-        if (zend_register_class_alias_ex(alias.c_str(), alias.length(), ce, true) < 0) {
+        if (zend_register_class_alias_ex(alias.c_str(), alias.length(), ce, true) == FAILURE) {
             return false;
         }
     }

@@ -147,5 +147,5 @@ TEST(string, move_ctor) {
     String s("abc");
     String t(std::move(s));
     EXPECT_STREQ(t.data(), "abc");
-    EXPECT_EQ(s.ptr(), nullptr);
+    EXPECT_EQ(s.str(), nullptr);
 }
