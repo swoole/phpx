@@ -99,11 +99,11 @@ String String::stripTags(const String &allow, bool allow_tag_spaces) const {
 }
 
 String String::addSlashes() const {
-    return php_addslashes(str());
+    return from(php_addslashes(str()));
 }
 
 String String::basename(const String &suffix) const {
-    return php_basename(data(), length(), suffix.data(), suffix.length());
+    return from(php_basename(data(), length(), suffix.data(), suffix.length()));
 }
 
 String String::dirname() const {

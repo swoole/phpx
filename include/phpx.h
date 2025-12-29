@@ -50,7 +50,7 @@ extern "C" {
 #define PHPX_MAX_ARGC 10
 #define PHPX_VAR_DUMP_LEVEL 10
 #define PHPX_API PHPAPI
-#define PHPX_UNSAFE_API
+#define PHPX_UNSAFE
 
 /**
  * !!! Unsafe conversion, discarding const modifier. There are many errors in the php src source code.
@@ -267,7 +267,7 @@ class Variant {
     zval *ptr() {
         return &val;
     }
-    static PHPX_UNSAFE_API Variant from(zval *v) {
+    static PHPX_UNSAFE Variant from(zval *v) {
         Variant retval{v};
         zval_ptr_dtor(v);
         return retval;
@@ -341,7 +341,7 @@ class Variant {
      * This function is not read-only.
      * If the current variable is not a string, it will be auto converted to a string
      */
-    const char *toCString() {
+    PHPX_UNSAFE const char *toCString() {
         convert_to_string(&val);
         return Z_STRVAL(val);
     }
@@ -462,8 +462,13 @@ class Variant {
     Variant pow(const Variant &) const;
     // Concatenates two strings, return new string.
     Variant concat(const Variant &) const;
-    // Concatenates the specified string to the end of this string.
-    void append(const Variant &);
+    /**
+     * Concatenates the specified string to the end of this string.
+     * This function is unsafe, only supporting array and string types.
+     * If the type is an array, it will append elements;
+     * otherwise, if the variable is not a string type, this variable will be converted into a string
+     */
+    PHPX_UNSAFE void append(const Variant &);
 
     Variant operator()() const;
     explicit operator bool() const noexcept {
@@ -648,11 +653,6 @@ class String : public Variant {
     uint64_t hashCode() const {
         return zend_string_hash_val(str());
     }
-    void extend(size_t new_size) {
-        auto old_str = str();
-        ZVAL_STR(ptr(), zend_string_extend(old_str, new_size, false));
-        zend_string_release(old_str);
-    }
     bool equals(const char *s, size_t slen) const {
         return length() == slen && memcmp(data(), s, slen) == 0;
     }
@@ -669,7 +669,7 @@ class String : public Variant {
     static String format(const char *format, ...);
     String trim(const char *what = " \t\n\r\v\0", TrimMode mode = TRIM_BOTH) const;
     String lower() const {
-        return zend_string_tolower(str());
+        return from(zend_string_tolower(str()));
     }
     String upper() const {
         return from(zend_string_toupper(str()));
@@ -705,12 +705,12 @@ class String : public Variant {
      * The second from method below behaves in the same way as this method,
      * except it takes a new reference to a zval and is not repeated here.
      */
-    PHPX_UNSAFE_API static String from(zend_string *v) {
+    PHPX_UNSAFE static String from(zend_string *v) {
         String result{v};
         zend_string_release(v);
         return result;
     }
-    PHPX_UNSAFE_API static String from(zval *v) {
+    PHPX_UNSAFE static String from(zval *v) {
         String result{v};
         zval_ptr_dtor(v);
         return result;
@@ -1214,6 +1214,14 @@ static inline Int to_int(Int v) {
 
 static inline Int to_int(const Variant &v) {
     return v.toInt();
+}
+
+static inline Float to_float(Float v) {
+    return v;
+}
+
+static inline Float to_float(const Variant &v) {
+    return v.toFloat();
 }
 
 extern zend_result extension_startup(int type, int module_number);

@@ -10,9 +10,6 @@ TEST(string, base) {
 
     ASSERT_GT(s1.length(), 10);
 
-    s1.extend(128);
-    ASSERT_EQ(s1.length(), 128);
-
     String s2("   hello  \n");
     auto s3 = s2.trim();
     ASSERT_STREQ(s3.data(), "hello");
