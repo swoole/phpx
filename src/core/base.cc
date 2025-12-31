@@ -370,6 +370,10 @@ Variant eval(const String &script) {
     return _include(script.str(), ZEND_EVAL);
 }
 
+bool equals(const Variant &a, const Variant &b) {
+    return compare(a, b) == 0;
+}
+
 bool same(const Variant &a, const Variant &b) {
     return zend_is_identical(a.const_ptr(), b.const_ptr());
 }

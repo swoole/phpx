@@ -126,6 +126,16 @@ PHPX_API Variant concat(const Variant &a, const Variant &b);
 PHPX_API Variant concat(const std::initializer_list<Variant> &args);
 PHPX_API void exit(const Variant &status);
 PHPX_API bool same(const Variant &a, const Variant &b);
+
+static inline bool equals(Int a, Int b) {
+    return a == b;
+}
+
+static inline bool equals(Float a, Float b) {
+    return a == b;
+}
+
+PHPX_API bool equals(const Variant &a, const Variant &b);
 PHPX_API int compare(const Variant &a, const Variant &b);
 
 Int atoi(const String &str);
@@ -629,7 +639,7 @@ static inline Variant operator==(T a, const Variant &b) {
 class String : public Variant {
   public:
     String() {
-    	ZVAL_EMPTY_STRING(&val);
+        ZVAL_EMPTY_STRING(&val);
     }
     String(const zval *v);
     String(const Variant &v);
@@ -674,6 +684,9 @@ class String : public Variant {
         return equals(s, strlen(s));
     }
     bool equals(const String &s, bool ci = false) const;
+    bool equals(const Variant &v, bool ci = false) const {
+        return Variant::equals(v, ci);
+    }
     bool operator==(const String &v) const {
         return equals(v);
     }

@@ -148,8 +148,19 @@ TEST(string, move_ctor) {
 }
 
 TEST(string, empty_str) {
-	String empty_str{};
-	ASSERT_EQ(empty_str.length(), 0);
-	empty_str.append("hello world");
-	ASSERT_EQ(empty_str.length(), 11);
+    String empty_str{};
+    ASSERT_EQ(empty_str.length(), 0);
+    empty_str.append("hello world");
+    ASSERT_EQ(empty_str.length(), 11);
+}
+
+TEST(string, empty_str_equals_zero) {
+    String empty_str;
+    empty_str = "";
+    var zero_v = 0;
+    ASSERT_FALSE(empty_str.equals(zero_v));
+
+    zval result;
+    ASSERT_EQ(is_equal_function(&result, empty_str.ptr(), zero_v.ptr()), SUCCESS);
+    ASSERT_EQ(Z_TYPE(result), IS_FALSE);
 }

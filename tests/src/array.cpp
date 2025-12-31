@@ -285,14 +285,21 @@ TEST(array, ref) {
     ASSERT_EQ(c.length(), 2);
 }
 
+TEST(array, ref2) {
+    Array numbers{99, 10, 7};
+    var tmp_var_0 = numbers.toReference();
+    php::call(php::sort, {tmp_var_0});
+    ASSERT_EQ(tmp_var_0.offsetGet(0).toInt(), 7);
+}
+
 TEST(array, to_array) {
-	var a = 10;
-	auto arr = to_array(a);
+    var a = 10;
+    auto arr = to_array(a);
     ASSERT_EQ(arr.length(), 1);
     ASSERT_EQ(arr.get(0).toInt(), 10);
 
     var s = "hello world";
-	auto arr2 = to_array(s);
+    auto arr2 = to_array(s);
     ASSERT_EQ(arr2.length(), 1);
     ASSERT_STREQ(arr2.get(0).toCString(), "hello world");
 

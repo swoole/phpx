@@ -153,10 +153,13 @@ Variant Variant::getRefValue() const {
 }
 
 Variant Variant::offsetGet(zend_long offset) const {
-    if (isArray()) {
-        return zend_hash_index_find(Z_ARRVAL_P(const_ptr()), offset);
-    } else if (isString()) {
-        auto str = Z_STR_P(const_ptr());
+	auto zvar = const_ptr();
+	ZVAL_DEREF(zvar);
+
+    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+        return zend_hash_index_find(Z_ARRVAL_P(zvar), offset);
+    } else if (Z_TYPE_P(zvar) == IS_STRING) {
+        auto str = Z_STR_P(zvar);
         if (UNEXPECTED(ZSTR_LEN(str) < ((offset < 0) ? -(size_t) offset : ((size_t) offset + 1)))) {
             return Variant{"", 0};
         } else {
@@ -165,8 +168,8 @@ Variant Variant::offsetGet(zend_long offset) const {
                                    : offset;
             return Variant{ZSTR_VAL(str) + real_offset, 1};
         }
-    } else if (isObject()) {
-        Object tmp(const_ptr());
+    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+        Object tmp(zvar);
         return tmp.exec("offsetGet", offset);
     } else {
         return Variant{};
@@ -174,14 +177,17 @@ Variant Variant::offsetGet(zend_long offset) const {
 }
 
 Variant Variant::offsetGet(const Variant &key) const {
-    if (key.isInt() || key.isFloat() || isString()) {
+	auto zvar = const_ptr();
+	ZVAL_DEREF(zvar);
+
+	if (key.isInt() || key.isFloat() || Z_TYPE_P(zvar) == IS_STRING) {
         return offsetGet(key.toInt());
     }
-    if (isArray()) {
+    if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto skey = key.toString();
-        return zend_hash_find(Z_ARRVAL_P(const_ptr()), skey.str());
-    } else if (isObject()) {
-        Object tmp(const_ptr());
+        return zend_hash_find(Z_ARRVAL_P(zvar), skey.str());
+    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+        Object tmp(zvar);
         return tmp.exec("offsetGet", key);
     } else {
         return Variant{};
@@ -189,13 +195,16 @@ Variant Variant::offsetGet(const Variant &key) const {
 }
 
 bool Variant::offsetExists(zend_long offset) const {
-    if (isArray()) {
-        return zend_hash_index_exists(Z_ARRVAL_P(const_ptr()), offset);
-    } else if (isString()) {
-        auto str = Z_STR_P(const_ptr());
+	auto zvar = const_ptr();
+	ZVAL_DEREF(zvar);
+
+	if (Z_TYPE_P(zvar) == IS_ARRAY) {
+        return zend_hash_index_exists(Z_ARRVAL_P(zvar), offset);
+    } else if (Z_TYPE_P(zvar) == IS_STRING) {
+        auto str = Z_STR_P(zvar);
         return ZSTR_LEN(str) < ((offset < 0) ? -(size_t) offset : ((size_t) offset + 1));
-    } else if (isObject()) {
-        Object tmp(const_ptr());
+    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+        Object tmp(zvar);
         return tmp.exec("offsetExists", offset).toBool();
     } else {
         return false;
@@ -203,14 +212,17 @@ bool Variant::offsetExists(zend_long offset) const {
 }
 
 bool Variant::offsetExists(const Variant &key) const {
-    if (key.isInt() || key.isFloat() || isString()) {
+	auto zvar = const_ptr();
+	ZVAL_DEREF(zvar);
+
+    if (key.isInt() || key.isFloat() || Z_TYPE_P(zvar) == IS_STRING) {
         return offsetExists(key.toInt());
     }
-    if (isArray()) {
+    if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto skey = key.toString();
-        return zend_hash_exists(Z_ARRVAL_P(const_ptr()), skey.str());
-    } else if (isObject()) {
-        Object tmp(const_ptr());
+        return zend_hash_exists(Z_ARRVAL_P(zvar), skey.str());
+    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+        Object tmp(zvar);
         return tmp.exec("offsetExists", key).toBool();
     } else {
         return false;
@@ -218,57 +230,65 @@ bool Variant::offsetExists(const Variant &key) const {
 }
 
 void Variant::offsetSet(zend_long offset, const Variant &value) {
-    if (isArray()) {
+	auto zvar = const_ptr();
+	ZVAL_DEREF(zvar);
+
+    if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto zv = NO_CONST_V(value);
         Z_TRY_ADDREF_P(zv);
-        SEPARATE_ARRAY(ptr());
-        zend_hash_index_update(Z_ARRVAL_P(const_ptr()), offset, zv);
-    } else if (isObject()) {
-        Object tmp(const_ptr());
+        zend_hash_index_update(Z_ARRVAL_P(zvar), offset, zv);
+    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+        Object tmp(zvar);
         tmp.exec("offsetSet", offset, value);
     }
 }
 
 void Variant::offsetSet(const Variant &key, const Variant &value) {
-    if (isArray()) {
+	auto zvar = const_ptr();
+	ZVAL_DEREF(zvar);
+
+    if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto zv = NO_CONST_V(value);
         Z_TRY_ADDREF_P(zv);
-        SEPARATE_ARRAY(ptr());
         if (key.isInt() || key.isFloat()) {
-            zend_hash_index_update(Z_ARRVAL_P(const_ptr()), key.toInt(), zv);
+            zend_hash_index_update(Z_ARRVAL_P(zvar), key.toInt(), zv);
         } else if (key.isNull()) {
-            zend_hash_next_index_insert(Z_ARRVAL_P(const_ptr()), zv);
+            zend_hash_next_index_insert(Z_ARRVAL_P(zvar), zv);
         } else {
             auto skey = key.toString();
-            zend_symtable_update(Z_ARRVAL_P(const_ptr()), skey.str(), zv);
+            zend_symtable_update(Z_ARRVAL_P(zvar), skey.str(), zv);
         }
-    } else if (isObject()) {
-        Object tmp(const_ptr());
+    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+        Object tmp(zvar);
         tmp.exec("offsetSet", key, value);
     }
 }
 
 void Variant::offsetUnset(zend_long offset) {
-    if (isArray()) {
-        SEPARATE_ARRAY(ptr());
-        zend_hash_index_del(Z_ARRVAL_P(const_ptr()), offset);
-    } else if (isObject()) {
-        Object tmp(const_ptr());
+	auto zvar = const_ptr();
+	ZVAL_DEREF(zvar);
+
+    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+        zend_hash_index_del(Z_ARRVAL_P(zvar), offset);
+    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+        Object tmp(zvar);
         tmp.exec("offsetUnset", offset);
     }
 }
 
 void Variant::offsetUnset(const Variant &key) {
-    if (isArray()) {
-        SEPARATE_ARRAY(ptr());
+	auto zvar = const_ptr();
+	ZVAL_DEREF(zvar);
+
+	if (Z_TYPE_P(zvar) == IS_ARRAY) {
         if (key.isInt() || key.isFloat()) {
-            zend_hash_index_del(Z_ARRVAL_P(const_ptr()), key.toInt());
+            zend_hash_index_del(Z_ARRVAL_P(zvar), key.toInt());
         } else {
             auto skey = key.toString();
-            zend_hash_del(Z_ARRVAL_P(const_ptr()), skey.str());
+            zend_hash_del(Z_ARRVAL_P(zvar), skey.str());
         }
-    } else if (isObject()) {
-        Object tmp(const_ptr());
+    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+        Object tmp(zvar);
         tmp.exec("offsetUnset", key);
     }
 }

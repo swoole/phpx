@@ -598,7 +598,7 @@ TEST(variant, newReference) {
 }
 
 TEST(variant, unary_operators) {
-	var a = -199;
-	var b = -a;
+    var a = -199;
+    var b = -a;
     ASSERT_EQ(b.toInt(), 199);
 }
