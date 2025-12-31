@@ -284,3 +284,18 @@ TEST(array, ref) {
     auto c = ref.getRefValue();
     ASSERT_EQ(c.length(), 2);
 }
+
+TEST(array, to_array) {
+	var a = 10;
+	auto arr = to_array(a);
+    ASSERT_EQ(arr.length(), 1);
+    ASSERT_EQ(arr.get(0).toInt(), 10);
+
+    var s = "hello world";
+	auto arr2 = to_array(s);
+    ASSERT_EQ(arr2.length(), 1);
+    ASSERT_STREQ(arr2.get(0).toCString(), "hello world");
+
+    auto arr3 = to_array(arr2);
+    ASSERT_TRUE(same(arr2, arr3));
+}

@@ -146,3 +146,10 @@ TEST(string, move_ctor) {
     EXPECT_STREQ(t.data(), "abc");
     EXPECT_EQ(s.str(), nullptr);
 }
+
+TEST(string, empty_str) {
+	String empty_str{};
+	ASSERT_EQ(empty_str.length(), 0);
+	empty_str.append("hello world");
+	ASSERT_EQ(empty_str.length(), 11);
+}

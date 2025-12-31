@@ -236,6 +236,8 @@ void Variant::offsetSet(const Variant &key, const Variant &value) {
         SEPARATE_ARRAY(ptr());
         if (key.isInt() || key.isFloat()) {
             zend_hash_index_update(Z_ARRVAL_P(const_ptr()), key.toInt(), zv);
+        } else if (key.isNull()) {
+            zend_hash_next_index_insert(Z_ARRVAL_P(const_ptr()), zv);
         } else {
             auto skey = key.toString();
             zend_symtable_update(Z_ARRVAL_P(const_ptr()), skey.str(), zv);
@@ -483,6 +485,12 @@ Variant Variant::operator~() const {
     Variant result{};
     bitwise_not_function(result.ptr(), NO_CONST_Z(const_ptr()));
     return result;
+}
+
+Variant Variant::operator-() const {
+    zval tmp;
+    ZVAL_LONG(&tmp, -1);
+    return calc_op(mul_function, const_ptr(), &tmp);
 }
 
 Variant Variant::pow(const Variant &v) const {

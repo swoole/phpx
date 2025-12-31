@@ -596,3 +596,9 @@ TEST(variant, newReference) {
     array arr(*ref);
     ASSERT_STREQ(arr.offsetGet("first").toCString(), "value");
 }
+
+TEST(variant, unary_operators) {
+	var a = -199;
+	var b = -a;
+    ASSERT_EQ(b.toInt(), 199);
+}

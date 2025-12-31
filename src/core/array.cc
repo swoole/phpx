@@ -17,6 +17,7 @@
 #include "phpx.h"
 
 #include "phpx_func.h"
+#include "zend_closures.h"
 
 namespace php {
 int array_data_compare(Bucket *f, Bucket *s) {
@@ -122,25 +123,55 @@ Array::Array(const zval *v) : Variant(v) {
 
 Array::Array(const Variant &v) : Array(v.const_ptr()) {}
 
-Array::Array(const std::initializer_list<const Variant> &list) {
+void Array::copyFrom(const std::initializer_list<const Variant> &list) {
     array_init(&val);
     for (const auto &val : list) {
         append(val);
     }
 }
 
-Array::Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list) {
+void Array::copyFrom(const std::initializer_list<std::pair<const std::string, const Variant>> &list) {
     array_init(&val);
     for (const auto &kv : list) {
         set(kv.first, kv.second);
     }
 }
 
-Array::Array(const std::initializer_list<std::pair<Int, const Variant>> &list) {
+void Array::copyFrom(const std::initializer_list<std::pair<Int, const Variant>> &list) {
     array_init(&val);
     for (const auto &kv : list) {
         set(kv.first, kv.second);
     }
+}
+
+Array::Array(const std::initializer_list<const Variant> &list) {
+    copyFrom(list);
+}
+
+Array::Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list) {
+    copyFrom(list);
+}
+
+Array::Array(const std::initializer_list<std::pair<Int, const Variant>> &list) {
+    copyFrom(list);
+}
+
+Array &Array::operator=(const std::initializer_list<const Variant> &list) {
+    destroy();
+    copyFrom(list);
+    return *this;
+}
+
+Array &Array::operator=(const std::initializer_list<std::pair<const std::string, const Variant>> &list) {
+    destroy();
+    copyFrom(list);
+    return *this;
+}
+
+Array &Array::operator=(const std::initializer_list<std::pair<Int, const Variant>> &list) {
+    destroy();
+    copyFrom(list);
+    return *this;
 }
 
 void Array::set(const String &s, const Variant &v) {
@@ -231,5 +262,46 @@ ArrayItem &ArrayItem::operator=(const Variant &v) {
         zend_hash_index_update(Z_ARRVAL_P(array_.ptr()), index_, zv);
     }
     return *this;
+}
+
+Array to_array(const Variant &v) {
+    zval result;
+    zval *expr = NO_CONST_V(v);
+
+    if (v.isArray()) {
+        return Array(expr);
+    }
+
+    if (Z_TYPE_P(expr) != IS_OBJECT || Z_OBJCE_P(expr) == zend_ce_closure) {
+        if (Z_TYPE_P(expr) != IS_NULL) {
+            ZVAL_ARR(&result, zend_new_array(1));
+            expr = zend_hash_index_add_new(Z_ARRVAL(result), 0, expr);
+            if (IS_CONST == IS_CONST) {
+                if (UNEXPECTED(Z_OPT_REFCOUNTED_P(expr))) Z_ADDREF_P(expr);
+            } else {
+                if (Z_OPT_REFCOUNTED_P(expr)) Z_ADDREF_P(expr);
+            }
+        } else {
+            ZVAL_EMPTY_ARRAY(&result);
+        }
+    } else if (Z_OBJ_P(expr)->properties == NULL && Z_OBJ_HT_P(expr)->get_properties_for == NULL &&
+               Z_OBJ_HT_P(expr)->get_properties == zend_std_get_properties) {
+        /* Optimized version without rebuilding properties HashTable */
+        ZVAL_ARR(&result, zend_std_build_object_properties_array(Z_OBJ_P(expr)));
+    } else {
+        HashTable *obj_ht = zend_get_properties_for(expr, ZEND_PROP_PURPOSE_ARRAY_CAST);
+        if (obj_ht) {
+            /* fast copy */
+            ZVAL_ARR(&result,
+                     zend_proptable_to_symtable(
+                         obj_ht,
+                         (Z_OBJCE_P(expr)->default_properties_count ||
+                          Z_OBJ_P(expr)->handlers != &std_object_handlers || GC_IS_RECURSIVE(obj_ht))));
+            zend_release_properties(obj_ht);
+        } else {
+            ZVAL_EMPTY_ARRAY(&result);
+        }
+    }
+    return Array::from(&result);
 }
 }  // namespace php

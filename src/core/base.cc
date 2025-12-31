@@ -216,19 +216,14 @@ void _exec_method(zend_execute_data *data, zval *return_value) {
     retval.moveTo(return_value);
 }
 
-zend_result _call_user_function_impl(const zval *object,
-                                     const zval *function_name,
-                                     zval *retval_ptr,
-                                     uint32_t param_count,
-                                     zval params[],
-                                     HashTable *named_params) /* {{{ */
-{
+static void _call_user_function_impl(
+    const zval *zobject, const zval *function_name, zval *retval_ptr, uint32_t param_count, zval params[]) {
     zend_fcall_info fci;
 
     fci.size = sizeof(fci);
-    if (object) {
-        ZEND_ASSERT(Z_TYPE_P(object) == IS_OBJECT);
-        fci.object = Z_OBJ_P(object);
+    if (zobject) {
+        ZEND_ASSERT(Z_TYPE_P(zobject) == IS_OBJECT);
+        fci.object = Z_OBJ_P(zobject);
     } else {
         fci.object = nullptr;
     }
@@ -236,25 +231,25 @@ zend_result _call_user_function_impl(const zval *object,
     fci.retval = retval_ptr;
     fci.param_count = param_count;
     fci.params = params;
-    fci.named_params = named_params;
+    fci.named_params = nullptr;
 
-    return zend_call_function(&fci, nullptr);
+    zend_call_function(&fci, nullptr);
 }
 
 Variant _call(const zval *object, const zval *func, Args &args) {
     Variant retval{};
-    _call_user_function_impl(object, func, retval.ptr(), args.count(), args.ptr(), nullptr);
+    _call_user_function_impl(object, func, retval.ptr(), args.count(), args.ptr());
     return retval;
 }
 
 Variant _call(const zval *object, const zval *func) {
     Variant retval{};
-    _call_user_function_impl(object, func, retval.ptr(), 0, nullptr, nullptr);
+    _call_user_function_impl(object, func, retval.ptr(), 0, nullptr);
     return retval;
 }
 
 Variant call(const Variant &func, Array &args) {
-    Args _args;
+    Args _args(args.count());
     for (size_t i = 0; i < args.count(); i++) {
         _args.append(args[i]);
     }
@@ -266,7 +261,7 @@ Variant call(const Variant &func, Args &args) {
 }
 
 Variant call(const Variant &func, const std::initializer_list<Variant> &args) {
-    Args _args;
+    Args _args(args.size());
     for (const auto &arg : args) {
         _args.append(const_cast<Variant &>(arg).ptr());
     }
@@ -347,6 +342,10 @@ static Variant _include(zend_string *filename, const int type) {
     } else {
         Variant result;
         zend_execute(new_op_array, result.ptr());
+        if (new_op_array != ZEND_FAKE_OP_ARRAY && new_op_array != nullptr) {
+            destroy_op_array(new_op_array);
+            efree_size(new_op_array, sizeof(zend_op_array));
+        }
         return result;
     }
 }
@@ -369,6 +368,14 @@ Variant require_once(const String &file) {
 
 Variant eval(const String &script) {
     return _include(script.str(), ZEND_EVAL);
+}
+
+bool same(const Variant &a, const Variant &b) {
+    return zend_is_identical(a.const_ptr(), b.const_ptr());
+}
+
+int compare(const Variant &a, const Variant &b) {
+    return zend_compare(NO_CONST_V(a), NO_CONST_V(b));
 }
 
 zend_function_entry *copy_function_entries(const zend_function_entry *_functions) {

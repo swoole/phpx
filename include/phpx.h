@@ -125,6 +125,8 @@ PHPX_API Object catchException();
 PHPX_API Variant concat(const Variant &a, const Variant &b);
 PHPX_API Variant concat(const std::initializer_list<Variant> &args);
 PHPX_API void exit(const Variant &status);
+PHPX_API bool same(const Variant &a, const Variant &b);
+PHPX_API int compare(const Variant &a, const Variant &b);
 
 Int atoi(const String &str);
 Resource *getResource(const std::string &name);
@@ -262,7 +264,7 @@ class Variant {
     }
     void unset() {
         destroy();
-        ZVAL_UNDEF(&val);
+        val = {};
     }
     zval *ptr() {
         return &val;
@@ -446,7 +448,6 @@ class Variant {
     Variant &operator&=(const Variant &);
     Variant &operator|=(const Variant &);
     Variant &operator^=(const Variant &);
-    // Unary operators
     Variant operator+(const Variant &) const;
     Variant operator-(const Variant &) const;
     Variant operator*(const Variant &) const;
@@ -457,7 +458,12 @@ class Variant {
     Variant operator&(const Variant &) const;
     Variant operator|(const Variant &) const;
     Variant operator^(const Variant &) const;
+    // Unary operators
     Variant operator~() const;
+    Variant operator-() const;
+    bool operator!() const noexcept {
+        return !toBool();
+    }
     // Exponential expression
     Variant pow(const Variant &) const;
     // Concatenates two strings, return new string.
@@ -473,9 +479,6 @@ class Variant {
     Variant operator()() const;
     explicit operator bool() const noexcept {
         return toBool();
-    }
-    bool operator!() const noexcept {
-        return !toBool();
     }
     Variant operator()(const std::initializer_list<Variant> &args) const;
 
@@ -618,8 +621,16 @@ static inline Variant operator>(T a, const Variant &b) {
     return Variant(a) > b;
 }
 
+template <typename T>
+static inline Variant operator==(T a, const Variant &b) {
+    return Variant(a) == b;
+}
+
 class String : public Variant {
   public:
+    String() {
+    	ZVAL_EMPTY_STRING(&val);
+    }
     String(const zval *v);
     String(const Variant &v);
     String(int v) {
@@ -800,6 +811,10 @@ class ArrayItem : public Variant {
 extern int array_data_compare(Bucket *f, Bucket *s);
 
 class Array : public Variant {
+    void copyFrom(const std::initializer_list<const Variant> &list);
+    void copyFrom(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
+    void copyFrom(const std::initializer_list<std::pair<Int, const Variant>> &list);
+
   public:
     Array() {
         array_init(&val);
@@ -809,6 +824,11 @@ class Array : public Variant {
     Array(const std::initializer_list<const Variant> &list);
     Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     Array(const std::initializer_list<std::pair<Int, const Variant>> &list);
+
+    Array &operator=(const std::initializer_list<const Variant> &list);
+    Array &operator=(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
+    Array &operator=(const std::initializer_list<std::pair<Int, const Variant>> &list);
+
     void set(const String &s, const Variant &v);
     void set(zend_ulong i, const Variant &v);
     Variant get(const String &key) const {
@@ -875,6 +895,10 @@ class Args {
     std::vector<Variant> params;
 
   public:
+    Args() {}
+    Args(size_t n) {
+        params.reserve(n);
+    }
     void append(const Variant &v) {
         params.emplace_back(v);
     }
@@ -1222,6 +1246,20 @@ static inline Float to_float(Float v) {
 
 static inline Float to_float(const Variant &v) {
     return v.toFloat();
+}
+
+Array to_array(const Variant &v);
+
+static inline bool to_bool(bool v) {
+    return v;
+}
+
+static inline bool to_bool(const Variant &v) {
+    return v.toBool();
+}
+
+static inline void echo(int val) {
+    echo((Int) val);
 }
 
 extern zend_result extension_startup(int type, int module_number);
