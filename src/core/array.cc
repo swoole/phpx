@@ -236,14 +236,14 @@ void ArrayIterator::skipUndefBucket() {
     }
 }
 
-ArrayItem::ArrayItem(Array &_array, zend_ulong _index, zend_string *_key) : array_(_array), index_(_index) {
+ArrayItem::ArrayItem(Array &_array, zend_ulong _index, const String &_key) : array_(_array), index_(_index) {
     zval *value_;
-    if (_key) {
-        key_ = zend_string_copy(_key);
-        value_ = zend_hash_find(_array.array(), key_);
-    } else {
+    key_ = _key;
+
+    if (key_.isEmpty()) {
         value_ = zend_hash_index_find(_array.array(), index_);
-        key_ = nullptr;
+    } else {
+        value_ = zend_hash_find(_array.array(), key_.str());
     }
     if (value_) {
         val = *value_;
@@ -257,7 +257,7 @@ ArrayItem &ArrayItem::operator=(const Variant &v) {
     const auto zv = NO_CONST_V(v);
     Z_TRY_ADDREF_P(zv);
     if (key_) {
-        zend_symtable_update(Z_ARRVAL_P(array_.ptr()), key_, zv);
+        zend_symtable_update(Z_ARRVAL_P(array_.ptr()), key_.str(), zv);
     } else {
         zend_hash_index_update(Z_ARRVAL_P(array_.ptr()), index_, zv);
     }

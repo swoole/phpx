@@ -662,16 +662,6 @@ class String : public Variant {
     String(const char *v) : Variant(v) {}
     String(const char *str, size_t len) : Variant(str, len) {}
     String(const char *str, size_t len, bool persistent) : Variant(str, len, persistent) {}
-    ~String() {
-        /**
-         * There are some design flaws in ZendVM's garbage collection. The destructor checks whether an object is a root
-         * object, and assertions only allow for array or object types; string types will crash directly. Strings do not
-         * have circular references, so they can be manually released to bypass the garbage collector's check for
-         * circular references.
-         */
-        zend_string_release(str());
-        val = {};
-    }
     bool isNumeric() const {
         return is_numeric_string(data(), length(), nullptr, nullptr, false);
     }
@@ -720,7 +710,12 @@ class String : public Variant {
     String unescape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
         return from(php_unescape_html_entities(str(), 1, flags, charset));
     }
-
+    bool isEmpty() {
+        return str() == zend_empty_string;
+    }
+    zend_string *str() const {
+        return Z_STR(val);
+    }
     Array split(const String &delim, long = ZEND_LONG_MAX) const;
     String substr(long _offset, long _length = -1) const;
     String stripTags(const String &allow, bool allow_tag_spaces = false) const;
@@ -729,10 +724,6 @@ class String : public Variant {
     String basename(const String &suffix) const;
     String dirname() const;
     void print() const;
-
-    zend_string *str() const {
-        return Z_STR(val);
-    }
     /**
      * This function is unsafe, lacks GC, and takes a new reference to a `zend_string`.
      * The String object will acquire its ownership, and the external code must not use the `zend_string` pointer again.
@@ -819,15 +810,10 @@ class ArrayItem : public Variant {
   private:
     Array &array_;
     zend_ulong index_;
-    zend_string *key_;
+    String key_;
 
   public:
-    ArrayItem(Array &_array, zend_ulong _index, zend_string *_key);
-    ~ArrayItem() {
-        if (key_) {
-            zend_string_release(key_);
-        }
-    }
+    ArrayItem(Array &_array, zend_ulong _index, const String &_key);
     ArrayItem &operator=(const Variant &v);
 };
 
@@ -861,13 +847,13 @@ class Array : public Variant {
         return zend_hash_index_find(Z_ARRVAL_P(const_ptr()), i);
     }
     ArrayItem operator[](zend_ulong i) {
-        return {*this, i, nullptr};
+        return {*this, i, String{}};
     }
     ArrayItem operator[](int i) {
-        return {*this, (zend_ulong) i, nullptr};
+        return {*this, (zend_ulong) i, String{}};
     }
     ArrayItem operator[](const String &key) {
-        return {*this, 0, key.str()};
+        return {*this, 0, key};
     }
     bool del(zend_ulong index) {
         SEPARATE_ARRAY(ptr());
