@@ -243,7 +243,7 @@ static void _call_user_function_impl(
 
     zend_fcall_info_cache *fci_cache = nullptr;
 
-    if (Z_TYPE_P(function_name) == IS_STRING) {
+    if (Z_TYPE_P(function_name) == IS_STRING && !zobject) {
         auto iter = func_cache_map.find(Z_STRVAL_P(function_name));
         if (iter == func_cache_map.end()) {
             fci_cache = (zend_fcall_info_cache *) emalloc(sizeof(*fci_cache));

@@ -602,3 +602,13 @@ TEST(variant, unary_operators) {
     var b = -a;
     ASSERT_EQ(b.toInt(), 199);
 }
+
+TEST(variant, nested_update) {
+    Array a{1, 2, 3, 99, 1000};
+
+    Array b{};
+    b.set("hello", a);
+
+    auto c = b.offsetGet("hello");
+    c.offsetSet(4, 1987);
+}

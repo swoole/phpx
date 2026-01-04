@@ -229,6 +229,49 @@ bool Variant::offsetExists(const Variant &key) const {
     }
 }
 
+/**
+ * The runtime copy mechanism of PHP conflicts with the design of phpx, and COW must be disabled to update array elements.
+ */
+struct NoCowArray {
+    zend_array *ht;
+    uint32_t ref_count;
+    NoCowArray(const zval *zarr) {
+        ht = Z_ARRVAL_P(zarr);
+        ref_count = GC_REFCOUNT(ht);
+        GC_SET_REFCOUNT(ht, 1);
+    }
+    ~NoCowArray() {
+        GC_SET_REFCOUNT(ht, ref_count);
+    }
+};
+
+static zval *array_update_no_cow(const zval *zarr, zend_long h, zval *zv) {
+    NoCowArray array(zarr);
+    return zend_hash_index_update(array.ht, h, zv);
+}
+
+static zval *array_update_no_cow(const zval *zarr, const Variant &key, zval *zv) {
+    auto skey = key.toString();
+    NoCowArray array(zarr);
+    return zend_symtable_update(array.ht, skey.str(), zv);
+}
+
+static zval *array_append_no_cow(const zval *zarr, zval *zv) {
+    NoCowArray array(zarr);
+    return zend_hash_next_index_insert(array.ht, zv);
+}
+
+static zend_result array_delele_no_cow(const zval *zarr, zend_long h) {
+    NoCowArray array(zarr);
+    return zend_hash_index_del(array.ht, h);
+}
+
+static zend_result array_delele_no_cow(const zval *zarr, const Variant &key) {
+    NoCowArray array(zarr);
+    auto skey = key.toString();
+    return zend_hash_del(array.ht, skey.str());
+}
+
 void Variant::offsetSet(zend_long offset, const Variant &value) {
     auto zvar = const_ptr();
     ZVAL_DEREF(zvar);
@@ -236,8 +279,7 @@ void Variant::offsetSet(zend_long offset, const Variant &value) {
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto zv = NO_CONST_V(value);
         Z_TRY_ADDREF_P(zv);
-        SEPARATE_ARRAY(ptr());
-        zend_hash_index_update(Z_ARRVAL_P(zvar), offset, zv);
+        array_update_no_cow(zvar, offset, zv);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
         tmp.exec("offsetSet", offset, value);
@@ -251,14 +293,12 @@ void Variant::offsetSet(const Variant &key, const Variant &value) {
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto zv = NO_CONST_V(value);
         Z_TRY_ADDREF_P(zv);
-        SEPARATE_ARRAY(ptr());
         if (key.isInt() || key.isFloat()) {
-            zend_hash_index_update(Z_ARRVAL_P(zvar), key.toInt(), zv);
+            array_update_no_cow(zvar, key.toInt(), zv);
         } else if (key.isNull()) {
-            zend_hash_next_index_insert(Z_ARRVAL_P(zvar), zv);
+            array_append_no_cow(zvar, zv);
         } else {
-            auto skey = key.toString();
-            zend_symtable_update(Z_ARRVAL_P(zvar), skey.str(), zv);
+            array_update_no_cow(zvar, key, zv);
         }
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
@@ -271,7 +311,6 @@ void Variant::offsetUnset(zend_long offset) {
     ZVAL_DEREF(zvar);
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
-        SEPARATE_ARRAY(ptr());
         zend_hash_index_del(Z_ARRVAL_P(zvar), offset);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
@@ -284,12 +323,10 @@ void Variant::offsetUnset(const Variant &key) {
     ZVAL_DEREF(zvar);
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
-        SEPARATE_ARRAY(ptr());
         if (key.isInt() || key.isFloat()) {
-            zend_hash_index_del(Z_ARRVAL_P(zvar), key.toInt());
+            array_delele_no_cow(zvar, key.toInt());
         } else {
-            auto skey = key.toString();
-            zend_hash_del(Z_ARRVAL_P(zvar), skey.str());
+            array_delele_no_cow(zvar, key);
         }
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
