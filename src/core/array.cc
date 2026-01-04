@@ -240,10 +240,10 @@ ArrayItem::ArrayItem(Array &_array, zend_ulong _index, const String &_key) : arr
     zval *value_;
     key_ = _key;
 
-    if (key_.isEmpty()) {
-        value_ = zend_hash_index_find(_array.array(), index_);
+    if (key_.str() != zend_empty_string) {
+        value_ = zend_symtable_find(_array.array(), key_.str());
     } else {
-        value_ = zend_hash_find(_array.array(), key_.str());
+        value_ = zend_hash_index_find(_array.array(), index_);
     }
     if (value_) {
         val = *value_;
@@ -256,11 +256,13 @@ ArrayItem::ArrayItem(Array &_array, zend_ulong _index, const String &_key) : arr
 ArrayItem &ArrayItem::operator=(const Variant &v) {
     const auto zv = NO_CONST_V(v);
     Z_TRY_ADDREF_P(zv);
-    if (key_) {
+
+    if (key_.str() != zend_empty_string) {
         zend_symtable_update(Z_ARRVAL_P(array_.ptr()), key_.str(), zv);
     } else {
         zend_hash_index_update(Z_ARRVAL_P(array_.ptr()), index_, zv);
     }
+
     return *this;
 }
 

@@ -710,9 +710,6 @@ class String : public Variant {
     String unescape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
         return from(php_unescape_html_entities(str(), 1, flags, charset));
     }
-    bool isEmpty() {
-        return str() == zend_empty_string;
-    }
     zend_string *str() const {
         return Z_STR(val);
     }
