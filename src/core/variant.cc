@@ -236,6 +236,7 @@ void Variant::offsetSet(zend_long offset, const Variant &value) {
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto zv = NO_CONST_V(value);
         Z_TRY_ADDREF_P(zv);
+        SEPARATE_ARRAY(ptr());
         zend_hash_index_update(Z_ARRVAL_P(zvar), offset, zv);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
@@ -250,6 +251,7 @@ void Variant::offsetSet(const Variant &key, const Variant &value) {
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto zv = NO_CONST_V(value);
         Z_TRY_ADDREF_P(zv);
+        SEPARATE_ARRAY(ptr());
         if (key.isInt() || key.isFloat()) {
             zend_hash_index_update(Z_ARRVAL_P(zvar), key.toInt(), zv);
         } else if (key.isNull()) {
@@ -269,6 +271,7 @@ void Variant::offsetUnset(zend_long offset) {
     ZVAL_DEREF(zvar);
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
+        SEPARATE_ARRAY(ptr());
         zend_hash_index_del(Z_ARRVAL_P(zvar), offset);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
@@ -281,6 +284,7 @@ void Variant::offsetUnset(const Variant &key) {
     ZVAL_DEREF(zvar);
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
+        SEPARATE_ARRAY(ptr());
         if (key.isInt() || key.isFloat()) {
             zend_hash_index_del(Z_ARRVAL_P(zvar), key.toInt());
         } else {

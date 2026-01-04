@@ -23,6 +23,7 @@ END_EXTERN_C()
 namespace php {
 std::map<const char *, std::map<const char *, Method *, StrCmp>, StrCmp> method_map;
 std::map<const char *, Function *, StrCmp> function_map;
+std::map<const char *, zend_fcall_info_cache *, StrCmp> func_cache_map;
 
 void error(int level, const char *format, ...) {
     va_list args;
@@ -96,6 +97,13 @@ void exit(const Variant &status) {
         EG(exit_status) = 0;
     }
     zend_bailout();
+}
+
+void request_shutdown() {
+    for (auto kv : func_cache_map) {
+        efree(kv.second);
+    }
+    func_cache_map.clear();
 }
 
 void throwException(const char *name, const char *message, int code) {
@@ -233,7 +241,24 @@ static void _call_user_function_impl(
     fci.params = params;
     fci.named_params = nullptr;
 
-    zend_call_function(&fci, nullptr);
+    zend_fcall_info_cache *fci_cache = nullptr;
+
+    if (Z_TYPE_P(function_name) == IS_STRING) {
+        auto iter = func_cache_map.find(Z_STRVAL_P(function_name));
+        if (iter == func_cache_map.end()) {
+            fci_cache = (zend_fcall_info_cache *) emalloc(sizeof(*fci_cache));
+            if (zend_is_callable_ex(&fci.function_name, fci.object, 0, NULL, fci_cache, nullptr)) {
+                func_cache_map[Z_STRVAL_P(function_name)] = fci_cache;
+            } else {
+                efree(fci_cache);
+                fci_cache = nullptr;
+            }
+        } else {
+            fci_cache = iter->second;
+        }
+    }
+
+    zend_call_function(&fci, fci_cache);
 }
 
 Variant _call(const zval *object, const zval *func, Args &args) {
@@ -400,5 +425,4 @@ zend_function_entry *copy_function_entries(const zend_function_entry *_functions
     }
     return functions;
 }
-
 }  // namespace php

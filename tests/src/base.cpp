@@ -131,8 +131,3 @@ TEST(base, atoi) {
     auto i = php::atoi("hello");
     ASSERT_EQ(i, 0);
 }
-
-TEST(base, empty_str_to_int) {
-    auto i = php::to_int("");
-    ASSERT_EQ(i, 0);
-}

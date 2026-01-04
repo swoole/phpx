@@ -126,20 +126,13 @@ PHPX_API Variant concat(const Variant &a, const Variant &b);
 PHPX_API Variant concat(const std::initializer_list<Variant> &args);
 PHPX_API void exit(const Variant &status);
 PHPX_API bool same(const Variant &a, const Variant &b);
-
-static inline bool equals(Int a, Int b) {
-    return a == b;
-}
-
-static inline bool equals(Float a, Float b) {
-    return a == b;
-}
-
 PHPX_API bool equals(const Variant &a, const Variant &b);
 PHPX_API int compare(const Variant &a, const Variant &b);
 
 Int atoi(const String &str);
+Array to_array(const Variant &v);
 Resource *getResource(const std::string &name);
+void request_shutdown();
 
 class Variant {
   protected:
@@ -1237,36 +1230,6 @@ class Interface {
     zend_class_entry *ce;
     const zend_function_entry *functions;
 };
-
-static inline Int to_int(Int v) {
-    return v;
-}
-
-static inline Int to_int(const Variant &v) {
-    return v.toInt();
-}
-
-static inline Float to_float(Float v) {
-    return v;
-}
-
-static inline Float to_float(const Variant &v) {
-    return v.toFloat();
-}
-
-Array to_array(const Variant &v);
-
-static inline bool to_bool(bool v) {
-    return v;
-}
-
-static inline bool to_bool(const Variant &v) {
-    return v.toBool();
-}
-
-static inline void echo(int val) {
-    echo((Int) val);
-}
 
 extern zend_result extension_startup(int type, int module_number);
 extern void extension_info(zend_module_entry *module);
