@@ -662,6 +662,16 @@ class String : public Variant {
     String(const char *v) : Variant(v) {}
     String(const char *str, size_t len) : Variant(str, len) {}
     String(const char *str, size_t len, bool persistent) : Variant(str, len, persistent) {}
+    ~String() {
+        /**
+         * There are some design flaws in ZendVM's garbage collection. The destructor checks whether an object is a root
+         * object, and assertions only allow for array or object types; string types will crash directly. Strings do not
+         * have circular references, so they can be manually released to bypass the garbage collector's check for
+         * circular references.
+         */
+        zend_string_release(str());
+        val = {};
+    }
     bool isNumeric() const {
         return is_numeric_string(data(), length(), nullptr, nullptr, false);
     }
