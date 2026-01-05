@@ -536,6 +536,7 @@ class Variant {
 };
 
 extern Variant null;
+extern Int zero;
 
 template <typename T>
 Variant newResource(const char *name, T *v) {
@@ -823,6 +824,7 @@ class Array : public Variant {
     Array(const std::initializer_list<const Variant> &list);
     Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     Array(const std::initializer_list<std::pair<Int, const Variant>> &list);
+    Array(Variant *v) : Variant(v) {}
 
     Array &operator=(const std::initializer_list<const Variant> &list);
     Array &operator=(const std::initializer_list<std::pair<const std::string, const Variant>> &list);

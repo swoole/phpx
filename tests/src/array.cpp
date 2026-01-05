@@ -306,3 +306,12 @@ TEST(array, to_array) {
     auto arr3 = to_array(arr2);
     ASSERT_TRUE(same(arr2, arr3));
 }
+
+TEST(array, init3) {
+    php::Array arr;
+
+    Int index = 0L;
+
+    arr = php::Array{{index, php::Var(100L)}};
+    var_dump(arr);
+}

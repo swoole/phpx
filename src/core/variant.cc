@@ -25,6 +25,7 @@ END_EXTERN_C()
 
 namespace php {
 Variant null = {};
+Int zero = 0L;
 static Variant __construct{ZEND_STRL("__construct"), true};
 
 Variant &Variant::operator=(const zval *v) {
@@ -201,8 +202,10 @@ bool Variant::offsetExists(zend_long offset) const {
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         return zend_hash_index_exists(Z_ARRVAL_P(zvar), offset);
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
-        auto str = Z_STR_P(zvar);
-        return ZSTR_LEN(str) < ((offset < 0) ? -(size_t) offset : ((size_t) offset + 1));
+        if (UNEXPECTED(offset < 0)) {
+            offset += (zend_long) Z_STRLEN_P(zvar);
+        }
+        return EXPECTED(offset >= 0) && (size_t) offset < Z_STRLEN_P(zvar);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
         return tmp.exec("offsetExists", offset).toBool();
@@ -230,7 +233,8 @@ bool Variant::offsetExists(const Variant &key) const {
 }
 
 /**
- * The runtime copy mechanism of PHP conflicts with the design of phpx, and COW must be disabled to update array elements.
+ * The runtime copy mechanism of PHP conflicts with the design of phpx, and COW must be disabled to update array
+ * elements.
  */
 struct NoCowArray {
     zend_array *ht;
@@ -311,7 +315,7 @@ void Variant::offsetUnset(zend_long offset) {
     ZVAL_DEREF(zvar);
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
-        zend_hash_index_del(Z_ARRVAL_P(zvar), offset);
+        array_delele_no_cow(zvar, offset);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
         tmp.exec("offsetUnset", offset);

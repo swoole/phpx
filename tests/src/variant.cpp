@@ -549,12 +549,13 @@ TEST(variant, offsetGet) {
     Array a{1, 2, 3, 99, 1000};
     ASSERT_EQ(a.offsetGet(3).toInt(), 99);
     ASSERT_TRUE(a.offsetGet(100).isNull());
+    ASSERT_TRUE(a.offsetExists(3));
+    ASSERT_TRUE(a.offsetGet(a.length()).isNull());
 
     var s = "hello world";
     ASSERT_STREQ(s.offsetGet(4).toCString(), "o");
-    ASSERT_TRUE(a.offsetExists(3));
-    ASSERT_TRUE(a.offsetGet(s.length()).isNull());
-    ASSERT_FALSE(a.offsetExists(s.length()));
+    ASSERT_STREQ(s.offsetGet(s.length()).toCString(), "");
+    ASSERT_FALSE(s.offsetExists(s.length()));
     ASSERT_STREQ(s.offsetGet(-1).toCString(), "d");
 
     var b = false;
@@ -565,6 +566,8 @@ TEST(variant, offsetGet) {
     a2.set(sk, 999);
     a2.set("world", 888);
     ASSERT_EQ(a2.offsetGet(sk).toInt(), 999);
+    ASSERT_TRUE(a2.offsetExists("world"));
+    ASSERT_FALSE(a2.offsetExists("golang"));
 }
 
 TEST(variant, offsetGet2) {
@@ -576,6 +579,15 @@ TEST(variant, offsetGet2) {
 
     o.offsetUnset(sk);
     ASSERT_FALSE(o.offsetExists(sk));
+}
+
+TEST(variant, offsetGet3) {
+    auto o = newObject("ArrayObject");
+    o.offsetSet(null, 1987);
+    o.offsetSet(null, 2026);
+    ASSERT_TRUE(o.offsetExists(1));
+    ASSERT_FALSE(o.offsetExists(2));
+    ASSERT_EQ(o.offsetGet(0).toInt(), 1987);
 }
 
 TEST(variant, setProperty) {
@@ -611,4 +623,19 @@ TEST(variant, nested_update) {
 
     auto c = b.offsetGet("hello");
     c.offsetSet(4, 1987);
+}
+
+TEST(variant, offsetSet) {
+    Array a2;
+    var sk = "hello";
+    a2.offsetSet(sk, 999);
+    a2.offsetSet("world", 888);
+    ASSERT_EQ(a2.offsetGet(sk).toInt(), 999);
+
+    Array a3(a2);
+    a3.offsetSet("php", 2026);
+    ASSERT_EQ(a2.offsetGet("php").toInt(), 2026);
+
+    a3.offsetUnset(sk);
+    ASSERT_FALSE(a2.offsetExists(sk));
 }
