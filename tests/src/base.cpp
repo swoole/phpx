@@ -195,3 +195,17 @@ TEST(base, exit) {
     ASSERT_EQ(EG(exit_status), 250);
     ASSERT_EQ(count, 2);
 }
+
+TEST(base, exit2) {
+    int count = 1;
+    zend_first_try {
+        ::usleep(100000);
+        php::exit("hello world\n");
+    }
+    zend_catch {
+        count++;
+    }
+    zend_end_try();
+    ASSERT_EQ(EG(exit_status), 0);
+    ASSERT_EQ(count, 2);
+}
