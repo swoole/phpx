@@ -56,6 +56,7 @@ int main(int argc, char **argv) {
     }
     zend_end_try();
 
+    php::request_shutdown();
     php_embed_shutdown();
 
     return rc;

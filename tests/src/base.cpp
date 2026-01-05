@@ -16,6 +16,17 @@ TEST(base, constant) {
 
 TEST(base, echo) {
     echo("php error: %s, ErrorCode: %d\n", "hello world", 1001);
+
+    String s("hello world\n");
+    echo(s);
+
+    var b = 2026;
+    echo(b);
+    echo("\n");
+    echo(1987L);
+    echo("\n");
+    echo(3.1415926);
+    echo("\n");
 }
 
 TEST(base, define) {
@@ -130,4 +141,31 @@ TEST(base, throwException) {
 TEST(base, atoi) {
     auto i = php::atoi("hello");
     ASSERT_EQ(i, 0);
+}
+
+TEST(base, concat) {
+    var a("hello");
+    var b("world");
+    var c = concat(a, b);
+    ASSERT_STREQ(c.toCString(), "helloworld");
+
+    var d = concat({a, " ", b, "\n"});
+    ASSERT_STREQ(d.toCString(), "hello world\n");
+}
+
+TEST(base, compare) {
+    var a("hello");
+    var b("world");
+    ASSERT_FALSE(equals(a, b));
+
+    var c("hello");
+    ASSERT_TRUE(equals(a, c));
+}
+
+TEST(base, exit) {
+    ChildResult r = run_in_child_capture_stdout([]() -> int {
+    	::usleep(200000);
+        exit(250);
+    });
+    ASSERT_EQ(r.exit_code, 250);
 }

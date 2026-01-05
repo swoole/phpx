@@ -654,15 +654,21 @@ TEST(variant, offsetSet) {
 }
 
 TEST(variant, offsetUnset) {
-	Array a{1, 2, 3, 99, 1000};
+    Array a{1, 2, 3, 99, 1000};
     ASSERT_TRUE(a.offsetExists(3));
     a.offsetUnset(3);
     ASSERT_FALSE(a.offsetExists(3));
 
+    a.offsetSet(null, 2026);
+    ASSERT_EQ(a.offsetGet(5).toInt(), 2026);
+
     auto o = newObject("ArrayObject");
-	o.offsetSet(null, 1987);
-	o.offsetSet(null, 2026);
+    o.offsetSet(null, 1987);
+    o.offsetSet(null, 2026);
+    o.offsetSet(2, 1999);
+    ASSERT_EQ(o.offsetGet(2).toInt(), 1999);
+
     ASSERT_TRUE(o.offsetExists(1));
-	o.offsetUnset(1);
-	ASSERT_FALSE(o.offsetExists(1));
+    o.offsetUnset(1);
+    ASSERT_FALSE(o.offsetExists(1));
 }
