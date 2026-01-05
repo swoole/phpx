@@ -554,8 +554,11 @@ TEST(variant, offsetGet) {
 
     var s = "hello world";
     ASSERT_STREQ(s.offsetGet(4).toCString(), "o");
+    ASSERT_STREQ(s.offsetGet("4").toCString(), "o");
     ASSERT_STREQ(s.offsetGet(s.length()).toCString(), "");
     ASSERT_FALSE(s.offsetExists(s.length()));
+    ASSERT_FALSE(s.offsetExists(-99));
+    ASSERT_TRUE(s.offsetExists(-2));
     ASSERT_STREQ(s.offsetGet(-1).toCString(), "d");
 
     var b = false;

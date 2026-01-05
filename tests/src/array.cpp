@@ -315,3 +315,11 @@ TEST(array, init3) {
     arr = php::Array{{index, php::Var(100L)}};
     var_dump(arr);
 }
+
+TEST(array, assign) {
+    Array arr1 = create_list();
+    ASSERT_EQ(arr1.length(), 5);
+
+    arr1 = {"erlang", "ruby", "lua"};
+    ASSERT_EQ(arr1.length(), 3);
+}

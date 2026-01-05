@@ -116,6 +116,14 @@ TEST(base, eval) {
     ASSERT_TRUE(str_contains(rs, PHP_VERSION).toBool());
 }
 
+TEST(base, eval2) {
+    auto rs = eval("throw new Exception('phpx error');");
+    ASSERT_EQ(rs, nullptr);
+    auto e = catchException();
+    auto msg = e.exec("getMessage");
+    ASSERT_STREQ(msg.toCString(), "phpx error");
+}
+
 TEST(base, exception) {
     zend_try {
         eval("throw new RuntimeException('phpx exception test');");
@@ -160,11 +168,23 @@ TEST(base, compare) {
 
     var c("hello");
     ASSERT_TRUE(equals(a, c));
+
+    ASSERT_EQ(compare(1, 1), 0);
+    ASSERT_EQ(compare(1, 2), -1);
+    ASSERT_EQ(compare(2, 1), 1);
+
+    ASSERT_EQ(compare(1.5, 1.5), 0);
+    ASSERT_EQ(compare(1.5, 2.5), -1);
+    ASSERT_EQ(compare(2.5, 1.5), 1);
+
+    ASSERT_EQ(compare("a", "a"), 0);
+    ASSERT_EQ(compare("a", "b"), -1);
+    ASSERT_EQ(compare("b", "a"), 1);
 }
 
 TEST(base, exit) {
     ChildResult r = run_in_child_capture_stdout([]() -> int {
-    	::usleep(200000);
+        ::usleep(200000);
         exit(250);
     });
     ASSERT_EQ(r.exit_code, 250);
