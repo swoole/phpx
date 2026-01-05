@@ -878,6 +878,9 @@ class Array : public Variant {
     bool empty() const {
         return count() == 0;
     }
+    bool isList() const {
+        return zend_array_is_list(array());
+    }
     Variant search(const Variant &_other_var, bool strict = false) const;
     bool contains(const Variant &_other_var, bool strict = false) const;
     String join(const String &delim);

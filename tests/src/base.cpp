@@ -183,9 +183,15 @@ TEST(base, compare) {
 }
 
 TEST(base, exit) {
-    ChildResult r = run_in_child_capture_stdout([]() -> int {
-        ::usleep(200000);
-        exit(250);
-    });
-    ASSERT_EQ(r.exit_code, 250);
+    int count = 1;
+    zend_first_try {
+        ::usleep(100000);
+        php::exit(250);
+    }
+    zend_catch {
+        count++;
+    }
+    zend_end_try();
+    ASSERT_EQ(EG(exit_status), 250);
+    ASSERT_EQ(count, 2);
 }

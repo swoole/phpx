@@ -13,3 +13,13 @@ TEST(helper, to_int) {
     auto v = php::atoi("512k");
     ASSERT_EQ(v, 512 * 1024);
 }
+
+TEST(helper, to_array) {
+    auto o = newObject("ArrayObject");
+    o.offsetSet(null, 1987);
+    o.offsetSet(null, 2026);
+    o.offsetSet(2, 1999);
+
+    auto a2 = to_array(o);
+    ASSERT_EQ(a2.length(), 3);
+}

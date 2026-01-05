@@ -322,4 +322,12 @@ TEST(array, assign) {
 
     arr1 = {"erlang", "ruby", "lua"};
     ASSERT_EQ(arr1.length(), 3);
+
+    ASSERT_TRUE(arr1.isList());
+    arr1 = {{"a", "apple"}, {"b", "banana"}};
+    ASSERT_FALSE(arr1.isList());
+    ASSERT_STREQ(arr1["a"].toCString(), "apple");
+
+    arr1 = {{2020, "apple"}, {1999, "banana"}};
+    ASSERT_STREQ(arr1[1999].toCString(), "banana");
 }
