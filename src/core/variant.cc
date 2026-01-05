@@ -338,7 +338,7 @@ void Variant::offsetUnset(const Variant &key) {
     }
 }
 
-Variant Variant::readProperty(zend_string *prop_name) const {
+Variant Variant::getProperty(zend_string *prop_name) const {
     zval rv;
     Variant retval;
     zval *member_p = zend_read_property_ex(ce(), object(), prop_name, false, &rv);
@@ -350,7 +350,7 @@ Variant Variant::readProperty(zend_string *prop_name) const {
     return retval;
 }
 
-void Variant::updateProperty(zend_string *prop_name, const Variant &value) const {
+void Variant::setProperty(zend_string *prop_name, const Variant &value) const {
     auto zv = NO_CONST_V(value);
     zend_update_property_ex(ce(), object(), prop_name, zv);
 }
@@ -361,7 +361,7 @@ Variant Variant::getProperty(const Variant &name) const {
     }
     auto zk = NO_CONST_V(name);
     auto prop_name = zval_get_string(zk);
-    auto prop_value = readProperty(prop_name);
+    auto prop_value = getProperty(prop_name);
     zend_string_release(prop_name);
     return prop_value;
 }
@@ -369,11 +369,11 @@ Variant Variant::getProperty(const Variant &name) const {
 void Variant::setProperty(const Variant &name, const Variant &value) const {
     auto zk = NO_CONST_V(name);
     auto prop_name = zval_get_string(zk);
-    updateProperty(prop_name, value);
+    setProperty(prop_name, value);
     zend_string_release(prop_name);
 }
 
-void Variant::deleteProperty(zend_string *prop_name) {
+void Variant::unsetProperty(zend_string *prop_name) {
     zend_class_entry *old_scope = EG(fake_scope);
     EG(fake_scope) = ce();
     object()->handlers->unset_property(object(), prop_name, 0);
@@ -383,7 +383,7 @@ void Variant::deleteProperty(zend_string *prop_name) {
 void Variant::unsetProperty(const Variant &name) {
     auto zk = NO_CONST_V(name);
     auto prop_name = zval_get_string(zk);
-    deleteProperty(prop_name);
+    unsetProperty(prop_name);
     zend_string_release(prop_name);
 }
 
@@ -728,7 +728,7 @@ Variant Object::callParentMethod(const String &func, const std::initializer_list
 }
 
 Variant Object::get(const String &name) const {
-    return readProperty(name.str());
+    return getProperty(name.str());
 }
 
 Object Object::clone() const {

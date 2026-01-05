@@ -599,6 +599,19 @@ TEST(variant, setProperty) {
     ASSERT_EQ(v.toInt(), 1987);
 }
 
+TEST(variant, unsetProperty) {
+    var sk = "hello";
+    auto o = newObject("ArrayObject");
+
+    o.setProperty(sk, 1987);
+    auto v = o.getProperty(sk);
+    ASSERT_EQ(v.toInt(), 1987);
+
+    o.unsetProperty(sk);
+    auto v2 = o.getProperty(sk);
+    ASSERT_TRUE(v2.isNull());
+}
+
 TEST(variant, newReference) {
     var ref = newReference();
 
@@ -638,4 +651,18 @@ TEST(variant, offsetSet) {
 
     a3.offsetUnset(sk);
     ASSERT_FALSE(a2.offsetExists(sk));
+}
+
+TEST(variant, offsetUnset) {
+	Array a{1, 2, 3, 99, 1000};
+    ASSERT_TRUE(a.offsetExists(3));
+    a.offsetUnset(3);
+    ASSERT_FALSE(a.offsetExists(3));
+
+    auto o = newObject("ArrayObject");
+	o.offsetSet(null, 1987);
+	o.offsetSet(null, 2026);
+    ASSERT_TRUE(o.offsetExists(1));
+	o.offsetUnset(1);
+	ASSERT_FALSE(o.offsetExists(1));
 }

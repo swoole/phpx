@@ -404,11 +404,11 @@ class Variant {
     void offsetUnset(const Variant &key);
 
     Variant getProperty(const Variant &name) const;
+    Variant getProperty(zend_string *prop_name) const;
     void setProperty(const Variant &name, const Variant &value) const;
-    Variant readProperty(zend_string *prop_name) const;
-    void updateProperty(zend_string *prop_name, const Variant &value) const;
+    void setProperty(zend_string *prop_name, const Variant &value) const;
     void unsetProperty(const Variant &name);
-    void deleteProperty(zend_string *prop_name);
+    void unsetProperty(zend_string *prop_name);
 
     bool operator==(const Variant &v) const {
         return equals(v);
@@ -1014,7 +1014,7 @@ class Object : public Variant {
 
     Variant get(const String &name) const;
     void set(const String &name, const Variant &v) const {
-        updateProperty(name.str(), v);
+        setProperty(name.str(), v);
     }
     template <class T>
     T *oGet(const String &name, const char *resource_name) {
