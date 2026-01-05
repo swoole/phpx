@@ -374,7 +374,7 @@ void Variant::setProperty(const Variant &name, const Variant &value) const {
 }
 
 void Variant::unsetProperty(zend_string *prop_name) {
-    zend_class_entry *old_scope = EG(fake_scope);
+    auto old_scope = EG(fake_scope);
     EG(fake_scope) = ce();
     object()->handlers->unset_property(object(), prop_name, 0);
     EG(fake_scope) = old_scope;
