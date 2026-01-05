@@ -593,15 +593,6 @@ TEST(variant, offsetGet3) {
     ASSERT_EQ(o.offsetGet(0).toInt(), 1987);
 }
 
-TEST(variant, offsetGetInvalidType) {
-    var v(19992);
-    ASSERT_TRUE(v.offsetGet("hello").isNull());
-    ASSERT_FALSE(v.offsetExists(2000));
-
-    var ik(3.1415);
-    ASSERT_FALSE(v.offsetExists(ik));
-}
-
 TEST(variant, setProperty) {
     var sk = "hello";
     auto o = newObject("ArrayObject");
@@ -667,11 +658,15 @@ TEST(variant, offsetSet) {
 
 TEST(variant, offsetUnset) {
     Array a{1, 2, 3, 99, 1000};
+    var ik(4);
+
+    a.offsetSet(ik, 999);
+    ASSERT_EQ(a.offsetGet(ik).toInt(), 999);
+
     ASSERT_TRUE(a.offsetExists(3));
     a.offsetUnset(3);
     ASSERT_FALSE(a.offsetExists(3));
 
-    var ik(4);
     ASSERT_TRUE(a.offsetExists(ik));
     a.offsetUnset(ik);
     ASSERT_FALSE(a.offsetExists(ik));
@@ -688,4 +683,18 @@ TEST(variant, offsetUnset) {
     ASSERT_TRUE(o.offsetExists(1));
     o.offsetUnset(1);
     ASSERT_FALSE(o.offsetExists(1));
+}
+
+TEST(variant, operateWithBadType) {
+    var v(19992);
+    ASSERT_TRUE(v.offsetGet("hello").isNull());
+    ASSERT_FALSE(v.offsetExists(2000));
+
+    var ik(3.1415);
+    ASSERT_FALSE(v.offsetExists(ik));
+
+    var sk("world");
+    ASSERT_FALSE(v.offsetExists(sk));
+
+    ASSERT_TRUE(v.getProperty("hello").isNull());
 }

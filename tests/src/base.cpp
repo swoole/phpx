@@ -159,6 +159,9 @@ TEST(base, concat) {
 
     var d = concat({a, " ", b, "\n"});
     ASSERT_STREQ(d.toCString(), "hello world\n");
+
+    var e = concat({});
+    ASSERT_TRUE(e.isNull());
 }
 
 TEST(base, compare) {
