@@ -166,7 +166,7 @@ TEST(string, empty_str_equals_zero) {
 }
 
 TEST(string, unset) {
-	String s("hello");
+    String s("hello");
     ASSERT_EQ(s.length(), 5);
     s.unset();
     ob_start();
@@ -176,8 +176,8 @@ TEST(string, unset) {
 }
 
 TEST(string, zval_to_str) {
-	zval v;
-	ZVAL_LONG(&v, 1999);
-	String s(&v);
+    zval v;
+    ZVAL_LONG(&v, 1999);
+    String s(&v);
     ASSERT_STREQ(s.toCString(), "1999");
 }

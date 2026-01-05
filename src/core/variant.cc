@@ -694,6 +694,7 @@ Object newObject(const char *name, const std::initializer_list<Variant> &args) {
 Variant newReference() {
     Variant ref{};
     ZVAL_NEW_EMPTY_REF(ref.ptr());
+    ZVAL_NULL(Z_REFVAL_P(ref.ptr()));
     return ref;
 }
 
