@@ -164,3 +164,20 @@ TEST(string, empty_str_equals_zero) {
     ASSERT_EQ(is_equal_function(&result, empty_str.ptr(), zero_v.ptr()), SUCCESS);
     ASSERT_EQ(Z_TYPE(result), IS_FALSE);
 }
+
+TEST(string, unset) {
+	String s("hello");
+    ASSERT_EQ(s.length(), 5);
+    s.unset();
+    ob_start();
+    s.print();
+    auto rs = ob_get_clean();
+    ASSERT_STREQ(rs.toCString(), "(null)\n");
+}
+
+TEST(string, zval_to_str) {
+	zval v;
+	ZVAL_LONG(&v, 1999);
+	String s(&v);
+    ASSERT_STREQ(s.toCString(), "1999");
+}

@@ -41,7 +41,7 @@ void String::print() const {
     if (str()) {
         php_printf("(string[%zu]) \"%.*s\"\n", length(), (int) length(), data());
     } else {
-        php_printf("(null)");
+        php_printf("(null)\n");
     }
 }
 

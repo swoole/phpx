@@ -159,7 +159,7 @@ void _exec_function(zend_execute_data *data, zval *return_value) {
         func = static_cast<Function *>(fn_reserved[FUNC_RESERVE_INDEX]);
     } else {
         auto iter_func = function_map.find(fn_name);
-        if (iter_func == function_map.end()) {
+        if (UNEXPECTED(iter_func == function_map.end())) {
             error(E_WARNING, "[phpx::_exec_function] function '%s' not found", fn_name);
             return;
         }
@@ -192,12 +192,12 @@ void _exec_method(zend_execute_data *data, zval *return_value) {
         method = static_cast<Method *>(fn_reserved[FUNC_RESERVE_INDEX]);
     } else {
         const auto iter_class = method_map.find(class_name);
-        if (iter_class == method_map.end()) {
+        if (UNEXPECTED(iter_class == method_map.end())) {
             error(E_WARNING, "[phpx::_exec_method] class '%s' not found", class_name);
             return;
         }
         auto iter_method = iter_class->second.find(method_name);
-        if (iter_method == iter_class->second.end()) {
+        if (UNEXPECTED(iter_method == iter_class->second.end())) {
             error(E_WARNING, "[phpx::_exec_method] method '%s' not found", method_name);
             return;
         }
