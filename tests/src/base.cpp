@@ -125,25 +125,23 @@ TEST(base, eval2) {
 }
 
 TEST(base, exception) {
-    zend_try {
-        eval("throw new RuntimeException('phpx exception test');");
-        zend_bailout();
+	bool done = false;
+
+	zend_try {
+        throwException("RuntimeException", "phpx exception test", 1999);
     }
     zend_catch {
         auto e = catchException();
         ASSERT_TRUE(e.getClassName().equals("RuntimeException"));
-#if 0
         auto msg = e.exec("getMessage");
+
         ASSERT_TRUE(msg.isString());
         ASSERT_TRUE(str_contains(msg, "phpx exception test").isTrue());
-        std::cout << "DONE\n";
-#endif
+        done = true;
     }
     zend_end_try();
-}
 
-TEST(base, throwException) {
-    throwException("NotExistsException", "hello world", 19900);
+    ASSERT_TRUE(done);
 }
 
 TEST(base, atoi) {

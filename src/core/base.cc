@@ -106,13 +106,8 @@ void request_shutdown() {
     func_cache_map.clear();
 }
 
-void throwException(const char *name, const char *message, int code) {
-    zend_class_entry *ce = getClassEntry(name);
-    if (ce == nullptr) {
-        php_error_docref(nullptr, E_WARNING, "class '%s' undefined.", name);
-        return;
-    }
-    zend_throw_exception(ce, message, code);
+void throwException(const char *class_name, const char *message, int code) {
+    throwException(newObject(class_name, message, code));
 }
 
 void throwException(const Object &e) {
