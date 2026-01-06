@@ -23,3 +23,9 @@ TEST(helper, to_array) {
     auto a2 = to_array(o);
     ASSERT_EQ(a2.length(), 3);
 }
+
+TEST(helper, instanceOf) {
+    var b = newObject("ArrayObject");
+    ASSERT_FALSE(instanceOf(b, "NotExistsClass"));
+    ASSERT_TRUE(instanceOf(b, "ArrayObject"));
+}

@@ -153,6 +153,13 @@ Variant Variant::getRefValue() const {
     return {&zv};
 }
 
+static zend_long str_offset(zend_string *str, zend_long offset) {
+    if (UNEXPECTED(ZSTR_LEN(str) < ((offset < 0) ? -(size_t) offset : ((size_t) offset + 1)))) {
+        return -1;
+    }
+    return offset < 0 ? (zend_long) ZSTR_LEN(str) + offset : offset;
+}
+
 Variant Variant::offsetGet(zend_long offset) const {
     auto zvar = const_ptr();
     ZVAL_DEREF(zvar);
@@ -161,13 +168,11 @@ Variant Variant::offsetGet(zend_long offset) const {
         return zend_hash_index_find(Z_ARRVAL_P(zvar), offset);
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
         auto str = Z_STR_P(zvar);
-        if (UNEXPECTED(ZSTR_LEN(str) < ((offset < 0) ? -(size_t) offset : ((size_t) offset + 1)))) {
+        auto _offset = str_offset(str, offset);
+        if (UNEXPECTED(_offset == -1)) {
             return Variant{"", 0};
         } else {
-            auto real_offset = (UNEXPECTED(offset < 0)) /* Handle negative offset */
-                                   ? (zend_long) ZSTR_LEN(str) + offset
-                                   : offset;
-            return Variant{ZSTR_VAL(str) + real_offset, 1};
+            return Variant{ZSTR_VAL(str) + _offset, 1};
         }
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
@@ -202,10 +207,7 @@ bool Variant::offsetExists(zend_long offset) const {
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         return zend_hash_index_exists(Z_ARRVAL_P(zvar), offset);
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
-        if (UNEXPECTED(offset < 0)) {
-            offset += (zend_long) Z_STRLEN_P(zvar);
-        }
-        return EXPECTED(offset >= 0) && (size_t) offset < Z_STRLEN_P(zvar);
+        return str_offset(Z_STR_P(zvar), offset) != -1;
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
         return tmp.exec("offsetExists", offset).toBool();
@@ -287,6 +289,14 @@ void Variant::offsetSet(zend_long offset, const Variant &value) {
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
         tmp.exec("offsetSet", offset, value);
+    } else if (Z_TYPE_P(zvar) == IS_STRING) {
+        auto _offset = str_offset(Z_STR_P(zvar), offset);
+        if (offset != -1) {
+            auto wr_str = value.toString();
+            if (wr_str.length() > 0) {
+                Z_STRVAL_P(zvar)[_offset] = wr_str.str()->val[0];
+            }
+        }
     }
 }
 
@@ -307,6 +317,8 @@ void Variant::offsetSet(const Variant &key, const Variant &value) {
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
         tmp.exec("offsetSet", key, value);
+    } else if (Z_TYPE_P(zvar) == IS_STRING) {
+        offsetSet(key.toInt(), value);
     }
 }
 
@@ -708,6 +720,14 @@ Variant Object::exec(const Variant &fn, const std::initializer_list<Variant> &ar
         _args.append(const_cast<Variant &>(arg).ptr());
     }
     return _call(ptr(), fn.const_ptr(), _args);
+}
+
+bool Object::instanceOf(const String &name) const {
+    auto cls_ce = getClassEntry(name);
+    if (!cls_ce) {
+        return false;
+    }
+    return instanceof_function(ce(), cls_ce);
 }
 
 Variant Object::callParentMethod(const String &func, const std::initializer_list<Variant> &args) {

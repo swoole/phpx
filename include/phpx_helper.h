@@ -58,4 +58,8 @@ static inline void echo(int val) {
 static inline Int len(const Variant &v) {
     return v.length();
 }
+
+static inline bool instanceOf(const Object &v, const String &cls) {
+    return v.instanceOf(cls);
+}
 }  // namespace php

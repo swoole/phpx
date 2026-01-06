@@ -181,3 +181,13 @@ TEST(string, zval_to_str) {
     String s(&v);
     ASSERT_STREQ(s.toCString(), "1999");
 }
+
+TEST(string, offsetSet) {
+    String s("hello world");
+    s.offsetSet(0, "H");
+    ASSERT_STREQ(s.offsetGet(0).toCString(), "H");
+
+    var sk = "1";
+    s.offsetSet(sk, "E");
+    ASSERT_STREQ(s.offsetGet(1).toCString(), "E");
+}

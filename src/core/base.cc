@@ -115,6 +115,13 @@ void throwException(const char *name, const char *message, int code) {
     zend_throw_exception(ce, message, code);
 }
 
+void throwException(const Object &e) {
+    auto zv = NO_CONST_V(e);
+    zval_add_ref(zv);
+    EG(exception) = Z_OBJ_P(zv);
+    zend_bailout();
+}
+
 Object catchException() {
     zval zv;
     ZVAL_OBJ(&zv, EG(exception));
