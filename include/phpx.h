@@ -120,7 +120,13 @@ PHPX_API Variant eval(const String &script);
 PHPX_API Variant call(const Variant &func, Args &args);
 PHPX_API Variant call(const Variant &func, Array &args);
 PHPX_API Variant call(const Variant &func, const std::initializer_list<Variant> &args);
+/**
+ * This function is only used to throw exceptions in PHP extensions.
+ */
 PHPX_API void throwException(const char *class_name, const char *message, int code = 0);
+/**
+ * For use only in C/C++ embed environment
+ */
 PHPX_API void throwException(const Object &e);
 PHPX_API Object catchException();
 PHPX_API Variant concat(const Variant &a, const Variant &b);

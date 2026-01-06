@@ -128,7 +128,8 @@ TEST(base, exception) {
 	bool done = false;
 
 	zend_try {
-        throwException("RuntimeException", "phpx exception test", 1999);
+		auto e = newObject("RuntimeException", "phpx exception test", 1999);
+        throwException(e);
     }
     zend_catch {
         auto e = catchException();
