@@ -166,3 +166,17 @@ TEST(object, static_property_error2) {
     var s(r.output);
     ASSERT_TRUE(str_contains(s, "class 'TestClassNotFound' is undefined.").toBool());
 }
+
+TEST(object, to_object) {
+    auto o1 = to_object(1992);
+    ASSERT_EQ(o1.getProperty("scalar").toInt(), 1992);
+
+    Array arr = create_map();
+    auto o2 = to_object(arr);
+    ASSERT_EQ(o2.getProperty("golang").toInt(), 4);
+
+    auto o3 = newObject("ArrayObject");
+    o3.setProperty("value", 1999);
+    auto o4 = to_object(o3);
+    ASSERT_EQ(o4.getProperty("value").toInt(), 1999);
+}

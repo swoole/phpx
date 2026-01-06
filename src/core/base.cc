@@ -107,12 +107,12 @@ void request_shutdown() {
 }
 
 void throwException(const char *class_name, const char *message, int code) {
-	zend_class_entry *ce = getClassEntry(class_name);
-	if (ce == nullptr) {
-		php_error_docref(nullptr, E_WARNING, "class '%s' undefined.", class_name);
-		return;
-	}
-	zend_throw_exception(ce, message, code);
+    zend_class_entry *ce = getClassEntry(class_name);
+    if (ce == nullptr) {
+        php_error_docref(nullptr, E_WARNING, "class '%s' undefined.", class_name);
+        return;
+    }
+    zend_throw_exception(ce, message, code);
 }
 
 void throwException(const Object &e) {
@@ -123,6 +123,9 @@ void throwException(const Object &e) {
 }
 
 Object catchException() {
+    if (!EG(exception)) {
+        return Object{};
+    }
     zval zv;
     ZVAL_OBJ(&zv, EG(exception));
     Variant result{&zv};

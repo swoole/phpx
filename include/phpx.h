@@ -138,6 +138,7 @@ PHPX_API int compare(const Variant &a, const Variant &b);
 
 Int atoi(const String &str);
 Array to_array(const Variant &v);
+Object to_object(const Variant &v);
 Resource *getResource(const std::string &name);
 void request_shutdown();
 

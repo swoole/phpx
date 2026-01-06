@@ -51,6 +51,10 @@ static inline bool to_bool(const Variant &v) {
     return v.toBool();
 }
 
+static inline String to_string(const Variant &v) {
+    return v.toString();
+}
+
 static inline void echo(int val) {
     echo((Int) val);
 }

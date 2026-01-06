@@ -26,7 +26,6 @@ END_EXTERN_C()
 namespace php {
 Variant null = {};
 Int zero = 0L;
-static Variant __construct{ZEND_STRL("__construct"), true};
 
 Variant &Variant::operator=(const zval *v) {
     destroy();
@@ -318,6 +317,9 @@ void Variant::offsetSet(const Variant &key, const Variant &value) {
         Object tmp(zvar);
         tmp.exec("offsetSet", key, value);
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
+        if (key.isNull()) {
+            throwException(newObject("Error", "[] operator not supported for strings"));
+        }
         offsetSet(key.toInt(), value);
     }
 }
@@ -667,95 +669,10 @@ bool Variant::isCallable() {
     return zend_is_callable(ptr(), 0, nullptr);
 }
 
-Object newObject(const char *name) {
-    Object object;
-    zend_class_entry *ce = getClassEntry(name);
-    if (ce == nullptr) {
-        error(E_WARNING, "class '%s' is undefined.", name);
-        return object;
-    }
-    if (object_init_ex(object.ptr(), ce) == FAILURE) {
-        return object;
-    }
-    if (ce->constructor) {
-        _call(object.ptr(), __construct.ptr());
-    }
-    return object;
-}
-
-Object newObject(const char *name, const std::initializer_list<Variant> &args) {
-    Object object;
-    zend_class_entry *ce = getClassEntry(name);
-    if (ce == nullptr) {
-        error(E_WARNING, "class '%s' is undefined.", name);
-        return object;
-    }
-    if (object_init_ex(object.ptr(), ce) == FAILURE) {
-        return object;
-    }
-    Args _args;
-    for (const auto &arg : args) {
-        _args.append(const_cast<Variant &>(arg).ptr());
-    }
-    if (ce->constructor) {
-        object.call(__construct, _args);
-    }
-    return object;
-}
-
 Variant newReference() {
     Variant ref{};
     ZVAL_NEW_EMPTY_REF(ref.ptr());
     ZVAL_NULL(Z_REFVAL_P(ref.ptr()));
     return ref;
-}
-
-String Object::hash() const {
-    return String::from(php_spl_object_hash(object()));
-}
-
-Variant Object::exec(const Variant &fn, const std::initializer_list<Variant> &args) {
-    Args _args;
-    for (const auto &arg : args) {
-        _args.append(const_cast<Variant &>(arg).ptr());
-    }
-    return _call(ptr(), fn.const_ptr(), _args);
-}
-
-bool Object::instanceOf(const String &name) const {
-    auto cls_ce = getClassEntry(name);
-    if (!cls_ce) {
-        return false;
-    }
-    return instanceof_function(ce(), cls_ce);
-}
-
-Variant Object::callParentMethod(const String &func, const std::initializer_list<Variant> &args) {
-    Args _args;
-    for (const auto &arg : args) {
-        _args.append(const_cast<Variant &>(arg).ptr());
-    }
-
-    Variant retval;
-    auto fn = (zend_function *) zend_hash_find_ptr_lc(&parent_ce()->function_table, func.str());
-    if (UNEXPECTED(fn == nullptr)) {
-        /* error at c-level */
-        zend_error_noreturn(
-            E_CORE_ERROR, "Couldn't find implementation for method %s::%s", ZSTR_VAL(parent_ce()->name), func.data());
-    } else {
-        zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), nullptr);
-    }
-    return retval;
-}
-
-Variant Object::get(const String &name) const {
-    return getProperty(name.str());
-}
-
-Object Object::clone() const {
-    const auto new_object = zend_objects_clone_obj(object());
-    Object retval;
-    ZVAL_OBJ(retval.ptr(), new_object);
-    return retval;
 }
 }  // namespace php

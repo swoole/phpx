@@ -125,10 +125,10 @@ TEST(base, eval2) {
 }
 
 TEST(base, exception) {
-	bool done = false;
+    bool done = false;
 
-	zend_try {
-		auto e = newObject("RuntimeException", "phpx exception test", 1999);
+    zend_try {
+        auto e = newObject("RuntimeException", "phpx exception test", 1999);
         throwException(e);
     }
     zend_catch {
@@ -143,6 +143,11 @@ TEST(base, exception) {
     zend_end_try();
 
     ASSERT_TRUE(done);
+}
+
+TEST(base, exception2) {
+    auto e = catchException();
+    ASSERT_TRUE(e.isNull());
 }
 
 TEST(base, atoi) {
