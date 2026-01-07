@@ -27,6 +27,10 @@ static inline bool equals(Float a, Float b) {
     return a == b;
 }
 
+static inline bool equals(Bool a, Bool b) {
+    return a == b;
+}
+
 static inline Int to_int(Int v) {
     return v;
 }

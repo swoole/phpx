@@ -96,6 +96,7 @@ void exit(const Variant &status) {
         zend_print_zval(zv, 0);
         EG(exit_status) = 0;
     }
+    EG(exception) = zend_create_graceful_exit();
     zend_bailout();
 }
 
