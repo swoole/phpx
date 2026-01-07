@@ -51,6 +51,14 @@ static inline bool to_bool(bool v) {
     return v;
 }
 
+static inline bool to_bool(Int v) {
+    return v != 0;
+}
+
+static inline bool to_bool(Float v) {
+    return v != 0;
+}
+
 static inline bool to_bool(const Variant &v) {
     return v.toBool();
 }
@@ -65,6 +73,22 @@ static inline void echo(int val) {
 
 static inline Int len(const Variant &v) {
     return v.length();
+}
+
+static inline Bool empty(Int v) {
+    return v == 0;
+}
+
+static inline Bool empty(Float v) {
+    return v == 0;
+}
+
+static inline Bool empty(Bool v) {
+    return !v;
+}
+
+static inline Bool empty(const Variant &v) {
+    return !v.toBool();
 }
 
 static inline bool instanceOf(const Object &v, const String &cls) {

@@ -21,9 +21,10 @@ BEGIN_EXTERN_C()
 END_EXTERN_C()
 
 namespace php {
-std::map<const char *, std::map<const char *, Method *, StrCmp>, StrCmp> method_map;
-std::map<const char *, Function *, StrCmp> function_map;
-std::map<const char *, zend_fcall_info_cache *, StrCmp> func_cache_map;
+std::unordered_map<std::string, std::map<std::string, Method *>> method_map;
+std::unordered_map<std::string, Function *> function_map;
+
+static zend_array *func_cache_map = nullptr;
 
 void error(int level, const char *format, ...) {
     va_list args;
@@ -101,10 +102,10 @@ void exit(const Variant &status) {
 }
 
 void request_shutdown() {
-    for (auto kv : func_cache_map) {
-        efree(kv.second);
+    if (func_cache_map) {
+        zend_hash_destroy(func_cache_map);
+        pefree(func_cache_map, 1);
     }
-    func_cache_map.clear();
 }
 
 void throwException(const char *class_name, const char *message, int code) {
@@ -235,6 +236,10 @@ void _exec_method(zend_execute_data *data, zval *return_value) {
     retval.moveTo(return_value);
 }
 
+static void free_fci_cache(zval *el) {
+    efree((zend_fcall_info_cache *) Z_PTR_P(el));
+}
+
 static void _call_user_function_impl(
     const zval *zobject, const zval *function_name, zval *retval_ptr, uint32_t param_count, zval params[]) {
     zend_fcall_info fci;
@@ -255,17 +260,20 @@ static void _call_user_function_impl(
     zend_fcall_info_cache *fci_cache = nullptr;
 
     if (Z_TYPE_P(function_name) == IS_STRING && !zobject) {
-        auto iter = func_cache_map.find(Z_STRVAL_P(function_name));
-        if (iter == func_cache_map.end()) {
+        if (UNEXPECTED(func_cache_map == nullptr)) {
+            func_cache_map = (zend_array *) pemalloc(sizeof(zend_array), 1);
+            zend_hash_init(func_cache_map, 0, NULL, free_fci_cache, 0);
+        } else {
+            fci_cache = (zend_fcall_info_cache *) zend_hash_find_ptr(func_cache_map, Z_STR_P(function_name));
+        }
+        if (UNEXPECTED(!fci_cache)) {
             fci_cache = (zend_fcall_info_cache *) emalloc(sizeof(*fci_cache));
             if (zend_is_callable_ex(&fci.function_name, fci.object, 0, NULL, fci_cache, nullptr)) {
-                func_cache_map[Z_STRVAL_P(function_name)] = fci_cache;
+                zend_hash_update_ptr(func_cache_map, Z_STR_P(function_name), fci_cache);
             } else {
                 efree(fci_cache);
                 fci_cache = nullptr;
             }
-        } else {
-            fci_cache = iter->second;
         }
     }
 
@@ -435,5 +443,23 @@ zend_function_entry *copy_function_entries(const zend_function_entry *_functions
         ptr++;
     }
     return functions;
+}
+
+Variant getStaticProperty(const char *class_name, const std::string &prop) {
+    const auto ce = getClassEntry(class_name);
+    if (!ce) {
+        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
+    }
+    return Variant::from(zend_read_static_property(ce, prop.c_str(), prop.length(), true));
+}
+
+bool setStaticProperty(const char *class_name, const std::string &prop, const Variant &v) {
+    const auto ce = getClassEntry(class_name);
+    if (!ce) {
+        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
+    }
+    const auto zv = NO_CONST_V(v);
+    Z_TRY_ADDREF_P(zv);
+    return zend_update_static_property(ce, prop.c_str(), prop.length(), zv) == SUCCESS;
 }
 }  // namespace php

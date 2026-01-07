@@ -135,6 +135,8 @@ PHPX_API void exit(const Variant &status);
 PHPX_API bool same(const Variant &a, const Variant &b);
 PHPX_API bool equals(const Variant &a, const Variant &b);
 PHPX_API int compare(const Variant &a, const Variant &b);
+PHPX_API Variant getStaticProperty(const char *class_name, const std::string &prop);
+PHPX_API bool setStaticProperty(const char *class_name, const std::string &prop, const Variant &value);
 
 Int atoi(const String &str);
 Array to_array(const Variant &v);
@@ -1064,17 +1066,11 @@ typedef void (*resource_dtor)(zend_resource *);
     }                                                                                                                  \
     ZEND_DLEXPORT Extension *get_module()
 
-struct StrCmp {
-    bool operator()(const char *s1, const char *s2) const {
-        return strcmp(s1, s2) < 0;
-    }
-};
-
 class Function;
 class Method;
 
-extern std::map<const char *, std::map<const char *, Method *, StrCmp>, StrCmp> method_map;
-extern std::map<const char *, Function *, StrCmp> function_map;
+extern std::unordered_map<std::string, std::map<std::string, Method *>> method_map;
+extern std::unordered_map<std::string, Function *> function_map;
 
 #define PHPX_FN(n) #n, n
 #define PHPX_ME(c, m) #m, c##_##m
@@ -1201,9 +1197,6 @@ class Class {
     zend_class_entry *ptr() const {
         return ce;
     }
-
-    static Variant getStaticProperty(const char *name, const std::string &prop);
-    static bool setStaticProperty(const char *name, const std::string &prop, const Variant &value);
 
   protected:
     bool activated;

@@ -92,7 +92,7 @@ bool Class::registerFunctions(const zend_function_entry *_functions) {
     zend_function_entry *ptr = functions;
     while (ptr->fname) {
         ptr->handler = _exec_method;
-        auto iter1 = method_map.find(class_name.c_str());
+        auto iter1 = method_map.find(class_name);
         if (iter1 == method_map.end()) {
             return false;
         }
@@ -165,23 +165,5 @@ bool Class::activate() {
     }
     activated = true;
     return true;
-}
-
-Variant Class::getStaticProperty(const char *name, const std::string &prop) {
-    const auto ce = getClassEntry(name);
-    if (!ce) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
-    }
-    return Variant::from(zend_read_static_property(ce, prop.c_str(), prop.length(), true));
-}
-
-bool Class::setStaticProperty(const char *name, const std::string &prop, const Variant &v) {
-    const auto ce = getClassEntry(name);
-    if (!ce) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
-    }
-    const auto zv = NO_CONST_V(v);
-    Z_TRY_ADDREF_P(zv);
-    return zend_update_static_property(ce, prop.c_str(), prop.length(), zv) == SUCCESS;
 }
 }  // namespace php

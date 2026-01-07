@@ -63,10 +63,10 @@ TEST(object, method) {
 
 TEST(object, static_property) {
     include_once(get_include_dir() + "/library.php");
-    ASSERT_EQ(Class::getStaticProperty("TestClass", "propInt").toInt(), 1990018900);
-    ASSERT_STREQ(Class::getStaticProperty("TestClass", "propString").toCString(), "Hello, World!");
-    ASSERT_TRUE(Class::setStaticProperty("TestClass", "propString", "phpx test"));
-    ASSERT_STREQ(Class::getStaticProperty("TestClass", "propString").toCString(), "phpx test");
+    ASSERT_EQ(getStaticProperty("TestClass", "propInt").toInt(), 1990018900);
+    ASSERT_STREQ(getStaticProperty("TestClass", "propString").toCString(), "Hello, World!");
+    ASSERT_TRUE(setStaticProperty("TestClass", "propString", "phpx test"));
+    ASSERT_STREQ(getStaticProperty("TestClass", "propString").toCString(), "phpx test");
 }
 
 TEST(object, call_parent_method) {
@@ -151,7 +151,7 @@ TEST(object, call_parent_method_error) {
 
 TEST(object, static_property_error1) {
     ChildResult r = run_in_child_capture_stdout([]() -> int {
-        Class::getStaticProperty("TestClassNotFound", "propInt");
+        getStaticProperty("TestClassNotFound", "propInt");
         return 0;
     });
     var s(r.output);
@@ -160,7 +160,7 @@ TEST(object, static_property_error1) {
 
 TEST(object, static_property_error2) {
     ChildResult r = run_in_child_capture_stdout([]() -> int {
-        Class::setStaticProperty("TestClassNotFound", "propInt", 1990);
+        setStaticProperty("TestClassNotFound", "propInt", 1990);
         return 0;
     });
     var s(r.output);
