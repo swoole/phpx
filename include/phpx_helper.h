@@ -94,4 +94,16 @@ static inline Bool empty(const Variant &v) {
 static inline bool instanceOf(const Object &v, const String &cls) {
     return v.instanceOf(cls);
 }
+
+static inline Variant silentCall(const Variant &func, const std::initializer_list<Variant> &args) {
+	auto ori_error_reporting = EG(error_reporting);
+	php::call("error_reporting", {E_FATAL_ERRORS});
+	auto rs = call(func, args);
+	php::call("error_reporting", {ori_error_reporting});
+	return rs;
+}
+
+static inline Variant silentCall(const Variant &func) {
+    return silentCall(func, {});
+}
 }  // namespace php
