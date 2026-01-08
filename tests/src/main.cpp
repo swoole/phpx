@@ -45,37 +45,30 @@ string get_include_dir() {
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_void, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
 
-static void php_main() {
-	EG(exit_status) = RUN_ALL_TESTS();
-}
+static int gtest_exit_status = 0;
 
-static void throw_exception(zend_object *ex) {
-    zend_bailout();
+static void php_main() {
+    gtest_exit_status = RUN_ALL_TESTS();
 }
 
 static ZEND_FUNCTION(main) {
-	php_main();
+    php_main();
 }
 
-static const zend_function_entry ext_functions[] = {
-	ZEND_FE(main, arginfo_void)
-	ZEND_FE_END
-};
+static const zend_function_entry ext_functions[] = {ZEND_FE(main, arginfo_void) ZEND_FE_END};
 
 int main(int argc, char **argv) {
     php_embed_init(argc, argv);
-    zend_throw_exception_hook = throw_exception;
-	zend_register_functions(nullptr, ext_functions, nullptr, 0);
+    zend_register_functions(nullptr, ext_functions, nullptr, 0);
 
     init_root_path(argv[0]);
     ::testing::InitGoogleTest(&argc, argv);
 
-    int rc;
     zend_first_try {
         php::eval("main();");
     }
     zend_catch {
-        rc = EG(exit_status);
+        EG(exit_status);
         if (EG(exception)) {
             zend_exception_error(EG(exception), E_ERROR);
         }
@@ -85,7 +78,7 @@ int main(int argc, char **argv) {
     php::request_shutdown();
     php_embed_shutdown();
 
-    return rc;
+    return gtest_exit_status;
 }
 
 php::Array create_map() {
