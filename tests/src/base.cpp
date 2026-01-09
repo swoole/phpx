@@ -197,6 +197,8 @@ TEST(base, exit) {
     }
     zend_catch {
         count++;
+        auto e = catchException();
+        ASSERT_TRUE(zend_is_graceful_exit(e.object()));
     }
     zend_end_try();
     ASSERT_EQ(EG(exit_status), 250);
@@ -208,9 +210,12 @@ TEST(base, exit2) {
     zend_first_try {
         ::usleep(100000);
         php::exit("hello world\n");
+        catchException();
     }
     zend_catch {
         count++;
+        auto e = catchException();
+        ASSERT_TRUE(zend_is_graceful_exit(e.object()));
     }
     zend_end_try();
     ASSERT_EQ(EG(exit_status), 0);

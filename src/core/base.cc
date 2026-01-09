@@ -98,6 +98,10 @@ void exit(const Variant &status) {
         EG(exit_status) = 0;
     }
     EG(exception) = zend_create_graceful_exit();
+    if (EG(current_execute_data)) {
+        EG(opline_before_exception) = EG(current_execute_data)->opline;
+    	EG(current_execute_data)->opline = EG(exception_op);
+    }
     zend_bailout();
 }
 

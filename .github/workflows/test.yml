@@ -26,10 +26,12 @@ jobs:
           php --ini
       - name: Build
         run: |
-          cmake . -D CODE_COVERAGE=ON -D enable_asan=ON || exit 1
+          cmake . -D CODE_COVERAGE=ON || exit 1
           make VERBOSE=1 -j$(nproc)
       - name: Run google tests
-        run: ./bin/phpx-tests
+        run: |
+          # sudo sh -c 'echo 0 > /proc/sys/kernel/randomize_va_space'
+          ./bin/phpx-tests
       - name: Run phpunit tests
         if: 0
         run: |

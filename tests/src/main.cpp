@@ -71,6 +71,7 @@ int main(int argc, char **argv) {
         EG(exit_status);
         if (EG(exception)) {
             zend_exception_error(EG(exception), E_ERROR);
+            zend_clear_exception();
         }
     }
     zend_end_try();
