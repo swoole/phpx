@@ -33,7 +33,6 @@ jobs:
           # sudo sh -c 'echo 0 > /proc/sys/kernel/randomize_va_space'
           ./bin/phpx-tests
       - name: Run phpunit tests
-        if: 0
         run: |
           composer install
           sudo cp lib/libext.so $(php-config --extension-dir)/phpx_test.so
