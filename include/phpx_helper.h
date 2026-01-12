@@ -27,10 +27,6 @@ static inline bool equals(Float a, Float b) {
     return a == b;
 }
 
-static inline bool equals(Bool a, Bool b) {
-    return a == b;
-}
-
 static inline Int to_int(Int v) {
     return v;
 }
@@ -49,14 +45,6 @@ static inline Float to_float(const Variant &v) {
 
 static inline bool to_bool(bool v) {
     return v;
-}
-
-static inline bool to_bool(Int v) {
-    return v != 0;
-}
-
-static inline bool to_bool(Float v) {
-    return v != 0;
 }
 
 static inline bool to_bool(const Variant &v) {
