@@ -35,6 +35,10 @@ static inline Int to_int(const Variant &v) {
     return v.toInt();
 }
 
+static inline Int to_int(zval *zv) {
+    return zval_get_long(zv);
+}
+
 static inline Float to_float(Float v) {
     return v;
 }
@@ -43,12 +47,20 @@ static inline Float to_float(const Variant &v) {
     return v.toFloat();
 }
 
+static inline Float to_float(zval *zv) {
+    return zval_get_double(zv);
+}
+
 static inline bool to_bool(bool v) {
     return v;
 }
 
 static inline bool to_bool(const Variant &v) {
     return v.toBool();
+}
+
+static inline bool to_bool(zval *zv) {
+    return zend_is_true(zv);
 }
 
 static inline String to_string(const Variant &v) {
@@ -77,6 +89,22 @@ static inline Bool empty(Bool v) {
 
 static inline Bool empty(const Variant &v) {
     return !v.toBool();
+}
+
+static inline void move(Int v, zval *retval) {
+    ZVAL_LONG(retval, v);
+}
+
+static inline void move(Float v, zval *retval) {
+    ZVAL_DOUBLE(retval, v);
+}
+
+static inline void move(Bool v, zval *retval) {
+    ZVAL_BOOL(retval, v);
+}
+
+static inline void move(Variant &v, zval *retval) {
+    v.moveTo(retval);
 }
 
 static inline bool instanceOf(const Object &v, const String &cls) {

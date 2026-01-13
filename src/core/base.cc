@@ -449,21 +449,29 @@ zend_function_entry *copy_function_entries(const zend_function_entry *_functions
     return functions;
 }
 
-Variant getStaticProperty(const char *class_name, const std::string &prop) {
+Variant getStaticProperty(const char *class_name, const String &prop) {
     const auto ce = getClassEntry(class_name);
     if (!ce) {
         zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
     }
-    return Variant::from(zend_read_static_property(ce, prop.c_str(), prop.length(), true));
+    return Variant::from(zend_read_static_property_ex(ce, prop.str(), true));
 }
 
-bool setStaticProperty(const char *class_name, const std::string &prop, const Variant &v) {
+bool hasStaticProperty(const char *class_name, const String &prop) {
+    const auto ce = getClassEntry(class_name);
+    if (!ce) {
+        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
+    }
+	return zend_hash_exists(&ce->properties_info, prop.str());
+}
+
+bool setStaticProperty(const char *class_name, const String &prop, const Variant &v) {
     const auto ce = getClassEntry(class_name);
     if (!ce) {
         zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
     }
     const auto zv = NO_CONST_V(v);
     Z_TRY_ADDREF_P(zv);
-    return zend_update_static_property(ce, prop.c_str(), prop.length(), zv) == SUCCESS;
+    return zend_update_static_property_ex(ce, prop.str(), zv) == SUCCESS;
 }
 }  // namespace php

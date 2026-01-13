@@ -135,8 +135,9 @@ PHPX_API void exit(const Variant &status);
 PHPX_API bool same(const Variant &a, const Variant &b);
 PHPX_API bool equals(const Variant &a, const Variant &b);
 PHPX_API int compare(const Variant &a, const Variant &b);
-PHPX_API Variant getStaticProperty(const char *class_name, const std::string &prop);
-PHPX_API bool setStaticProperty(const char *class_name, const std::string &prop, const Variant &value);
+PHPX_API Variant getStaticProperty(const char *class_name, const String &prop);
+PHPX_API bool setStaticProperty(const char *class_name, const String &prop, const Variant &value);
+PHPX_API bool hasStaticProperty(const char *class_name, const String &prop);
 
 Int atoi(const String &str);
 Array to_array(const Variant &v);
