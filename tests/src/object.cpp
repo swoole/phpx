@@ -182,22 +182,22 @@ TEST(object, to_object) {
 }
 
 TEST(object, getPropertyReference) {
-	auto o1 = newObject("stdClass");
-	o1.set("prop1", 1990);
+    auto o1 = newObject("stdClass");
+    o1.set("prop1", 1990);
 
-	auto prop1 = o1.getPropertyReference("prop1");
-	auto str = "first=value&arr[]=foo+bar&arr[]=baz";
+    auto prop1 = o1.getPropertyReference("prop1");
+    auto str = "first=value&arr[]=foo+bar&arr[]=baz";
 
-	parse_str(str, prop1);
+    parse_str(str, prop1);
 
-	auto v = prop1.getRefValue();
+    auto v = prop1.getRefValue();
 
-	ASSERT_TRUE(v.isArray());
-	ASSERT_STREQ(v.offsetGet("first").toCString(), "value");
+    ASSERT_TRUE(v.isArray());
+    ASSERT_STREQ(v.offsetGet("first").toCString(), "value");
 
-	prop1.unset();
+    prop1.unset();
 
-	auto v2 = o1.get("prop1");
-	ASSERT_TRUE(v2.isArray());
-	ASSERT_STREQ(v2.offsetGet("first").toCString(), "value");
+    auto v2 = o1.get("prop1");
+    ASSERT_TRUE(v2.isArray());
+    ASSERT_STREQ(v2.offsetGet("first").toCString(), "value");
 }
