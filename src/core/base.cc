@@ -23,6 +23,7 @@ END_EXTERN_C()
 namespace php {
 std::unordered_map<std::string, std::map<std::string, Method *>> method_map;
 std::unordered_map<std::string, Function *> function_map;
+std::unordered_map<std::string, zval> global_vars;
 
 static zend_array *func_cache_map = nullptr;
 
@@ -109,6 +110,9 @@ void request_shutdown() {
     if (func_cache_map) {
         zend_hash_destroy(func_cache_map);
         pefree(func_cache_map, 1);
+    }
+    for (auto kv : global_vars) {
+        zval_ptr_dtor(&kv.second);
     }
 }
 
@@ -462,7 +466,7 @@ bool hasStaticProperty(const char *class_name, const String &prop) {
     if (!ce) {
         zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
     }
-	return zend_hash_exists(&ce->properties_info, prop.str());
+    return zend_hash_exists(&ce->properties_info, prop.str());
 }
 
 bool setStaticProperty(const char *class_name, const String &prop, const Variant &v) {

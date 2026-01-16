@@ -356,6 +356,8 @@ Variant Variant::getProperty(zend_string *prop_name) const {
     zval rv;
     Variant retval;
     zval *member_p = zend_read_property_ex(ce(), object(), prop_name, false, &rv);
+    ZVAL_DEREF(member_p);
+
     if (member_p != &rv) {
         ZVAL_COPY(retval.ptr(), member_p);
     } else {

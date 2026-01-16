@@ -221,3 +221,13 @@ TEST(base, exit2) {
     ASSERT_EQ(EG(exit_status), 0);
     ASSERT_EQ(count, 2);
 }
+
+TEST(base, getInternalException) {
+    auto ce1 = php::getClassEntry("Iterator");
+    ASSERT_NE(ce1, nullptr);
+    ASSERT_STREQ(ce1->name->val, "Iterator");
+
+    auto ce2 = php::getClassEntry("IteratorAggregate");
+    ASSERT_NE(ce2, nullptr);
+    ASSERT_STREQ(ce2->name->val, "IteratorAggregate");
+}

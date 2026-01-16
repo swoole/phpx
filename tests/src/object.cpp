@@ -180,3 +180,24 @@ TEST(object, to_object) {
     auto o4 = to_object(o3);
     ASSERT_EQ(o4.getProperty("value").toInt(), 1999);
 }
+
+TEST(object, getPropertyReference) {
+	auto o1 = newObject("stdClass");
+	o1.set("prop1", 1990);
+
+	auto prop1 = o1.getPropertyReference("prop1");
+	auto str = "first=value&arr[]=foo+bar&arr[]=baz";
+
+	parse_str(str, prop1);
+
+	auto v = prop1.getRefValue();
+
+	ASSERT_TRUE(v.isArray());
+	ASSERT_STREQ(v.offsetGet("first").toCString(), "value");
+
+	prop1.unset();
+
+	var_dump(o1.get("prop1"));
+//
+//	var_dump(o1.get("prop1"));
+}

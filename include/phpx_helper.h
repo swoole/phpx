@@ -17,6 +17,7 @@
 #pragma once
 
 #include "phpx.h"
+#include "phpx_scope_guard.h"
 
 namespace php {
 static inline bool equals(Int a, Int b) {

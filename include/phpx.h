@@ -288,13 +288,16 @@ class Variant {
         zval_ptr_dtor(v);
         return retval;
     }
-    zend_array *array() const {
+    PHPX_UNSAFE zend_array *array() const {
         return Z_ARRVAL_P(&val);
     }
-    zend_class_entry *ce() const {
+    PHPX_UNSAFE zend_reference *reference() const {
+        return Z_REF_P(&val);
+    }
+    PHPX_UNSAFE zend_class_entry *ce() const {
         return Z_OBJCE_P(&val);
     }
-    zend_object *object() const {
+    PHPX_UNSAFE zend_object *object() const {
         return Z_OBJ_P(&val);
     }
     const zval *const_ptr() const {
@@ -962,11 +965,15 @@ class Object : public Variant {
     zend_class_entry *parent_ce() {
         return Z_OBJCE_P(ptr())->parent;
     }
+    Variant callParentMethod(const String &func) {
+        return callParentMethod(func, {});
+    }
     Variant callParentMethod(const String &func, const std::initializer_list<Variant> &args);
     Variant exec(const Variant &fn) {
         return _call(ptr(), fn.const_ptr());
     }
     Variant exec(const Variant &fn, const std::initializer_list<Variant> &args);
+    Variant getPropertyReference(const String &name);
 
     /* generator */
     Variant exec(const Variant &fn, const Variant &v1);
@@ -1072,6 +1079,7 @@ class Method;
 
 extern std::unordered_map<std::string, std::map<std::string, Method *>> method_map;
 extern std::unordered_map<std::string, Function *> function_map;
+extern std::unordered_map<std::string, zval> global_vars;
 
 #define PHPX_FN(n) #n, n
 #define PHPX_ME(c, m) #m, c##_##m
