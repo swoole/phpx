@@ -56,9 +56,15 @@ Variant Object::callParentMethod(const String &func, const std::initializer_list
         /* error at c-level */
         zend_error_noreturn(
             E_CORE_ERROR, "Couldn't find implementation for method %s::%s", ZSTR_VAL(parent_ce()->name), func.data());
+    } else if (UNEXPECTED(fn->common.fn_flags & ZEND_ACC_ABSTRACT)) {
+        zend_throw_error(NULL,
+                         "Cannot call abstract method %s::%s()",
+                         ZSTR_VAL(fn->common.scope->name),
+                         ZSTR_VAL(fn->common.function_name));
     } else {
         zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), nullptr);
     }
+
     return retval;
 }
 
