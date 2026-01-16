@@ -197,7 +197,7 @@ TEST(object, getPropertyReference) {
 
 	prop1.unset();
 
-	var_dump(o1.get("prop1"));
-//
-//	var_dump(o1.get("prop1"));
+	auto v2 = o1.get("prop1");
+	ASSERT_TRUE(v2.isArray());
+	ASSERT_STREQ(v2.offsetGet("first").toCString(), "value");
 }
