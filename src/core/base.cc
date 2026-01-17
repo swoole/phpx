@@ -245,7 +245,21 @@ void _exec_method(zend_execute_data *data, zval *return_value) {
 }
 
 static void free_fci_cache(zval *el) {
-    efree((zend_fcall_info_cache *) Z_PTR_P(el));
+    pefree((zend_fcall_info_cache *) Z_PTR_P(el), 1);
+}
+
+static bool is_callable_ex(zval *callable, zend_object *object, uint32_t check_flags, zend_string **callable_name, zend_fcall_info_cache *fcc, char **error) /* {{{ */
+{
+	zend_execute_data *frame = EG(current_execute_data);
+	while (frame && !frame->func) {
+		frame = frame->prev_execute_data;
+	}
+
+	bool ret = zend_is_callable_at_frame(callable, object, frame, check_flags, fcc, error);
+	if (callable_name) {
+		*callable_name = zend_get_callable_name_ex(callable, object);
+	}
+	return ret;
 }
 
 static void _call_user_function_impl(
@@ -265,27 +279,39 @@ static void _call_user_function_impl(
     fci.params = params;
     fci.named_params = nullptr;
 
-    zend_fcall_info_cache *fci_cache = nullptr;
+    zend_fcall_info_cache fcc;
+    zend_fcall_info_cache *fci_cache;
+    bool with_cache = Z_TYPE_P(function_name) == IS_STRING && !zobject;
+    char *error = NULL;
 
-    if (Z_TYPE_P(function_name) == IS_STRING && !zobject) {
+    if (with_cache) {
         if (UNEXPECTED(func_cache_map == nullptr)) {
             func_cache_map = (zend_array *) pemalloc(sizeof(zend_array), 1);
             zend_hash_init(func_cache_map, 0, NULL, free_fci_cache, 0);
         } else {
             fci_cache = (zend_fcall_info_cache *) zend_hash_find_ptr(func_cache_map, Z_STR_P(function_name));
-        }
-        if (UNEXPECTED(!fci_cache)) {
-            fci_cache = (zend_fcall_info_cache *) emalloc(sizeof(*fci_cache));
-            if (zend_is_callable_ex(&fci.function_name, fci.object, 0, NULL, fci_cache, nullptr)) {
-                zend_hash_update_ptr(func_cache_map, Z_STR_P(function_name), fci_cache);
-            } else {
-                efree(fci_cache);
-                fci_cache = nullptr;
+            if (fci_cache) {
+            	goto _do_call;
             }
         }
     }
 
-    zend_call_function(&fci, fci_cache);
+    if (!is_callable_ex(&fci.function_name, fci.object, 0, NULL, &fcc, &error)) {
+		ZEND_ASSERT(error && "Should have error if not callable");
+		auto callable_name = zend_get_callable_name_ex(&fci.function_name, fci.object);
+		zend_throw_error(NULL, "Invalid callback %s, %s", ZSTR_VAL(callable_name), error);
+		efree(error);
+		zend_string_release_ex(callable_name, 0);
+	} else {
+		fci_cache = &fcc;
+		if (with_cache) {
+			auto _cache = (zend_fcall_info_cache*) pemalloc(sizeof(fcc), 1);
+			*_cache = fcc;
+			zend_hash_update_ptr(func_cache_map, Z_STR_P(function_name), _cache);
+		}
+		_do_call:
+	    zend_call_function(&fci, fci_cache);
+	}
 }
 
 Variant _call(const zval *object, const zval *func, Args &args) {
@@ -361,7 +387,7 @@ static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_
         zend_string_release_ex(resolved_path, false);
     } break;
     case ZEND_EVAL: {
-        char *eval_desc = zend_make_compiled_string_description("eval()'d code");
+        char *eval_desc = zend_make_compiled_string_description("eval()");
 #if PHP_VERSION_ID < 80200
         new_op_array = zend_compile_string(inc_filename, eval_desc);
 #else
