@@ -260,37 +260,37 @@ class Variant {
     }
     Variant &operator=(int v) {
         destroy();
-        ZVAL_LONG(ptr(), (long) v);
+        ZVAL_LONG(unwrap_ptr(), (long) v);
         return *this;
     }
     Variant &operator=(long v) {
         destroy();
-        ZVAL_LONG(ptr(), v);
+        ZVAL_LONG(unwrap_ptr(), v);
         return *this;
     }
     Variant &operator=(const std::string &str) {
         destroy();
-        ZVAL_STRINGL(ptr(), str.c_str(), str.length());
+        ZVAL_STRINGL(unwrap_ptr(), str.c_str(), str.length());
         return *this;
     }
     Variant &operator=(const char *str) {
         destroy();
-        ZVAL_STRING(ptr(), str);
+        ZVAL_STRING(unwrap_ptr(), str);
         return *this;
     }
     Variant &operator=(double v) {
         destroy();
-        ZVAL_DOUBLE(ptr(), v);
+        ZVAL_DOUBLE(unwrap_ptr(), v);
         return *this;
     }
     Variant &operator=(bool v) {
         destroy();
-        ZVAL_BOOL(ptr(), v);
+        ZVAL_BOOL(unwrap_ptr(), v);
         return *this;
     }
     Variant &operator=(zend_string *v) {
         destroy();
-        ZVAL_STR(ptr(), zend_string_copy(v));
+        ZVAL_STR(unwrap_ptr(), zend_string_copy(v));
         return *this;
     }
     Variant &operator=(const zval *v);
@@ -298,12 +298,12 @@ class Variant {
     Variant &operator=(const Variant *v);
     Variant &operator=(nullptr_t) {
         destroy();
-        ZVAL_NULL(&val);
+        ZVAL_NULL(unwrap_ptr());
         return *this;
     }
     void unset() {
         destroy();
-        val = {};
+        ZVAL_UNDEF(unwrap_ptr());
     }
     zval *ptr() {
         return &val;
