@@ -29,8 +29,7 @@ Int zero = 0L;
 
 Variant &Variant::operator=(const zval *v) {
     destroy();
-    *unwrap_ptr() = *v;
-    addRef();
+    ZVAL_COPY(unwrap_ptr(), unwrap_zval(v));
     return *this;
 }
 
@@ -39,8 +38,7 @@ Variant &Variant::operator=(const Variant &v) {
         return *this;
     }
     destroy();
-    ZVAL_COPY_VALUE(unwrap_ptr(), v.unwrap_ptr());
-    addRef();
+    ZVAL_COPY(unwrap_ptr(), v.unwrap_ptr());
     return *this;
 }
 
