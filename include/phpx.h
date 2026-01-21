@@ -57,8 +57,9 @@ extern "C" {
  * Many function parameters are read-only zvals, and the const modifier should be added.
  * However, the php code does not do this, resulting in C++ code unable to implement safe const functions.
  */
-#define NO_CONST_V(_v) const_cast<zval *>(_v.const_ptr())
+#define NO_CONST_V(_v) const_cast<zval *>(_v.unwrap_ptr())
 #define NO_CONST_Z(_z) const_cast<zval *>(_z)
+#define NO_CONST_UNWRAP_Z(_z) const_cast<zval *>(unwrap_zval(_z))
 
 namespace php {
 typedef unsigned char uchar;

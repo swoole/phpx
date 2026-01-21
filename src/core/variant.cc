@@ -363,13 +363,13 @@ void Variant::unsetProperty(const Variant &name) {
  */
 static inline bool compare_op(const binary_op_type op, const zval *op1, const zval *op2) {
     zval result;
-    op(&result, NO_CONST_Z(op1), NO_CONST_Z(op2));
+    op(&result, NO_CONST_UNWRAP_Z(op1), NO_CONST_UNWRAP_Z(op2));
     return Z_TYPE(result) == IS_TRUE;
 }
 
 static inline Variant calc_op(const binary_op_type op, const zval *op1, const zval *op2) {
     Variant result;
-    op(result.ptr(), NO_CONST_Z(op1), NO_CONST_Z(op2));
+    op(result.ptr(), NO_CONST_UNWRAP_Z(op1), NO_CONST_UNWRAP_Z(op2));
     return result;
 }
 
@@ -383,9 +383,9 @@ static zend_result ZEND_FASTCALL is_greater_or_equal_function(zval *result, zval
 
 bool Variant::equals(const Variant &v, bool strict) const {
     if (strict) {
-        return compare_op(is_identical_function, unwrap_ptr(), v.unwrap_ptr());
+        return compare_op(is_identical_function, const_ptr(), v.const_ptr());
     } else {
-        return compare_op(is_equal_function, unwrap_ptr(), v.unwrap_ptr());
+        return compare_op(is_equal_function, const_ptr(), v.const_ptr());
     }
 }
 
@@ -481,55 +481,55 @@ Variant Variant::operator-(const Variant &v) const {
 }
 
 Variant Variant::operator*(const Variant &v) const {
-    return calc_op(mul_function, unwrap_ptr(), v.unwrap_ptr());
+    return calc_op(mul_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator/(const Variant &v) const {
-    return calc_op(div_function, unwrap_ptr(), v.unwrap_ptr());
+    return calc_op(div_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator%(const Variant &v) const {
-    return calc_op(mod_function, unwrap_ptr(), v.unwrap_ptr());
+    return calc_op(mod_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator<<(const Variant &v) const {
-    return calc_op(shift_left_function, unwrap_ptr(), v.unwrap_ptr());
+    return calc_op(shift_left_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator>>(const Variant &v) const {
-    return calc_op(shift_right_function, unwrap_ptr(), v.unwrap_ptr());
+    return calc_op(shift_right_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator&(const Variant &v) const {
-    return calc_op(bitwise_and_function, unwrap_ptr(), v.unwrap_ptr());
+    return calc_op(bitwise_and_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator|(const Variant &v) const {
-    return calc_op(bitwise_or_function, unwrap_ptr(), v.unwrap_ptr());
+    return calc_op(bitwise_or_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator^(const Variant &v) const {
-    return calc_op(bitwise_xor_function, unwrap_ptr(), v.unwrap_ptr());
+    return calc_op(bitwise_xor_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator~() const {
     Variant result{};
-    bitwise_not_function(result.unwrap_ptr(), NO_CONST_Z(unwrap_ptr()));
+    bitwise_not_function(result.ptr(), NO_CONST_Z(unwrap_ptr()));
     return result;
 }
 
 Variant Variant::operator-() const {
     zval tmp;
     ZVAL_LONG(&tmp, -1);
-    return calc_op(mul_function, unwrap_ptr(), &tmp);
+    return calc_op(mul_function, const_ptr(), &tmp);
 }
 
 Variant Variant::pow(const Variant &v) const {
-    return calc_op(pow_function, unwrap_ptr(), v.unwrap_ptr());
+    return calc_op(pow_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::concat(const Variant &v) const {
-    return calc_op(concat_function, unwrap_ptr(), v.unwrap_ptr());
+    return calc_op(concat_function, const_ptr(), v.const_ptr());
 }
 
 void Variant::append(const Variant &v) {
@@ -549,19 +549,19 @@ void Variant::append(const Variant &v) {
 }
 
 bool Variant::operator<(const Variant &v) const {
-    return compare_op(is_smaller_function, unwrap_ptr(), v.unwrap_ptr());
+    return compare_op(is_smaller_function, const_ptr(), v.const_ptr());
 }
 
 bool Variant::operator<=(const Variant &v) const {
-    return compare_op(is_smaller_or_equal_function, unwrap_ptr(), v.unwrap_ptr());
+    return compare_op(is_smaller_or_equal_function, const_ptr(), v.const_ptr());
 }
 
 bool Variant::operator>(const Variant &v) const {
-    return compare_op(is_greater_function, unwrap_ptr(), v.unwrap_ptr());
+    return compare_op(is_greater_function, const_ptr(), v.const_ptr());
 }
 
 bool Variant::operator>=(const Variant &v) const {
-    return compare_op(is_greater_or_equal_function, unwrap_ptr(), v.unwrap_ptr());
+    return compare_op(is_greater_or_equal_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator()() const {
