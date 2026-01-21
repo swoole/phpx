@@ -29,7 +29,7 @@ Int zero = 0L;
 
 Variant &Variant::operator=(const zval *v) {
     destroy();
-    val = *v;
+    *unwrap_ptr() = *v;
     addRef();
     return *this;
 }
@@ -39,7 +39,7 @@ Variant &Variant::operator=(const Variant &v) {
         return *this;
     }
     destroy();
-    ZVAL_COPY_VALUE(ptr(), v.const_ptr());
+    ZVAL_COPY_VALUE(unwrap_ptr(), v.unwrap_ptr());
     addRef();
     return *this;
 }
@@ -82,12 +82,13 @@ size_t Variant::length() const {
 }
 
 bool Variant::isNumeric() const {
-    switch (type()) {
+	auto zv = unwrap_ptr();
+    switch (Z_TYPE_P(zv)) {
     case IS_LONG:
     case IS_DOUBLE:
         return true;
     case IS_STRING:
-        return is_numeric_string(Z_STRVAL(val), Z_STRLEN(val), nullptr, nullptr, false);
+        return is_numeric_string(Z_STRVAL_P(zv), Z_STRLEN_P(zv), nullptr, nullptr, false);
     default:
         return false;
     }
@@ -129,13 +130,19 @@ void Variant::debug() {
 }
 #else
 void Variant::debug() {
-    php_debug_zval_dump(ptr(), 10);
+    php_debug_zval_dump(unwrap_ptr(), 10);
 }
 #endif
 
+void Variant::print() {
+    php_var_dump(unwrap_ptr(), 10);
+}
+
 int Variant::getRefCount() const {
-    if (Z_REFCOUNTED_P(const_ptr())) {
-        return Z_REFCOUNT_P(const_ptr());
+	auto zv = const_ptr();
+	ZVAL_DEINDIRECT(zv);
+    if (Z_REFCOUNTED_P(zv)) {
+        return Z_REFCOUNT_P(zv);
     }
     return 0;
 }
@@ -365,9 +372,9 @@ static zend_result ZEND_FASTCALL is_greater_or_equal_function(zval *result, zval
 
 bool Variant::equals(const Variant &v, bool strict) const {
     if (strict) {
-        return compare_op(is_identical_function, const_ptr(), v.const_ptr());
+        return compare_op(is_identical_function, unwrap_ptr(), v.unwrap_ptr());
     } else {
-        return compare_op(is_equal_function, const_ptr(), v.const_ptr());
+        return compare_op(is_equal_function, unwrap_ptr(), v.unwrap_ptr());
     }
 }
 
@@ -375,7 +382,7 @@ Variant Variant::serialize() {
     smart_str serialized_data = {};
     php_serialize_data_t var_hash;
     PHP_VAR_SERIALIZE_INIT(var_hash);
-    php_var_serialize(&serialized_data, ptr(), &var_hash);
+    php_var_serialize(&serialized_data, unwrap_ptr(), &var_hash);
     PHP_VAR_SERIALIZE_DESTROY(var_hash);
     Variant retval(serialized_data.s->val, serialized_data.s->len);
     smart_str_free(&serialized_data);
@@ -383,74 +390,74 @@ Variant Variant::serialize() {
 }
 
 Variant &Variant::operator++() {
-    increment_function(ptr());
+    increment_function(unwrap_ptr());
     return *this;
 }
 
 Variant &Variant::operator--() {
-    decrement_function(ptr());
+    decrement_function(unwrap_ptr());
     return *this;
 }
 
 Variant Variant::operator++(int) {
     auto original = *this;
-    increment_function(ptr());
+    increment_function(unwrap_ptr());
     return original;
 }
 
 Variant Variant::operator--(int) {
     auto original = *this;
-    decrement_function(ptr());
+    decrement_function(unwrap_ptr());
     return original;
 }
 
 Variant &Variant::operator+=(const Variant &v) {
-    add_function(ptr(), ptr(), NO_CONST_V(v));
+    add_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
     return *this;
 }
 
 Variant &Variant::operator-=(const Variant &v) {
-    sub_function(ptr(), ptr(), NO_CONST_V(v));
+    sub_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
     return *this;
 }
 
 Variant &Variant::operator/=(const Variant &v) {
-    div_function(ptr(), ptr(), NO_CONST_V(v));
+    div_function(ptr(), unwrap_ptr(), NO_CONST_V(v));
     return *this;
 }
 
 Variant &Variant::operator*=(const Variant &v) {
-    mul_function(ptr(), ptr(), NO_CONST_V(v));
+    mul_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
     return *this;
 }
 
 Variant &Variant::operator%=(const Variant &v) {
-    mod_function(ptr(), ptr(), NO_CONST_V(v));
+    mod_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
     return *this;
 }
 
 Variant &Variant::operator<<=(const Variant &v) {
-    shift_left_function(ptr(), ptr(), NO_CONST_V(v));
+    shift_left_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
     return *this;
 }
 
 Variant &Variant::operator>>=(const Variant &v) {
-    shift_right_function(ptr(), ptr(), NO_CONST_V(v));
+    shift_right_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
     return *this;
 }
 
 Variant &Variant::operator&=(const Variant &v) {
-    bitwise_and_function(ptr(), ptr(), NO_CONST_V(v));
+    bitwise_and_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
     return *this;
 }
 
 Variant &Variant::operator|=(const Variant &v) {
-    bitwise_or_function(ptr(), ptr(), NO_CONST_V(v));
+    bitwise_or_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
     return *this;
 }
 
 Variant &Variant::operator^=(const Variant &v) {
-    bitwise_xor_function(ptr(), ptr(), NO_CONST_V(v));
+    bitwise_xor_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
     return *this;
 }
 
@@ -463,87 +470,88 @@ Variant Variant::operator-(const Variant &v) const {
 }
 
 Variant Variant::operator*(const Variant &v) const {
-    return calc_op(mul_function, const_ptr(), v.const_ptr());
+    return calc_op(mul_function, unwrap_ptr(), v.unwrap_ptr());
 }
 
 Variant Variant::operator/(const Variant &v) const {
-    return calc_op(div_function, const_ptr(), v.const_ptr());
+    return calc_op(div_function, unwrap_ptr(), v.unwrap_ptr());
 }
 
 Variant Variant::operator%(const Variant &v) const {
-    return calc_op(mod_function, const_ptr(), v.const_ptr());
+    return calc_op(mod_function, unwrap_ptr(), v.unwrap_ptr());
 }
 
 Variant Variant::operator<<(const Variant &v) const {
-    return calc_op(shift_left_function, const_ptr(), v.const_ptr());
+    return calc_op(shift_left_function, unwrap_ptr(), v.unwrap_ptr());
 }
 
 Variant Variant::operator>>(const Variant &v) const {
-    return calc_op(shift_right_function, const_ptr(), v.const_ptr());
+    return calc_op(shift_right_function, unwrap_ptr(), v.unwrap_ptr());
 }
 
 Variant Variant::operator&(const Variant &v) const {
-    return calc_op(bitwise_and_function, const_ptr(), v.const_ptr());
+    return calc_op(bitwise_and_function, unwrap_ptr(), v.unwrap_ptr());
 }
 
 Variant Variant::operator|(const Variant &v) const {
-    return calc_op(bitwise_or_function, const_ptr(), v.const_ptr());
+    return calc_op(bitwise_or_function, unwrap_ptr(), v.unwrap_ptr());
 }
 
 Variant Variant::operator^(const Variant &v) const {
-    return calc_op(bitwise_xor_function, const_ptr(), v.const_ptr());
+    return calc_op(bitwise_xor_function, unwrap_ptr(), v.unwrap_ptr());
 }
 
 Variant Variant::operator~() const {
     Variant result{};
-    bitwise_not_function(result.ptr(), NO_CONST_Z(const_ptr()));
+    bitwise_not_function(result.unwrap_ptr(), NO_CONST_Z(unwrap_ptr()));
     return result;
 }
 
 Variant Variant::operator-() const {
     zval tmp;
     ZVAL_LONG(&tmp, -1);
-    return calc_op(mul_function, const_ptr(), &tmp);
+    return calc_op(mul_function, unwrap_ptr(), &tmp);
 }
 
 Variant Variant::pow(const Variant &v) const {
-    return calc_op(pow_function, const_ptr(), v.const_ptr());
+    return calc_op(pow_function, unwrap_ptr(), v.unwrap_ptr());
 }
 
 Variant Variant::concat(const Variant &v) const {
-    return calc_op(concat_function, const_ptr(), v.const_ptr());
+    return calc_op(concat_function, unwrap_ptr(), v.unwrap_ptr());
 }
 
 void Variant::append(const Variant &v) {
-    auto zv = NO_CONST_V(v);
+    auto zvalue = NO_CONST_V(v);
+    auto zresult = unwrap_ptr();
     if (isArray()) {
-        const_cast<Variant &>(v).addRef();
-        SEPARATE_ARRAY(ptr());
-        add_next_index_zval(ptr(), const_cast<Variant &>(v).ptr());
+        zval_add_ref(zvalue);
+        SEPARATE_ARRAY(zresult);
+        add_next_index_zval(zresult, zvalue);
     } else {
-        convert_to_string(ptr());
-        concat_function(ptr(), ptr(), NO_CONST_V(v));
+        convert_to_string(zresult);
+        concat_function(zresult, zresult, zvalue);
     }
 }
 
 bool Variant::operator<(const Variant &v) const {
-    return compare_op(is_smaller_function, const_ptr(), v.const_ptr());
+    return compare_op(is_smaller_function, unwrap_ptr(), v.unwrap_ptr());
 }
 
 bool Variant::operator<=(const Variant &v) const {
-    return compare_op(is_smaller_or_equal_function, const_ptr(), v.const_ptr());
+    return compare_op(is_smaller_or_equal_function, unwrap_ptr(), v.unwrap_ptr());
 }
 
 bool Variant::operator>(const Variant &v) const {
-    return compare_op(is_greater_function, const_ptr(), v.const_ptr());
+    return compare_op(is_greater_function, unwrap_ptr(), v.unwrap_ptr());
 }
 
 bool Variant::operator>=(const Variant &v) const {
-    return compare_op(is_greater_or_equal_function, const_ptr(), v.const_ptr());
+    return compare_op(is_greater_or_equal_function, unwrap_ptr(), v.unwrap_ptr());
 }
 
 Variant Variant::operator()() const {
-    return _call(nullptr, const_ptr());
+    return _call(nullptr, unwrap_ptr());
 }
 
 Variant Variant::operator()(const std::initializer_list<Variant> &args) const {
@@ -551,16 +559,17 @@ Variant Variant::operator()(const std::initializer_list<Variant> &args) const {
     for (const auto &arg : args) {
         _args.append(NO_CONST_V(arg));
     }
-    return _call(nullptr, const_ptr(), _args);
+    return _call(nullptr, unwrap_ptr(), _args);
 }
 
 Variant Variant::unserialize() {
     php_unserialize_data_t var_hash;
     Variant retval;
+    auto zv = unwrap_ptr();
 
     PHP_VAR_UNSERIALIZE_INIT(var_hash);
-    char *data = Z_STRVAL_P(ptr());
-    size_t length = Z_STRLEN_P(ptr());
+    char *data = Z_STRVAL_P(zv);
+    size_t length = Z_STRLEN_P(zv);
     auto rs = php_var_unserialize(retval.ptr(), (const uchar **) &data, (const uchar *) data + length, &var_hash);
     PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
 
@@ -575,9 +584,10 @@ Variant Variant::jsonEncode(zend_long options, zend_long depth) {
     smart_str buf = {};
     JSON_G(error_code) = PHP_JSON_ERROR_NONE;
     JSON_G(encode_max_depth) = (int) depth;
+    auto zv = unwrap_ptr();
 
     Variant result;
-    php_json_encode(&buf, ptr(), (int) options);
+    php_json_encode(&buf, zv, (int) options);
     if (EXPECTED(JSON_G(error_code) == PHP_JSON_ERROR_NONE || (options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR))) {
         smart_str_0(&buf);
         result = buf.s;
@@ -588,20 +598,21 @@ Variant Variant::jsonEncode(zend_long options, zend_long depth) {
 
 Variant Variant::jsonDecode(zend_long options, zend_long depth) {
     JSON_G(error_code) = PHP_JSON_ERROR_NONE;
+    auto zv = unwrap_ptr();
 
-    if (this->length() == 0) {
+    if (length() == 0) {
         JSON_G(error_code) = PHP_JSON_ERROR_SYNTAX;
         return {};
     }
 
     options |= PHP_JSON_OBJECT_AS_ARRAY;
     Variant retval;
-    php_json_decode_ex(retval.ptr(), Z_STRVAL_P(ptr()), Z_STRLEN_P(ptr()), options, depth);
+    php_json_decode_ex(retval.ptr(), Z_STRVAL_P(zv), Z_STRLEN_P(zv), options, depth);
     return retval;
 }
 
 bool Variant::isCallable() {
-    return zend_is_callable(ptr(), 0, nullptr);
+    return zend_is_callable(unwrap_ptr(), 0, nullptr);
 }
 
 Variant newReference() {

@@ -650,10 +650,11 @@ TEST(variant, offsetSet) {
 
     Array a3(a2);
     a3.offsetSet("php", 2026);
-    ASSERT_EQ(a2.offsetGet("php").toInt(), 2026);
+    ASSERT_EQ(a3.offsetGet("php").toInt(), 2026);
 
     a3.offsetUnset(sk);
-    ASSERT_FALSE(a2.offsetExists(sk));
+    ASSERT_FALSE(a3.offsetExists(sk));
+    ASSERT_TRUE(a2.offsetExists(sk));
 }
 
 TEST(variant, offsetUnset) {
@@ -672,6 +673,7 @@ TEST(variant, offsetUnset) {
     ASSERT_FALSE(a.offsetExists(ik));
 
     a.offsetSet(null, 2026);
+
     ASSERT_EQ(a.offsetGet(5).toInt(), 2026);
 
     auto o = newObject("ArrayObject");

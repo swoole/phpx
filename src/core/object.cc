@@ -24,6 +24,14 @@ END_EXTERN_C()
 namespace php {
 static Variant __construct{ZEND_STRL("__construct"), true};
 
+Object::Object(const zval *v, bool indirect, bool copy) {
+	ZVAL_DEREF(v);
+	Variant(v, false, copy);
+    if (!isUndef() && !isObject()) {
+        error(E_ERROR, "parameter 1 must be `object`, got `%s`", typeStr());
+    }
+}
+
 String Object::hash() const {
     return String::from(php_spl_object_hash(object()));
 }

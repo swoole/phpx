@@ -333,48 +333,46 @@ class Variant {
         return unwrap_zval(&val);
     }
     void debug();
-    void print() {
-        php_var_dump(&val, 10);
-    }
+    void print();
     int getRefCount() const;
     int type() const {
-        return Z_TYPE_P(const_ptr());
+        return Z_TYPE_P(unwrap_ptr());
     }
     const char *typeStr() const {
         return zend_get_type_by_const(type());
     }
     bool isString() const {
-        return Z_TYPE_P(const_ptr()) == IS_STRING;
+        return Z_TYPE_P(unwrap_ptr()) == IS_STRING;
     }
     bool isArray() const {
-        return Z_TYPE_P(const_ptr()) == IS_ARRAY;
+        return Z_TYPE_P(unwrap_ptr()) == IS_ARRAY;
     }
     bool isObject() const {
-        return Z_TYPE_P(const_ptr()) == IS_OBJECT;
+        return Z_TYPE_P(unwrap_ptr()) == IS_OBJECT;
     }
     bool isInt() const {
-        return Z_TYPE_P(const_ptr()) == IS_LONG;
+        return Z_TYPE_P(unwrap_ptr()) == IS_LONG;
     }
     bool isFloat() const {
-        return Z_TYPE_P(const_ptr()) == IS_DOUBLE;
+        return Z_TYPE_P(unwrap_ptr()) == IS_DOUBLE;
     }
     bool isBool() const {
-        return Z_TYPE_P(const_ptr()) == IS_TRUE || Z_TYPE_P(const_ptr()) == IS_FALSE;
+        return Z_TYPE_P(unwrap_ptr()) == IS_TRUE || Z_TYPE_P(unwrap_ptr()) == IS_FALSE;
     }
     bool isFalse() const {
-        return Z_TYPE_P(const_ptr()) == IS_FALSE;
+        return Z_TYPE_P(unwrap_ptr()) == IS_FALSE;
     }
     bool isTrue() const {
-        return Z_TYPE_P(const_ptr()) == IS_TRUE;
+        return Z_TYPE_P(unwrap_ptr()) == IS_TRUE;
     }
     bool isNull() const {
-        return Z_TYPE_P(const_ptr()) == IS_NULL;
+        return Z_TYPE_P(unwrap_ptr()) == IS_NULL;
     }
     bool isUndef() const {
-        return Z_TYPE_P(const_ptr()) == IS_UNDEF;
+        return Z_TYPE_P(unwrap_ptr()) == IS_UNDEF;
     }
     bool isResource() const {
-        return Z_TYPE_P(const_ptr()) == IS_RESOURCE;
+        return Z_TYPE_P(unwrap_ptr()) == IS_RESOURCE;
     }
     bool isReference() const {
         return Z_TYPE_P(const_ptr()) == IS_REFERENCE;
@@ -1013,11 +1011,7 @@ static inline zend_class_entry *getClassEntry(const String &name) {
 
 class Object : public Variant {
   public:
-    Object(const zval *v, bool indirect = false, bool copy = true) : Variant(v, indirect, copy) {
-        if (!isUndef() && !isObject()) {
-            error(E_ERROR, "parameter 1 must be `object`, got `%s`", typeStr());
-        }
-    }
+    Object(const zval *v, bool indirect = false, bool copy = true);
     Object(const Variant &v) : Object(v.const_ptr()) {}
     Object() = default;
     Variant call(const Variant &func, Args &args) {
