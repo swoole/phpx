@@ -81,8 +81,7 @@ Variant Object::getPropertyReference(const String &prop_name) {
     }
 
     if (Z_TYPE_P(member_p) == IS_REFERENCE) {
-        Z_TRY_ADDREF_P(member_p);
-        return from(member_p);
+        return Variant(member_p, false, true);
     }
 
     auto ref = newReference();
@@ -101,6 +100,59 @@ Variant Object::getPropertyReference(const String &prop_name) {
     Z_TRY_ADDREF_P(ref.ptr());
 
     return ref;
+}
+
+void Object::appendArrayProperty(const String &name, const Variant &value) {
+    zval rv;
+    Variant retval;
+    zval *member_p = zend_read_property_ex(ce(), object(), name.str(), false, &rv);
+
+    if (UNEXPECTED(!member_p)) {
+        return;
+    }
+
+    ZVAL_DEREF(member_p);
+    auto zv = NO_CONST_V(value);
+    Z_TRY_ADDREF_P(zv);
+    zend_hash_next_index_insert(Z_ARRVAL_P(member_p), zv);
+}
+
+void Object::updateArrayProperty(const String &name, zend_long offset, const Variant &value) {
+    zval rv;
+    Variant retval;
+    zval *member_p = zend_read_property_ex(ce(), object(), name.str(), false, &rv);
+
+    if (UNEXPECTED(!member_p)) {
+        return;
+    }
+
+    ZVAL_DEREF(member_p);
+    auto zv = NO_CONST_V(value);
+    Z_TRY_ADDREF_P(zv);
+    zend_hash_index_update(Z_ARRVAL_P(member_p), offset, zv);
+}
+
+void Object::updateArrayProperty(const String &name, const Variant &key, const Variant &value) {
+    zval rv;
+    Variant retval;
+    zval *member_p = zend_read_property_ex(ce(), object(), name.str(), false, &rv);
+
+    if (UNEXPECTED(!member_p)) {
+        return;
+    }
+
+    ZVAL_DEREF(member_p);
+    auto zv = NO_CONST_V(value);
+    Z_TRY_ADDREF_P(zv);
+
+    if (key.isInt() || key.isFloat() || key.isNumeric()) {
+        zend_hash_index_update(Z_ARRVAL_P(member_p), key.toInt(), zv);
+    } else if (key.isNull()) {
+        zend_hash_next_index_insert(Z_ARRVAL_P(member_p), zv);
+    } else {
+        auto skey = key.toString();
+        zend_hash_update(Z_ARRVAL_P(member_p), skey.str(), zv);
+    }
 }
 
 Variant Object::get(const String &name) const {
@@ -174,6 +226,6 @@ Object to_object(const Variant &v) {
             if (Z_OPT_REFCOUNTED_P(expr)) Z_ADDREF_P(expr);
         }
     }
-    return Object::from(&result);
+    return Object(&result, false, false);
 }
 }  // namespace php

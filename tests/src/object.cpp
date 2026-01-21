@@ -201,3 +201,17 @@ TEST(object, getPropertyReference) {
     ASSERT_TRUE(v2.isArray());
     ASSERT_STREQ(v2.offsetGet("first").toCString(), "value");
 }
+
+TEST(object, getPropertyIndirect) {
+    auto o1 = newObject("stdClass");
+    o1.set("prop1", 1990);
+    ASSERT_EQ(o1.getProperty("prop1").toInt(), 1990);
+
+    auto prop1 = o1.getPropertyIndirect("prop1");
+    prop1 = 2022;
+    ASSERT_EQ(o1.getProperty("prop1").toInt(), 2022);
+
+    Array arr{1, 3, 99};
+    prop1 = arr;
+    ASSERT_TRUE(o1.getProperty("prop1").isArray());
+}

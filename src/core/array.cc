@@ -40,6 +40,7 @@ int array_data_compare(Bucket *f, Bucket *s) {
 }
 
 Array Array::slice(long offset, long length, bool preserve_keys) {
+    auto zarr = unwrap_ptr();
     size_t num_in = count();
 
     if (offset > num_in) {
@@ -67,10 +68,10 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
 
     /* Start at the beginning and go until we hit offset */
     int pos = 0;
-    if (!preserve_keys && (Z_ARRVAL_P(this->ptr())->u.flags & HASH_FLAG_PACKED)) {
+    if (!preserve_keys && (Z_ARRVAL_P(zarr)->u.flags & HASH_FLAG_PACKED)) {
         zend_hash_real_init(Z_ARRVAL_P(&return_value), true);
         ZEND_HASH_FILL_PACKED(Z_ARRVAL_P(&return_value)) {
-            ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(this->ptr()), entry) {
+            ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(zarr), entry) {
                 pos++;
                 if (pos <= offset) {
                     continue;
@@ -85,7 +86,7 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
         }
         ZEND_HASH_FILL_END();
     } else {
-        ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(this->ptr()), num_key, string_key, entry) {
+        ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(zarr), num_key, string_key, entry) {
             pos++;
             if (pos <= offset) {
                 continue;
@@ -107,85 +108,118 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
         }
         ZEND_HASH_FOREACH_END();
     }
-    return from(&return_value);
+    return Array(&return_value, false, false);
 }
 
-Array::Array(const zval *v) : Variant(v) {
+Array::Array(const zval *v, bool indirect, bool copy) : Variant(v, indirect, copy) {
     if (isNull()) {
         array_init(ptr());
-    }
-    if (isReference()) {
-        error(E_ERROR, "parameter 1 must be `array`, got `reference`");
-    } else if (!isArray()) {
-        error(E_ERROR, "parameter 1 must be `array`, got `%s`", typeStr());
+    } else {
+        zval *zarray = unwrap_ptr();
+        if (Z_TYPE_P(zarray) != IS_ARRAY) {
+            error(E_ERROR, "parameter 1 must be `array`, got `%s`", typeStr());
+        }
     }
 }
 
 Array::Array(const Variant &v) : Array(v.const_ptr()) {}
 
 void Array::copyFrom(const std::initializer_list<const Variant> &list) {
-    array_init(&val);
     for (const auto &val : list) {
         append(val);
     }
 }
 
-void Array::copyFrom(const std::initializer_list<std::pair<const std::string, const Variant>> &list) {
-    array_init(&val);
+void Array::copyFrom(const std::initializer_list<std::pair<const String, const Variant>> &list) {
     for (const auto &kv : list) {
-        set(kv.first, kv.second);
+        set(String(kv.first), kv.second);
     }
 }
 
 void Array::copyFrom(const std::initializer_list<std::pair<Int, const Variant>> &list) {
-    array_init(&val);
     for (const auto &kv : list) {
         set(kv.first, kv.second);
     }
 }
 
 Array::Array(const std::initializer_list<const Variant> &list) {
+    array_init(&val);
     copyFrom(list);
 }
 
-Array::Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list) {
+Array::Array(const std::initializer_list<std::pair<const String, const Variant>> &list) {
+    array_init(&val);
     copyFrom(list);
 }
 
 Array::Array(const std::initializer_list<std::pair<Int, const Variant>> &list) {
+    array_init(&val);
     copyFrom(list);
 }
 
 Array &Array::operator=(const std::initializer_list<const Variant> &list) {
     destroy();
+    auto zarr = unwrap_ptr();
+    array_init(zarr);
     copyFrom(list);
     return *this;
 }
 
-Array &Array::operator=(const std::initializer_list<std::pair<const std::string, const Variant>> &list) {
+Array &Array::operator=(const std::initializer_list<std::pair<const String, const Variant>> &list) {
     destroy();
+    auto zarr = unwrap_ptr();
+    array_init(zarr);
     copyFrom(list);
     return *this;
 }
 
 Array &Array::operator=(const std::initializer_list<std::pair<Int, const Variant>> &list) {
     destroy();
+    auto zarr = unwrap_ptr();
+    array_init(zarr);
     copyFrom(list);
     return *this;
 }
 
-void Array::set(const String &s, const Variant &v) {
-    auto zv = NO_CONST_V(v);
-    Z_TRY_ADDREF_P(zv);
-    SEPARATE_ARRAY(ptr());
-    zend_symtable_update(Z_ARRVAL_P(ptr()), s.str(), zv);
+void Array::set(const Variant &key, const Variant &v) {
+    if (key.isNull()) {
+        append(v);
+    } else if (key.isInt() || key.isFloat()) {
+        set(key.toInt(), v);
+    } else {
+        auto zv = NO_CONST_V(v);
+        Z_TRY_ADDREF_P(zv);
+        auto zarr = unwrap_ptr();
+        SEPARATE_ARRAY(zarr);
+        auto skey = key.toString();
+        zend_symtable_update(Z_ARRVAL_P(zarr), skey.str(), zv);
+    }
 }
 
 void Array::set(zend_ulong i, const Variant &v) {
     auto zv = NO_CONST_V(v);
     Z_TRY_ADDREF_P(zv);
-    SEPARATE_ARRAY(ptr());
-    add_index_zval(ptr(), i, zv);
+
+    auto zarr = unwrap_ptr();
+    SEPARATE_ARRAY(zarr);
+    add_index_zval(zarr, i, zv);
+}
+
+bool Array::del(zend_ulong index) {
+    auto zarr = unwrap_ptr();
+    SEPARATE_ARRAY(zarr);
+    return zend_hash_index_del(Z_ARRVAL_P(zarr), index) == SUCCESS;
+}
+
+bool Array::del(const Variant &key) {
+    if (key.isInt() || key.isFloat()) {
+        return del(key.toInt());
+    } else {
+        auto zarr = unwrap_ptr();
+        SEPARATE_ARRAY(zarr);
+        auto skey = key.toString();
+        return zend_symtable_del(Z_ARRVAL_P(zarr), skey.str()) == SUCCESS;
+    }
 }
 
 Variant Array::search(const Variant &_other_var, bool strict) const {
@@ -208,7 +242,7 @@ bool Array::contains(const Variant &_other_var, bool strict) const {
 
 String Array::join(const String &delim) {
     zval retval;
-    php_implode(delim.str(), HASH_OF(ptr()), &retval);
+    php_implode(delim.str(), HASH_OF(unwrap_ptr()), &retval);
     return String::from(&retval);
 }
 
@@ -239,11 +273,12 @@ void ArrayIterator::skipUndefBucket() {
 ArrayItem::ArrayItem(Array &_array, zend_ulong _index, const String &_key) : array_(_array), index_(_index) {
     zval *value_;
     key_ = _key;
+    zend_array *ht = array_.unwrap_array();
 
     if (key_.str() != zend_empty_string) {
-        value_ = zend_symtable_find(_array.array(), key_.str());
+        value_ = zend_symtable_find(ht, key_.str());
     } else {
-        value_ = zend_hash_index_find(_array.array(), index_);
+        value_ = zend_hash_index_find(ht, index_);
     }
     if (value_) {
         val = *value_;
@@ -256,11 +291,12 @@ ArrayItem::ArrayItem(Array &_array, zend_ulong _index, const String &_key) : arr
 ArrayItem &ArrayItem::operator=(const Variant &v) {
     const auto zv = NO_CONST_V(v);
     Z_TRY_ADDREF_P(zv);
+    zend_array *ht = array_.unwrap_array();
 
     if (key_.str() != zend_empty_string) {
-        zend_symtable_update(Z_ARRVAL_P(array_.ptr()), key_.str(), zv);
+        zend_symtable_update(ht, key_.str(), zv);
     } else {
-        zend_hash_index_update(Z_ARRVAL_P(array_.ptr()), index_, zv);
+        zend_hash_index_update(ht, index_, zv);
     }
 
     return *this;
@@ -304,6 +340,6 @@ Array to_array(const Variant &v) {
             ZVAL_EMPTY_ARRAY(&result);
         }
     }
-    return Array::from(&result);
+    return Array(&result, false, false);
 }
 }  // namespace php

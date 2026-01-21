@@ -52,33 +52,30 @@ Variant &Variant::operator=(const Variant *v) {
 }
 
 std::string Variant::toStdString() const {
-    zend_string *str = zval_get_string(NO_CONST_Z(const_ptr()));
+    zend_string *str = zval_get_string(NO_CONST_Z(unwrap_ptr()));
     auto retval = std::string(ZSTR_VAL(str), ZSTR_LEN(str));
     zend_string_release(str);
     return retval;
 }
 
 String Variant::toString() const {
-    return String::from(zval_get_string(NO_CONST_Z(const_ptr())));
+    return String::from(zval_get_string(NO_CONST_Z(unwrap_ptr())));
 }
 
 Array Variant::toArray() const {
-    if (UNEXPECTED(Z_ISREF_P(const_ptr()))) {
-        return Array(Z_REFVAL(val));
-    } else {
-        return *this;
-    }
+    return Array{unwrap_ptr()};
 }
 
 Object Variant::toObject() const {
-    return *this;
+    return Object{unwrap_ptr()};
 }
 
 size_t Variant::length() const {
-    if (isString()) {
-        return Z_STRLEN_P(const_ptr());
-    } else if (isArray()) {
-        return zend_hash_num_elements(Z_ARRVAL_P(const_ptr()));
+    auto zv = unwrap_ptr();
+    if (Z_TYPE_P(zv) == IS_STRING) {
+        return Z_STRLEN_P(zv);
+    } else if (Z_TYPE_P(zv) == IS_ARRAY) {
+        return zend_hash_num_elements(Z_ARRVAL_P(zv));
     } else {
         return 0;
     }
@@ -152,203 +149,138 @@ Variant Variant::getRefValue() const {
     return {&zv};
 }
 
-static zend_long str_offset(zend_string *str, zend_long offset) {
-    if (UNEXPECTED(ZSTR_LEN(str) < ((offset < 0) ? -(size_t) offset : ((size_t) offset + 1)))) {
-        return -1;
-    }
-    return offset < 0 ? (zend_long) ZSTR_LEN(str) + offset : offset;
-}
-
 Variant Variant::offsetGet(zend_long offset) const {
-    auto zvar = const_ptr();
-    ZVAL_DEREF(zvar);
+    auto zvar = unwrap_ptr();
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         return zend_hash_index_find(Z_ARRVAL_P(zvar), offset);
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
-        auto str = Z_STR_P(zvar);
-        auto _offset = str_offset(str, offset);
-        if (UNEXPECTED(_offset == -1)) {
-            return Variant{"", 0};
-        } else {
-            return Variant{ZSTR_VAL(str) + _offset, 1};
-        }
+        String tmp(zvar);
+        return tmp.offsetGet(offset);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
-        return tmp.exec("offsetGet", offset);
+        return tmp.offsetGet(offset);
     } else {
         return Variant{};
     }
 }
 
 Variant Variant::offsetGet(const Variant &key) const {
-    auto zvar = const_ptr();
-    ZVAL_DEREF(zvar);
-
-    if (key.isInt() || key.isFloat() || Z_TYPE_P(zvar) == IS_STRING) {
+    if (key.isInt() || key.isFloat() || key.isNumeric()) {
         return offsetGet(key.toInt());
     }
-    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+
+    auto zvar = unwrap_ptr();
+    if (Z_TYPE_P(zvar) == IS_STRING) {
+        String tmp(zvar);
+        return tmp.offsetGet(key.toInt());
+    } else if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto skey = key.toString();
-        return zend_hash_find(Z_ARRVAL_P(zvar), skey.str());
+        return Variant{zend_hash_find(Z_ARRVAL_P(zvar), skey.str())};
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
-        return tmp.exec("offsetGet", key);
+        return tmp.offsetGet(key);
     } else {
         return Variant{};
     }
 }
 
 bool Variant::offsetExists(zend_long offset) const {
-    auto zvar = const_ptr();
-    ZVAL_DEREF(zvar);
+    auto zvar = unwrap_ptr();
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         return zend_hash_index_exists(Z_ARRVAL_P(zvar), offset);
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
-        return str_offset(Z_STR_P(zvar), offset) != -1;
+        String tmp(zvar);
+        return tmp.offset(offset) != -1;
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
-        return tmp.exec("offsetExists", offset).toBool();
+        return tmp.offsetExists(offset);
     } else {
         return false;
     }
 }
 
 bool Variant::offsetExists(const Variant &key) const {
-    auto zvar = const_ptr();
-    ZVAL_DEREF(zvar);
-
-    if (key.isInt() || key.isFloat() || Z_TYPE_P(zvar) == IS_STRING) {
+    if (key.isInt() || key.isFloat() || key.isNumeric()) {
         return offsetExists(key.toInt());
     }
-    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+
+    auto zvar = unwrap_ptr();
+    if (Z_TYPE_P(zvar) == IS_STRING) {
+        String tmp(zvar);
+        return tmp.offset(key.toInt()) != -1;
+    } else if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto skey = key.toString();
         return zend_hash_exists(Z_ARRVAL_P(zvar), skey.str());
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
-        return tmp.exec("offsetExists", key).toBool();
+        return tmp.offsetExists(key);
     } else {
         return false;
     }
 }
 
-/**
- * The runtime copy mechanism of PHP conflicts with the design of phpx, and COW must be disabled to update array
- * elements.
- */
-struct NoCowArray {
-    zend_array *ht;
-    uint32_t ref_count;
-    NoCowArray(const zval *zarr) {
-        ht = Z_ARRVAL_P(zarr);
-        ref_count = GC_REFCOUNT(ht);
-        GC_SET_REFCOUNT(ht, 1);
-    }
-    ~NoCowArray() {
-        GC_SET_REFCOUNT(ht, ref_count);
-    }
-};
-
-static zval *array_update_no_cow(const zval *zarr, zend_long h, zval *zv) {
-    NoCowArray array(zarr);
-    return zend_hash_index_update(array.ht, h, zv);
-}
-
-static zval *array_update_no_cow(const zval *zarr, const Variant &key, zval *zv) {
-    auto skey = key.toString();
-    NoCowArray array(zarr);
-    return zend_symtable_update(array.ht, skey.str(), zv);
-}
-
-static zval *array_append_no_cow(const zval *zarr, zval *zv) {
-    NoCowArray array(zarr);
-    return zend_hash_next_index_insert(array.ht, zv);
-}
-
-static zend_result array_delele_no_cow(const zval *zarr, zend_long h) {
-    NoCowArray array(zarr);
-    return zend_hash_index_del(array.ht, h);
-}
-
-static zend_result array_delele_no_cow(const zval *zarr, const Variant &key) {
-    NoCowArray array(zarr);
-    auto skey = key.toString();
-    return zend_hash_del(array.ht, skey.str());
-}
-
 void Variant::offsetSet(zend_long offset, const Variant &value) {
-    auto zvar = const_ptr();
-    ZVAL_DEREF(zvar);
+    auto zvar = unwrap_ptr();
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto zv = NO_CONST_V(value);
         Z_TRY_ADDREF_P(zv);
-        array_update_no_cow(zvar, offset, zv);
+        SEPARATE_ARRAY(zvar);
+        zend_hash_index_update(Z_ARRVAL_P(zvar), offset, zv);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
-        tmp.exec("offsetSet", offset, value);
+        tmp.offsetSet(offset, NO_CONST_V(value));
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
-        auto _offset = str_offset(Z_STR_P(zvar), offset);
-        if (offset != -1) {
-            auto wr_str = value.toString();
-            if (wr_str.length() > 0) {
-                Z_STRVAL_P(zvar)[_offset] = wr_str.str()->val[0];
-            }
-        }
+        String tmp(zvar);
+        tmp.offsetSet(offset, value);
     }
 }
 
 void Variant::offsetSet(const Variant &key, const Variant &value) {
-    auto zvar = const_ptr();
-    ZVAL_DEREF(zvar);
+    auto zvar = unwrap_ptr();
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
-        auto zv = NO_CONST_V(value);
-        Z_TRY_ADDREF_P(zv);
-        if (key.isInt() || key.isFloat()) {
-            array_update_no_cow(zvar, key.toInt(), zv);
-        } else if (key.isNull()) {
-            array_append_no_cow(zvar, zv);
-        } else {
-            array_update_no_cow(zvar, key, zv);
-        }
+        Array tmp(zvar, true, false);
+        tmp.set(key, value);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
-        tmp.exec("offsetSet", key, value);
+        tmp.offsetSet(key, value);
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
         if (key.isNull()) {
             throwException(newObject("Error", "[] operator not supported for strings"));
         }
-        offsetSet(key.toInt(), value);
+        String tmp(zvar);
+        tmp.offsetSet(key.toInt(), value);
     }
 }
 
 void Variant::offsetUnset(zend_long offset) {
-    auto zvar = const_ptr();
-    ZVAL_DEREF(zvar);
+    auto zvar = unwrap_ptr();
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
-        array_delele_no_cow(zvar, offset);
+        Array tmp(zvar, true, false);
+        tmp.del(offset);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
-        tmp.exec("offsetUnset", offset);
+        tmp.offsetUnset(offset);
+    } else {
+        throwException(newObject("Error", "Cannot unset offsets"));
     }
 }
 
 void Variant::offsetUnset(const Variant &key) {
-    auto zvar = const_ptr();
-    ZVAL_DEREF(zvar);
+    auto zvar = unwrap_ptr();
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
-        if (key.isInt() || key.isFloat()) {
-            array_delele_no_cow(zvar, key.toInt());
-        } else {
-            array_delele_no_cow(zvar, key);
-        }
+        Array tmp(zvar, true, false);
+        tmp.del(key);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
-        tmp.exec("offsetUnset", key);
+        tmp.offsetUnset(key);
+    } else {
+        throwException(newObject("Error", "Cannot unset offsets"));
     }
 }
 
@@ -356,7 +288,7 @@ Variant Variant::getProperty(zend_string *prop_name) const {
     zval rv;
     Variant retval;
     zval *member_p = zend_read_property_ex(ce(), object(), prop_name, false, &rv);
-    ZVAL_DEREF(member_p);
+    member_p = unwrap_zval(member_p);
 
     if (member_p != &rv) {
         ZVAL_COPY(retval.ptr(), member_p);
@@ -583,6 +515,7 @@ Variant Variant::concat(const Variant &v) const {
 }
 
 void Variant::append(const Variant &v) {
+    auto zv = NO_CONST_V(v);
     if (isArray()) {
         const_cast<Variant &>(v).addRef();
         SEPARATE_ARRAY(ptr());

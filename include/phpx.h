@@ -145,24 +145,40 @@ Object to_object(const Variant &v);
 Resource *getResource(const std::string &name);
 void request_shutdown();
 
+static inline const zval *unwrap_zval(const zval *val) {
+    switch (Z_TYPE_P(val)) {
+    case IS_REFERENCE:
+        return Z_REFVAL_P(val);
+    case IS_INDIRECT:
+        return Z_INDIRECT_P(val);
+    default:
+        return val;
+    }
+}
+
+static inline zval *unwrap_zval(zval *val) {
+    return const_cast<zval *>(unwrap_zval(const_cast<const zval *>(val)));
+}
+
 class Variant {
   protected:
     zval val;
     void destroy() {
-        zval_ptr_dtor(&val);
+        if (isIndirect()) {
+            zval_ptr_dtor(zv());
+        } else {
+            zval_ptr_dtor(&val);
+        }
     }
     void addRef() {
-        Z_TRY_ADDREF_P(ptr());
+        Z_TRY_ADDREF_P(&val);
     }
     void delRef() {
-        Z_TRY_DELREF_P(ptr());
+        Z_TRY_DELREF_P(&val);
     }
 
   public:
     Variant() {
-        ZVAL_NULL(&val);
-    }
-    Variant(nullptr_t) {
         ZVAL_NULL(&val);
     }
     Variant(long v) {
@@ -202,11 +218,18 @@ class Variant {
     Variant(bool v) {
         ZVAL_BOOL(&val, v);
     }
-    Variant(const zval *v) noexcept {
-        if (UNEXPECTED(!v)) {
+    Variant(const zval *v, bool indirect = false, bool copy = true) noexcept {
+        if (UNEXPECTED(v == nullptr)) {
             ZVAL_NULL(&val);
         } else {
-            ZVAL_COPY(&val, v);
+            ZVAL_DEINDIRECT(v);
+            if (indirect) {
+                ZVAL_INDIRECT(&val, const_cast<zval *>(v));
+            } else if (copy) {
+                ZVAL_COPY(&val, v);
+            } else {
+                memcpy(&val, v, sizeof(val));
+            }
         }
     }
     Variant(zend_string *s) noexcept {
@@ -231,7 +254,9 @@ class Variant {
         ZVAL_RES(ptr(), res);
     }
     ~Variant() {
-        destroy();
+        if (!isIndirect()) {
+            destroy();
+        }
     }
     Variant &operator=(int v) {
         destroy();
@@ -283,25 +308,29 @@ class Variant {
     zval *ptr() {
         return &val;
     }
-    static PHPX_UNSAFE Variant from(zval *v) {
-        Variant retval{v};
-        zval_ptr_dtor(v);
-        return retval;
-    }
     PHPX_UNSAFE zend_array *array() const {
-        return Z_ARRVAL_P(&val);
+        return Z_ARRVAL(val);
     }
     PHPX_UNSAFE zend_reference *reference() const {
-        return Z_REF_P(&val);
+        return Z_REF(val);
     }
     PHPX_UNSAFE zend_class_entry *ce() const {
-        return Z_OBJCE_P(&val);
+        return Z_OBJCE(val);
     }
     PHPX_UNSAFE zend_object *object() const {
-        return Z_OBJ_P(&val);
+        return Z_OBJ(val);
+    }
+    PHPX_UNSAFE zval *zv() const {
+        return Z_INDIRECT(val);
     }
     const zval *const_ptr() const {
         return &val;
+    }
+    const zval *unwrap_ptr() const {
+        return unwrap_zval(&val);
+    }
+    zval *unwrap_ptr() {
+        return unwrap_zval(&val);
     }
     void debug();
     void print() {
@@ -350,6 +379,9 @@ class Variant {
     bool isReference() const {
         return Z_TYPE_P(const_ptr()) == IS_REFERENCE;
     }
+    bool isIndirect() const {
+        return Z_TYPE_P(const_ptr()) == IS_INDIRECT;
+    }
     bool isNumeric() const;
     bool empty() const {
         return toBool() == false;
@@ -365,13 +397,13 @@ class Variant {
         return Z_STRVAL(val);
     }
     Int toInt() const {
-        return zval_get_long(const_cast<zval *>(&val));
+        return zval_get_long(const_cast<zval *>(unwrap_ptr()));
     }
     double toFloat() const {
-        return zval_get_double(const_cast<zval *>(&val));
+        return zval_get_double(const_cast<zval *>(unwrap_ptr()));
     }
     bool toBool() const {
-        return zval_is_true(const_cast<zval *>(&val));
+        return zval_is_true(const_cast<zval *>(unwrap_ptr()));
     }
     Array toArray() const;
     Object toObject() const;
@@ -424,8 +456,23 @@ class Variant {
     void unsetProperty(const Variant &name);
     void unsetProperty(zend_string *prop_name);
 
+    /**
+     * These three methods are unsafe. They only support arrays or objects, and will use the address of the zval in the
+     * These array elements or object properties to return an Indirect object. When assigning a value to this object, it
+     * will directly modify the values of the array elements or object properties. These methods are not safe; it is
+     * essential to ensure that the zval pointer already exists and has not been unset. Please note that after
+     * performing write operations on an array or object, the address of the zend_array or object property table may
+     * change, and the zval address pointed to by the Indirect object may become an invalid address.
+     */
+    PHPX_UNSAFE Variant getPropertyIndirect(const Variant &name) const;
+    PHPX_UNSAFE Variant offsetGetIndirect(zend_long offset) const;
+    PHPX_UNSAFE Variant offsetGetIndirect(const Variant &key) const;
+
     bool operator==(const Variant &v) const {
         return equals(v);
+    }
+    bool operator==(std::nullptr_t) const {
+        return isNull();
     }
     bool operator!=(const Variant &v) const {
         return !equals(v);
@@ -679,8 +726,22 @@ class String : public Variant {
     const char *data() const {
         return Z_STRVAL(val);
     }
+    String offsetGet(zend_long _offset) const;
+    String offsetGet(const Variant &_offset) const {
+        return offsetGet(_offset.toInt());
+    }
+    void offsetSet(zend_long _offset, const Variant &value);
+    void offsetSet(const Variant &_offset, const Variant &value) {
+        offsetSet(_offset.toInt(), value);
+    }
     uint64_t hashCode() const {
         return zend_string_hash_val(str());
+    }
+    zend_long offset(zend_long _offset) const {
+        if (UNEXPECTED(length() < ((_offset < 0) ? -(size_t) _offset : ((size_t) _offset + 1)))) {
+            return -1;
+        }
+        return _offset < 0 ? (zend_long) length() + _offset : _offset;
     }
     bool equals(const char *s, size_t slen) const {
         return length() == slen && memcmp(data(), s, slen) == 0;
@@ -826,26 +887,29 @@ extern int array_data_compare(Bucket *f, Bucket *s);
 
 class Array : public Variant {
     void copyFrom(const std::initializer_list<const Variant> &list);
-    void copyFrom(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
+    void copyFrom(const std::initializer_list<std::pair<const String, const Variant>> &list);
     void copyFrom(const std::initializer_list<std::pair<Int, const Variant>> &list);
 
   public:
     Array() {
         array_init(&val);
     }
-    Array(const zval *v);
+    Array(const zval *v, bool indirect = false, bool copy = true);
     Array(const Variant &v);
     Array(const std::initializer_list<const Variant> &list);
-    Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
+    Array(const std::initializer_list<std::pair<const String, const Variant>> &list);
     Array(const std::initializer_list<std::pair<Int, const Variant>> &list);
     Array(Variant *v) : Variant(v) {}
 
     Array &operator=(const std::initializer_list<const Variant> &list);
-    Array &operator=(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
+    Array &operator=(const std::initializer_list<std::pair<const String, const Variant>> &list);
     Array &operator=(const std::initializer_list<std::pair<Int, const Variant>> &list);
 
-    void set(const String &s, const Variant &v);
+    zend_array *unwrap_array() {
+        return Z_ARRVAL_P(unwrap_ptr());
+    }
     void set(zend_ulong i, const Variant &v);
+    void set(const Variant &key, const Variant &v);
     Variant get(const String &key) const {
         return zend_hash_find(Z_ARRVAL_P(const_ptr()), key.str());
     }
@@ -861,50 +925,47 @@ class Array : public Variant {
     ArrayItem operator[](const String &key) {
         return {*this, 0, key};
     }
-    bool del(zend_ulong index) {
-        SEPARATE_ARRAY(ptr());
-        return zend_hash_index_del(Z_ARRVAL_P(ptr()), index) == SUCCESS;
-    }
-    bool del(const String &key) {
-        SEPARATE_ARRAY(ptr());
-        return zend_hash_del(Z_ARRVAL_P(ptr()), key.str()) == SUCCESS;
-    }
+    bool del(zend_ulong index);
+    bool del(const Variant &key);
     void clean() {
-        SEPARATE_ARRAY(ptr());
-        zend_hash_clean(Z_ARRVAL_P(ptr()));
+        auto zarr = unwrap_ptr();
+        SEPARATE_ARRAY(zarr);
+        zend_hash_clean(Z_ARRVAL_P(zarr));
     }
     bool exists(zend_ulong index) const {
-        return zend_hash_index_exists(Z_ARRVAL_P(const_ptr()), index);
+        return zend_hash_index_exists(Z_ARRVAL_P(unwrap_ptr()), index);
     }
     bool exists(const String &key) const {
-        return zend_hash_exists(Z_ARRVAL_P(const_ptr()), key.str());
+        return zend_hash_exists(Z_ARRVAL_P(unwrap_ptr()), key.str());
     }
     ArrayIterator begin() const {
-        return {Z_ARRVAL_P(const_ptr()), 0};
+        return {Z_ARRVAL_P(unwrap_ptr()), 0};
     }
     ArrayIterator end() const {
-        const auto ht = Z_ARRVAL_P(const_ptr());
+        const auto ht = Z_ARRVAL_P(unwrap_ptr());
         return {ht, ht->nNumUsed};
     }
     size_t count() const {
-        return zend_hash_num_elements(Z_ARRVAL_P(const_ptr()));
+        return zend_hash_num_elements(Z_ARRVAL_P(unwrap_ptr()));
     }
     bool empty() const {
         return count() == 0;
     }
     bool isList() const {
-        return zend_array_is_list(array());
+        return zend_array_is_list(Z_ARRVAL_P(unwrap_ptr()));
     }
     Variant search(const Variant &_other_var, bool strict = false) const;
     bool contains(const Variant &_other_var, bool strict = false) const;
     String join(const String &delim);
     void merge(const Array &source) {
-        SEPARATE_ARRAY(ptr());
-        php_array_merge(array(), source.array());
+        auto zarr = unwrap_ptr();
+        SEPARATE_ARRAY(zarr);
+        php_array_merge(Z_ARRVAL_P(zarr), source.array());
     }
     void sort(bool renumber = true) {
-        SEPARATE_ARRAY(ptr());
-        zend_hash_sort(Z_ARRVAL_P(ptr()), array_data_compare, renumber);
+        auto zarr = unwrap_ptr();
+        SEPARATE_ARRAY(zarr);
+        zend_hash_sort(Z_ARRVAL_P(zarr), array_data_compare, renumber);
     }
     Array slice(long offset, long length = -1, bool preserve_keys = false);
 };
@@ -952,7 +1013,7 @@ static inline zend_class_entry *getClassEntry(const String &name) {
 
 class Object : public Variant {
   public:
-    Object(const zval *v) : Variant(v) {
+    Object(const zval *v, bool indirect = false, bool copy = true) : Variant(v, indirect, copy) {
         if (!isUndef() && !isObject()) {
             error(E_ERROR, "parameter 1 must be `object`, got `%s`", typeStr());
         }
@@ -974,6 +1035,44 @@ class Object : public Variant {
     }
     Variant exec(const Variant &fn, const std::initializer_list<Variant> &args);
     Variant getPropertyReference(const String &name);
+    void appendArrayProperty(const String &name, const Variant &value);
+    void updateArrayProperty(const String &name, zend_long offset, const Variant &value);
+    void updateArrayProperty(const String &name, const Variant &key, const Variant &value);
+
+    bool offsetExists(const Variant &offset) {
+        return object()->handlers->has_dimension(object(), NO_CONST_V(offset), 0);
+    }
+    bool offsetExists(zend_long offset) {
+        zval tmp;
+        ZVAL_LONG(&tmp, offset);
+        return object()->handlers->has_dimension(object(), &tmp, 0);
+    }
+    Variant offsetGet(const Variant &offset) {
+        zval rv;
+        return Variant{object()->handlers->read_dimension(object(), NO_CONST_V(offset), BP_VAR_R, &rv)};
+    }
+    Variant offsetGet(zend_long offset) {
+        zval tmp;
+        ZVAL_LONG(&tmp, offset);
+        zval rv;
+        return Variant{object()->handlers->read_dimension(object(), &tmp, BP_VAR_R, &rv)};
+    }
+    void offsetSet(const Variant &offset, const Variant &value) {
+        object()->handlers->write_dimension(object(), NO_CONST_V(offset), NO_CONST_V(value));
+    }
+    void offsetSet(zend_long offset, const Variant &value) {
+        zval tmp;
+        ZVAL_LONG(&tmp, offset);
+        object()->handlers->write_dimension(object(), &tmp, NO_CONST_V(value));
+    }
+    void offsetUnset(const Variant &offset) {
+        object()->handlers->unset_dimension(object(), NO_CONST_V(offset));
+    }
+    void offsetUnset(zend_long offset) {
+        zval tmp;
+        ZVAL_LONG(&tmp, offset);
+        object()->handlers->unset_dimension(object(), &tmp);
+    }
 
     /* generator */
     Variant exec(const Variant &fn, const Variant &v1);

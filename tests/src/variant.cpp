@@ -7,7 +7,7 @@ using namespace php;
 constexpr double PI = 3.1415926;
 
 TEST(variant, base) {
-    Variant v{nullptr};
+    Variant v{};
     ASSERT_TRUE(v.isNull());
     ASSERT_STREQ(v.typeStr(), "null");
     // no gc
@@ -697,4 +697,38 @@ TEST(variant, operateWithBadType) {
     ASSERT_FALSE(v.offsetExists(sk));
 
     ASSERT_TRUE(v.getProperty("hello").isNull());
+}
+
+TEST(variant, offsetGetIndirect) {
+    auto o = newObject("ArrayObject");
+    o.offsetSet(0, 2000);
+    o.offsetSet(1, 1987);
+
+    ASSERT_EQ(o.offsetGet(1).toInt(), 1987);
+
+    auto iv = o.offsetGetIndirect(1);
+    iv = 1999;
+    ASSERT_EQ(o.offsetGet(1).toInt(), 1999);
+
+    Array a{1, 2, 3, 99, 1000};
+    auto iv2 = a.offsetGetIndirect(3);
+    iv2 = 1987;
+    ASSERT_EQ(a.offsetGet(3).toInt(), 1987);
+}
+
+TEST(variant, offsetGetIndirect2) {
+    var sk = "hello";
+    auto o = newObject("ArrayObject");
+    o.offsetSet(sk, 1987);
+    ASSERT_TRUE(o.offsetExists(sk));
+    ASSERT_EQ(o.offsetGet(sk).toInt(), 1987);
+
+    auto iv = o.offsetGetIndirect(sk);
+    iv = 1999;
+    ASSERT_EQ(o.offsetGet(sk).toInt(), 1999);
+
+    Array a = create_map();
+    auto iv2 = a.offsetGetIndirect("php");
+    iv2 = 1995;
+    ASSERT_EQ(a.offsetGet("php").toInt(), 1995);
 }

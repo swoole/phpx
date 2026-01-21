@@ -55,6 +55,25 @@ bool String::equals(const String &s, const bool ci) const {
     return zend_string_equals(s.str(), str());
 }
 
+String String::offsetGet(zend_long _offset) const {
+    _offset = offset(_offset);
+    if (UNEXPECTED(_offset == -1)) {
+        return String{"", 0};
+    } else {
+        return String{data() + _offset, 1};
+    }
+}
+
+void String::offsetSet(zend_long _offset, const Variant &value) {
+    _offset = offset(_offset);
+    if (_offset != -1) {
+        auto wr_str = value.toString();
+        if (wr_str.length() > 0) {
+            str()->val[_offset] = wr_str.str()->val[0];
+        }
+    }
+}
+
 String String::substr(long f, long l) const {
     if (f < 0) {
         /* if "from" position is negative, count start position from the end
