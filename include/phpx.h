@@ -301,10 +301,7 @@ class Variant {
         ZVAL_NULL(unwrap_ptr());
         return *this;
     }
-    void unset() {
-        destroy();
-        ZVAL_UNDEF(unwrap_ptr());
-    }
+    void unset();
     zval *ptr() {
         return &val;
     }

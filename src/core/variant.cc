@@ -84,6 +84,16 @@ size_t Variant::length() const {
     }
 }
 
+void Variant::unset() {
+    if (isIndirect()) {
+        zval_ptr_dtor(Z_INDIRECT(val));
+        ZVAL_UNDEF(Z_INDIRECT(val));
+    } else {
+        zval_ptr_dtor(&val);
+        ZVAL_UNDEF(&val);
+    }
+}
+
 bool Variant::isNumeric() const {
     auto zv = unwrap_ptr();
     switch (Z_TYPE_P(zv)) {
