@@ -76,13 +76,16 @@ size_t Variant::length() const {
         return Z_STRLEN_P(zv);
     } else if (Z_TYPE_P(zv) == IS_ARRAY) {
         return zend_hash_num_elements(Z_ARRVAL_P(zv));
+    } else if (Z_TYPE_P(zv) == IS_OBJECT) {
+        Object tmp(zv);
+        return tmp.count();
     } else {
         return 0;
     }
 }
 
 bool Variant::isNumeric() const {
-	auto zv = unwrap_ptr();
+    auto zv = unwrap_ptr();
     switch (Z_TYPE_P(zv)) {
     case IS_LONG:
     case IS_DOUBLE:
@@ -139,8 +142,8 @@ void Variant::print() {
 }
 
 int Variant::getRefCount() const {
-	auto zv = const_ptr();
-	ZVAL_DEINDIRECT(zv);
+    auto zv = const_ptr();
+    ZVAL_DEINDIRECT(zv);
     if (Z_REFCOUNTED_P(zv)) {
         return Z_REFCOUNT_P(zv);
     }
@@ -525,12 +528,15 @@ void Variant::append(const Variant &v) {
     auto zvalue = NO_CONST_V(v);
     auto zresult = unwrap_ptr();
     if (isArray()) {
-        zval_add_ref(zvalue);
-        SEPARATE_ARRAY(zresult);
-        add_next_index_zval(zresult, zvalue);
-    } else {
-        convert_to_string(zresult);
+        Array tmp(zresult);
+        tmp.append(v);
+    } else if (isObject()) {
+        Object tmp(zresult);
+        tmp.offsetSet(null, v);
+    } else if (isString()) {
         concat_function(zresult, zresult, zvalue);
+    } else {
+        zend_throw_error(nullptr, "Cannot append element to an `%s`", typeStr());
     }
 }
 

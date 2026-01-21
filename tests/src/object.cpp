@@ -53,6 +53,17 @@ TEST(object, base) {
     ASSERT_EQ(hash.length(), 32);
 }
 
+TEST(object, ctor) {
+    auto o1 = newObject("ArrayObject");
+    ASSERT_EQ(o1.type(), IS_OBJECT);
+    o1.append("hello world");
+    ASSERT_EQ(o1.length(), 1);
+
+    auto m = create_map();
+    auto o2 = newObject("ArrayObject", m);
+    ASSERT_EQ(o2.offsetGet("php").toInt(), 3);
+}
+
 TEST(object, method) {
     auto obj = newObject("DateTimeImmutable");
     ASSERT_TRUE(obj.isObject());

@@ -24,9 +24,7 @@ END_EXTERN_C()
 namespace php {
 static Variant __construct{ZEND_STRL("__construct"), true};
 
-Object::Object(const zval *v, bool indirect, bool copy) {
-	ZVAL_DEREF(v);
-	Variant(v, false, copy);
+Object::Object(const zval *v, bool indirect, bool copy) : Variant(v, false, copy) {
     if (!isUndef() && !isObject()) {
         error(E_ERROR, "parameter 1 must be `object`, got `%s`", typeStr());
     }
@@ -34,6 +32,15 @@ Object::Object(const zval *v, bool indirect, bool copy) {
 
 String Object::hash() const {
     return String::from(php_spl_object_hash(object()));
+}
+
+zend_long Object::count() {
+    if (object()->handlers->count_elements) {
+        zend_long rv;
+        return object()->handlers->count_elements(object(), &rv) == SUCCESS ? rv : 0;
+    } else {
+        return 0;
+    }
 }
 
 Variant Object::exec(const Variant &fn, const std::initializer_list<Variant> &args) {
@@ -185,7 +192,7 @@ Object newObject(const char *name) {
         return object;
     }
     if (ce->constructor) {
-        _call(object.ptr(), __construct.ptr());
+        zend_call_known_function(ce->constructor, object.object(), object.ce(), nullptr, 0, nullptr, nullptr);
     }
     return object;
 }
@@ -200,12 +207,13 @@ Object newObject(const char *name, const std::initializer_list<Variant> &args) {
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
-    Args _args;
-    for (const auto &arg : args) {
-        _args.append(const_cast<Variant &>(arg).ptr());
-    }
     if (ce->constructor) {
-        object.call(__construct, _args);
+        Args _args;
+        for (const auto &arg : args) {
+            _args.append(const_cast<Variant &>(arg).ptr());
+        }
+        zend_call_known_function(
+            ce->constructor, object.object(), object.ce(), nullptr, _args.count(), _args.ptr(), nullptr);
     }
     return object;
 }

@@ -530,13 +530,11 @@ class Variant {
     Variant pow(const Variant &) const;
     // Concatenates two strings, return new string.
     Variant concat(const Variant &) const;
-    /**
-     * Concatenates the specified string to the end of this string.
-     * This function is unsafe, only supporting array and string types.
-     * If the type is an array, it will append elements;
-     * otherwise, if the variable is not a string type, this variable will be converted into a string
-     */
-    PHPX_UNSAFE void append(const Variant &);
+    // String: Adding a substring to the end of a string,
+    // Array: Appending elements to an array,
+    // Object: If there is an offsetSet method, it indicates that elements are being appended.
+    // Other type: throw exception
+    void append(const Variant &);
 
     Variant operator()() const;
     explicit operator bool() const noexcept {
@@ -1146,6 +1144,7 @@ class Object : public Variant {
         return Z_OBJ_HANDLE(val);
     }
     String hash() const;
+    zend_long count();
     bool methodExists(const String &name) const {
         return zend_hash_exists(&ce()->function_table, name.str());
     }
