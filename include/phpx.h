@@ -178,13 +178,16 @@ class Variant {
     }
 
   public:
-    Variant() {
+    Variant() noexcept {
         ZVAL_NULL(&val);
     }
-    Variant(long v) {
+    Variant(std::nullptr_t) noexcept {
+        ZVAL_NULL(&val);
+    }
+    Variant(long v) noexcept {
         ZVAL_LONG(&val, v);
     }
-    Variant(int v) {
+    Variant(int v) noexcept {
         ZVAL_LONG(&val, (long) v);
     }
     Variant(const char *str) {
@@ -212,10 +215,10 @@ class Variant {
     Variant(const std::string &str) {
         ZVAL_STRINGL(&val, str.c_str(), str.length());
     }
-    Variant(double v) {
+    Variant(double v) noexcept {
         ZVAL_DOUBLE(&val, v);
     }
-    Variant(bool v) {
+    Variant(bool v) noexcept {
         ZVAL_BOOL(&val, v);
     }
     Variant(const zval *v, bool indirect = false, bool copy = true) noexcept {
@@ -302,31 +305,31 @@ class Variant {
         return *this;
     }
     void unset();
-    zval *ptr() {
+    zval *ptr() noexcept {
         return &val;
     }
-    PHPX_UNSAFE zend_array *array() const {
+    PHPX_UNSAFE zend_array *array() const noexcept {
         return Z_ARRVAL(val);
     }
-    PHPX_UNSAFE zend_reference *reference() const {
+    PHPX_UNSAFE zend_reference *reference() const noexcept {
         return Z_REF(val);
     }
-    PHPX_UNSAFE zend_class_entry *ce() const {
+    PHPX_UNSAFE zend_class_entry *ce() const noexcept {
         return Z_OBJCE(val);
     }
-    PHPX_UNSAFE zend_object *object() const {
+    PHPX_UNSAFE zend_object *object() const noexcept {
         return Z_OBJ(val);
     }
-    PHPX_UNSAFE zval *zv() const {
+    PHPX_UNSAFE zval *zv() const noexcept {
         return Z_INDIRECT(val);
     }
-    const zval *const_ptr() const {
+    const zval *const_ptr() const noexcept {
         return &val;
     }
     const zval *unwrap_ptr() const {
         return unwrap_zval(&val);
     }
-    zval *unwrap_ptr() {
+    zval *unwrap_ptr() noexcept {
         return unwrap_zval(&val);
     }
     void debug();
@@ -465,9 +468,6 @@ class Variant {
 
     bool operator==(const Variant &v) const {
         return equals(v);
-    }
-    bool operator==(std::nullptr_t) const {
-        return isNull();
     }
     bool operator!=(const Variant &v) const {
         return !equals(v);

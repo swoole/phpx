@@ -118,7 +118,7 @@ TEST(base, eval) {
 
 TEST(base, eval2) {
     auto rs = eval("throw new Exception('phpx error');");
-    ASSERT_EQ(rs, nullptr);
+    ASSERT_TRUE(rs.isUndef());
     auto e = catchException();
     auto msg = e.exec("getMessage");
     ASSERT_STREQ(msg.toCString(), "phpx error");

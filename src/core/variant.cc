@@ -63,11 +63,11 @@ String Variant::toString() const {
 }
 
 Array Variant::toArray() const {
-    return Array{unwrap_ptr()};
+    return Array(unwrap_ptr());
 }
 
 Object Variant::toObject() const {
-    return Object{unwrap_ptr()};
+    return Object(unwrap_ptr());
 }
 
 size_t Variant::length() const {
@@ -87,10 +87,10 @@ size_t Variant::length() const {
 void Variant::unset() {
     if (isIndirect()) {
         zval_ptr_dtor(Z_INDIRECT(val));
-        ZVAL_UNDEF(Z_INDIRECT(val));
+        Z_INDIRECT(val) = {};
     } else {
         zval_ptr_dtor(&val);
-        ZVAL_UNDEF(&val);
+        val = {};
     }
 }
 

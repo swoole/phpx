@@ -208,9 +208,9 @@ TEST(object, getPropertyReference) {
 
     prop1.unset();
 
-	auto v2 = o1.get("prop1");
-	ASSERT_TRUE(v2.isArray());
-	ASSERT_STREQ(v2.offsetGet("first").toCString(), "value");
+    auto v2 = o1.get("prop1");
+    ASSERT_TRUE(v2.isArray());
+    ASSERT_STREQ(v2.offsetGet("first").toCString(), "value");
 }
 
 TEST(object, getPropertyIndirect) {
