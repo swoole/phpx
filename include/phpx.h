@@ -906,6 +906,7 @@ class Array : public Variant {
     }
     void set(zend_ulong i, const Variant &v);
     void set(const Variant &key, const Variant &v);
+    void append(const Variant &v);
     Variant get(const String &key) const {
         return zend_hash_find(Z_ARRVAL_P(const_ptr()), key.str());
     }
