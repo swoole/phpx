@@ -887,7 +887,7 @@ extern int array_data_compare(Bucket *f, Bucket *s);
 
 class Array : public Variant {
     void copyFrom(const std::initializer_list<const Variant> &list);
-    void copyFrom(const std::initializer_list<std::pair<const String, const Variant>> &list);
+    void copyFrom(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     void copyFrom(const std::initializer_list<std::pair<Int, const Variant>> &list);
 
   public:
@@ -897,12 +897,12 @@ class Array : public Variant {
     Array(const zval *v, bool indirect = false, bool copy = true);
     Array(const Variant &v);
     Array(const std::initializer_list<const Variant> &list);
-    Array(const std::initializer_list<std::pair<const String, const Variant>> &list);
+    Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     Array(const std::initializer_list<std::pair<Int, const Variant>> &list);
     Array(Variant *v) : Variant(v) {}
 
     Array &operator=(const std::initializer_list<const Variant> &list);
-    Array &operator=(const std::initializer_list<std::pair<const String, const Variant>> &list);
+    Array &operator=(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     Array &operator=(const std::initializer_list<std::pair<Int, const Variant>> &list);
 
     zend_array *unwrap_array() {

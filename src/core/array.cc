@@ -130,7 +130,7 @@ void Array::copyFrom(const std::initializer_list<const Variant> &list) {
     }
 }
 
-void Array::copyFrom(const std::initializer_list<std::pair<const String, const Variant>> &list) {
+void Array::copyFrom(const std::initializer_list<std::pair<const std::string, const Variant>> &list) {
     for (const auto &kv : list) {
         set(String(kv.first), kv.second);
     }
@@ -147,7 +147,7 @@ Array::Array(const std::initializer_list<const Variant> &list) {
     copyFrom(list);
 }
 
-Array::Array(const std::initializer_list<std::pair<const String, const Variant>> &list) {
+Array::Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list) {
     array_init(&val);
     copyFrom(list);
 }
@@ -165,7 +165,7 @@ Array &Array::operator=(const std::initializer_list<const Variant> &list) {
     return *this;
 }
 
-Array &Array::operator=(const std::initializer_list<std::pair<const String, const Variant>> &list) {
+Array &Array::operator=(const std::initializer_list<std::pair<const std::string, const Variant>> &list) {
     destroy();
     auto zarr = unwrap_ptr();
     array_init(zarr);
