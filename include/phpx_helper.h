@@ -124,4 +124,16 @@ static inline Variant silentCall(const Variant &func, const std::initializer_lis
 static inline Variant silentCall(const Variant &func) {
     return silentCall(func, {});
 }
+
+static inline Variant getCallArg(uint32_t i) {
+    return ZEND_CALL_ARG(EG(current_execute_data), i + 1);
+}
+
+static inline Variant getCallArg(uint32_t i, const Variant &defaultValue) {
+    if (i >= ZEND_CALL_NUM_ARGS(EG(current_execute_data))) {
+        return defaultValue;
+    } else {
+        return getCallArg(i);
+    }
+}
 }  // namespace php

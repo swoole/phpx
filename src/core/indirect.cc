@@ -88,7 +88,8 @@ Variant Variant::offsetGetIndirect(const Variant &key) const {
         auto dim = NO_CONST_V(key);
         retval = obj->handlers->read_dimension(obj, dim, BP_VAR_RW, &rv);
         if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
-            zend_throw_error(NULL, "Indirect modification of overloaded element of %s has no effect", ZSTR_VAL(ce()->name));
+            zend_throw_error(
+                NULL, "Indirect modification of overloaded element of %s has no effect", ZSTR_VAL(ce()->name));
             return Variant{};
         }
     } else {
