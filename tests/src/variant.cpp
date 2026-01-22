@@ -46,7 +46,8 @@ TEST(variant, base) {
     v2 = nullptr;
     ASSERT_TRUE(v2.isNull());
 
-    Variant v3{nullptr};
+    zval *zv2 = nullptr;
+    Variant v3{zv2};
     ASSERT_TRUE(v3.isNull());
 
     v3 = 199000L;

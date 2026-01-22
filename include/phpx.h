@@ -229,11 +229,6 @@ class Variant {
     Variant(bool v) noexcept {
         ZVAL_BOOL(&val, v);
     }
-    /**
-     * The `v` must not be a null pointer, otherwise it will crash immediately.
-     * The constructor will not check whether it is a null pointer,
-     * and developers must ensure it themselves.
-     */
     Variant(const zval *v, Ctor method = Ctor::Copy) noexcept {
         switch (method) {
         case Ctor::Copy:
