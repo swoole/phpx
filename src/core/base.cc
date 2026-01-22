@@ -489,7 +489,7 @@ Variant getStaticProperty(const char *class_name, const String &prop) {
     if (UNEXPECTED(!ce)) {
         zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
     }
-    return Variant(zend_read_static_property_ex(ce, prop.str(), true), false, false);
+    return Variant(zend_read_static_property_ex(ce, prop.str(), true), Ctor::Move);
 }
 
 bool hasStaticProperty(const char *class_name, const String &prop) {
@@ -516,7 +516,7 @@ uint32_t getPropertyOffset(const char *class_name, const String &prop) {
         zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
     }
     zend_class_entry *prev_scope = EG(fake_scope);
-	EG(fake_scope) = ce;
+    EG(fake_scope) = ce;
     auto prop_info = zend_get_property_info(ce, prop.str(), 0);
     EG(fake_scope) = prev_scope;
     return prop_info->offset;

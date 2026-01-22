@@ -22,14 +22,8 @@ BEGIN_EXTERN_C()
 END_EXTERN_C()
 
 namespace php {
-Object::Object(const zval *v, bool indirect, bool copy) : Variant(v, false, copy) {
-    if (!isUndef() && !isObject()) {
-        error(E_ERROR, "parameter 1 must be `object`, got `%s`", typeStr());
-    }
-}
-
 String Object::hash() const {
-    return String::from(php_spl_object_hash(object()));
+    return String(php_spl_object_hash(object()), Ctor::Move);
 }
 
 zend_long Object::count() {
@@ -94,7 +88,7 @@ Variant Object::getPropertyReference(const String &prop_name) {
     }
 
     if (Z_TYPE_P(member_p) == IS_REFERENCE) {
-        return Variant(member_p, false, true);
+        return Variant(member_p);
     }
 
     auto ref = newReference();
@@ -240,6 +234,6 @@ Object to_object(const Variant &v) {
             if (Z_OPT_REFCOUNTED_P(expr)) Z_ADDREF_P(expr);
         }
     }
-    return Object(&result, false, false);
+    return Object(&result, Ctor::Move);
 }
 }  // namespace php

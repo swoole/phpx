@@ -27,21 +27,6 @@ namespace php {
 Variant null = {};
 Int zero = 0L;
 
-Variant::Variant(const zval *v, bool indirect, bool copy) noexcept {
-    if (UNEXPECTED(v == nullptr)) {
-        ZVAL_NULL(&val);
-    } else {
-        ZVAL_DEINDIRECT(v);
-        if (indirect) {
-            ZVAL_INDIRECT(&val, const_cast<zval *>(v));
-        } else if (copy) {
-            ZVAL_COPY(&val, v);
-        } else {
-            memcpy(&val, v, sizeof(val));
-        }
-    }
-}
-
 Variant &Variant::operator=(const zval *v) {
     destroy();
     ZVAL_COPY(unwrap_ptr(), unwrap_zval(v));
@@ -72,7 +57,7 @@ std::string Variant::toStdString() const {
 }
 
 String Variant::toString() const {
-    return String::from(zval_get_string(NO_CONST_Z(unwrap_ptr())));
+    return String(zval_get_string(NO_CONST_Z(unwrap_ptr())), Ctor::Move);
 }
 
 Array Variant::toArray() const {
@@ -275,10 +260,10 @@ void Variant::offsetSet(const Variant &key, const Variant &value) {
     auto zvar = unwrap_ptr();
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
-        Array tmp(zvar, true, false);
+        Array tmp(zvar, Ctor::Indirect);
         tmp.set(key, value);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
-        Object tmp(zvar);
+        Object tmp(zvar, Ctor::Indirect);
         tmp.offsetSet(key, value);
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
         if (key.isNull()) {
@@ -293,10 +278,10 @@ void Variant::offsetUnset(zend_long offset) {
     auto zvar = unwrap_ptr();
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
-        Array tmp(zvar, true, false);
+        Array tmp(zvar, Ctor::Indirect);
         tmp.del(offset);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
-        Object tmp(zvar);
+        Object tmp(zvar, Ctor::Indirect);
         tmp.offsetUnset(offset);
     } else {
         throwException(newObject("Error", "Cannot unset offsets"));
@@ -307,10 +292,10 @@ void Variant::offsetUnset(const Variant &key) {
     auto zvar = unwrap_ptr();
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
-        Array tmp(zvar, true, false);
+        Array tmp(zvar, Ctor::Indirect);
         tmp.del(key);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
-        Object tmp(zvar);
+        Object tmp(zvar, Ctor::Indirect);
         tmp.offsetUnset(key);
     } else {
         throwException(newObject("Error", "Cannot unset offsets"));

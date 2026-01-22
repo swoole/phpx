@@ -108,21 +108,8 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
         }
         ZEND_HASH_FOREACH_END();
     }
-    return Array(&return_value, false, false);
+    return Array(&return_value, Ctor::Move);
 }
-
-Array::Array(const zval *v, bool indirect, bool copy) : Variant(v, indirect, copy) {
-    if (isNull()) {
-        array_init(ptr());
-    } else {
-        zval *zarray = unwrap_ptr();
-        if (Z_TYPE_P(zarray) != IS_ARRAY) {
-            error(E_ERROR, "parameter 1 must be `array`, got `%s`", typeStr());
-        }
-    }
-}
-
-Array::Array(const Variant &v) : Array(v.const_ptr()) {}
 
 void Array::copyFrom(const std::initializer_list<const Variant> &list) {
     for (const auto &val : list) {
@@ -253,7 +240,7 @@ bool Array::contains(const Variant &_other_var, bool strict) const {
 String Array::join(const String &delim) {
     zval retval;
     php_implode(delim.str(), HASH_OF(unwrap_ptr()), &retval);
-    return String::from(&retval);
+    return String(&retval, Ctor::Move);
 }
 
 Variant ArrayIterator::key() const {
@@ -350,6 +337,6 @@ Array to_array(const Variant &v) {
             ZVAL_EMPTY_ARRAY(&result);
         }
     }
-    return Array(&result, false, false);
+    return Array(&result, Ctor::Move);
 }
 }  // namespace php

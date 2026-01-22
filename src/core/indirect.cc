@@ -28,7 +28,7 @@ Variant Variant::getPropertyIndirect(const Variant &name) const {
     zval *member_p = zend_read_property_ex(ce(), object(), prop_name, false, &rv);
     member_p = unwrap_zval(member_p);
     zend_string_release(prop_name);
-    return Variant{member_p, true};
+    return Variant{member_p, Ctor::Indirect};
 }
 
 Variant Variant::getPropertyIndirect(uintptr_t offset) const {
@@ -36,7 +36,7 @@ Variant Variant::getPropertyIndirect(uintptr_t offset) const {
         zend_throw_error(NULL, "Only objects support the getPropertyIndirect() method");
         return Variant{};
     }
-    return Variant{OBJ_PROP(object(), offset), true};
+    return Variant{OBJ_PROP(object(), offset), Ctor::Indirect};
 }
 
 Variant Variant::offsetGetIndirect(zend_long offset) const {
@@ -60,7 +60,7 @@ Variant Variant::offsetGetIndirect(zend_long offset) const {
         zend_throw_error(NULL, "Indirect modification of overloaded element of %s has no effect", ZSTR_VAL(ce()->name));
         return Variant{};
     }
-    return Variant{retval, true};
+    return Variant{retval, Ctor::Indirect};
 }
 
 Variant Variant::offsetGetIndirect(const Variant &key) const {
@@ -88,6 +88,6 @@ Variant Variant::offsetGetIndirect(const Variant &key) const {
         zend_throw_error(NULL, "Indirect modification of overloaded element of %s has no effect", ZSTR_VAL(ce()->name));
         return Variant{};
     }
-    return Variant{retval, true};
+    return Variant{retval, Ctor::Indirect};
 }
 }  // namespace php

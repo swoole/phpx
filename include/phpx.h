@@ -162,6 +162,12 @@ static inline zval *unwrap_zval(zval *val) {
     return const_cast<zval *>(unwrap_zval(const_cast<const zval *>(val)));
 }
 
+enum class Ctor {
+	Copy,
+	Indirect,
+	Move,
+};
+
 class Variant {
   protected:
     zval val;
@@ -223,7 +229,28 @@ class Variant {
     Variant(bool v) noexcept {
         ZVAL_BOOL(&val, v);
     }
-    Variant(const zval *v, bool indirect = false, bool copy = true) noexcept;
+    Variant(const zval *v, Ctor method = Ctor::Copy) noexcept {
+    	switch(method) {
+    	case Ctor::Copy:
+    		 ZVAL_COPY(&val, v);
+    		 break;
+		/**
+		 * The value of v must be the address of an array element, or the address of an object property,
+		 * and v cannot be INDIRECT.
+		 */
+    	case Ctor::Indirect:
+            ZVAL_INDIRECT(&val, const_cast<zval *>(v));
+            break;
+		/**
+		 * The v must be a new reference, created using `array_init()` or `object_init()`, or `zend_string_init()`,
+		 * after which the ownership of the zval pointer is transferred to the Variant.
+		 */
+    	case Ctor::Move:
+    	default:
+            memcpy(&val, v, sizeof(val));
+            break;
+    	}
+    }
     Variant(zend_string *s) noexcept {
         ZVAL_STR(&val, zend_string_copy(s));
     }
@@ -675,12 +702,21 @@ static inline Variant operator==(T a, const Variant &b) {
 }
 
 class String : public Variant {
+	void checkString() {
+	    if (!isString()) {
+	        auto new_str = zval_get_string(unwrap_ptr());
+	    	destroy();
+	    	ZVAL_STR(&val, new_str);
+	    }
+	}
   public:
     String() {
         ZVAL_EMPTY_STRING(&val);
     }
-    String(const zval *v);
-    String(const Variant &v);
+    String(const zval *v, Ctor method = Ctor::Copy) : Variant(v, method) {
+    	checkString();
+    }
+    String(const Variant &v): String(v.const_ptr()) {}
     String(int v) {
         ZVAL_STR(ptr(), zend_long_to_str(v));
     }
@@ -693,8 +729,12 @@ class String : public Variant {
     String(bool v) {
         ZVAL_STR(ptr(), zend_string_init(v ? "1" : "0", 1, false));
     }
-    String(zend_string *v) {
-        ZVAL_STR(ptr(), zend_string_copy(v));
+    String(zend_string *v, Ctor method = Ctor::Copy) {
+    	if (method == Ctor::Copy) {
+            ZVAL_STR(ptr(), zend_string_copy(v));
+    	} else {
+            ZVAL_STR(ptr(), v);
+    	}
     }
     String(const std::string &v) : Variant(v) {}
     String(const char *v) : Variant(v) {}
@@ -745,22 +785,22 @@ class String : public Variant {
     static String format(const char *format, ...);
     String trim(const char *what = " \t\n\r\v\0", TrimMode mode = TRIM_BOTH) const;
     String lower() const {
-        return from(zend_string_tolower(str()));
+        return String(zend_string_tolower(str()), Ctor::Move);
     }
     String upper() const {
-        return from(zend_string_toupper(str()));
+        return String(zend_string_toupper(str()), Ctor::Move);
     }
     String base64Encode() const {
-        return from(php_base64_encode_str(str()));
+        return String(php_base64_encode_str(str()), Ctor::Move);
     }
     String base64Decode() const {
-        return from(php_base64_decode_str(str()));
+        return String(php_base64_decode_str(str()), Ctor::Move);
     }
     String escape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
-        return from(php_escape_html_entities((uchar *) data(), length(), 0, flags, charset));
+        return String(php_escape_html_entities((uchar *) data(), length(), 0, flags, charset), Ctor::Move);
     }
     String unescape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
-        return from(php_unescape_html_entities(str(), 1, flags, charset));
+        return String(php_unescape_html_entities(str(), 1, flags, charset), Ctor::Move);
     }
     zend_string *str() const {
         return Z_STR(val);
@@ -773,22 +813,6 @@ class String : public Variant {
     String basename(const String &suffix) const;
     String dirname() const;
     void print() const;
-    /**
-     * This function is unsafe, lacks GC, and takes a new reference to a `zend_string`.
-     * The String object will acquire its ownership, and the external code must not use the `zend_string` pointer again.
-     * The second from method below behaves in the same way as this method,
-     * except it takes a new reference to a zval and is not repeated here.
-     */
-    PHPX_UNSAFE static String from(zend_string *v) {
-        String result{v};
-        zend_string_release(v);
-        return result;
-    }
-    PHPX_UNSAFE static String from(zval *v) {
-        String result{v};
-        zval_ptr_dtor(v);
-        return result;
-    }
 };
 
 class ArrayKeyValue {
@@ -872,13 +896,23 @@ class Array : public Variant {
     void copyFrom(const std::initializer_list<const Variant> &list);
     void copyFrom(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     void copyFrom(const std::initializer_list<std::pair<Int, const Variant>> &list);
+    void checkArray() {
+        zval *zarray = unwrap_ptr();
+        if (Z_TYPE_P(zarray) == IS_NULL || Z_TYPE_P(zarray) == IS_UNDEF) {
+            array_init(ptr());
+        } else if (Z_TYPE_P(zarray) != IS_ARRAY) {
+            error(E_ERROR, "parameter 1 must be `array`, got `%s`", typeStr());
+        }
+    }
 
   public:
     Array() {
         array_init(&val);
     }
-    Array(const zval *v, bool indirect = false, bool copy = true);
-    Array(const Variant &v);
+    Array(const zval *v, Ctor method = Ctor::Copy) noexcept : Variant(v, method) {
+        checkArray();
+    }
+    Array(const Variant &v) : Array(v.const_ptr()) {}
     Array(const std::initializer_list<const Variant> &list);
     Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     Array(const std::initializer_list<std::pair<Int, const Variant>> &list);
@@ -996,8 +1030,16 @@ static inline zend_class_entry *getClassEntry(const String &name) {
 }
 
 class Object : public Variant {
+    void checkObject() {
+        if (!isUndef() && !isObject()) {
+            error(E_ERROR, "parameter 1 must be `object`, got `%s`", typeStr());
+        }
+    }
+
   public:
-    Object(const zval *v, bool indirect = false, bool copy = true);
+    Object(const zval *v, Ctor method = Ctor::Copy) noexcept : Variant(v, method) {
+    	checkObject();
+    }
     Object(const Variant &v) : Object(v.const_ptr()) {}
     Object() = default;
     Variant call(const Variant &func, Args &args) {

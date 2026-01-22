@@ -17,24 +17,16 @@
 #include "phpx.h"
 
 namespace php {
-String::String(const zval *v) : Variant(v) {
-    if (!isString()) {
-        from(zval_get_string(ptr()));
-    }
-}
-
-String::String(const Variant &v) : String(v.const_ptr()) {}
-
 String String::format(const char *format, ...) {
     va_list args;
     va_start(args, format);
     zend_string *s = vstrpprintf(0, format, args);
     va_end(args);
-    return from(s);
+    return String(s, Ctor::Move);
 }
 
 String String::trim(const char *what, TrimMode mode) const {
-    return from(php_trim(str(), what, strlen(what), mode));
+    return String(php_trim(str(), what, strlen(what), mode), Ctor::Move);
 }
 
 void String::print() const {
@@ -114,28 +106,28 @@ String String::stripTags(const String &allow, bool allow_tag_spaces) const {
     auto new_str = zend_string_copy(str());
     new_str->len = php_strip_tags_ex(new_str->val, new_str->len, allow.data(), allow.length(), allow_tag_spaces);
     new_str->val[new_str->len] = '\0';
-    return from(new_str);
+    return String(new_str, Ctor::Move);
 }
 
 String String::addSlashes() const {
-    return from(php_addslashes(str()));
+    return String(php_addslashes(str()), Ctor::Move);
 }
 
 String String::basename(const String &suffix) const {
-    return from(php_basename(data(), length(), suffix.data(), suffix.length()));
+    return String(php_basename(data(), length(), suffix.data(), suffix.length()), Ctor::Move);
 }
 
 String String::dirname() const {
     auto new_str = zend_string_copy(str());
     new_str->len = php_dirname(new_str->val, new_str->len);
     new_str->val[new_str->len] = '\0';
-    return from(new_str);
+    return String(new_str, Ctor::Move);
 }
 
 String String::stripSlashes() const {
     auto new_str = zend_string_copy(str());
     php_stripslashes(new_str);
-    return from(new_str);
+    return String(new_str, Ctor::Move);
 }
 
 }  // namespace php
