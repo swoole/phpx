@@ -31,6 +31,14 @@ Variant Variant::getPropertyIndirect(const Variant &name) const {
     return Variant{member_p, true};
 }
 
+Variant Variant::getPropertyIndirect(uintptr_t offset) const {
+    if (UNEXPECTED(!isObject())) {
+        zend_throw_error(NULL, "Only objects support the getPropertyIndirect() method");
+        return Variant{};
+    }
+    return Variant{OBJ_PROP(object(), offset), true};
+}
+
 Variant Variant::offsetGetIndirect(zend_long offset) const {
     auto zvar = unwrap_zval(const_ptr());
     zval *retval;

@@ -27,6 +27,21 @@ namespace php {
 Variant null = {};
 Int zero = 0L;
 
+Variant::Variant(const zval *v, bool indirect, bool copy) noexcept {
+    if (UNEXPECTED(v == nullptr)) {
+        ZVAL_NULL(&val);
+    } else {
+        ZVAL_DEINDIRECT(v);
+        if (indirect) {
+            ZVAL_INDIRECT(&val, const_cast<zval *>(v));
+        } else if (copy) {
+            ZVAL_COPY(&val, v);
+        } else {
+            memcpy(&val, v, sizeof(val));
+        }
+    }
+}
+
 Variant &Variant::operator=(const zval *v) {
     destroy();
     ZVAL_COPY(unwrap_ptr(), unwrap_zval(v));

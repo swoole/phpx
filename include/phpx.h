@@ -139,6 +139,7 @@ PHPX_API int compare(const Variant &a, const Variant &b);
 PHPX_API Variant getStaticProperty(const char *class_name, const String &prop);
 PHPX_API bool setStaticProperty(const char *class_name, const String &prop, const Variant &value);
 PHPX_API bool hasStaticProperty(const char *class_name, const String &prop);
+PHPX_API uint32_t getPropertyOffset(const char *class_name, const String &prop);
 
 Int atoi(const String &str);
 Array to_array(const Variant &v);
@@ -222,20 +223,7 @@ class Variant {
     Variant(bool v) noexcept {
         ZVAL_BOOL(&val, v);
     }
-    Variant(const zval *v, bool indirect = false, bool copy = true) noexcept {
-        if (UNEXPECTED(v == nullptr)) {
-            ZVAL_NULL(&val);
-        } else {
-            ZVAL_DEINDIRECT(v);
-            if (indirect) {
-                ZVAL_INDIRECT(&val, const_cast<zval *>(v));
-            } else if (copy) {
-                ZVAL_COPY(&val, v);
-            } else {
-                memcpy(&val, v, sizeof(val));
-            }
-        }
-    }
+    Variant(const zval *v, bool indirect = false, bool copy = true) noexcept;
     Variant(zend_string *s) noexcept {
         ZVAL_STR(&val, zend_string_copy(s));
     }
@@ -464,6 +452,7 @@ class Variant {
      * change, and the zval address pointed to by the Indirect object may become an invalid address.
      */
     PHPX_UNSAFE Variant getPropertyIndirect(const Variant &name) const;
+    PHPX_UNSAFE Variant getPropertyIndirect(uintptr_t offset) const;
     PHPX_UNSAFE Variant offsetGetIndirect(zend_long offset) const;
     PHPX_UNSAFE Variant offsetGetIndirect(const Variant &key) const;
 

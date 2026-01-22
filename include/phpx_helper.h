@@ -18,6 +18,7 @@
 
 #include "phpx.h"
 #include "phpx_scope_guard.h"
+#include "phpx_math.h"
 
 namespace php {
 static inline bool equals(Int a, Int b) {

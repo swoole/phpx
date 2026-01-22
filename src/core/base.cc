@@ -486,7 +486,7 @@ zend_function_entry *copy_function_entries(const zend_function_entry *_functions
 
 Variant getStaticProperty(const char *class_name, const String &prop) {
     const auto ce = getClassEntry(class_name);
-    if (!ce) {
+    if (UNEXPECTED(!ce)) {
         zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
     }
     return Variant(zend_read_static_property_ex(ce, prop.str(), true), false, false);
@@ -494,7 +494,7 @@ Variant getStaticProperty(const char *class_name, const String &prop) {
 
 bool hasStaticProperty(const char *class_name, const String &prop) {
     const auto ce = getClassEntry(class_name);
-    if (!ce) {
+    if (UNEXPECTED(!ce)) {
         zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
     }
     return zend_hash_exists(&ce->properties_info, prop.str());
@@ -502,11 +502,23 @@ bool hasStaticProperty(const char *class_name, const String &prop) {
 
 bool setStaticProperty(const char *class_name, const String &prop, const Variant &v) {
     const auto ce = getClassEntry(class_name);
-    if (!ce) {
+    if (UNEXPECTED(!ce)) {
         zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
     }
     const auto zv = NO_CONST_V(v);
     Z_TRY_ADDREF_P(zv);
     return zend_update_static_property_ex(ce, prop.str(), zv) == SUCCESS;
+}
+
+uint32_t getPropertyOffset(const char *class_name, const String &prop) {
+    const auto ce = getClassEntry(class_name);
+    if (UNEXPECTED(!ce)) {
+        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
+    }
+    zend_class_entry *prev_scope = EG(fake_scope);
+	EG(fake_scope) = ce;
+    auto prop_info = zend_get_property_info(ce, prop.str(), 0);
+    EG(fake_scope) = prev_scope;
+    return prop_info->offset;
 }
 }  // namespace php
