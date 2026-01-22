@@ -194,7 +194,8 @@ Variant Variant::offsetGet(const Variant &key) const {
         return tmp.offsetGet(key.toInt());
     } else if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto skey = key.toString();
-        return Variant{zend_hash_find(Z_ARRVAL_P(zvar), skey.str())};
+        Array tmp(zvar);
+        return tmp.get(skey);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
         return tmp.offsetGet(key);
@@ -263,7 +264,7 @@ void Variant::offsetSet(const Variant &key, const Variant &value) {
         Array tmp(zvar, Ctor::Indirect);
         tmp.set(key, value);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
-        Object tmp(zvar, Ctor::Indirect);
+        Object tmp(zvar);
         tmp.offsetSet(key, value);
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
         if (key.isNull()) {
@@ -281,7 +282,7 @@ void Variant::offsetUnset(zend_long offset) {
         Array tmp(zvar, Ctor::Indirect);
         tmp.del(offset);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
-        Object tmp(zvar, Ctor::Indirect);
+        Object tmp(zvar);
         tmp.offsetUnset(offset);
     } else {
         throwException(newObject("Error", "Cannot unset offsets"));
@@ -295,7 +296,7 @@ void Variant::offsetUnset(const Variant &key) {
         Array tmp(zvar, Ctor::Indirect);
         tmp.del(key);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
-        Object tmp(zvar, Ctor::Indirect);
+        Object tmp(zvar);
         tmp.offsetUnset(key);
     } else {
         throwException(newObject("Error", "Cannot unset offsets"));

@@ -238,7 +238,7 @@ class Variant {
         switch (method) {
         case Ctor::Copy:
             ZVAL_DEINDIRECT(v);
-            ZVAL_COPY(&val, v);
+            ZVAL_COPY(&val, UNEXPECTED(zv == nullptr) ? null.ptr() : zv);
             break;
             /**
              * The value of v must be the address of an array element, or the address of an object property,
