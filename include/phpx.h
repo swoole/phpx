@@ -163,9 +163,9 @@ static inline zval *unwrap_zval(zval *val) {
 }
 
 enum class Ctor {
-	Copy,
-	Indirect,
-	Move,
+    Copy,
+    Indirect,
+    Move,
 };
 
 class Variant {
@@ -230,26 +230,27 @@ class Variant {
         ZVAL_BOOL(&val, v);
     }
     Variant(const zval *v, Ctor method = Ctor::Copy) noexcept {
-    	switch(method) {
-    	case Ctor::Copy:
-    		 ZVAL_COPY(&val, v);
-    		 break;
-		/**
-		 * The value of v must be the address of an array element, or the address of an object property,
-		 * and v cannot be INDIRECT.
-		 */
-    	case Ctor::Indirect:
+        switch (method) {
+        case Ctor::Copy:
+        	ZVAL_DEINDIRECT(v);
+            ZVAL_COPY(&val, v);
+            break;
+            /**
+             * The value of v must be the address of an array element, or the address of an object property,
+             * and v cannot be INDIRECT.
+             */
+        case Ctor::Indirect:
             ZVAL_INDIRECT(&val, const_cast<zval *>(v));
             break;
-		/**
-		 * The v must be a new reference, created using `array_init()` or `object_init()`, or `zend_string_init()`,
-		 * after which the ownership of the zval pointer is transferred to the Variant.
-		 */
-    	case Ctor::Move:
-    	default:
+            /**
+             * The v must be a new reference, created using `array_init()` or `object_init()`, or `zend_string_init()`,
+             * after which the ownership of the zval pointer is transferred to the Variant.
+             */
+        case Ctor::Move:
+        default:
             memcpy(&val, v, sizeof(val));
             break;
-    	}
+        }
     }
     Variant(zend_string *s) noexcept {
         ZVAL_STR(&val, zend_string_copy(s));
@@ -702,21 +703,22 @@ static inline Variant operator==(T a, const Variant &b) {
 }
 
 class String : public Variant {
-	void checkString() {
-	    if (!isString()) {
-	        auto new_str = zval_get_string(unwrap_ptr());
-	    	destroy();
-	    	ZVAL_STR(&val, new_str);
-	    }
-	}
+    void checkString() {
+        if (!isString()) {
+            auto new_str = zval_get_string(unwrap_ptr());
+            destroy();
+            ZVAL_STR(&val, new_str);
+        }
+    }
+
   public:
     String() {
         ZVAL_EMPTY_STRING(&val);
     }
     String(const zval *v, Ctor method = Ctor::Copy) : Variant(v, method) {
-    	checkString();
+        checkString();
     }
-    String(const Variant &v): String(v.const_ptr()) {}
+    String(const Variant &v) : String(v.const_ptr()) {}
     String(int v) {
         ZVAL_STR(ptr(), zend_long_to_str(v));
     }
@@ -730,11 +732,11 @@ class String : public Variant {
         ZVAL_STR(ptr(), zend_string_init(v ? "1" : "0", 1, false));
     }
     String(zend_string *v, Ctor method = Ctor::Copy) {
-    	if (method == Ctor::Copy) {
+        if (method == Ctor::Copy) {
             ZVAL_STR(ptr(), zend_string_copy(v));
-    	} else {
+        } else {
             ZVAL_STR(ptr(), v);
-    	}
+        }
     }
     String(const std::string &v) : Variant(v) {}
     String(const char *v) : Variant(v) {}
@@ -897,10 +899,9 @@ class Array : public Variant {
     void copyFrom(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     void copyFrom(const std::initializer_list<std::pair<Int, const Variant>> &list);
     void checkArray() {
-        zval *zarray = unwrap_ptr();
-        if (Z_TYPE_P(zarray) == IS_NULL || Z_TYPE_P(zarray) == IS_UNDEF) {
-            array_init(ptr());
-        } else if (Z_TYPE_P(zarray) != IS_ARRAY) {
+        if (isNull() || isUndef()) {
+            array_init(unwrap_ptr());
+        } else if (!isArray()) {
             error(E_ERROR, "parameter 1 must be `array`, got `%s`", typeStr());
         }
     }
@@ -909,7 +910,7 @@ class Array : public Variant {
     Array() {
         array_init(&val);
     }
-    Array(const zval *v, Ctor method = Ctor::Copy) noexcept : Variant(v, method) {
+    Array(const zval *v, Ctor method = Ctor::Copy) : Variant(v, method) {
         checkArray();
     }
     Array(const Variant &v) : Array(v.const_ptr()) {}
@@ -1037,8 +1038,8 @@ class Object : public Variant {
     }
 
   public:
-    Object(const zval *v, Ctor method = Ctor::Copy) noexcept : Variant(v, method) {
-    	checkObject();
+    Object(const zval *v, Ctor method = Ctor::Copy) : Variant(v, method) {
+        checkObject();
     }
     Object(const Variant &v) : Object(v.const_ptr()) {}
     Object() = default;
