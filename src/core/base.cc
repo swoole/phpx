@@ -116,10 +116,10 @@ void request_shutdown() {
     }
 }
 
-void throwException(const char *class_name, const char *message, int code) {
+void throwException(const String &class_name, const char *message, int code) {
     zend_class_entry *ce = getClassEntry(class_name);
     if (ce == nullptr) {
-        php_error_docref(nullptr, E_WARNING, "class '%s' undefined.", class_name);
+        php_error_docref(nullptr, E_WARNING, "class '%s' undefined.", class_name.toCString());
         return;
     }
     zend_throw_exception(ce, message, code);
@@ -484,36 +484,36 @@ zend_function_entry *copy_function_entries(const zend_function_entry *_functions
     return functions;
 }
 
-Variant getStaticProperty(const char *class_name, const String &prop) {
+Variant getStaticProperty(const String &class_name, const String &prop) {
     const auto ce = getClassEntry(class_name);
     if (UNEXPECTED(!ce)) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
+        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name.toCString());
     }
     return Variant(zend_read_static_property_ex(ce, prop.str(), true), Ctor::Move);
 }
 
-bool hasStaticProperty(const char *class_name, const String &prop) {
+bool hasStaticProperty(const String &class_name, const String &prop) {
     const auto ce = getClassEntry(class_name);
     if (UNEXPECTED(!ce)) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
+        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name.toCString());
     }
     return zend_hash_exists(&ce->properties_info, prop.str());
 }
 
-bool setStaticProperty(const char *class_name, const String &prop, const Variant &v) {
+bool setStaticProperty(const String &class_name, const String &prop, const Variant &v) {
     const auto ce = getClassEntry(class_name);
     if (UNEXPECTED(!ce)) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
+        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name.toCString());
     }
     const auto zv = NO_CONST_V(v);
     Z_TRY_ADDREF_P(zv);
     return zend_update_static_property_ex(ce, prop.str(), zv) == SUCCESS;
 }
 
-uint32_t getPropertyOffset(const char *class_name, const String &prop) {
+uint32_t getPropertyOffset(const String &class_name, const String &prop) {
     const auto ce = getClassEntry(class_name);
     if (UNEXPECTED(!ce)) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name);
+        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name.toCString());
     }
     zend_class_entry *prev_scope = EG(fake_scope);
     EG(fake_scope) = ce;

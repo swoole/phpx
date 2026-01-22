@@ -124,7 +124,7 @@ PHPX_API Variant call(const Variant &func, const std::initializer_list<Variant> 
 /**
  * This function is only used to throw exceptions in PHP extensions.
  */
-PHPX_API void throwException(const char *class_name, const char *message, int code = 0);
+PHPX_API void throwException(const String &class_name, const char *message, int code = 0);
 /**
  * For use only in C/C++ embed environment
  */
@@ -136,14 +136,15 @@ PHPX_API void exit(const Variant &status);
 PHPX_API bool same(const Variant &a, const Variant &b);
 PHPX_API bool equals(const Variant &a, const Variant &b);
 PHPX_API int compare(const Variant &a, const Variant &b);
-PHPX_API Variant getStaticProperty(const char *class_name, const String &prop);
-PHPX_API bool setStaticProperty(const char *class_name, const String &prop, const Variant &value);
-PHPX_API bool hasStaticProperty(const char *class_name, const String &prop);
-PHPX_API uint32_t getPropertyOffset(const char *class_name, const String &prop);
+PHPX_API Variant getStaticProperty(const String &class_name, const String &prop);
+PHPX_API bool setStaticProperty(const String &class_name, const String &prop, const Variant &value);
+PHPX_API bool hasStaticProperty(const String &class_name, const String &prop);
+PHPX_API uint32_t getPropertyOffset(const String &class_name, const String &prop);
 
 Int atoi(const String &str);
 Array to_array(const Variant &v);
 Object to_object(const Variant &v);
+Object to_object(const Variant &v, const String &class_name);
 Resource *getResource(const std::string &name);
 void request_shutdown();
 
@@ -335,16 +336,16 @@ class Variant {
         return &val;
     }
     PHPX_UNSAFE zend_array *array() const noexcept {
-        return Z_ARRVAL(val);
+        return Z_ARRVAL_P(unwrap_ptr());
     }
     PHPX_UNSAFE zend_reference *reference() const noexcept {
         return Z_REF(val);
     }
     PHPX_UNSAFE zend_class_entry *ce() const noexcept {
-        return Z_OBJCE(val);
+        return Z_OBJCE_P(unwrap_ptr());
     }
     PHPX_UNSAFE zend_object *object() const noexcept {
-        return Z_OBJ(val);
+        return Z_OBJ_P(unwrap_ptr());
     }
     PHPX_UNSAFE zval *zv() const noexcept {
         return Z_INDIRECT(val);
@@ -412,13 +413,11 @@ class Variant {
     }
     std::string toStdString() const;
     String toString() const;
-    /**
-     * This function is not read-only.
-     * If the current variable is not a string, it will be auto converted to a string
-     */
-    PHPX_UNSAFE const char *toCString() {
-        convert_to_string(&val);
-        return Z_STRVAL(val);
+    const char *toCString() const {
+        if (!isString()) {
+            return "";
+        }
+        return Z_STRVAL_P(unwrap_ptr());
     }
     Int toInt() const {
         return zval_get_long(const_cast<zval *>(unwrap_ptr()));
@@ -1041,9 +1040,7 @@ static inline zend_class_entry *getClassEntry(const String &name) {
 
 class Object : public Variant {
     void checkObject() {
-        if (!isUndef() && !isObject()) {
-            error(E_ERROR, "parameter 1 must be `object`, got `%s`", typeStr());
-        }
+        assert(isUndef() || isObject());
     }
 
   public:

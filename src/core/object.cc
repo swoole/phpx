@@ -191,12 +191,13 @@ Object newObject(const char *name) {
 
 Object newObject(const char *name, const std::initializer_list<Variant> &args) {
     Object object;
-    zend_class_entry *ce = getClassEntry(name);
-    if (ce == nullptr) {
+    auto ce = getClassEntry(name);
+    if (UNEXPECTED(!ce)) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    if (object_init_ex(object.ptr(), ce) == FAILURE) {
+    auto zobj = object_init_ex(object.ptr(), ce);
+    if (UNEXPECTED(zobj == FAILURE)) {
         return object;
     }
     if (ce->constructor) {
@@ -235,5 +236,25 @@ Object to_object(const Variant &v) {
         }
     }
     return Object(&result, Ctor::Move);
+}
+
+Object to_object(const Variant &v, const String &class_name) {
+    if (UNEXPECTED(!v.isObject())) {
+        zend_throw_error(nullptr, "parameter 1 must be `object`, got `%s`", v.typeStr());
+        return {};
+    }
+    auto ce = getClassEntry(class_name);
+    if (UNEXPECTED(ce == nullptr)) {
+        zend_throw_error(nullptr, "class '%s' is undefined.", class_name.toCString());
+        return {};
+    }
+    if (UNEXPECTED(!instanceof_function(v.ce(), ce))) {
+        zend_throw_error(nullptr,
+                         "must be instance of class `%s`, object of `%s` given",
+                         class_name.toCString(),
+                         ZSTR_VAL(v.ce()->name));
+        return {};
+    }
+    return Object{v.unwrap_ptr()};
 }
 }  // namespace php

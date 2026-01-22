@@ -46,20 +46,25 @@ Variant Variant::offsetGetIndirect(zend_long offset) const {
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         retval = zend_hash_index_find(Z_ARRVAL_P(zvar), offset);
+        if (retval == nullptr) {
+            return Variant{};
+        }
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         auto obj = object();
         zval dim;
         ZVAL_LONG(&dim, offset);
         retval = obj->handlers->read_dimension(obj, &dim, BP_VAR_RW, &rv);
+        if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
+            zend_throw_error(
+                NULL, "Indirect modification of overloaded element of %s has no effect", ZSTR_VAL(ce()->name));
+            return Variant{};
+        }
     } else {
-        zend_throw_error(NULL, "Only arrays or objects support the offsetGetIndirect() method");
+        zend_throw_error(
+            NULL, "Only arrays or objects support the offsetGetIndirect(%ld) method, got `%s`", offset, typeStr());
         return Variant{};
     }
 
-    if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
-        zend_throw_error(NULL, "Indirect modification of overloaded element of %s has no effect", ZSTR_VAL(ce()->name));
-        return Variant{};
-    }
     return Variant{retval, Ctor::Indirect};
 }
 
@@ -75,19 +80,22 @@ Variant Variant::offsetGetIndirect(const Variant &key) const {
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto skey = key.toString();
         retval = zend_hash_find(Z_ARRVAL_P(zvar), skey.str());
+        if (retval == nullptr) {
+            return Variant{};
+        }
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         auto obj = object();
         auto dim = NO_CONST_V(key);
         retval = obj->handlers->read_dimension(obj, dim, BP_VAR_RW, &rv);
+        if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
+            zend_throw_error(NULL, "Indirect modification of overloaded element of %s has no effect", ZSTR_VAL(ce()->name));
+            return Variant{};
+        }
     } else {
         zend_throw_error(NULL, "Only arrays or objects support the offsetGetIndirect() method");
         return Variant{};
     }
 
-    if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
-        zend_throw_error(NULL, "Indirect modification of overloaded element of %s has no effect", ZSTR_VAL(ce()->name));
-        return Variant{};
-    }
     return Variant{retval, Ctor::Indirect};
 }
 }  // namespace php
