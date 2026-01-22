@@ -232,8 +232,18 @@ class Variant {
     Variant(const zval *v, Ctor method = Ctor::Copy) noexcept {
         switch (method) {
         case Ctor::Copy:
-            ZVAL_DEINDIRECT(v);
-            ZVAL_COPY(&val, UNEXPECTED(zv == nullptr) ? null.ptr() : zv);
+            /**
+             * Many ZendAPIs return null-pointer instead of null value, and it is too laborious to carefully
+             * discern whether each API will return an empty pointer. Therefore, it is necessary to detect whether the
+             * incoming zval pointer is empty in the constructor, and if so, initialize it to null.
+             * Move ctor and Indirect ctor must not take a null pointer as an argument.
+             */
+            if (UNEXPECTED(v == nullptr)) {
+                ZVAL_NULL(&val);
+            } else {
+                ZVAL_DEINDIRECT(v);
+                ZVAL_COPY(&val, v);
+            }
             break;
             /**
              * The value of v must be the address of an array element, or the address of an object property,
