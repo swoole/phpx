@@ -312,7 +312,11 @@ class Variant {
     Variant &operator=(const Variant *v);
     Variant &operator=(nullptr_t) {
         destroy();
-        ZVAL_NULL(unwrap_ptr());
+        if (isReference()) {
+        	ZVAL_NULL(ptr());
+        } else {
+            ZVAL_NULL(unwrap_ptr());
+        }
         return *this;
     }
     void unset();

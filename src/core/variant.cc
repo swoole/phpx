@@ -125,6 +125,7 @@ void Variant::debug() {
     const zval *_val;
     if (isReference()) {
         _val = Z_REFVAL_P(const_ptr());
+        printf("ref=%p, rc=%d\n", Z_REF_P(const_ptr()), Z_REFCOUNT_P(const_ptr()));
     } else {
         _val = const_ptr();
     }
