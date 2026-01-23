@@ -5,22 +5,22 @@
 using namespace php;
 
 TEST(helper, empty_str_to_int) {
-    auto i = php::to_int("");
+    auto i = php::toInt("");
     ASSERT_EQ(i, 0);
 }
 
-TEST(helper, to_int) {
+TEST(helper, toInt) {
     auto v = php::atoi("512k");
     ASSERT_EQ(v, 512 * 1024);
 }
 
-TEST(helper, to_array) {
+TEST(helper, toArray) {
     auto o = newObject("ArrayObject");
     o.offsetSet(null, 1987);
     o.offsetSet(null, 2026);
     o.offsetSet(2, 1999);
 
-    auto a2 = to_array(o);
+    auto a2 = toArray(o);
     ASSERT_EQ(a2.length(), 3);
 }
 

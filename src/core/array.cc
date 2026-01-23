@@ -20,7 +20,7 @@
 #include "zend_closures.h"
 
 namespace php {
-int array_data_compare(Bucket *f, Bucket *s) {
+static int array_data_compare(Bucket *f, Bucket *s) {
     zval result;
     zval *first = &f->val;
     zval *second = &s->val;
@@ -37,6 +37,12 @@ int array_data_compare(Bucket *f, Bucket *s) {
 
     ZEND_ASSERT(Z_TYPE(result) == IS_LONG);
     return Z_LVAL(result);
+}
+
+void Array::sort(bool renumber) {
+	auto zarr = unwrap_ptr();
+	SEPARATE_ARRAY(zarr);
+	zend_hash_sort(Z_ARRVAL_P(zarr), array_data_compare, renumber);
 }
 
 Array Array::slice(long offset, long length, bool preserve_keys) {
@@ -299,7 +305,7 @@ ArrayItem &ArrayItem::operator=(const Variant &v) {
     return *this;
 }
 
-Array to_array(const Variant &v) {
+Array toArray(const Variant &v) {
     zval result;
     zval *expr = NO_CONST_V(v);
 

@@ -297,18 +297,18 @@ TEST(array, ref2) {
     ASSERT_EQ(tmp_var_0.offsetGet(0).toInt(), 7);
 }
 
-TEST(array, to_array) {
+TEST(array, toArray) {
     var a = 10;
-    auto arr = to_array(a);
+    auto arr = toArray(a);
     ASSERT_EQ(arr.length(), 1);
     ASSERT_EQ(arr.get(0).toInt(), 10);
 
     var s = "hello world";
-    auto arr2 = to_array(s);
+    auto arr2 = toArray(s);
     ASSERT_EQ(arr2.length(), 1);
     ASSERT_STREQ(arr2.get(0).toCString(), "hello world");
 
-    auto arr3 = to_array(arr2);
+    auto arr3 = toArray(arr2);
     ASSERT_TRUE(same(arr2, arr3));
 }
 

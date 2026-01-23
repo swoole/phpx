@@ -319,13 +319,13 @@ static void _call_user_function_impl(
     }
 }
 
-Variant _call(const zval *object, const zval *func, Args &args) {
+Variant call_impl(const zval *object, const zval *func, Args &args) {
     Variant retval{};
     _call_user_function_impl(object, func, retval.ptr(), args.count(), args.ptr());
     return retval;
 }
 
-Variant _call(const zval *object, const zval *func) {
+Variant call_impl(const zval *object, const zval *func) {
     Variant retval{};
     _call_user_function_impl(object, func, retval.ptr(), 0, nullptr);
     return retval;
@@ -336,11 +336,11 @@ Variant call(const Variant &func, Array &args) {
     for (size_t i = 0; i < args.count(); i++) {
         _args.append(args[i]);
     }
-    return _call(nullptr, func.const_ptr(), _args);
+    return call_impl(nullptr, func.const_ptr(), _args);
 }
 
 Variant call(const Variant &func, Args &args) {
-    return _call(nullptr, func.const_ptr(), args);
+    return call_impl(nullptr, func.const_ptr(), args);
 }
 
 Variant call(const Variant &func, const std::initializer_list<Variant> &args) {
@@ -348,7 +348,7 @@ Variant call(const Variant &func, const std::initializer_list<Variant> &args) {
     for (const auto &arg : args) {
         _args.append(arg.const_ptr());
     }
-    return _call(nullptr, func.const_ptr(), _args);
+    return call_impl(nullptr, func.const_ptr(), _args);
 }
 
 #define ZEND_FAKE_OP_ARRAY ((zend_op_array *) (intptr_t) -1)
@@ -410,7 +410,7 @@ static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_
     return new_op_array;
 }
 
-static Variant _include(zend_string *filename, const int type) {
+static Variant include_impl(zend_string *filename, const int type) {
     zend_op_array *new_op_array = zend_include_or_eval(filename, type);
     if (UNEXPECTED(EG(exception) != nullptr)) {
         if (new_op_array != ZEND_FAKE_OP_ARRAY && new_op_array != nullptr) {
@@ -433,24 +433,12 @@ static Variant _include(zend_string *filename, const int type) {
     }
 }
 
-Variant include(const String &file) {
-    return _include(file.str(), ZEND_INCLUDE);
-}
-
-Variant include_once(const String &file) {
-    return _include(file.str(), ZEND_INCLUDE_ONCE);
-}
-
-Variant require(const String &file) {
-    return _include(file.str(), ZEND_REQUIRE);
-}
-
-Variant require_once(const String &file) {
-    return _include(file.str(), ZEND_REQUIRE_ONCE);
+Variant include(const String &file, IncludeType type) {
+    return include_impl(file.str(), type);
 }
 
 Variant eval(const String &script) {
-    return _include(script.str(), ZEND_EVAL);
+    return include_impl(script.str(), ZEND_EVAL);
 }
 
 bool equals(const Variant &a, const Variant &b) {

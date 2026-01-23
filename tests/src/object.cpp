@@ -73,7 +73,7 @@ TEST(object, method) {
 }
 
 TEST(object, static_property) {
-    include_once(get_include_dir() + "/library.php");
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
     ASSERT_EQ(getStaticProperty("TestClass", "propInt").toInt(), 1990018900);
     ASSERT_STREQ(getStaticProperty("TestClass", "propString").toCString(), "Hello, World!");
     ASSERT_TRUE(setStaticProperty("TestClass", "propString", "phpx test"));
@@ -81,7 +81,7 @@ TEST(object, static_property) {
 }
 
 TEST(object, call_parent_method) {
-    include_once(get_include_dir() + "/library.php");
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
 
     auto obj = newObject("TestClass2");
     ASSERT_TRUE(obj.methodExists("test"));
@@ -107,7 +107,7 @@ TEST(object, call_parent_method) {
 }
 
 TEST(object, instanceOf) {
-    include_once(get_include_dir() + "/library.php");
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
 
     auto obj = newObject("TestClass2");
     ASSERT_TRUE(obj.instanceOf("TestClass"));
@@ -178,17 +178,17 @@ TEST(object, static_property_error2) {
     ASSERT_TRUE(str_contains(s, "class 'TestClassNotFound' is undefined.").toBool());
 }
 
-TEST(object, to_object) {
-    auto o1 = to_object(1992);
+TEST(object, toObject) {
+    auto o1 = toObject(1992);
     ASSERT_EQ(o1.getProperty("scalar").toInt(), 1992);
 
     Array arr = create_map();
-    auto o2 = to_object(arr);
+    auto o2 = toObject(arr);
     ASSERT_EQ(o2.getProperty("golang").toInt(), 4);
 
     auto o3 = newObject("ArrayObject");
     o3.setProperty("value", 1999);
-    auto o4 = to_object(o3);
+    auto o4 = toObject(o3);
     ASSERT_EQ(o4.getProperty("value").toInt(), 1999);
 }
 

@@ -29,43 +29,43 @@ static inline bool equals(Float a, Float b) {
     return a == b;
 }
 
-static inline Int to_int(Int v) {
+static inline Int toInt(Int v) {
     return v;
 }
 
-static inline Int to_int(const Variant &v) {
+static inline Int toInt(const Variant &v) {
     return v.toInt();
 }
 
-static inline Int to_int(zval *zv) {
+static inline Int toInt(zval *zv) {
     return zval_get_long(zv);
 }
 
-static inline Float to_float(Float v) {
+static inline Float toFloat(Float v) {
     return v;
 }
 
-static inline Float to_float(const Variant &v) {
+static inline Float toFloat(const Variant &v) {
     return v.toFloat();
 }
 
-static inline Float to_float(zval *zv) {
+static inline Float toFloat(zval *zv) {
     return zval_get_double(zv);
 }
 
-static inline bool to_bool(bool v) {
+static inline bool toBool(bool v) {
     return v;
 }
 
-static inline bool to_bool(const Variant &v) {
+static inline bool toBool(const Variant &v) {
     return v.toBool();
 }
 
-static inline bool to_bool(zval *zv) {
+static inline bool toBool(zval *zv) {
     return zend_is_true(zv);
 }
 
-static inline String to_string(const Variant &v) {
+static inline String toString(const Variant &v) {
     return v.toString();
 }
 

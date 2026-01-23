@@ -65,16 +65,16 @@ TEST(base, include1) {
 }
 
 TEST(base, include2) {
-    auto version = include_once(get_include_dir() + "/../include/return_const.php");
+    auto version = include(get_include_dir() + "/../include/return_const.php", INCLUDE_ONCE);
     ASSERT_STREQ(version.toCString(), PHP_VERSION);
 
-    auto rs1 = include_once(get_include_dir() + "/../include/return_const.php");
+    auto rs1 = include(get_include_dir() + "/../include/return_const.php", INCLUDE_ONCE);
     ASSERT_TRUE(rs1.toBool());
 
-    auto rs2 = require_once(get_include_dir() + "/../include/return_const.php");
+    auto rs2 = include(get_include_dir() + "/../include/return_const.php", REQUIRE_ONCE);
     ASSERT_TRUE(rs2.toBool());
 
-    auto rs3 = include_once(get_include_dir() + "/../include/not_exists.php");
+    auto rs3 = include(get_include_dir() + "/../include/not_exists.php", INCLUDE_ONCE);
     ASSERT_FALSE(rs3.toBool());
 }
 

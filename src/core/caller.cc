@@ -20,20 +20,20 @@ namespace php {
 Variant Variant::operator()(const Variant &v1) const {
     Args args;
     args.append(v1);
-    return _call(nullptr, const_ptr(), args);
+    return call_impl(nullptr, const_ptr(), args);
 }
 Variant Variant::operator()(const Variant &v1, const Variant &v2) const {
     Args args;
     args.append(v1);
     args.append(v2);
-    return _call(nullptr, const_ptr(), args);
+    return call_impl(nullptr, const_ptr(), args);
 }
 Variant Variant::operator()(const Variant &v1, const Variant &v2, const Variant &v3) const {
     Args args;
     args.append(v1);
     args.append(v2);
     args.append(v3);
-    return _call(nullptr, const_ptr(), args);
+    return call_impl(nullptr, const_ptr(), args);
 }
 Variant Variant::operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4) const {
     Args args;
@@ -41,7 +41,7 @@ Variant Variant::operator()(const Variant &v1, const Variant &v2, const Variant 
     args.append(v2);
     args.append(v3);
     args.append(v4);
-    return _call(nullptr, const_ptr(), args);
+    return call_impl(nullptr, const_ptr(), args);
 }
 Variant Variant::operator()(
     const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5) const {
@@ -51,7 +51,7 @@ Variant Variant::operator()(
     args.append(v3);
     args.append(v4);
     args.append(v5);
-    return _call(nullptr, const_ptr(), args);
+    return call_impl(nullptr, const_ptr(), args);
 }
 Variant Variant::operator()(const Variant &v1,
                             const Variant &v2,
@@ -66,7 +66,7 @@ Variant Variant::operator()(const Variant &v1,
     args.append(v4);
     args.append(v5);
     args.append(v6);
-    return _call(nullptr, const_ptr(), args);
+    return call_impl(nullptr, const_ptr(), args);
 }
 Variant Variant::operator()(const Variant &v1,
                             const Variant &v2,
@@ -83,7 +83,7 @@ Variant Variant::operator()(const Variant &v1,
     args.append(v5);
     args.append(v6);
     args.append(v7);
-    return _call(nullptr, const_ptr(), args);
+    return call_impl(nullptr, const_ptr(), args);
 }
 Variant Variant::operator()(const Variant &v1,
                             const Variant &v2,
@@ -102,7 +102,7 @@ Variant Variant::operator()(const Variant &v1,
     args.append(v6);
     args.append(v7);
     args.append(v8);
-    return _call(nullptr, const_ptr(), args);
+    return call_impl(nullptr, const_ptr(), args);
 }
 Variant Variant::operator()(const Variant &v1,
                             const Variant &v2,
@@ -123,7 +123,7 @@ Variant Variant::operator()(const Variant &v1,
     args.append(v7);
     args.append(v8);
     args.append(v9);
-    return _call(nullptr, const_ptr(), args);
+    return call_impl(nullptr, const_ptr(), args);
 }
 Variant Variant::operator()(const Variant &v1,
                             const Variant &v2,
@@ -146,7 +146,7 @@ Variant Variant::operator()(const Variant &v1,
     args.append(v8);
     args.append(v9);
     args.append(v10);
-    return _call(nullptr, const_ptr(), args);
+    return call_impl(nullptr, const_ptr(), args);
 }
 Object newObject(const char *name, const Variant &v1) {
     Object object;
@@ -387,20 +387,20 @@ Object newObject(const char *name,
 Variant Object::exec(const Variant &fn, const Variant &v1) {
     Args args;
     args.append(v1);
-    return _call(ptr(), fn.const_ptr(), args);
+    return call_impl(ptr(), fn.const_ptr(), args);
 }
 Variant Object::exec(const Variant &fn, const Variant &v1, const Variant &v2) {
     Args args;
     args.append(v1);
     args.append(v2);
-    return _call(ptr(), fn.const_ptr(), args);
+    return call_impl(ptr(), fn.const_ptr(), args);
 }
 Variant Object::exec(const Variant &fn, const Variant &v1, const Variant &v2, const Variant &v3) {
     Args args;
     args.append(v1);
     args.append(v2);
     args.append(v3);
-    return _call(ptr(), fn.const_ptr(), args);
+    return call_impl(ptr(), fn.const_ptr(), args);
 }
 Variant Object::exec(const Variant &fn, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4) {
     Args args;
@@ -408,7 +408,7 @@ Variant Object::exec(const Variant &fn, const Variant &v1, const Variant &v2, co
     args.append(v2);
     args.append(v3);
     args.append(v4);
-    return _call(ptr(), fn.const_ptr(), args);
+    return call_impl(ptr(), fn.const_ptr(), args);
 }
 Variant Object::exec(
     const Variant &fn, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5) {
@@ -418,7 +418,7 @@ Variant Object::exec(
     args.append(v3);
     args.append(v4);
     args.append(v5);
-    return _call(ptr(), fn.const_ptr(), args);
+    return call_impl(ptr(), fn.const_ptr(), args);
 }
 Variant Object::exec(const Variant &fn,
                      const Variant &v1,
@@ -434,7 +434,7 @@ Variant Object::exec(const Variant &fn,
     args.append(v4);
     args.append(v5);
     args.append(v6);
-    return _call(ptr(), fn.const_ptr(), args);
+    return call_impl(ptr(), fn.const_ptr(), args);
 }
 Variant Object::exec(const Variant &fn,
                      const Variant &v1,
@@ -452,7 +452,7 @@ Variant Object::exec(const Variant &fn,
     args.append(v5);
     args.append(v6);
     args.append(v7);
-    return _call(ptr(), fn.const_ptr(), args);
+    return call_impl(ptr(), fn.const_ptr(), args);
 }
 Variant Object::exec(const Variant &fn,
                      const Variant &v1,
@@ -472,7 +472,7 @@ Variant Object::exec(const Variant &fn,
     args.append(v6);
     args.append(v7);
     args.append(v8);
-    return _call(ptr(), fn.const_ptr(), args);
+    return call_impl(ptr(), fn.const_ptr(), args);
 }
 Variant Object::exec(const Variant &fn,
                      const Variant &v1,
@@ -494,7 +494,7 @@ Variant Object::exec(const Variant &fn,
     args.append(v7);
     args.append(v8);
     args.append(v9);
-    return _call(ptr(), fn.const_ptr(), args);
+    return call_impl(ptr(), fn.const_ptr(), args);
 }
 Variant Object::exec(const Variant &fn,
                      const Variant &v1,
@@ -518,6 +518,6 @@ Variant Object::exec(const Variant &fn,
     args.append(v8);
     args.append(v9);
     args.append(v10);
-    return _call(ptr(), fn.const_ptr(), args);
+    return call_impl(ptr(), fn.const_ptr(), args);
 }
 }  // namespace php

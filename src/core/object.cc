@@ -40,7 +40,7 @@ Variant Object::exec(const Variant &fn, const std::initializer_list<Variant> &ar
     for (const auto &arg : args) {
         _args.append(const_cast<Variant &>(arg).ptr());
     }
-    return _call(ptr(), fn.const_ptr(), _args);
+    return call_impl(ptr(), fn.const_ptr(), _args);
 }
 
 bool Object::instanceOf(const String &name) const {
@@ -211,7 +211,7 @@ Object newObject(const char *name, const std::initializer_list<Variant> &args) {
     return object;
 }
 
-Object to_object(const Variant &v) {
+Object toObject(const Variant &v) {
     if (v.isObject()) {
         return v;
     }
@@ -238,7 +238,7 @@ Object to_object(const Variant &v) {
     return Object(&result, Ctor::Move);
 }
 
-Object to_object(const Variant &v, const String &class_name) {
+Object toObject(const Variant &v, const String &class_name) {
     if (UNEXPECTED(!v.isObject())) {
         zend_throw_error(nullptr, "parameter 1 must be `object`, got `%s`", v.typeStr());
         return {};

@@ -63,11 +63,11 @@ PHPX_FUNCTION(phpx_test4) {
         case 0:
             return include(args[1].toString());
         case 1:
-            return include_once(args[1].toString());
+            return include(args[1].toString(), INCLUDE_ONCE);
         case 2:
-            return require(args[1].toString());
+            return include(args[1].toString(), REQUIRE);
         case 3:
-            return require_once(args[1].toString());
+            return include(args[1].toString(), REQUIRE_ONCE);
         default:
             break;
         }

@@ -51,6 +51,9 @@ extern "C" {
 
 #define PHPX_MAX_ARGC 10
 #define PHPX_VAR_DUMP_LEVEL 10
+/**
+ * All API names must be in lowercase camel case.
+ */
 #define PHPX_API PHPAPI
 #define PHPX_UNSAFE
 
@@ -71,6 +74,13 @@ enum TrimMode {
     TRIM_BOTH = 3,
 };
 
+enum IncludeType {
+	INCLUDE = ZEND_INCLUDE,
+	INCLUDE_ONCE = ZEND_INCLUDE_ONCE,
+	REQUIRE = ZEND_REQUIRE,
+	REQUIRE_ONCE = ZEND_REQUIRE_ONCE,
+};
+
 PHPX_API void error(int level, const char *format, ...);
 PHPX_API void echo(const char *format, ...);
 PHPX_API void echo(const String &str);
@@ -78,10 +88,7 @@ PHPX_API void echo(const Variant &val);
 PHPX_API void echo(Int val);
 PHPX_API void echo(Float val);
 PHPX_API Variant global(const String &name);
-PHPX_API Variant include(const String &file);
-PHPX_API Variant include_once(const String &file);
-PHPX_API Variant require(const String &file);
-PHPX_API Variant require_once(const String &file);
+PHPX_API Variant include(const String &file, IncludeType type = INCLUDE);
 PHPX_API Variant eval(const String &script);
 PHPX_API Variant call(const Variant &func, Args &args);
 PHPX_API Variant call(const Variant &func, Array &args);
@@ -107,9 +114,9 @@ PHPX_API bool hasStaticProperty(const String &class_name, const String &prop);
 PHPX_API uint32_t getPropertyOffset(const String &class_name, const String &prop);
 
 Int atoi(const String &str);
-Array to_array(const Variant &v);
-Object to_object(const Variant &v);
-Object to_object(const Variant &v, const String &class_name);
+Array toArray(const Variant &v);
+Object toObject(const Variant &v);
+Object toObject(const Variant &v, const String &class_name);
 Resource *getResource(const std::string &name);
 void request_shutdown();
 
@@ -870,8 +877,6 @@ class ArrayItem : public Variant {
     ArrayItem &operator=(const Variant &v);
 };
 
-extern int array_data_compare(Bucket *f, Bucket *s);
-
 class Array : public Variant {
     void copyFrom(const std::initializer_list<const Variant> &list);
     void copyFrom(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
@@ -959,11 +964,7 @@ class Array : public Variant {
         SEPARATE_ARRAY(zarr);
         php_array_merge(Z_ARRVAL_P(zarr), source.array());
     }
-    void sort(bool renumber = true) {
-        auto zarr = unwrap_ptr();
-        SEPARATE_ARRAY(zarr);
-        zend_hash_sort(Z_ARRVAL_P(zarr), array_data_compare, renumber);
-    }
+    void sort(bool renumber = true);
     Array slice(long offset, long length = -1, bool preserve_keys = false);
 };
 
@@ -1000,11 +1001,11 @@ class Args {
     }
 };
 
-extern Variant _call(const zval *object, const zval *func, Args &args);
-extern Variant _call(const zval *object, const zval *func);
+extern Variant call_impl(const zval *object, const zval *func, Args &args);
+extern Variant call_impl(const zval *object, const zval *func);
 
 static inline Variant call(const Variant &func) {
-    return _call(nullptr, func.const_ptr());
+    return call_impl(nullptr, func.const_ptr());
 }
 
 static inline zend_class_entry *getClassEntry(const String &name) {
@@ -1023,7 +1024,7 @@ class Object : public Variant {
     Object(const Variant &v) : Object(v.const_ptr()) {}
     Object() = default;
     Variant call(const Variant &func, Args &args) {
-        return _call(ptr(), func.const_ptr(), args);
+        return call_impl(ptr(), func.const_ptr(), args);
     }
     zend_class_entry *parent_ce() {
         return Z_OBJCE_P(ptr())->parent;
@@ -1033,7 +1034,7 @@ class Object : public Variant {
     }
     Variant callParentMethod(const String &func, const std::initializer_list<Variant> &args);
     Variant exec(const Variant &fn) {
-        return _call(ptr(), fn.const_ptr());
+        return call_impl(ptr(), fn.const_ptr());
     }
     Variant exec(const Variant &fn, const std::initializer_list<Variant> &args);
     Variant getPropertyReference(const String &name);

@@ -580,7 +580,7 @@ bool Variant::operator>=(const Variant &v) const {
 }
 
 Variant Variant::operator()() const {
-    return _call(nullptr, unwrap_ptr());
+    return call_impl(nullptr, unwrap_ptr());
 }
 
 Variant Variant::operator()(const std::initializer_list<Variant> &args) const {
@@ -588,7 +588,7 @@ Variant Variant::operator()(const std::initializer_list<Variant> &args) const {
     for (const auto &arg : args) {
         _args.append(NO_CONST_V(arg));
     }
-    return _call(nullptr, unwrap_ptr(), _args);
+    return call_impl(nullptr, unwrap_ptr(), _args);
 }
 
 Variant Variant::unserialize() {
