@@ -298,11 +298,11 @@ TEST(variant, ref1) {
     Array v3 = ref.getRefValue();
     ASSERT_EQ(v3.count(), 2);
 
-    ASSERT_EQ(ref.getRefCount(), 1);
+    ASSERT_EQ(ref.getRefCount(), 2);
 
     auto ref2 = ref.toReference();
     ASSERT_TRUE(ref2.isReference());
-    ASSERT_EQ(ref2.getRefCount(), 2);
+    ASSERT_EQ(ref2.getRefCount(), 3);
 }
 
 TEST(variant, ref2) {
@@ -339,8 +339,8 @@ TEST(variant, ref5) {
 
     auto b = ref.toString();
     ASSERT_TRUE(ref.isReference());
-    ASSERT_STREQ(b.data(), "hello world");
-    ASSERT_STREQ(ref.toCString(), "hello world");
+    ASSERT_STREQ(b.data(), "hello php");
+    ASSERT_STREQ(ref.toCString(), "hello php");
     ASSERT_TRUE(ref.isString());
 }
 

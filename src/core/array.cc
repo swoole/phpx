@@ -40,9 +40,9 @@ static int array_data_compare(Bucket *f, Bucket *s) {
 }
 
 void Array::sort(bool renumber) {
-	auto zarr = unwrap_ptr();
-	SEPARATE_ARRAY(zarr);
-	zend_hash_sort(Z_ARRVAL_P(zarr), array_data_compare, renumber);
+    auto zarr = unwrap_ptr();
+    SEPARATE_ARRAY(zarr);
+    zend_hash_sort(Z_ARRVAL_P(zarr), array_data_compare, renumber);
 }
 
 Array Array::slice(long offset, long length, bool preserve_keys) {

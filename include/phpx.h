@@ -75,10 +75,10 @@ enum TrimMode {
 };
 
 enum IncludeType {
-	INCLUDE = ZEND_INCLUDE,
-	INCLUDE_ONCE = ZEND_INCLUDE_ONCE,
-	REQUIRE = ZEND_REQUIRE,
-	REQUIRE_ONCE = ZEND_REQUIRE_ONCE,
+    INCLUDE = ZEND_INCLUDE,
+    INCLUDE_ONCE = ZEND_INCLUDE_ONCE,
+    REQUIRE = ZEND_REQUIRE,
+    REQUIRE_ONCE = ZEND_REQUIRE_ONCE,
 };
 
 PHPX_API void error(int level, const char *format, ...);
@@ -146,11 +146,7 @@ class Variant {
   protected:
     zval val;
     void destroy() {
-        if (isIndirect()) {
-            zval_ptr_dtor(zv());
-        } else {
-            zval_ptr_dtor(&val);
-        }
+        zval_ptr_dtor(unwrap_ptr());
     }
     void addRef() {
         Z_TRY_ADDREF_P(&val);
@@ -267,7 +263,9 @@ class Variant {
         ZVAL_RES(ptr(), res);
     }
     ~Variant() {
-        if (!isIndirect()) {
+        if (isReference()) {
+            zval_ptr_dtor(&val);
+        } else if (!isIndirect()) {
             destroy();
         }
     }
@@ -312,11 +310,7 @@ class Variant {
     Variant &operator=(const Variant *v);
     Variant &operator=(nullptr_t) {
         destroy();
-        if (isReference()) {
-        	ZVAL_NULL(ptr());
-        } else {
-            ZVAL_NULL(unwrap_ptr());
-        }
+        ZVAL_NULL(unwrap_ptr());
         return *this;
     }
     void unset();
@@ -328,6 +322,9 @@ class Variant {
     }
     PHPX_UNSAFE zend_reference *reference() const noexcept {
         return Z_REF(val);
+    }
+    PHPX_UNSAFE zval *refval() const noexcept {
+        return Z_REFVAL(val);
     }
     PHPX_UNSAFE zend_class_entry *ce() const noexcept {
         return Z_OBJCE_P(unwrap_ptr());
@@ -1194,7 +1191,7 @@ class Reference : public Variant {
         if (&v == this) {
             return *this;
         }
-        destroy();
+        zval_ptr_dtor(&val);
         ZVAL_COPY(&val, v.const_ptr());
         return *this;
     }
