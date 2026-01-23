@@ -293,7 +293,7 @@ TEST(array, ref) {
 TEST(array, ref2) {
     Array numbers{99, 10, 7};
     var tmp_var_0 = numbers.toReference();
-    php::call(php::sort, {tmp_var_0});
+    php::call(php::sort, {&tmp_var_0});
     ASSERT_EQ(tmp_var_0.offsetGet(0).toInt(), 7);
 }
 

@@ -1015,7 +1015,9 @@ static inline zend_class_entry *getClassEntry(const String &name) {
 
 class Object : public Variant {
     void checkObject() {
-        assert(isUndef() || isObject());
+        if (!isUndef() && !isNull() && !isObject()) {
+            error(E_ERROR, "parameter 1 must be `object`, got `%s`", typeStr());
+        }
     }
 
   public:
