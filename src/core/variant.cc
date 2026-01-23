@@ -27,9 +27,19 @@ namespace php {
 Variant null = {};
 Int zero = 0L;
 
+void Variant::copyFrom(const zval *src) {
+    src = unwrap_zval(src);
+    if (isIndirect()) {
+        zval_ptr_dtor(zv());
+        ZVAL_COPY(zv(), src);
+    } else {
+        zval_ptr_dtor(&val);
+        ZVAL_COPY(&val, src);
+    }
+}
+
 Variant &Variant::operator=(const zval *v) {
-    destroy();
-    ZVAL_COPY(unwrap_ptr(), unwrap_zval(v));
+    copyFrom(v);
     return *this;
 }
 
@@ -37,8 +47,7 @@ Variant &Variant::operator=(const Variant &v) {
     if (&v == this) {
         return *this;
     }
-    destroy();
-    ZVAL_COPY(unwrap_ptr(), v.unwrap_ptr());
+    copyFrom(v.unwrap_ptr());
     return *this;
 }
 
@@ -58,6 +67,11 @@ std::string Variant::toStdString() const {
 
 String Variant::toString() const {
     return String(zval_get_string(NO_CONST_Z(unwrap_ptr())), Ctor::Move);
+}
+
+Reference Variant::toReference() {
+    Variant tmp{this};
+    return Reference{tmp.const_ptr()};
 }
 
 Array Variant::toArray() const {
@@ -628,12 +642,5 @@ Variant Variant::jsonDecode(zend_long options, zend_long depth) {
 
 bool Variant::isCallable() {
     return zend_is_callable(unwrap_ptr(), 0, nullptr);
-}
-
-Variant newReference() {
-    Variant ref{};
-    ZVAL_NEW_EMPTY_REF(ref.ptr());
-    ZVAL_NULL(Z_REFVAL_P(ref.ptr()));
-    return ref;
 }
 }  // namespace php

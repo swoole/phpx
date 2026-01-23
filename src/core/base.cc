@@ -346,7 +346,7 @@ Variant call(const Variant &func, Args &args) {
 Variant call(const Variant &func, const std::initializer_list<Variant> &args) {
     Args _args(args.size());
     for (const auto &arg : args) {
-        _args.append(const_cast<Variant &>(arg).ptr());
+        _args.append(arg.const_ptr());
     }
     return _call(nullptr, func.const_ptr(), _args);
 }

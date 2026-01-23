@@ -276,17 +276,17 @@ TEST(array, ref) {
     var ref = &a;
     a.set("c", "cherry");
     ASSERT_EQ(a.count(), 3);
-    auto b = ref.toArray();
-    ASSERT_EQ(b.count(), 2);
-    ASSERT_EQ(b.length(), 2);
 
-    ASSERT_EQ(ref.length(), 2);
+    auto b = ref.toArray();
+    ASSERT_EQ(b.count(), 3);
+    ASSERT_EQ(b.length(), 3);
+    ASSERT_EQ(ref.length(), 3);
 
     auto c = ref.getRefValue();
-    ASSERT_EQ(c.length(), 2);
+    ASSERT_EQ(c.length(), 3);
 
     ref.offsetSet("c", "orange");
-    ASSERT_EQ(c.length(), 2);
+    ASSERT_EQ(c.length(), 3);
     ASSERT_EQ(ref.length(), 3);
 }
 
