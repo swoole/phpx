@@ -320,16 +320,9 @@ void Variant::offsetUnset(const Variant &key) {
 
 Variant Variant::getProperty(zend_string *prop_name) const {
     zval rv;
-    Variant retval;
     zval *member_p = zend_read_property_ex(ce(), object(), prop_name, false, &rv);
     member_p = unwrap_zval(member_p);
-
-    if (member_p != &rv) {
-        ZVAL_COPY(retval.ptr(), member_p);
-    } else {
-        ZVAL_COPY_VALUE(retval.ptr(), member_p);
-    }
-    return retval;
+    return {member_p};
 }
 
 void Variant::setProperty(zend_string *prop_name, const Variant &value) const {

@@ -17,18 +17,31 @@
 #include "phpx.h"
 
 namespace php {
-Variant Variant::getPropertyIndirect(const Variant &name) const {
+Variant Variant::getPropertyIndirect(const Variant &name, bool write) const {
     if (UNEXPECTED(!isObject())) {
         zend_throw_error(NULL, "Only objects support the getPropertyIndirect() method");
         return Variant{};
     }
-    auto zk = NO_CONST_V(name);
-    auto prop_name = zval_get_string(zk);
+
+    auto prop_name = name.toString();
     zval rv;
-    zval *member_p = zend_read_property_ex(ce(), object(), prop_name, false, &rv);
-    member_p = unwrap_zval(member_p);
-    zend_string_release(prop_name);
-    return Variant{member_p, Ctor::Indirect};
+    auto member_p = zend_read_property_ex(ce(), object(), prop_name.str(), write, &rv);
+
+    if (ZVAL_IS_NULL(member_p) && write) {
+        zval tmp;
+        ZVAL_NULL(&tmp);
+        auto old_scope = EG(fake_scope);
+        EG(fake_scope) = ce();
+        member_p = object()->handlers->write_property(object(), prop_name.str(), &tmp, NULL);
+        EG(fake_scope) = old_scope;
+    }
+
+    if (member_p == &rv) {
+        return Variant{member_p};
+    } else {
+        member_p = unwrap_zval(member_p);
+        return Variant{member_p, Ctor::Indirect};
+    }
 }
 
 Variant Variant::getPropertyIndirect(uintptr_t offset) const {
@@ -55,9 +68,7 @@ Variant Variant::offsetGetIndirect(zend_long offset) const {
         ZVAL_LONG(&dim, offset);
         retval = obj->handlers->read_dimension(obj, &dim, BP_VAR_RW, &rv);
         if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
-            zend_throw_error(
-                NULL, "Indirect modification of overloaded element of %s has no effect", ZSTR_VAL(ce()->name));
-            return Variant{};
+            return Variant{retval};
         }
     } else {
         zend_throw_error(
@@ -88,9 +99,7 @@ Variant Variant::offsetGetIndirect(const Variant &key) const {
         auto dim = NO_CONST_V(key);
         retval = obj->handlers->read_dimension(obj, dim, BP_VAR_RW, &rv);
         if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
-            zend_throw_error(
-                NULL, "Indirect modification of overloaded element of %s has no effect", ZSTR_VAL(ce()->name));
-            return Variant{};
+            return Variant{retval};
         }
     } else {
         zend_throw_error(NULL, "Only arrays or objects support the offsetGetIndirect() method");

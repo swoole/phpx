@@ -1,5 +1,7 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
+#include "phpx_helper.h"
+
 #include "const/json.h"
 
 using namespace php;

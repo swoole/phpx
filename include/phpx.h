@@ -467,7 +467,7 @@ class Variant {
      * performing write operations on an array or object, the address of the zend_array or object property table may
      * change, and the zval address pointed to by the Indirect object may become an invalid address.
      */
-    PHPX_UNSAFE Variant getPropertyIndirect(const Variant &name) const;
+    PHPX_UNSAFE Variant getPropertyIndirect(const Variant &name, bool write = false) const;
     PHPX_UNSAFE Variant getPropertyIndirect(uintptr_t offset) const;
     PHPX_UNSAFE Variant offsetGetIndirect(zend_long offset) const;
     PHPX_UNSAFE Variant offsetGetIndirect(const Variant &key) const;
@@ -612,81 +612,6 @@ Variant newResource(const char *name, T *v) {
 #ifndef ZEND_HASH_ELEMENT
 #define ZEND_HASH_ELEMENT(ht, idx) &HT_HASH_TO_BUCKET(ht, idx)->val
 #endif
-
-template <typename T>
-static inline Variant operator+(T a, const Variant &b) {
-    return Variant(a) + b;
-}
-
-template <typename T>
-static inline Variant operator-(T a, const Variant &b) {
-    return Variant(a) - b;
-}
-
-template <typename T>
-static inline Variant operator*(T a, const Variant &b) {
-    return Variant(a) * b;
-}
-
-template <typename T>
-static inline Variant operator/(T a, const Variant &b) {
-    return Variant(a) / b;
-}
-
-template <typename T>
-static inline Variant operator%(T a, const Variant &b) {
-    return Variant(a) % b;
-}
-
-template <typename T>
-static inline Variant operator<<(T a, const Variant &b) {
-    return Variant(a) << b;
-}
-
-template <typename T>
-static inline Variant operator>>(T a, const Variant &b) {
-    return Variant(a) >> b;
-}
-
-template <typename T>
-static inline Variant operator&(T a, const Variant &b) {
-    return Variant(a) & b;
-}
-
-template <typename T>
-static inline Variant operator|(T a, const Variant &b) {
-    return Variant(a) | b;
-}
-
-template <typename T>
-static inline Variant operator^(T a, const Variant &b) {
-    return Variant(a) ^ b;
-}
-
-template <typename T>
-static inline Variant operator<=(T a, const Variant &b) {
-    return Variant(a) <= b;
-}
-
-template <typename T>
-static inline Variant operator<(T a, const Variant &b) {
-    return Variant(a) < b;
-}
-
-template <typename T>
-static inline Variant operator>=(T a, const Variant &b) {
-    return Variant(a) >= b;
-}
-
-template <typename T>
-static inline Variant operator>(T a, const Variant &b) {
-    return Variant(a) > b;
-}
-
-template <typename T>
-static inline Variant operator==(T a, const Variant &b) {
-    return Variant(a) == b;
-}
 
 class String : public Variant {
     void checkString() {

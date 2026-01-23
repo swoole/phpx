@@ -23,9 +23,15 @@ namespace math {
 static inline Int abs(Int v) {
     return std::abs(v);
 }
+
 static inline Float abs(Float v) {
     return std::fabs(v);
 }
+
 Variant abs(const Variant &v);
+
+static inline Variant mod(const Variant &a, const Variant &b) {
+    return a % b;
+}
 }  // namespace math
 }  // namespace php
