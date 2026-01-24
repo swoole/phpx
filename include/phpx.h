@@ -468,7 +468,7 @@ class Variant {
      * change, and the zval address pointed to by the Indirect object may become an invalid address.
      */
     PHPX_UNSAFE Variant getPropertyIndirect(const Variant &name, bool write = false) const;
-    PHPX_UNSAFE Variant getPropertyIndirect(uintptr_t offset) const;
+    PHPX_UNSAFE Variant getPropertyIndirect(uintptr_t offset, bool write = false) const;
     PHPX_UNSAFE Variant offsetGetIndirect(zend_long offset) const;
     PHPX_UNSAFE Variant offsetGetIndirect(const Variant &key) const;
 

@@ -44,7 +44,7 @@ Variant Variant::getPropertyIndirect(const Variant &name, bool write) const {
     }
 }
 
-Variant Variant::getPropertyIndirect(uintptr_t offset) const {
+Variant Variant::getPropertyIndirect(uintptr_t offset, bool write) const {
     if (UNEXPECTED(!isObject())) {
         zend_throw_error(NULL, "Only objects support the getPropertyIndirect() method");
         return Variant{};
