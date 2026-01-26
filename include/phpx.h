@@ -110,6 +110,8 @@ Object toObject(const Variant &v, const String &class_name);
 Resource *getResource(const std::string &name);
 void request_shutdown();
 
+extern std::unordered_map<std::string, zval> global_vars;
+
 static inline const zval *unwrap_zval(const zval *val) {
     switch (Z_TYPE_P(val)) {
     case IS_REFERENCE:

@@ -31,7 +31,6 @@ class Method;
 
 extern std::unordered_map<std::string, std::map<std::string, Method *>> method_map;
 extern std::unordered_map<std::string, Function *> function_map;
-extern std::unordered_map<std::string, zval> global_vars;
 
 #define PHPX_FN(n) #n, n
 #define PHPX_ME(c, m) #m, c##_##m
