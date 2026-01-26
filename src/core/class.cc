@@ -15,6 +15,7 @@
 */
 
 #include "phpx.h"
+#include "phpx_ext.h"
 
 BEGIN_EXTERN_C()
 #include "zend_inheritance.h"

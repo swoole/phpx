@@ -249,6 +249,12 @@ String Array::join(const String &delim) {
     return String(&retval, Ctor::Move);
 }
 
+void Array::merge(const Array &source) {
+    auto zarr = unwrap_ptr();
+    SEPARATE_ARRAY(zarr);
+    php_array_merge(Z_ARRVAL_P(zarr), source.array());
+}
+
 Variant ArrayIterator::key() const {
     if (HT_IS_PACKED(array_)) {
         return (zend_long) idx_;

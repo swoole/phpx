@@ -1,6 +1,7 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
 #include "phpx_class.h"
+#include "phpx_helper.h"
 #include "const/curl.h"
 
 using namespace php;

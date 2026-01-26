@@ -16,13 +16,7 @@
 
 #include "phpx.h"
 
-BEGIN_EXTERN_C()
-#include "zend_ini.h"
-END_EXTERN_C()
-
 namespace php {
-std::unordered_map<std::string, std::map<std::string, Method *>> method_map;
-std::unordered_map<std::string, Function *> function_map;
 std::unordered_map<std::string, zval> global_vars;
 
 static zend_array *func_cache_map = nullptr;
@@ -155,93 +149,6 @@ Int atoi(const String &str) {
 #else
     return zend_atol(str.data(), str.length());
 #endif
-}
-
-static ZEND_RESULT_CODE _check_args_num(const zend_execute_data *data, const int num_args) {
-    const uint32_t min_num_args = data->func->common.required_num_args;
-    const uint32_t max_num_args = data->func->common.num_args;
-
-    if (num_args < min_num_args || (num_args > max_num_args && max_num_args > 0)) {
-        zend_wrong_parameters_count_error(min_num_args, max_num_args);
-        return FAILURE;
-    }
-
-    return SUCCESS;
-}
-
-#define FUNC_RESERVE_INDEX 3
-
-void _exec_function(zend_execute_data *data, zval *return_value) {
-    Function *func = nullptr;
-    const auto fn_reserved = data->func->internal_function.reserved;
-    const auto fn_name = data->func->common.function_name->val;
-    if (EXPECTED(fn_reserved[FUNC_RESERVE_INDEX])) {
-        func = static_cast<Function *>(fn_reserved[FUNC_RESERVE_INDEX]);
-    } else {
-        auto iter_func = function_map.find(fn_name);
-        if (UNEXPECTED(iter_func == function_map.end())) {
-            error(E_WARNING, "[phpx::_exec_function] function '%s' not found", fn_name);
-            return;
-        }
-        func = iter_func->second;
-        fn_reserved[FUNC_RESERVE_INDEX] = func;
-    }
-
-    Args args;
-    zval *param_ptr = ZEND_CALL_ARG(EG(current_execute_data), 1);
-    int arg_count = ZEND_CALL_NUM_ARGS(EG(current_execute_data));
-
-    if (_check_args_num(data, arg_count) == FAILURE) {
-        return;
-    }
-
-    while (arg_count-- > 0) {
-        args.append(param_ptr);
-        param_ptr++;
-    }
-    auto retval = func->impl(args);
-    retval.moveTo(return_value);
-}
-
-void _exec_method(zend_execute_data *data, zval *return_value) {
-    Method *method = nullptr;
-    const auto fn_reserved = data->func->internal_function.reserved;
-    const auto class_name = data->func->common.scope->name->val;
-    const auto method_name = data->func->common.function_name->val;
-    if (EXPECTED(fn_reserved[FUNC_RESERVE_INDEX])) {
-        method = static_cast<Method *>(fn_reserved[FUNC_RESERVE_INDEX]);
-    } else {
-        const auto iter_class = method_map.find(class_name);
-        if (UNEXPECTED(iter_class == method_map.end())) {
-            error(E_WARNING, "[phpx::_exec_method] class '%s' not found", class_name);
-            return;
-        }
-        auto iter_method = iter_class->second.find(method_name);
-        if (UNEXPECTED(iter_method == iter_class->second.end())) {
-            error(E_WARNING, "[phpx::_exec_method] method '%s' not found", method_name);
-            return;
-        }
-
-        method = iter_method->second;
-        fn_reserved[FUNC_RESERVE_INDEX] = method;
-    }
-
-    Args args;
-    Object _this(&data->This);
-
-    zval *param_ptr = ZEND_CALL_ARG(EG(current_execute_data), 1);
-    int arg_count = ZEND_CALL_NUM_ARGS(EG(current_execute_data));
-
-    if (_check_args_num(data, arg_count) == FAILURE) {
-        return;
-    }
-
-    while (arg_count-- > 0) {
-        args.append(param_ptr);
-        param_ptr++;
-    }
-    auto retval = method->impl(_this, args);
-    retval.moveTo(return_value);
 }
 
 static void free_fci_cache(zval *el) {

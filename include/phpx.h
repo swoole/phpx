@@ -16,27 +16,20 @@
 
 #pragma once
 
-extern "C" {
 #include "php.h"
-#include "php_ini.h"
-#include "php_main.h"
+#include "phpx_types.h"
+
+#include "zend_ini.h"
+#include "zend_interfaces.h"
+#include "zend_exceptions.h"
+
+BEGIN_EXTERN_C()
+#include <ext/standard/php_standard.h>
+#include <ext/json/php_json.h>
+END_EXTERN_C()
 
 #if PHP_VERSION_ID < 80100
 #error "only supports PHP-8.1 or later."
-#endif
-
-#include "zend_API.h"
-#include "zend_interfaces.h"
-#include "zend_exceptions.h"
-#include "zend_variables.h"
-
-#include <ext/json/php_json.h>
-#include <ext/standard/html.h>
-#include <ext/standard/php_standard.h>
-}
-
-#if PHP_VERSION_ID < 80200
-#define zend_string_toupper php_string_toupper
 #endif
 
 #include <unordered_map>
@@ -46,11 +39,8 @@ extern "C" {
 #include <map>
 #include <memory>
 
-#include "phpx_types.h"
-#include "phpx_ext.h"
-
 #define PHPX_MAX_ARGC 10
-#define PHPX_VAR_DUMP_LEVEL 10
+
 /**
  * All API names must be in lowercase camel case.
  */
@@ -697,24 +687,12 @@ class String : public Variant {
     }
     static String format(const char *format, ...);
     String trim(const char *what = " \t\n\r\v\0", TrimMode mode = TRIM_BOTH) const;
-    String lower() const {
-        return String(zend_string_tolower(str()), Ctor::Move);
-    }
-    String upper() const {
-        return String(zend_string_toupper(str()), Ctor::Move);
-    }
-    String base64Encode() const {
-        return String(php_base64_encode_str(str()), Ctor::Move);
-    }
-    String base64Decode() const {
-        return String(php_base64_decode_str(str()), Ctor::Move);
-    }
-    String escape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
-        return String(php_escape_html_entities((uchar *) data(), length(), 0, flags, charset), Ctor::Move);
-    }
-    String unescape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const {
-        return String(php_unescape_html_entities(str(), 1, flags, charset), Ctor::Move);
-    }
+    String lower() const;
+    String upper() const;
+    String base64Encode() const;
+    String base64Decode() const;
+    String escape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const;
+    String unescape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const;
     zend_string *str() const {
         return Z_STR(val);
     }
@@ -885,11 +863,7 @@ class Array : public Variant {
     Variant search(const Variant &_other_var, bool strict = false) const;
     bool contains(const Variant &_other_var, bool strict = false) const;
     String join(const String &delim);
-    void merge(const Array &source) {
-        auto zarr = unwrap_ptr();
-        SEPARATE_ARRAY(zarr);
-        php_array_merge(Z_ARRVAL_P(zarr), source.array());
-    }
+    void merge(const Array &source);
     void sort(bool renumber = true);
     Array slice(long offset, long length = -1, bool preserve_keys = false);
 };

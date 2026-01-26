@@ -16,6 +16,10 @@
 
 #include "phpx.h"
 
+#if PHP_VERSION_ID < 80200
+#define zend_string_toupper php_string_toupper
+#endif
+
 namespace php {
 String String::format(const char *format, ...) {
     va_list args;
@@ -25,8 +29,32 @@ String String::format(const char *format, ...) {
     return String(s, Ctor::Move);
 }
 
+String String::base64Encode() const {
+    return String(php_base64_encode_str(str()), Ctor::Move);
+}
+
+String String::base64Decode() const {
+    return String(php_base64_decode_str(str()), Ctor::Move);
+}
+
+String String::escape(const int flags, const char *charset) const {
+    return String(php_escape_html_entities((uchar *) data(), length(), 0, flags, charset), Ctor::Move);
+}
+
+String String::unescape(const int flags, const char *charset) const {
+    return String(php_unescape_html_entities(str(), 1, flags, charset), Ctor::Move);
+}
+
 String String::trim(const char *what, TrimMode mode) const {
     return String(php_trim(str(), what, strlen(what), mode), Ctor::Move);
+}
+
+String String::lower() const {
+    return String(zend_string_tolower(str()), Ctor::Move);
+}
+
+String String::upper() const {
+    return String(zend_string_toupper(str()), Ctor::Move);
 }
 
 void String::print() const {
