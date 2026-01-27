@@ -250,3 +250,10 @@ TEST(object, ArrayProperty2) {
     auto prop1 = o1.get("prop");
     ASSERT_EQ(prop1.offsetGet("php").toInt(), 2999);
 }
+
+TEST(object, toObject2) {
+    auto v = date_create("now");
+    auto o = toObject(v, "DateTime");
+    auto ts = o.exec("getTimestamp");
+    ASSERT_GE(ts.toInt(),  10000000);
+}
