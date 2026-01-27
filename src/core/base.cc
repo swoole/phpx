@@ -103,15 +103,14 @@ void exit(const Variant &status) {
 }
 
 static void box_dtor(zend_resource *res) {
-    Box *box = (Box *) res->ptr;
+    auto box = static_cast<Box *>(res->ptr);
     box->destroy();
 }
 
 void request_init() {
     box_res_id = zend_register_list_destructors_ex(box_dtor, nullptr, box_res_name, 0);
     if (box_res_id < 0) {
-        zend_throw_error(NULL, "error");
-        return;
+        zend_throw_error(nullptr, "error");
     }
 }
 
@@ -399,7 +398,7 @@ Variant getStaticProperty(const String &class_name, const String &prop) {
     if (UNEXPECTED(!ce)) {
         zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name.toCString());
     }
-    return Variant(zend_read_static_property_ex(ce, prop.str(), true), Ctor::Move);
+    return {zend_read_static_property_ex(ce, prop.str(), true), Ctor::Move};
 }
 
 bool hasStaticProperty(const String &class_name, const String &prop) {

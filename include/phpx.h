@@ -895,8 +895,8 @@ class Args {
     std::vector<Variant> params;
 
   public:
-    Args() {}
-    Args(size_t n) {
+    Args() = default;
+    explicit Args(size_t n) {
         params.reserve(n);
     }
     void append(const zval *zv) {
@@ -936,7 +936,7 @@ static inline zend_class_entry *getClassEntry(const String &name) {
 }
 
 class Object : public Variant {
-    void checkObject() {
+    void checkObject() const {
         if (!isUndef() && !isNull() && !isObject()) {
             error(E_ERROR, "parameter 1 must be `object`, got `%s`", typeStr());
         }
@@ -967,7 +967,7 @@ class Object : public Variant {
     void updateArrayProperty(const String &name, zend_long offset, const Variant &value);
     void updateArrayProperty(const String &name, const Variant &key, const Variant &value);
 
-    bool offsetExists(const Variant &offset) {
+    bool offsetExists(const Variant &offset) const {
         return object()->handlers->has_dimension(object(), NO_CONST_V(offset), 0);
     }
     bool offsetExists(zend_long offset) {
@@ -1124,7 +1124,7 @@ class Reference : public Variant {
 class Box {
   public:
     Box() = default;
-    void destroy() {
+    void destroy() const {
         delete this;
     }
 
