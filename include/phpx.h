@@ -250,8 +250,8 @@ class Variant {
         }
     }
     Variant(Box *v) {
-    	zend_resource *res = zend_register_resource(v, box_res_id);
-    	ZVAL_RES(&val, res);
+        zend_resource *res = zend_register_resource(v, box_res_id);
+        ZVAL_RES(&val, res);
     }
     /**
      * !!! [UNSAFE]
@@ -1122,12 +1122,13 @@ class Reference : public Variant {
 };
 
 class Box {
-public:
-	Box() = default;
-	void destroy() {
-		delete this;
-	}
-protected:
+  public:
+    Box() = default;
+    void destroy() {
+        delete this;
+    }
+
+  protected:
     virtual ~Box() = default;
 };
 

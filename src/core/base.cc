@@ -103,12 +103,12 @@ void exit(const Variant &status) {
 }
 
 static void box_dtor(zend_resource *res) {
-	Box *box = (Box *)res->ptr;
-	box->destroy();
+    Box *box = (Box *) res->ptr;
+    box->destroy();
 }
 
 void request_init() {
-	box_res_id = zend_register_list_destructors_ex(box_dtor, nullptr, box_res_name, 0);
+    box_res_id = zend_register_list_destructors_ex(box_dtor, nullptr, box_res_name, 0);
     if (box_res_id < 0) {
         zend_throw_error(NULL, "error");
         return;
