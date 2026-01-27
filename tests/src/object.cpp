@@ -226,3 +226,27 @@ TEST(object, getPropertyIndirect) {
     prop1 = arr;
     ASSERT_TRUE(o1.getProperty("prop1").isArray());
 }
+
+TEST(object, ArrayProperty) {
+    auto o1 = newObject("stdClass");
+    o1.set("prop", create_list());
+    o1.appendArrayProperty("prop", 1899);
+
+    auto prop1 = o1.get("prop");
+    ASSERT_EQ(prop1.offsetGet(5).toInt(), 1899);
+
+    o1.updateArrayProperty("prop", 5, 2026);
+
+    auto prop2 = o1.get("prop");
+    ASSERT_EQ(prop2.offsetGet(5).toInt(), 2026);
+}
+
+TEST(object, ArrayProperty2) {
+    auto o1 = newObject("stdClass");
+    o1.set("prop", create_map());
+
+    o1.updateArrayProperty("prop", "php", 2999);
+
+    auto prop1 = o1.get("prop");
+    ASSERT_EQ(prop1.offsetGet("php").toInt(), 2999);
+}

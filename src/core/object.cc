@@ -51,16 +51,6 @@ bool Object::instanceOf(const String &name) const {
     return instanceof_function(ce(), cls_ce);
 }
 
-#if PHP_VERSION_ID < 80400
-ZEND_API void *zend_hash_find_ptr_lc(const HashTable *ht, zend_string *key) {
-	void *result;
-	zend_string *lc_key = zend_string_tolower(key);
-	result = zend_hash_find_ptr(ht, lc_key);
-	zend_string_release(lc_key);
-	return result;
-}
-#endif
-
 Variant Object::callParentMethod(const String &func, const std::initializer_list<Variant> &args) {
     Args _args;
     for (const auto &arg : args) {
@@ -128,9 +118,15 @@ void Object::appendArrayProperty(const String &name, const Variant &value) {
         return;
     }
 
+    if (Z_TYPE_P(member_p) != IS_ARRAY) {
+        zend_throw_error(nullptr, "property `%s` must be `array`", name.data());
+        return;
+    }
+
     ZVAL_DEREF(member_p);
     auto zv = NO_CONST_V(value);
     Z_TRY_ADDREF_P(zv);
+    SEPARATE_ARRAY(member_p);
     zend_hash_next_index_insert(Z_ARRVAL_P(member_p), zv);
 }
 
@@ -143,9 +139,15 @@ void Object::updateArrayProperty(const String &name, zend_long offset, const Var
         return;
     }
 
+    if (Z_TYPE_P(member_p) != IS_ARRAY) {
+        zend_throw_error(nullptr, "property `%s` must be `array`", name.data());
+        return;
+    }
+
     ZVAL_DEREF(member_p);
     auto zv = NO_CONST_V(value);
     Z_TRY_ADDREF_P(zv);
+    SEPARATE_ARRAY(member_p);
     zend_hash_index_update(Z_ARRVAL_P(member_p), offset, zv);
 }
 
@@ -158,9 +160,15 @@ void Object::updateArrayProperty(const String &name, const Variant &key, const V
         return;
     }
 
+    if (Z_TYPE_P(member_p) != IS_ARRAY) {
+        zend_throw_error(nullptr, "property `%s` must be `array`", name.data());
+        return;
+    }
+
     ZVAL_DEREF(member_p);
     auto zv = NO_CONST_V(value);
     Z_TRY_ADDREF_P(zv);
+    SEPARATE_ARRAY(member_p);
 
     if (key.isInt() || key.isFloat() || key.isNumeric()) {
         zend_hash_index_update(Z_ARRVAL_P(member_p), key.toInt(), zv);

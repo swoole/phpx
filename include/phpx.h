@@ -17,16 +17,17 @@
 #pragma once
 
 #include "php.h"
-#include "phpx_types.h"
 
+BEGIN_EXTERN_C()
 #include "zend_ini.h"
 #include "zend_interfaces.h"
 #include "zend_exceptions.h"
 
-BEGIN_EXTERN_C()
 #include <ext/standard/php_standard.h>
 #include <ext/json/php_json.h>
 END_EXTERN_C()
+
+#include "phpx_types.h"
 
 #if PHP_VERSION_ID < 80100
 #error "only supports PHP-8.1 or later."
