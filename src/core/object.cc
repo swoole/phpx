@@ -51,6 +51,16 @@ bool Object::instanceOf(const String &name) const {
     return instanceof_function(ce(), cls_ce);
 }
 
+#if PHP_VERSION_ID < 80400
+ZEND_API void *zend_hash_find_ptr_lc(const HashTable *ht, zend_string *key) {
+	void *result;
+	zend_string *lc_key = zend_string_tolower(key);
+	result = zend_hash_find_ptr(ht, lc_key);
+	zend_string_release(lc_key);
+	return result;
+}
+#endif
+
 Variant Object::callParentMethod(const String &func, const std::initializer_list<Variant> &args) {
     Args _args;
     for (const auto &arg : args) {
