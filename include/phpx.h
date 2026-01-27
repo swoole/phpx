@@ -108,9 +108,13 @@ Array toArray(const Variant &v);
 Object toObject(const Variant &v);
 Object toObject(const Variant &v, const String &class_name);
 Resource *getResource(const std::string &name);
+
+void request_init();
 void request_shutdown();
 
 extern std::unordered_map<std::string, zval> global_vars;
+extern int box_res_id;
+extern const char *box_res_name;
 
 static inline const zval *unwrap_zval(const zval *val) {
     switch (Z_TYPE_P(val)) {
@@ -245,6 +249,10 @@ class Variant {
             v->addRef();
         }
     }
+    Variant(Box *v) {
+    	zend_resource *res = zend_register_resource(v, box_res_id);
+    	ZVAL_RES(&val, res);
+    }
     /**
      * !!! [UNSAFE]
      * This constructor is unsafe and should be used with caution.
@@ -376,7 +384,7 @@ class Variant {
         return Z_TYPE_P(unwrap_ptr()) == IS_UNDEF;
     }
     bool isResource() const {
-        return Z_TYPE_P(unwrap_ptr()) == IS_RESOURCE;
+        return Z_TYPE_P(const_ptr()) == IS_RESOURCE;
     }
     bool isReference() const {
         return Z_TYPE_P(const_ptr()) == IS_REFERENCE;
@@ -425,6 +433,19 @@ class Variant {
         }
         return static_cast<T *>(_ptr);
     }
+    template <class T>
+    T *toBox() {
+        if (!isResource()) {
+            error(E_WARNING, "This variant is not a resource type.");
+            return nullptr;
+        }
+        auto res = Z_RES(val);
+        if (res->type != box_res_id) {
+            error(E_WARNING, "This resource is not type of `%s`.", box_res_name);
+            return nullptr;
+        }
+        return static_cast<T *>(res->ptr);
+    }
     Reference toReference();
     Variant getRefValue() const;
     Variant operator*() const {
@@ -461,8 +482,8 @@ class Variant {
      */
     PHPX_UNSAFE Variant getPropertyIndirect(const Variant &name, bool write = false) const;
     PHPX_UNSAFE Variant getPropertyIndirect(uintptr_t offset, bool write = false) const;
-    PHPX_UNSAFE Variant offsetGetIndirect(zend_long offset) const;
-    PHPX_UNSAFE Variant offsetGetIndirect(const Variant &key) const;
+    PHPX_UNSAFE Variant offsetGetIndirect(zend_long offset, bool write = false) const;
+    PHPX_UNSAFE Variant offsetGetIndirect(const Variant &key, bool write = false) const;
 
     bool operator==(const Variant &v) const {
         return equals(v);
@@ -1098,6 +1119,16 @@ class Reference : public Variant {
         ZVAL_COPY(&val, v.const_ptr());
         return *this;
     }
+};
+
+class Box {
+public:
+	Box() = default;
+	void destroy() {
+		delete this;
+	}
+protected:
+    virtual ~Box() = default;
 };
 
 static inline Reference newReference() {

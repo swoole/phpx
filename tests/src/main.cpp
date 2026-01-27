@@ -61,6 +61,7 @@ int main(int argc, char **argv) {
     php_embed_init(argc, argv);
     zend_register_functions(nullptr, ext_functions, nullptr, 0);
 
+    php::request_init();
     init_root_path(argv[0]);
     ::testing::InitGoogleTest(&argc, argv);
 

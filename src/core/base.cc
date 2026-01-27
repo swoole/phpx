@@ -18,6 +18,8 @@
 
 namespace php {
 std::unordered_map<std::string, zval> global_vars;
+const char *box_res_name = "php::box";
+int box_res_id;
 
 static zend_array *func_cache_map = nullptr;
 
@@ -98,6 +100,19 @@ void exit(const Variant &status) {
         EG(current_execute_data)->opline = EG(exception_op);
     }
     zend_bailout();
+}
+
+static void box_dtor(zend_resource *res) {
+	Box *box = (Box *)res->ptr;
+	box->destroy();
+}
+
+void request_init() {
+	box_res_id = zend_register_list_destructors_ex(box_dtor, nullptr, box_res_name, 0);
+    if (box_res_id < 0) {
+        zend_throw_error(NULL, "error");
+        return;
+    }
 }
 
 void request_shutdown() {

@@ -52,7 +52,7 @@ Variant Variant::getPropertyIndirect(uintptr_t offset, bool write) const {
     return Variant{OBJ_PROP(object(), offset), Ctor::Indirect};
 }
 
-Variant Variant::offsetGetIndirect(zend_long offset) const {
+Variant Variant::offsetGetIndirect(zend_long offset, bool write) const {
     auto zvar = unwrap_zval(const_ptr());
     zval *retval;
     zval rv;
@@ -60,7 +60,13 @@ Variant Variant::offsetGetIndirect(zend_long offset) const {
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         retval = zend_hash_index_find(Z_ARRVAL_P(zvar), offset);
         if (retval == nullptr) {
-            return Variant{};
+            if (write) {
+                zval tmp;
+                ZVAL_NULL(&tmp);
+                retval = zend_hash_index_update(Z_ARRVAL_P(zvar), offset, &tmp);
+            } else {
+                return Variant{};
+            }
         }
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         auto obj = object();
@@ -70,16 +76,18 @@ Variant Variant::offsetGetIndirect(zend_long offset) const {
         if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
             return Variant{retval};
         }
+    } else if (Z_TYPE_P(zvar) == IS_STRING) {
+        return offsetGet(offset);
     } else {
         zend_throw_error(
-            NULL, "Only arrays or objects support the offsetGetIndirect(%ld) method, got `%s`", offset, typeStr());
+            NULL, "Only array/object/string support the offsetGetIndirect(%ld) method, got `%s`", offset, typeStr());
         return Variant{};
     }
 
     return Variant{retval, Ctor::Indirect};
 }
 
-Variant Variant::offsetGetIndirect(const Variant &key) const {
+Variant Variant::offsetGetIndirect(const Variant &key, bool write) const {
     auto zvar = unwrap_zval(const_ptr());
     zval *retval;
     zval rv;
@@ -92,7 +100,13 @@ Variant Variant::offsetGetIndirect(const Variant &key) const {
         auto skey = key.toString();
         retval = zend_hash_find(Z_ARRVAL_P(zvar), skey.str());
         if (retval == nullptr) {
-            return Variant{};
+            if (write) {
+                zval tmp;
+                ZVAL_NULL(&tmp);
+                retval = zend_hash_update(Z_ARRVAL_P(zvar), skey.str(), &tmp);
+            } else {
+                return Variant{};
+            }
         }
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         auto obj = object();
@@ -101,8 +115,10 @@ Variant Variant::offsetGetIndirect(const Variant &key) const {
         if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
             return Variant{retval};
         }
+    } else if (Z_TYPE_P(zvar) == IS_STRING) {
+        return offsetGet(key);
     } else {
-        zend_throw_error(NULL, "Only arrays or objects support the offsetGetIndirect() method");
+        zend_throw_error(NULL, "Only array/object/string support the offsetGetIndirect() method");
         return Variant{};
     }
 

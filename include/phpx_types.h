@@ -35,6 +35,7 @@ class Object;
 class String;
 class Args;
 class Reference;
+class Box;
 
 using var = Variant;
 using array = Array;

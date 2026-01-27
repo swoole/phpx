@@ -258,11 +258,13 @@ bool Variant::offsetExists(const Variant &key) const {
 void Variant::offsetSet(zend_long offset, const Variant &value) {
     auto zvar = unwrap_ptr();
 
+    if (Z_TYPE_P(zvar) == IS_UNDEF || Z_TYPE_P(zvar) == IS_NULL) {
+        array_init(zvar);
+    }
+
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
-        auto zv = NO_CONST_V(value);
-        Z_TRY_ADDREF_P(zv);
-        SEPARATE_ARRAY(zvar);
-        zend_hash_index_update(Z_ARRVAL_P(zvar), offset, zv);
+        Array tmp(zvar, Ctor::Indirect);
+        tmp.set(offset, value);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
         tmp.offsetSet(offset, NO_CONST_V(value));
@@ -274,6 +276,10 @@ void Variant::offsetSet(zend_long offset, const Variant &value) {
 
 void Variant::offsetSet(const Variant &key, const Variant &value) {
     auto zvar = unwrap_ptr();
+
+    if (Z_TYPE_P(zvar) == IS_UNDEF || Z_TYPE_P(zvar) == IS_NULL) {
+        array_init(zvar);
+    }
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         Array tmp(zvar, Ctor::Indirect);
