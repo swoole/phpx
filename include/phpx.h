@@ -242,9 +242,14 @@ class Variant {
     Variant(zend_string *s) noexcept {
         ZVAL_STR(&val, zend_string_copy(s));
     }
-    Variant(const Variant &v) : Variant(v.const_ptr()) {}
+    Variant(const Variant &v) : Variant(v.unwrap_ptr()) {}
     Variant(Variant &&v) noexcept {
-        memcpy(&val, &v.val, sizeof(zval));
+    	if (v.isIndirect()) {
+    		memcpy(&val, v.zv(), sizeof(zval));
+    		addRef();
+    	} else {
+            memcpy(&val, v.const_ptr(), sizeof(zval));
+    	}
         v.val = {};
     }
     Variant(Variant *v) {
@@ -315,7 +320,6 @@ class Variant {
     void copyFrom(const zval *src);
     Variant &operator=(const zval *v);
     Variant &operator=(const Variant &v);
-    Variant &operator=(Variant &&v);
     Variant &operator=(const Variant *v);
     Variant &operator=(nullptr_t) {
         destroy();
@@ -350,8 +354,14 @@ class Variant {
     const zval *unwrap_ptr() const {
         return unwrap_zval(&val);
     }
+    const zval *direct_ptr() const {
+        return isIndirect() ? zv() : &val;
+    }
     zval *unwrap_ptr() noexcept {
         return unwrap_zval(&val);
+    }
+    zval *direct_ptr() {
+        return isIndirect() ? zv() : &val;
     }
     void debug();
     void print();
@@ -955,7 +965,7 @@ class Object : public Variant {
     Object(const zval *v, Ctor method = Ctor::Copy) : Variant(v, method) {
         checkObject();
     }
-    Object(const Variant &v) : Object(v.const_ptr()) {}
+    Object(const Variant &v) : Object(v.unwrap_ptr()) {}
     Object() = default;
     Variant call(const Variant &func, Args &args) {
         return call_impl(ptr(), func.const_ptr(), args);
@@ -1128,14 +1138,6 @@ class Reference : public Variant {
         if (&v != this) {
             zval_ptr_dtor(&val);
             ZVAL_COPY(&val, v.const_ptr());
-        }
-        return *this;
-    }
-    Reference &operator=(Reference &&v) noexcept {
-        if (&v != this) {
-            zval_ptr_dtor(&val);
-            memcpy(&val, &v.val, sizeof(zval));
-            v.val = {};
         }
         return *this;
     }

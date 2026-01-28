@@ -28,14 +28,8 @@ Variant null = {};
 Int zero = 0L;
 
 void Variant::copyFrom(const zval *src) {
-    src = unwrap_zval(src);
-    if (isIndirect()) {
-        zval_ptr_dtor(zv());
-        ZVAL_COPY(zv(), src);
-    } else {
-        zval_ptr_dtor(&val);
-        ZVAL_COPY(&val, src);
-    }
+    zval_ptr_dtor(direct_ptr());
+    ZVAL_COPY(direct_ptr(), unwrap_zval(src));
 }
 
 Variant &Variant::operator=(const zval *v) {
@@ -46,15 +40,6 @@ Variant &Variant::operator=(const zval *v) {
 Variant &Variant::operator=(const Variant &v) {
     if (&v != this) {
         copyFrom(v.unwrap_ptr());
-    }
-    return *this;
-}
-
-Variant &Variant::operator=(Variant &&v) {
-    if (&v != this) {
-        destroy();
-        memcpy(&val, &v.val, sizeof(zval));
-        v.val = {};
     }
     return *this;
 }
