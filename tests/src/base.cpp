@@ -117,11 +117,17 @@ TEST(base, eval) {
 }
 
 TEST(base, eval2) {
-    auto rs = eval("throw new Exception('phpx error');");
-    ASSERT_TRUE(rs.isUndef());
-    auto e = catchException();
-    auto msg = e.exec("getMessage");
-    ASSERT_STREQ(msg.toCString(), "phpx error");
+    var rs;
+    zend_try {
+        rs = eval("throw new Exception('phpx error');");
+    }
+    zend_catch {
+        ASSERT_TRUE(rs.isNull());
+        auto e = catchException();
+        auto msg = e.exec("getMessage");
+        ASSERT_STREQ(msg.toCString(), "phpx error");
+    }
+    zend_end_try();
 }
 
 TEST(base, exception) {
@@ -233,7 +239,7 @@ TEST(base, getInternalException) {
 }
 
 TEST(base, call_bad_func) {
-	zend_try {
+    zend_try {
         call("func_not_exists");
     }
     zend_catch {

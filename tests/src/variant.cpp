@@ -735,4 +735,11 @@ TEST(variant, offsetGetIndirect2) {
     auto iv2 = a.offsetGetIndirect("php");
     iv2 = 1995;
     ASSERT_EQ(a.offsetGet("php").toInt(), 1995);
+
+    auto iv3 = a.offsetGetIndirect("swift", true);
+    iv3 = 2012;
+    ASSERT_EQ(a.offsetGet("swift").toInt(), 2012);
+
+    auto chr = sk.offsetGetIndirect(1);
+    ASSERT_STREQ(chr.toCString(), "e");
 }

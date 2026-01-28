@@ -235,6 +235,11 @@ TEST(object, getPropertyIndirect) {
     Array arr{1, 3, 99};
     prop1 = arr;
     ASSERT_TRUE(o1.getProperty("prop1").isArray());
+
+    auto prop2 = o1.getPropertyIndirect("prop2", true);
+    prop2 = 9898;
+
+    ASSERT_EQ(o1.getProperty("prop2").toInt(), 9898);
 }
 
 TEST(object, ArrayProperty) {
