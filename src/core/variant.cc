@@ -44,10 +44,18 @@ Variant &Variant::operator=(const zval *v) {
 }
 
 Variant &Variant::operator=(const Variant &v) {
-    if (&v == this) {
-        return *this;
+    if (&v != this) {
+        copyFrom(v.unwrap_ptr());
     }
-    copyFrom(v.unwrap_ptr());
+    return *this;
+}
+
+Variant &Variant::operator=(Variant &&v) {
+	if (&v != this) {
+	    destroy();
+	    memcpy(&val, &v.val, sizeof(zval));
+	    v.val = {};
+	}
     return *this;
 }
 

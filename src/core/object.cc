@@ -72,7 +72,7 @@ Variant Object::callParentMethod(const String &func, const std::initializer_list
     return retval;
 }
 
-Variant Object::getPropertyReference(const String &prop_name) {
+Reference Object::getPropertyReference(const String &prop_name) {
     auto zobj = object();
     zval rv;
     zval *member_p = zobj->handlers->get_property_ptr_ptr(zobj, prop_name.str(), BP_VAR_RW, NULL);
@@ -85,7 +85,7 @@ Variant Object::getPropertyReference(const String &prop_name) {
     }
 
     if (Z_TYPE_P(member_p) == IS_REFERENCE) {
-        return Variant(member_p);
+        return Reference(member_p);
     }
 
     auto ref = newReference();

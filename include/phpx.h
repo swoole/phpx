@@ -315,6 +315,7 @@ class Variant {
     void copyFrom(const zval *src);
     Variant &operator=(const zval *v);
     Variant &operator=(const Variant &v);
+    Variant &operator=(Variant &&v);
     Variant &operator=(const Variant *v);
     Variant &operator=(nullptr_t) {
         destroy();
@@ -970,7 +971,7 @@ class Object : public Variant {
         return call_impl(ptr(), fn.const_ptr());
     }
     Variant exec(const Variant &fn, const std::initializer_list<Variant> &args);
-    Variant getPropertyReference(const String &name);
+    Reference getPropertyReference(const String &name);
     void appendArrayProperty(const String &name, const Variant &value);
     void updateArrayProperty(const String &name, zend_long offset, const Variant &value);
     void updateArrayProperty(const String &name, const Variant &key, const Variant &value);
@@ -1118,14 +1119,6 @@ class Reference : public Variant {
     }
     Reference(const zval *v, Ctor method = Ctor::CopyRef) : Variant(v, method) {
         checkRef();
-    }
-    Reference &operator=(const Reference &v) {
-        if (&v == this) {
-            return *this;
-        }
-        zval_ptr_dtor(&val);
-        ZVAL_COPY(&val, v.const_ptr());
-        return *this;
     }
 };
 
