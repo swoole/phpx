@@ -388,20 +388,42 @@ TEST(variant, empty) {
 
 TEST(variant, resource) {
     Variant v;
-    auto rs = v.toResource<String>("string");
-    ASSERT_EQ(rs, nullptr);
+    String *rs1 = nullptr;
+
+    try {
+        rs1 = v.toResource<String>("string");
+    } catch (zend_object *ex) {
+        catchException();
+    }
+    ASSERT_EQ(rs1, nullptr);
 
     auto fp = php::fopen("/tmp/test.txt", "w+");
     ASSERT_TRUE(fp.isResource());
-    auto rs2 = fp.toResource<php_stream>("php_stream");
+
+    php_stream *rs2 = nullptr;
+    try {
+        rs2 = fp.toResource<php_stream>("php_stream");
+    } catch (zend_object *ex) {
+        catchException();
+    }
     ASSERT_EQ(rs2, nullptr);
 
     auto *s = new String("hello world");
-    auto rs3 = newResource<String>("string", s);
+    var rs3;
+    try {
+        rs3 = newResource<String>("string", s);
+    } catch (zend_object *ex) {
+        catchException();
+    }
     ASSERT_TRUE(rs3.isNull());
     delete s;
 
-    auto rs4 = fp.toResource<String>("string_not_exists");
+    String *rs4 = nullptr;
+    try {
+        rs4 = fp.toResource<String>("string_not_exists");
+    } catch (zend_object *ex) {
+        catchException();
+    }
     ASSERT_EQ(rs4, nullptr);
 }
 

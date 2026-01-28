@@ -51,11 +51,11 @@ Variant &Variant::operator=(const Variant &v) {
 }
 
 Variant &Variant::operator=(Variant &&v) {
-	if (&v != this) {
-	    destroy();
-	    memcpy(&val, &v.val, sizeof(zval));
-	    v.val = {};
-	}
+    if (&v != this) {
+        destroy();
+        memcpy(&val, &v.val, sizeof(zval));
+        v.val = {};
+    }
     return *this;
 }
 

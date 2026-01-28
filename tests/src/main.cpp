@@ -69,12 +69,9 @@ int main(int argc, char **argv) {
 
     try {
         php::eval("main();");
-    } catch (php::Var &e) {
+    } catch (zend_object *e) {
         EG(exit_status);
-        if (EG(exception)) {
-            zend_exception_error(EG(exception), E_ERROR);
-            zend_clear_exception();
-        }
+        zend_exception_error(e, E_ERROR);
     }
 
     php::request_shutdown();
