@@ -60,14 +60,11 @@ Variant Object::callParentMethod(const String &func, const std::initializer_list
     Variant retval;
     auto fn = (zend_function *) zend_hash_find_ptr_lc(&parent_ce()->function_table, func.str());
     if (UNEXPECTED(fn == nullptr)) {
-        /* error at c-level */
-        zend_error_noreturn(
-            E_CORE_ERROR, "Couldn't find implementation for method %s::%s", ZSTR_VAL(parent_ce()->name), func.data());
+        throwError("Couldn't find implementation for method %s::%s", ZSTR_VAL(parent_ce()->name), func.data());
     } else if (UNEXPECTED(fn->common.fn_flags & ZEND_ACC_ABSTRACT)) {
-        zend_throw_error(NULL,
-                         "Cannot call abstract method %s::%s()",
-                         ZSTR_VAL(fn->common.scope->name),
-                         ZSTR_VAL(fn->common.function_name));
+        throwError("Cannot call abstract method %s::%s()",
+                   ZSTR_VAL(fn->common.scope->name),
+                   ZSTR_VAL(fn->common.function_name));
     } else {
         zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), nullptr);
     }
@@ -119,7 +116,7 @@ void Object::appendArrayProperty(const String &name, const Variant &value) {
     }
 
     if (Z_TYPE_P(member_p) != IS_ARRAY) {
-        zend_throw_error(nullptr, "property `%s` must be `array`", name.data());
+        throwError("property `%s` must be `array`", name.data());
         return;
     }
 
@@ -140,7 +137,7 @@ void Object::updateArrayProperty(const String &name, zend_long offset, const Var
     }
 
     if (Z_TYPE_P(member_p) != IS_ARRAY) {
-        zend_throw_error(nullptr, "property `%s` must be `array`", name.data());
+        throwError("property `%s` must be `array`", name.data());
         return;
     }
 
@@ -161,7 +158,7 @@ void Object::updateArrayProperty(const String &name, const Variant &key, const V
     }
 
     if (Z_TYPE_P(member_p) != IS_ARRAY) {
-        zend_throw_error(nullptr, "property `%s` must be `array`", name.data());
+        throwError("property `%s` must be `array`", name.data());
         return;
     }
 
@@ -258,17 +255,16 @@ Object toObject(const Variant &v) {
 
 Object toObject(const Variant &v, const String &class_name) {
     if (UNEXPECTED(!v.isObject())) {
-        zend_throw_error(nullptr, "parameter 1 must be `object`, got `%s`", v.typeStr());
+        throwError("parameter 1 must be `object`, got `%s`", v.typeStr());
         return {};
     }
     auto ce = getClassEntry(class_name);
     if (UNEXPECTED(ce == nullptr)) {
-        zend_throw_error(nullptr, "class '%s' is undefined.", class_name.toCString());
+        throwError("class '%s' is undefined.", class_name.toCString());
         return {};
     }
     if (UNEXPECTED(!instanceof_function(v.ce(), ce))) {
-        zend_throw_error(nullptr,
-                         "must be instance of class `%s`, object of `%s` given",
+    	throwError("must be instance of class `%s`, object of `%s` given",
                          class_name.toCString(),
                          ZSTR_VAL(v.ce()->name));
         return {};

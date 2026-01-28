@@ -89,6 +89,15 @@ PHPX_API Variant call(const Variant &func, Array &args);
 PHPX_API Variant call(const Variant &func, const std::initializer_list<Variant> &args);
 PHPX_API void throwException(const String &class_name, const char *message, int code = 0);
 PHPX_API void throwException(const Object &e);
+
+#define throwError(format, ...)                                                                                        \
+    do {                                                                                                               \
+        zend_throw_error(NULL, format, ##__VA_ARGS__);                                                                 \
+        if (throw_impl) {                                                                                              \
+            throw_impl(EG(exception));                                                                                 \
+        }                                                                                                              \
+    } while (0)
+
 PHPX_API Object catchException();
 PHPX_API Variant concat(const Variant &a, const Variant &b);
 PHPX_API Variant concat(const std::initializer_list<Variant> &args);
@@ -418,7 +427,7 @@ class Variant {
     template <class T>
     T *toResource(const char *name) {
         if (!isResource()) {
-            error(E_WARNING, "This variant is not a resource type.");
+            throwError("This variant is not a resource type.");
             return nullptr;
         }
         void *_ptr = nullptr;
@@ -427,7 +436,7 @@ class Variant {
             return nullptr;
         }
         if ((_ptr = zend_fetch_resource(Z_RES_P(ptr()), name, _c->type)) == nullptr) {
-            error(E_WARNING, "The `%s` type of resource is undefined.", name);
+            throwError("The `%s` type of resource is undefined.", name);
             return nullptr;
         }
         return static_cast<T *>(_ptr);
@@ -435,12 +444,12 @@ class Variant {
     template <class T>
     T *toBox() {
         if (!isResource()) {
-            error(E_WARNING, "This variant is not a resource type.");
+            throwError("This variant is not a resource type.");
             return nullptr;
         }
         auto res = Z_RES(val);
         if (res->type != box_res_id) {
-            error(E_WARNING, "This resource is not type of `%s`.", box_res_name);
+            throwError("This resource is not type of `%s`.", box_res_name);
             return nullptr;
         }
         return static_cast<T *>(res->ptr);
@@ -614,7 +623,7 @@ template <typename T>
 Variant newResource(const char *name, T *v) {
     const auto _c = getResource(name);
     if (!_c) {
-        error(E_WARNING, "%s type of resource is undefined.", name);
+        throwError("%s type of resource is undefined.", name);
         return {};
     }
     zend_resource *res = zend_register_resource(static_cast<void *>(v), _c->type);
@@ -811,7 +820,7 @@ class Array : public Variant {
         if (isNull() || isUndef()) {
             array_init(unwrap_ptr());
         } else if (!isArray()) {
-            error(E_ERROR, "parameter 1 must be `array`, got `%s`", typeStr());
+            throwError("parameter 1 must be `array`, got `%s`", typeStr());
         }
     }
 
@@ -937,7 +946,7 @@ static inline zend_class_entry *getClassEntry(const String &name) {
 class Object : public Variant {
     void checkObject() const {
         if (!isUndef() && !isNull() && !isObject()) {
-            error(E_ERROR, "parameter 1 must be `object`, got `%s`", typeStr());
+            throwError("parameter 1 must be `object`, got `%s`", typeStr());
         }
     }
 
@@ -1098,7 +1107,7 @@ class Reference : public Variant {
         if (isNull() || isUndef()) {
             Reference();
         } else if (!isReference()) {
-            zend_throw_error(NULL, "parameter 1 must be `reference`, got `%s`", typeStr());
+            throwError("parameter 1 must be `reference`, got `%s`", typeStr());
         }
     }
 

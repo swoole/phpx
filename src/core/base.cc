@@ -97,7 +97,7 @@ void exit(const Variant &status) {
     }
     zend_throw_graceful_exit();
     if (throw_impl) {
-    	throw_impl(EG(exception));
+        throw_impl(EG(exception));
     }
 }
 
@@ -109,7 +109,7 @@ static void box_dtor(zend_resource *res) {
 void request_init() {
     box_res_id = zend_register_list_destructors_ex(box_dtor, nullptr, box_res_name, 0);
     if (box_res_id < 0) {
-        zend_throw_error(nullptr, "error");
+        throwError("failed to register box resource");
     }
 }
 
@@ -126,12 +126,12 @@ void request_shutdown() {
 void throwException(const String &class_name, const char *message, int code) {
     zend_class_entry *ce = getClassEntry(class_name);
     if (ce == nullptr) {
-        php_error_docref(nullptr, E_WARNING, "class '%s' undefined.", class_name.toCString());
+        throwError("class '%s' undefined.", class_name.toCString());
         return;
     }
     zend_throw_exception(ce, message, code);
     if (throw_impl) {
-    	throw_impl(EG(exception));
+        throw_impl(EG(exception));
     }
 }
 
@@ -140,7 +140,7 @@ void throwException(const Object &e) {
     zval_add_ref(zv);
     EG(exception) = Z_OBJ_P(zv);
     if (throw_impl) {
-    	throw_impl(EG(exception));
+        throw_impl(EG(exception));
     }
 }
 
@@ -192,7 +192,7 @@ static bool is_callable_ex(zval *callable,
     return ret;
 }
 
-static void _call_user_function_impl(
+static void call_function_impl(
     const zval *zobject, const zval *function_name, zval *retval_ptr, uint32_t param_count, zval params[]) {
     zend_fcall_info fci;
 
@@ -249,13 +249,13 @@ static void _call_user_function_impl(
 
 Variant call_impl(const zval *object, const zval *func, Args &args) {
     Variant retval{};
-    _call_user_function_impl(object, func, retval.ptr(), args.count(), args.ptr());
+    call_function_impl(object, func, retval.ptr(), args.count(), args.ptr());
     return retval;
 }
 
 Variant call_impl(const zval *object, const zval *func) {
     Variant retval{};
-    _call_user_function_impl(object, func, retval.ptr(), 0, nullptr);
+    call_function_impl(object, func, retval.ptr(), 0, nullptr);
     return retval;
 }
 
@@ -387,7 +387,8 @@ int compare(const Variant &a, const Variant &b) {
 Variant getStaticProperty(const String &class_name, const String &prop) {
     const auto ce = getClassEntry(class_name);
     if (UNEXPECTED(!ce)) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name.toCString());
+        throwError("class '%s' is undefined.", class_name.toCString());
+        return {};
     }
     return {zend_read_static_property_ex(ce, prop.str(), true), Ctor::Move};
 }
@@ -395,7 +396,8 @@ Variant getStaticProperty(const String &class_name, const String &prop) {
 bool hasStaticProperty(const String &class_name, const String &prop) {
     const auto ce = getClassEntry(class_name);
     if (UNEXPECTED(!ce)) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name.toCString());
+        throwError("class '%s' is undefined.", class_name.toCString());
+        return {};
     }
     return zend_hash_exists(&ce->properties_info, prop.str());
 }
@@ -403,7 +405,8 @@ bool hasStaticProperty(const String &class_name, const String &prop) {
 bool setStaticProperty(const String &class_name, const String &prop, const Variant &v) {
     const auto ce = getClassEntry(class_name);
     if (UNEXPECTED(!ce)) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name.toCString());
+        throwError("class '%s' is undefined.", class_name.toCString());
+        return {};
     }
     const auto zv = NO_CONST_V(v);
     Z_TRY_ADDREF_P(zv);
@@ -413,7 +416,8 @@ bool setStaticProperty(const String &class_name, const String &prop, const Varia
 uint32_t getPropertyOffset(const String &class_name, const String &prop) {
     const auto ce = getClassEntry(class_name);
     if (UNEXPECTED(!ce)) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", class_name.toCString());
+        throwError("class '%s' is undefined.", class_name.toCString());
+        return 0;
     }
     auto prev_scope = EG(fake_scope);
     EG(fake_scope) = ce;

@@ -559,7 +559,7 @@ void Variant::append(const Variant &v) {
     } else if (isString()) {
         concat_function(zresult, zresult, zvalue);
     } else {
-        zend_throw_error(nullptr, "Cannot append element to an `%s`", typeStr());
+        throwError("Cannot append element to an `%s`", typeStr());
     }
 }
 

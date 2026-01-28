@@ -152,7 +152,7 @@ Object newObject(const char *name, const Variant &v1) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
     if (ce == nullptr) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
+        throwError("class '%s' is undefined.", name);
         return object;
     }
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
@@ -167,7 +167,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
     if (ce == nullptr) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
+        throwError("class '%s' is undefined.", name);
         return object;
     }
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
@@ -183,7 +183,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     Object object;
     zend_class_entry *ce = getClassEntry(name);
     if (ce == nullptr) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
+        throwError("class '%s' is undefined.", name);
         return object;
     }
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
@@ -200,7 +200,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     Object object;
     zend_class_entry *ce = getClassEntry(name);
     if (ce == nullptr) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
+        throwError("class '%s' is undefined.", name);
         return object;
     }
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
@@ -219,7 +219,7 @@ Object newObject(
     Object object;
     zend_class_entry *ce = getClassEntry(name);
     if (ce == nullptr) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
+        throwError("class '%s' is undefined.", name);
         return object;
     }
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
@@ -244,7 +244,7 @@ Object newObject(const char *name,
     Object object;
     zend_class_entry *ce = getClassEntry(name);
     if (ce == nullptr) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
+        throwError("class '%s' is undefined.", name);
         return object;
     }
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
@@ -271,7 +271,7 @@ Object newObject(const char *name,
     Object object;
     zend_class_entry *ce = getClassEntry(name);
     if (ce == nullptr) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
+        throwError("class '%s' is undefined.", name);
         return object;
     }
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
@@ -300,7 +300,7 @@ Object newObject(const char *name,
     Object object;
     zend_class_entry *ce = getClassEntry(name);
     if (ce == nullptr) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
+        throwError("class '%s' is undefined.", name);
         return object;
     }
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
@@ -331,7 +331,7 @@ Object newObject(const char *name,
     Object object;
     zend_class_entry *ce = getClassEntry(name);
     if (ce == nullptr) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
+        throwError("class '%s' is undefined.", name);
         return object;
     }
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
@@ -364,7 +364,7 @@ Object newObject(const char *name,
     Object object;
     zend_class_entry *ce = getClassEntry(name);
     if (ce == nullptr) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
+        throwError("class '%s' is undefined.", name);
         return object;
     }
     if (object_init_ex(object.ptr(), ce) == FAILURE) {

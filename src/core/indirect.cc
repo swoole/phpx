@@ -19,7 +19,7 @@
 namespace php {
 Variant Variant::getPropertyIndirect(const Variant &name, bool write) const {
     if (UNEXPECTED(!isObject())) {
-        zend_throw_error(NULL, "Only objects support the getPropertyIndirect() method");
+        throwError("Only objects support the getPropertyIndirect() method");
         return Variant{};
     }
 
@@ -46,7 +46,7 @@ Variant Variant::getPropertyIndirect(const Variant &name, bool write) const {
 
 Variant Variant::getPropertyIndirect(uintptr_t offset, bool write) const {
     if (UNEXPECTED(!isObject())) {
-        zend_throw_error(NULL, "Only objects support the getPropertyIndirect() method");
+        throwError("Only objects support the getPropertyIndirect() method");
         return Variant{};
     }
     return Variant{OBJ_PROP(object(), offset), Ctor::Indirect};
@@ -79,8 +79,7 @@ Variant Variant::offsetGetIndirect(zend_long offset, bool write) const {
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
         return offsetGet(offset);
     } else {
-        zend_throw_error(
-            NULL, "Only array/object/string support the offsetGetIndirect(%ld) method, got `%s`", offset, typeStr());
+        throwError("Only array/object/string support the offsetGetIndirect(%ld) method, got `%s`", offset, typeStr());
         return Variant{};
     }
 
@@ -118,7 +117,7 @@ Variant Variant::offsetGetIndirect(const Variant &key, bool write) const {
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
         return offsetGet(key);
     } else {
-        zend_throw_error(NULL, "Only array/object/string support the offsetGetIndirect() method");
+        throwError("Only array/object/string support the offsetGetIndirect() method");
         return Variant{};
     }
 

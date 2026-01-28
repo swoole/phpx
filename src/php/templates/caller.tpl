@@ -31,7 +31,7 @@ Object newObject(const char *name, <?=self::makeArgs($i)?>) {
     Object object;
     zend_class_entry *ce = getClassEntry(name);
     if (ce == nullptr) {
-        zend_throw_exception_ex(nullptr, -1, "class '%s' is undefined.", name);
+        throwError("class '%s' is undefined.", name);
         return object;
     }
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
