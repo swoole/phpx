@@ -148,26 +148,28 @@ TEST(object, clone) {
 
 TEST(object, bad_type) {
     auto arr1 = create_list();
-    ChildResult r = run_in_child_capture_stdout([&arr1]() -> int {
+    try {
         auto v = arr1.get(2);
         Object o(v);
-        return 0;
-    });
-    var s(r.output);
-    ASSERT_TRUE(str_contains(s, "parameter 1 must be `object`, got `string`").toBool());
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto s = e.exec("getMessage");
+        ASSERT_TRUE(str_contains(s, "parameter 1 must be `object`, got `string`").toBool());
+    }
 }
 
 TEST(object, call_parent_method_error) {
-    ChildResult r = run_in_child_capture_stdout([]() -> int {
+    try {
         if (!class_exists("TestClass2")) {
             include(get_include_dir() + "/library.php");
         }
         auto obj = newObject("TestClass2");
         auto rs2 = obj.callParentMethod("test1990", {});
-        return 0;
-    });
-    var s(r.output);
-    ASSERT_TRUE(str_contains(s, "Couldn't find implementation for method").toBool());
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto s = e.exec("getMessage");
+        ASSERT_TRUE(str_contains(s, "Couldn't find implementation for method").toBool());
+    }
 }
 
 TEST(object, static_property_error1) {

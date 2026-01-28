@@ -28,10 +28,19 @@ TEST(box, create) {
     a.unset();
     ASSERT_TRUE(test_box_dtor);
 
-    auto box2 = a.toBox<TestBox>();
+    TestBox *box2 = nullptr, *box3 = nullptr;
+    try {
+        box2 = a.toBox<TestBox>();
+    } catch (zend_object *ex) {
+        catchException();
+    }
     ASSERT_EQ(box2, nullptr);
 
-    auto fp = php::fopen("/tmp/test.log", "w+");
-    auto box3 = fp.toBox<TestBox>();
+    try {
+        auto fp = php::fopen("/tmp/test.log", "w+");
+        box3 = fp.toBox<TestBox>();
+    } catch (zend_object *ex) {
+        catchException();
+    }
     ASSERT_EQ(box3, nullptr);
 }

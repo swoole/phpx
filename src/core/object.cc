@@ -264,9 +264,8 @@ Object toObject(const Variant &v, const String &class_name) {
         return {};
     }
     if (UNEXPECTED(!instanceof_function(v.ce(), ce))) {
-    	throwError("must be instance of class `%s`, object of `%s` given",
-                         class_name.toCString(),
-                         ZSTR_VAL(v.ce()->name));
+        throwError(
+            "must be instance of class `%s`, object of `%s` given", class_name.toCString(), ZSTR_VAL(v.ce()->name));
         return {};
     }
     return Object{v.unwrap_ptr()};
