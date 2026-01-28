@@ -342,23 +342,21 @@ static Variant include_impl(zend_string *filename, const int type) {
     Variant result;
     zend_op_array *new_op_array = zend_include_or_eval(filename, type);
 
-    if (UNEXPECTED(EG(exception) != nullptr)) {
-        throw EG(exception);
+    if (EXPECTED(new_op_array != nullptr && EG(exception) != nullptr)) {
+        zend_execute(new_op_array, result.ptr());
     } else if (new_op_array == ZEND_FAKE_OP_ARRAY) {
         return true;
-    } else if (UNEXPECTED(new_op_array == nullptr)) {
-        return false;
-    } else {
-        zend_execute(new_op_array, result.ptr());
     }
 
-    if (new_op_array != ZEND_FAKE_OP_ARRAY && new_op_array != nullptr) {
+    if (new_op_array != nullptr) {
         destroy_op_array(new_op_array);
         efree_size(new_op_array, sizeof(zend_op_array));
+    } else {
+        result = false;
     }
 
-    if (UNEXPECTED(EG(exception) != nullptr)) {
-        throw EG(exception);
+    if (UNEXPECTED(EG(exception) != nullptr) && throw_impl != nullptr) {
+        throw_impl(EG(exception));
     }
 
     return result;
