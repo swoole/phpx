@@ -765,3 +765,11 @@ TEST(variant, offsetGetIndirect2) {
     auto chr = sk.offsetGetIndirect(1);
     ASSERT_STREQ(chr.toCString(), "e");
 }
+
+TEST(variant, ref) {
+    Reference ref;
+    auto array = create_list();
+    ref = array.toReference();
+    sort(ref);
+    ASSERT_STREQ(ref.offsetGet(0).toCString(), "c++");
+}

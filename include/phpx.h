@@ -1113,12 +1113,31 @@ class Reference : public Variant {
     }
 
   public:
-    Reference() {
+    Reference() noexcept {
         ZVAL_NEW_EMPTY_REF(ptr());
         ZVAL_NULL(Z_REFVAL_P(ptr()));
     }
+    Reference(const Reference &v) noexcept {
+        ZVAL_COPY(&val, v.const_ptr());
+    }
+    Reference(Reference &&v) noexcept = default;
     Reference(const zval *v, Ctor method = Ctor::CopyRef) : Variant(v, method) {
         checkRef();
+    }
+    Reference &operator=(const Reference &v) noexcept {
+        if (&v != this) {
+            zval_ptr_dtor(&val);
+            ZVAL_COPY(&val, v.const_ptr());
+        }
+        return *this;
+    }
+    Reference &operator=(Reference &&v) noexcept {
+        if (&v != this) {
+            zval_ptr_dtor(&val);
+            memcpy(&val, &v.val, sizeof(zval));
+            v.val = {};
+        }
+        return *this;
     }
 };
 
