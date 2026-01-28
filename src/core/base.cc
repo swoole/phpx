@@ -22,6 +22,7 @@ const char *box_res_name = "php::box";
 int box_res_id;
 
 static zend_array *func_cache_map = nullptr;
+std::function<void(zend_object *)> throw_impl;
 
 void error(int level, const char *format, ...) {
     va_list args;
@@ -94,12 +95,10 @@ void exit(const Variant &status) {
         zend_print_zval(zv, 0);
         EG(exit_status) = 0;
     }
-    EG(exception) = zend_create_graceful_exit();
-    if (EG(current_execute_data)) {
-        EG(opline_before_exception) = EG(current_execute_data)->opline;
-        EG(current_execute_data)->opline = EG(exception_op);
+    zend_throw_graceful_exit();
+    if (throw_impl) {
+    	throw_impl(EG(exception));
     }
-    zend_bailout();
 }
 
 static void box_dtor(zend_resource *res) {
@@ -131,13 +130,18 @@ void throwException(const String &class_name, const char *message, int code) {
         return;
     }
     zend_throw_exception(ce, message, code);
+    if (throw_impl) {
+    	throw_impl(EG(exception));
+    }
 }
 
 void throwException(const Object &e) {
     auto zv = NO_CONST_V(e);
     zval_add_ref(zv);
     EG(exception) = Z_OBJ_P(zv);
-    zend_bailout();
+    if (throw_impl) {
+    	throw_impl(EG(exception));
+    }
 }
 
 Object catchException() {
@@ -194,7 +198,6 @@ static void _call_user_function_impl(
 
     fci.size = sizeof(fci);
     if (zobject) {
-        ZEND_ASSERT(Z_TYPE_P(zobject) == IS_OBJECT);
         fci.object = Z_OBJ_P(zobject);
     } else {
         fci.object = nullptr;
@@ -237,6 +240,10 @@ static void _call_user_function_impl(
         }
     _do_call:
         zend_call_function(&fci, fci_cache);
+    }
+
+    if (EG(exception) && throw_impl) {
+        throw_impl(EG(exception));
     }
 }
 
@@ -332,26 +339,29 @@ static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_
 }
 
 static Variant include_impl(zend_string *filename, const int type) {
+    Variant result;
     zend_op_array *new_op_array = zend_include_or_eval(filename, type);
+
     if (UNEXPECTED(EG(exception) != nullptr)) {
-        if (new_op_array != ZEND_FAKE_OP_ARRAY && new_op_array != nullptr) {
-            destroy_op_array(new_op_array);
-            efree_size(new_op_array, sizeof(zend_op_array));
-        }
-        return {};
+        throw EG(exception);
     } else if (new_op_array == ZEND_FAKE_OP_ARRAY) {
         return true;
     } else if (UNEXPECTED(new_op_array == nullptr)) {
         return false;
     } else {
-        Variant result;
         zend_execute(new_op_array, result.ptr());
-        if (new_op_array != ZEND_FAKE_OP_ARRAY && new_op_array != nullptr) {
-            destroy_op_array(new_op_array);
-            efree_size(new_op_array, sizeof(zend_op_array));
-        }
-        return result;
     }
+
+    if (new_op_array != ZEND_FAKE_OP_ARRAY && new_op_array != nullptr) {
+        destroy_op_array(new_op_array);
+        efree_size(new_op_array, sizeof(zend_op_array));
+    }
+
+    if (UNEXPECTED(EG(exception) != nullptr)) {
+        throw EG(exception);
+    }
+
+    return result;
 }
 
 Variant include(const String &file, IncludeType type) {

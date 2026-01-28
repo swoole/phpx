@@ -118,26 +118,23 @@ TEST(base, eval) {
 
 TEST(base, eval2) {
     var rs;
-    zend_try {
-        rs = eval("throw new Exception('phpx error');");
-    }
-    zend_catch {
+    try {
+        rs = eval("$array = [1999, rand()]; throw new Exception('phpx error');");
+    } catch (zend_object *ex) {
         ASSERT_TRUE(rs.isNull());
         auto e = catchException();
         auto msg = e.exec("getMessage");
         ASSERT_STREQ(msg.toCString(), "phpx error");
     }
-    zend_end_try();
 }
 
 TEST(base, exception) {
     bool done = false;
 
-    zend_try {
+    try {
         auto e = newObject("RuntimeException", "phpx exception test", 1999);
         throwException(e);
-    }
-    zend_catch {
+    } catch (zend_object *ex) {
         auto e = catchException();
         ASSERT_TRUE(e.getClassName().equals("RuntimeException"));
         auto msg = e.exec("getMessage");
@@ -146,7 +143,6 @@ TEST(base, exception) {
         ASSERT_TRUE(str_contains(msg, "phpx exception test").isTrue());
         done = true;
     }
-    zend_end_try();
 
     ASSERT_TRUE(done);
 }
@@ -197,33 +193,28 @@ TEST(base, compare) {
 
 TEST(base, exit) {
     int count = 1;
-    zend_first_try {
+    try {
         ::usleep(100000);
         php::exit(250);
-    }
-    zend_catch {
+    } catch (zend_object *ex) {
         count++;
         auto e = catchException();
         ASSERT_TRUE(zend_is_graceful_exit(e.object()));
     }
-    zend_end_try();
     ASSERT_EQ(EG(exit_status), 250);
     ASSERT_EQ(count, 2);
 }
 
 TEST(base, exit2) {
     int count = 1;
-    zend_first_try {
+    try {
         ::usleep(100000);
         php::exit("hello world\n");
-        catchException();
-    }
-    zend_catch {
+    } catch (zend_object *ex) {
         count++;
         auto e = catchException();
         ASSERT_TRUE(zend_is_graceful_exit(e.object()));
     }
-    zend_end_try();
     ASSERT_EQ(EG(exit_status), 0);
     ASSERT_EQ(count, 2);
 }
@@ -239,13 +230,11 @@ TEST(base, getInternalException) {
 }
 
 TEST(base, call_bad_func) {
-    zend_try {
+    try {
         call("func_not_exists");
-    }
-    zend_catch {
+    } catch (zend_object *ex) {
         auto e = catchException();
         auto msg = e.exec("getMessage");
         ASSERT_TRUE(str_contains(msg, "Invalid callback func_not_exists").toBool());
     }
-    zend_end_try();
 }

@@ -55,32 +55,27 @@ static ZEND_FUNCTION(main) {
     php_main();
 }
 
-static void throw_exception(zend_object *ex) {
-    zend_bailout();
-}
-
 static const zend_function_entry ext_functions[] = {ZEND_FE(main, arginfo_void) ZEND_FE_END};
 
 int main(int argc, char **argv) {
     php_embed_init(argc, argv);
     zend_register_functions(nullptr, ext_functions, nullptr, 0);
-    zend_throw_exception_hook = throw_exception;
+
+    php::throw_impl = [](zend_object *ex) { throw ex; };
 
     php::request_init();
     init_root_path(argv[0]);
     ::testing::InitGoogleTest(&argc, argv);
 
-    zend_first_try {
+    try {
         php::eval("main();");
-    }
-    zend_catch {
+    } catch (php::Var &e) {
         EG(exit_status);
         if (EG(exception)) {
             zend_exception_error(EG(exception), E_ERROR);
             zend_clear_exception();
         }
     }
-    zend_end_try();
 
     php::request_shutdown();
     php_embed_shutdown();
