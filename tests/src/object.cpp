@@ -255,5 +255,5 @@ TEST(object, toObject2) {
     auto v = date_create("now");
     auto o = toObject(v, "DateTime");
     auto ts = o.exec("getTimestamp");
-    ASSERT_GE(ts.toInt(),  10000000);
+    ASSERT_GE(ts.toInt(), 10000000);
 }

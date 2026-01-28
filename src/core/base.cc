@@ -374,25 +374,6 @@ int compare(const Variant &a, const Variant &b) {
     return zend_compare(NO_CONST_V(a), NO_CONST_V(b));
 }
 
-zend_function_entry *copy_function_entries(const zend_function_entry *_functions) {
-    const zend_function_entry *ptr = _functions;
-    size_t count = 0;
-    while (ptr->fname) {
-        count++;
-        ptr++;
-    }
-
-    auto *functions = new zend_function_entry[count + 1]();
-    int i = 0;
-    ptr = _functions;
-    while (ptr->fname) {
-        functions[i] = *ptr;
-        i++;
-        ptr++;
-    }
-    return functions;
-}
-
 Variant getStaticProperty(const String &class_name, const String &prop) {
     const auto ce = getClassEntry(class_name);
     if (UNEXPECTED(!ce)) {

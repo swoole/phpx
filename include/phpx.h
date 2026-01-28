@@ -16,16 +16,19 @@
 
 #pragma once
 
+/**
+ * Do not trust any header files of PHP, its internal implementation is very chaotic,
+ * which must be wrapped in extern "C" {}
+ */
+extern "C" {
 #include "php.h"
-
-BEGIN_EXTERN_C()
 #include "zend_ini.h"
 #include "zend_interfaces.h"
 #include "zend_exceptions.h"
 
 #include <ext/standard/php_standard.h>
 #include <ext/json/php_json.h>
-END_EXTERN_C()
+}
 
 #include "phpx_types.h"
 

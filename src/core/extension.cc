@@ -319,6 +319,25 @@ static ZEND_RESULT_CODE _check_args_num(const zend_execute_data *data, const int
     return SUCCESS;
 }
 
+zend_function_entry *copy_function_entries(const zend_function_entry *_functions) {
+    const zend_function_entry *ptr = _functions;
+    size_t count = 0;
+    while (ptr->fname) {
+        count++;
+        ptr++;
+    }
+
+    auto *functions = new zend_function_entry[count + 1]();
+    int i = 0;
+    ptr = _functions;
+    while (ptr->fname) {
+        functions[i] = *ptr;
+        i++;
+        ptr++;
+    }
+    return functions;
+}
+
 void _exec_function(zend_execute_data *data, zval *return_value) {
     Function *func = nullptr;
     const auto fn_reserved = data->func->internal_function.reserved;
