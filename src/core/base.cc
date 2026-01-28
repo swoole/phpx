@@ -342,7 +342,7 @@ static Variant include_impl(zend_string *filename, const int type) {
     Variant result;
     zend_op_array *new_op_array = zend_include_or_eval(filename, type);
 
-    if (EXPECTED(new_op_array != nullptr && EG(exception) != nullptr)) {
+    if (EXPECTED(new_op_array != nullptr && EG(exception) == nullptr)) {
         zend_execute(new_op_array, result.ptr());
     } else if (new_op_array == ZEND_FAKE_OP_ARRAY) {
         return true;
