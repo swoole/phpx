@@ -231,3 +231,15 @@ TEST(base, getInternalException) {
     ASSERT_NE(ce2, nullptr);
     ASSERT_STREQ(ce2->name->val, "IteratorAggregate");
 }
+
+TEST(base, call_bad_func) {
+	zend_try {
+        call("func_not_exists");
+    }
+    zend_catch {
+        auto e = catchException();
+        auto msg = e.exec("getMessage");
+        ASSERT_TRUE(str_contains(msg, "Invalid callback func_not_exists").toBool());
+    }
+    zend_end_try();
+}

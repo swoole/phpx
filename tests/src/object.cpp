@@ -78,6 +78,9 @@ TEST(object, static_property) {
     ASSERT_STREQ(getStaticProperty("TestClass", "propString").toCString(), "Hello, World!");
     ASSERT_TRUE(setStaticProperty("TestClass", "propString", "phpx test"));
     ASSERT_STREQ(getStaticProperty("TestClass", "propString").toCString(), "phpx test");
+
+    ASSERT_TRUE(hasStaticProperty("TestClass", "propString"));
+    ASSERT_FALSE(hasStaticProperty("TestClass", "propObject"));
 }
 
 TEST(object, call_parent_method) {
@@ -90,6 +93,13 @@ TEST(object, call_parent_method) {
     ASSERT_TRUE(obj.propertyExists("propArray"));
     ASSERT_FALSE(obj.propertyExists("propNotExists"));
     ASSERT_TRUE(obj.propertyExists("propBool"));
+
+    auto prop_offset = getPropertyOffset("TestClass2", "propArray");
+    ASSERT_EQ(prop_offset, sizeof(zend_object));
+
+    auto prop = obj.getPropertyIndirect(prop_offset);
+    ASSERT_TRUE(prop.isArray());
+    ASSERT_EQ(prop.length(), 5);
 
     // This method inherits from the parent class and is not defined in the child class
     ASSERT_TRUE(obj.methodExists("fun"));
