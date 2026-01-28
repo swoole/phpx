@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
     try {
         php::eval("main();");
     } catch (zend_object *e) {
-    	gtest_exit_status = EG(exit_status);
+        gtest_exit_status = EG(exit_status);
         zend_exception_error(e, E_ERROR);
     }
 
