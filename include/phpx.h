@@ -244,12 +244,12 @@ class Variant {
     }
     Variant(const Variant &v) : Variant(v.unwrap_ptr()) {}
     Variant(Variant &&v) noexcept {
-    	if (v.isIndirect()) {
-    		memcpy(&val, v.zv(), sizeof(zval));
-    		addRef();
-    	} else {
+        if (v.isIndirect()) {
+            memcpy(&val, v.zv(), sizeof(zval));
+            addRef();
+        } else {
             memcpy(&val, v.const_ptr(), sizeof(zval));
-    	}
+        }
         v.val = {};
     }
     Variant(Variant *v) {
@@ -364,7 +364,7 @@ class Variant {
         return isIndirect() ? zv() : &val;
     }
     void debug();
-    void print();
+    void print() const;
     int getRefCount() const;
     int type() const {
         return Z_TYPE_P(unwrap_ptr());

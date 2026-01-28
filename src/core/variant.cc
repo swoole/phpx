@@ -29,11 +29,11 @@ Int zero = 0L;
 
 void Variant::copyFrom(const zval *src) {
     zval_ptr_dtor(direct_ptr());
-    ZVAL_COPY(direct_ptr(), unwrap_zval(src));
+    ZVAL_COPY(direct_ptr(), src);
 }
 
 Variant &Variant::operator=(const zval *v) {
-    copyFrom(v);
+    copyFrom(unwrap_zval(v));
     return *this;
 }
 
@@ -153,8 +153,8 @@ void Variant::debug() {
 }
 #endif
 
-void Variant::print() {
-    php_var_dump(unwrap_ptr(), 10);
+void Variant::print() const {
+    php_var_dump((zval *) unwrap_ptr(), 10);
 }
 
 int Variant::getRefCount() const {
