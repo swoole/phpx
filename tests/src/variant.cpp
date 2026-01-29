@@ -657,6 +657,16 @@ TEST(variant, offsetSet2) {
     ASSERT_TRUE(o.offsetGet(1).isNull());
 }
 
+TEST(variant, offsetSet3) {
+	var v;
+	v.offsetSet(null, 1923);
+    ASSERT_EQ(v.offsetGet(0).toInt(), 1923);
+
+    var s = "hello";
+    s.offsetSet(4, "x");
+    ASSERT_STREQ(s.toCString(), "hellx");
+}
+
 TEST(variant, setProperty) {
     var sk = "hello";
     auto o = newObject("ArrayObject");
@@ -812,4 +822,25 @@ TEST(variant, ref) {
     ref = array.toReference();
     sort(ref);
     ASSERT_STREQ(ref.offsetGet(0).toCString(), "c++");
+}
+
+TEST(variant, item3) {
+	auto arr = create_list();
+	var v = arr;
+	auto indirect = v.item(3, true);
+	indirect = "golang";
+
+    ASSERT_STREQ(v.item(3).toCString(), "golang");
+
+    auto item2 = v.item(9999);
+    ASSERT_TRUE(item2.isNull());
+
+    try {
+    	var v2 = false;
+    	auto res = v2.item(2);
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto msg = e.exec("getMessage");
+        ASSERT_TRUE(str_contains(msg, "Only array/object/string support the item").isTrue());
+    }
 }
