@@ -92,11 +92,11 @@ size_t Variant::length() const {
 void Variant::unset() {
     if (isIndirect()) {
         zval_ptr_dtor(Z_INDIRECT(val));
-        Z_INDIRECT(val) = {};
+        *Z_INDIRECT(val) = {};
     } else {
         zval_ptr_dtor(&val);
-        val = {};
     }
+    val = {};
 }
 
 bool Variant::isNumeric() const {

@@ -107,11 +107,6 @@ Reference Object::attrRef(const String &prop_name) {
 }
 
 Variant Object::attr(const Variant &name, bool update) const {
-    if (UNEXPECTED(!isObject())) {
-        throwError("Only objects support the attr() method");
-        return Variant{};
-    }
-
     auto prop_name = name.toString();
     zval rv;
     auto member_p = zend_read_property_ex(ce(), object(), prop_name.str(), update, &rv);
@@ -131,14 +126,6 @@ Variant Object::attr(const Variant &name, bool update) const {
         member_p = unwrap_zval(member_p);
         return Variant{member_p, Ctor::Indirect};
     }
-}
-
-Variant Object::attr(uintptr_t offset, bool update) const {
-    if (UNEXPECTED(!isObject())) {
-        throwError("Only objects support the attr() method");
-        return Variant{};
-    }
-    return Variant{OBJ_PROP(object(), offset), Ctor::Indirect};
 }
 
 void Object::appendArrayProperty(const String &name, const Variant &value) {
@@ -230,12 +217,15 @@ Object newObject(const char *name) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    if (object_init_ex(object.ptr(), ce) == FAILURE) {
-        return object;
+
+    auto rc = object_init_ex(object.ptr(), ce);
+    if (EXPECTED(rc == SUCCESS)) {
+        if (ce->constructor) {
+            zend_call_known_function(ce->constructor, object.object(), object.ce(), nullptr, 0, nullptr, nullptr);
+        }
     }
-    if (ce->constructor) {
-        zend_call_known_function(ce->constructor, object.object(), object.ce(), nullptr, 0, nullptr, nullptr);
-    }
+    throwErrorIfOccurred();
+
     return object;
 }
 
@@ -246,18 +236,20 @@ Object newObject(const char *name, const std::initializer_list<Variant> &args) {
         error(E_WARNING, "class '%s' is undefined.", name);
         return object;
     }
-    auto zobj = object_init_ex(object.ptr(), ce);
-    if (UNEXPECTED(zobj == FAILURE)) {
-        return object;
-    }
-    if (ce->constructor) {
-        Args _args;
-        for (const auto &arg : args) {
-            _args.append(const_cast<Variant &>(arg).ptr());
+
+    auto rc = object_init_ex(object.ptr(), ce);
+    if (EXPECTED(rc == SUCCESS)) {
+        if (ce->constructor) {
+            Args _args;
+            for (const auto &arg : args) {
+                _args.append(const_cast<Variant &>(arg).ptr());
+            }
+            zend_call_known_function(
+                ce->constructor, object.object(), object.ce(), nullptr, _args.count(), _args.ptr(), nullptr);
         }
-        zend_call_known_function(
-            ce->constructor, object.object(), object.ce(), nullptr, _args.count(), _args.ptr(), nullptr);
     }
+    throwErrorIfOccurred();
+
     return object;
 }
 

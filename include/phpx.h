@@ -98,6 +98,13 @@ PHPX_API void throwException(const Object &e);
         }                                                                                                              \
     } while (0)
 
+#define throwErrorIfOccurred()                                                                                         \
+    do {                                                                                                               \
+        if (UNEXPECTED(EG(exception) != nullptr && throw_impl != nullptr)) {                                           \
+            throw_impl(EG(exception));                                                                                 \
+        }                                                                                                              \
+    } while (0)
+
 PHPX_API Object catchException();
 PHPX_API Variant concat(const Variant &a, const Variant &b);
 PHPX_API Variant concat(const std::initializer_list<Variant> &args);
@@ -982,7 +989,9 @@ class Object : public Variant {
 
     Reference attrRef(const String &name);
     Variant attr(const Variant &name, bool update = false) const;
-    Variant attr(uintptr_t offset, bool update = false) const;
+    Variant attr(uintptr_t offset, bool update = false) const {
+        return Variant{OBJ_PROP(object(), offset), Ctor::Indirect};
+    }
 
     void appendArrayProperty(const String &name, const Variant &value);
     void updateArrayProperty(const String &name, zend_long offset, const Variant &value);

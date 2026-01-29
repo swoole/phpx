@@ -1,5 +1,9 @@
 <?php
 
+abstract class TestAbstract {
+    abstract public function test(): string;
+}
+
 class TestClass
 {
     static int $propInt = 1990018900;

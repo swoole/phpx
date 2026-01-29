@@ -83,6 +83,46 @@ TEST(object, static_property) {
     ASSERT_FALSE(hasStaticProperty("TestClass", "propObject"));
 }
 
+TEST(object, mixed) {
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
+
+    auto obj = newObject("TestClass2");
+    ASSERT_EQ(obj.count(), 0);
+
+    try {
+        auto o2 = newObject("TestAbstract");
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto s = e.exec("getMessage");
+        ASSERT_TRUE(str_contains(s, "Cannot instantiate abstract class").toBool());
+    }
+
+    var arr = create_list();
+    try {
+        toObject(arr, "TestClass2");
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto s = e.exec("getMessage");
+        ASSERT_TRUE(str_contains(s, "parameter 1 must be `object`").toBool());
+    }
+
+    try {
+        toObject(obj, "TestNotExists");
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto s = e.exec("getMessage");
+        ASSERT_TRUE(str_contains(s, "class 'TestNotExists' is undefined.").toBool());
+    }
+
+    try {
+        toObject(obj, "stdClass");
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto s = e.exec("getMessage");
+        ASSERT_TRUE(str_contains(s, "must be instance of class `stdClass`").toBool());
+    }
+}
+
 TEST(object, call_parent_method) {
     include(get_include_dir() + "/library.php", INCLUDE_ONCE);
 
@@ -275,4 +315,16 @@ TEST(object, toObject2) {
     auto o = toObject(v, "DateTime");
     auto ts = o.exec("getTimestamp");
     ASSERT_GE(ts.toInt(), 10000000);
+}
+
+TEST(object, attr_unset) {
+    auto o1 = newObject("stdClass");
+    o1.set("prop1", 1990);
+
+    auto prop1 = o1.attr("prop1");
+    prop1.unset();
+    prop1 = 2026;
+    ASSERT_EQ(prop1.toInt(), 2026);
+
+    ASSERT_EQ(o1.attr("prop1").toInt(), 0);
 }

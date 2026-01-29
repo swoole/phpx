@@ -587,6 +587,7 @@ TEST(variant, offsetGet) {
 
     var b = false;
     ASSERT_TRUE(b.offsetGet(0).isNull());
+    ASSERT_STREQ(s.offsetGet(b).toCString(), "h");
 
     Array a2;
     var sk = "hello";
@@ -612,9 +613,13 @@ TEST(variant, offsetGet3) {
     auto o = newObject("ArrayObject");
     o.offsetSet(null, 1987);
     o.offsetSet(null, 2026);
+
     ASSERT_TRUE(o.offsetExists(1));
     ASSERT_FALSE(o.offsetExists(2));
     ASSERT_EQ(o.offsetGet(0).toInt(), 1987);
+
+    var o2 = o;
+    ASSERT_EQ(o.offsetGet(1).toInt(), 2026);
 }
 
 TEST(variant, setProperty) {

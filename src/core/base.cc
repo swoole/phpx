@@ -354,10 +354,7 @@ static Variant include_impl(zend_string *filename, const int type) {
     } else {
         result = false;
     }
-
-    if (UNEXPECTED(EG(exception) != nullptr && throw_impl != nullptr)) {
-        throw_impl(EG(exception));
-    }
+    throwErrorIfOccurred();
 
     return result;
 }
