@@ -312,7 +312,8 @@ TEST(object, ArrayProperty) {
     auto prop2 = o1.get("prop");
     ASSERT_EQ(prop2.offsetGet(5).toInt(), 2026);
 
-    try_call([&]() { o1.updateArrayProperty("propNotExists", 5, 2026); }, "property `propNotExists` is undefined");
+    try_call(
+        [&]() { o1.updateArrayProperty("propNotExists", 5, 2026); }, "property `propNotExists` is undefined");
 
     o1.set("prop2", false);
     try_call([&]() { o1.updateArrayProperty("prop2", 5, 2026); }, "property `prop2` must be `array`");
