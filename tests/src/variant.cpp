@@ -618,8 +618,43 @@ TEST(variant, offsetGet3) {
     ASSERT_FALSE(o.offsetExists(2));
     ASSERT_EQ(o.offsetGet(0).toInt(), 1987);
 
-    var o2 = o;
-    ASSERT_EQ(o.offsetGet(1).toInt(), 2026);
+    var v = o;
+    ASSERT_EQ(v.offsetGet(1).toInt(), 2026);
+    ASSERT_FALSE(v.offsetExists(4));
+    ASSERT_TRUE(v.offsetExists(1));
+}
+
+TEST(variant, offsetGet4) {
+    auto o = newObject("ArrayObject");
+    o.offsetSet("hello", 1987);
+    o.offsetSet("world", 2026);
+
+    var v = o;
+
+    var sk = "hello";
+    ASSERT_EQ(v.offsetGet(sk).toInt(), 1987);
+
+    var sk2 = "emtpy";
+    ASSERT_TRUE(v.offsetGet(sk2).isNull());
+
+    ASSERT_FALSE(sk2.offsetExists(10));
+    ASSERT_TRUE(sk2.offsetExists(4));
+
+    ASSERT_TRUE(sk2.offsetExists(true));
+    ASSERT_TRUE(sk2.offsetExists(false));
+}
+
+TEST(variant, offsetSet2) {
+    auto o = newObject("ArrayObject");
+    o.offsetSet(null, 1987);
+    o.offsetSet(null, 2026);
+
+    var v = o;
+    v.offsetSet(1, 1900);
+    ASSERT_EQ(o.offsetGet(1).toInt(), 1900);
+
+    v.offsetUnset(1);
+    ASSERT_TRUE(o.offsetGet(1).isNull());
 }
 
 TEST(variant, setProperty) {

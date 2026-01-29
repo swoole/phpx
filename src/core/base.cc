@@ -242,9 +242,7 @@ static void call_function_impl(
         zend_call_function(&fci, fci_cache);
     }
 
-    if (EG(exception) && throw_impl) {
-        throw_impl(EG(exception));
-    }
+    throwErrorIfOccurred();
 }
 
 Variant call_impl(const zval *object, const zval *func, Args &args) {
