@@ -725,44 +725,44 @@ TEST(variant, operateWithBadType) {
     ASSERT_TRUE(v.getProperty("hello").isNull());
 }
 
-TEST(variant, offsetGetIndirect) {
+TEST(variant, item) {
     auto o = newObject("ArrayObject");
     o.offsetSet(0, 2000);
     o.offsetSet(1, 1987);
 
     ASSERT_EQ(o.offsetGet(1).toInt(), 1987);
 
-    auto iv = o.offsetGetIndirect(1);
+    auto iv = o.item(1);
     iv = 1999;
     ASSERT_EQ(o.offsetGet(1).toInt(), 1999);
 
     Array a{1, 2, 3, 99, 1000};
-    auto iv2 = a.offsetGetIndirect(3);
+    auto iv2 = a.item(3);
     iv2 = 1987;
     ASSERT_EQ(a.offsetGet(3).toInt(), 1987);
 }
 
-TEST(variant, offsetGetIndirect2) {
+TEST(variant, item2) {
     var sk = "hello";
     auto o = newObject("ArrayObject");
     o.offsetSet(sk, 1987);
     ASSERT_TRUE(o.offsetExists(sk));
     ASSERT_EQ(o.offsetGet(sk).toInt(), 1987);
 
-    auto iv = o.offsetGetIndirect(sk);
+    auto iv = o.item(sk);
     iv = 1999;
     ASSERT_EQ(o.offsetGet(sk).toInt(), 1999);
 
     Array a = create_map();
-    auto iv2 = a.offsetGetIndirect("php");
+    auto iv2 = a.item("php");
     iv2 = 1995;
     ASSERT_EQ(a.offsetGet("php").toInt(), 1995);
 
-    auto iv3 = a.offsetGetIndirect("swift", true);
+    auto iv3 = a.item("swift", true);
     iv3 = 2012;
     ASSERT_EQ(a.offsetGet("swift").toInt(), 2012);
 
-    auto chr = sk.offsetGetIndirect(1);
+    auto chr = sk.item(1);
     ASSERT_STREQ(chr.toCString(), "e");
 }
 

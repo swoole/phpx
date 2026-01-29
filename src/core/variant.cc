@@ -636,4 +636,76 @@ Variant Variant::jsonDecode(zend_long options, zend_long depth) {
 bool Variant::isCallable() {
     return zend_is_callable(unwrap_ptr(), 0, nullptr);
 }
+
+Variant Variant::item(zend_long offset, bool update) const {
+    auto zvar = unwrap_zval(const_ptr());
+    zval *retval;
+    zval rv;
+
+    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+        retval = zend_hash_index_find(Z_ARRVAL_P(zvar), offset);
+        if (retval == nullptr) {
+            if (update) {
+                zval tmp;
+                ZVAL_NULL(&tmp);
+                retval = zend_hash_index_update(Z_ARRVAL_P(zvar), offset, &tmp);
+            } else {
+                return Variant{};
+            }
+        }
+    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+        auto obj = object();
+        zval dim;
+        ZVAL_LONG(&dim, offset);
+        retval = obj->handlers->read_dimension(obj, &dim, BP_VAR_RW, &rv);
+        if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
+            return Variant{retval};
+        }
+    } else if (Z_TYPE_P(zvar) == IS_STRING) {
+        return offsetGet(offset);
+    } else {
+        throwError("Only array/object/string support the item(%ld) method, got `%s`", offset, typeStr());
+        return Variant{};
+    }
+
+    return Variant{retval, Ctor::Indirect};
+}
+
+Variant Variant::item(const Variant &key, bool update) const {
+    auto zvar = unwrap_zval(const_ptr());
+    zval *retval;
+    zval rv;
+
+    if (key.isInt() || key.isFloat() || key.isNumeric() || Z_TYPE_P(zvar) == IS_STRING) {
+        return item(key.toInt());
+    }
+
+    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+        auto skey = key.toString();
+        retval = zend_hash_find(Z_ARRVAL_P(zvar), skey.str());
+        if (retval == nullptr) {
+            if (update) {
+                zval tmp;
+                ZVAL_NULL(&tmp);
+                retval = zend_hash_update(Z_ARRVAL_P(zvar), skey.str(), &tmp);
+            } else {
+                return Variant{};
+            }
+        }
+    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+        auto obj = object();
+        auto dim = NO_CONST_V(key);
+        retval = obj->handlers->read_dimension(obj, dim, BP_VAR_RW, &rv);
+        if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
+            return Variant{retval};
+        }
+    } else if (Z_TYPE_P(zvar) == IS_STRING) {
+        return offsetGet(key);
+    } else {
+        throwError("Only array/object/string support the item() method");
+        return Variant{};
+    }
+
+    return Variant{retval, Ctor::Indirect};
+}
 }  // namespace php

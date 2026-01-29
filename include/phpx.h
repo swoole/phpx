@@ -499,10 +499,8 @@ class Variant {
      * performing write operations on an array or object, the address of the zend_array or object property table may
      * change, and the zval address pointed to by the Indirect object may become an invalid address.
      */
-    PHPX_UNSAFE Variant getPropertyIndirect(const Variant &name, bool write = false) const;
-    PHPX_UNSAFE Variant getPropertyIndirect(uintptr_t offset, bool write = false) const;
-    PHPX_UNSAFE Variant offsetGetIndirect(zend_long offset, bool write = false) const;
-    PHPX_UNSAFE Variant offsetGetIndirect(const Variant &key, bool write = false) const;
+    Variant item(zend_long offset, bool update = false) const;
+    Variant item(const Variant &key, bool update = false) const;
 
     bool operator==(const Variant &v) const {
         return equals(v);
@@ -981,7 +979,11 @@ class Object : public Variant {
         return call_impl(ptr(), fn.const_ptr());
     }
     Variant exec(const Variant &fn, const std::initializer_list<Variant> &args);
-    Reference getPropertyReference(const String &name);
+
+    Reference attrRef(const String &name);
+    Variant attr(const Variant &name, bool update = false) const;
+    Variant attr(uintptr_t offset, bool update = false) const;
+
     void appendArrayProperty(const String &name, const Variant &value);
     void updateArrayProperty(const String &name, zend_long offset, const Variant &value);
     void updateArrayProperty(const String &name, const Variant &key, const Variant &value);
@@ -1138,6 +1140,13 @@ class Reference : public Variant {
         if (&v != this) {
             zval_ptr_dtor(&val);
             ZVAL_COPY(&val, v.const_ptr());
+        }
+        return *this;
+    }
+    Reference &operator=(const Variant &v) {
+        if (&v != this) {
+            destroy();
+            ZVAL_COPY(refval(), v.direct_ptr());
         }
         return *this;
     }

@@ -72,7 +72,7 @@ Variant Object::callParentMethod(const String &func, const std::initializer_list
     return retval;
 }
 
-Reference Object::getPropertyReference(const String &prop_name) {
+Reference Object::attrRef(const String &prop_name) {
     auto zobj = object();
     zval rv;
     zval *member_p = zobj->handlers->get_property_ptr_ptr(zobj, prop_name.str(), BP_VAR_RW, NULL);
@@ -104,6 +104,41 @@ Reference Object::getPropertyReference(const String &prop_name) {
     Z_TRY_ADDREF_P(ref.ptr());
 
     return ref;
+}
+
+Variant Object::attr(const Variant &name, bool update) const {
+    if (UNEXPECTED(!isObject())) {
+        throwError("Only objects support the attr() method");
+        return Variant{};
+    }
+
+    auto prop_name = name.toString();
+    zval rv;
+    auto member_p = zend_read_property_ex(ce(), object(), prop_name.str(), update, &rv);
+
+    if (ZVAL_IS_NULL(member_p) && update) {
+        zval tmp;
+        ZVAL_NULL(&tmp);
+        auto old_scope = EG(fake_scope);
+        EG(fake_scope) = ce();
+        member_p = object()->handlers->write_property(object(), prop_name.str(), &tmp, NULL);
+        EG(fake_scope) = old_scope;
+    }
+
+    if (member_p == &rv) {
+        return Variant{member_p};
+    } else {
+        member_p = unwrap_zval(member_p);
+        return Variant{member_p, Ctor::Indirect};
+    }
+}
+
+Variant Object::attr(uintptr_t offset, bool update) const {
+    if (UNEXPECTED(!isObject())) {
+        throwError("Only objects support the attr() method");
+        return Variant{};
+    }
+    return Variant{OBJ_PROP(object(), offset), Ctor::Indirect};
 }
 
 void Object::appendArrayProperty(const String &name, const Variant &value) {

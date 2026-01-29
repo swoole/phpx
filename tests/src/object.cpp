@@ -97,7 +97,7 @@ TEST(object, call_parent_method) {
     auto prop_offset = getPropertyOffset("TestClass2", "propArray");
     ASSERT_EQ(prop_offset, sizeof(zend_object));
 
-    auto prop = obj.getPropertyIndirect(prop_offset);
+    auto prop = obj.attr(prop_offset);
     ASSERT_TRUE(prop.isArray());
     ASSERT_EQ(prop.length(), 5);
 
@@ -206,11 +206,11 @@ TEST(object, toObject) {
     ASSERT_EQ(o4.getProperty("value").toInt(), 1999);
 }
 
-TEST(object, getPropertyReference) {
+TEST(object, attrRef) {
     auto o1 = newObject("stdClass");
     o1.set("prop1", 1990);
 
-    auto prop1 = o1.getPropertyReference("prop1");
+    auto prop1 = o1.attrRef("prop1");
     auto str = "first=value&arr[]=foo+bar&arr[]=baz";
 
     parse_str(str, prop1);
@@ -227,12 +227,12 @@ TEST(object, getPropertyReference) {
     ASSERT_STREQ(v2.offsetGet("first").toCString(), "value");
 }
 
-TEST(object, getPropertyIndirect) {
+TEST(object, attr) {
     auto o1 = newObject("stdClass");
     o1.set("prop1", 1990);
     ASSERT_EQ(o1.getProperty("prop1").toInt(), 1990);
 
-    auto prop1 = o1.getPropertyIndirect("prop1");
+    auto prop1 = o1.attr("prop1");
     prop1 = 2022;
     ASSERT_EQ(o1.getProperty("prop1").toInt(), 2022);
 
@@ -240,7 +240,7 @@ TEST(object, getPropertyIndirect) {
     prop1 = arr;
     ASSERT_TRUE(o1.getProperty("prop1").isArray());
 
-    auto prop2 = o1.getPropertyIndirect("prop2", true);
+    auto prop2 = o1.attr("prop2", true);
     prop2 = 9898;
 
     ASSERT_EQ(o1.getProperty("prop2").toInt(), 9898);
