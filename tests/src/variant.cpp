@@ -631,6 +631,9 @@ TEST(variant, offsetGet3) {
     ASSERT_EQ(v.offsetGet(1).toInt(), 2026);
     ASSERT_FALSE(v.offsetExists(4));
     ASSERT_TRUE(v.offsetExists(1));
+
+    v.offsetSet(2, 1882);
+    ASSERT_EQ(v.offsetGet(2).toInt(), 1882);
 }
 
 TEST(variant, offsetGet4) {
@@ -674,6 +677,29 @@ TEST(variant, offsetSet3) {
     var s = "hello";
     s.offsetSet(4, "x");
     ASSERT_STREQ(s.toCString(), "hellx");
+
+    s.offsetSet("3", "_");
+    ASSERT_STREQ(s.toCString(), "hel_x");
+
+    var v2;
+    v2.offsetSet(2, 2000);
+    ASSERT_EQ(v2.offsetGet(2).toInt(), 2000);
+
+    try {
+        s.offsetUnset(2);
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto msg = e.exec("getMessage");
+        ASSERT_TRUE(str_contains(msg, "Cannot unset offsets").isTrue());
+    }
+
+    try {
+        s.offsetUnset("1");
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto msg = e.exec("getMessage");
+        ASSERT_TRUE(str_contains(msg, "Cannot unset offsets").isTrue());
+    }
 }
 
 TEST(variant, setProperty) {

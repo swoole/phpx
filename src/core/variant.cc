@@ -282,7 +282,7 @@ void Variant::offsetSet(const Variant &key, const Variant &value) {
         tmp.offsetSet(key, value);
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
         if (key.isNull()) {
-            throwException(newObject("Error", "[] operator not supported for strings"));
+            throwError("[] operator not supported for strings");
         }
         String tmp(zvar);
         tmp.offsetSet(key.toInt(), value);
@@ -299,7 +299,7 @@ void Variant::offsetUnset(zend_long offset) {
         Object tmp(zvar);
         tmp.offsetUnset(offset);
     } else {
-        throwException(newObject("Error", "Cannot unset offsets"));
+        throwError("Cannot unset offsets");
     }
 }
 
@@ -313,7 +313,7 @@ void Variant::offsetUnset(const Variant &key) {
         Object tmp(zvar);
         tmp.offsetUnset(key);
     } else {
-        throwException(newObject("Error", "Cannot unset offsets"));
+        throwError("Cannot unset offsets");
     }
 }
 
