@@ -267,6 +267,17 @@ TEST(object, attrRef) {
     ASSERT_STREQ(v2.offsetGet("first").toCString(), "value");
 }
 
+TEST(object, attrRef2) {
+    auto o1 = newObject("stdClass");
+    o1.set("prop1", 1990);
+
+    auto ref1 = o1.attrRef("prop1");
+    auto ref2 = o1.attrRef("prop1");
+
+    ref1 = 2026;
+    ASSERT_EQ(ref2.toInt(), 2026);
+}
+
 TEST(object, attr) {
     auto o1 = newObject("stdClass");
     o1.set("prop1", 1990);

@@ -844,3 +844,13 @@ TEST(variant, item3) {
         ASSERT_TRUE(str_contains(msg, "Only array/object/string support the item").isTrue());
     }
 }
+
+TEST(variant, item4) {
+	auto arr = create_list();
+	var v = arr;
+
+	{
+		auto v2 = std::move(v.item(3));
+		ASSERT_EQ(v2.getRefCount(), 2);
+	}
+}
