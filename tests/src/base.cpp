@@ -238,3 +238,13 @@ TEST(base, call_bad_func) {
         ASSERT_TRUE(str_contains(msg, "Invalid callback func_not_exists").toBool());
     }
 }
+
+TEST(base, getFunction) {
+    auto fn1 = getFunction("var_dump");
+    ASSERT_NE(fn1, nullptr);
+
+    try_call([]() { auto fn2 = getFunction("func_not_exists"); }, "function 'func_not_exists' is undefined");
+
+    auto fn3 = getFunction("DateTime::createFromFormat");
+    ASSERT_NE(fn3, nullptr);
+}

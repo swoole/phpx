@@ -18,4 +18,4 @@ const std::string &get_root_path();
 std::string get_tests_dir();
 std::string get_include_dir();
 ChildResult run_in_child_capture_stdout(const std::function<int(void)> &func);
-bool try_call(const std::function<void(void)> &fn, const php::String &msg);
+void try_call(const std::function<void(void)> &fn, const php::String &msg, bool print = false);

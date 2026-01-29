@@ -43,15 +43,17 @@ string get_include_dir() {
     return get_root_path() + "/tests/include";
 }
 
-bool try_call(const std::function<void(void)> &fn, const php::String &msg) {
+void try_call(const std::function<void(void)> &fn, const php::String &msg, bool print) {
     try {
         fn();
     } catch (zend_object *ex) {
         auto e = php::catchException();
         auto s = e.exec("getMessage");
-        return php::str_contains(s, msg).toBool();
+        if (print) {
+            s.print();
+        }
+        EXPECT_TRUE(php::str_contains(s, msg).toBool());
     }
-    return false;
 }
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_void, 0, 0, IS_VOID, 0)

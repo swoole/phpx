@@ -192,6 +192,22 @@ static bool is_callable_ex(zval *callable,
     return ret;
 }
 
+zend_function *getFunction(const String &name) {
+    zend_fcall_info_cache fcc;
+    zval *fn = NO_CONST_V(name);
+
+    if (!is_callable_ex(fn, nullptr, 0, nullptr, &fcc, nullptr)) {
+        ZEND_ASSERT(error && "Should have error if not callable");
+        auto callable_name = zend_get_callable_name_ex(fn, nullptr);
+        zend_throw_error(NULL, "function '%s' is undefined.", ZSTR_VAL(callable_name));
+        zend_string_release_ex(callable_name, 0);
+    }
+
+    throwErrorIfOccurred();
+
+    return fcc.function_handler;
+}
+
 static void call_function_impl(
     const zval *zobject, const zval *function_name, zval *retval_ptr, uint32_t param_count, zval params[]) {
     zend_fcall_info fci;
