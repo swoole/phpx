@@ -38,11 +38,13 @@ TEST(object, base) {
     ASSERT_TRUE(flags.toInt() & constant("ArrayObject::ARRAY_AS_PROPS").toInt());
     flags.debug();
 
-    auto o2 = newObject("class_not_exists");
-    ASSERT_FALSE(o2.isUndef());
+    try_call([]() { auto o2 = newObject("class_not_exists"); }, "class 'class_not_exists' is undefined");
 
-    auto o3 = newObject("class_not_exists", {1234, "hello world"});
-    ASSERT_FALSE(o3.isUndef());
+    try_call(
+        []() {
+            auto o3 = newObject("class_not_exists", {1234, "hello world"});
+        },
+        "class 'class_not_exists' is undefined");
 
     Array arr3;
     arr3.append("hello world");

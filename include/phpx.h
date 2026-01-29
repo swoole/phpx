@@ -963,7 +963,7 @@ static inline zend_class_entry *getClassEntry(const String &name) {
 static inline zend_class_entry *getClassEntrySafe(const String &name) {
     zend_class_entry *ce = getClassEntry(name);
     if (UNEXPECTED(!ce)) {
-    	throwError("class '%s' is undefined.", name.data());
+        throwError("class '%s' is undefined.", name.data());
     }
     return ce;
 }
