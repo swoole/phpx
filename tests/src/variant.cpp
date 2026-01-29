@@ -954,3 +954,19 @@ TEST(variant, append) {
         ASSERT_TRUE(str_contains(msg, "Cannot append element").isTrue());
     }
 }
+
+TEST(variant, item5) {
+    try_call(
+        []() {
+            var a = 1234;
+            a.item(0);
+        },
+        "Only array/object/string support the item");
+
+    try_call(
+        []() {
+            var a = 1234;
+            a.newItem();
+        },
+        "Only array/object/string support the item");
+}
