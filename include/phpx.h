@@ -1127,16 +1127,20 @@ class Object : public Variant {
 class Reference : public Variant {
     void checkRef() {
         if (isNull() || isUndef()) {
-            Reference();
+        	init();
         } else if (!isReference()) {
             throwError("parameter 1 must be `reference`, got `%s`", typeStr());
         }
     }
 
-  public:
-    Reference() noexcept {
+    void init() {
         ZVAL_NEW_EMPTY_REF(ptr());
         ZVAL_NULL(Z_REFVAL_P(ptr()));
+    }
+
+  public:
+    Reference() noexcept {
+    	init();
     }
     Reference(const Reference &v) noexcept {
         ZVAL_COPY(&val, v.const_ptr());

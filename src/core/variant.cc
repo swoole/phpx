@@ -701,8 +701,6 @@ Variant Variant::item(const Variant &key, bool update) {
         if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
             return Variant{retval};
         }
-    } else if (Z_TYPE_P(zvar) == IS_STRING) {
-        return offsetGet(key);
     } else {
         throwError("Only array/object/string support the item() method");
         return Variant{};

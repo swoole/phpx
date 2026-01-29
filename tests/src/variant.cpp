@@ -91,6 +91,9 @@ TEST(variant, toCString) {
     std::string s1("hello world");
     Variant s2("hello world");
     ASSERT_STREQ(s1.c_str(), s2.toCString());
+
+    var v = 1000;
+    ASSERT_STREQ(v.toCString(), "");
 }
 
 TEST(variant, toStdString) {
@@ -344,6 +347,22 @@ TEST(variant, ref5) {
     ASSERT_STREQ(b.data(), "hello php");
     ASSERT_STREQ(ref.toCString(), "hello php");
     ASSERT_TRUE(ref.isString());
+}
+
+TEST(variant, ref6) {
+    var s;
+
+    Ref ref{s.ptr()};
+    ASSERT_TRUE(ref.isReference());
+
+    try {
+        var s2 = "hello";
+        Ref ref2{s2.ptr()};
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto msg = e.exec("getMessage");
+        ASSERT_TRUE(str_contains(msg, "parameter 1 must be `reference`").isTrue());
+    }
 }
 
 TEST(variant, callable) {
@@ -869,6 +888,9 @@ TEST(variant, item3) {
 
     auto item2 = v.item(9999);
     ASSERT_TRUE(item2.isNull());
+
+    auto item3 = v.item("4");
+    ASSERT_STREQ(item3.toCString(), "c++");
 
     try {
         var v2 = false;

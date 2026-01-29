@@ -21,12 +21,6 @@
 #include "phpx_math.h"
 #include "phpx_operator.h"
 
-enum Semantics {
-    Read,
-    Write,
-    Ref,
-};
-
 namespace php {
 static inline bool equals(Int a, Int b) {
     return a == b;
