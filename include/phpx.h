@@ -508,6 +508,7 @@ class Variant {
      */
     Variant item(zend_long offset, bool update = false);
     Variant item(const Variant &key, bool update = false);
+    Variant newItem();
 
     bool operator==(const Variant &v) const {
         return equals(v);
@@ -1127,20 +1128,20 @@ class Object : public Variant {
 class Reference : public Variant {
     void checkRef() {
         if (isNull() || isUndef()) {
-        	init();
+            ref_init(&val);
         } else if (!isReference()) {
             throwError("parameter 1 must be `reference`, got `%s`", typeStr());
         }
     }
 
-    void init() {
-        ZVAL_NEW_EMPTY_REF(ptr());
-        ZVAL_NULL(Z_REFVAL_P(ptr()));
+    static void ref_init(zval *arg) {
+        ZVAL_NEW_EMPTY_REF(arg);
+        ZVAL_NULL(Z_REFVAL_P(arg));
     }
 
   public:
     Reference() noexcept {
-    	init();
+        ref_init(&val);
     }
     Reference(const Reference &v) noexcept {
         ZVAL_COPY(&val, v.const_ptr());

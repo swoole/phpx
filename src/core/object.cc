@@ -155,6 +155,7 @@ void Object::updateArrayProperty(const String &name, zend_long offset, const Var
     zval *member_p = zend_read_property_ex(ce(), object(), name.str(), false, &rv);
 
     if (UNEXPECTED(!member_p)) {
+        throwError("property `%s` is undefined", name.data());
         return;
     }
 

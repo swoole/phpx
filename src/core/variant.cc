@@ -708,4 +708,28 @@ Variant Variant::item(const Variant &key, bool update) {
 
     return Variant{retval, Ctor::Indirect};
 }
+
+Variant Variant::newItem() {
+    auto zvar = unwrap_zval(ptr());
+    zval *retval;
+    zval rv;
+    zval tmp;
+    ZVAL_NULL(&tmp);
+
+    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+        SEPARATE_ARRAY(zvar);
+        retval = zend_hash_next_index_insert(Z_ARRVAL_P(zvar), &tmp);
+    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+        auto obj = object();
+        retval = obj->handlers->read_dimension(obj, &tmp, BP_VAR_RW, &rv);
+        if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
+            return Variant{retval};
+        }
+    } else {
+        throwError("Only array/object/string support the item() method");
+        return Variant{};
+    }
+
+    return Variant{retval, Ctor::Indirect};
+}
 }  // namespace php
