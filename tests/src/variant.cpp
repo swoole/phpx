@@ -601,12 +601,21 @@ TEST(variant, offsetGet) {
 TEST(variant, offsetGet2) {
     var sk = "hello";
     auto o = newObject("ArrayObject");
+    var v = o;
+
     o.offsetSet(sk, 1987);
     ASSERT_TRUE(o.offsetExists(sk));
+    ASSERT_TRUE(v.offsetExists(sk));
     ASSERT_EQ(o.offsetGet(sk).toInt(), 1987);
 
     o.offsetUnset(sk);
     ASSERT_FALSE(o.offsetExists(sk));
+    ASSERT_FALSE(v.offsetExists(sk));
+
+    v.offsetSet(sk, 2494);
+    ASSERT_EQ(v.offsetGet(sk).toInt(), 2494);
+    v.offsetUnset(sk);
+    ASSERT_EQ(v.offsetGet(sk).toInt(), 0);
 }
 
 TEST(variant, offsetGet3) {
@@ -658,8 +667,8 @@ TEST(variant, offsetSet2) {
 }
 
 TEST(variant, offsetSet3) {
-	var v;
-	v.offsetSet(null, 1923);
+    var v;
+    v.offsetSet(null, 1923);
     ASSERT_EQ(v.offsetGet(0).toInt(), 1923);
 
     var s = "hello";
@@ -825,10 +834,10 @@ TEST(variant, ref) {
 }
 
 TEST(variant, item3) {
-	auto arr = create_list();
-	var v = arr;
-	auto indirect = v.item(3, true);
-	indirect = "golang";
+    auto arr = create_list();
+    var v = arr;
+    auto indirect = v.item(3, true);
+    indirect = "golang";
 
     ASSERT_STREQ(v.item(3).toCString(), "golang");
 
@@ -836,8 +845,8 @@ TEST(variant, item3) {
     ASSERT_TRUE(item2.isNull());
 
     try {
-    	var v2 = false;
-    	auto res = v2.item(2);
+        var v2 = false;
+        auto res = v2.item(2);
     } catch (zend_object *ex) {
         auto e = catchException();
         auto msg = e.exec("getMessage");
@@ -846,11 +855,54 @@ TEST(variant, item3) {
 }
 
 TEST(variant, item4) {
-	auto arr = create_list();
-	var v = arr;
+    auto arr = create_list();
+    var v = arr;
 
-	{
-		auto v2 = std::move(v.item(3));
-		ASSERT_EQ(v2.getRefCount(), 2);
-	}
+    {
+        auto v2 = std::move(v.item(3));
+        ASSERT_EQ(v2.getRefCount(), 2);
+    }
+}
+
+TEST(variant, itemUpdate1) {
+    auto arr = create_list();
+    var v = arr;
+
+    ASSERT_EQ(v.length(), 5);
+    var item = v.item(5, true);
+    item = "node.js";
+    ASSERT_STREQ(v.offsetGet(5).toCString(), "node.js");
+    ASSERT_EQ(v.length(), 6);
+
+    ASSERT_EQ(arr.length(), 5);
+}
+
+TEST(variant, itemUpdate2) {
+    auto arr = create_map();
+    var v = arr;
+
+    ASSERT_EQ(v.length(), 5);
+    var item = v.item("swift", true);
+    item = 999;
+    ASSERT_EQ(v.offsetGet("swift").toInt(), 999);
+    ASSERT_EQ(v.length(), 6);
+
+    ASSERT_EQ(arr.length(), 5);
+}
+
+TEST(variant, append) {
+    auto arr = create_list();
+    var v = arr;
+    ASSERT_EQ(v.length(), 5);
+    v.append("node.js");
+    ASSERT_EQ(v.length(), 6);
+
+    try {
+        var v2 = false;
+        v2.append(9999);
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto msg = e.exec("getMessage");
+        ASSERT_TRUE(str_contains(msg, "Cannot append element").isTrue());
+    }
 }

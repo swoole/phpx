@@ -544,7 +544,7 @@ void Variant::append(const Variant &v) {
     auto zvalue = NO_CONST_V(v);
     auto zresult = unwrap_ptr();
     if (isArray()) {
-        Array tmp(zresult);
+        Array tmp(zresult, Ctor::Indirect);
         tmp.append(v);
     } else if (isObject()) {
         Object tmp(zresult);
@@ -637,8 +637,8 @@ bool Variant::isCallable() {
     return zend_is_callable(unwrap_ptr(), 0, nullptr);
 }
 
-Variant Variant::item(zend_long offset, bool update) const {
-    auto zvar = unwrap_zval(const_ptr());
+Variant Variant::item(zend_long offset, bool update) {
+    auto zvar = unwrap_zval(ptr());
     zval *retval;
     zval rv;
 
@@ -648,6 +648,7 @@ Variant Variant::item(zend_long offset, bool update) const {
             if (update) {
                 zval tmp;
                 ZVAL_NULL(&tmp);
+                SEPARATE_ARRAY(zvar);
                 retval = zend_hash_index_update(Z_ARRVAL_P(zvar), offset, &tmp);
             } else {
                 return Variant{};
@@ -671,8 +672,8 @@ Variant Variant::item(zend_long offset, bool update) const {
     return Variant{retval, Ctor::Indirect};
 }
 
-Variant Variant::item(const Variant &key, bool update) const {
-    auto zvar = unwrap_zval(const_ptr());
+Variant Variant::item(const Variant &key, bool update) {
+    auto zvar = unwrap_zval(ptr());
     zval *retval;
     zval rv;
 
@@ -687,6 +688,7 @@ Variant Variant::item(const Variant &key, bool update) const {
             if (update) {
                 zval tmp;
                 ZVAL_NULL(&tmp);
+                SEPARATE_ARRAY(zvar);
                 retval = zend_hash_update(Z_ARRVAL_P(zvar), skey.str(), &tmp);
             } else {
                 return Variant{};

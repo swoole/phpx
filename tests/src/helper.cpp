@@ -31,12 +31,12 @@ TEST(helper, instanceOf) {
 }
 
 TEST(helper, abs) {
-	var a = "-10";
-	ASSERT_EQ(php::math::abs(a).toInt(), 10);
+    var a = "-10";
+    ASSERT_EQ(php::math::abs(a).toInt(), 10);
 
-	var b = -3.1415;
-	ASSERT_EQ(php::math::abs(b).toFloat(), 3.1415);
+    var b = -3.1415;
+    ASSERT_EQ(php::math::abs(b).toFloat(), 3.1415);
 
-	var c = 199;
-	ASSERT_EQ(php::math::abs(c).toInt(), 199);
+    var c = 199;
+    ASSERT_EQ(php::math::abs(c).toInt(), 199);
 }

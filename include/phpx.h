@@ -506,8 +506,8 @@ class Variant {
      * performing write operations on an array or object, the address of the zend_array or object property table may
      * change, and the zval address pointed to by the Indirect object may become an invalid address.
      */
-    Variant item(zend_long offset, bool update = false) const;
-    Variant item(const Variant &key, bool update = false) const;
+    Variant item(zend_long offset, bool update = false);
+    Variant item(const Variant &key, bool update = false);
 
     bool operator==(const Variant &v) const {
         return equals(v);
