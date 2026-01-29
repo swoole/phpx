@@ -87,6 +87,8 @@ PHPX_API Variant eval(const String &script);
 PHPX_API Variant call(const Variant &func, Args &args);
 PHPX_API Variant call(const Variant &func, Array &args);
 PHPX_API Variant call(const Variant &func, const std::initializer_list<Variant> &args);
+PHPX_API Variant call(zend_function *func);
+PHPX_API Variant call(zend_function *func, const std::initializer_list<Variant> &args);
 PHPX_API void throwException(const String &class_name, const char *message, int code = 0);
 PHPX_API void throwException(const Object &e);
 

@@ -293,6 +293,24 @@ Variant call(const Variant &func, const std::initializer_list<Variant> &args) {
     return call_impl(nullptr, func.const_ptr(), _args);
 }
 
+Variant call(zend_function *func) {
+    Variant retval{};
+    zend_call_known_function(func, nullptr, nullptr, retval.ptr(), 0, nullptr, nullptr);
+    throwErrorIfOccurred();
+    return retval;
+}
+
+Variant call(zend_function *func, const std::initializer_list<Variant> &args) {
+    Variant retval{};
+    Args _args(args.size());
+    for (const auto &arg : args) {
+        _args.append(arg.const_ptr());
+    }
+    zend_call_known_function(func, nullptr, nullptr, retval.ptr(), _args.count(), _args.ptr(), nullptr);
+    throwErrorIfOccurred();
+    return retval;
+}
+
 #define ZEND_FAKE_OP_ARRAY ((zend_op_array *) (intptr_t) -1)
 
 static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_string *inc_filename, const int type) {

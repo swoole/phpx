@@ -248,3 +248,13 @@ TEST(base, getFunction) {
     auto fn3 = getFunction("DateTime::createFromFormat");
     ASSERT_NE(fn3, nullptr);
 }
+
+TEST(base, call) {
+    auto fn1 = getFunction("php_uname");
+    auto rt1 = call(fn1, {"m"});
+    ASSERT_STREQ(rt1.toCString(), "x86_64");
+
+    auto fn2 = getFunction("posix_getpid");
+    auto rt2 = call(fn2);
+    ASSERT_EQ(rt2.toInt(), getpid());
+}
