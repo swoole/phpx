@@ -960,6 +960,14 @@ static inline zend_class_entry *getClassEntry(const String &name) {
     return zend_lookup_class(name.str());
 }
 
+static inline zend_class_entry *getClassEntrySafe(const String &name) {
+    zend_class_entry *ce = getClassEntry(name);
+    if (UNEXPECTED(!ce)) {
+        error(E_ERROR, "class '%s' is undefined.", name);
+    }
+    return ce;
+}
+
 class Object : public Variant {
     void checkObject() const {
         if (!isUndef() && !isNull() && !isObject()) {
@@ -1181,8 +1189,17 @@ static inline Reference newReference() {
     return Reference{};
 }
 
-extern Object newObject(const char *name);
-extern Object newObject(const char *name, const std::initializer_list<Variant> &args);
+extern Object newObject(zend_class_entry *ce);
+extern Object newObject(zend_class_entry *ce, const std::initializer_list<Variant> &args);
+
+static inline Object newObject(const char *name) {
+    return newObject(getClassEntrySafe(name));
+}
+
+static inline Object newObject(const char *name, const std::initializer_list<Variant> &args) {
+    return newObject(getClassEntrySafe(name), args);
+}
+
 /* generator */
 extern Object newObject(const char *name, const Variant &v1);
 extern Object newObject(const char *name, const Variant &v1, const Variant &v2);

@@ -213,14 +213,8 @@ Object Object::clone() const {
     return retval;
 }
 
-Object newObject(const char *name) {
+Object newObject(zend_class_entry *ce) {
     Object object;
-    zend_class_entry *ce = getClassEntry(name);
-    if (ce == nullptr) {
-        error(E_WARNING, "class '%s' is undefined.", name);
-        return object;
-    }
-
     auto rc = object_init_ex(object.ptr(), ce);
     if (EXPECTED(rc == SUCCESS)) {
         if (ce->constructor) {
@@ -228,17 +222,11 @@ Object newObject(const char *name) {
         }
     }
     throwErrorIfOccurred();
-
     return object;
 }
 
-Object newObject(const char *name, const std::initializer_list<Variant> &args) {
+Object newObject(zend_class_entry *ce, const std::initializer_list<Variant> &args) {
     Object object;
-    auto ce = getClassEntry(name);
-    if (UNEXPECTED(!ce)) {
-        error(E_WARNING, "class '%s' is undefined.", name);
-        return object;
-    }
 
     auto rc = object_init_ex(object.ptr(), ce);
     if (EXPECTED(rc == SUCCESS)) {
