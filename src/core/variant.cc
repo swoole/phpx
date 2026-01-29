@@ -82,7 +82,7 @@ size_t Variant::length() const {
     } else if (Z_TYPE_P(zv) == IS_ARRAY) {
         return zend_hash_num_elements(Z_ARRVAL_P(zv));
     } else if (Z_TYPE_P(zv) == IS_OBJECT) {
-        Object tmp(zv);
+        Object tmp(zv, Ctor::Indirect);
         return tmp.count();
     } else {
         return 0;
@@ -721,7 +721,10 @@ Variant Variant::newItem() {
         retval = zend_hash_next_index_insert(Z_ARRVAL_P(zvar), &tmp);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         auto obj = object();
-        retval = obj->handlers->read_dimension(obj, &tmp, BP_VAR_RW, &rv);
+        zval key;
+        ZVAL_LONG(&key, length());
+        obj->handlers->write_dimension(obj, &key, &tmp);
+        retval = obj->handlers->read_dimension(obj, &key, BP_VAR_RW, &rv);
         if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
             return Variant{retval};
         }

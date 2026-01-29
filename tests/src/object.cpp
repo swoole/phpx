@@ -341,7 +341,7 @@ TEST(object, toObject2) {
     ASSERT_GE(ts.toInt(), 10000000);
 }
 
-TEST(object, attr_unset) {
+TEST(object, unsetAttr) {
     auto o1 = newObject("stdClass");
     o1.set("prop1", 1990);
 
@@ -351,4 +351,20 @@ TEST(object, attr_unset) {
     ASSERT_EQ(prop1.toInt(), 2026);
 
     ASSERT_EQ(o1.attr("prop1").toInt(), 0);
+}
+
+TEST(object, newItem) {
+    auto o1 = newObject("ArrayObject");
+    auto prop1 = o1.newItem();
+    prop1 = 2025;
+    ASSERT_EQ(o1.offsetGet(0), 2025);
+
+    auto prop2 = o1.newItem();
+    prop2 = 1999;
+    ASSERT_EQ(o1.offsetGet(1), 1999);
+
+    auto arr = create_list();
+    auto item1 = arr.newItem();
+    item1 = "erlang";
+    ASSERT_STREQ(arr.offsetGet(5).toCString(), "erlang");
 }
