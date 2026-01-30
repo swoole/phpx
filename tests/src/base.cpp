@@ -14,6 +14,16 @@ TEST(base, constant) {
     ASSERT_STREQ(c.toCString(), PHP_VERSION);
 }
 
+TEST(base, constant2) {
+    define("IA", 6492);
+    auto c = constant(nullptr, "IA");
+    ASSERT_TRUE(c.isInt());
+    ASSERT_EQ(c.toInt(), 6492);
+
+    auto c2 = constant(nullptr, "XXTT");
+    ASSERT_TRUE(c2.isNull());
+}
+
 TEST(base, echo) {
     echo("php error: %s, ErrorCode: %d\n", "hello world", 1001);
 

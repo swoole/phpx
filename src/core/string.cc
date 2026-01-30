@@ -78,9 +78,10 @@ bool String::equals(const String &s, const bool ci) const {
 String String::offsetGet(zend_long _offset) const {
     _offset = offset(_offset);
     if (UNEXPECTED(_offset == -1)) {
-        return String{"", 0};
+        return String{zend_empty_string};
     } else {
-        return String{data() + _offset, 1};
+        zend_uchar c = (zend_uchar) data()[_offset];
+        return String{zend_one_char_string[c]};
     }
 }
 

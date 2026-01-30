@@ -190,4 +190,7 @@ TEST(string, offsetSet) {
     var sk = "1";
     s.offsetSet(sk, "E");
     ASSERT_STREQ(s.offsetGet(1).toCString(), "E");
+    ASSERT_STREQ(s.offsetGet(sk).toCString(), "E");
+
+    ASSERT_STREQ(s.offsetGet(999).toCString(), "");
 }

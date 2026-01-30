@@ -112,7 +112,7 @@ Variant constant(const String &name) {
 
 Variant constant(zend_class_entry *ce, const String &name) {
     if (ce == nullptr) {
-        return {zend_hash_find(EG(zend_constants), name.str())};
+        return {zend_get_constant(name.str())};
     } else {
         return zend_hash_find(CE_CONSTANTS_TABLE(ce), name.str());
     }
@@ -487,9 +487,9 @@ Variant getStaticProperty(const String &class_name, const String &prop) {
 }
 
 Variant getStaticProperty(zend_class_entry *ce, uint32_t offset) {
-	if (UNEXPECTED(CE_STATIC_MEMBERS(ce) == NULL)) {
-		zend_class_init_statics(ce);
-	}
+    if (UNEXPECTED(CE_STATIC_MEMBERS(ce) == NULL)) {
+        zend_class_init_statics(ce);
+    }
     return Variant{CE_STATIC_MEMBERS(ce) + offset, Ctor::Indirect};
 }
 
