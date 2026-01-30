@@ -102,7 +102,6 @@ extern Variant array_combine;
 extern Variant array_is_list;
 extern Variant base64_encode;
 extern Variant base64_decode;
-extern Variant constant;
 extern Variant ip2long;
 extern Variant long2ip;
 extern Variant getenv;

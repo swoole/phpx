@@ -104,7 +104,6 @@ Variant array_combine{ZEND_STRL("array_combine"), true};
 Variant array_is_list{ZEND_STRL("array_is_list"), true};
 Variant base64_encode{ZEND_STRL("base64_encode"), true};
 Variant base64_decode{ZEND_STRL("base64_decode"), true};
-Variant constant{ZEND_STRL("constant"), true};
 Variant ip2long{ZEND_STRL("ip2long"), true};
 Variant long2ip{ZEND_STRL("long2ip"), true};
 Variant getenv{ZEND_STRL("getenv"), true};

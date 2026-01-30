@@ -82,6 +82,8 @@ PHPX_API void echo(const Variant &val);
 PHPX_API void echo(Int val);
 PHPX_API void echo(Float val);
 PHPX_API Variant global(const String &name);
+PHPX_API Variant constant(const String &name);
+PHPX_API Variant constant(zend_class_entry *ce, const String &name);
 PHPX_API void initGlobal(const String &name, Variant &var);
 PHPX_API void unsetGlobal(const String &name);
 PHPX_API Variant include(const String &file, IncludeType type = INCLUDE);

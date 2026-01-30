@@ -102,6 +102,22 @@ void unsetGlobal(const String &name) {
     zend_hash_del(&EG(symbol_table), name.str());
 }
 
+Variant constant(const String &name) {
+    auto c = zend_get_constant_ex(name.str(), zend_get_executed_scope(), ZEND_FETCH_CLASS_EXCEPTION);
+    if (!c) {
+        return {};
+    }
+    return Variant{c};
+}
+
+Variant constant(zend_class_entry *ce, const String &name) {
+    if (ce == nullptr) {
+        return {zend_hash_find(EG(zend_constants), name.str())};
+    } else {
+        return zend_hash_find(CE_CONSTANTS_TABLE(ce), name.str());
+    }
+}
+
 void exit(const Variant &status) {
     if (status.isInt()) {
         EG(exit_status) = status.toInt();
@@ -471,7 +487,10 @@ Variant getStaticProperty(const String &class_name, const String &prop) {
 }
 
 Variant getStaticProperty(zend_class_entry *ce, uint32_t offset) {
-	return Variant{CE_STATIC_MEMBERS(ce) + offset, Ctor::Indirect};
+	if (UNEXPECTED(CE_STATIC_MEMBERS(ce) == NULL)) {
+		zend_class_init_statics(ce);
+	}
+    return Variant{CE_STATIC_MEMBERS(ce) + offset, Ctor::Indirect};
 }
 
 bool hasStaticProperty(const String &class_name, const String &prop) {
