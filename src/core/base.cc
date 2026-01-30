@@ -82,9 +82,24 @@ Variant global(const String &name) {
     zend_is_auto_global(name.str());
     zval *var = zend_hash_find_ind(&EG(symbol_table), name.str());
     if (!var) {
-        return false;
+        return {};
     }
-    return {var};
+    return {var, Ctor::Indirect};
+}
+
+void initGlobal(const String &name, Variant &var) {
+    auto gvar = global(name);
+    var.unset();
+    if (gvar.isIndirect()) {
+        *var.ptr() = *gvar.ptr();
+    } else {
+        auto addr = zend_hash_add_new(&EG(symbol_table), name.str(), undef());
+        ZVAL_INDIRECT(var.ptr(), addr);
+    }
+}
+
+void unsetGlobal(const String &name) {
+    zend_hash_del(&EG(symbol_table), name.str());
 }
 
 void exit(const Variant &status) {
@@ -106,7 +121,20 @@ static void box_dtor(zend_resource *res) {
     box->destroy();
 }
 
+#ifdef ZTS
+#define THREAD_LOCAL thread_local
+#else
+#define THREAD_LOCAL
+#endif
+
+THREAD_LOCAL bool request_init_called = false;
+THREAD_LOCAL bool request_shutdown_called = false;
+
 void request_init() {
+    if (request_init_called) {
+        return;
+    }
+    request_init_called = true;
     box_res_id = zend_register_list_destructors_ex(box_dtor, nullptr, box_res_name, 0);
     if (box_res_id < 0) {
         throwError("failed to register box resource");
@@ -114,6 +142,10 @@ void request_init() {
 }
 
 void request_shutdown() {
+    if (request_shutdown_called) {
+        return;
+    }
+    request_shutdown_called = true;
     if (func_cache_map) {
         zend_hash_destroy(func_cache_map);
         pefree(func_cache_map, 1);

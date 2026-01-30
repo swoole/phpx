@@ -97,6 +97,25 @@ TEST(base, global) {
     ASSERT_FALSE(v2.toBool());
 }
 
+TEST(base, global2) {
+    auto g = global("_SERVER");
+    g.offsetSet("test", 1999);
+
+    auto g2 = global("_SERVER");
+    ASSERT_EQ(g2.offsetGet("test").toInt(), 1999);
+
+    var a;
+    initGlobal("a", a);
+    a = 100;
+    ASSERT_EQ(global("a").toInt(), 100);
+
+    unsetGlobal("a");
+    ASSERT_TRUE(global("a").isNull());
+
+    unsetGlobal("_SERVER");
+    ASSERT_TRUE(global("_SERVER").isNull());
+}
+
 TEST(base, equals) {
     Variant v1((zend_long) UINT_MAX);
     auto v2 = random_int(1, 1000000);

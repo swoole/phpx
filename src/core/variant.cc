@@ -646,10 +646,8 @@ Variant Variant::item(zend_long offset, bool update) {
         retval = zend_hash_index_find(Z_ARRVAL_P(zvar), offset);
         if (retval == nullptr) {
             if (update) {
-                zval tmp;
-                ZVAL_NULL(&tmp);
                 SEPARATE_ARRAY(zvar);
-                retval = zend_hash_index_update(Z_ARRVAL_P(zvar), offset, &tmp);
+                retval = zend_hash_index_update(Z_ARRVAL_P(zvar), offset, undef());
             } else {
                 return Variant{};
             }
@@ -686,10 +684,8 @@ Variant Variant::item(const Variant &key, bool update) {
         retval = zend_hash_find(Z_ARRVAL_P(zvar), skey.str());
         if (retval == nullptr) {
             if (update) {
-                zval tmp;
-                ZVAL_NULL(&tmp);
                 SEPARATE_ARRAY(zvar);
-                retval = zend_hash_update(Z_ARRVAL_P(zvar), skey.str(), &tmp);
+                retval = zend_hash_update(Z_ARRVAL_P(zvar), skey.str(), undef());
             } else {
                 return Variant{};
             }
@@ -713,17 +709,15 @@ Variant Variant::newItem() {
     auto zvar = unwrap_zval(ptr());
     zval *retval;
     zval rv;
-    zval tmp;
-    ZVAL_NULL(&tmp);
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         SEPARATE_ARRAY(zvar);
-        retval = zend_hash_next_index_insert(Z_ARRVAL_P(zvar), &tmp);
+        retval = zend_hash_next_index_insert(Z_ARRVAL_P(zvar), undef());
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         auto obj = object();
         zval key;
         ZVAL_LONG(&key, length());
-        obj->handlers->write_dimension(obj, &key, &tmp);
+        obj->handlers->write_dimension(obj, &key, undef());
         retval = obj->handlers->read_dimension(obj, &key, BP_VAR_RW, &rv);
         if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
             return Variant{retval};

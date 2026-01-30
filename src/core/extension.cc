@@ -266,6 +266,7 @@ zend_result extension_shutdown(int type, int module_number) {
 }
 
 zend_result extension_before_request(int type, int module_number) {
+    request_init();
     auto extension = _module_number_to_extension[module_number];
     if (extension->onBeforeRequest) {
         extension->onBeforeRequest();
@@ -274,6 +275,7 @@ zend_result extension_before_request(int type, int module_number) {
 }
 
 zend_result extension_after_request(int type, int module_number) {
+    request_shutdown();
     auto extension = _module_number_to_extension[module_number];
     if (extension->onAfterRequest) {
         extension->onAfterRequest();
@@ -284,7 +286,7 @@ zend_result extension_after_request(int type, int module_number) {
 Array Args::toArray() const {
     Array array;
     for (const auto &param : params) {
-        array.append(&param);
+        array.append(param);
     }
     return array;
 }

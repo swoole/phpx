@@ -82,6 +82,8 @@ PHPX_API void echo(const Variant &val);
 PHPX_API void echo(Int val);
 PHPX_API void echo(Float val);
 PHPX_API Variant global(const String &name);
+PHPX_API void initGlobal(const String &name, Variant &var);
+PHPX_API void unsetGlobal(const String &name);
 PHPX_API Variant include(const String &file, IncludeType type = INCLUDE);
 PHPX_API Variant eval(const String &script);
 PHPX_API Variant call(const Variant &func, Args &args);
@@ -146,6 +148,10 @@ static inline const zval *unwrap_zval(const zval *val) {
 
 static inline zval *unwrap_zval(zval *val) {
     return const_cast<zval *>(unwrap_zval(const_cast<const zval *>(val)));
+}
+
+static inline zval *undef() {
+    return &EG(uninitialized_zval);
 }
 
 enum class Ctor {
@@ -245,6 +251,18 @@ class Variant {
         case Ctor::Move:
         default:
             memcpy(&val, v, sizeof(val));
+            break;
+        }
+    }
+    Variant(zend_array *arr, Ctor method = Ctor::Copy) noexcept {
+        switch (method) {
+        case Ctor::Copy:
+            ZVAL_ARR(&val, arr);
+            addRef();
+            break;
+        case Ctor::Move:
+        default:
+            ZVAL_ARR(&val, arr);
             break;
         }
     }
