@@ -14,45 +14,12 @@
   +----------------------------------------------------------------------+
 */
 
+#pragma once
+
 #include "phpx.h"
-#include "phpx_helper.h"
-#include "phpx_func.h"
-#include "zend_operators.h"
 
 namespace php {
-namespace math {
-Variant abs(const Variant &v) {
-    switch (v.type()) {
-    case IS_LONG:
-        return std::abs(v.toInt());
-    case IS_DOUBLE:
-        return std::fabs(v.toFloat());
-    default:
-        return php::abs(v);
-    }
-}
-}  // namespace math
 namespace fn {
-bool function_exists(const String &fname, bool formatted) {
-    if (formatted) {
-        return zend_hash_exists(EG(function_table), fname.str());
-    }
-
-    zend_string *name = fname.str();
-    bool exists;
-    zend_string *lcname;
-
-    if (ZSTR_VAL(name)[0] == '\\') {
-        /* Ignore leading "\" */
-        lcname = zend_string_alloc(ZSTR_LEN(name) - 1, 0);
-        zend_str_tolower_copy(ZSTR_VAL(lcname), ZSTR_VAL(name) + 1, ZSTR_LEN(name) - 1);
-    } else {
-        lcname = zend_string_tolower(name);
-    }
-
-    exists = zend_hash_exists(EG(function_table), lcname);
-    zend_string_release_ex(lcname, 0);
-    return exists;
-}
+bool function_exists(const String &fname, bool formatted = false);
 }  // namespace fn
 }  // namespace php

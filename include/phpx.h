@@ -91,6 +91,8 @@ PHPX_API Variant call(const Variant &func, Array &args);
 PHPX_API Variant call(const Variant &func, const std::initializer_list<Variant> &args);
 PHPX_API Variant call(zend_function *func);
 PHPX_API Variant call(zend_function *func, const std::initializer_list<Variant> &args);
+PHPX_API Variant call(zend_class_entry *ce, zend_function *func);
+PHPX_API Variant call(zend_class_entry *ce, zend_function *func, const std::initializer_list<Variant> &args);
 PHPX_API void throwException(const String &class_name, const char *message, int code = 0);
 PHPX_API void throwException(const Object &e);
 
@@ -117,9 +119,11 @@ PHPX_API bool same(const Variant &a, const Variant &b);
 PHPX_API bool equals(const Variant &a, const Variant &b);
 PHPX_API int compare(const Variant &a, const Variant &b);
 PHPX_API Variant getStaticProperty(const String &class_name, const String &prop);
+PHPX_API Variant getStaticProperty(zend_class_entry *ce, uint32_t offset);
 PHPX_API bool setStaticProperty(const String &class_name, const String &prop, const Variant &value);
 PHPX_API bool hasStaticProperty(const String &class_name, const String &prop);
 PHPX_API uint32_t getPropertyOffset(const String &class_name, const String &prop);
+PHPX_API uint32_t getPropertyOffset(zend_class_entry *ce, const String &prop);
 
 Int atoi(const String &str);
 Array toArray(const Variant &v);

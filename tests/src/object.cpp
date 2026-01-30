@@ -83,6 +83,14 @@ TEST(object, static_property) {
 
     ASSERT_TRUE(hasStaticProperty("TestClass", "propString"));
     ASSERT_FALSE(hasStaticProperty("TestClass", "propObject"));
+
+    try_call([](){
+    	auto offset1 = getPropertyOffset("TestClass", "propXt");
+    }, "property 'TestClass::propXt' is undefined");
+
+    auto ce = getClassEntry("TestClass");
+    auto offset2 = getPropertyOffset(ce, "propInt");
+    ASSERT_EQ(getStaticProperty(ce, offset2).toInt(), 1990018900);
 }
 
 TEST(object, mixed) {

@@ -343,6 +343,24 @@ Variant call(zend_function *func, const std::initializer_list<Variant> &args) {
     return retval;
 }
 
+Variant call(zend_class_entry *ce, zend_function *func) {
+    Variant retval{};
+    zend_call_known_function(func, nullptr, ce, retval.ptr(), 0, nullptr, nullptr);
+    throwErrorIfOccurred();
+    return retval;
+}
+
+Variant call(zend_class_entry *ce, zend_function *func, const std::initializer_list<Variant> &args) {
+    Variant retval{};
+    Args _args(args.size());
+    for (const auto &arg : args) {
+        _args.append(arg.const_ptr());
+    }
+    zend_call_known_function(func, nullptr, ce, retval.ptr(), _args.count(), _args.ptr(), nullptr);
+    throwErrorIfOccurred();
+    return retval;
+}
+
 #define ZEND_FAKE_OP_ARRAY ((zend_op_array *) (intptr_t) -1)
 
 static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_string *inc_filename, const int type) {
@@ -452,6 +470,10 @@ Variant getStaticProperty(const String &class_name, const String &prop) {
     return {zend_read_static_property_ex(ce, prop.str(), true), Ctor::Move};
 }
 
+Variant getStaticProperty(zend_class_entry *ce, uint32_t offset) {
+	return Variant{CE_STATIC_MEMBERS(ce) + offset, Ctor::Indirect};
+}
+
 bool hasStaticProperty(const String &class_name, const String &prop) {
     const auto ce = getClassEntry(class_name);
     if (UNEXPECTED(!ce)) {
@@ -478,9 +500,17 @@ uint32_t getPropertyOffset(const String &class_name, const String &prop) {
         throwError("class '%s' is undefined.", class_name.toCString());
         return 0;
     }
+    return getPropertyOffset(ce, prop);
+}
+
+PHPX_API uint32_t getPropertyOffset(zend_class_entry *ce, const String &prop) {
     auto prev_scope = EG(fake_scope);
     EG(fake_scope) = ce;
     auto prop_info = zend_get_property_info(ce, prop.str(), 0);
+    if (UNEXPECTED(!prop_info)) {
+        throwError("property '%s::%s' is undefined.", ce->name->val, prop.toCString());
+        return 0;
+    }
     EG(fake_scope) = prev_scope;
     return prop_info->offset;
 }

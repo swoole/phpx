@@ -40,3 +40,11 @@ TEST(helper, abs) {
     var c = 199;
     ASSERT_EQ(php::math::abs(c).toInt(), 199);
 }
+
+TEST(helper, function_exists) {
+    ASSERT_TRUE(php::fn::function_exists("php_uname"));
+    ASSERT_FALSE(php::fn::function_exists("func_not_exists"));
+    ASSERT_TRUE(php::fn::function_exists("php_uname", true));
+    ASSERT_TRUE(php::fn::function_exists("\\php_uname"));
+    ASSERT_TRUE(php::fn::function_exists("PHP_UNAME"));
+}
