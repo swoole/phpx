@@ -968,5 +968,5 @@ TEST(variant, item5) {
             var a = 1234;
             a.newItem();
         },
-        "Only array/object/string support the item");
+        "Only array/object/string support the newItem");
 }
