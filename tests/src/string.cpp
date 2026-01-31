@@ -194,3 +194,11 @@ TEST(string, offsetSet) {
 
     ASSERT_STREQ(s.offsetGet(999).toCString(), "");
 }
+
+TEST(string, cow) {
+	String s("hello");
+	auto s2 = s;
+	s.offsetSet(0, "X");
+    ASSERT_STREQ(s.toCString(), "Xello");
+    ASSERT_STREQ(s2.toCString(), "hello");
+}

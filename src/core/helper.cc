@@ -54,5 +54,14 @@ bool function_exists(const String &fname, bool formatted) {
     zend_string_release_ex(lcname, 0);
     return exists;
 }
+
+Int ord(const Variant &v) {
+	auto sv = v.toString();
+	return sv.data()[0];
+}
+
+String chr(Int c) {
+	return {zend_one_char_string[c]};
+}
 }  // namespace fn
 }  // namespace php

@@ -48,3 +48,13 @@ TEST(helper, function_exists) {
     ASSERT_TRUE(php::fn::function_exists("\\php_uname"));
     ASSERT_TRUE(php::fn::function_exists("PHP_UNAME"));
 }
+
+TEST(helper, chr) {
+    char c1 = 'A';
+    auto c2 = php::fn::ord("A");
+    ASSERT_EQ(c1, c2);
+
+    auto s1 = php::fn::chr(c1);
+    ASSERT_EQ(s1.length(), 1);
+    ASSERT_STREQ(s1.toCString(), "A");
+}
