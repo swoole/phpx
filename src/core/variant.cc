@@ -181,7 +181,7 @@ Variant Variant::offsetGet(zend_long offset) const {
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         return zend_hash_index_find(Z_ARRVAL_P(zvar), offset);
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
-        String tmp(zvar);
+        String tmp(zvar, Ctor::Indirect);
         return tmp.offsetGet(offset);
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
@@ -198,7 +198,7 @@ Variant Variant::offsetGet(const Variant &key) const {
 
     auto zvar = unwrap_ptr();
     if (Z_TYPE_P(zvar) == IS_STRING) {
-        String tmp(zvar);
+        String tmp(zvar, Ctor::Indirect);
         return tmp.offsetGet(key.toInt());
     } else if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto skey = key.toString();
@@ -218,7 +218,7 @@ bool Variant::offsetExists(zend_long offset) const {
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         return zend_hash_index_exists(Z_ARRVAL_P(zvar), offset);
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
-        String tmp(zvar);
+        String tmp(zvar, Ctor::Indirect);
         return tmp.offset(offset) != -1;
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
         Object tmp(zvar);
@@ -235,7 +235,7 @@ bool Variant::offsetExists(const Variant &key) const {
 
     auto zvar = unwrap_ptr();
     if (Z_TYPE_P(zvar) == IS_STRING) {
-        String tmp(zvar);
+        String tmp(zvar, Ctor::Indirect);
         return tmp.offset(key.toInt()) != -1;
     } else if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto skey = key.toString();
@@ -262,7 +262,7 @@ void Variant::offsetSet(zend_long offset, const Variant &value) {
         Object tmp(zvar);
         tmp.offsetSet(offset, NO_CONST_V(value));
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
-        String tmp(zvar);
+        String tmp(zvar, Ctor::Indirect);
         tmp.offsetSet(offset, value);
     }
 }
@@ -284,7 +284,7 @@ void Variant::offsetSet(const Variant &key, const Variant &value) {
         if (key.isNull()) {
             throwError("[] operator not supported for strings");
         }
-        String tmp(zvar);
+        String tmp(zvar, Ctor::Indirect);
         tmp.offsetSet(key.toInt(), value);
     }
 }

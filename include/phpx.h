@@ -680,9 +680,10 @@ Variant newResource(const char *name, T *v) {
 class String : public Variant {
     void checkString() {
         if (!isString()) {
-            auto new_str = zval_get_string(unwrap_ptr());
+        	auto zv = unwrap_ptr();
+            auto new_str = zval_get_string(zv);
             destroy();
-            ZVAL_STR(&val, new_str);
+            ZVAL_STR(zv, new_str);
         }
     }
 
@@ -721,10 +722,10 @@ class String : public Variant {
         return is_numeric_string(data(), length(), nullptr, nullptr, false);
     }
     size_t length() const {
-        return Z_STRLEN(val);
+        return Z_STRLEN_P(unwrap_ptr());
     }
     const char *data() const {
-        return Z_STRVAL(val);
+        return Z_STRVAL_P(unwrap_ptr());
     }
     String offsetGet(zend_long _offset) const;
     String offsetGet(const Variant &_offset) const {
@@ -768,7 +769,7 @@ class String : public Variant {
     String escape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const;
     String unescape(const int flags = ENT_QUOTES | ENT_SUBSTITUTE, const char *charset = PHP_DEFAULT_CHARSET) const;
     zend_string *str() const {
-        return Z_STR(val);
+        return Z_STR_P(unwrap_ptr());
     }
     Array split(const String &delim, long = ZEND_LONG_MAX) const;
     String substr(long _offset, long _length = -1) const;

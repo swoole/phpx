@@ -90,8 +90,9 @@ void String::offsetSet(zend_long _offset, const Variant &value) {
     if (_offset != -1) {
         auto wr_str = value.toString();
         if (wr_str.length() > 0) {
-        	SEPARATE_STRING(&val);
-            str()->val[_offset] = wr_str.str()->val[0];
+        	auto zv = unwrap_ptr();
+        	SEPARATE_STRING(zv);
+        	Z_STRVAL_P(zv)[_offset] = wr_str.str()->val[0];
         }
     }
 }
