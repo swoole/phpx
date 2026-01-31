@@ -93,6 +93,7 @@ void String::offsetSet(zend_long _offset, const Variant &value) {
         	auto zv = unwrap_ptr();
         	SEPARATE_STRING(zv);
         	Z_STRVAL_P(zv)[_offset] = wr_str.str()->val[0];
+        	zend_string_forget_hash_val(Z_STR_P(zv));
         }
     }
 }
