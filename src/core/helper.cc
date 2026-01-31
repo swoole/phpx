@@ -56,12 +56,12 @@ bool function_exists(const String &fname, bool formatted) {
 }
 
 Int ord(const Variant &v) {
-	auto sv = v.toString();
-	return sv.data()[0];
+    auto sv = v.toString();
+    return sv.data()[0];
 }
 
 String chr(Int c) {
-	return {zend_one_char_string[c]};
+    return {zend_one_char_string[c]};
 }
 }  // namespace fn
 }  // namespace php

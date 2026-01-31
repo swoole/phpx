@@ -680,7 +680,7 @@ Variant newResource(const char *name, T *v) {
 class String : public Variant {
     void checkString() {
         if (!isString()) {
-        	auto zv = unwrap_ptr();
+            auto zv = unwrap_ptr();
             auto new_str = zval_get_string(zv);
             destroy();
             ZVAL_STR(zv, new_str);

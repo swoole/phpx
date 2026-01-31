@@ -196,24 +196,24 @@ TEST(string, offsetSet) {
 }
 
 TEST(string, cow) {
-	String s("hello");
-	auto s2 = s;
-	s.offsetSet(0, "X");
+    String s("hello");
+    auto s2 = s;
+    s.offsetSet(0, "X");
     ASSERT_STREQ(s.toCString(), "Xello");
     ASSERT_STREQ(s2.toCString(), "hello");
 }
 
 TEST(string, update) {
-	Array wordList{"hot", "dog", "dot"};
-	var newWordList = array_flip(wordList);
+    Array wordList{"hot", "dog", "dot"};
+    var newWordList = array_flip(wordList);
 
-	String s1("hot");
+    String s1("hot");
     ASSERT_TRUE(newWordList.offsetExists(s1));
 
     s1.offsetSet(0, "t");
     ASSERT_FALSE(newWordList.offsetExists(s1));
 
-	String s2("aot");
+    String s2("aot");
     s2.offsetSet(0, "d");
     ASSERT_TRUE(newWordList.offsetExists(s2));
 }

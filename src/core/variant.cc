@@ -663,8 +663,13 @@ Variant Variant::item(zend_long offset, bool update) {
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
         return offsetGet(offset);
     } else {
-        throwError("Only array/object/string support the item(%ld) method, got `%s`", offset, typeStr());
-        return Variant{};
+        if (update) {
+            array_init(zvar);
+            retval = zend_hash_index_update(Z_ARRVAL_P(zvar), offset, undef());
+        } else {
+            throwError("Only array/object/string support the item(%ld) method, got `%s`", offset, typeStr());
+            return Variant{};
+        }
     }
 
     return Variant{retval, Ctor::Indirect};
@@ -676,7 +681,7 @@ Variant Variant::item(const Variant &key, bool update) {
     zval rv;
 
     if (key.isInt() || key.isFloat() || key.isNumeric() || Z_TYPE_P(zvar) == IS_STRING) {
-        return item(key.toInt());
+        return item(key.toInt(), update);
     }
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
@@ -698,8 +703,14 @@ Variant Variant::item(const Variant &key, bool update) {
             return Variant{retval};
         }
     } else {
-        throwError("Only array/object/string support the item() method");
-        return Variant{};
+        if (update) {
+            array_init(zvar);
+            auto skey = key.toString();
+            retval = zend_hash_update(Z_ARRVAL_P(zvar), skey.str(), undef());
+        } else {
+            throwError("Only array/object/string support the item() method");
+            return Variant{};
+        }
     }
 
     return Variant{retval, Ctor::Indirect};
@@ -709,6 +720,10 @@ Variant Variant::newItem() {
     auto zvar = unwrap_zval(ptr());
     zval *retval;
     zval rv;
+
+    if (Z_TYPE_P(zvar) == IS_UNDEF || Z_TYPE_P(zvar) == IS_NULL) {
+        array_init(zvar);
+    }
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         SEPARATE_ARRAY(zvar);
@@ -723,7 +738,7 @@ Variant Variant::newItem() {
             return Variant{retval};
         }
     } else {
-        throwError("Only array/object/string support the item() method");
+        throwError("Only array/object/string support the newItem() method");
         return Variant{};
     }
 
