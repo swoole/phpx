@@ -68,7 +68,7 @@ endif()
 
 message("PHP_PREFIX: ${PHP_PREFIX}")
 message("PHP_INCLUDES: ${PHP_INCLUDES}")
-message("PHP_LIBS: ${PHP_LIBS}")
+message("PHP_LIBS: ${PHP_LIBS_NO_PHP}")
 message("PHP_LDFLAGS: ${PHP_LDFLAGS}")
 
 include_directories(include tests/include)
@@ -106,7 +106,7 @@ message(STATUS "Found GTest")
 file(GLOB_RECURSE TEST_FILES tests/src/*.cpp)
 add_executable(phpx-tests ${TEST_FILES})
 add_dependencies(phpx-tests phpx)
-target_link_libraries(phpx-tests php phpx ${PHP_LIBS} ${PHP_LDFLAGS} ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(phpx-tests php phpx ${PHP_LIBS_NO_PHP} ${PHP_LDFLAGS} ${GTEST_BOTH_LIBRARIES})
 
 # ext
 file(GLOB_RECURSE EXT_FILES tests/ext/*.cpp)

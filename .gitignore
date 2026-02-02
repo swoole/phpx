@@ -66,3 +66,5 @@ bin/phpx
 /examples/gtk/CMakeCache.txt
 /examples/embed/cmake_install.cmake
 /examples/embed/CMakeCache.txt
+/test_output.xml
+/test_results.xml
