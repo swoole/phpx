@@ -123,6 +123,10 @@ TEST(base, global) {
 }
 
 TEST(base, global2) {
+    var gv;
+    initGlobal("_SERVER", gv);
+    ASSERT_TRUE(gv.isArray());
+
     auto g = global("_SERVER");
     g.offsetSet("test", 1999);
 
@@ -139,12 +143,6 @@ TEST(base, global2) {
 
     unsetGlobal("_SERVER");
     ASSERT_TRUE(global("_SERVER").isNull());
-}
-
-TEST(base, global3) {
-    var gv;
-    initGlobal("_SERVER", gv);
-    ASSERT_TRUE(gv.isArray());
 }
 
 TEST(base, equals) {

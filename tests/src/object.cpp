@@ -163,6 +163,20 @@ TEST(object, call_parent_method) {
     ASSERT_STREQ(rs2.toCString(), "parent test");
 
     ASSERT_STREQ(obj.getClassName().data(), "TestClass2");
+
+    auto obj2 = newObject("TestClass");
+    try_call(
+        [&]() {
+            auto rs = obj2.callParentMethod("test", {"hello", "world"});
+        },
+        "class does not inherit the parent class");
+
+    auto obj3 = newObject("TestClass3");
+    try_call(
+        [&]() {
+            auto rs = obj3.callParentMethod("test", {"hello", "world"});
+        },
+        "Cannot call abstract method TestAbstract::test()");
 }
 
 TEST(object, instanceOf) {

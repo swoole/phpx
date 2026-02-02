@@ -31,3 +31,10 @@ class TestClass2 extends TestClass
         return 'child test';
     }
 }
+
+class TestClass3 extends TestAbstract {
+    public function test(): string
+    {
+        return 'override test';
+    }
+}

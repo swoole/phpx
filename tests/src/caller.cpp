@@ -25,6 +25,9 @@ TEST(caller, args) {
 
     auto arr2 = args.toArray();
     ASSERT_TRUE(arr2.equals(arr1));
+
+    ASSERT_TRUE(args.get(100).isNull());
+    ASSERT_STREQ(args.get(2).toCString(), "go");
 }
 
 TEST(caller, func) {

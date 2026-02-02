@@ -52,12 +52,14 @@ bool Object::instanceOf(const String &name) const {
 }
 
 Variant Object::callParentMethod(const String &func, const std::initializer_list<Variant> &args) {
-    Args _args;
-    for (const auto &arg : args) {
-        _args.append(const_cast<Variant &>(arg).ptr());
+    Args _args(args);
+    Variant retval;
+
+    if (UNEXPECTED(parent_ce() == nullptr)) {
+        throwError("class does not inherit the parent class");
+        return retval;
     }
 
-    Variant retval;
     auto fn = (zend_function *) zend_hash_find_ptr_lc(&parent_ce()->function_table, func.str());
     if (UNEXPECTED(fn == nullptr)) {
         throwError("Couldn't find implementation for method %s::%s", ZSTR_VAL(parent_ce()->name), func.data());
