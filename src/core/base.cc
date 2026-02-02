@@ -524,7 +524,7 @@ uint32_t getPropertyOffset(const String &class_name, const String &prop) {
     return getPropertyOffset(ce, prop);
 }
 
-PHPX_API uint32_t getPropertyOffset(zend_class_entry *ce, const String &prop) {
+uint32_t getPropertyOffset(zend_class_entry *ce, const String &prop) {
     auto prev_scope = EG(fake_scope);
     EG(fake_scope) = ce;
     auto prop_info = zend_get_property_info(ce, prop.str(), 0);

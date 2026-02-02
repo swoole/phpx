@@ -288,11 +288,18 @@ TEST(base, call) {
     ASSERT_EQ(rt2.toInt(), getpid());
 }
 
-TEST(base, staticMethod) {
+TEST(base, staticMethod1) {
     auto ce = getClassEntry("DateTime");
     auto fn = getMethod(ce, "createFromFormat");
 
     auto o = call(ce, fn, {"j-M-Y", "15-Feb-2009"}).toObject();
     auto rs = o.exec("format", {"Y-m-d"});
     ASSERT_STREQ(rs.toCString(), "2009-02-15");
+}
+
+TEST(base, staticMethod2) {
+    auto ce = getClassEntry("Phar");
+    auto fn = getMethod(ce, "getSupportedCompression");
+    auto arr = call(ce, fn).toArray();
+    ASSERT_TRUE(in_array("GZ", arr));
 }
