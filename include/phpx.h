@@ -982,6 +982,7 @@ class Args {
 };
 
 PHPX_API extern zend_function *getFunction(const String &name);
+PHPX_API extern zend_function *getMethod(zend_class_entry *ce, const String &name);
 extern Variant call_impl(const zval *object, const zval *func, Args &args);
 extern Variant call_impl(const zval *object, const zval *func);
 

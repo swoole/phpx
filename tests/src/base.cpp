@@ -287,3 +287,12 @@ TEST(base, call) {
     auto rt2 = call(fn2);
     ASSERT_EQ(rt2.toInt(), getpid());
 }
+
+TEST(base, staticMethod) {
+    auto ce = getClassEntry("DateTime");
+    auto fn = getMethod(ce, "createFromFormat");
+
+    auto o = call(ce, fn, {"j-M-Y", "15-Feb-2009"}).toObject();
+    auto rs = o.exec("format", {"Y-m-d"});
+    ASSERT_STREQ(rs.toCString(), "2009-02-15");
+}
