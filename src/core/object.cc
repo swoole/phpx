@@ -231,10 +231,7 @@ Object newObject(zend_class_entry *ce, const std::initializer_list<Variant> &arg
     auto rc = object_init_ex(object.ptr(), ce);
     if (EXPECTED(rc == SUCCESS)) {
         if (ce->constructor) {
-            Args _args;
-            for (const auto &arg : args) {
-                _args.append(const_cast<Variant &>(arg).ptr());
-            }
+            Args _args(args);
             zend_call_known_function(
                 ce->constructor, object.object(), object.ce(), nullptr, _args.count(), _args.ptr(), nullptr);
         }

@@ -19,11 +19,11 @@
 namespace php {
 <?php for ($i = 1; $i <= $maxArgc; $i++): ?>
 Variant Variant::operator()(<?=self::makeArgs($i)?>) const {
-    Args args;
+    Args args(<?=$i?>);
 <?php for ($j = 1; $j <= $i; $j++) :?>
     args.append(v<?=$j?>);
 <?php endfor; ?>
-    return _call(nullptr, const_ptr(), args);
+    return call_impl(nullptr, const_ptr(), args);
 }
 <?php endfor; ?>
 <?php for ($i = 1; $i <= $maxArgc; $i++): ?>
@@ -37,7 +37,7 @@ Object newObject(const char *name, <?=self::makeArgs($i)?>) {
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
-    Args args;
+    Args args(<?=$i?>);
 <?php for ($j = 1; $j <= $i; $j++) :?>
     args.append(v<?=$j?>);
 <?php endfor; ?>
@@ -47,11 +47,11 @@ Object newObject(const char *name, <?=self::makeArgs($i)?>) {
 <?php endfor; ?>
 <?php for ($i = 1; $i <= $maxArgc; $i++): ?>
 Variant Object::exec(const Variant &fn, <?=self::makeArgs($i)?>) {
-    Args args;
+    Args args(<?=$i?>);
 <?php for ($j = 1; $j <= $i; $j++) :?>
     args.append(v<?=$j?>);
 <?php endfor; ?>
-    return _call(ptr(), fn.const_ptr(), args);
+    return call_impl(ptr(), fn.const_ptr(), args);
 }
 <?php endfor; ?>
 }

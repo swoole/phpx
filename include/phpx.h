@@ -951,7 +951,7 @@ class Args {
     explicit Args(size_t n) {
         params.reserve(n);
     }
-    explicit Args(const std::initializer_list<Variant> &args) : params(args.size()) {
+    explicit Args(const std::initializer_list<Variant> &args) : Args(args.size()) {
         for (const auto &arg : args) {
             append(arg.const_ptr());
         }

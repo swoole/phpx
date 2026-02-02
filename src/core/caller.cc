@@ -18,25 +18,25 @@
 
 namespace php {
 Variant Variant::operator()(const Variant &v1) const {
-    Args args;
+    Args args(1);
     args.append(v1);
     return call_impl(nullptr, const_ptr(), args);
 }
 Variant Variant::operator()(const Variant &v1, const Variant &v2) const {
-    Args args;
+    Args args(2);
     args.append(v1);
     args.append(v2);
     return call_impl(nullptr, const_ptr(), args);
 }
 Variant Variant::operator()(const Variant &v1, const Variant &v2, const Variant &v3) const {
-    Args args;
+    Args args(3);
     args.append(v1);
     args.append(v2);
     args.append(v3);
     return call_impl(nullptr, const_ptr(), args);
 }
 Variant Variant::operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4) const {
-    Args args;
+    Args args(4);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -45,7 +45,7 @@ Variant Variant::operator()(const Variant &v1, const Variant &v2, const Variant 
 }
 Variant Variant::operator()(
     const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5) const {
-    Args args;
+    Args args(5);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -59,7 +59,7 @@ Variant Variant::operator()(const Variant &v1,
                             const Variant &v4,
                             const Variant &v5,
                             const Variant &v6) const {
-    Args args;
+    Args args(6);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -75,7 +75,7 @@ Variant Variant::operator()(const Variant &v1,
                             const Variant &v5,
                             const Variant &v6,
                             const Variant &v7) const {
-    Args args;
+    Args args(7);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -93,7 +93,7 @@ Variant Variant::operator()(const Variant &v1,
                             const Variant &v6,
                             const Variant &v7,
                             const Variant &v8) const {
-    Args args;
+    Args args(8);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -113,7 +113,7 @@ Variant Variant::operator()(const Variant &v1,
                             const Variant &v7,
                             const Variant &v8,
                             const Variant &v9) const {
-    Args args;
+    Args args(9);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -135,7 +135,7 @@ Variant Variant::operator()(const Variant &v1,
                             const Variant &v8,
                             const Variant &v9,
                             const Variant &v10) const {
-    Args args;
+    Args args(10);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -158,7 +158,7 @@ Object newObject(const char *name, const Variant &v1) {
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
-    Args args;
+    Args args(1);
     args.append(v1);
     object.call("__construct", args);
     return object;
@@ -173,7 +173,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2) {
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
-    Args args;
+    Args args(2);
     args.append(v1);
     args.append(v2);
     object.call("__construct", args);
@@ -189,7 +189,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
-    Args args;
+    Args args(3);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -206,7 +206,7 @@ Object newObject(const char *name, const Variant &v1, const Variant &v2, const V
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
-    Args args;
+    Args args(4);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -225,7 +225,7 @@ Object newObject(
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
-    Args args;
+    Args args(5);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -250,7 +250,7 @@ Object newObject(const char *name,
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
-    Args args;
+    Args args(6);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -277,7 +277,7 @@ Object newObject(const char *name,
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
-    Args args;
+    Args args(7);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -306,7 +306,7 @@ Object newObject(const char *name,
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
-    Args args;
+    Args args(8);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -337,7 +337,7 @@ Object newObject(const char *name,
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
-    Args args;
+    Args args(9);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -370,7 +370,7 @@ Object newObject(const char *name,
     if (object_init_ex(object.ptr(), ce) == FAILURE) {
         return object;
     }
-    Args args;
+    Args args(10);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -385,25 +385,25 @@ Object newObject(const char *name,
     return object;
 }
 Variant Object::exec(const Variant &fn, const Variant &v1) {
-    Args args;
+    Args args(1);
     args.append(v1);
     return call_impl(ptr(), fn.const_ptr(), args);
 }
 Variant Object::exec(const Variant &fn, const Variant &v1, const Variant &v2) {
-    Args args;
+    Args args(2);
     args.append(v1);
     args.append(v2);
     return call_impl(ptr(), fn.const_ptr(), args);
 }
 Variant Object::exec(const Variant &fn, const Variant &v1, const Variant &v2, const Variant &v3) {
-    Args args;
+    Args args(3);
     args.append(v1);
     args.append(v2);
     args.append(v3);
     return call_impl(ptr(), fn.const_ptr(), args);
 }
 Variant Object::exec(const Variant &fn, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4) {
-    Args args;
+    Args args(4);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -412,7 +412,7 @@ Variant Object::exec(const Variant &fn, const Variant &v1, const Variant &v2, co
 }
 Variant Object::exec(
     const Variant &fn, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5) {
-    Args args;
+    Args args(5);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -427,7 +427,7 @@ Variant Object::exec(const Variant &fn,
                      const Variant &v4,
                      const Variant &v5,
                      const Variant &v6) {
-    Args args;
+    Args args(6);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -444,7 +444,7 @@ Variant Object::exec(const Variant &fn,
                      const Variant &v5,
                      const Variant &v6,
                      const Variant &v7) {
-    Args args;
+    Args args(7);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -463,7 +463,7 @@ Variant Object::exec(const Variant &fn,
                      const Variant &v6,
                      const Variant &v7,
                      const Variant &v8) {
-    Args args;
+    Args args(8);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -484,7 +484,7 @@ Variant Object::exec(const Variant &fn,
                      const Variant &v7,
                      const Variant &v8,
                      const Variant &v9) {
-    Args args;
+    Args args(9);
     args.append(v1);
     args.append(v2);
     args.append(v3);
@@ -507,7 +507,7 @@ Variant Object::exec(const Variant &fn,
                      const Variant &v8,
                      const Variant &v9,
                      const Variant &v10) {
-    Args args;
+    Args args(10);
     args.append(v1);
     args.append(v2);
     args.append(v3);
