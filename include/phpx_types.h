@@ -17,6 +17,7 @@
 #pragma once
 
 #include "zend_types.h"
+#include <initializer_list>
 
 namespace php {
 typedef unsigned char uchar;
@@ -45,6 +46,7 @@ using string = String;
 using Var = Variant;
 using Str = String;
 using Ref = Reference;
+using ArgList = std::initializer_list<const Variant>;
 
 typedef void (*resource_dtor)(zend_resource *);
 

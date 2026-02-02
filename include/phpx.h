@@ -75,6 +75,11 @@ enum IncludeType {
     REQUIRE_ONCE = ZEND_REQUIRE_ONCE,
 };
 
+enum Operation {
+    ArrayDimFetch,
+    PropertyFetch,
+};
+
 PHPX_API void error(int level, const char *format, ...);
 PHPX_API void echo(const char *format, ...);
 PHPX_API void echo(const String &str);
@@ -90,13 +95,14 @@ PHPX_API Variant include(const String &file, IncludeType type = INCLUDE);
 PHPX_API Variant eval(const String &script);
 PHPX_API Variant call(const Variant &func, Args &args);
 PHPX_API Variant call(const Variant &func, Array &args);
-PHPX_API Variant call(const Variant &func, const std::initializer_list<Variant> &args);
+PHPX_API Variant call(const Variant &func, const ArgList &args);
 PHPX_API Variant call(zend_function *func);
-PHPX_API Variant call(zend_function *func, const std::initializer_list<Variant> &args);
+PHPX_API Variant call(zend_function *func, const ArgList &args);
 PHPX_API Variant call(zend_class_entry *ce, zend_function *func);
-PHPX_API Variant call(zend_class_entry *ce, zend_function *func, const std::initializer_list<Variant> &args);
+PHPX_API Variant call(zend_class_entry *ce, zend_function *func, const ArgList &args);
 PHPX_API void throwException(const String &class_name, const char *message, int code = 0);
 PHPX_API void throwException(const Object &e);
+PHPX_API bool empty(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list);
 
 #define throwError(format, ...)                                                                                        \
     do {                                                                                                               \
@@ -115,7 +121,7 @@ PHPX_API void throwException(const Object &e);
 
 PHPX_API Object catchException();
 PHPX_API Variant concat(const Variant &a, const Variant &b);
-PHPX_API Variant concat(const std::initializer_list<Variant> &args);
+PHPX_API Variant concat(const ArgList &args);
 PHPX_API void exit(const Variant &status);
 PHPX_API bool same(const Variant &a, const Variant &b);
 PHPX_API bool equals(const Variant &a, const Variant &b);
@@ -856,7 +862,7 @@ class ArrayItem : public Variant {
 };
 
 class Array : public Variant {
-    void copyFrom(const std::initializer_list<const Variant> &list);
+    void copyFrom(const ArgList &list);
     void copyFrom(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     void copyFrom(const std::initializer_list<std::pair<Int, const Variant>> &list);
     void checkArray() {
@@ -875,12 +881,12 @@ class Array : public Variant {
         checkArray();
     }
     Array(const Variant &v) : Array(v.const_ptr()) {}
-    Array(const std::initializer_list<const Variant> &list);
+    Array(const ArgList &list);
     Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     Array(const std::initializer_list<std::pair<Int, const Variant>> &list);
     Array(Variant *v) : Variant(v) {}
 
-    Array &operator=(const std::initializer_list<const Variant> &list);
+    Array &operator=(const ArgList &list);
     Array &operator=(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     Array &operator=(const std::initializer_list<std::pair<Int, const Variant>> &list);
 
@@ -950,7 +956,7 @@ class Args {
     explicit Args(size_t n) {
         params.reserve(n);
     }
-    explicit Args(const std::initializer_list<Variant> &args) : Args(args.size()) {
+    explicit Args(const ArgList &args) : Args(args.size()) {
         for (const auto &arg : args) {
             append(arg.const_ptr());
         }
@@ -1023,11 +1029,11 @@ class Object : public Variant {
     Variant callParentMethod(const String &func) {
         return callParentMethod(func, {});
     }
-    Variant callParentMethod(const String &func, const std::initializer_list<Variant> &args);
+    Variant callParentMethod(const String &func, const ArgList &args);
     Variant exec(const Variant &fn) {
         return call_impl(ptr(), fn.const_ptr());
     }
-    Variant exec(const Variant &fn, const std::initializer_list<Variant> &args);
+    Variant exec(const Variant &fn, const ArgList &args);
 
     Reference attrRef(const String &name);
     Variant attr(const Variant &name, bool update = false) const;
@@ -1223,13 +1229,13 @@ static inline Reference newReference() {
 }
 
 extern Object newObject(zend_class_entry *ce);
-extern Object newObject(zend_class_entry *ce, const std::initializer_list<Variant> &args);
+extern Object newObject(zend_class_entry *ce, const ArgList &args);
 
 static inline Object newObject(const char *name) {
     return newObject(getClassEntrySafe(name));
 }
 
-static inline Object newObject(const char *name, const std::initializer_list<Variant> &args) {
+static inline Object newObject(const char *name, const ArgList &args) {
     return newObject(getClassEntrySafe(name), args);
 }
 

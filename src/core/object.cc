@@ -35,7 +35,7 @@ zend_long Object::count() {
     }
 }
 
-Variant Object::exec(const Variant &fn, const std::initializer_list<Variant> &args) {
+Variant Object::exec(const Variant &fn, const ArgList &args) {
     Args _args;
     for (const auto &arg : args) {
         _args.append(const_cast<Variant &>(arg).ptr());
@@ -51,7 +51,7 @@ bool Object::instanceOf(const String &name) const {
     return instanceof_function(ce(), cls_ce);
 }
 
-Variant Object::callParentMethod(const String &func, const std::initializer_list<Variant> &args) {
+Variant Object::callParentMethod(const String &func, const ArgList &args) {
     Args _args(args);
     Variant retval;
 
@@ -227,7 +227,7 @@ Object newObject(zend_class_entry *ce) {
     return object;
 }
 
-Object newObject(zend_class_entry *ce, const std::initializer_list<Variant> &args) {
+Object newObject(zend_class_entry *ce, const ArgList &args) {
     Object object;
 
     auto rc = object_init_ex(object.ptr(), ce);

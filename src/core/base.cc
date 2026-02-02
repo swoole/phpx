@@ -61,7 +61,7 @@ Variant concat(const Variant &a, const Variant &b) {
     return a.concat(b);
 }
 
-Variant concat(const std::initializer_list<Variant> &args) {
+Variant concat(const ArgList &args) {
     if (args.size() == 0) {
         return Variant();
     }
@@ -337,7 +337,7 @@ Variant call(const Variant &func, Args &args) {
     return call_impl(nullptr, func.const_ptr(), args);
 }
 
-Variant call(const Variant &func, const std::initializer_list<Variant> &args) {
+Variant call(const Variant &func, const ArgList &args) {
     Args _args(args);
     return call_impl(nullptr, func.const_ptr(), _args);
 }
@@ -349,7 +349,7 @@ Variant call(zend_function *func) {
     return retval;
 }
 
-Variant call(zend_function *func, const std::initializer_list<Variant> &args) {
+Variant call(zend_function *func, const ArgList &args) {
     Variant retval{};
     Args _args(args);
     zend_call_known_function(func, nullptr, nullptr, retval.ptr(), _args.count(), _args.ptr(), nullptr);
@@ -364,7 +364,7 @@ Variant call(zend_class_entry *ce, zend_function *func) {
     return retval;
 }
 
-Variant call(zend_class_entry *ce, zend_function *func, const std::initializer_list<Variant> &args) {
+Variant call(zend_class_entry *ce, zend_function *func, const ArgList &args) {
     Variant retval{};
     Args _args(args);
     zend_call_known_function(func, nullptr, ce, retval.ptr(), _args.count(), _args.ptr(), nullptr);
@@ -470,6 +470,32 @@ bool same(const Variant &a, const Variant &b) {
 
 int compare(const Variant &a, const Variant &b) {
     return zend_compare(NO_CONST_V(a), NO_CONST_V(b));
+}
+
+bool empty(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list) {
+    Variant tmp(v.const_ptr(), Ctor::Indirect);
+    for (const auto &expr : list) {
+        if (expr.first == ArrayDimFetch) {
+            if (!tmp.isArray()) {
+                return true;
+            } else {
+                tmp = tmp.item(expr.second);
+            }
+        } else if (expr.first == PropertyFetch) {
+            if (!tmp.isObject()) {
+                return true;
+            } else {
+                Object o(tmp);
+                tmp = o.attr(expr.second);
+            }
+        } else {
+            abort();
+        }
+        if (!tmp) {
+            return true;
+        }
+    }
+    return !tmp;
 }
 
 Variant getStaticProperty(const String &class_name, const String &prop) {
