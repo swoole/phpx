@@ -20,8 +20,14 @@ TEST(base, constant2) {
     ASSERT_TRUE(c.isInt());
     ASSERT_EQ(c.toInt(), 6492);
 
-    auto c2 = constant(nullptr, "XXTT");
+    auto c2 = constant(nullptr, "XXTT1");
     ASSERT_TRUE(c2.isNull());
+
+    auto ce = getClassEntry("DateTime");
+    auto c3 = constant(nullptr, "XXTT2");
+    ASSERT_TRUE(c3.isNull());
+
+    try_call([]() { auto c4 = constant("XXTT3"); }, "Undefined constant \"XXTT3\"");
 }
 
 TEST(base, echo) {

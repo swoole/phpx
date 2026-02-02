@@ -604,6 +604,9 @@ TEST(variant, offsetGet) {
     ASSERT_TRUE(s.offsetExists(-2));
     ASSERT_STREQ(s.offsetGet(-1).toCString(), "d");
 
+    var bv = true;
+    ASSERT_STREQ(s.offsetGet(bv).toCString(), "e");
+
     var b = false;
     ASSERT_TRUE(b.offsetGet(0).isNull());
     ASSERT_STREQ(s.offsetGet(b).toCString(), "h");
@@ -827,6 +830,8 @@ TEST(variant, operateWithBadType) {
     ASSERT_FALSE(v.offsetExists(sk));
 
     ASSERT_TRUE(v.getProperty("hello").isNull());
+
+    try_call([&]() { sk.offsetSet(null, "_"); }, "[] operator not supported for strings");
 }
 
 TEST(variant, item) {
@@ -936,6 +941,12 @@ TEST(variant, itemUpdate2) {
     ASSERT_EQ(v.length(), 6);
 
     ASSERT_EQ(arr.length(), 5);
+
+    var arr3 = 1992;
+    ASSERT_FALSE(arr3.isArray());
+    arr3.item(2020, true) = "hello";
+    ASSERT_TRUE(arr3.isArray());
+    ASSERT_STREQ(arr3.offsetGet(2020).toCString(), "hello");
 }
 
 TEST(variant, append) {

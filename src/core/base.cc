@@ -104,9 +104,7 @@ void unsetGlobal(const String &name) {
 
 Variant constant(const String &name) {
     auto c = zend_get_constant_ex(name.str(), zend_get_executed_scope(), ZEND_FETCH_CLASS_EXCEPTION);
-    if (!c) {
-        return {};
-    }
+    throwErrorIfOccurred();
     return Variant{c};
 }
 
