@@ -103,6 +103,7 @@ PHPX_API Variant call(zend_class_entry *ce, zend_function *func, const ArgList &
 PHPX_API void throwException(const String &class_name, const char *message, int code = 0);
 PHPX_API void throwException(const Object &e);
 PHPX_API bool empty(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list);
+PHPX_API bool exists(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list);
 
 #define throwError(format, ...)                                                                                        \
     do {                                                                                                               \

@@ -649,7 +649,7 @@ Variant Variant::item(zend_long offset, bool update) {
                 SEPARATE_ARRAY(zvar);
                 retval = zend_hash_index_update(Z_ARRVAL_P(zvar), offset, undef());
             } else {
-                return Variant{};
+                return Variant{undef()};
             }
         }
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
@@ -668,7 +668,7 @@ Variant Variant::item(zend_long offset, bool update) {
             retval = zend_hash_index_update(Z_ARRVAL_P(zvar), offset, undef());
         } else {
             throwError("Only array/object/string support the item(%ld) method, got `%s`", offset, typeStr());
-            return Variant{};
+            return Variant{undef()};
         }
     }
 
@@ -692,7 +692,7 @@ Variant Variant::item(const Variant &key, bool update) {
                 SEPARATE_ARRAY(zvar);
                 retval = zend_hash_update(Z_ARRVAL_P(zvar), skey.str(), undef());
             } else {
-                return Variant{};
+                return Variant{undef()};
             }
         }
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
@@ -709,7 +709,7 @@ Variant Variant::item(const Variant &key, bool update) {
             retval = zend_hash_update(Z_ARRVAL_P(zvar), skey.str(), undef());
         } else {
             throwError("Only array/object/string support the item() method");
-            return Variant{};
+            return Variant{undef()};
         }
     }
 

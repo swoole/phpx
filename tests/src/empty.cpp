@@ -200,6 +200,43 @@ TEST(empty, numeric_keys) {
     ASSERT_TRUE(empty(v, {{ArrayDimFetch, 999}}));
 }
 
+TEST(empty, mixed_array_object_access) {
+    // 测试类似 PHP 语法 empty($arr[0][1]->prop[2]) 的混合访问
+    
+    // 创建模拟的数据结构
+    auto inner_obj = newObject("stdClass");
+    inner_obj.set("prop", Array{10, 20, 30}); // prop 是一个数组
+    
+    Array level1_arr;
+    level1_arr.set(1, inner_obj); // $arr[0][1] = $inner_obj
+    
+    Array level0_arr;
+    level0_arr.set(0, level1_arr); // $arr[0] = $level1_arr
+    
+    Variant arr = level0_arr;
+    
+    // 测试有效的混合访问: $arr[0][1]->prop[2]
+    // 对应: {{ArrayDimFetch, 0}, {ArrayDimFetch, 1}, {PropertyFetch, "prop"}, {ArrayDimFetch, 2}}
+    ASSERT_FALSE(empty(arr, {{ArrayDimFetch, 0}, {ArrayDimFetch, 1}, {PropertyFetch, "prop"}, {ArrayDimFetch, 2}}));
+    
+    // 测试访问不存在的路径
+    ASSERT_TRUE(empty(arr, {{ArrayDimFetch, 0}, {ArrayDimFetch, 1}, {PropertyFetch, "nonexistent"}, {ArrayDimFetch, 2}}));
+    
+    // 测试中间步骤失败的情况
+    ASSERT_TRUE(empty(arr, {{ArrayDimFetch, 999}, {ArrayDimFetch, 1}, {PropertyFetch, "prop"}, {ArrayDimFetch, 2}}));
+    
+    // 测试属性不是对象的情况
+    auto bad_obj = newObject("stdClass");
+    bad_obj.set("bad_prop", "not_an_object");
+    
+    Array bad_arr;
+    bad_arr.set(0, bad_obj);
+    Variant bad_variant = bad_arr;
+    
+    // 尝试在非对象上调用属性获取
+    ASSERT_TRUE(empty(bad_variant, {{ArrayDimFetch, 0}, {PropertyFetch, "bad_prop"}, {PropertyFetch, "any_prop"}}));
+}
+
 TEST(empty, string_numeric_keys) {
     // 测试字符串形式的数字键
     Array mixed_arr;
