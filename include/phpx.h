@@ -136,7 +136,6 @@ Resource *getResource(const std::string &name);
 void request_init();
 void request_shutdown();
 
-extern std::unordered_map<std::string, zval> global_vars;
 extern std::function<void(zend_object *)> throw_impl;
 extern int box_res_id;
 extern const char *box_res_name;

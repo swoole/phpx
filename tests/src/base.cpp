@@ -24,7 +24,7 @@ TEST(base, constant2) {
     ASSERT_TRUE(c2.isNull());
 
     auto ce = getClassEntry("DateTime");
-    auto c3 = constant(nullptr, "XXTT2");
+    auto c3 = constant(ce, "XXTT2");
     ASSERT_TRUE(c3.isNull());
 
     try_call([]() { auto c4 = constant("XXTT3"); }, "Undefined constant \"XXTT3\"");
@@ -297,6 +297,9 @@ TEST(base, call) {
 TEST(base, staticMethod1) {
     auto ce = getClassEntry("DateTime");
     auto fn = getMethod(ce, "createFromFormat");
+
+    try_call([ce]() { auto fn2 = getMethod(ce, "methodNotExists"); },
+             "method 'DateTime::methodNotExists' is undefined");
 
     auto o = call(ce, fn, {"j-M-Y", "15-Feb-2009"}).toObject();
     auto rs = o.exec("format", {"Y-m-d"});

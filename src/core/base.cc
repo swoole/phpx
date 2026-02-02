@@ -17,7 +17,6 @@
 #include "phpx.h"
 
 namespace php {
-std::unordered_map<std::string, zval> global_vars;
 const char *box_res_name = "php::box";
 int box_res_id;
 
@@ -164,9 +163,6 @@ void request_shutdown() {
         zend_hash_destroy(func_cache_map);
         pefree(func_cache_map, 1);
     }
-    for (auto kv : global_vars) {
-        zval_ptr_dtor(&kv.second);
-    }
 }
 
 void throwException(const String &class_name, const char *message, int code) {
@@ -248,7 +244,6 @@ zend_function *getFunction(const String &name) {
         zend_throw_error(NULL, "function '%s' is undefined.", ZSTR_VAL(callable_name));
         zend_string_release_ex(callable_name, 0);
     }
-
     throwErrorIfOccurred();
 
     return fcc.function_handler;
@@ -259,7 +254,7 @@ zend_function *getMethod(zend_class_entry *ce, const String &name) {
     auto zv = zend_hash_find(&ce->function_table, lmname);
     zend_string_release(lmname);
     if (UNEXPECTED(zv == nullptr)) {
-        zend_throw_error(NULL, "method '%s::%s' is undefined.", ZSTR_VAL(ce->name), name.data());
+        throwError("method '%s::%s' is undefined.", ZSTR_VAL(ce->name), name.data());
         return nullptr;
     }
     return (zend_function *) Z_PTR_P(zv);
