@@ -525,7 +525,7 @@ class Variant {
     void unsetProperty(zend_string *prop_name);
 
     /**
-     * These three methods are unsafe. They only support arrays or objects, and will use the address of the zval in the
+     * These methods are unsafe. They only support arrays or objects, and will use the address of the zval in the
      * These array elements or object properties to return an Indirect object. When assigning a value to this object, it
      * will directly modify the values of the array elements or object properties. These methods are not safe; it is
      * essential to ensure that the zval pointer already exists and has not been unset. Please note that after
@@ -950,6 +950,11 @@ class Args {
     Args() = default;
     explicit Args(size_t n) {
         params.reserve(n);
+    }
+    explicit Args(const std::initializer_list<Variant> &args) : params(args.size()) {
+        for (const auto &arg : args) {
+            append(arg.const_ptr());
+        }
     }
     void append(const zval *zv) {
         params.emplace_back(zv, Ctor::CopyRef);

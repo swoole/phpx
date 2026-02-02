@@ -334,10 +334,7 @@ Variant call(const Variant &func, Args &args) {
 }
 
 Variant call(const Variant &func, const std::initializer_list<Variant> &args) {
-    Args _args(args.size());
-    for (const auto &arg : args) {
-        _args.append(arg.const_ptr());
-    }
+    Args _args(args);
     return call_impl(nullptr, func.const_ptr(), _args);
 }
 
@@ -350,10 +347,7 @@ Variant call(zend_function *func) {
 
 Variant call(zend_function *func, const std::initializer_list<Variant> &args) {
     Variant retval{};
-    Args _args(args.size());
-    for (const auto &arg : args) {
-        _args.append(arg.const_ptr());
-    }
+    Args _args(args);
     zend_call_known_function(func, nullptr, nullptr, retval.ptr(), _args.count(), _args.ptr(), nullptr);
     throwErrorIfOccurred();
     return retval;
@@ -368,10 +362,7 @@ Variant call(zend_class_entry *ce, zend_function *func) {
 
 Variant call(zend_class_entry *ce, zend_function *func, const std::initializer_list<Variant> &args) {
     Variant retval{};
-    Args _args(args.size());
-    for (const auto &arg : args) {
-        _args.append(arg.const_ptr());
-    }
+    Args _args(args);
     zend_call_known_function(func, nullptr, ce, retval.ptr(), _args.count(), _args.ptr(), nullptr);
     throwErrorIfOccurred();
     return retval;
