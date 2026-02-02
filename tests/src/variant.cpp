@@ -606,6 +606,10 @@ TEST(variant, offsetGet) {
 
     var bv = true;
     ASSERT_STREQ(s.offsetGet(bv).toCString(), "e");
+    ASSERT_TRUE(s.offsetExists(bv));
+
+    var s2 = "";
+    ASSERT_FALSE(s2.offsetExists(bv));
 
     var b = false;
     ASSERT_TRUE(b.offsetGet(0).isNull());
@@ -947,6 +951,13 @@ TEST(variant, itemUpdate2) {
     arr3.item(2020, true) = "hello";
     ASSERT_TRUE(arr3.isArray());
     ASSERT_STREQ(arr3.offsetGet(2020).toCString(), "hello");
+
+    var arr4 = 1992;
+    var sk = "hello";
+    ASSERT_FALSE(arr4.isArray());
+    arr4.item(sk, true) = 2026;
+    ASSERT_TRUE(arr4.isArray());
+    ASSERT_EQ(arr4.offsetGet(sk).toInt(), 2026);
 }
 
 TEST(variant, append) {
@@ -969,15 +980,21 @@ TEST(variant, append) {
 TEST(variant, item5) {
     try_call(
         []() {
-            var a = 1234;
-            a.item(0);
+            var arr1 = 1234;
+            arr1.item(0);
         },
         "Only array/object/string support the item");
 
     try_call(
         []() {
-            var a = 1234;
-            a.newItem();
+            var arr2 = "world";
+            arr2.newItem();
         },
-        "Only array/object/string support the newItem");
+        "Only array/object support the newItem() method");
+
+    var arr3;
+    ASSERT_FALSE(arr3.isArray());
+    arr3.newItem() = "hello";
+    ASSERT_TRUE(arr3.isArray());
+    ASSERT_STREQ(arr3.offsetGet(0).toCString(), "hello");
 }

@@ -94,6 +94,15 @@ TEST(base, include2) {
     ASSERT_FALSE(rs3.toBool());
 }
 
+TEST(base, include3) {
+    auto rs1 = include(get_include_dir() + "/../include/library.php", INCLUDE_ONCE);
+    ASSERT_TRUE(rs1.isInt());
+    ASSERT_EQ(rs1.toInt(), 1);
+
+    auto rs2 = include(get_include_dir() + "/../include/library.php", INCLUDE_ONCE);
+    ASSERT_TRUE(rs2.isTrue());
+}
+
 TEST(base, ini_get) {
     auto v = ini_get("post_max_size");
     ASSERT_GE(v.length(), 2);

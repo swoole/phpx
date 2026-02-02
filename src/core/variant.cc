@@ -738,7 +738,7 @@ Variant Variant::newItem() {
             return Variant{retval};
         }
     } else {
-        throwError("Only array/object/string support the newItem() method");
+        throwError("Only array/object support the newItem() method");
         return Variant{};
     }
 
