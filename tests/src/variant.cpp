@@ -990,11 +990,18 @@ TEST(variant, item5) {
             var arr2 = "world";
             arr2.newItem();
         },
-        "Only array/object support the newItem() method");
+        "[] operator not supported for strings");
 
     var arr3;
     ASSERT_FALSE(arr3.isArray());
     arr3.newItem() = "hello";
     ASSERT_TRUE(arr3.isArray());
     ASSERT_STREQ(arr3.offsetGet(0).toCString(), "hello");
+
+    try_call(
+        []() {
+            var arr4 = 1234;
+            arr4.newItem();
+        },
+        "Only array/object support the newItem() method");
 }

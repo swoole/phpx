@@ -309,7 +309,12 @@ TEST(object, attr) {
 TEST(object, ArrayProperty) {
     auto o1 = newObject("stdClass");
     o1.set("prop", create_list());
+    o1.set("propInt", 999);
     o1.appendArrayProperty("prop", 1899);
+
+    try_call([&]() { o1.appendArrayProperty("propInt", 1899); }, "property `propInt` must be `array`");
+
+    try_call([&]() { o1.appendArrayProperty("propNotExists", 1899); }, "property `propNotExists` is undefined");
 
     auto prop1 = o1.get("prop");
     ASSERT_EQ(prop1.offsetGet(5).toInt(), 1899);
@@ -336,8 +341,12 @@ TEST(object, ArrayProperty) {
 TEST(object, ArrayProperty2) {
     auto o1 = newObject("stdClass");
     o1.set("prop", create_map());
-
+    o1.set("propInt", 999);
     o1.updateArrayProperty("prop", "php", 2999);
+
+    try_call([&]() { o1.updateArrayProperty("propInt", "key", 1899); }, "property `propInt` must be `array`");
+
+    try_call([&]() { o1.updateArrayProperty("propNotExists", "key", 1899); }, "property `propNotExists` is undefined");
 
     auto prop1 = o1.get("prop");
     ASSERT_EQ(prop1.offsetGet("php").toInt(), 2999);

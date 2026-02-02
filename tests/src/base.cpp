@@ -141,6 +141,12 @@ TEST(base, global2) {
     ASSERT_TRUE(global("_SERVER").isNull());
 }
 
+TEST(base, global3) {
+    var gv;
+    initGlobal("_SERVER", gv);
+    ASSERT_TRUE(gv.isArray());
+}
+
 TEST(base, equals) {
     Variant v1((zend_long) UINT_MAX);
     auto v2 = random_int(1, 1000000);

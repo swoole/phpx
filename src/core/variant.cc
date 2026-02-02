@@ -737,6 +737,9 @@ Variant Variant::newItem() {
         if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
             return Variant{retval};
         }
+    } else if (Z_TYPE_P(zvar) == IS_STRING) {
+        throwError("[] operator not supported for strings");
+        return Variant{};
     } else {
         throwError("Only array/object support the newItem() method");
         return Variant{};
