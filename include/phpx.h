@@ -143,6 +143,14 @@ Resource *getResource(const std::string &name);
 void request_init();
 void request_shutdown();
 
+bool is_callable_ex(zval *callable,
+                    zend_object *object,
+                    uint32_t check_flags,
+                    zend_string **callable_name,
+                    zend_fcall_info_cache *fcc,
+                    char **error);
+int array_data_compare(Bucket *f, Bucket *s);
+
 extern std::function<void(zend_object *)> throw_impl;
 extern int box_res_id;
 extern const char *box_res_name;
@@ -452,7 +460,7 @@ class Variant {
     }
 
     bool isScalar() const {
-    	return isBool() || isInt() || isFloat() || isString();
+        return isBool() || isInt() || isFloat() || isString();
     }
 
     bool isNumeric() const;
@@ -521,11 +529,11 @@ class Variant {
     }
 
     void redirect(const Variant &v) {
-    	if (v.isIndirect()) {
-    		redirect(zv());
-    	} else {
-    	    throwError("Cannot redirect to a non-indirect value.");
-    	}
+        if (v.isIndirect()) {
+            redirect(zv());
+        } else {
+            throwError("Cannot redirect to a non-indirect value.");
+        }
     }
 
     Variant offsetGet(zend_long offset) const;

@@ -20,7 +20,7 @@
 #include "zend_closures.h"
 
 namespace php {
-static int array_data_compare(Bucket *f, Bucket *s) {
+int array_data_compare(Bucket *f, Bucket *s) {
     zval result;
     zval *first = &f->val;
     zval *second = &s->val;

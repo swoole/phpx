@@ -215,13 +215,12 @@ static void free_fci_cache(zval *el) {
     pefree((zend_fcall_info_cache *) Z_PTR_P(el), 1);
 }
 
-static bool is_callable_ex(zval *callable,
-                           zend_object *object,
-                           uint32_t check_flags,
-                           zend_string **callable_name,
-                           zend_fcall_info_cache *fcc,
-                           char **error) /* {{{ */
-{
+bool is_callable_ex(zval *callable,
+                    zend_object *object,
+                    uint32_t check_flags,
+                    zend_string **callable_name,
+                    zend_fcall_info_cache *fcc,
+                    char **error) {
     zend_execute_data *frame = EG(current_execute_data);
     while (frame && !frame->func) {
         frame = frame->prev_execute_data;
@@ -473,7 +472,7 @@ int compare(const Variant &a, const Variant &b) {
 }
 
 bool empty(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list) {
-    Variant tmp(v.const_ptr(), Ctor::Indirect);
+    Variant tmp(v.const_ptr());
     for (const auto &expr : list) {
         if (expr.first == ArrayDimFetch) {
             if (!tmp.isArray()) {

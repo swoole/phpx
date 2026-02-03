@@ -200,6 +200,10 @@ TEST(base, exception2) {
     ASSERT_TRUE(e.isNull());
 }
 
+TEST(base, exception3) {
+    try_call([]() { throwException("TestClassNotExists", "test"); }, "class 'TestClassNotExists' undefined.");
+}
+
 TEST(base, atoi) {
     auto i = php::atoi("hello");
     ASSERT_EQ(i, 0);
@@ -329,30 +333,20 @@ TEST(base, staticMethod2) {
 TEST(base, hasStaticProperty) {
     // Include test library file
     include(get_include_dir() + "/library.php", INCLUDE_ONCE);
-    
+
     ASSERT_TRUE(hasStaticProperty("TestClass", "propInt"));
     ASSERT_TRUE(hasStaticProperty("TestClass", "propString"));
-    
+
     ASSERT_FALSE(hasStaticProperty("TestClass", "nonExistentProp"));
-    
+
     // Test non-existent class - should throw exception
-    try_call(
-        []() { 
-            hasStaticProperty("NonExistentClass", "someProp"); 
-        }, 
-        "class 'NonExistentClass' is undefined."
-    );
-    
+    try_call([]() { hasStaticProperty("NonExistentClass", "someProp"); }, "class 'NonExistentClass' is undefined.");
+
     // Test empty class name
-    try_call(
-        []() { 
-            hasStaticProperty("", "someProp"); 
-        }, 
-        "class '' is undefined."
-    );
-    
+    try_call([]() { hasStaticProperty("", "someProp"); }, "class '' is undefined.");
+
     ASSERT_FALSE(hasStaticProperty("stdClass", "anyProp"));
-    
+
     // DateTime has no static properties
     ASSERT_FALSE(hasStaticProperty("DateTime", "ATOM"));
     ASSERT_FALSE(hasStaticProperty("DateTime", "NONEXISTENT_CONSTANT"));

@@ -4,7 +4,6 @@
 
 using namespace php;
 
-
 TEST(exists, basic_array_access) {
     Array arr;
     arr.set("name", "John");
@@ -36,7 +35,6 @@ TEST(exists, basic_object_property) {
 
     ASSERT_FALSE(exists(v, {{PropertyFetch, "nonexistent"}}));
 }
-
 
 TEST(exists, array_dim_fetch_basic) {
     Array arr;
@@ -124,7 +122,6 @@ TEST(exists, string_numeric_keys) {
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, "99"}}));
 }
 
-
 TEST(exists, property_fetch_basic) {
     auto obj = newObject("stdClass");
     obj.set("prop1", "value1");
@@ -167,7 +164,6 @@ TEST(exists, property_fetch_nested) {
     ASSERT_FALSE(exists(v, {{PropertyFetch, "nonexistent"}, {PropertyFetch, "prop"}}));
 }
 
-
 TEST(exists, mixed_operations) {
     auto obj = newObject("stdClass");
     obj.set("obj_prop", "object_value");
@@ -202,7 +198,6 @@ TEST(exists, mixed_operations) {
 }
 
 TEST(exists, complex_chains) {
-
     auto deep_obj = newObject("stdClass");
     deep_obj.set("level3_prop", "deep_value");
     deep_obj.set("empty_prop", "");
@@ -221,8 +216,8 @@ TEST(exists, complex_chains) {
     ASSERT_TRUE(
         exists(v, {{ArrayDimFetch, "level1_obj"}, {PropertyFetch, "level2_obj"}, {PropertyFetch, "level3_prop"}}));
 
-    ASSERT_TRUE(exists(
-        v, {{ArrayDimFetch, "level1_obj"}, {PropertyFetch, "level2_obj"}, {PropertyFetch, "empty_prop"}}));
+    ASSERT_TRUE(
+        exists(v, {{ArrayDimFetch, "level1_obj"}, {PropertyFetch, "level2_obj"}, {PropertyFetch, "empty_prop"}}));
 
     ASSERT_FALSE(
         exists(v, {{ArrayDimFetch, "level1_obj"}, {PropertyFetch, "level2_obj"}, {PropertyFetch, "null_prop"}}));
@@ -237,9 +232,7 @@ TEST(exists, complex_chains) {
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, "nonexistent_key"}, {PropertyFetch, "any_prop"}}));
 }
 
-
 TEST(exists, edge_cases) {
-
     Array empty_arr;
     var v1 = empty_arr;
     ASSERT_FALSE(exists(v1, {{ArrayDimFetch, "any_key"}}));
@@ -262,7 +255,6 @@ TEST(exists, edge_cases) {
 }
 
 TEST(exists, type_mismatch_scenarios) {
-
     var string_val = "hello";
     ASSERT_FALSE(exists(string_val, {{ArrayDimFetch, "key"}}));
 
@@ -277,7 +269,6 @@ TEST(exists, type_mismatch_scenarios) {
     ASSERT_FALSE(exists(bool_val, {{ArrayDimFetch, "key"}}));
     ASSERT_FALSE(exists(bool_val, {{PropertyFetch, "prop"}}));
 }
-
 
 TEST(exists, comparison_with_empty) {
     Array arr;
@@ -297,7 +288,6 @@ TEST(exists, comparison_with_empty) {
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, "not_exists"}}));
 }
 
-
 TEST(exists, string_offset_access) {
     var v = "hello";
 
@@ -306,7 +296,6 @@ TEST(exists, string_offset_access) {
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, -1}}));
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, 100}}));
 }
-
 
 TEST(exists, special_key_names) {
     Array arr;
@@ -339,7 +328,6 @@ TEST(exists, special_key_names) {
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, "\n"}}));
 }
 
-
 TEST(exists, float_keys) {
     Array arr;
 
@@ -356,7 +344,6 @@ TEST(exists, float_keys) {
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, 3.0}}));
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, 0.5}}));
 }
-
 
 TEST(exists, negative_indices) {
     Array arr;
@@ -377,7 +364,6 @@ TEST(exists, negative_indices) {
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, -100}}));
 }
 
-
 TEST(exists, boundary_values) {
     Array arr;
 
@@ -394,7 +380,6 @@ TEST(exists, boundary_values) {
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, 999999}}));
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, LONG_MAX - 1}}));
 }
-
 
 TEST(exists, very_deep_nesting) {
     auto level6_obj = newObject("stdClass");
@@ -442,9 +427,7 @@ TEST(exists, very_deep_nesting) {
                          {PropertyFetch, "nonexistent"}}));
 }
 
-
 TEST(exists, complex_mixed_paths) {
-
     Array innermost_arr;
     innermost_arr.set("final_key", "final_value");
     innermost_arr.set("empty_final", "");
@@ -489,7 +472,6 @@ TEST(exists, complex_mixed_paths) {
     ASSERT_TRUE(exists(v, {{ArrayDimFetch, "obj1"}, {PropertyFetch, "mid_arr"}, {ArrayDimFetch, "direct_value"}}));
 }
 
-
 TEST(exists, array_with_various_types) {
     Array arr;
     arr.set("string", "value");
@@ -513,7 +495,6 @@ TEST(exists, array_with_various_types) {
 
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, "null"}}));
 }
-
 
 TEST(exists, object_with_various_types) {
     auto obj = newObject("stdClass");
@@ -539,7 +520,6 @@ TEST(exists, object_with_various_types) {
     ASSERT_FALSE(exists(v, {{PropertyFetch, "null"}}));
 }
 
-
 TEST(exists, wrong_operation_order) {
     Array arr;
     arr.set("key", "value");
@@ -558,7 +538,6 @@ TEST(exists, wrong_operation_order) {
     ASSERT_FALSE(exists(v4, {{PropertyFetch, "prop"}, {ArrayDimFetch, "key"}}));
 }
 
-
 TEST(exists, empty_containers_nested_access) {
     Array empty_arr;
     var v1 = empty_arr;
@@ -574,7 +553,6 @@ TEST(exists, empty_containers_nested_access) {
     ASSERT_TRUE(exists(v3, {{ArrayDimFetch, "inner"}}));
     ASSERT_FALSE(exists(v3, {{ArrayDimFetch, "inner"}, {ArrayDimFetch, "key"}}));
 }
-
 
 TEST(exists, numeric_string_vs_int_keys) {
     Array arr;
