@@ -723,16 +723,16 @@ class String : public Variant {
         checkString();
     }
     String(const Variant &v) : String(v.const_ptr()) {}
-    String(int v) {
+    explicit String(int v) {
         ZVAL_STR(ptr(), zend_long_to_str(v));
     }
-    String(long v) {
+    explicit String(long v) {
         ZVAL_STR(ptr(), zend_long_to_str(v));
     }
-    String(double v) {
+    explicit String(double v) {
         ZVAL_STR(ptr(), zend_strpprintf(0, "%.*G", (int) EG(precision), v));
     }
-    String(bool v) {
+    explicit String(bool v) {
         ZVAL_STR(ptr(), zend_string_init(v ? "1" : "0", 1, false));
     }
     String(zend_string *v, Ctor method = Ctor::Copy) {

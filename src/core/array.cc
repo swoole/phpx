@@ -304,6 +304,7 @@ ArrayItem &ArrayItem::operator=(const Variant &v) {
         copyFrom(v.unwrap_ptr());
     } else {
         zval *new_zv;
+        Z_TRY_ADDREF_P(zv);
         if (key_.str() != zend_empty_string) {
             new_zv = zend_symtable_update(ht, key_.str(), zv);
         } else {
