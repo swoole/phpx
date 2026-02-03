@@ -928,9 +928,6 @@ class Array : public Variant {
     ArrayItem operator[](zend_ulong i) {
         return {*this, i, String{}};
     }
-    ArrayItem operator[](int i) {
-        return {*this, (zend_ulong) i, String{}};
-    }
     ArrayItem operator[](const String &key) {
         return {*this, 0, key};
     }
