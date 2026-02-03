@@ -7,7 +7,7 @@
 using namespace php;
 
 TEST(empty, array_dim_fetch_basic) {
-    // 测试基本数组访问
+    // Basic array access test
     Array arr;
     arr.set("key1", "value1");
     arr.set("key2", "");
@@ -15,19 +15,19 @@ TEST(empty, array_dim_fetch_basic) {
     
     Variant v = arr;
     
-    // 存在且非空的元素
+    // Existing non-empty elements
     ASSERT_FALSE(empty(v, {{ArrayDimFetch, "key1"}}));
     
-    // 存在但为空的元素
+    // Existing but empty elements
     ASSERT_TRUE(empty(v, {{ArrayDimFetch, "key2"}}));
     ASSERT_TRUE(empty(v, {{ArrayDimFetch, "key3"}}));
     
-    // 不存在的元素
+    // Non-existent elements
     ASSERT_TRUE(empty(v, {{ArrayDimFetch, "nonexistent"}}));
 }
 
 TEST(empty, array_dim_fetch_nested) {
-    // 测试嵌套数组访问
+    // Nested array access test
     Array inner_arr;
     inner_arr.set("inner_key", "inner_value");
     inner_arr.set("empty_key", "");
@@ -38,16 +38,16 @@ TEST(empty, array_dim_fetch_nested) {
     
     Variant v = outer_arr;
     
-    // 访问存在的嵌套元素
+    // Access existing nested elements
     ASSERT_FALSE(empty(v, {{ArrayDimFetch, "nested"}, {ArrayDimFetch, "inner_key"}}));
     
-    // 访问嵌套的空元素
+    // Access nested empty elements
     ASSERT_TRUE(empty(v, {{ArrayDimFetch, "nested"}, {ArrayDimFetch, "empty_key"}}));
     
-    // 访问空的嵌套数组
+    // Access empty nested array
     ASSERT_TRUE(empty(v, {{ArrayDimFetch, "empty_nested"}, {ArrayDimFetch, "any_key"}}));
     
-    // 访问不存在的嵌套路径
+    // Access non-existent nested path
     ASSERT_TRUE(empty(v, {{ArrayDimFetch, "nonexistent"}, {ArrayDimFetch, "key"}}));
 }
 
@@ -181,7 +181,7 @@ TEST(empty, complex_chains) {
 }
 
 TEST(empty, numeric_keys) {
-    // 测试数字键的数组访问
+    // Numeric key array access test
     Array numeric_arr;
     numeric_arr.set(0, "first");
     numeric_arr.set(1, "");
@@ -189,23 +189,23 @@ TEST(empty, numeric_keys) {
     
     Variant v = numeric_arr;
     
-    // 存在且非空的数字索引
+    // Existing non-empty numeric indices
     ASSERT_FALSE(empty(v, {{ArrayDimFetch, 0}}));
     
-    // 存在但为空的数字索引
+    // Existing but empty numeric indices
     ASSERT_TRUE(empty(v, {{ArrayDimFetch, 1}}));
     ASSERT_TRUE(empty(v, {{ArrayDimFetch, 2}}));
     
-    // 不存在的数字索引
+    // Non-existent numeric indices
     ASSERT_TRUE(empty(v, {{ArrayDimFetch, 999}}));
 }
 
 TEST(empty, mixed_array_object_access) {
-    // 测试类似 PHP 语法 empty($arr[0][1]->prop[2]) 的混合访问
+    // Test mixed access similar to PHP syntax empty($arr[0][1]->prop[2])
     
-    // 创建模拟的数据结构
+    // Create mock data structure
     auto inner_obj = newObject("stdClass");
-    inner_obj.set("prop", Array{10, 20, 30}); // prop 是一个数组
+    inner_obj.set("prop", Array{10, 20, 30}); // prop is an array
     
     Array level1_arr;
     level1_arr.set(1, inner_obj); // $arr[0][1] = $inner_obj
@@ -215,17 +215,17 @@ TEST(empty, mixed_array_object_access) {
     
     Variant arr = level0_arr;
     
-    // 测试有效的混合访问: $arr[0][1]->prop[2]
-    // 对应: {{ArrayDimFetch, 0}, {ArrayDimFetch, 1}, {PropertyFetch, "prop"}, {ArrayDimFetch, 2}}
+    // Test valid mixed access: $arr[0][1]->prop[2]
+    // Corresponds to: {{ArrayDimFetch, 0}, {ArrayDimFetch, 1}, {PropertyFetch, "prop"}, {ArrayDimFetch, 2}}
     ASSERT_FALSE(empty(arr, {{ArrayDimFetch, 0}, {ArrayDimFetch, 1}, {PropertyFetch, "prop"}, {ArrayDimFetch, 2}}));
     
-    // 测试访问不存在的路径
+    // Test accessing non-existent path
     ASSERT_TRUE(empty(arr, {{ArrayDimFetch, 0}, {ArrayDimFetch, 1}, {PropertyFetch, "nonexistent"}, {ArrayDimFetch, 2}}));
     
-    // 测试中间步骤失败的情况
+    // Test failure at intermediate step
     ASSERT_TRUE(empty(arr, {{ArrayDimFetch, 999}, {ArrayDimFetch, 1}, {PropertyFetch, "prop"}, {ArrayDimFetch, 2}}));
     
-    // 测试属性不是对象的情况
+    // Test case where property is not an object
     auto bad_obj = newObject("stdClass");
     bad_obj.set("bad_prop", "not_an_object");
     
@@ -233,22 +233,22 @@ TEST(empty, mixed_array_object_access) {
     bad_arr.set(0, bad_obj);
     Variant bad_variant = bad_arr;
     
-    // 尝试在非对象上调用属性获取
+    // Try to call property access on non-object
     ASSERT_TRUE(empty(bad_variant, {{ArrayDimFetch, 0}, {PropertyFetch, "bad_prop"}, {PropertyFetch, "any_prop"}}));
 }
 
 TEST(empty, string_numeric_keys) {
-    // 测试字符串形式的数字键
+    // Test string-form numeric keys
     Array mixed_arr;
     mixed_arr.set("0", "string_zero");
     mixed_arr.set("1", "");
     
     Variant v = mixed_arr;
     
-    // 字符串数字键
+    // String numeric keys
     ASSERT_FALSE(empty(v, {{ArrayDimFetch, "0"}}));
     ASSERT_TRUE(empty(v, {{ArrayDimFetch, "1"}}));
     
-    // 实际数字键（应该找不到）
+    // Actual numeric keys (should not be found)
     ASSERT_TRUE(empty(v, {{ArrayDimFetch, 0}}));
 }
