@@ -643,10 +643,12 @@ Variant Variant::item(zend_long offset, bool update) {
     zval rv;
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
+        if (update) {
+            SEPARATE_ARRAY(zvar);
+        }
         retval = zend_hash_index_find(Z_ARRVAL_P(zvar), offset);
         if (retval == nullptr) {
             if (update) {
-                SEPARATE_ARRAY(zvar);
                 retval = zend_hash_index_update(Z_ARRVAL_P(zvar), offset, undef());
             } else {
                 return Variant{undef()};
@@ -686,10 +688,12 @@ Variant Variant::item(const Variant &key, bool update) {
 
     if (Z_TYPE_P(zvar) == IS_ARRAY) {
         auto skey = key.toString();
+        if (update) {
+            SEPARATE_ARRAY(zvar);
+        }
         retval = zend_hash_find(Z_ARRVAL_P(zvar), skey.str());
         if (retval == nullptr) {
             if (update) {
-                SEPARATE_ARRAY(zvar);
                 retval = zend_hash_update(Z_ARRVAL_P(zvar), skey.str(), undef());
             } else {
                 return Variant{undef()};

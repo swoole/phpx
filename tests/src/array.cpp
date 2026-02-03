@@ -423,3 +423,24 @@ TEST(array, array_data_compare) {
 
     ASSERT_EQ(array_data_compare(&b1, &b2), -1);
 }
+
+void dump_buckets(zend_array *ht) {
+    for (int i = 0; i < ht->nNumOfElements; i++) {
+        zend_array *ht2 = ht->arPacked[i].value.arr;
+        ::printf("i=%d, p=%p, arr=%p, rc=%d\n", i, &ht->arPacked[i], ht2, ht2->gc.refcount);
+    }
+}
+
+TEST(array, matrix) {
+    auto row = 2;
+    auto col = 2;
+
+    auto arr = array_fill(0, row + 1, array_fill(0, col + 1, 0));
+    arr.item(1, true).item(1, true) = 99;
+    arr.item(2, true).item(0, true) = 88;
+
+    ASSERT_EQ(arr.item(1).item(1).toInt(), 99);
+    ASSERT_EQ(arr.item(2).item(0).toInt(), 88);
+    ASSERT_EQ(arr.item(0).item(1).toInt(), 0);
+    ASSERT_EQ(arr.item(2).item(2).toInt(), 0);
+}
