@@ -115,12 +115,24 @@ TEST(array, update) {
     arr["php"] = 999;
     ASSERT_EQ(arr.get("php").toInt(), 999);
 
+    arr["rust"] = 1000;
+    ASSERT_EQ(arr.get("rust").toInt(), 1000);
+
     arr.set("java", 666);
     ASSERT_EQ(arr.get("java").toInt(), 666);
 
     Array arr2 = create_list();
     arr2[2] = "golang";
     ASSERT_STREQ(arr2.get(2).toCString(), "golang");
+
+    arr2[2] = "swift";
+    ASSERT_STREQ(arr2.get(2).toCString(), "swift");
+
+    arr2[5] = "erlang";
+    ASSERT_STREQ(arr2.get(5).toCString(), "erlang");
+
+    arr2[5] = "node.js";
+    ASSERT_STREQ(arr2.get(5).toCString(), "node.js");
 }
 
 TEST(array, nesting) {
