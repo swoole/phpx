@@ -499,36 +499,35 @@ bool empty(const Variant &v, const std::initializer_list<std::pair<Operation, co
 }
 
 bool exists(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list) {
-    Variant tmp(v.const_ptr(), Ctor::Indirect);
+    Variant tmp = v;
+
     for (const auto &expr : list) {
         if (expr.first == ArrayDimFetch) {
             if (!tmp.isArray()) {
                 return false;
             } else {
-                // 使用 offsetExists 检查数组元素是否存在
                 if (!tmp.offsetExists(expr.second)) {
                     return false;
                 }
-                // 获取元素用于下一次迭代
                 tmp = tmp.item(expr.second);
+                if (tmp.isNull()) {
+                    return false;
+                }
             }
         } else if (expr.first == PropertyFetch) {
             if (!tmp.isObject()) {
                 return false;
             } else {
                 Object o(tmp);
-                // 使用 propertyExists 检查对象属性是否存在
-                if (!o.propertyExists(expr.second)) {
+                tmp = o.attr(expr.second);
+                if (tmp.isNull() || tmp.isUndef()) {
                     return false;
                 }
-                // 获取属性用于下一次迭代
-                tmp = o.attr(expr.second);
             }
         } else {
             abort();
         }
     }
-    // 如果能走到这里，说明整个路径都存在
     return true;
 }
 
