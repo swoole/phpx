@@ -31,11 +31,8 @@ int array_data_compare(Bucket *f, Bucket *s) {
     if (UNEXPECTED(Z_TYPE_P(second) == IS_INDIRECT)) {
         second = Z_INDIRECT_P(second);
     }
-    if (compare_function(&result, first, second) == FAILURE) {
-        return 0;
-    }
+    compare_function(&result, first, second);
 
-    ZEND_ASSERT(Z_TYPE(result) == IS_LONG);
     return Z_LVAL(result);
 }
 

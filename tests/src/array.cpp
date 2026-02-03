@@ -407,3 +407,19 @@ TEST(array, indirect_handling_mixed_types) {
     ASSERT_EQ(values[2], 75);
     ASSERT_EQ(values[3], 100);
 }
+
+TEST(array, array_data_compare) {
+	Bucket b1;
+	Bucket b2;
+
+	zval zv1;
+	ZVAL_LONG(&zv1, 199);
+
+	zval zv2;
+	ZVAL_LONG(&zv2, 283);
+
+	ZVAL_INDIRECT(&b1.val, &zv1);
+	ZVAL_INDIRECT(&b2.val, &zv2);
+
+	ASSERT_EQ(array_data_compare(&b1, &b2), -1);
+}
