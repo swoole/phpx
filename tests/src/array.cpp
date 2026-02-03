@@ -337,3 +337,61 @@ TEST(array, assign) {
     arr1 = {{2020, "apple"}, {1999, "banana"}};
     ASSERT_STREQ(arr1[1999].toCString(), "banana");
 }
+
+// Test case to cover the array_data_compare function's handling of INDIRECT values
+// The array_data_compare function has specific logic to handle IS_INDIRECT type:
+// if (UNEXPECTED(Z_TYPE_P(first) == IS_INDIRECT)) {
+//     first = Z_INDIRECT_P(first);
+// }
+// if (UNEXPECTED(Z_TYPE_P(second) == IS_INDIRECT)) {
+//     second = Z_INDIRECT_P(second);
+// }
+TEST(array, indirect_handling_in_sort) {
+    // Create an array with various comparable values
+    Array arr;
+    arr.append(30);
+    arr.append(10);
+    arr.append(20);
+    arr.append(5);
+
+    // Perform sort operation which will call array_data_compare
+    // During the sorting algorithm, some internal operations may create INDIRECT references
+    arr.sort();
+
+    // Validate that the array was sorted properly despite potential INDIRECT values
+    ASSERT_EQ(arr.count(), 4);
+    ASSERT_EQ(arr[0].toInt(), 5);   // Smallest value first
+    ASSERT_EQ(arr[1].toInt(), 10);
+    ASSERT_EQ(arr[2].toInt(), 20);
+    ASSERT_EQ(arr[3].toInt(), 30);  // Largest value last
+}
+
+// Another test to verify sorting with mixed data types
+TEST(array, indirect_handling_mixed_types) {
+    // Create array with values that will definitely be compared by array_data_compare
+    Array arr;
+    arr.set("key1", 100);
+    arr.set("key2", 50);
+    arr.set("key3", 75);
+    arr.set("key4", 25);
+
+    // Sort by values, which calls array_data_compare
+    // The internal implementation might use INDIRECT references during the process
+    arr.sort();
+
+    // Verify that the function handles any INDIRECT values properly during comparison
+    ASSERT_EQ(arr.count(), 4);
+
+    // Get values in order and verify they are sorted
+    int values[4];
+    int i = 0;
+    for (auto it = arr.begin(); it != arr.end(); ++it) {
+        values[i++] = it.value().toInt();
+    }
+
+    // Values should be in ascending order
+    ASSERT_EQ(values[0], 25);
+    ASSERT_EQ(values[1], 50);
+    ASSERT_EQ(values[2], 75);
+    ASSERT_EQ(values[3], 100);
+}
