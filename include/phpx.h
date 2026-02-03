@@ -1025,14 +1025,14 @@ class Object : public Variant {
         return call_impl(ptr(), func.const_ptr(), args);
     }
     zend_class_entry *parent_ce() {
-        return Z_OBJCE_P(ptr())->parent;
+        return Z_OBJCE_P(unwrap_ptr())->parent;
     }
     Variant callParentMethod(const String &func) {
         return callParentMethod(func, {});
     }
     Variant callParentMethod(const String &func, const ArgList &args);
     Variant exec(const Variant &fn) {
-        return call_impl(ptr(), fn.const_ptr());
+        return call_impl(unwrap_ptr(), fn.const_ptr());
     }
     Variant exec(const Variant &fn, const ArgList &args);
 

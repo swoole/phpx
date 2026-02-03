@@ -36,11 +36,8 @@ zend_long Object::count() {
 }
 
 Variant Object::exec(const Variant &fn, const ArgList &args) {
-    Args _args;
-    for (const auto &arg : args) {
-        _args.append(const_cast<Variant &>(arg).ptr());
-    }
-    return call_impl(ptr(), fn.const_ptr(), _args);
+    Args _args(args);
+    return call_impl(unwrap_ptr(), fn.const_ptr(), _args);
 }
 
 bool Object::instanceOf(const String &name) const {
