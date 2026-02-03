@@ -4,6 +4,14 @@
 
 using namespace php;
 
+TEST(exists, null) {
+    var v1;
+    ASSERT_FALSE(exists(v1, {}));
+
+    var v2(undef());
+    ASSERT_FALSE(exists(v2, {}));
+}
+
 TEST(exists, basic_array_access) {
     Array arr;
     arr.set("name", "John");

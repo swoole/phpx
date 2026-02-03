@@ -6,6 +6,14 @@
 
 using namespace php;
 
+TEST(empty, null) {
+    var v1;
+    ASSERT_TRUE(empty(v1, {}));
+
+    var v2(undef());
+    ASSERT_TRUE(empty(v2, {}));
+}
+
 TEST(empty, array_dim_fetch_basic) {
     // Basic array access test
     Array arr;

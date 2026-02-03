@@ -37,7 +37,7 @@ TEST(array_slice, negative_offset_2) {
     // length = 5 - 2 + (-10) = -7
     // Line 60 check: if (length <= 0) { return {}; }
     auto result2 = arr.slice(2, -10);  // offset=2, length=-10
-    ASSERT_EQ(result2.count(), 0);  // Should return empty array
+    ASSERT_EQ(result2.count(), 0);     // Should return empty array
 
     // Test case 3: Negative length but still positive result
     // offset = 0, length = -3, num_in = 5
@@ -63,7 +63,7 @@ TEST(array_slice, combined_negative_offset_and_length_branches) {
 
     // Test boundary case: Very large negative values
     auto result2 = arr.slice(-100, -100);  // Extreme negative values
-    ASSERT_EQ(result2.count(), 0);  // Should return empty array
+    ASSERT_EQ(result2.count(), 0);         // Should return empty array
 }
 
 // Test preserve_keys parameter effect on branch logic

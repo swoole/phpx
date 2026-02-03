@@ -499,6 +499,9 @@ bool empty(const Variant &v, const std::initializer_list<std::pair<Operation, co
 
 bool exists(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list) {
     Variant tmp = v;
+    if (tmp.isNull() or tmp.isUndef()) {
+        return false;
+    }
 
     for (const auto &expr : list) {
         if (expr.first == ArrayDimFetch) {
@@ -527,6 +530,7 @@ bool exists(const Variant &v, const std::initializer_list<std::pair<Operation, c
             abort();
         }
     }
+
     return true;
 }
 
