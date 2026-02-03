@@ -279,6 +279,38 @@ void ArrayIterator::skipUndefBucket() {
     }
 }
 
+ArrayItem::ArrayItem(Array &_array, zend_ulong _index, const String &_key) : array_(_array), index_(_index) {
+    zval *value_;
+    key_ = _key;
+    zend_array *ht = array_.unwrap_array();
+
+    if (key_.str() != zend_empty_string) {
+        value_ = zend_symtable_find(ht, key_.str());
+    } else {
+        value_ = zend_hash_index_find(ht, index_);
+    }
+    if (value_) {
+        val = *value_;
+        addRef();
+    } else {
+        ZVAL_NULL(&val);
+    }
+}
+
+ArrayItem &ArrayItem::operator=(const Variant &v) {
+    const auto zv = NO_CONST_V(v);
+    Z_TRY_ADDREF_P(zv);
+    zend_array *ht = array_.unwrap_array();
+
+    if (key_.str() != zend_empty_string) {
+        zend_symtable_update(ht, key_.str(), zv);
+    } else {
+        zend_hash_index_update(ht, index_, zv);
+    }
+
+    return *this;
+}
+
 Array toArray(const Variant &v) {
     zval result;
     zval *expr = NO_CONST_V(v);
