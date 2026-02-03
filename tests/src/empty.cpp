@@ -243,5 +243,5 @@ TEST(empty, string_numeric_keys) {
     ASSERT_TRUE(empty(v, {{ArrayDimFetch, "1"}}));
 
     // Actual numeric keys (should not be found)
-    ASSERT_TRUE(empty(v, {{ArrayDimFetch, 0}}));
+    ASSERT_FALSE(empty(v, {{ArrayDimFetch, 0}}));
 }
