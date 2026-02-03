@@ -108,7 +108,7 @@ Reference Object::attrRef(const String &prop_name) {
 Variant Object::attr(const Variant &name, bool update) const {
     auto prop_name = name.toString();
     zval rv;
-    auto member_p = zend_read_property_ex(ce(), object(), prop_name.str(), update, &rv);
+    auto member_p = zend_read_property_ex(ce(), object(), prop_name.str(), true, &rv);
 
     if (ZVAL_IS_NULL(member_p) && update) {
         zval tmp;

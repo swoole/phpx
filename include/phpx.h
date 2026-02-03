@@ -450,6 +450,11 @@ class Variant {
     bool isIndirect() const {
         return Z_TYPE_P(const_ptr()) == IS_INDIRECT;
     }
+
+    bool isScalar() {
+    	return isBool() || isInt() || isFloat() || isString();
+    }
+
     bool isNumeric() const;
     bool empty() const {
         return toBool() == false;
@@ -509,9 +514,18 @@ class Variant {
     Variant operator*() const {
         return getRefValue();
     }
+
     void moveTo(zval *dest) {
         ZVAL_COPY_VALUE(dest, &val);
         val = {};
+    }
+
+    void redirect(const Variant &v) {
+    	if (v.isIndirect()) {
+    		redirect(zv());
+    	} else {
+    	    throwError("Cannot redirect to a non-indirect value.");
+    	}
     }
 
     Variant offsetGet(zend_long offset) const;
@@ -1019,7 +1033,7 @@ class Object : public Variant {
     Object(const zval *v, Ctor method = Ctor::Copy) : Variant(v, method) {
         checkObject();
     }
-    Object(const Variant &v) : Object(v.unwrap_ptr()) {}
+    Object(const Variant &v, Ctor method = Ctor::Copy) : Object(v.unwrap_ptr(), method) {}
     Object() = default;
     Variant call(const Variant &func, Args &args) {
         return call_impl(ptr(), func.const_ptr(), args);
