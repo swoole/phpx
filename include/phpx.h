@@ -373,6 +373,18 @@ class Variant {
         ZVAL_NULL(unwrap_ptr());
         return *this;
     }
+    Variant operator[](zend_ulong i) {
+        return item(i, true);
+    }
+    Variant operator[](const Variant &key) {
+        return item(key, true);
+    }
+    Variant operator[](zend_ulong i) const {
+        return offsetGet(i);
+    }
+    Variant operator[](const Variant &key) const {
+        return offsetGet(key);
+    }
     void unset();
     zval *ptr() noexcept {
         return &val;
@@ -873,17 +885,6 @@ class ArrayIterator {
     void skipUndefBucket();
 };
 
-class ArrayItem : public Variant {
-  private:
-    Array &array_;
-    zend_ulong index_;
-    String key_;
-
-  public:
-    ArrayItem(Array &_array, zend_ulong _index, const String &_key);
-    ArrayItem &operator=(const Variant &v);
-};
-
 class Array : public Variant {
     void copyFrom(const ArgList &list);
     void copyFrom(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
@@ -924,15 +925,6 @@ class Array : public Variant {
     }
     Variant get(zend_ulong i) const {
         return zend_hash_index_find(Z_ARRVAL_P(const_ptr()), i);
-    }
-    ArrayItem operator[](zend_ulong i) {
-        return {*this, i, String{}};
-    }
-    ArrayItem operator[](int i) {
-        return {*this, (zend_ulong) i, String{}};
-    }
-    ArrayItem operator[](const String &key) {
-        return {*this, 0, key};
     }
     bool del(zend_ulong index);
     bool del(const Variant &key);

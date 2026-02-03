@@ -360,7 +360,7 @@ TEST(array, indirect_handling_in_sort) {
 
     // Validate that the array was sorted properly despite potential INDIRECT values
     ASSERT_EQ(arr.count(), 4);
-    ASSERT_EQ(arr[0].toInt(), 5);   // Smallest value first
+    ASSERT_EQ(arr[0].toInt(), 5);  // Smallest value first
     ASSERT_EQ(arr[1].toInt(), 10);
     ASSERT_EQ(arr[2].toInt(), 20);
     ASSERT_EQ(arr[3].toInt(), 30);  // Largest value last
