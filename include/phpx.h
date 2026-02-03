@@ -451,7 +451,7 @@ class Variant {
         return Z_TYPE_P(const_ptr()) == IS_INDIRECT;
     }
 
-    bool isScalar() {
+    bool isScalar() const {
     	return isBool() || isInt() || isFloat() || isString();
     }
 

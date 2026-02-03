@@ -102,6 +102,45 @@ TEST(variant, toStdString) {
     ASSERT_STREQ(s1.c_str(), s2.toStdString().c_str());
 }
 
+TEST(variant, isScalar) {
+    Variant bool_true(true);
+    Variant bool_false(false);
+    ASSERT_TRUE(bool_true.isScalar());
+    ASSERT_TRUE(bool_false.isScalar());
+    
+    Variant int_val(42);
+    Variant long_val(123456789L);
+    ASSERT_TRUE(int_val.isScalar());
+    ASSERT_TRUE(long_val.isScalar());
+    
+    Variant float_val(3.14f);
+    Variant double_val(2.71828);
+    ASSERT_TRUE(float_val.isScalar());
+    ASSERT_TRUE(double_val.isScalar());
+    
+    Variant string_val("hello");
+    Variant empty_string("");
+    ASSERT_TRUE(string_val.isScalar());
+    ASSERT_TRUE(empty_string.isScalar());
+    
+    Variant null_val;
+    Variant array_val = create_map();
+    Variant object_val = newObject("stdClass");
+    
+    ASSERT_FALSE(null_val.isScalar());
+    ASSERT_FALSE(array_val.isScalar());
+    ASSERT_FALSE(object_val.isScalar());
+    
+    Variant ref_val = int_val.toReference();
+    ASSERT_TRUE(ref_val.isScalar());
+    
+    Variant array_ref = array_val.toReference();
+    ASSERT_FALSE(array_ref.isScalar());
+    
+    auto fp = php::fopen("/tmp/test.txt", "w+");
+    ASSERT_FALSE(fp.isScalar());
+}
+
 TEST(variant, toString) {
     Variant s("hello world");
     auto s2 = s.toString();
