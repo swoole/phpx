@@ -536,7 +536,7 @@ Variant getStaticProperty(const String &class_name, const String &prop) {
         throwError("class '%s' is undefined.", class_name.toCString());
         return {};
     }
-    return {zend_read_static_property_ex(ce, prop.str(), true), Ctor::Move};
+    return {zend_read_static_property_ex(ce, prop.str(), true), Ctor::Indirect};
 }
 
 Variant getStaticProperty(zend_class_entry *ce, uint32_t offset) {
