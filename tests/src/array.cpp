@@ -424,12 +424,14 @@ TEST(array, array_data_compare) {
     ASSERT_EQ(array_data_compare(&b1, &b2), -1);
 }
 
+#if PHP_VERSION_ID >= 80200
 void dump_buckets(zend_array *ht) {
     for (int i = 0; i < ht->nNumOfElements; i++) {
         zend_array *ht2 = ht->arPacked[i].value.arr;
         ::printf("i=%d, p=%p, arr=%p, rc=%d\n", i, &ht->arPacked[i], ht2, ht2->gc.refcount);
     }
 }
+#endif
 
 TEST(array, matrix) {
     auto row = 2;
