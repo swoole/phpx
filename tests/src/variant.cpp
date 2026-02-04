@@ -1046,11 +1046,13 @@ TEST(variant, item5) {
 }
 
 TEST(variant, item6) {
-    try_call(
-        []() {
-            var s("hello world");
-            s.item(5, true) = "x";
-            s.print();
-        },
-        "Modification of strings via the `$str[$offset] = $char` operator is not supported");
+    var s1("hello world");
+    s1.item(5, true) = "_";
+    ASSERT_STREQ(s1.toCString(), "hello_world");
+
+    var s2 = s1;
+    s2.item(5, true) = "@";
+
+    ASSERT_STREQ(s1.toCString(), "hello_world");
+    ASSERT_STREQ(s2.toCString(), "hello@world");
 }

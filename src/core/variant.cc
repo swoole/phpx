@@ -28,8 +28,22 @@ Variant null = {};
 Int zero = 0L;
 
 void Variant::copyFrom(const zval *src) {
-    zval_ptr_dtor(direct_ptr());
-    ZVAL_COPY(direct_ptr(), src);
+    zval *zv = direct_ptr();
+    if (isIndirect() && isString() && isStrOffsetSet(zv) && Z_TYPE_P(src) == IS_STRING) {
+        strOffsetSet(zv, Z_STRVAL_P(src)[0]);
+    } else {
+        zval_ptr_dtor(zv);
+        ZVAL_COPY(zv, src);
+    }
+}
+
+void Variant::strOffsetSet(zval *zv, char c) {
+	auto str = Z_STR_P(zv);
+	zend_long offset = str->h;
+    SEPARATE_STRING(zv);
+    Z_STRVAL_P(zv)[offset] = c;
+    zend_string_forget_hash_val(Z_STR_P(zv));
+    GC_DEL_FLAGS(str, IS_STR_PERMANENT);
 }
 
 Variant &Variant::operator=(const zval *v) {
@@ -664,11 +678,14 @@ Variant Variant::item(zend_long offset, bool update) {
         }
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
         if (update) {
-            throwError("Modification of strings via the `$str[$offset] = $char` operator is not supported");
-            return Variant{undef()};
+            auto str = Z_STR_P(zvar);
+            str->h = offset;
+            GC_ADD_FLAGS(str, IS_STR_PERMANENT);
+            retval = zvar;
+        } else {
+            String tmp(zvar, Ctor::Indirect);
+            return tmp.offsetGet(offset);
         }
-        String tmp(zvar, Ctor::Indirect);
-        return tmp.offsetGet(offset);
     } else {
         if (update) {
             array_init(zvar);

@@ -206,6 +206,10 @@ class Variant {
     void delRef() {
         Z_TRY_DELREF_P(&val);
     }
+    static void strOffsetSet(zval *zv, char c);
+    static bool isStrOffsetSet(zval *zv) {
+        return GC_FLAGS(Z_STR_P(zv)) & IS_STR_PERMANENT;
+    }
 
   public:
     Variant() noexcept {
@@ -353,13 +357,21 @@ class Variant {
         return *this;
     }
     Variant &operator=(const std::string &str) {
-        destroy();
-        ZVAL_STRINGL(unwrap_ptr(), str.c_str(), str.length());
+        if (isIndirect() && isString() && isStrOffsetSet(zv())) {
+            strOffsetSet(zv(), str.c_str()[0]);
+        } else {
+            destroy();
+            ZVAL_STRINGL(unwrap_ptr(), str.c_str(), str.length());
+        }
         return *this;
     }
     Variant &operator=(const char *str) {
-        destroy();
-        ZVAL_STRING(unwrap_ptr(), str);
+        if (isIndirect() && isString() && isStrOffsetSet(zv())) {
+            strOffsetSet(zv(), str[0]);
+        } else {
+            destroy();
+            ZVAL_STRING(unwrap_ptr(), str);
+        }
         return *this;
     }
     Variant &operator=(double v) {
