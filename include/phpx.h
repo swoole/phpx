@@ -105,9 +105,12 @@ PHPX_API void throwException(const Object &e);
 PHPX_API bool empty(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list);
 PHPX_API bool exists(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list);
 
+void setDebugInfo();
+
 #define throwError(format, ...)                                                                                        \
     do {                                                                                                               \
         zend_throw_error(NULL, format, ##__VA_ARGS__);                                                                 \
+        setDebugInfo();                                                                                                \
         if (throw_impl) {                                                                                              \
             throw_impl(EG(exception));                                                                                 \
         }                                                                                                              \
@@ -116,6 +119,7 @@ PHPX_API bool exists(const Variant &v, const std::initializer_list<std::pair<Ope
 #define throwErrorIfOccurred()                                                                                         \
     do {                                                                                                               \
         if (UNEXPECTED(EG(exception) != nullptr && throw_impl != nullptr)) {                                           \
+            setDebugInfo();                                                                                            \
             throw_impl(EG(exception));                                                                                 \
         }                                                                                                              \
     } while (0)
@@ -154,6 +158,15 @@ int array_data_compare(Bucket *f, Bucket *s);
 extern std::function<void(zend_object *)> throw_impl;
 extern int box_res_id;
 extern const char *box_res_name;
+
+struct DebugInfo {
+    bool enable;
+    const char *php_file;
+    int php_line;
+    int cpp_line;
+};
+
+extern DebugInfo debug_info;
 
 static inline const zval *unwrap_zval(const zval *val) {
     switch (Z_TYPE_P(val)) {

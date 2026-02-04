@@ -85,6 +85,7 @@ int main(int argc, char **argv) {
         php::eval("main();");
     } catch (zend_object *e) {
         gtest_exit_status = EG(exit_status);
+        CG(unclean_shutdown) = 1;
         zend_exception_error(e, E_ERROR);
     }
 

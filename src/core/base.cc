@@ -19,6 +19,12 @@
 namespace php {
 const char *box_res_name = "php::box";
 int box_res_id;
+DebugInfo debug_info{
+    false,
+    "",
+    0,
+    0,
+};
 
 static zend_array *func_cache_map = nullptr;
 std::function<void(zend_object *)> throw_impl;
@@ -99,6 +105,24 @@ void initGlobal(const String &name, Variant &var) {
 
 void unsetGlobal(const String &name) {
     zend_hash_del(&EG(symbol_table), name.str());
+}
+
+void setDebugInfo() {
+    if (debug_info.enable && EG(exception)) {
+        zval tmp;
+        ZVAL_STRING(&tmp, debug_info.php_file);
+
+        auto prev_scope = EG(fake_scope);
+        EG(fake_scope) = EG(exception)->ce;
+
+        zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_FILE), &tmp);
+        zval_ptr_dtor(&tmp);
+
+        ZVAL_LONG(&tmp, debug_info.php_line);
+        zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_LINE), &tmp);
+
+        EG(fake_scope) = prev_scope;
+    }
 }
 
 Variant constant(const String &name) {

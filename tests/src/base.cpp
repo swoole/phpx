@@ -351,3 +351,20 @@ TEST(base, hasStaticProperty) {
     ASSERT_FALSE(hasStaticProperty("DateTime", "ATOM"));
     ASSERT_FALSE(hasStaticProperty("DateTime", "NONEXISTENT_CONSTANT"));
 }
+
+TEST(base, debugInfo) {
+    debug_info.enable = true;
+    debug_info.php_file = "test.php";
+    debug_info.php_line = 999;
+
+    try {
+        throwError("phpx error");
+    } catch (zend_object *ex) {
+        auto e = php::catchException();
+        auto f = e.exec("getFile");
+        auto l = e.exec("getLine");
+
+        ASSERT_STREQ(f.toCString(), "test.php");
+        ASSERT_EQ(l.toInt(), 999);
+    }
+}
