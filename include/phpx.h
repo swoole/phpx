@@ -1073,15 +1073,15 @@ class Object : public Variant {
         ZVAL_LONG(&tmp, offset);
         return object()->handlers->has_dimension(object(), &tmp, 0);
     }
-    Variant offsetGet(const Variant &offset) {
+    Variant offsetGet(const Variant &offset, int type = BP_VAR_R) {
         zval rv;
-        return Variant{object()->handlers->read_dimension(object(), NO_CONST_V(offset), BP_VAR_R, &rv)};
+        return Variant{object()->handlers->read_dimension(object(), NO_CONST_V(offset), type, &rv)};
     }
-    Variant offsetGet(zend_long offset) {
+    Variant offsetGet(zend_long offset, int type = BP_VAR_R) {
         zval tmp;
         ZVAL_LONG(&tmp, offset);
         zval rv;
-        return Variant{object()->handlers->read_dimension(object(), &tmp, BP_VAR_R, &rv)};
+        return Variant{object()->handlers->read_dimension(object(), &tmp, type, &rv)};
     }
     void offsetSet(const Variant &offset, const Variant &value) {
         object()->handlers->write_dimension(object(), NO_CONST_V(offset), NO_CONST_V(value));

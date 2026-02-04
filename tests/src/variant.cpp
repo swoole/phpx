@@ -1044,3 +1044,9 @@ TEST(variant, item5) {
         },
         "Only array/object support the newItem() method");
 }
+
+TEST(variant, item6) {
+    var s("hello world");
+    s.item(5, true) = "x";
+    s.print();
+}

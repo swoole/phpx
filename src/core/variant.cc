@@ -655,15 +655,11 @@ Variant Variant::item(zend_long offset, bool update) {
             }
         }
     } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
-        auto obj = object();
-        zval dim;
-        ZVAL_LONG(&dim, offset);
-        retval = obj->handlers->read_dimension(obj, &dim, BP_VAR_RW, &rv);
-        if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
-            return Variant{retval};
-        }
+        Object tmp(zvar, Ctor::Indirect);
+        return tmp.offsetGet(offset, update ? BP_VAR_RW : BP_VAR_R);
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
-        return offsetGet(offset);
+        String tmp(zvar, Ctor::Indirect);
+        return tmp.offsetGet(offset);
     } else {
         if (update) {
             array_init(zvar);
