@@ -1046,7 +1046,11 @@ TEST(variant, item5) {
 }
 
 TEST(variant, item6) {
-    var s("hello world");
-    s.item(5, true) = "x";
-    s.print();
+    try_call(
+        []() {
+            var s("hello world");
+            s.item(5, true) = "x";
+            s.print();
+        },
+        "Modification of strings via the `$str[$offset] = $char` operator is not supported");
 }
