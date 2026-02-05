@@ -38,8 +38,8 @@ void Variant::copyFrom(const zval *src) {
 }
 
 void Variant::strOffsetSet(zval *zv, char c) {
-	auto str = Z_STR_P(zv);
-	zend_long offset = str->h;
+    auto str = Z_STR_P(zv);
+    zend_long offset = str->h;
     SEPARATE_STRING(zv);
     Z_STRVAL_P(zv)[offset] = c;
     zend_string_forget_hash_val(Z_STR_P(zv));
@@ -679,6 +679,10 @@ Variant Variant::item(zend_long offset, bool update) {
     } else if (Z_TYPE_P(zvar) == IS_STRING) {
         if (update) {
             auto str = Z_STR_P(zvar);
+            if (offset >= str->len) {
+                throwError("String offset[%ld] out of range", offset);
+                return {};
+            }
             str->h = offset;
             GC_ADD_FLAGS(str, IS_STR_PERMANENT);
             retval = zvar;
