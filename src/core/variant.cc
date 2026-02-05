@@ -44,7 +44,7 @@ void Variant::strOffsetSet(zval *zv, char c) {
     SEPARATE_STRING(zv);
     Z_STRVAL_P(zv)[offset] = c;
     zend_string_forget_hash_val(Z_STR_P(zv));
-    GC_DEL_FLAGS(str, IS_STR_PERMANENT);
+    GC_DEL_FLAGS(str, IS_STR_OFFSET_SET);
 }
 
 Variant &Variant::operator=(const zval *v) {
@@ -685,7 +685,7 @@ Variant Variant::item(zend_long offset, bool update) {
                 return {};
             }
             str->h = offset;
-            GC_ADD_FLAGS(str, IS_STR_PERMANENT);
+            GC_ADD_FLAGS(str, IS_STR_OFFSET_SET);
             retval = zvar;
         } else {
             String tmp(zvar, Ctor::Indirect);

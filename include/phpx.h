@@ -51,6 +51,8 @@ extern "C" {
 #define PHPX_API PHPAPI
 #define PHPX_UNSAFE
 
+#define IS_STR_OFFSET_SET IS_STR_CLASS_NAME_MAP_PTR
+
 /**
  * !!! Unsafe conversion, discarding const modifier. There are many errors in the php src source code.
  * Many function parameters are read-only zvals, and the const modifier should be added.
@@ -228,7 +230,7 @@ class Variant {
     }
     static void strOffsetSet(zval *zv, char c);
     static bool isStrOffsetSet(zval *zv) {
-        return GC_FLAGS(Z_STR_P(zv)) & IS_STR_PERMANENT;
+        return GC_FLAGS(Z_STR_P(zv)) & IS_STR_OFFSET_SET;
     }
 
   public:
