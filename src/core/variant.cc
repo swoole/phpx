@@ -29,8 +29,8 @@ Object null_object;
 Int zero = 0L;
 
 void Variant::copyFrom(const zval *src) {
-    zval *zv = direct_ptr();
-    if (isIndirect() && isString() && isStrOffsetSet(zv) && Z_TYPE_P(src) == IS_STRING) {
+    zval *zv = unwrap_ptr();
+    if (zval_is_string(zv) && isStrOffsetSet(zv) && zval_is_string(src)) {
         strOffsetSet(zv, Z_STRVAL_P(src)[0]);
     } else {
         zval_ptr_dtor(zv);
@@ -92,11 +92,11 @@ Object Variant::toObject() const {
 
 size_t Variant::length() const {
     auto zv = unwrap_ptr();
-    if (Z_TYPE_P(zv) == IS_STRING) {
+    if (zval_is_string(zv)) {
         return Z_STRLEN_P(zv);
-    } else if (Z_TYPE_P(zv) == IS_ARRAY) {
+    } else if (zval_is_array(zv)) {
         return zend_hash_num_elements(Z_ARRVAL_P(zv));
-    } else if (Z_TYPE_P(zv) == IS_OBJECT) {
+    } else if (zval_is_object(zv)) {
         Object tmp(zv, Ctor::Indirect);
         return tmp.count();
     } else {
@@ -193,12 +193,12 @@ Variant Variant::getRefValue() const {
 Variant Variant::offsetGet(zend_long offset) const {
     auto zvar = unwrap_ptr();
 
-    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+    if (zval_is_array(zvar)) {
         return zend_hash_index_find(Z_ARRVAL_P(zvar), offset);
-    } else if (Z_TYPE_P(zvar) == IS_STRING) {
+    } else if (zval_is_string(zvar)) {
         String tmp(zvar, Ctor::Indirect);
         return tmp.offsetGet(offset);
-    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+    } else if (zval_is_object(zvar)) {
         Object tmp(zvar);
         return tmp.offsetGet(offset);
     } else {
@@ -212,14 +212,14 @@ Variant Variant::offsetGet(const Variant &key) const {
     }
 
     auto zvar = unwrap_ptr();
-    if (Z_TYPE_P(zvar) == IS_STRING) {
+    if (zval_is_string(zvar)) {
         String tmp(zvar, Ctor::Indirect);
         return tmp.offsetGet(key.toInt());
-    } else if (Z_TYPE_P(zvar) == IS_ARRAY) {
+    } else if (zval_is_array(zvar)) {
         auto skey = key.toString();
         Array tmp(zvar);
         return tmp.get(skey);
-    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+    } else if (zval_is_object(zvar)) {
         Object tmp(zvar);
         return tmp.offsetGet(key);
     } else {
@@ -230,12 +230,12 @@ Variant Variant::offsetGet(const Variant &key) const {
 bool Variant::offsetExists(zend_long offset) const {
     auto zvar = unwrap_ptr();
 
-    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+    if (zval_is_array(zvar)) {
         return zend_hash_index_exists(Z_ARRVAL_P(zvar), offset);
-    } else if (Z_TYPE_P(zvar) == IS_STRING) {
+    } else if (zval_is_string(zvar)) {
         String tmp(zvar, Ctor::Indirect);
         return tmp.offset(offset) != -1;
-    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+    } else if (zval_is_object(zvar)) {
         Object tmp(zvar);
         return tmp.offsetExists(offset);
     } else {
@@ -249,13 +249,13 @@ bool Variant::offsetExists(const Variant &key) const {
     }
 
     auto zvar = unwrap_ptr();
-    if (Z_TYPE_P(zvar) == IS_STRING) {
+    if (zval_is_string(zvar)) {
         String tmp(zvar, Ctor::Indirect);
         return tmp.offset(key.toInt()) != -1;
-    } else if (Z_TYPE_P(zvar) == IS_ARRAY) {
+    } else if (zval_is_array(zvar)) {
         auto skey = key.toString();
         return zend_hash_exists(Z_ARRVAL_P(zvar), skey.str());
-    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+    } else if (zval_is_object(zvar)) {
         Object tmp(zvar);
         return tmp.offsetExists(key);
     } else {
@@ -270,13 +270,13 @@ void Variant::offsetSet(zend_long offset, const Variant &value) {
         array_init(zvar);
     }
 
-    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+    if (zval_is_array(zvar)) {
         Array tmp(zvar, Ctor::Indirect);
         tmp.set(offset, value);
-    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+    } else if (zval_is_object(zvar)) {
         Object tmp(zvar);
         tmp.offsetSet(offset, NO_CONST_V(value));
-    } else if (Z_TYPE_P(zvar) == IS_STRING) {
+    } else if (zval_is_string(zvar)) {
         String tmp(zvar, Ctor::Indirect);
         tmp.offsetSet(offset, value);
     }
@@ -289,13 +289,13 @@ void Variant::offsetSet(const Variant &key, const Variant &value) {
         array_init(zvar);
     }
 
-    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+    if (zval_is_array(zvar)) {
         Array tmp(zvar, Ctor::Indirect);
         tmp.set(key, value);
-    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+    } else if (zval_is_object(zvar)) {
         Object tmp(zvar);
         tmp.offsetSet(key, value);
-    } else if (Z_TYPE_P(zvar) == IS_STRING) {
+    } else if (zval_is_string(zvar)) {
         if (key.isNull()) {
             throwError("[] operator not supported for strings");
         }
@@ -307,10 +307,10 @@ void Variant::offsetSet(const Variant &key, const Variant &value) {
 void Variant::offsetUnset(zend_long offset) {
     auto zvar = unwrap_ptr();
 
-    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+    if (zval_is_array(zvar)) {
         Array tmp(zvar, Ctor::Indirect);
         tmp.del(offset);
-    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+    } else if (zval_is_object(zvar)) {
         Object tmp(zvar);
         tmp.offsetUnset(offset);
     } else {
@@ -321,10 +321,10 @@ void Variant::offsetUnset(zend_long offset) {
 void Variant::offsetUnset(const Variant &key) {
     auto zvar = unwrap_ptr();
 
-    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+    if (zval_is_array(zvar)) {
         Array tmp(zvar, Ctor::Indirect);
         tmp.del(key);
-    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+    } else if (zval_is_object(zvar)) {
         Object tmp(zvar);
         tmp.offsetUnset(key);
     } else {
@@ -657,7 +657,7 @@ Variant Variant::item(zend_long offset, bool update) {
     zval *retval;
     zval rv;
 
-    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+    if (zval_is_array(zvar)) {
         if (update) {
             SEPARATE_ARRAY(zvar);
         }
@@ -669,7 +669,7 @@ Variant Variant::item(zend_long offset, bool update) {
                 return Variant{undef()};
             }
         }
-    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+    } else if (zval_is_object(zvar)) {
         auto obj = object();
         zval dim;
         ZVAL_LONG(&dim, offset);
@@ -677,7 +677,7 @@ Variant Variant::item(zend_long offset, bool update) {
         if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
             return Variant{retval};
         }
-    } else if (Z_TYPE_P(zvar) == IS_STRING) {
+    } else if (zval_is_string(zvar)) {
         if (update) {
             auto str = Z_STR_P(zvar);
             if (offset >= str->len) {
@@ -709,11 +709,11 @@ Variant Variant::item(const Variant &key, bool update) {
     zval *retval;
     zval rv;
 
-    if (key.isInt() || key.isFloat() || key.isNumeric() || Z_TYPE_P(zvar) == IS_STRING) {
+    if (key.isInt() || key.isFloat() || key.isNumeric() || zval_is_array(zvar)) {
         return item(key.toInt(), update);
     }
 
-    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+    if (zval_is_array(zvar)) {
         auto skey = key.toString();
         if (update) {
             SEPARATE_ARRAY(zvar);
@@ -726,7 +726,7 @@ Variant Variant::item(const Variant &key, bool update) {
                 return Variant{undef()};
             }
         }
-    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+    } else if (zval_is_object(zvar)) {
         auto obj = object();
         auto dim = NO_CONST_V(key);
         retval = obj->handlers->read_dimension(obj, dim, BP_VAR_RW, &rv);
@@ -748,9 +748,9 @@ Variant Variant::item(const Variant &key, bool update) {
 }
 
 Reference Variant::itemRef(zend_long offset) {
-    auto val = item(offset);
-    if (val.isIndirect()) {
-        return val.toReference();
+    auto v = item(offset);
+    if (v.isIndirect()) {
+        return v.toReference();
     } else {
         return {};
     }
@@ -770,14 +770,14 @@ Variant Variant::newItem() {
     zval *retval;
     zval rv;
 
-    if (Z_TYPE_P(zvar) == IS_UNDEF || Z_TYPE_P(zvar) == IS_NULL) {
+    if (zval_is_undef(zvar) || zval_is_null(zvar)) {
         array_init(zvar);
     }
 
-    if (Z_TYPE_P(zvar) == IS_ARRAY) {
+    if (zval_is_array(zvar)) {
         SEPARATE_ARRAY(zvar);
         retval = zend_hash_next_index_insert(Z_ARRVAL_P(zvar), undef());
-    } else if (Z_TYPE_P(zvar) == IS_OBJECT) {
+    } else if (zval_is_object(zvar)) {
         auto obj = object();
         zval key;
         ZVAL_LONG(&key, length());
@@ -786,7 +786,7 @@ Variant Variant::newItem() {
         if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
             return Variant{retval};
         }
-    } else if (Z_TYPE_P(zvar) == IS_STRING) {
+    } else if (zval_is_string(zvar)) {
         throwError("[] operator not supported for strings");
         return Variant{};
     } else {

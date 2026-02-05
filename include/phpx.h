@@ -187,6 +187,26 @@ static inline zval *undef() {
     return &EG(uninitialized_zval);
 }
 
+static inline bool zval_is_string(const zval *v) {
+    return Z_TYPE_P(v) == IS_STRING;
+}
+
+static inline bool zval_is_array(const zval *v) {
+    return Z_TYPE_P(v) == IS_ARRAY;
+}
+
+static inline bool zval_is_object(const zval *v) {
+    return Z_TYPE_P(v) == IS_OBJECT;
+}
+
+static inline bool zval_is_undef(const zval *v) {
+    return Z_TYPE_P(v) == IS_UNDEF;
+}
+
+static inline bool zval_is_null(const zval *v) {
+    return Z_TYPE_P(v) == IS_NULL;
+}
+
 enum class Ctor {
     Copy,
     CopyRef,

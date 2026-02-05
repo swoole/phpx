@@ -81,35 +81,20 @@ Reference Object::attrRef(const String &prop_name) {
         return {};
     }
 
-    auto zobj = object();
-    zval rv;
-    zval *member_p = zobj->handlers->get_property_ptr_ptr(zobj, prop_name.str(), BP_VAR_RW, NULL);
-
-    if (!member_p) {
-        member_p = zobj->handlers->read_property(zobj, prop_name.str(), BP_VAR_RW, NULL, &rv);
-        if (!member_p) {
-            return {};
-        }
+    auto member = attr(prop_name);
+    if (!member.isIndirect()) {
+        return {};
     }
 
-    if (Z_TYPE_P(member_p) == IS_REFERENCE) {
-        return Reference(member_p);
+    if (Z_TYPE_P(member.zv()) == IS_REFERENCE) {
+        return Reference(member.zv());
     }
 
-    auto ref = newReference();
+    auto ref = member.toReference();
     auto prop_info = zend_get_property_info(ce(), prop_name.str(), 1);
     if (prop_info) {
         ZEND_REF_ADD_TYPE_SOURCE(ref.reference(), prop_info);
     }
-
-    if (member_p != &rv) {
-        ZVAL_COPY(Z_REFVAL_P(ref.ptr()), member_p);
-    } else {
-        ZVAL_COPY_VALUE(Z_REFVAL_P(ref.ptr()), member_p);
-    }
-
-    ZVAL_REF(member_p, ref.reference());
-    Z_TRY_ADDREF_P(ref.ptr());
 
     return ref;
 }
