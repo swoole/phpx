@@ -321,9 +321,10 @@ class Variant {
             val = *v->ptr();
             addRef();
         } else {
-            ZVAL_NEW_REF(&val, v->const_ptr());
-            *v->ptr() = val;
-            v->addRef();
+            auto zv = v->unwrap_ptr();
+            ZVAL_NEW_REF(&val, zv);
+            *zv = val;
+            Z_TRY_ADDREF_P(zv);
         }
     }
     Variant(Box *v) {
@@ -587,6 +588,8 @@ class Variant {
      */
     Variant item(zend_long offset, bool update = false);
     Variant item(const Variant &key, bool update = false);
+    Reference itemRef(zend_long offset);
+    Reference itemRef(const Variant &key);
     Variant newItem();
 
     bool operator==(const Variant &v) const {
@@ -713,6 +716,7 @@ class Variant {
 };
 
 extern Variant null;
+extern Object null_object;
 extern Int zero;
 
 template <typename T>

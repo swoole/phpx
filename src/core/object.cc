@@ -36,6 +36,10 @@ zend_long Object::count() {
 }
 
 Variant Object::exec(const Variant &fn, const ArgList &args) {
+    if (UNEXPECTED(isNull())) {
+        throwError("read property `%s` on null", fn.toCString());
+        return {};
+    }
     Args _args(args);
     return call_impl(unwrap_ptr(), fn.const_ptr(), _args);
 }
@@ -72,6 +76,11 @@ Variant Object::callParentMethod(const String &func, const ArgList &args) {
 }
 
 Reference Object::attrRef(const String &prop_name) {
+    if (UNEXPECTED(isNull())) {
+        throwError("read property `%s` on null", prop_name.toCString());
+        return {};
+    }
+
     auto zobj = object();
     zval rv;
     zval *member_p = zobj->handlers->get_property_ptr_ptr(zobj, prop_name.str(), BP_VAR_RW, NULL);
@@ -106,6 +115,11 @@ Reference Object::attrRef(const String &prop_name) {
 }
 
 Variant Object::attr(const Variant &name, bool update) const {
+    if (UNEXPECTED(isNull())) {
+        throwError("read property `%s` on null", name.toCString());
+        return {};
+    }
+
     auto prop_name = name.toString();
     zval rv;
     auto member_p = zend_read_property_ex(ce(), object(), prop_name.str(), true, &rv);

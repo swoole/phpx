@@ -25,6 +25,7 @@ END_EXTERN_C()
 
 namespace php {
 Variant null = {};
+Object null_object;
 Int zero = 0L;
 
 void Variant::copyFrom(const zval *src) {
@@ -744,6 +745,24 @@ Variant Variant::item(const Variant &key, bool update) {
     }
 
     return Variant{retval, Ctor::Indirect};
+}
+
+Reference Variant::itemRef(zend_long offset) {
+    auto val = item(offset);
+    if (val.isIndirect()) {
+        return val.toReference();
+    } else {
+        return {};
+    }
+}
+
+Reference Variant::itemRef(const Variant &key) {
+    auto val = item(key);
+    if (val.isIndirect()) {
+        return val.toReference();
+    } else {
+        return {};
+    }
 }
 
 Variant Variant::newItem() {
