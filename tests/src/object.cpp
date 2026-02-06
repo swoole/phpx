@@ -271,9 +271,11 @@ TEST(object, toObject) {
 
 TEST(object, toObject3) {
     auto arr = create_map();
-	GC_TYPE_INFO(arr.array()) = GC_ARRAY | ((IS_ARRAY_IMMUTABLE|GC_NOT_COLLECTABLE) << GC_FLAGS_SHIFT);
-	auto o = toObject(arr);
-	o.print();
+    GC_SET_REFCOUNT(arr.array(), 2);
+    GC_TYPE_INFO(arr.array()) = GC_ARRAY | ((IS_ARRAY_IMMUTABLE | GC_NOT_COLLECTABLE) << GC_FLAGS_SHIFT);
+    auto o = toObject(arr);
+    ASSERT_EQ(o.attr("php").toInt(), 3);
+    o.unset();
 }
 
 TEST(object, attrRef) {
@@ -310,7 +312,7 @@ TEST(object, attrRef2) {
 }
 
 TEST(object, attrRef3) {
-    include(get_include_dir() + "/library.php");
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
     auto o = newObject("TestClass2");
     auto ref = o.attrRef("propInt2");
     ref = 2026;
