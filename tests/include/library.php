@@ -25,6 +25,7 @@ class TestClass
 class TestClass2 extends TestClass
 {
     public array $propArray = [1, 2, 3, 4, 5];
+    public int $propInt2 = 0;
 
     public function test(): string
     {

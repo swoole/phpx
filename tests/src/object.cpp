@@ -269,6 +269,13 @@ TEST(object, toObject) {
     ASSERT_EQ(o4.getProperty("value").toInt(), 1999);
 }
 
+TEST(object, toObject3) {
+    auto arr = create_map();
+	GC_TYPE_INFO(arr.array()) = GC_ARRAY | ((IS_ARRAY_IMMUTABLE|GC_NOT_COLLECTABLE) << GC_FLAGS_SHIFT);
+	auto o = toObject(arr);
+	o.print();
+}
+
 TEST(object, attrRef) {
     auto o1 = newObject("stdClass");
     o1.set("prop1", 1990);
@@ -300,6 +307,14 @@ TEST(object, attrRef2) {
     ref1 = 2026;
     ASSERT_EQ(o1.get("prop1"), 2026);
     ASSERT_EQ(ref2.toInt(), 2026);
+}
+
+TEST(object, attrRef3) {
+    include(get_include_dir() + "/library.php");
+    auto o = newObject("TestClass2");
+    auto ref = o.attrRef("propInt2");
+    ref = 2026;
+    ASSERT_EQ(o.get("propInt2"), 2026);
 }
 
 TEST(object, attr) {
