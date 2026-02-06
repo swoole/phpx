@@ -1273,3 +1273,234 @@ TEST(variant, itemRef2) {
     ASSERT_EQ(a.item("php").toInt(), 2000);
     ASSERT_EQ(ref2.toInt(), 2000);
 }
+
+TEST(variant, operator_arithmetic) {
+    // Test addition operator
+    {
+        Variant v1(10);
+        Variant result = 5 + v1;
+        ASSERT_TRUE(result.isInt());
+        ASSERT_EQ(result.toInt(), 15);
+        
+        Variant result2 = 3.14 + v1;
+        ASSERT_TRUE(result2.isFloat());
+        ASSERT_NEAR(result2.toFloat(), 13.14, 0.001);
+        
+        Variant v2("20");
+        Variant result3 = 5 + v2;
+        ASSERT_TRUE(result3.isInt());
+        ASSERT_EQ(result3.toInt(), 25);
+    }
+    
+    // Test subtraction operator
+    {
+        Variant v1(10);
+        Variant result = 15 - v1;
+        ASSERT_TRUE(result.isInt());
+        ASSERT_EQ(result.toInt(), 5);
+        
+        Variant result2 = 20.5 - v1;
+        ASSERT_TRUE(result2.isFloat());
+        ASSERT_NEAR(result2.toFloat(), 10.5, 0.001);
+    }
+    
+    // Test multiplication operator
+    {
+        Variant v1(5);
+        Variant result = 3 * v1;
+        ASSERT_TRUE(result.isInt());
+        ASSERT_EQ(result.toInt(), 15);
+        
+        Variant result2 = 2.5 * v1;
+        ASSERT_TRUE(result2.isFloat());
+        ASSERT_NEAR(result2.toFloat(), 12.5, 0.001);
+    }
+    
+    // Test division operator
+    {
+        Variant v1(4);
+        Variant result = 20 / v1;
+        ASSERT_TRUE(result.isInt());
+        ASSERT_EQ(result.toInt(), 5);
+        
+        Variant v2(3);
+        Variant result2 = 10 / v2;
+        ASSERT_TRUE(result2.isFloat());
+        ASSERT_NEAR(result2.toFloat(), 3.333, 0.001);
+    }
+    
+    // Test modulo operator
+    {
+        Variant v1(3);
+        Variant result = 10 % v1;
+        ASSERT_TRUE(result.isInt());
+        ASSERT_EQ(result.toInt(), 1);
+        
+        // Test the specialized Float version
+        Variant result2 = 10.5 % v1;
+        ASSERT_TRUE(result2.isInt());
+        ASSERT_EQ(result2.toInt(), 1);
+    }
+}
+
+TEST(variant, operator_bitwise) {
+    // Test left shift operator
+    {
+        Variant v1(2);
+        Variant result = 4 << v1;
+        ASSERT_TRUE(result.isInt());
+        ASSERT_EQ(result.toInt(), 16); // 4 << 2 = 16
+    }
+    
+    // Test right shift operator
+    {
+        Variant v1(2);
+        Variant result = 16 >> v1;
+        ASSERT_TRUE(result.isInt());
+        ASSERT_EQ(result.toInt(), 4); // 16 >> 2 = 4
+    }
+    
+    // Test bitwise AND operator
+    {
+        Variant v1(12); // 1100 in binary
+        Variant result = 10 & v1;   // 1010 in binary
+        ASSERT_TRUE(result.isInt());
+        ASSERT_EQ(result.toInt(), 8); // 1000 in binary
+    }
+    
+    // Test bitwise OR operator
+    {
+        Variant v1(12); // 1100 in binary
+        Variant result = 10 | v1;   // 1010 in binary
+        ASSERT_TRUE(result.isInt());
+        ASSERT_EQ(result.toInt(), 14); // 1110 in binary
+    }
+    
+    // Test bitwise XOR operator
+    {
+        Variant v1(12); // 1100 in binary
+        Variant result = 10 ^ v1;   // 1010 in binary
+        ASSERT_TRUE(result.isInt());
+        ASSERT_EQ(result.toInt(), 6); // 0110 in binary
+    }
+}
+
+TEST(variant, operator_comparison) {
+    // Test less than or equal operator
+    {
+        Variant v1(10);
+        ASSERT_TRUE((5 <= v1).toBool());
+        ASSERT_TRUE((10 <= v1).toBool());
+        ASSERT_FALSE((15 <= v1).toBool());
+    }
+    
+    // Test less than operator
+    {
+        Variant v1(10);
+        ASSERT_TRUE((5 < v1).toBool());
+        ASSERT_FALSE((10 < v1).toBool());
+        ASSERT_FALSE((15 < v1).toBool());
+    }
+    
+    // Test greater than or equal operator
+    {
+        Variant v1(10);
+        ASSERT_FALSE((5 >= v1).toBool());
+        ASSERT_TRUE((10 >= v1).toBool());
+        ASSERT_TRUE((15 >= v1).toBool());
+    }
+    
+    // Test greater than operator
+    {
+        Variant v1(10);
+        ASSERT_FALSE((5 > v1).toBool());
+        ASSERT_FALSE((10 > v1).toBool());
+        ASSERT_TRUE((15 > v1).toBool());
+    }
+    
+    // Test equality operator
+    {
+        Variant v1(10);
+        ASSERT_FALSE((5 == v1).toBool());
+        ASSERT_TRUE((10 == v1).toBool());
+        ASSERT_FALSE((15 == v1).toBool());
+        
+        // Test with different types
+        Variant v2("10");
+        ASSERT_TRUE((10 == v2).toBool());
+        ASSERT_TRUE(("10" == v2).toBool());
+    }
+}
+
+TEST(variant, operator_mixed_types) {
+    // Test operations with different numeric types
+    {
+        Variant v1(10.5); // Float
+        Variant result = 5 + v1;
+        ASSERT_TRUE(result.isFloat());
+        ASSERT_NEAR(result.toFloat(), 15.5, 0.001);
+        
+        Variant result2 = 20 - v1;
+        ASSERT_TRUE(result2.isFloat());
+        ASSERT_NEAR(result2.toFloat(), 9.5, 0.001);
+    }
+    
+    // Test operations with string numbers
+    {
+        Variant v1("15");
+        Variant result = 5 + v1;
+        ASSERT_TRUE(result.isInt());
+        ASSERT_EQ(result.toInt(), 20);
+        
+        Variant result2 = 25 - v1;
+        ASSERT_TRUE(result2.isInt());
+        ASSERT_EQ(result2.toInt(), 10);
+    }
+    
+    // Test boolean operations
+    {
+        Variant v1(true);
+        Variant result = 1 + v1; // true converts to 1
+        ASSERT_TRUE(result.isInt());
+        ASSERT_EQ(result.toInt(), 2);
+        
+        Variant v2(false);
+        Variant result2 = 5 + v2; // false converts to 0
+        ASSERT_TRUE(result2.isInt());
+        ASSERT_EQ(result2.toInt(), 5);
+    }
+}
+
+TEST(variant, operator_edge_cases) {
+    // Test with zero values
+    {
+        Variant v1(0);
+        Variant result = 10 + v1;
+        ASSERT_TRUE(result.isInt());
+        ASSERT_EQ(result.toInt(), 10);
+        
+        Variant result2 = 10 * v1;
+        ASSERT_TRUE(result2.isInt());
+        ASSERT_EQ(result2.toInt(), 0);
+    }
+    
+    // Test with negative values
+    {
+        Variant v1(-5);
+        Variant result = 10 + v1;
+        ASSERT_TRUE(result.isInt());
+        ASSERT_EQ(result.toInt(), 5);
+        
+        Variant result2 = 10 - v1;
+        ASSERT_TRUE(result2.isInt());
+        ASSERT_EQ(result2.toInt(), 15);
+    }
+    
+    // Test with large values
+    {
+        Variant v1(1000000L);
+        Variant result = 2000000L + v1;
+        ASSERT_TRUE(result.isInt());
+        ASSERT_EQ(result.toInt(), 3000000L);
+    }
+}

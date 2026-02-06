@@ -387,12 +387,14 @@ void Variant::unsetProperty(const Variant &name) {
 static inline bool compare_op(const binary_op_type op, const zval *op1, const zval *op2) {
     zval result;
     op(&result, NO_CONST_UNWRAP_Z(op1), NO_CONST_UNWRAP_Z(op2));
+    throwErrorIfOccurred();
     return Z_TYPE(result) == IS_TRUE;
 }
 
 static inline Variant calc_op(const binary_op_type op, const zval *op1, const zval *op2) {
     Variant result;
     op(result.ptr(), NO_CONST_UNWRAP_Z(op1), NO_CONST_UNWRAP_Z(op2));
+    throwErrorIfOccurred();
     return result;
 }
 
@@ -425,73 +427,87 @@ Variant Variant::serialize() {
 
 Variant &Variant::operator++() {
     increment_function(unwrap_ptr());
+    throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator--() {
     decrement_function(unwrap_ptr());
+    throwErrorIfOccurred();
     return *this;
 }
 
 Variant Variant::operator++(int) {
     auto original = *this;
     increment_function(unwrap_ptr());
+    throwErrorIfOccurred();
     return original;
 }
 
 Variant Variant::operator--(int) {
     auto original = *this;
     decrement_function(unwrap_ptr());
+    throwErrorIfOccurred();
     return original;
 }
 
 Variant &Variant::operator+=(const Variant &v) {
     add_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
+    throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator-=(const Variant &v) {
     sub_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
+    throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator/=(const Variant &v) {
     div_function(ptr(), unwrap_ptr(), NO_CONST_V(v));
+    throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator*=(const Variant &v) {
     mul_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
+    throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator%=(const Variant &v) {
     mod_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
+    throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator<<=(const Variant &v) {
     shift_left_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
+    throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator>>=(const Variant &v) {
     shift_right_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
+    throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator&=(const Variant &v) {
     bitwise_and_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
+    throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator|=(const Variant &v) {
     bitwise_or_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
+    throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator^=(const Variant &v) {
     bitwise_xor_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
+    throwErrorIfOccurred();
     return *this;
 }
 
@@ -538,6 +554,7 @@ Variant Variant::operator^(const Variant &v) const {
 Variant Variant::operator~() const {
     Variant result{};
     bitwise_not_function(result.ptr(), NO_CONST_Z(unwrap_ptr()));
+    throwErrorIfOccurred();
     return result;
 }
 
