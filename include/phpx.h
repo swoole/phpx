@@ -1112,9 +1112,7 @@ class Object : public Variant {
 
     Reference attrRef(const String &name);
     Variant attr(const Variant &name, bool update = false) const;
-    Variant attr(uintptr_t offset, bool update = false) const {
-        return Variant{OBJ_PROP(object(), offset), Ctor::Indirect};
-    }
+    Variant attr(uintptr_t offset, bool update = false) const;
 
     void appendArrayProperty(const String &name, const Variant &value);
     void updateArrayProperty(const String &name, zend_long offset, const Variant &value);

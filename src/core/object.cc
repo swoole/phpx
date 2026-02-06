@@ -124,6 +124,15 @@ Variant Object::attr(const Variant &name, bool update) const {
     }
 }
 
+Variant Object::attr(uintptr_t offset, bool update) const {
+    auto member_p = OBJ_PROP(object(), offset);
+    if (zval_is_ref(member_p)) {
+        return Variant{member_p, Ctor::CopyRef};
+    } else {
+        return Variant{member_p, Ctor::Indirect};
+    }
+}
+
 void Object::appendArrayProperty(const String &name, const Variant &value) {
     zval rv;
     Variant retval;
