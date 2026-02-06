@@ -115,24 +115,117 @@ TEST(to_array, refcounted_types) {
 }
 
 TEST(to_array, edge_cases) {
-    // 测试空字符串
+    // Test empty string
     Variant empty_str("");
     Array empty_arr = toArray(empty_str);
     ASSERT_TRUE(empty_arr.isArray());
     ASSERT_EQ(empty_arr.count(), 1);
     ASSERT_STREQ(empty_arr[0].toCString(), "");
     
-    // 测试零值
+    // Test zero value
     Variant zero_int(0);
     Array zero_arr = toArray(zero_int);
     ASSERT_TRUE(zero_arr.isArray());
     ASSERT_EQ(zero_arr.count(), 1);
     ASSERT_EQ(zero_arr[0].toInt(), 0);
     
-    // 测试false布尔值
+    // Test false boolean
     Variant false_bool(false);
     Array false_arr = toArray(false_bool);
     ASSERT_TRUE(false_arr.isArray());
     ASSERT_EQ(false_arr.count(), 1);
     ASSERT_FALSE(false_arr[0].toBool());
+}
+
+TEST(to_array, line_322_branch_conditions) {
+    // Specific test to understand and cover line 322 branch conditions
+    // The branch condition is:
+    // Z_OBJ_P(expr)->properties == NULL && 
+    // Z_OBJ_HT_P(expr)->get_properties_for == NULL &&
+    // Z_OBJ_HT_P(expr)->get_properties == zend_std_get_properties
+    
+    // Test various object types to see which ones trigger this optimized path
+    
+    // Test 1: stdClass object (most likely to trigger optimized path)
+    auto std_obj = newObject("stdClass");
+    std_obj.set("test_key", "test_value");
+    
+    Variant std_var(std_obj);
+    Array std_arr = toArray(std_var);
+    
+    ASSERT_TRUE(std_arr.isArray());
+    ASSERT_TRUE(std_arr.exists("test_key"));
+    ASSERT_STREQ(std_arr.get("test_key").toCString(), "test_value");
+    
+    // Test 2: DateTime object (internal PHP class)
+    auto datetime_obj = eval("return new DateTime('2024-01-01');");
+    if (datetime_obj.isObject()) {
+        Variant dt_var(datetime_obj);
+        Array dt_arr = toArray(dt_var);
+        ASSERT_TRUE(dt_arr.isArray());
+        // DateTime should convert to array with its properties
+    }
+    
+    // Test 3: Exception object
+    auto exception_obj = eval("return new Exception('Test exception', 42);");
+    if (exception_obj.isObject()) {
+        Variant exc_var(exception_obj);
+        Array exc_arr = toArray(exc_var);
+        ASSERT_TRUE(exc_arr.isArray());
+        // Exception objects should convert properly
+    }
+    
+    // Test 4: Simple custom object
+    eval(R"(
+        class SimpleClass {
+            public $public_prop = 'simple_value';
+        }
+    )");
+    
+    auto simple_custom_obj = eval("return new SimpleClass();");
+    if (simple_custom_obj.isObject()) {
+        Variant simple_custom_var(simple_custom_obj);
+        Array simple_custom_arr = toArray(simple_custom_var);
+        ASSERT_TRUE(simple_custom_arr.isArray());
+        ASSERT_TRUE(simple_custom_arr.exists("public_prop"));
+        ASSERT_STREQ(simple_custom_arr.get("public_prop").toCString(), "simple_value");
+    }
+}
+
+TEST(to_array, optimized_object_path) {
+    // Test the optimized object path (line 322 branch)
+    // This branch is triggered for objects with:
+    // - properties == NULL
+    // - get_properties_for == NULL
+    // - get_properties == zend_std_get_properties
+    
+    // Create a simple stdClass object which should trigger the optimized path
+    auto obj = newObject("stdClass");
+    obj.set("test_prop", "test_value");
+    
+    Variant obj_var(obj);
+    Array obj_arr = toArray(obj_var);
+    
+    ASSERT_TRUE(obj_arr.isArray());
+    ASSERT_TRUE(obj_arr.exists("test_prop"));
+    ASSERT_STREQ(obj_arr.get("test_prop").toCString(), "test_value");
+    
+    // Test with internal objects that might trigger the optimized path
+    // DateTime objects often have special handling
+    auto datetime_obj = eval("return new DateTime('2023-01-01');");
+    if (datetime_obj.isObject()) {
+        Variant datetime_var(datetime_obj);
+        Array datetime_arr = toArray(datetime_var);
+        ASSERT_TRUE(datetime_arr.isArray());
+        // DateTime objects should convert to arrays with their properties
+    }
+    
+    // Test with ArrayObject which has custom property handling
+    auto array_obj = eval("return new ArrayObject(['key' => 'value']);");
+    if (array_obj.isObject()) {
+        Variant arrayobj_var(array_obj);
+        Array arrayobj_arr = toArray(arrayobj_var);
+        ASSERT_TRUE(arrayobj_arr.isArray());
+        // ArrayObject should convert properly to array
+    }
 }
