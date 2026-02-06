@@ -1055,4 +1055,26 @@ TEST(variant, item6) {
 
     ASSERT_STREQ(s1.toCString(), "hello_world");
     ASSERT_STREQ(s2.toCString(), "hello@world");
+
+    var s3 = "$";
+    s2.item(5, true) = s3;
+    ASSERT_STREQ(s2.toCString(), "hello$world");
+}
+
+TEST(variant, itemRef1) {
+    auto a = create_list();
+    auto ref = a.itemRef(2);
+    auto ref2 = a.itemRef(2);
+    ref = "rust";
+    ASSERT_STREQ(a.item(2).toCString(), "rust");
+    ASSERT_STREQ(ref2.toCString(), "rust");
+}
+
+TEST(variant, itemRef2) {
+    auto a = create_map();
+    auto ref = a.itemRef("php");
+    auto ref2 = a.itemRef("php");
+    ref = 2000;
+    ASSERT_EQ(a.item("php").toInt(), 2000);
+    ASSERT_EQ(ref2.toInt(), 2000);
 }

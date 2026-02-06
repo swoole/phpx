@@ -37,7 +37,7 @@ zend_long Object::count() {
 
 Variant Object::exec(const Variant &fn, const ArgList &args) {
     if (UNEXPECTED(isNull())) {
-        throwError("read property `%s` on null", fn.toCString());
+        throwError("call method `%s` on null", fn.toCString());
         return {};
     }
     Args _args(args);
@@ -55,6 +55,11 @@ bool Object::instanceOf(const String &name) const {
 Variant Object::callParentMethod(const String &func, const ArgList &args) {
     Args _args(args);
     Variant retval;
+
+    if (UNEXPECTED(isNull())) {
+        throwError("call method `%s` on null", func.data());
+        return retval;
+    }
 
     if (UNEXPECTED(parent_ce() == nullptr)) {
         throwError("class does not inherit the parent class");

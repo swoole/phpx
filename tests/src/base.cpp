@@ -368,3 +368,8 @@ TEST(base, debugInfo) {
         ASSERT_EQ(l.toInt(), 999);
     }
 }
+
+TEST(base, getPropertyOffset) {
+    try_call([]() { auto offset1 = getPropertyOffset("TestClassNotExists", "propXt"); },
+             "class 'TestClassNotExists' is undefined.");
+}

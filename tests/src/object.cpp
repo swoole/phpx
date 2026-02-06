@@ -401,3 +401,10 @@ TEST(object, newItem) {
     item1 = "erlang";
     ASSERT_STREQ(arr.offsetGet(5).toCString(), "erlang");
 }
+
+TEST(object, null) {
+    try_call([]() { null_object.exec("foo", {}); }, "call method `foo` on null");
+    try_call([]() { null_object.callParentMethod("foo", {}); }, "call method `foo` on null");
+    try_call([]() { null_object.attr("bar"); }, "read property `bar` on null");
+    try_call([]() { null_object.attrRef("bar"); }, "read property `bar` on null");
+}
