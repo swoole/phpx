@@ -709,7 +709,7 @@ Variant Variant::item(const Variant &key, bool update) {
     zval *retval;
     zval rv;
 
-    if (key.isInt() || key.isFloat() || key.isNumeric() || zval_is_array(zvar)) {
+    if (key.isInt() || key.isFloat() || key.isNumeric() || zval_is_string(zvar)) {
         return item(key.toInt(), update);
     }
 
