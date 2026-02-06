@@ -323,19 +323,16 @@ class Variant {
         }
     }
     Variant(zend_array *arr, Ctor method = Ctor::Copy) noexcept {
-        switch (method) {
-        case Ctor::Copy:
-            ZVAL_ARR(&val, arr);
+        ZVAL_ARR(&val, arr);
+        if (method == Ctor::Copy) {
             addRef();
-            break;
-        case Ctor::Move:
-        default:
-            ZVAL_ARR(&val, arr);
-            break;
         }
     }
-    Variant(zend_string *s) noexcept {
-        ZVAL_STR(&val, zend_string_copy(s));
+    Variant(zend_string *s, Ctor method = Ctor::Copy) noexcept {
+        ZVAL_STR(&val, s);
+        if (method == Ctor::Copy) {
+            addRef();
+        }
     }
     Variant(const Variant &v) : Variant(v.unwrap_ptr()) {}
     Variant(Variant &&v) noexcept {

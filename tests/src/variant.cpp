@@ -3,10 +3,189 @@
 #include "phpx_helper.h"
 
 #include "const/json.h"
+#include <cstring>
 
 using namespace php;
 
 constexpr double PI = 3.1415926;
+
+TEST(variant, zend_string_constructor) {
+    // Test Variant(zend_string *s, Ctor method = Ctor::Copy) constructor
+    
+    // Test 1: Ctor::Copy method (default)
+    zend_string *str1 = zend_string_init("hello world", 11, 0);
+    Variant v1(str1, Ctor::Copy);
+    
+    ASSERT_TRUE(v1.isString());
+    ASSERT_EQ(v1.getRefCount(), 2); // Original + copied reference
+    ASSERT_STREQ(v1.toCString(), "hello world");
+    ASSERT_EQ(v1.length(), 11);
+    
+    // Clean up original string
+    zend_string_release(str1);
+    
+    // Test 2: Ctor::Move method
+    zend_string *str2 = zend_string_init("move test", 9, 0);
+    Variant v2(str2, Ctor::Move);
+    
+    ASSERT_TRUE(v2.isString());
+    ASSERT_EQ(v2.getRefCount(), 1); // Only one reference since we moved ownership
+    ASSERT_STREQ(v2.toCString(), "move test");
+    ASSERT_EQ(v2.length(), 9);
+    
+    // Don't release str2 here since ownership was moved
+    
+    // Test 3: Default constructor parameter (should be Ctor::Copy)
+    zend_string *str3 = zend_string_init("default param", 13, 0);
+    Variant v3(str3); // Using default parameter
+    
+    ASSERT_TRUE(v3.isString());
+    ASSERT_EQ(v3.getRefCount(), 2); // Should behave like Ctor::Copy
+    ASSERT_STREQ(v3.toCString(), "default param");
+    ASSERT_EQ(v3.length(), 13);
+    
+    zend_string_release(str3);
+    
+    // Test 4: Empty string
+    zend_string *str4 = zend_string_init("", 0, 0);
+    Variant v4(str4, Ctor::Copy);
+    
+    ASSERT_TRUE(v4.isString());
+    ASSERT_EQ(v4.getRefCount(), 2);
+    ASSERT_STREQ(v4.toCString(), "");
+    ASSERT_EQ(v4.length(), 0);
+    
+    zend_string_release(str4);
+    
+    // Test 5: String with special characters
+    zend_string *str5 = zend_string_init("Hello\nWorld\tTest", 16, 0);
+    Variant v5(str5, Ctor::Move);
+    
+    ASSERT_TRUE(v5.isString());
+    ASSERT_EQ(v5.getRefCount(), 1);
+    ASSERT_STREQ(v5.toCString(), "Hello\nWorld\tTest");
+    ASSERT_EQ(v5.length(), 16);
+    
+    // Test 6: Reference counting behavior
+    Variant v6 = v5; // Copy constructor
+    // Both variants should be valid strings
+    ASSERT_TRUE(v6.isString());
+    ASSERT_STREQ(v6.toCString(), "Hello\nWorld\tTest");
+    ASSERT_EQ(v6.length(), 16);
+    
+    // Test 7: Long string
+    const char* long_str = "This is a very long string that tests the handling of larger string data in the Variant constructor with zend_string parameter";
+    size_t long_len = std::strlen(long_str);
+    zend_string *str7 = zend_string_init(long_str, long_len, 0);
+    Variant v7(str7, Ctor::Copy);
+    
+    ASSERT_TRUE(v7.isString());
+    ASSERT_EQ(v7.getRefCount(), 2);
+    ASSERT_STREQ(v7.toCString(), long_str);
+    ASSERT_EQ(v7.length(), long_len);
+    
+    zend_string_release(str7);
+}
+
+TEST(variant, zend_array_constructor) {
+    // Test Variant(zend_array *arr, Ctor method = Ctor::Copy) constructor
+    
+    // Test 1: Ctor::Copy method (default)
+    zval zarr1;
+    array_init(&zarr1);
+    add_next_index_long(&zarr1, 100);
+    add_next_index_string(&zarr1, "test");
+    
+    zend_array *arr1 = Z_ARRVAL(zarr1);
+    Variant v1(arr1, Ctor::Copy);
+    
+    ASSERT_TRUE(v1.isArray());
+    ASSERT_EQ(v1.getRefCount(), 2); // Original + copied reference
+    
+    Array array1(v1);
+    ASSERT_EQ(array1.count(), 2);
+    ASSERT_EQ(array1[0].toInt(), 100);
+    ASSERT_STREQ(array1[1].toCString(), "test");
+    
+    zval_ptr_dtor(&zarr1);
+    
+    // Test 2: Ctor::Move method
+    zval zarr2;
+    array_init(&zarr2);
+    add_next_index_long(&zarr2, 200);
+    add_next_index_string(&zarr2, "move_test");
+    
+    zend_array *arr2 = Z_ARRVAL(zarr2);
+    Variant v2(arr2, Ctor::Move);
+    
+    ASSERT_TRUE(v2.isArray());
+    ASSERT_EQ(v2.getRefCount(), 1); // Only one reference since we moved ownership
+    
+    Array array2(v2);
+    ASSERT_EQ(array2.count(), 2);
+    ASSERT_EQ(array2[0].toInt(), 200);
+    ASSERT_STREQ(array2[1].toCString(), "move_test");
+    
+    // Don't call zval_ptr_dtor here since ownership was moved
+    
+    // Test 3: Default constructor parameter (should be Ctor::Copy)
+    zval zarr3;
+    array_init(&zarr3);
+    add_next_index_long(&zarr3, 300);
+    
+    zend_array *arr3 = Z_ARRVAL(zarr3);
+    Variant v3(arr3); // Using default parameter
+    
+    ASSERT_TRUE(v3.isArray());
+    ASSERT_EQ(v3.getRefCount(), 2); // Should behave like Ctor::Copy
+    
+    Array array3(v3);
+    ASSERT_EQ(array3.count(), 1);
+    ASSERT_EQ(array3[0].toInt(), 300);
+    
+    zval_ptr_dtor(&zarr3);
+    
+    // Test 4: Empty array
+    zval zarr4;
+    array_init(&zarr4);
+    
+    zend_array *arr4 = Z_ARRVAL(zarr4);
+    Variant v4(arr4, Ctor::Copy);
+    
+    ASSERT_TRUE(v4.isArray());
+    ASSERT_EQ(v4.getRefCount(), 2);
+    
+    Array array4(v4);
+    ASSERT_EQ(array4.count(), 0);
+    ASSERT_TRUE(array4.empty());
+    
+    zval_ptr_dtor(&zarr4);
+    
+    // Test 5: Array with mixed types
+    zval zarr5;
+    array_init(&zarr5);
+    add_next_index_long(&zarr5, 42);
+    add_next_index_double(&zarr5, 3.14);
+    add_next_index_string(&zarr5, "mixed");
+    
+    zend_array *arr5 = Z_ARRVAL(zarr5);
+    Variant v5(arr5, Ctor::Move);
+    
+    ASSERT_TRUE(v5.isArray());
+    Array array5(v5);
+    ASSERT_EQ(array5.count(), 3);
+    ASSERT_EQ(array5[0].toInt(), 42);
+    ASSERT_EQ(array5[1].toFloat(), 3.14);
+    ASSERT_STREQ(array5[2].toCString(), "mixed");
+    
+    // Test reference counting behavior
+    Variant v6 = v5; // Copy constructor
+    // The reference count may vary depending on internal implementation
+    // Just verify that both variants are valid arrays
+    ASSERT_TRUE(v6.isArray());
+    Array array6(v6);
+    ASSERT_EQ(array6.count(), 3);
+}
 
 TEST(variant, base) {
     Variant v{};
