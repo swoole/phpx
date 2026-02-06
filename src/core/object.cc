@@ -82,12 +82,10 @@ Reference Object::attrRef(const String &prop_name) {
     }
 
     auto member = attr(prop_name);
-    if (!member.isIndirect()) {
+    if (zval_is_ref(member.const_ptr())) {
+        return Reference(member.const_ptr());
+    } else if (!member.isIndirect()) {
         return {};
-    }
-
-    if (Z_TYPE_P(member.zv()) == IS_REFERENCE) {
-        return Reference(member.zv());
     }
 
     auto ref = member.toReference();
@@ -95,7 +93,6 @@ Reference Object::attrRef(const String &prop_name) {
     if (prop_info) {
         ZEND_REF_ADD_TYPE_SOURCE(ref.reference(), prop_info);
     }
-
     return ref;
 }
 
@@ -109,7 +106,7 @@ Variant Object::attr(const Variant &name, bool update) const {
     zval rv;
     auto member_p = zend_read_property_ex(ce(), object(), prop_name.str(), true, &rv);
 
-    if (ZVAL_IS_NULL(member_p) && update) {
+    if (zval_is_null(member_p) && update) {
         zval tmp;
         ZVAL_NULL(&tmp);
         auto old_scope = EG(fake_scope);
@@ -120,8 +117,9 @@ Variant Object::attr(const Variant &name, bool update) const {
 
     if (member_p == &rv) {
         return Variant{member_p};
+    } else if (zval_is_ref(member_p)) {
+        return Variant{member_p, Ctor::CopyRef};
     } else {
-        member_p = unwrap_zval(member_p);
         return Variant{member_p, Ctor::Indirect};
     }
 }

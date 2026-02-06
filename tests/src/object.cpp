@@ -298,6 +298,7 @@ TEST(object, attrRef2) {
     auto ref2 = o1.attrRef("prop1");
 
     ref1 = 2026;
+    ASSERT_EQ(o1.get("prop1"), 2026);
     ASSERT_EQ(ref2.toInt(), 2026);
 }
 

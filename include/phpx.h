@@ -209,6 +209,10 @@ static inline bool zval_is_null(const zval *v) {
     return Z_TYPE_P(v) == IS_NULL;
 }
 
+static inline bool zval_is_ref(const zval *v) {
+    return Z_TYPE_P(v) == IS_REFERENCE;
+}
+
 enum class Ctor {
     Copy,
     CopyRef,
