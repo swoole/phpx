@@ -156,6 +156,7 @@ bool is_callable_ex(zval *callable,
                     zend_fcall_info_cache *fcc,
                     char **error);
 int array_data_compare(Bucket *f, Bucket *s);
+bool prepare_slice(long &offset, long &length, size_t total);
 
 extern std::function<void(zend_object *)> throw_impl;
 extern int box_res_id;

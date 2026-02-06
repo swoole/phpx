@@ -11,13 +11,13 @@ TEST(array_slice, negative_offset_1) {
     // Based on actual behavior observed, negative offsets result in empty arrays
     // This suggests the loop logic may not work as expected with negative offsets
     auto result1 = arr.slice(-5, 2);  // offset=-5, length=2
-    ASSERT_EQ(result1.count(), 0);
+    ASSERT_EQ(result1.count(), 2);
 
     auto result2 = arr.slice(-4, 1);  // offset=-4, length=1
-    ASSERT_EQ(result2.count(), 0);
+    ASSERT_EQ(result2.count(), 1);
 
     auto result3 = arr.slice(-3, 2);  // offset=-3, length=2
-    ASSERT_EQ(result3.count(), 0);
+    ASSERT_EQ(result3.count(), 2);
 }
 
 // When length < 0, execute length = num_in - offset + length calculation
@@ -50,7 +50,7 @@ TEST(array_slice, negative_offset_2) {
     // Test case 4: Combined negative offset and negative length
     // Based on actual behavior, negative offset results in empty array regardless of length
     auto result4 = arr.slice(-2, -1);  // offset=-2, length=-1
-    ASSERT_EQ(result4.count(), 0);
+    ASSERT_EQ(result4.count(), 1);
 }
 
 // Comprehensive test: Trigger both line 52 and line 58 branches
@@ -59,7 +59,7 @@ TEST(array_slice, combined_negative_offset_and_length_branches) {
 
     // Based on actual behavior, negative offset always results in empty array
     auto result = arr.slice(-10, -2);  // offset=-10, length=-2
-    ASSERT_EQ(result.count(), 0);
+    ASSERT_EQ(result.count(), 2);
 
     // Test boundary case: Very large negative values
     auto result2 = arr.slice(-100, -100);  // Extreme negative values
@@ -76,7 +76,7 @@ TEST(array_slice, negative_values_with_preserve_keys) {
 
     // Based on actual behavior, negative offset results in empty array regardless of preserve_keys
     auto result1 = arr.slice(-3, 2, true);  // offset=-3, length=2, preserve_keys=true
-    ASSERT_EQ(result1.count(), 0);
+    ASSERT_EQ(result1.count(), 2);
 
     // Test preserved keys with negative length (positive offset)
     auto result2 = arr.slice(1, -1, true);  // offset=1, length=-1, preserve_keys=true
@@ -104,4 +104,13 @@ TEST(array_slice, boundary_values) {
     Array empty_arr;
     auto result4 = empty_arr.slice(-1, -1);  // Empty array, any slice should be empty
     ASSERT_EQ(result4.count(), 0);
+}
+
+TEST(array_slice, negative_offset_3) {
+    auto a = create_list();
+    auto rs1 = a.slice(-10, 3);
+    ASSERT_EQ(rs1.count(), 3);
+
+    auto rs2 = a.slice(3, 10);
+    ASSERT_EQ(rs2.count(), 2);
 }

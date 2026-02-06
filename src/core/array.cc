@@ -43,22 +43,7 @@ void Array::sort(bool renumber) {
 }
 
 Array Array::slice(long offset, long length, bool preserve_keys) {
-    auto zarr = unwrap_ptr();
-    size_t num_in = count();
-
-    if (offset > num_in) {
-        return Array{};
-    } else if (offset < 0 && (offset = (num_in + offset)) < 0) {
-        offset = 0;
-    }
-
-    if (length < 0) {
-        length = num_in - offset + length;
-    } else if (((zend_ulong) offset + (zend_ulong) length) > (unsigned) num_in) {
-        length = num_in - offset;
-    }
-
-    if (length <= 0) {
+    if (!prepare_slice(offset, length, count())) {
         return {};
     }
 
@@ -69,6 +54,7 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
     zval return_value;
     array_init_size(&return_value, (uint32_t) length);
 
+    auto zarr = unwrap_ptr();
     /* Start at the beginning and go until we hit offset */
     int pos = 0;
     if (!preserve_keys && (Z_ARRVAL_P(zarr)->u.flags & HASH_FLAG_PACKED)) {

@@ -98,33 +98,40 @@ void String::offsetSet(zend_long _offset, const Variant &value) {
     }
 }
 
-String String::substr(long f, long l) const {
-    if (f < 0) {
+bool prepare_slice(long &offset, long &length, size_t total) {
+    if (offset < 0) {
         /* if "from" position is negative, count start position from the end
          * of the string
          */
-        if (-(size_t) f > length()) {
-            f = 0;
+        if (-(size_t) offset > total) {
+            offset = 0;
         } else {
-            f = (zend_long) length() + f;
+            offset = (zend_long) total + offset;
         }
-    } else if ((size_t) f > length()) {
-        return "";
+    } else if ((size_t) offset > total) {
+        return false;
     }
 
-    if (l < 0) {
+    if (length < 0) {
         /* if "length" position is negative, set it to the length
          * needed to stop that many chars from the end of the string
          */
-        if (-(size_t) l > length() - (size_t) f) {
-            l = 0;
+        if (-(size_t) length > total - (size_t) offset) {
+            length = 0;
         } else {
-            l = (zend_long) length() - f + l;
+            length = (zend_long) total - offset + length;
         }
-    } else if ((size_t) l > length() - (size_t) f) {
-        l = (zend_long) length() - f;
+    } else if ((size_t) length > total - (size_t) offset) {
+        length = (zend_long) total - offset;
     }
 
+    return true;
+}
+
+String String::substr(long f, long l) const {
+    if (!prepare_slice(f, l, length())) {
+        return "";
+    }
     return {data() + f, (size_t) l};
 }
 
