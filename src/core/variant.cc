@@ -701,7 +701,7 @@ Variant Variant::item(zend_long offset, bool update) {
         }
     }
 
-    return Variant{retval, Ctor::Indirect};
+    return Variant{retval, zval_wrap(retval)};
 }
 
 Variant Variant::item(const Variant &key, bool update) {
@@ -744,24 +744,28 @@ Variant Variant::item(const Variant &key, bool update) {
         }
     }
 
-    return Variant{retval, Ctor::Indirect};
+    return Variant{retval, zval_wrap(retval)};
 }
 
 Reference Variant::itemRef(zend_long offset) {
     auto v = item(offset);
-    if (v.isIndirect()) {
-        return v.toReference();
-    } else {
+    if (zval_is_ref(v.const_ptr())) {
+        return Reference(v.const_ptr());
+    } else if (!v.isIndirect()) {
         return {};
+    } else {
+        return v.toReference();
     }
 }
 
 Reference Variant::itemRef(const Variant &key) {
-    auto val = item(key);
-    if (val.isIndirect()) {
-        return val.toReference();
-    } else {
+    auto v = item(key);
+    if (zval_is_ref(v.const_ptr())) {
+        return Reference(v.const_ptr());
+    } else if (!v.isIndirect()) {
         return {};
+    } else {
+        return v.toReference();
     }
 }
 

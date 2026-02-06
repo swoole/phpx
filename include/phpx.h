@@ -220,6 +220,10 @@ enum class Ctor {
     Move,
 };
 
+static inline Ctor zval_wrap(zval *v) {
+    return zval_is_ref(v) ? Ctor::CopyRef : Ctor::Indirect;
+}
+
 class Variant {
   protected:
     zval val;
@@ -1112,7 +1116,10 @@ class Object : public Variant {
 
     Reference attrRef(const String &name);
     Variant attr(const Variant &name, bool update = false) const;
-    Variant attr(uintptr_t offset, bool update = false) const;
+    Variant attr(uintptr_t offset, bool update = false) const {
+        auto member_p = OBJ_PROP(object(), offset);
+        return Variant{member_p, zval_wrap(member_p)};
+    }
 
     void appendArrayProperty(const String &name, const Variant &value);
     void updateArrayProperty(const String &name, zend_long offset, const Variant &value);
