@@ -301,6 +301,21 @@ TEST(base, getFunction) {
     ASSERT_NE(fn3, nullptr);
 }
 
+TEST(base, is_callable_ex) {
+    var fn1("var_dump");
+    var fn2("foo");
+    zend_string *fname;
+    zend_fcall_info_cache fcc;
+
+    ASSERT_TRUE(is_callable_ex(fn1.ptr(), nullptr, 0, &fname, &fcc, nullptr));
+    ASSERT_STREQ(fname->val, "var_dump");
+    zend_string_release(fname);
+
+    ASSERT_FALSE(is_callable_ex(fn2.ptr(), nullptr, 0, &fname, &fcc, nullptr));
+    ASSERT_STREQ(fname->val, "foo");
+    zend_string_release(fname);
+}
+
 TEST(base, call) {
     auto fn1 = getFunction("php_uname");
     auto rt1 = call(fn1, {"m"});

@@ -681,7 +681,7 @@ Variant Variant::item(zend_long offset, bool update) {
         if (update) {
             auto str = Z_STR_P(zvar);
             if (offset >= str->len) {
-                throwError("String offset[%ld] out of range", offset);
+                throwError("String offset `%ld` out of range", offset);
                 return {};
             }
             str->h = offset;

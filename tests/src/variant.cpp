@@ -1043,6 +1043,14 @@ TEST(variant, item5) {
             arr4.newItem();
         },
         "Only array/object support the newItem() method");
+
+    try_call(
+        []() {
+            var arr1 = 1234;
+            var key = "key";
+            arr1.item(key);
+        },
+        "Only array/object/string support the item");
 }
 
 TEST(variant, item6) {
@@ -1059,12 +1067,20 @@ TEST(variant, item6) {
     var s3 = "$";
     s2.item(5, true) = s3;
     ASSERT_STREQ(s2.toCString(), "hello$world");
+
+    s2.item(5, true) = std::string("#");
+    ASSERT_STREQ(s2.toCString(), "hello#world");
+
+    try_call([&]() { s2.item(100, true) = "@"; }, "String offset `100` out of range");
 }
 
 TEST(variant, itemRef1) {
     auto a = create_list();
     auto ref = a.itemRef(2);
     auto ref2 = a.itemRef(2);
+
+    ASSERT_NE(ref.reference(), nullptr);
+
     ref = "rust";
     ASSERT_STREQ(a.item(2).toCString(), "rust");
     ASSERT_STREQ(ref2.toCString(), "rust");

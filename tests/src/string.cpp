@@ -93,6 +93,7 @@ TEST(string, substr) {
     ASSERT_EQ(str.substr(20, 5), "");
     ASSERT_EQ(str.substr(-20, 5), "Hello");
     ASSERT_EQ(str.substr(-20, -1), "Hello, World");
+    ASSERT_EQ(str.substr(0, -20), "");
 }
 
 TEST(string, split) {

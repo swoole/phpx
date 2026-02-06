@@ -239,6 +239,10 @@ static void free_fci_cache(zval *el) {
     pefree((zend_fcall_info_cache *) Z_PTR_P(el), 1);
 }
 
+/**
+ * @param object/error/fcc optional, nullable
+ * @param check_flags IS_CALLABLE_CHECK_SYNTAX_ONLY, IS_CALLABLE_SUPPRESS_DEPRECATIONS
+ */
 bool is_callable_ex(zval *callable,
                     zend_object *object,
                     uint32_t check_flags,
