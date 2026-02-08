@@ -35,6 +35,18 @@ zend_long Object::count() {
     }
 }
 
+bool Object::propertyExists(const String &name) const {
+    zend_string *property = name.str();
+    auto property_info = (zend_property_info *) zend_hash_find_ptr(&ce()->properties_info, property);
+    if (property_info != NULL && (!(property_info->flags & ZEND_ACC_PRIVATE) || property_info->ce == ce())) {
+        return true;
+    }
+    if (object()->handlers->has_property(object(), property, 2, NULL)) {
+        return true;
+    }
+    return false;
+}
+
 Variant Object::exec(const Variant &fn, const ArgList &args) {
     if (UNEXPECTED(isNull())) {
         throwError("call method `%s` on null", fn.toCString());
@@ -112,10 +124,10 @@ Variant Object::attr(const Variant &name, bool update) const {
     auto member_p = zend_read_property_ex(ce(), object(), prop_name.str(), true, &rv);
 
     if (zval_is_null(member_p) && update) {
-		auto old_scope = EG(fake_scope);
-		EG(fake_scope) = ce();
-		member_p = object()->handlers->write_property(object(), prop_name.str(), undef(), NULL);
-		EG(fake_scope) = old_scope;
+        auto old_scope = EG(fake_scope);
+        EG(fake_scope) = ce();
+        member_p = object()->handlers->write_property(object(), prop_name.str(), undef(), NULL);
+        EG(fake_scope) = old_scope;
     }
 
     if (member_p == &rv) {

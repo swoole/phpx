@@ -1246,9 +1246,7 @@ class Object : public Variant {
     bool methodExists(const String &name) const {
         return zend_hash_exists(&ce()->function_table, name.str());
     }
-    bool propertyExists(const String &name) const {
-        return zend_hash_exists(&ce()->properties_info, name.str());
-    }
+    bool propertyExists(const String &name) const;
     bool instanceOf(const String &name) const;
     bool instanceOf(const zend_class_entry *ce_) const {
         return instanceof_function(ce(), ce_);

@@ -440,55 +440,60 @@ TEST(object, non_existent_attr_operations) {
     ASSERT_TRUE(nonExistentAttr2.isNull());
 
     // Test attr() with update=true for non-existent properties
-	auto newAttr1 = obj.attr("new_prop", true);
-	newAttr1 = 2003;
-	ASSERT_EQ(obj.get("new_prop").toInt(), 2003);
+    auto newAttr1 = obj.attr("new_prop", true);
+    newAttr1 = 2003;
+    ASSERT_EQ(obj.get("new_prop").toInt(), 2003);
 
     // For attr chaining, we need to work with Object type
-    try_call([&]() {
-        Object tempObj = newObject("stdClass");
-        auto chained = tempObj.attr("non_existent");
-        ASSERT_TRUE(chained.isNull());
-    }, "", true);
+    try_call(
+        [&]() {
+            Object tempObj = newObject("stdClass");
+            auto chained = tempObj.attr("non_existent");
+            ASSERT_TRUE(chained.isNull());
+        },
+        "",
+        true);
 
     // Test attrRef with non-existent properties
-	auto ref3 = obj.attrRef("missing_prop");
-	// This should work but return a reference to null/undefined
-	ASSERT_TRUE(ref3.isReference());
-	ref3 = "assigned_value";
+    auto ref3 = obj.attrRef("missing_prop");
+    // This should work but return a reference to null/undefined
+    ASSERT_TRUE(ref3.isReference());
+    ref3 = "assigned_value";
     ASSERT_STREQ(obj.get("missing_prop").toCString(), "assigned_value");
 
-    try_call([&]() {
-        null_object.attr("prop"); // Accessing attr on null object
-    }, "read property `prop` on null");
+    try_call(
+        [&]() {
+            null_object.attr("prop");  // Accessing attr on null object
+        },
+        "read property `prop` on null");
 }
 
 TEST(object, array_object_non_existent_items) {
     // Test ArrayObject specific behavior with non-existent items
     auto arrayObj = newObject("ArrayObject");
-    
+
     // Test offsetGet with non-existent indices
     auto result1 = arrayObj.offsetGet(999);
     ASSERT_TRUE(result1.isNull());
-    
+
     auto result2 = arrayObj.offsetGet("non_existent_key");
     ASSERT_TRUE(result2.isNull());
-    
+
     // Test exists methods
     ASSERT_FALSE(arrayObj.offsetExists(999));
     ASSERT_FALSE(arrayObj.offsetExists("non_existent_key"));
-    
+
     // Test item method on ArrayObject
     auto item1 = arrayObj.item(500);
     ASSERT_TRUE(item1.isNull());
-    
+
     auto item2 = arrayObj.item("missing_key");
     ASSERT_TRUE(item2.isNull());
-    
+
     // Test that non-existent items can be assigned
     auto newItem = arrayObj.item("new_key", true);
     newItem = "assigned_value";
-    
+
     auto retrieved = arrayObj.item("new_key");
     ASSERT_STREQ(retrieved.toCString(), "assigned_value");
 }
@@ -496,23 +501,25 @@ TEST(object, array_object_non_existent_items) {
 TEST(object, custom_class_non_existent_operations) {
     // Test non-existent operations on custom classes
     include(get_include_dir() + "/library.php", INCLUDE_ONCE);
-    
+
     auto obj = newObject("TestClass2");
-    
+
     // Test non-existent properties on custom class
     ASSERT_TRUE(obj.attr("non_existent_custom_prop").isNull());
     ASSERT_FALSE(obj.propertyExists("non_existent_custom_prop"));
-    
+
     // Test non-existent methods
     ASSERT_FALSE(obj.methodExists("nonExistentMethod"));
-    
+
     // Test chained operations
-    try_call([&]() {
-        Object tempObj = newObject("stdClass");
-        auto firstLevel = tempObj.attr("missing_prop");
-        ASSERT_TRUE(firstLevel.isNull());
-    }, "");
-    
+    try_call(
+        [&]() {
+            Object tempObj = newObject("stdClass");
+            auto firstLevel = tempObj.attr("missing_prop");
+            ASSERT_TRUE(firstLevel.isNull());
+        },
+        "");
+
     // Test with update on custom class
     try {
         auto newAttr = obj.attr("dynamically_added_prop", true);
@@ -524,18 +531,17 @@ TEST(object, custom_class_non_existent_operations) {
 
 TEST(object, special_object_types_non_existent) {
     // Test non-existent operations on special object types
-    
+
     // DateTime object - test property access only
     auto dateTime = newObject("DateTime");
     ASSERT_TRUE(dateTime.attr("non_existent_datetime_prop").isNull());
-    
+
     // Simple stdClass object
     auto simpleObj = newObject("stdClass");
     ASSERT_TRUE(simpleObj.attr("simple_missing_prop").isNull());
 
-    try_call([&](){
-    	ASSERT_TRUE(simpleObj.item("simple_missing_item").isNull());
-    }, "Cannot use object of type stdClass as array");
+    try_call([&]() { ASSERT_TRUE(simpleObj.item("simple_missing_item").isNull()); },
+             "Cannot use object of type stdClass as array");
 
     // Test that basic operations work without crashing
     SUCCEED() << "Special object types test completed";
@@ -543,21 +549,21 @@ TEST(object, special_object_types_non_existent) {
 
 TEST(object, simple_property_access) {
     auto obj = newObject("stdClass");
-    
+
     // Test basic property operations
     obj.set("test_prop", "test_value");
     ASSERT_STREQ(obj.get("test_prop").toCString(), "test_value");
-    
+
     // Test non-existent property
     ASSERT_TRUE(obj.get("non_existent").isNull());
-    
+
     // Test property existence
     ASSERT_TRUE(obj.propertyExists("test_prop"));
     ASSERT_FALSE(obj.propertyExists("missing_prop"));
-    
+
     // Test attr access
     auto attrResult = obj.attr("test_prop");
     ASSERT_STREQ(attrResult.toCString(), "test_value");
-    
+
     SUCCEED() << "Simple property access test completed";
 }
