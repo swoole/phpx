@@ -86,7 +86,7 @@ Reference Object::attrRef(const String &prop_name) {
         return {};
     }
 
-    auto member = attr(prop_name);
+    auto member = attr(prop_name, true);
     if (zval_is_ref(member.const_ptr())) {
         return Reference(member.const_ptr());
     } else if (!member.isIndirect()) {
@@ -112,12 +112,10 @@ Variant Object::attr(const Variant &name, bool update) const {
     auto member_p = zend_read_property_ex(ce(), object(), prop_name.str(), true, &rv);
 
     if (zval_is_null(member_p) && update) {
-        zval tmp;
-        ZVAL_NULL(&tmp);
-        auto old_scope = EG(fake_scope);
-        EG(fake_scope) = ce();
-        member_p = object()->handlers->write_property(object(), prop_name.str(), &tmp, NULL);
-        EG(fake_scope) = old_scope;
+		auto old_scope = EG(fake_scope);
+		EG(fake_scope) = ce();
+		member_p = object()->handlers->write_property(object(), prop_name.str(), undef(), NULL);
+		EG(fake_scope) = old_scope;
     }
 
     if (member_p == &rv) {

@@ -18,7 +18,6 @@
 
 namespace php {
 const char *box_res_name = "php::box";
-int box_res_id;
 DebugInfo debug_info{
     false,
     "",
@@ -158,14 +157,9 @@ static void box_dtor(zend_resource *res) {
     box->destroy();
 }
 
-#ifdef ZTS
-#define THREAD_LOCAL thread_local
-#else
-#define THREAD_LOCAL
-#endif
-
-THREAD_LOCAL bool request_init_called = false;
-THREAD_LOCAL bool request_shutdown_called = false;
+THREAD_LOCAL static bool request_init_called = false;
+THREAD_LOCAL static bool request_shutdown_called = false;
+THREAD_LOCAL int box_res_id;
 
 void request_init() {
     if (request_init_called) {

@@ -158,8 +158,14 @@ bool is_callable_ex(zval *callable,
 int array_data_compare(Bucket *f, Bucket *s);
 bool prepare_slice(long &offset, long &length, size_t total);
 
+#ifdef ZTS
+#define THREAD_LOCAL thread_local
+#else
+#define THREAD_LOCAL
+#endif
+
 extern std::function<void(zend_object *)> throw_impl;
-extern int box_res_id;
+extern THREAD_LOCAL int box_res_id;
 extern const char *box_res_name;
 
 struct DebugInfo {
@@ -1252,7 +1258,7 @@ class Object : public Variant {
 
 class Reference : public Variant {
     void checkRef() {
-        if (isNull() || isUndef()) {
+        if (zval_is_null(&val) || zval_is_undef(&val)) {
             ref_init(&val);
         } else if (!isReference()) {
             throwError("parameter 1 must be `reference`, got `%s`", typeStr());
