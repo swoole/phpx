@@ -11,175 +11,176 @@ constexpr double PI = 3.1415926;
 
 TEST(variant, zend_string_constructor) {
     // Test Variant(zend_string *s, Ctor method = Ctor::Copy) constructor
-    
+
     // Test 1: Ctor::Copy method (default)
     zend_string *str1 = zend_string_init("hello world", 11, 0);
     Variant v1(str1, Ctor::Copy);
-    
+
     ASSERT_TRUE(v1.isString());
-    ASSERT_EQ(v1.getRefCount(), 2); // Original + copied reference
+    ASSERT_EQ(v1.getRefCount(), 2);  // Original + copied reference
     ASSERT_STREQ(v1.toCString(), "hello world");
     ASSERT_EQ(v1.length(), 11);
-    
+
     // Clean up original string
     zend_string_release(str1);
-    
+
     // Test 2: Ctor::Move method
     zend_string *str2 = zend_string_init("move test", 9, 0);
     Variant v2(str2, Ctor::Move);
-    
+
     ASSERT_TRUE(v2.isString());
-    ASSERT_EQ(v2.getRefCount(), 1); // Only one reference since we moved ownership
+    ASSERT_EQ(v2.getRefCount(), 1);  // Only one reference since we moved ownership
     ASSERT_STREQ(v2.toCString(), "move test");
     ASSERT_EQ(v2.length(), 9);
-    
+
     // Don't release str2 here since ownership was moved
-    
+
     // Test 3: Default constructor parameter (should be Ctor::Copy)
     zend_string *str3 = zend_string_init("default param", 13, 0);
-    Variant v3(str3); // Using default parameter
-    
+    Variant v3(str3);  // Using default parameter
+
     ASSERT_TRUE(v3.isString());
-    ASSERT_EQ(v3.getRefCount(), 2); // Should behave like Ctor::Copy
+    ASSERT_EQ(v3.getRefCount(), 2);  // Should behave like Ctor::Copy
     ASSERT_STREQ(v3.toCString(), "default param");
     ASSERT_EQ(v3.length(), 13);
-    
+
     zend_string_release(str3);
-    
+
     // Test 4: Empty string
     zend_string *str4 = zend_string_init("", 0, 0);
     Variant v4(str4, Ctor::Copy);
-    
+
     ASSERT_TRUE(v4.isString());
     ASSERT_EQ(v4.getRefCount(), 2);
     ASSERT_STREQ(v4.toCString(), "");
     ASSERT_EQ(v4.length(), 0);
-    
+
     zend_string_release(str4);
-    
+
     // Test 5: String with special characters
     zend_string *str5 = zend_string_init("Hello\nWorld\tTest", 16, 0);
     Variant v5(str5, Ctor::Move);
-    
+
     ASSERT_TRUE(v5.isString());
     ASSERT_EQ(v5.getRefCount(), 1);
     ASSERT_STREQ(v5.toCString(), "Hello\nWorld\tTest");
     ASSERT_EQ(v5.length(), 16);
-    
+
     // Test 6: Reference counting behavior
-    Variant v6 = v5; // Copy constructor
+    Variant v6 = v5;  // Copy constructor
     // Both variants should be valid strings
     ASSERT_TRUE(v6.isString());
     ASSERT_STREQ(v6.toCString(), "Hello\nWorld\tTest");
     ASSERT_EQ(v6.length(), 16);
-    
+
     // Test 7: Long string
-    const char* long_str = "This is a very long string that tests the handling of larger string data in the Variant constructor with zend_string parameter";
+    const char *long_str = "This is a very long string that tests the handling of larger string data in the Variant "
+                           "constructor with zend_string parameter";
     size_t long_len = std::strlen(long_str);
     zend_string *str7 = zend_string_init(long_str, long_len, 0);
     Variant v7(str7, Ctor::Copy);
-    
+
     ASSERT_TRUE(v7.isString());
     ASSERT_EQ(v7.getRefCount(), 2);
     ASSERT_STREQ(v7.toCString(), long_str);
     ASSERT_EQ(v7.length(), long_len);
-    
+
     zend_string_release(str7);
 }
 
 TEST(variant, zend_array_constructor) {
     // Test Variant(zend_array *arr, Ctor method = Ctor::Copy) constructor
-    
+
     // Test 1: Ctor::Copy method (default)
     zval zarr1;
     array_init(&zarr1);
     add_next_index_long(&zarr1, 100);
     add_next_index_string(&zarr1, "test");
-    
+
     zend_array *arr1 = Z_ARRVAL(zarr1);
     Variant v1(arr1, Ctor::Copy);
-    
+
     ASSERT_TRUE(v1.isArray());
-    ASSERT_EQ(v1.getRefCount(), 2); // Original + copied reference
-    
+    ASSERT_EQ(v1.getRefCount(), 2);  // Original + copied reference
+
     Array array1(v1);
     ASSERT_EQ(array1.count(), 2);
     ASSERT_EQ(array1[0].toInt(), 100);
     ASSERT_STREQ(array1[1].toCString(), "test");
-    
+
     zval_ptr_dtor(&zarr1);
-    
+
     // Test 2: Ctor::Move method
     zval zarr2;
     array_init(&zarr2);
     add_next_index_long(&zarr2, 200);
     add_next_index_string(&zarr2, "move_test");
-    
+
     zend_array *arr2 = Z_ARRVAL(zarr2);
     Variant v2(arr2, Ctor::Move);
-    
+
     ASSERT_TRUE(v2.isArray());
-    ASSERT_EQ(v2.getRefCount(), 1); // Only one reference since we moved ownership
-    
+    ASSERT_EQ(v2.getRefCount(), 1);  // Only one reference since we moved ownership
+
     Array array2(v2);
     ASSERT_EQ(array2.count(), 2);
     ASSERT_EQ(array2[0].toInt(), 200);
     ASSERT_STREQ(array2[1].toCString(), "move_test");
-    
+
     // Don't call zval_ptr_dtor here since ownership was moved
-    
+
     // Test 3: Default constructor parameter (should be Ctor::Copy)
     zval zarr3;
     array_init(&zarr3);
     add_next_index_long(&zarr3, 300);
-    
+
     zend_array *arr3 = Z_ARRVAL(zarr3);
-    Variant v3(arr3); // Using default parameter
-    
+    Variant v3(arr3);  // Using default parameter
+
     ASSERT_TRUE(v3.isArray());
-    ASSERT_EQ(v3.getRefCount(), 2); // Should behave like Ctor::Copy
-    
+    ASSERT_EQ(v3.getRefCount(), 2);  // Should behave like Ctor::Copy
+
     Array array3(v3);
     ASSERT_EQ(array3.count(), 1);
     ASSERT_EQ(array3[0].toInt(), 300);
-    
+
     zval_ptr_dtor(&zarr3);
-    
+
     // Test 4: Empty array
     zval zarr4;
     array_init(&zarr4);
-    
+
     zend_array *arr4 = Z_ARRVAL(zarr4);
     Variant v4(arr4, Ctor::Copy);
-    
+
     ASSERT_TRUE(v4.isArray());
     ASSERT_EQ(v4.getRefCount(), 2);
-    
+
     Array array4(v4);
     ASSERT_EQ(array4.count(), 0);
     ASSERT_TRUE(array4.empty());
-    
+
     zval_ptr_dtor(&zarr4);
-    
+
     // Test 5: Array with mixed types
     zval zarr5;
     array_init(&zarr5);
     add_next_index_long(&zarr5, 42);
     add_next_index_double(&zarr5, 3.14);
     add_next_index_string(&zarr5, "mixed");
-    
+
     zend_array *arr5 = Z_ARRVAL(zarr5);
     Variant v5(arr5, Ctor::Move);
-    
+
     ASSERT_TRUE(v5.isArray());
     Array array5(v5);
     ASSERT_EQ(array5.count(), 3);
     ASSERT_EQ(array5[0].toInt(), 42);
     ASSERT_EQ(array5[1].toFloat(), 3.14);
     ASSERT_STREQ(array5[2].toCString(), "mixed");
-    
+
     // Test reference counting behavior
-    Variant v6 = v5; // Copy constructor
+    Variant v6 = v5;  // Copy constructor
     // The reference count may vary depending on internal implementation
     // Just verify that both variants are valid arrays
     ASSERT_TRUE(v6.isArray());
@@ -1281,61 +1282,61 @@ TEST(variant, operator_arithmetic) {
         Variant result = 5 + v1;
         ASSERT_TRUE(result.isInt());
         ASSERT_EQ(result.toInt(), 15);
-        
+
         Variant result2 = 3.14 + v1;
         ASSERT_TRUE(result2.isFloat());
         ASSERT_NEAR(result2.toFloat(), 13.14, 0.001);
-        
+
         Variant v2("20");
         Variant result3 = 5 + v2;
         ASSERT_TRUE(result3.isInt());
         ASSERT_EQ(result3.toInt(), 25);
     }
-    
+
     // Test subtraction operator
     {
         Variant v1(10);
         Variant result = 15 - v1;
         ASSERT_TRUE(result.isInt());
         ASSERT_EQ(result.toInt(), 5);
-        
+
         Variant result2 = 20.5 - v1;
         ASSERT_TRUE(result2.isFloat());
         ASSERT_NEAR(result2.toFloat(), 10.5, 0.001);
     }
-    
+
     // Test multiplication operator
     {
         Variant v1(5);
         Variant result = 3 * v1;
         ASSERT_TRUE(result.isInt());
         ASSERT_EQ(result.toInt(), 15);
-        
+
         Variant result2 = 2.5 * v1;
         ASSERT_TRUE(result2.isFloat());
         ASSERT_NEAR(result2.toFloat(), 12.5, 0.001);
     }
-    
+
     // Test division operator
     {
         Variant v1(4);
         Variant result = 20 / v1;
         ASSERT_TRUE(result.isInt());
         ASSERT_EQ(result.toInt(), 5);
-        
+
         Variant v2(3);
         Variant result2 = 10 / v2;
         ASSERT_TRUE(result2.isFloat());
         ASSERT_NEAR(result2.toFloat(), 3.333, 0.001);
     }
-    
+
     // Test modulo operator
     {
         Variant v1(3);
         Variant result = 10 % v1;
         ASSERT_TRUE(result.isInt());
         ASSERT_EQ(result.toInt(), 1);
-        
+
         // Test the specialized Float version
         Variant result2 = 10.5 % v1;
         ASSERT_TRUE(result2.isInt());
@@ -1349,39 +1350,39 @@ TEST(variant, operator_bitwise) {
         Variant v1(2);
         Variant result = 4 << v1;
         ASSERT_TRUE(result.isInt());
-        ASSERT_EQ(result.toInt(), 16); // 4 << 2 = 16
+        ASSERT_EQ(result.toInt(), 16);  // 4 << 2 = 16
     }
-    
+
     // Test right shift operator
     {
         Variant v1(2);
         Variant result = 16 >> v1;
         ASSERT_TRUE(result.isInt());
-        ASSERT_EQ(result.toInt(), 4); // 16 >> 2 = 4
+        ASSERT_EQ(result.toInt(), 4);  // 16 >> 2 = 4
     }
-    
+
     // Test bitwise AND operator
     {
-        Variant v1(12); // 1100 in binary
-        Variant result = 10 & v1;   // 1010 in binary
+        Variant v1(12);            // 1100 in binary
+        Variant result = 10 & v1;  // 1010 in binary
         ASSERT_TRUE(result.isInt());
-        ASSERT_EQ(result.toInt(), 8); // 1000 in binary
+        ASSERT_EQ(result.toInt(), 8);  // 1000 in binary
     }
-    
+
     // Test bitwise OR operator
     {
-        Variant v1(12); // 1100 in binary
-        Variant result = 10 | v1;   // 1010 in binary
+        Variant v1(12);            // 1100 in binary
+        Variant result = 10 | v1;  // 1010 in binary
         ASSERT_TRUE(result.isInt());
-        ASSERT_EQ(result.toInt(), 14); // 1110 in binary
+        ASSERT_EQ(result.toInt(), 14);  // 1110 in binary
     }
-    
+
     // Test bitwise XOR operator
     {
-        Variant v1(12); // 1100 in binary
-        Variant result = 10 ^ v1;   // 1010 in binary
+        Variant v1(12);            // 1100 in binary
+        Variant result = 10 ^ v1;  // 1010 in binary
         ASSERT_TRUE(result.isInt());
-        ASSERT_EQ(result.toInt(), 6); // 0110 in binary
+        ASSERT_EQ(result.toInt(), 6);  // 0110 in binary
     }
 }
 
@@ -1393,7 +1394,7 @@ TEST(variant, operator_comparison) {
         ASSERT_TRUE((10 <= v1).toBool());
         ASSERT_FALSE((15 <= v1).toBool());
     }
-    
+
     // Test less than operator
     {
         Variant v1(10);
@@ -1401,7 +1402,7 @@ TEST(variant, operator_comparison) {
         ASSERT_FALSE((10 < v1).toBool());
         ASSERT_FALSE((15 < v1).toBool());
     }
-    
+
     // Test greater than or equal operator
     {
         Variant v1(10);
@@ -1409,7 +1410,7 @@ TEST(variant, operator_comparison) {
         ASSERT_TRUE((10 >= v1).toBool());
         ASSERT_TRUE((15 >= v1).toBool());
     }
-    
+
     // Test greater than operator
     {
         Variant v1(10);
@@ -1417,14 +1418,14 @@ TEST(variant, operator_comparison) {
         ASSERT_FALSE((10 > v1).toBool());
         ASSERT_TRUE((15 > v1).toBool());
     }
-    
+
     // Test equality operator
     {
         Variant v1(10);
         ASSERT_FALSE((5 == v1).toBool());
         ASSERT_TRUE((10 == v1).toBool());
         ASSERT_FALSE((15 == v1).toBool());
-        
+
         // Test with different types
         Variant v2("10");
         ASSERT_TRUE((10 == v2).toBool());
@@ -1435,37 +1436,37 @@ TEST(variant, operator_comparison) {
 TEST(variant, operator_mixed_types) {
     // Test operations with different numeric types
     {
-        Variant v1(10.5); // Float
+        Variant v1(10.5);  // Float
         Variant result = 5 + v1;
         ASSERT_TRUE(result.isFloat());
         ASSERT_NEAR(result.toFloat(), 15.5, 0.001);
-        
+
         Variant result2 = 20 - v1;
         ASSERT_TRUE(result2.isFloat());
         ASSERT_NEAR(result2.toFloat(), 9.5, 0.001);
     }
-    
+
     // Test operations with string numbers
     {
         Variant v1("15");
         Variant result = 5 + v1;
         ASSERT_TRUE(result.isInt());
         ASSERT_EQ(result.toInt(), 20);
-        
+
         Variant result2 = 25 - v1;
         ASSERT_TRUE(result2.isInt());
         ASSERT_EQ(result2.toInt(), 10);
     }
-    
+
     // Test boolean operations
     {
         Variant v1(true);
-        Variant result = 1 + v1; // true converts to 1
+        Variant result = 1 + v1;  // true converts to 1
         ASSERT_TRUE(result.isInt());
         ASSERT_EQ(result.toInt(), 2);
-        
+
         Variant v2(false);
-        Variant result2 = 5 + v2; // false converts to 0
+        Variant result2 = 5 + v2;  // false converts to 0
         ASSERT_TRUE(result2.isInt());
         ASSERT_EQ(result2.toInt(), 5);
     }
@@ -1478,24 +1479,24 @@ TEST(variant, operator_edge_cases) {
         Variant result = 10 + v1;
         ASSERT_TRUE(result.isInt());
         ASSERT_EQ(result.toInt(), 10);
-        
+
         Variant result2 = 10 * v1;
         ASSERT_TRUE(result2.isInt());
         ASSERT_EQ(result2.toInt(), 0);
     }
-    
+
     // Test with negative values
     {
         Variant v1(-5);
         Variant result = 10 + v1;
         ASSERT_TRUE(result.isInt());
         ASSERT_EQ(result.toInt(), 5);
-        
+
         Variant result2 = 10 - v1;
         ASSERT_TRUE(result2.isInt());
         ASSERT_EQ(result2.toInt(), 15);
     }
-    
+
     // Test with large values
     {
         Variant v1(1000000L);
