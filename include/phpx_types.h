@@ -18,6 +18,8 @@
 
 #include "zend_types.h"
 #include <initializer_list>
+#include <functional>
+#include <vector>
 
 namespace php {
 typedef unsigned char uchar;
@@ -47,6 +49,7 @@ using Var = Variant;
 using Str = String;
 using Ref = Reference;
 using ArgList = std::initializer_list<const Variant>;
+using ClosureFn = std::function<void(INTERNAL_FUNCTION_PARAMETERS, Object &, Array &)>;
 
 typedef void (*resource_dtor)(zend_resource *);
 

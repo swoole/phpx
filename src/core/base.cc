@@ -47,7 +47,9 @@ void echo(const char *format, ...) {
 }
 
 void echo(const String &str) {
-    PHPWRITE(str.data(), str.length());
+    if (EXPECTED(str.isString())) {
+        PHPWRITE(str.data(), str.length());
+    }
 }
 
 void echo(const Variant &val) {
