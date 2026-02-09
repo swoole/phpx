@@ -1310,7 +1310,9 @@ static inline Reference newReference() {
     return Reference{};
 }
 
+#if PHP_VERSION_ID >= 80200
 extern Object newClosure(const ClosureFn &fn, const ArgList &uses = {}, const Object &_this = {});
+#endif
 
 extern Object newObject(zend_class_entry *ce);
 extern Object newObject(zend_class_entry *ce, const ArgList &args);

@@ -4,6 +4,7 @@
 
 using namespace php;
 
+#if PHP_VERSION_ID >= 80200
 TEST(closure, base) {
     ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Array &vars_) {
         ZVAL_LONG(return_value, 1000);
@@ -19,3 +20,4 @@ TEST(closure, base) {
     auto rs = o("java", "php");
     ASSERT_EQ(rs.toInt(), 1000);
 }
+#endif

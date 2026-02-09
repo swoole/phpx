@@ -16,6 +16,7 @@
 
 #include "phpx.h"
 
+#if PHP_VERSION_ID >= 80200
 #include "zend_closures.h"
 
 namespace php {
@@ -68,3 +69,4 @@ Object newClosure(const ClosureFn &fn, const ArgList &uses, const Object &_this)
     return {&closure, Ctor::Move};
 }
 }  // namespace php
+#endif
