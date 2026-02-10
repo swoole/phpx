@@ -144,7 +144,7 @@ static inline Variant silentCall(const Variant &func) {
 }
 
 static inline Variant getCallArg(uint32_t i) {
-    return ZEND_CALL_ARG(EG(current_execute_data), i + 1);
+    return {ZEND_CALL_ARG(EG(current_execute_data), i + 1), Ctor::CopyRef};
 }
 
 static inline Variant getCallArg(uint32_t i, const Variant &defaultValue) {

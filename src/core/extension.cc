@@ -293,9 +293,9 @@ Array Args::toArray() const {
 
 Variant Args::get(size_t i) const {
     if (i >= count()) {
-        return Variant{};
+        return null;
     }
-    return params.at(i);
+    return {params.at(i).const_ptr(), Ctor::CopyRef};
 }
 
 Resource *getResource(const std::string &name) {

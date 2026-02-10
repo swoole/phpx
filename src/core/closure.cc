@@ -28,15 +28,11 @@ class ClosureBox : public Box {
   public:
     Object this_;
     ClosureFn fn_;
-    Array vars_;
+    Args vars_;
     zend_function *zf_;
 
-    ClosureBox(const ClosureFn &fn, const Object &_this, const Array &vars, zend_function *zf) {
-        fn_ = fn;
-        this_ = _this;
-        zf_ = zf;
-        vars_ = vars;
-    }
+    ClosureBox(const ClosureFn &fn, const Object &_this, const ArgList &uses, zend_function *zf)
+        : fn_(fn), this_(_this), vars_(uses), zf_(zf) {}
 };
 
 Object newClosure(const ClosureFn &fn, const ArgList &uses, const Object &_this) {
@@ -44,11 +40,7 @@ Object newClosure(const ClosureFn &fn, const ArgList &uses, const Object &_this)
     memset(func, 0, sizeof(zend_internal_function));
 
     String fnName("{closure}");
-    Array vars;
-    for (auto useItem : uses) {
-        vars.append(useItem);
-    }
-    auto box_ptr = new ClosureBox(fn, _this, vars, func);
+    auto box_ptr = new ClosureBox(fn, _this, uses, func);
 
     func->type = ZEND_INTERNAL_FUNCTION;
     func->internal_function.handler = [](INTERNAL_FUNCTION_PARAMETERS) {
