@@ -46,7 +46,8 @@ Object newClosure(const ClosureFn &fn, const ArgList &uses, const Object &_this)
     func->internal_function.handler = [](INTERNAL_FUNCTION_PARAMETERS) {
         Object this_(ZEND_THIS);
         auto box = this_.get("box").toBox<ClosureBox>();
-        box->fn_(INTERNAL_FUNCTION_PARAM_PASSTHRU, box->this_, box->vars_);
+        auto rv = box->fn_(INTERNAL_FUNCTION_PARAM_PASSTHRU, box->this_, box->vars_);
+        rv.moveTo(return_value);
     };
     func->internal_function.function_name = fnName.str();
     func->common.scope = zend_standard_class_def;

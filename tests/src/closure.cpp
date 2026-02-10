@@ -6,17 +6,17 @@ using namespace php;
 
 #if PHP_VERSION_ID >= 80200
 TEST(closure, base) {
-    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &vars_) {
-        ZVAL_LONG(return_value, 1000);
-
+    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &vars_) -> Variant {
         auto arg_0 = getCallArg(0);
-        ASSERT_STREQ(arg_0.toCString(), "java");
+        EXPECT_STREQ(arg_0.toCString(), "java");
 
         auto arg_1 = getCallArg(1);
-        ASSERT_STREQ(arg_1.toCString(), "php");
+        EXPECT_STREQ(arg_1.toCString(), "php");
 
         auto arg_0_2 = getCallArg(0, "golang");
-        ASSERT_STREQ(arg_0_2.toCString(), "java");
+        EXPECT_STREQ(arg_0_2.toCString(), "java");
+
+        return 1000;
     };
 
     auto o = newClosure(fn, {"hello", "swoole"});
@@ -25,9 +25,10 @@ TEST(closure, base) {
 }
 
 TEST(closure, ref) {
-    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &vars_) {
+    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &vars_) -> Variant {
         auto v = vars_.get(0);
         v = 1000;
+        return null;
     };
 
     var v(2020);

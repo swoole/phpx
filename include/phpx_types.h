@@ -49,7 +49,7 @@ using Var = Variant;
 using Str = String;
 using Ref = Reference;
 using ArgList = std::initializer_list<const Variant>;
-using ClosureFn = std::function<void(INTERNAL_FUNCTION_PARAMETERS, Object &, Args &)>;
+using ClosureFn = std::function<Variant(INTERNAL_FUNCTION_PARAMETERS, Object &, Args &)>;
 
 typedef void (*resource_dtor)(zend_resource *);
 
