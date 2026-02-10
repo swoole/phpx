@@ -28,8 +28,8 @@ class ClosureBox : public Box {
   public:
     Object this_;
     ClosureFn fn_;
-    zend_function *zf_;
     Array vars_;
+    zend_function *zf_;
 
     ClosureBox(const ClosureFn &fn, const Object &_this, const Array &vars, zend_function *zf) {
         fn_ = fn;

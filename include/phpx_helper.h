@@ -95,6 +95,22 @@ static inline Bool empty(const Variant &v) {
     return !v.toBool();
 }
 
+static inline bool exists(Int v) {
+    return true;
+}
+
+static inline bool exists(Float v) {
+    return true;
+}
+
+static inline bool exists(Bool v) {
+    return true;
+}
+
+static inline Bool exists(const Variant &v) {
+    return !(v.isNull() || v.isUndef());
+}
+
 static inline void move(Int v, zval *retval) {
     ZVAL_LONG(retval, v);
 }

@@ -523,7 +523,7 @@ bool empty(const Variant &v, const std::initializer_list<std::pair<Operation, co
 
 bool exists(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list) {
     Variant tmp = v;
-    if (tmp.isNull() or tmp.isUndef()) {
+    if (tmp.isNull() || tmp.isUndef()) {
         return false;
     }
 

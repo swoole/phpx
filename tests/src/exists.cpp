@@ -4,6 +4,16 @@
 
 using namespace php;
 
+TEST(exists, basic) {
+    ASSERT_TRUE(exists(100L));
+    ASSERT_TRUE(exists(100.1002));
+    ASSERT_TRUE(exists(true));
+    ASSERT_TRUE(exists(false));
+    ASSERT_FALSE(exists(null));
+    var v(undef());
+    ASSERT_FALSE(exists(v));
+}
+
 TEST(exists, null) {
     var v1;
     ASSERT_FALSE(exists(v1, {}));
