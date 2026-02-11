@@ -92,6 +92,9 @@ TEST(object, static_property) {
     auto ce = getClassEntry("TestClass");
     auto offset2 = getPropertyOffset(ce, "propInt");
     ASSERT_EQ(getStaticProperty(ce, offset2).toInt(), 1990018900);
+
+    auto obj = newObject("TestClass");
+    ASSERT_EQ(getStaticProperty(obj, "propInt").toInt(), 1990018900);
 }
 
 TEST(object, mixed) {
@@ -593,6 +596,6 @@ TEST(object, enum_class) {
     eval("enum Suit{case Hearts; case Diamonds; case Clubs; case Spades;}");
     auto ce = getClassEntry("Suit");
     auto case1 = getEnumCase(ce, "Spades");
-    auto name = zend_enum_fetch_case_name(case1.object());
-    ASSERT_STREQ(Z_STRVAL_P(name), "Spades");
+    auto name = getEnumCaseName(case1);
+    ASSERT_STREQ(name.data(), "Spades");
 }

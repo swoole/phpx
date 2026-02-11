@@ -593,9 +593,7 @@ bool setStaticProperty(const String &class_name, const String &prop, const Varia
         throwError("class '%s' is undefined.", class_name.toCString());
         return {};
     }
-    const auto zv = NO_CONST_V(v);
-    Z_TRY_ADDREF_P(zv);
-    return zend_update_static_property_ex(ce, prop.str(), zv) == SUCCESS;
+    return zend_update_static_property_ex(ce, prop.str(), NO_CONST_V(v)) == SUCCESS;
 }
 
 uint32_t getPropertyOffset(const String &class_name, const String &prop) {

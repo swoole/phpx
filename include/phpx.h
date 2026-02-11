@@ -1337,6 +1337,10 @@ static inline Object getEnumCase(zend_class_entry *ce, const String &name) {
     return {zend_enum_get_case(ce, name.str())};
 }
 
+static inline String getEnumCaseName(Object &obj) {
+    return {zend_enum_fetch_case_name(obj.object()), Ctor::Indirect};
+}
+
 /* generator */
 extern Object newObject(const char *name, const Variant &v1);
 extern Object newObject(const char *name, const Variant &v1, const Variant &v2);
