@@ -340,8 +340,7 @@ Variant Variant::getProperty(zend_string *prop_name) const {
 }
 
 void Variant::setProperty(zend_string *prop_name, const Variant &value) const {
-    auto zv = NO_CONST_V(value);
-    zend_update_property_ex(ce(), object(), prop_name, zv);
+    zend_update_property_ex(ce(), object(), prop_name, NO_CONST_V(value));
 }
 
 Variant Variant::getProperty(const Variant &name) const {
