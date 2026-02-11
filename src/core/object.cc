@@ -56,6 +56,21 @@ Variant Object::exec(const Variant &fn, const ArgList &args) {
     return call_impl(unwrap_ptr(), fn.const_ptr(), _args);
 }
 
+Variant Object::exec(zend_function *fn) {
+    Variant retval{};
+    zend_call_known_function(fn, object(), ce(), retval.ptr(), 0, nullptr, nullptr);
+    throwErrorIfOccurred();
+    return retval;
+}
+
+Variant Object::exec(zend_function *fn, const ArgList &args) {
+    Variant retval{};
+    Args _args(args);
+    zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), nullptr);
+    throwErrorIfOccurred();
+    return retval;
+}
+
 bool Object::instanceOf(const String &name) const {
     auto cls_ce = getClassEntry(name);
     if (!cls_ce) {

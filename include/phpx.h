@@ -1125,6 +1125,8 @@ class Object : public Variant {
         return call_impl(unwrap_ptr(), fn.const_ptr());
     }
     Variant exec(const Variant &fn, const ArgList &args);
+    Variant exec(zend_function *fn);
+    Variant exec(zend_function *fn, const ArgList &args);
 
     Reference attrRef(const String &name);
     Variant attr(const Variant &name, bool update = false) const;
