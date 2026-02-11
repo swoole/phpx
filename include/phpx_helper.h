@@ -23,6 +23,18 @@
 #include "phpx_operator.h"
 
 namespace php {
+static inline bool same(Int a, Int b) {
+    return a == b;
+}
+
+static inline bool same(Float a, Float b) {
+    return a == b;
+}
+
+static inline bool same(Bool a, Bool b) {
+    return a == b;
+}
+
 static inline bool equals(Int a, Int b) {
     return a == b;
 }

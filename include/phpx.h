@@ -23,6 +23,7 @@
 extern "C" {
 #include "php.h"
 #include "zend_ini.h"
+#include "zend_enum.h"
 #include "zend_interfaces.h"
 #include "zend_exceptions.h"
 
@@ -133,6 +134,7 @@ PHPX_API void exit(const Variant &status);
 PHPX_API bool same(const Variant &a, const Variant &b);
 PHPX_API bool equals(const Variant &a, const Variant &b);
 PHPX_API int compare(const Variant &a, const Variant &b);
+PHPX_API Variant getStaticProperty(const Object &object, const String &prop);
 PHPX_API Variant getStaticProperty(const String &class_name, const String &prop);
 PHPX_API Variant getStaticProperty(zend_class_entry *ce, uint32_t offset);
 PHPX_API bool setStaticProperty(const String &class_name, const String &prop, const Variant &value);
@@ -1101,6 +1103,12 @@ class Object : public Variant {
     Object(const zval *v, Ctor method = Ctor::Copy) : Variant(v, method) {
         checkObject();
     }
+    Object(zend_object *o, Ctor method = Ctor::Copy) {
+        ZVAL_OBJ(&val, o);
+        if (method == Ctor::Copy) {
+            addRef();
+        }
+    }
     Object(const Variant &v, Ctor method = Ctor::Copy) : Object(v.unwrap_ptr(), method) {}
     Object() = default;
     Variant call(const Variant &func, Args &args) {
@@ -1323,6 +1331,10 @@ static inline Object newObject(const char *name) {
 
 static inline Object newObject(const char *name, const ArgList &args) {
     return newObject(getClassEntrySafe(name), args);
+}
+
+static inline Object getEnumCase(zend_class_entry *ce, const String &name) {
+    return {zend_enum_get_case(ce, name.str())};
 }
 
 /* generator */

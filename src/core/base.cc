@@ -558,6 +558,10 @@ bool exists(const Variant &v, const std::initializer_list<std::pair<Operation, c
     return true;
 }
 
+Variant getStaticProperty(const Object &object, const String &prop) {
+    return {zend_read_static_property_ex(object.ce(), prop.str(), true), Ctor::Indirect};
+}
+
 Variant getStaticProperty(const String &class_name, const String &prop) {
     const auto ce = getClassEntry(class_name);
     if (UNEXPECTED(!ce)) {
