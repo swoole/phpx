@@ -567,3 +567,32 @@ TEST(object, simple_property_access) {
 
     SUCCEED() << "Simple property access test completed";
 }
+
+TEST(object, move_ctor) {
+    zval tmp;
+    object_init(&tmp);
+    Object obj(tmp.value.obj, Ctor::Move);
+    ASSERT_TRUE(obj.isObject());
+
+    obj.attr("test", true) = 2025;
+    ASSERT_EQ(obj.get("test").toInt(), 2025);
+}
+
+TEST(object, copy_ctor) {
+    auto o1 = newObject("stdClass");
+    ASSERT_TRUE(o1.isObject());
+
+    Object o2(o1.object(), Ctor::Copy);
+    o2.attr("test", true) = 2025;
+
+    ASSERT_EQ(o1.get("test").toInt(), 2025);
+    ASSERT_EQ(o2.get("test").toInt(), 2025);
+}
+
+TEST(object, enum_class) {
+    eval("enum Suit{case Hearts; case Diamonds; case Clubs; case Spades;}");
+    auto ce = getClassEntry("Suit");
+    auto case1 = getEnumCase(ce, "Spades");
+    auto name = zend_enum_fetch_case_name(case1.object());
+    ASSERT_STREQ(Z_STRVAL_P(name), "Spades");
+}
