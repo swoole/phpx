@@ -100,6 +100,8 @@ PHPX_API Variant call(const Variant &func, Args &args);
 PHPX_API Variant call(const Variant &func, Array &args);
 PHPX_API Variant call(const Variant &func, const ArgList &args);
 PHPX_API Variant call(zend_function *func);
+PHPX_API Variant call(zend_function *func, Args &_args);
+PHPX_API Variant call(zend_function *func, Array &args);
 PHPX_API Variant call(zend_function *func, const ArgList &args);
 PHPX_API Variant call(zend_class_entry *ce, zend_function *func);
 PHPX_API Variant call(zend_class_entry *ce, zend_function *func, const ArgList &args);
@@ -1044,6 +1046,11 @@ class Args {
     explicit Args(const ArgList &args) : Args(args.size()) {
         for (const auto &arg : args) {
             append(arg.const_ptr());
+        }
+    }
+    explicit Args(Array &args) : Args(args.count()) {
+        for (const auto &arg : args) {
+            append(arg.value.const_ptr());
         }
     }
     void append(const zval *zv) {
