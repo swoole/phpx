@@ -388,3 +388,10 @@ TEST(base, getPropertyOffset) {
     try_call([]() { auto offset1 = getPropertyOffset("TestClassNotExists", "propXt"); },
              "class 'TestClassNotExists' is undefined.");
 }
+
+TEST(base, call_array) {
+    auto fn = getFunction("substr_compare");
+    Array arr({"abcde", "bc", 1, 3});
+    auto rs = call(fn, arr);
+    ASSERT_EQ(rs.toInt(), 1);
+}

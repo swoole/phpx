@@ -610,3 +610,12 @@ TEST(object, exec) {
     auto rs2 = obj.exec(fn2);
     ASSERT_GT(rs2.toInt(), 100000000);
 }
+
+TEST(object, call_array) {
+    auto obj = newObject("DateTime", "2000-01-01");
+    auto fn = getMethod(obj.ce(), "setTime");
+    Array arr({10, 10, 10});
+    obj.exec(fn, arr);
+    auto rs = obj.exec("format", "Y-m-d H:i:s");
+    ASSERT_STREQ(rs.toCString(), "2000-01-01 10:10:10");
+}
