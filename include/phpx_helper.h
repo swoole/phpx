@@ -159,8 +159,12 @@ static inline Variant getCallArg(uint32_t i) {
     return {ZEND_CALL_ARG(EG(current_execute_data), i + 1), Ctor::CopyRef};
 }
 
+static inline uint32_t getCallArgNum() {
+    return ZEND_CALL_NUM_ARGS(EG(current_execute_data));
+}
+
 static inline Variant getCallArg(uint32_t i, const Variant &defaultValue) {
-    if (i >= ZEND_CALL_NUM_ARGS(EG(current_execute_data))) {
+    if (i >= getCallArgNum()) {
         return defaultValue;
     } else {
         return getCallArg(i);

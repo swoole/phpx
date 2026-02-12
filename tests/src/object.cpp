@@ -601,12 +601,12 @@ TEST(object, enum_class) {
 }
 
 TEST(object, exec) {
-	auto obj = newObject("DateTime", "2000-01-01");
-	auto fn = getMethod(obj.ce(), "format");
-	auto rs = obj.exec(fn, {"Y-m-d H:i:s"});
+    auto obj = newObject("DateTime", "2000-01-01");
+    auto fn = getMethod(obj.ce(), "format");
+    auto rs = obj.exec(fn, {"Y-m-d H:i:s"});
     ASSERT_STREQ(rs.toCString(), "2000-01-01 00:00:00");
 
-	auto fn2 = getMethod(obj.ce(), "getTimestamp");
-	auto rs2 = obj.exec(fn2);
+    auto fn2 = getMethod(obj.ce(), "getTimestamp");
+    auto rs2 = obj.exec(fn2);
     ASSERT_GT(rs2.toInt(), 100000000);
 }
