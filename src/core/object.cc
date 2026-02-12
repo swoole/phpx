@@ -63,12 +63,21 @@ Variant Object::exec(zend_function *fn) {
     return retval;
 }
 
-Variant Object::exec(zend_function *fn, const ArgList &args) {
+Variant Object::exec(zend_function *fn, Args &_args) {
     Variant retval{};
-    Args _args(args);
     zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), nullptr);
     throwErrorIfOccurred();
     return retval;
+}
+
+Variant Object::exec(zend_function *fn, Array &args) {
+    Args _args(args);
+    return exec(fn, _args);
+}
+
+Variant Object::exec(zend_function *fn, const ArgList &args) {
+    Args _args(args);
+    return exec(fn, _args);
 }
 
 bool Object::instanceOf(const String &name) const {

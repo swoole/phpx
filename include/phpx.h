@@ -1133,6 +1133,8 @@ class Object : public Variant {
     }
     Variant exec(const Variant &fn, const ArgList &args);
     Variant exec(zend_function *fn);
+    Variant exec(zend_function *fn, Args &args);
+    Variant exec(zend_function *fn, Array &args);
     Variant exec(zend_function *fn, const ArgList &args);
 
     Reference attrRef(const String &name);
