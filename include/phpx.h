@@ -629,6 +629,12 @@ class Variant {
     Reference itemRef(zend_long offset);
     Reference itemRef(const Variant &key);
     Variant newItem();
+    Reference attrRef(const String &name);
+    Variant attr(const Variant &name, bool update = false) const;
+    Variant attr(uintptr_t offset, bool update = false) const {
+        auto member_p = OBJ_PROP(object(), offset);
+        return Variant{member_p, zval_wrap(member_p)};
+    }
 
     bool operator==(const Variant &v) const {
         return equals(v);
@@ -1136,13 +1142,6 @@ class Object : public Variant {
     Variant exec(zend_function *fn, Args &args);
     Variant exec(zend_function *fn, Array &args);
     Variant exec(zend_function *fn, const ArgList &args);
-
-    Reference attrRef(const String &name);
-    Variant attr(const Variant &name, bool update = false) const;
-    Variant attr(uintptr_t offset, bool update = false) const {
-        auto member_p = OBJ_PROP(object(), offset);
-        return Variant{member_p, zval_wrap(member_p)};
-    }
 
     void appendArrayProperty(const String &name, const Variant &value);
     void updateArrayProperty(const String &name, zend_long offset, const Variant &value);

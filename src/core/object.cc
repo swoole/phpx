@@ -116,51 +116,6 @@ Variant Object::callParentMethod(const String &func, const ArgList &args) {
     return retval;
 }
 
-Reference Object::attrRef(const String &prop_name) {
-    if (UNEXPECTED(isNull())) {
-        throwError("read property `%s` on null", prop_name.toCString());
-        return {};
-    }
-
-    auto member = attr(prop_name, true);
-    if (zval_is_ref(member.const_ptr())) {
-        return Reference(member.const_ptr());
-    } else if (!member.isIndirect()) {
-        return {};
-    }
-
-    auto ref = member.toReference();
-    auto prop_info = zend_get_property_info(ce(), prop_name.str(), 1);
-    if (prop_info) {
-        ZEND_REF_ADD_TYPE_SOURCE(ref.reference(), prop_info);
-    }
-    return ref;
-}
-
-Variant Object::attr(const Variant &name, bool update) const {
-    if (UNEXPECTED(isNull())) {
-        throwError("read property `%s` on null", name.toCString());
-        return {};
-    }
-
-    auto prop_name = name.toString();
-    zval rv;
-    auto member_p = zend_read_property_ex(ce(), object(), prop_name.str(), true, &rv);
-
-    if (zval_is_null(member_p) && update) {
-        auto old_scope = EG(fake_scope);
-        EG(fake_scope) = ce();
-        member_p = object()->handlers->write_property(object(), prop_name.str(), undef(), NULL);
-        EG(fake_scope) = old_scope;
-    }
-
-    if (member_p == &rv) {
-        return Variant{member_p};
-    } else {
-        return Variant{member_p, zval_wrap(member_p)};
-    }
-}
-
 void Object::appendArrayProperty(const String &name, const Variant &value) {
     zval rv;
     Variant retval;

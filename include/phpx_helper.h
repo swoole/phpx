@@ -35,12 +35,28 @@ static inline bool same(Bool a, Bool b) {
     return a == b;
 }
 
+static inline bool same(Float a, Int b) {
+    return same(a, static_cast<Float>(b));
+}
+
+static inline bool same(Int a, Float b) {
+    return same(static_cast<Float>(a), b);
+}
+
 static inline bool equals(Int a, Int b) {
     return a == b;
 }
 
 static inline bool equals(Float a, Float b) {
     return a == b;
+}
+
+static inline bool equals(Float a, Int b) {
+    return equals(a, static_cast<Float>(b));
+}
+
+static inline bool equals(Int a, Float b) {
+    return equals(static_cast<Float>(a), b);
 }
 
 static inline Int toInt(Int v) {
@@ -156,6 +172,10 @@ static inline Variant silentCall(const Variant &func) {
 }
 
 static inline Variant getCallArg(uint32_t i) {
+    return {ZEND_CALL_ARG(EG(current_execute_data), i + 1), Ctor::CopyRef};
+}
+
+static inline Reference getCallArgByRef(uint32_t i) {
     return {ZEND_CALL_ARG(EG(current_execute_data), i + 1), Ctor::CopyRef};
 }
 
