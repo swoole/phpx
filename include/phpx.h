@@ -1333,7 +1333,9 @@ extern Object newClosure(const ClosureFn &fn, const ArgList &uses = {}, const Ob
 #endif
 
 extern Object newObject(zend_class_entry *ce);
+extern Object newObject(zend_class_entry *ce, Args &args);
 extern Object newObject(zend_class_entry *ce, const ArgList &args);
+extern Object newObject(zend_class_entry *ce, Array &args);
 
 static inline Object newObject(const char *name) {
     return newObject(getClassEntrySafe(name));

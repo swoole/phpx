@@ -787,7 +787,6 @@ Reference Variant::itemRef(const Variant &key) {
     }
 }
 
-
 Reference Variant::attrRef(const String &prop_name) {
     auto member = attr(prop_name, true);
     if (zval_is_ref(member.const_ptr())) {

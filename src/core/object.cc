@@ -213,20 +213,32 @@ Object newObject(zend_class_entry *ce) {
     return object;
 }
 
-Object newObject(zend_class_entry *ce, const ArgList &args) {
+Object newObject(zend_class_entry *ce, Args &args) {
     Object object;
 
     auto rc = object_init_ex(object.ptr(), ce);
     if (EXPECTED(rc == SUCCESS)) {
         if (ce->constructor) {
-            Args _args(args);
             zend_call_known_function(
-                ce->constructor, object.object(), object.ce(), nullptr, _args.count(), _args.ptr(), nullptr);
+                ce->constructor, object.object(), object.ce(), nullptr, args.count(), args.ptr(), nullptr);
         }
     }
     throwErrorIfOccurred();
 
     return object;
+}
+
+Object newObject(zend_class_entry *ce, const ArgList &args) {
+    Args _args(args);
+    return newObject(ce, args);
+}
+
+Object newObject(zend_class_entry *ce, Array &args) {
+    Args _args(args.count());
+    for (size_t i = 0; i < args.count(); i++) {
+        _args.append(args[i]);
+    }
+    return newObject(ce, _args);
 }
 
 Object toObject(const Variant &v) {
