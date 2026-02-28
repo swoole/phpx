@@ -508,7 +508,7 @@ bool empty(const Variant &v, const std::initializer_list<std::pair<Operation, co
     Variant tmp(v.const_ptr());
     for (const auto &expr : list) {
         if (expr.first == ArrayDimFetch) {
-            if (!tmp.isArray()) {
+            if (!tmp.isArray() && !tmp.isObject()) {
                 return true;
             } else {
                 tmp = tmp.item(expr.second);
@@ -538,7 +538,7 @@ bool exists(const Variant &v, const std::initializer_list<std::pair<Operation, c
 
     for (const auto &expr : list) {
         if (expr.first == ArrayDimFetch) {
-            if (!tmp.isArray()) {
+            if (!tmp.isArray() && !tmp.isObject()) {
                 return false;
             } else {
                 if (!tmp.offsetExists(expr.second)) {

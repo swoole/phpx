@@ -230,7 +230,7 @@ Object newObject(zend_class_entry *ce, Args &args) {
 
 Object newObject(zend_class_entry *ce, const ArgList &args) {
     Args _args(args);
-    return newObject(ce, args);
+    return newObject(ce, _args);
 }
 
 Object newObject(zend_class_entry *ce, Array &args) {

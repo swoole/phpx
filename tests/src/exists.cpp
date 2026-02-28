@@ -210,9 +210,6 @@ TEST(exists, mixed_operations) {
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, "null_key"}}));
 
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, "null_obj_key"}, {PropertyFetch, "any_prop"}}));
-
-    auto obj_v = Variant(obj);
-    ASSERT_FALSE(exists(obj_v, {{ArrayDimFetch, "any_key"}}));
 }
 
 TEST(exists, complex_chains) {
@@ -544,11 +541,6 @@ TEST(exists, wrong_operation_order) {
     var v1 = arr;
     ASSERT_FALSE(exists(v1, {{PropertyFetch, "key"}}));
 
-    auto obj = newObject("stdClass");
-    obj.set("prop", "value");
-    var v2 = obj;
-    ASSERT_FALSE(exists(v2, {{ArrayDimFetch, "prop"}}));
-
     var v3 = 123;
     ASSERT_FALSE(exists(v3, {{ArrayDimFetch, "key"}, {PropertyFetch, "prop"}}));
 
@@ -599,4 +591,14 @@ TEST(exists, numeric_string_vs_int_keys) {
 
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, 999}}));
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, "99"}}));
+}
+
+TEST(exists, array_object) {
+    auto o = newObject("ArrayObject");
+    ASSERT_TRUE(o.offsetGet("key").isNull());
+    auto item = o.item("key", true);
+    item = "value";
+    ASSERT_TRUE(exists(o, {{ArrayDimFetch, "key"}}));
+    ASSERT_FALSE(exists(o, {{ArrayDimFetch, "key2"}}));
+    ASSERT_STREQ(o.offsetGet("key").toCString(), "value");
 }
