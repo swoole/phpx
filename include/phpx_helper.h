@@ -67,10 +67,6 @@ static inline Int toInt(Float v) {
     return static_cast<Int>(v);
 }
 
-static inline Int toInt(Bool v) {
-    return v ? 1 : 0;
-}
-
 static inline Int toInt(const Variant &v) {
     return v.toInt();
 }
@@ -85,10 +81,6 @@ static inline Float toFloat(Int v) {
 
 static inline Float toFloat(Float v) {
     return v;
-}
-
-static inline Float toFloat(Bool v) {
-    return v ? 1.0 : 0;
 }
 
 static inline Float toFloat(const Variant &v) {
