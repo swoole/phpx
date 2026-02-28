@@ -805,7 +805,7 @@ Reference Variant::attrRef(const String &prop_name) {
 
 Variant Variant::attr(const Variant &name, bool update) const {
     if (UNEXPECTED(!isObject())) {
-        throwError("Attempt to read property `%s` on `%s`", name.toCString(), name.typeStr());
+        throwError("Attempt to read property `%s` on %s", name.toCString(), typeStr());
         return {};
     }
 

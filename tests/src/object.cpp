@@ -427,8 +427,8 @@ TEST(object, newItem) {
 TEST(object, null) {
     try_call([]() { null_object.exec("foo", {}); }, "call method `foo` on null");
     try_call([]() { null_object.callParentMethod("foo", {}); }, "call method `foo` on null");
-    try_call([]() { null_object.attr("bar"); }, "read property `bar` on null");
-    try_call([]() { null_object.attrRef("bar"); }, "read property `bar` on null");
+    try_call([]() { null_object.attr("bar"); }, "Attempt to read property `bar` on null");
+    try_call([]() { null_object.attrRef("bar"); }, "Attempt to read property `bar` on null");
 }
 
 TEST(object, non_existent_attr_operations) {

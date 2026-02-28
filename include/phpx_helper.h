@@ -68,7 +68,7 @@ static inline Int toInt(Float v) {
 }
 
 static inline Int toInt(Bool v) {
-	return v ? 1 : 0;
+    return v ? 1 : 0;
 }
 
 static inline Int toInt(const Variant &v) {
@@ -88,7 +88,7 @@ static inline Float toFloat(Float v) {
 }
 
 static inline Float toFloat(Bool v) {
-	return v ? 1.0 : 0;
+    return v ? 1.0 : 0;
 }
 
 static inline Float toFloat(const Variant &v) {
