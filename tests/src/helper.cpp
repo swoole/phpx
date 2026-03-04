@@ -12,6 +12,12 @@ TEST(helper, empty_str_to_int) {
 TEST(helper, toInt) {
     auto v = php::atoi("512k");
     ASSERT_EQ(v, 512 * 1024);
+
+    ASSERT_EQ(php::toInt(true), 1);
+    ASSERT_EQ(php::toInt(false), 0);
+
+    ASSERT_EQ(php::toFloat(true), 1.0);
+    ASSERT_EQ(php::toFloat(false), 0);
 }
 
 TEST(helper, toArray) {

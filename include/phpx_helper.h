@@ -67,6 +67,18 @@ static inline Int toInt(Float v) {
     return static_cast<Int>(v);
 }
 
+static inline Int toInt(Bool v) {
+    return static_cast<Int>(v);
+}
+
+static inline Int toInt(const char *v) {
+    return Variant(v).toInt();
+}
+
+static inline Int toInt(const std::string &v) {
+	return Variant(v).toInt();
+}
+
 static inline Int toInt(const Variant &v) {
     return v.toInt();
 }
@@ -81,6 +93,18 @@ static inline Float toFloat(Int v) {
 
 static inline Float toFloat(Float v) {
     return v;
+}
+
+static inline Float toFloat(Bool v) {
+    return static_cast<Float>(v);
+}
+
+static inline Float toFloat(const char *v) {
+    return Variant(v).toFloat();
+}
+
+static inline Float toFloat(const std::string &v) {
+	return Variant(v).toFloat();
 }
 
 static inline Float toFloat(const Variant &v) {
