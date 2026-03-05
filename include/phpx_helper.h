@@ -76,7 +76,7 @@ static inline Int toInt(const char *v) {
 }
 
 static inline Int toInt(const std::string &v) {
-	return Variant(v).toInt();
+    return Variant(v).toInt();
 }
 
 static inline Int toInt(const Variant &v) {
@@ -104,7 +104,7 @@ static inline Float toFloat(const char *v) {
 }
 
 static inline Float toFloat(const std::string &v) {
-	return Variant(v).toFloat();
+    return Variant(v).toFloat();
 }
 
 static inline Float toFloat(const Variant &v) {

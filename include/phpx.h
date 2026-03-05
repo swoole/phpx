@@ -91,6 +91,7 @@ PHPX_API void echo(Int val);
 PHPX_API void echo(Float val);
 PHPX_API Variant global(const String &name);
 PHPX_API Variant constant(const String &name);
+PHPX_API Variant constant(const String &cls, const String &name);
 PHPX_API Variant constant(zend_class_entry *ce, const String &name);
 PHPX_API void initGlobal(const String &name, Variant &var);
 PHPX_API void unsetGlobal(const String &name);
@@ -1337,11 +1338,11 @@ extern Object newObject(zend_class_entry *ce, Args &args);
 extern Object newObject(zend_class_entry *ce, const ArgList &args);
 extern Object newObject(zend_class_entry *ce, Array &args);
 
-static inline Object newObject(const char *name) {
+static inline Object newObject(const String &name) {
     return newObject(getClassEntrySafe(name));
 }
 
-static inline Object newObject(const char *name, const ArgList &args) {
+static inline Object newObject(const String &name, const ArgList &args) {
     return newObject(getClassEntrySafe(name), args);
 }
 

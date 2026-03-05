@@ -132,12 +132,26 @@ Variant constant(const String &name) {
     return Variant{c};
 }
 
+Variant constant(const String &cls, const String &name) {
+    auto c = zend_get_class_constant_ex(cls.str(), name.str(), getClassEntrySafe(cls), ZEND_FETCH_CLASS_SILENT);
+    throwErrorIfOccurred();
+    return Variant{c};
+}
+
 Variant constant(zend_class_entry *ce, const String &name) {
     if (ce == nullptr) {
         return {zend_get_constant(name.str())};
-    } else {
-        return zend_hash_find(CE_CONSTANTS_TABLE(ce), name.str());
     }
+
+	auto constant_name = name.str();
+	zval *ret_constant = NULL;
+	auto c = (zend_class_constant *)zend_hash_find_ptr(CE_CONSTANTS_TABLE(ce), constant_name);
+	if (c == NULL) {
+		ret_constant = NULL;
+	} else {
+		ret_constant = &c->value;
+	}
+	return ret_constant;
 }
 
 void exit(const Variant &status) {

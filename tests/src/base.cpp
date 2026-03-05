@@ -16,18 +16,24 @@ TEST(base, constant) {
 
 TEST(base, constant2) {
     define("IA", 6492);
-    auto c = constant(nullptr, "IA");
+    auto c = constant("IA");
     ASSERT_TRUE(c.isInt());
     ASSERT_EQ(c.toInt(), 6492);
 
-    auto c2 = constant(nullptr, "XXTT1");
-    ASSERT_TRUE(c2.isNull());
-
-    auto ce = getClassEntry("DateTime");
-    auto c3 = constant(ce, "XXTT2");
+    auto c3 = constant("DateTime", "XXTT2");
     ASSERT_TRUE(c3.isNull());
 
     try_call([]() { auto c4 = constant("XXTT3"); }, "Undefined constant \"XXTT3\"");
+
+    auto c4 = constant("PDO", "PARAM_STMT");
+    ASSERT_EQ(c4.toInt(), 4);
+
+    auto c5 = constant("Pdo::PARAM_STMT");
+    ASSERT_EQ(c5.toInt(), 4);
+
+    auto ce = getClassEntrySafe("PDO");
+    auto c6 = constant(ce, "PARAM_STMT");
+    ASSERT_EQ(c6.toInt(), 4);
 }
 
 TEST(base, echo) {
