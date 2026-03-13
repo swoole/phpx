@@ -97,6 +97,15 @@ TEST(object, static_property) {
     ASSERT_EQ(getStaticProperty(obj, "propInt").toInt(), 1990018900);
 }
 
+TEST(object, static_property_write_1) {
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
+
+    auto prop = getStaticProperty("TestClass", "propInt");
+    prop = 12009;
+
+    ASSERT_EQ(getStaticProperty("TestClass", "propInt").toInt(), 12009);
+}
+
 TEST(object, mixed) {
     include(get_include_dir() + "/library.php", INCLUDE_ONCE);
 

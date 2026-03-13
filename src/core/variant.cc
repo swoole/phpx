@@ -32,7 +32,7 @@ void Variant::copyFrom(const zval *src) {
     zval *zv = unwrap_ptr();
     if (zval_is_string(zv) && isStrOffsetSet(zv) && zval_is_string(src)) {
         strOffsetSet(zv, Z_STRVAL_P(src)[0]);
-    } else {
+    } else if (Z_PTR_P(zv) != Z_PTR_P(src)) {
         zval_ptr_dtor(zv);
         ZVAL_COPY(zv, src);
     }
