@@ -66,6 +66,13 @@ TEST(object, ctor) {
     auto m = create_map();
     auto o2 = newObject("ArrayObject", m);
     ASSERT_EQ(o2.offsetGet("php").toInt(), 3);
+
+    auto ce = getClassEntry("ArrayObject");
+    Array args;
+    args.append(m);
+    args.append(2);
+    auto o3 = newObject(ce, args);
+    ASSERT_EQ(o3.attr("golang").toInt(), 4);
 }
 
 TEST(object, method) {

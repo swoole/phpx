@@ -10,7 +10,7 @@ TEST(base, error) {
 TEST(base, constant) {
     auto c = constant("PHP_VERSION");
     ASSERT_TRUE(c.isString());
-    ASSERT_GT(c.length(), 0);
+    ASSERT_GT(c.length(), 3);
     ASSERT_STREQ(c.toCString(), PHP_VERSION);
 }
 
@@ -34,6 +34,13 @@ TEST(base, constant2) {
     auto ce = getClassEntrySafe("PDO");
     auto c6 = constant(ce, "PARAM_STMT");
     ASSERT_EQ(c6.toInt(), 4);
+
+    auto c7 = constant(nullptr, "PHP_VERSION");
+    ASSERT_TRUE(c7.isString());
+    ASSERT_GT(c7.length(), 3);
+
+    auto c8 = constant("PDO", "XXTT2");
+    ASSERT_TRUE(c8.isNull());
 }
 
 TEST(base, echo) {
