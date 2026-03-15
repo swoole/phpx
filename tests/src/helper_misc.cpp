@@ -17,6 +17,12 @@ TEST(helper_equals, float_equals) {
     ASSERT_FALSE(php::equals(static_cast<Float>(3.14f), static_cast<Float>(2.71f)));
     ASSERT_TRUE(php::equals(static_cast<Float>(-1.5f), static_cast<Float>(-1.5f)));
     ASSERT_FALSE(php::equals(static_cast<Float>(0.0f), static_cast<Float>(0.1f)));
+
+    ASSERT_TRUE(php::equals(2.0, 2L));
+    ASSERT_TRUE(php::equals(3L, 3.0));
+
+    ASSERT_FALSE(php::equals(2.1, 22L));
+    ASSERT_FALSE(php::equals(3L, 3.23));
 }
 
 // Test toInt conversion functions
@@ -24,6 +30,22 @@ TEST(helper_toInt, int_toInt) {
     ASSERT_EQ(php::toInt(static_cast<Int>(42)), 42);
     ASSERT_EQ(php::toInt(static_cast<Int>(-5)), -5);
     ASSERT_EQ(php::toInt(static_cast<Int>(0)), 0);
+}
+
+TEST(helper_misc, toInt) {
+    ASSERT_EQ(php::toInt(34.56), 34);
+
+    std::string s1("1990882");
+    ASSERT_EQ(php::toInt(s1), 1990882);
+}
+
+TEST(helper_misc, toFloat) {
+    ASSERT_EQ(php::toFloat(34L), 34.00);
+
+    ASSERT_EQ(php::toFloat("3.1415"), 3.1415);
+
+    std::string s1("996.1314");
+    ASSERT_EQ(php::toFloat(s1), 996.1314);
 }
 
 TEST(helper_toInt, variant_toInt) {
