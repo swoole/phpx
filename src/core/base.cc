@@ -77,7 +77,7 @@ Variant concat(const ArgList &args) {
     ++it;
 
     for (; it != args.end(); ++it) {
-        result = result.concat(*it);
+        result.append(*it);
     }
 
     return result;
