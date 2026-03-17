@@ -288,36 +288,6 @@ TEST(helper_instanceOf, object_instance_check) {
     ASSERT_TRUE(php::instanceOf(arrayObj, arrayClassName));
 }
 
-// Test silentCall function
-TEST(helper_silentCall, function_call) {
-    // Test calling existing function
-    Variant result = php::silentCall("phpversion");
-    ASSERT_TRUE(result.isString());
-    ASSERT_GT(result.length(), 0);
-
-    // Test calling with arguments
-    ArgList args = {"php"};
-    Variant result2 = php::silentCall("extension_loaded", args);
-    ASSERT_TRUE(result2.isBool());
-
-    try {
-        Variant result3 = php::silentCall("function_that_does_not_exist");
-    } catch (...) {
-        catchException();
-        SUCCEED() << "silentCall handled non-existent function gracefully";
-    }
-}
-
-TEST(helper_silentCall, function_call_no_args) {
-    try {
-        Variant result = php::silentCall("phpversion");
-        ASSERT_TRUE(result.isString());
-    } catch (...) {
-        catchException();
-        SUCCEED() << "silentCall handled gracefully";
-    }
-}
-
 // Test getCallArg function
 TEST(helper_getCallArg, call_argument_retrieval) {
     // This test requires being called from within a PHP function context

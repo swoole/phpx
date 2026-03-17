@@ -381,9 +381,8 @@ TEST(base, hasStaticProperty) {
 }
 
 TEST(base, debugInfo) {
-    debug_info.enable = true;
-    debug_info.php_file = "test.php";
-    debug_info.php_line = 999;
+    enableDebugInfo(true);
+    traceDebugInfo("test.php", 999);
 
     try {
         throwError("phpx error");

@@ -191,18 +191,6 @@ static inline bool instanceOf(const Object &v, const String &cls) {
     return v.instanceOf(cls);
 }
 
-static inline Variant silentCall(const Variant &func, const ArgList &args) {
-    auto ori_error_reporting = EG(error_reporting);
-    php::call("error_reporting", {E_FATAL_ERRORS});
-    auto rs = call(func, args);
-    php::call("error_reporting", {ori_error_reporting});
-    return rs;
-}
-
-static inline Variant silentCall(const Variant &func) {
-    return silentCall(func, {});
-}
-
 static inline Variant getCallArg(uint32_t i) {
     return {ZEND_CALL_ARG(EG(current_execute_data), i + 1), Ctor::CopyRef};
 }

@@ -112,6 +112,8 @@ PHPX_API bool empty(const Variant &v, const std::initializer_list<std::pair<Oper
 PHPX_API bool exists(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list);
 
 void setDebugInfo();
+void traceDebugInfo(const char *file, int lineno);
+void enableDebugInfo(bool enable = true);
 
 #define throwError(format, ...)                                                                                        \
     do {                                                                                                               \
@@ -175,9 +177,8 @@ extern const char *box_res_name;
 
 struct DebugInfo {
     bool enable;
-    const char *php_file;
-    int php_line;
-    int cpp_line;
+    const char *file;
+    int line;
 };
 
 extern DebugInfo debug_info;

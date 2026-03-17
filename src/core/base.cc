@@ -22,7 +22,6 @@ DebugInfo debug_info{
     false,
     "",
     0,
-    0,
 };
 
 static zend_array *func_cache_map = nullptr;
@@ -111,7 +110,7 @@ void unsetGlobal(const String &name) {
 void setDebugInfo() {
     if (debug_info.enable && EG(exception)) {
         zval tmp;
-        ZVAL_STRING(&tmp, debug_info.php_file);
+        ZVAL_STRING(&tmp, debug_info.file);
 
         auto prev_scope = EG(fake_scope);
         EG(fake_scope) = EG(exception)->ce;
@@ -119,11 +118,20 @@ void setDebugInfo() {
         zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_FILE), &tmp);
         zval_ptr_dtor(&tmp);
 
-        ZVAL_LONG(&tmp, debug_info.php_line);
+        ZVAL_LONG(&tmp, debug_info.line);
         zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_LINE), &tmp);
 
         EG(fake_scope) = prev_scope;
     }
+}
+
+void traceDebugInfo(const char *file, int lineno) {
+    debug_info.file = file;
+    debug_info.line = lineno;
+}
+
+void enableDebugInfo(bool enable) {
+    debug_info.enable = enable;
 }
 
 Variant constant(const String &name) {
