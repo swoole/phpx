@@ -408,7 +408,7 @@ TEST(base, call_array) {
     ASSERT_EQ(rs.toInt(), 1);
 }
 
-TEST(base, toReference) {
+TEST(base, toReference1) {
     include(get_include_dir() + "/library.php", INCLUDE_ONCE);
 
     auto obj = newObject("TestClass2");
@@ -424,4 +424,24 @@ TEST(base, toReference) {
 
     auto v2 = obj.attr("propArray2").item("value");
     ASSERT_STREQ(v2.toCString(), "swoole");
+}
+
+TEST(base, toReference2) {
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
+
+    Array arr;
+    auto obj = newObject("TestClass2");
+    arr.set("object", obj);
+
+    auto v1 = arr.item("object").attr("propInt2");
+    ASSERT_EQ(v1.toInt(), 0);
+
+    auto ref = toReference(arr,
+                           {
+                               {ArrayDimFetch, "object"},
+                               {PropertyFetch, "propInt2"},
+                           });
+    ref = 2026;
+    auto v2 = arr.item("object").attr("propInt2");
+    ASSERT_EQ(v2.toInt(), 2026);
 }
