@@ -78,11 +78,6 @@ enum IncludeType {
     REQUIRE_ONCE = ZEND_REQUIRE_ONCE,
 };
 
-enum Operation {
-    ArrayDimFetch,
-    PropertyFetch,
-};
-
 PHPX_API void error(int level, const char *format, ...);
 PHPX_API void echo(const char *format, ...);
 PHPX_API void echo(const String &str);
@@ -108,10 +103,9 @@ PHPX_API Variant call(zend_class_entry *ce, zend_function *func);
 PHPX_API Variant call(zend_class_entry *ce, zend_function *func, const ArgList &args);
 PHPX_API void throwException(const String &class_name, const char *message, int code = 0);
 PHPX_API void throwException(const Object &e);
-PHPX_API bool empty(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list);
-PHPX_API bool exists(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list);
-PHPX_API Reference toReference(const Variant &v,
-                               const std::initializer_list<std::pair<Operation, const Variant>> &list);
+PHPX_API bool empty(const Variant &v, const OperationChain &list);
+PHPX_API bool exists(const Variant &v, const OperationChain &list);
+PHPX_API Reference toReference(const Variant &v, const OperationChain &list);
 
 void setDebugInfo();
 void traceDebugInfo(const char *file, int lineno);

@@ -526,7 +526,7 @@ int compare(const Variant &a, const Variant &b) {
     return zend_compare(NO_CONST_V(a), NO_CONST_V(b));
 }
 
-bool empty(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list) {
+bool empty(const Variant &v, const OperationChain &list) {
     Variant tmp(v.const_ptr());
     for (const auto &expr : list) {
         if (expr.first == ArrayDimFetch) {
@@ -552,7 +552,7 @@ bool empty(const Variant &v, const std::initializer_list<std::pair<Operation, co
     return !tmp;
 }
 
-bool exists(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list) {
+bool exists(const Variant &v, const OperationChain &list) {
     Variant tmp = v;
     if (tmp.isNull() || tmp.isUndef()) {
         return false;
@@ -589,7 +589,7 @@ bool exists(const Variant &v, const std::initializer_list<std::pair<Operation, c
     return true;
 }
 
-Reference toReference(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list) {
+Reference toReference(const Variant &v, const OperationChain &list) {
     Variant tmp = v;
     size_t total = list.size();
     size_t count = 0;

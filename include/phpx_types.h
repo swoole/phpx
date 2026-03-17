@@ -27,6 +27,25 @@ typedef zend_long Int;
 typedef double Float;
 typedef bool Bool;
 
+enum Operation {
+    ArrayDimFetch,
+    PropertyFetch,
+};
+
+enum ZvalType {
+    TYPE_UNDEF = IS_UNDEF,
+    TYPE_NULL = IS_NULL,
+    TYPE_FALSE = IS_FALSE,
+    TYPE_TRUE = IS_TRUE,
+    TYPE_LONG = IS_LONG,
+    TYPE_DOUBLE = IS_DOUBLE,
+    TYPE_STRING = IS_STRING,
+    TYPE_ARRAY = IS_ARRAY,
+    TYPE_OBJECT = IS_OBJECT,
+    TYPE_RESOURCE = IS_RESOURCE,
+    TYPE_REFERENCE = IS_REFERENCE,
+};
+
 struct Resource {
     const char *name;
     int type;
@@ -49,21 +68,8 @@ using Var = Variant;
 using Str = String;
 using Ref = Reference;
 using ArgList = std::initializer_list<const Variant>;
+using OperationChain = std::initializer_list<std::pair<Operation, const Variant>>;
 using ClosureFn = std::function<Variant(INTERNAL_FUNCTION_PARAMETERS, Object &, Args &)>;
 
 typedef void (*resource_dtor)(zend_resource *);
-
-enum ZvalType {
-    TYPE_UNDEF = IS_UNDEF,
-    TYPE_NULL = IS_NULL,
-    TYPE_FALSE = IS_FALSE,
-    TYPE_TRUE = IS_TRUE,
-    TYPE_LONG = IS_LONG,
-    TYPE_DOUBLE = IS_DOUBLE,
-    TYPE_STRING = IS_STRING,
-    TYPE_ARRAY = IS_ARRAY,
-    TYPE_OBJECT = IS_OBJECT,
-    TYPE_RESOURCE = IS_RESOURCE,
-    TYPE_REFERENCE = IS_REFERENCE,
-};
 }  // namespace php
