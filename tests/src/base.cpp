@@ -407,3 +407,21 @@ TEST(base, call_array) {
     auto rs = call(fn, arr);
     ASSERT_EQ(rs.toInt(), 1);
 }
+
+TEST(base, toReference) {
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
+
+    auto obj = newObject("TestClass2");
+    auto v1 = obj.attr("propArray2").item("value");
+    ASSERT_STREQ(v1.toCString(), "hello");
+
+    auto ref = toReference(obj,
+                           {
+                               {PropertyFetch, "propArray2"},
+                               {ArrayDimFetch, "value"},
+                           });
+    ref = "swoole";
+
+    auto v2 = obj.attr("propArray2").item("value");
+    ASSERT_STREQ(v2.toCString(), "swoole");
+}

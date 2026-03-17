@@ -589,6 +589,31 @@ bool exists(const Variant &v, const std::initializer_list<std::pair<Operation, c
     return true;
 }
 
+Reference toReference(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list) {
+    Variant tmp = v;
+    size_t total = list.size();
+    size_t count = 0;
+
+    for (const auto &expr : list) {
+        if (count == total - 1) {
+            if (expr.first == ArrayDimFetch) {
+                return tmp.itemRef(expr.second);
+            } else {
+                return tmp.attrRef(expr.second);
+            }
+        } else {
+            if (expr.first == ArrayDimFetch) {
+                tmp = tmp.item(expr.second);
+            } else {
+                tmp = tmp.attr(expr.second);
+            }
+            count++;
+        }
+    }
+
+    return {};
+}
+
 Variant getStaticProperty(const Object &object, const String &prop) {
     return {zend_read_static_property_ex(object.ce(), prop.str(), true), Ctor::Indirect};
 }

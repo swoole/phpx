@@ -110,6 +110,8 @@ PHPX_API void throwException(const String &class_name, const char *message, int 
 PHPX_API void throwException(const Object &e);
 PHPX_API bool empty(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list);
 PHPX_API bool exists(const Variant &v, const std::initializer_list<std::pair<Operation, const Variant>> &list);
+PHPX_API Reference toReference(const Variant &v,
+                               const std::initializer_list<std::pair<Operation, const Variant>> &list);
 
 void setDebugInfo();
 void traceDebugInfo(const char *file, int lineno);
