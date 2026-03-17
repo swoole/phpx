@@ -251,6 +251,11 @@ Variant ArrayIterator::key() const {
     }
 }
 
+Reference ArrayIterator::valueRef() {
+    Variant value(current(), Ctor::Indirect);
+    return value.toReference();
+}
+
 void ArrayIterator::skipUndefBucket() {
     while (idx_ < array_->nNumUsed) {
         zval *cur = current();
