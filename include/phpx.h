@@ -900,12 +900,8 @@ class ArrayIterator {
 
     ArrayIterator(zend_array *array, zend_ulong idx) {
         array_ = array;
-        GC_TRY_ADDREF(array_);
         idx_ = idx;
         skipUndefBucket();
-    }
-    ~ArrayIterator() {
-    	zend_array_release(array_);
     }
     ArrayIterator operator++(int) {
         ArrayIterator tmp = *this;
