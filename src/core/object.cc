@@ -35,16 +35,20 @@ zend_long Object::count() {
     }
 }
 
-bool Object::propertyExists(const String &name) const {
+bool Object::propertyExists(const String &name, PropertyOperation op) const {
     zend_string *property = name.str();
+
     auto property_info = (zend_property_info *) zend_hash_find_ptr(&ce()->properties_info, property);
     if (property_info != NULL && (!(property_info->flags & ZEND_ACC_PRIVATE) || property_info->ce == ce())) {
         return true;
     }
-    if (object()->handlers->has_property(object(), property, 2, NULL)) {
-        return true;
-    }
-    return false;
+
+    auto ori_scope = EG(fake_scope);
+    EG(fake_scope) = ce();
+    bool rs = object()->handlers->has_property(object(), name.str(), op, NULL);
+
+    EG(fake_scope) = ori_scope;
+    return rs;
 }
 
 Variant Object::exec(const Variant &fn, const ArgList &args) {

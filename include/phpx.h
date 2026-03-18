@@ -78,6 +78,12 @@ enum IncludeType {
     REQUIRE_ONCE = ZEND_REQUIRE_ONCE,
 };
 
+enum PropertyOperation {
+    PROP_ISSET = ZEND_PROPERTY_ISSET,
+    PROP_EMPTY = ZEND_PROPERTY_NOT_EMPTY,
+    PROP_EXISTS = ZEND_PROPERTY_EXISTS,
+};
+
 PHPX_API void error(int level, const char *format, ...);
 PHPX_API void echo(const char *format, ...);
 PHPX_API void echo(const String &str);
@@ -1263,7 +1269,7 @@ class Object : public Variant {
     bool methodExists(const String &name) const {
         return zend_hash_exists(&ce()->function_table, name.str());
     }
-    bool propertyExists(const String &name) const;
+    bool propertyExists(const String &name, PropertyOperation op = PROP_EXISTS) const;
     bool instanceOf(const String &name) const;
     bool instanceOf(const zend_class_entry *ce_) const {
         return instanceof_function(ce(), ce_);
