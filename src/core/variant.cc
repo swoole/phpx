@@ -33,9 +33,6 @@ void Variant::copyFrom(const zval *src) {
     if (UNEXPECTED(zval_is_string(zv) && isStrOffsetSet(zv) && zval_is_string(src))) {
         strOffsetSet(zv, Z_STRVAL_P(src)[0]);
     } else {
-        if (Z_REFCOUNTED_P(src) && Z_PTR_P(zv) == Z_PTR_P(src)) {
-            return;
-        }
         zval_ptr_dtor(zv);
         ZVAL_COPY(zv, src);
     }
@@ -821,6 +818,10 @@ Variant Variant::attr(const Variant &name, bool update) const {
         EG(fake_scope) = ce();
         member_p = object()->handlers->write_property(object(), prop_name.str(), undef(), NULL);
         EG(fake_scope) = old_scope;
+
+        if (member_p == undef()) {
+        	throwError("Dynamic property `%s` assignment is not supported", name.toCString());
+        }
     }
 
     if (member_p == &rv) {
