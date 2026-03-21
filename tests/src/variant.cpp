@@ -1507,12 +1507,12 @@ TEST(variant, operator_edge_cases) {
 }
 
 TEST(variant, copy_same) {
-	auto s = zend_string_init(ZEND_STRL("hello world"), false);
+    auto s = zend_string_init(ZEND_STRL("hello world"), false);
 
-	var v1(s);
-	var v2(s);
+    var v1(s);
+    var v2(s);
 
-	v1 = v2;
+    v1 = v2;
 
-	zend_string_release(s);
+    zend_string_release(s);
 }

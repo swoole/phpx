@@ -187,6 +187,22 @@ static inline void move(Variant &v, zval *retval) {
     v.moveTo(retval);
 }
 
+static inline bool instanceOf(const Variant &v, const String &cls) {
+    if (!v.isObject()) {
+        return false;
+    }
+    Object tmp(v);
+    return tmp.instanceOf(cls);
+}
+
+static inline bool instanceOf(const Variant &v, zend_class_entry *ce) {
+    if (!v.isObject()) {
+        return false;
+    }
+    Object tmp(v);
+    return tmp.instanceOf(ce);
+}
+
 static inline bool instanceOf(const Object &v, const String &cls) {
     return v.instanceOf(cls);
 }

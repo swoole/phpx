@@ -820,7 +820,7 @@ Variant Variant::attr(const Variant &name, bool update) const {
         EG(fake_scope) = old_scope;
 
         if (member_p == undef()) {
-        	throwError("Dynamic property `%s` assignment is not supported", name.toCString());
+            throwError("Dynamic property `%s` assignment is not supported", name.toCString());
         }
     }
 
