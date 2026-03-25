@@ -375,16 +375,16 @@ Variant call(const Variant &func, Array &args) {
     for (size_t i = 0; i < args.count(); i++) {
         _args.append(args[i]);
     }
-    return call_impl(nullptr, func.const_ptr(), _args);
+    return call_impl(nullptr, func.unwrap_ptr(), _args);
 }
 
 Variant call(const Variant &func, Args &args) {
-    return call_impl(nullptr, func.const_ptr(), args);
+    return call_impl(nullptr, func.unwrap_ptr(), args);
 }
 
 Variant call(const Variant &func, const ArgList &args) {
     Args _args(args);
-    return call_impl(nullptr, func.const_ptr(), _args);
+    return call_impl(nullptr, func.unwrap_ptr(), _args);
 }
 
 Variant call(zend_function *func) {
