@@ -35,6 +35,8 @@ TEST(helper, instanceOf) {
     ASSERT_FALSE(instanceOf(b, "NotExistsClass"));
     ASSERT_TRUE(instanceOf(b, "ArrayObject"));
 
+    ASSERT_FALSE(instanceOf(null, "ArrayObject"));
+
     Object o;
     auto ce = getClassEntrySafe("ArrayObject");
     ASSERT_FALSE(instanceOf(o, ce));
