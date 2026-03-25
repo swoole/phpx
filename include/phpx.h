@@ -359,15 +359,7 @@ class Variant {
         v.val = {};
     }
     Variant(Variant *v) {
-        if (v->isReference()) {
-            val = *v->ptr();
-            addRef();
-        } else {
-            auto zv = v->unwrap_ptr();
-            ZVAL_NEW_REF(&val, zv);
-            *zv = val;
-            Z_TRY_ADDREF_P(zv);
-        }
+        copyRef(v);
     }
     Variant(Box *v) {
         zend_resource *res = zend_register_resource(v, box_res_id);
@@ -433,9 +425,15 @@ class Variant {
         return *this;
     }
     void copyFrom(const zval *src);
+    /**
+     * Calling this method will change the type of src from value type to reference type. It also refers to the same
+     * block of zend_reference memory as the current Variant object. Any modifications to the value of zend_reference
+     * will affect all Variant objects.
+     */
+    void copyRef(Variant *v);
     Variant &operator=(const zval *v);
     Variant &operator=(const Variant &v);
-    Variant &operator=(const Variant *v);
+    Variant &operator=(Variant *v);
     Variant &operator=(nullptr_t) {
         destroy();
         ZVAL_NULL(unwrap_ptr());

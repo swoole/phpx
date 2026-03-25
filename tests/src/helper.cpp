@@ -34,6 +34,13 @@ TEST(helper, instanceOf) {
     var b = newObject("ArrayObject");
     ASSERT_FALSE(instanceOf(b, "NotExistsClass"));
     ASSERT_TRUE(instanceOf(b, "ArrayObject"));
+
+    Object o;
+    auto ce = getClassEntrySafe("ArrayObject");
+    ASSERT_FALSE(instanceOf(o, ce));
+
+    o = newObject("ArrayObject");
+    ASSERT_TRUE(instanceOf(o, ce));
 }
 
 TEST(helper, abs) {
@@ -63,4 +70,9 @@ TEST(helper, chr) {
     auto s1 = php::fn::chr(c1);
     ASSERT_EQ(s1.length(), 1);
     ASSERT_STREQ(s1.toCString(), "A");
+}
+
+TEST(helper, same) {
+    ASSERT_TRUE(php::same(2.0, 2L));
+    ASSERT_TRUE(php::same(3L, 3.0));
 }

@@ -166,6 +166,17 @@ TEST(array, foreach2) {
     }
 }
 
+TEST(array, foreach_ref) {
+    Array arr = create_map();
+    for (auto i = arr.begin(); i != arr.end(); i++) {
+        auto ref = i.valueRef();
+        ref *= 3;
+    }
+
+    ASSERT_EQ(arr.get("php").toInt(), 9);
+    ASSERT_EQ(arr.get("node.js").toInt(), 15);
+}
+
 TEST(array, contains) {
     Array arr = create_list();
     Variant v1{"php"};

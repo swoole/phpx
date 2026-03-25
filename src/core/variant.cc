@@ -33,9 +33,21 @@ void Variant::copyFrom(const zval *src) {
     if (UNEXPECTED(zval_is_string(zv) && isStrOffsetSet(zv) && zval_is_string(src))) {
         strOffsetSet(zv, Z_STRVAL_P(src)[0]);
     } else {
-    	zval tmp = *zv;
+        zval tmp = *zv;
         ZVAL_COPY(zv, src);
         zval_ptr_dtor(&tmp);
+    }
+}
+
+void Variant::copyRef(Variant *v) {
+    if (v->isReference()) {
+        val = *v->ptr();
+        addRef();
+    } else {
+        auto zv = v->unwrap_ptr();
+        ZVAL_NEW_REF(&val, zv);
+        ZVAL_COPY_VALUE(zv, &val);
+        Z_TRY_ADDREF_P(zv);
     }
 }
 
@@ -60,10 +72,9 @@ Variant &Variant::operator=(const Variant &v) {
     return *this;
 }
 
-Variant &Variant::operator=(const Variant *v) {
+Variant &Variant::operator=(Variant *v) {
     destroy();
-    ZVAL_NEW_REF(&val, v->const_ptr());
-    zval_add_ref(Z_REFVAL(val));
+    copyRef(v);
     return *this;
 }
 

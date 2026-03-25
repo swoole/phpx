@@ -199,6 +199,10 @@ Variant Object::get(const String &name) const {
 }
 
 Object Object::clone() const {
+    if (UNEXPECTED(isNull())) {
+        throwError("clone on null");
+        return {};
+    }
     const auto new_object = zend_objects_clone_obj(object());
     Object retval;
     ZVAL_OBJ(retval.ptr(), new_object);
