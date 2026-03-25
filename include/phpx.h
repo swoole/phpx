@@ -485,7 +485,7 @@ class Variant {
         return Z_TYPE_P(unwrap_ptr());
     }
     const char *typeStr() const {
-        return zend_get_type_by_const(type());
+        return type() > 0 ? zend_get_type_by_const(type()) : "undef";
     }
     bool isString() const {
         return Z_TYPE_P(unwrap_ptr()) == IS_STRING;

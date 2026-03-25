@@ -1506,7 +1506,7 @@ TEST(variant, operator_edge_cases) {
     }
 }
 
-TEST(variant, copy_same) {
+TEST(variant, copy_self_1) {
     auto s = zend_string_init(ZEND_STRL("hello world"), false);
 
     var v1(s);
@@ -1515,4 +1515,10 @@ TEST(variant, copy_same) {
     v1 = v2;
 
     zend_string_release(s);
+}
+
+TEST(variant, copy_self_2) {
+    string s1("hello world");
+    var s2(s1.ptr(), Ctor::Indirect);
+    s2 = s1;
 }
