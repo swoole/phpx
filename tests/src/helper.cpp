@@ -80,7 +80,7 @@ TEST(helper, same) {
 }
 
 TEST(helper, clone) {
-	try_call([]() { clone(null); }, "Attempt to clone on null");
+    try_call([]() { clone(null); }, "Attempt to clone on null");
     var o1 = newObject("ArrayObject");
     o1.newItem() = "hello";
 
@@ -92,8 +92,8 @@ TEST(helper, clone) {
 }
 
 TEST(helper, getEmptyArrayRef) {
-	auto ref = getEmptyArrayRef();
-	ref.newItem() = "php";
-	ref.newItem() = "java";
+    auto ref = getEmptyArrayRef();
+    ref.newItem() = "php";
+    ref.newItem() = "java";
     ASSERT_EQ(ref.length(), 2);
 }

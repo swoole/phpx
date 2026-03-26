@@ -228,6 +228,12 @@ TEST(object, clone) {
     o1.set("prop1", 2024);
     ASSERT_TRUE(o3.get("prop1").equals(2019));
     ASSERT_TRUE(o1.get("prop1").equals(2024));
+
+    Object o4;
+    try_call([&]() { o4.clone(); }, "Attempt to clone on null");
+
+    Object o5 = newObject("finfo", {constant("FILEINFO_MIME"), "/dev/null"});
+    try_call([&]() { o5.clone(); }, "Trying to clone an uncloneable object of class finfo");
 }
 
 TEST(object, bad_type) {
