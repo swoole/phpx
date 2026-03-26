@@ -1522,3 +1522,21 @@ TEST(variant, copy_self_2) {
     var s2(s1.ptr(), Ctor::Indirect);
     s2 = s1;
 }
+
+TEST(variant, assign_ref1) {
+	var v1("hello world");
+    ASSERT_TRUE(v1.isString());
+
+    Array arr;
+    v1 = &arr;
+    ASSERT_TRUE(v1.isReference());
+}
+
+TEST(variant, assign_ref2) {
+    Array arr = create_list();
+    Reference ref = arr.toReference();
+
+    var v1(&ref);
+    ASSERT_TRUE(v1.isReference());
+    ASSERT_EQ(v1.length(), 5);
+}
