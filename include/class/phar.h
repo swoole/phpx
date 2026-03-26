@@ -36,7 +36,7 @@ class Phar {
     Variant extractTo(const Variant &directory, const Variant &files = {}, const Variant &overwrite = false);
     Variant getAlias();
     Variant getPath();
-    Variant getMetadata(const Array &unserialize_options = {});
+    Variant getMetadata(const Variant &unserialize_options = Array{});
     Variant getModified();
     Variant getSignature();
     Variant getStub();
@@ -71,7 +71,7 @@ class Phar {
     static Variant mount(const Variant &phar_path, const Variant &external_path);
     static Variant mungServer(const Variant &variables);
     static Variant unlinkArchive(const Variant &filename);
-    static Variant webPhar(const Variant &alias = {}, const Variant &index = {}, const Variant &file_not_found_script = {}, const Array &mime_types = {}, const Variant &rewrite = {});
+    static Variant webPhar(const Variant &alias = {}, const Variant &index = {}, const Variant &file_not_found_script = {}, const Variant &mime_types = Array{}, const Variant &rewrite = {});
     Variant hasChildren(const Variant &allow_links = false);
     Variant getChildren();
     Variant getSubPath();
@@ -137,7 +137,7 @@ class PharData {
     Variant extractTo(const Variant &directory, const Variant &files = {}, const Variant &overwrite = false);
     Variant getAlias();
     Variant getPath();
-    Variant getMetadata(const Array &unserialize_options = {});
+    Variant getMetadata(const Variant &unserialize_options = Array{});
     Variant getModified();
     Variant getSignature();
     Variant getStub();
@@ -172,7 +172,7 @@ class PharData {
     static Variant mount(const Variant &phar_path, const Variant &external_path);
     static Variant mungServer(const Variant &variables);
     static Variant unlinkArchive(const Variant &filename);
-    static Variant webPhar(const Variant &alias = {}, const Variant &index = {}, const Variant &file_not_found_script = {}, const Array &mime_types = {}, const Variant &rewrite = {});
+    static Variant webPhar(const Variant &alias = {}, const Variant &index = {}, const Variant &file_not_found_script = {}, const Variant &mime_types = Array{}, const Variant &rewrite = {});
     Variant hasChildren(const Variant &allow_links = false);
     Variant getChildren();
     Variant getSubPath();
@@ -227,7 +227,7 @@ class PharFileInfo {
     Variant getCompressedSize();
     Variant getCRC32();
     Variant getContent();
-    Variant getMetadata(const Array &unserialize_options = {});
+    Variant getMetadata(const Variant &unserialize_options = Array{});
     Variant getPharFlags();
     Variant hasMetadata();
     Variant isCompressed(const Variant &compression = {});

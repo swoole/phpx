@@ -27,7 +27,10 @@ class ReflectionFunction {
     Variant __toString();
     Variant isAnonymous();
     Variant isDisabled();
-    Variant invoke(const Variant &args = {});
+    template <typename... Args>
+    Variant invoke(const Args&... args) {
+        return call("invoke", {args...});
+    }
     Variant invokeArgs(const Variant &args);
     Variant getClosure();
     Variant inNamespace();
@@ -73,6 +76,7 @@ class ReflectionGenerator {
     Variant getFunction();
     Variant _getThis();
     Variant getExecutingGenerator();
+    Variant isClosed();
 };
 
 class ReflectionParameter {
@@ -142,7 +146,10 @@ class ReflectionMethod {
     Variant isDestructor();
     Variant getClosure(const Variant &object = {});
     Variant getModifiers();
-    Variant invoke(const Variant &object, const Variant &args = {});
+    template <typename... Args>
+    Variant invoke(const Variant &object, const Args&... args) {
+        return call("invoke", {object, args...});
+    }
     Variant invokeArgs(const Variant &object, const Variant &args);
     Variant getDeclaringClass();
     Variant getPrototype();
@@ -221,9 +228,20 @@ class ReflectionClass {
     Variant isReadOnly();
     Variant getModifiers();
     Variant isInstance(const Variant &object);
-    Variant newInstance(const Variant &args = {});
+    template <typename... Args>
+    Variant newInstance(const Args&... args) {
+        return call("newInstance", {args...});
+    }
     Variant newInstanceWithoutConstructor();
-    Variant newInstanceArgs(const Array &args = {});
+    Variant newInstanceArgs(const Variant &args = Array{});
+    Variant newLazyGhost(const Variant &initializer, const Variant &options = 0);
+    Variant newLazyProxy(const Variant &factory, const Variant &options = 0);
+    Variant resetAsLazyGhost(const Variant &object, const Variant &initializer, const Variant &options = 0);
+    Variant resetAsLazyProxy(const Variant &object, const Variant &factory, const Variant &options = 0);
+    Variant initializeLazyObject(const Variant &object);
+    Variant isUninitializedLazyObject(const Variant &object);
+    Variant markLazyObjectAsInitialized(const Variant &object);
+    Variant getLazyInitializer(const Variant &object);
     Variant getParentClass();
     Variant isSubclassOf(const Variant &_class);
     Variant getStaticProperties();
@@ -281,9 +299,20 @@ class ReflectionObject {
     Variant isReadOnly();
     Variant getModifiers();
     Variant isInstance(const Variant &object);
-    Variant newInstance(const Variant &args = {});
+    template <typename... Args>
+    Variant newInstance(const Args&... args) {
+        return call("newInstance", {args...});
+    }
     Variant newInstanceWithoutConstructor();
-    Variant newInstanceArgs(const Array &args = {});
+    Variant newInstanceArgs(const Variant &args = Array{});
+    Variant newLazyGhost(const Variant &initializer, const Variant &options = 0);
+    Variant newLazyProxy(const Variant &factory, const Variant &options = 0);
+    Variant resetAsLazyGhost(const Variant &object, const Variant &initializer, const Variant &options = 0);
+    Variant resetAsLazyProxy(const Variant &object, const Variant &factory, const Variant &options = 0);
+    Variant initializeLazyObject(const Variant &object);
+    Variant isUninitializedLazyObject(const Variant &object);
+    Variant markLazyObjectAsInitialized(const Variant &object);
+    Variant getLazyInitializer(const Variant &object);
     Variant getParentClass();
     Variant isSubclassOf(const Variant &_class);
     Variant getStaticProperties();
@@ -309,23 +338,39 @@ class ReflectionProperty {
     Variant getName();
     Variant getValue(const Variant &object = {});
     Variant setValue(const Variant &object_or_value, const Variant &value = {});
+    Variant getRawValue(const Variant &object);
+    Variant setRawValue(const Variant &object, const Variant &value);
+    Variant setRawValueWithoutLazyInitialization(const Variant &object, const Variant &value);
+    Variant skipLazyInitialization(const Variant &object);
+    Variant isLazy(const Variant &object);
     Variant isInitialized(const Variant &object = {});
     Variant isPublic();
     Variant isPrivate();
     Variant isProtected();
+    Variant isPrivateSet();
+    Variant isProtectedSet();
     Variant isStatic();
     Variant isReadOnly();
     Variant isDefault();
+    Variant isDynamic();
+    Variant isAbstract();
+    Variant isVirtual();
     Variant isPromoted();
     Variant getModifiers();
     Variant getDeclaringClass();
     Variant getDocComment();
     Variant setAccessible(const Variant &accessible);
     Variant getType();
+    Variant getSettableType();
     Variant hasType();
     Variant hasDefaultValue();
     Variant getDefaultValue();
     Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
+    Variant hasHooks();
+    Variant getHooks();
+    Variant hasHook(const Variant &type);
+    Variant getHook(const Variant &type);
+    Variant isFinal();
 };
 
 class ReflectionClassConstant {
@@ -344,6 +389,7 @@ class ReflectionClassConstant {
     Variant getDocComment();
     Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
     Variant isEnumCase();
+    Variant isDeprecated();
     Variant hasType();
     Variant getType();
 };
@@ -441,9 +487,20 @@ class ReflectionEnum {
     Variant isReadOnly();
     Variant getModifiers();
     Variant isInstance(const Variant &object);
-    Variant newInstance(const Variant &args = {});
+    template <typename... Args>
+    Variant newInstance(const Args&... args) {
+        return call("newInstance", {args...});
+    }
     Variant newInstanceWithoutConstructor();
-    Variant newInstanceArgs(const Array &args = {});
+    Variant newInstanceArgs(const Variant &args = Array{});
+    Variant newLazyGhost(const Variant &initializer, const Variant &options = 0);
+    Variant newLazyProxy(const Variant &factory, const Variant &options = 0);
+    Variant resetAsLazyGhost(const Variant &object, const Variant &initializer, const Variant &options = 0);
+    Variant resetAsLazyProxy(const Variant &object, const Variant &factory, const Variant &options = 0);
+    Variant initializeLazyObject(const Variant &object);
+    Variant isUninitializedLazyObject(const Variant &object);
+    Variant markLazyObjectAsInitialized(const Variant &object);
+    Variant getLazyInitializer(const Variant &object);
     Variant getParentClass();
     Variant isSubclassOf(const Variant &_class);
     Variant getStaticProperties();
@@ -478,6 +535,7 @@ class ReflectionEnumUnitCase {
     Variant getDocComment();
     Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
     Variant isEnumCase();
+    Variant isDeprecated();
     Variant hasType();
     Variant getType();
 };
@@ -500,6 +558,7 @@ class ReflectionEnumBackedCase {
     Variant getDocComment();
     Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
     Variant isEnumCase();
+    Variant isDeprecated();
     Variant hasType();
     Variant getType();
 };
@@ -513,6 +572,26 @@ class ReflectionFiber {
     Variant getExecutingLine();
     Variant getCallable();
     Variant getTrace(const Variant &options = 1);
+};
+
+class ReflectionConstant {
+    Object this_;
+  public:
+    ReflectionConstant(const Variant &name);
+    Variant getName();
+    Variant getNamespaceName();
+    Variant getShortName();
+    Variant getValue();
+    Variant isDeprecated();
+    Variant __toString();
+};
+
+class PropertyHookType {
+    Object this_;
+  public:
+    static Variant cases();
+    static Variant from(const Variant &value);
+    static Variant tryFrom(const Variant &value);
 };
 
 }

@@ -64,7 +64,7 @@ TEST(object, ctor) {
     ASSERT_EQ(o1.length(), 1);
 
     auto m = create_map();
-    auto o2 = newObject("ArrayObject", m);
+    auto o2 = newObject("ArrayObject", {m});
     ASSERT_EQ(o2.offsetGet("php").toInt(), 3);
 
     auto ce = getClassEntry("ArrayObject");
@@ -78,7 +78,7 @@ TEST(object, ctor) {
 TEST(object, method) {
     auto obj = newObject("DateTimeImmutable");
     ASSERT_TRUE(obj.isObject());
-    auto str = obj.exec("format", "Y-m-d H:i:s");
+    auto str = obj.exec("format", {"Y-m-d H:i:s"});
     ASSERT_TRUE(str.isString());
     ASSERT_GT(str.length(), 0);
 }
@@ -626,7 +626,7 @@ TEST(object, enum_class) {
 }
 
 TEST(object, exec) {
-    auto obj = newObject("DateTime", "2000-01-01");
+    auto obj = newObject("DateTime", {"2000-01-01"});
     auto fn = getMethod(obj.ce(), "format");
     auto rs = obj.exec(fn, {"Y-m-d H:i:s"});
     ASSERT_STREQ(rs.toCString(), "2000-01-01 00:00:00");
@@ -637,10 +637,10 @@ TEST(object, exec) {
 }
 
 TEST(object, call_array) {
-    auto obj = newObject("DateTime", "2000-01-01");
+    auto obj = newObject("DateTime", {"2000-01-01"});
     auto fn = getMethod(obj.ce(), "setTime");
     Array arr({10, 10, 10});
     obj.exec(fn, arr);
-    auto rs = obj.exec("format", "Y-m-d H:i:s");
+    auto rs = obj.exec("format", {"Y-m-d H:i:s"});
     ASSERT_STREQ(rs.toCString(), "2000-01-01 10:10:10");
 }

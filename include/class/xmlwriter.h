@@ -3,7 +3,10 @@ class XMLWriter {
     Object this_;
   public:
     Variant openUri(const Variant &uri);
+    static Variant toUri(const Variant &uri);
     Variant openMemory();
+    static Variant toMemory();
+    static Variant toStream(const Variant &stream);
     Variant setIndent(const Variant &enable);
     Variant setIndentString(const Variant &indentation);
     Variant startComment();

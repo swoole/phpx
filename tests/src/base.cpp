@@ -193,7 +193,7 @@ TEST(base, exception) {
     bool done = false;
 
     try {
-        auto e = newObject("RuntimeException", "phpx exception test", 1999);
+        auto e = newObject("RuntimeException", {"phpx exception test", 1999});
         throwException(e);
     } catch (zend_object *ex) {
         auto e = catchException();

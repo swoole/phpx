@@ -1,103 +1,298 @@
 #include "phpx.h"
 
 namespace php {
-Variant gd_info{ZEND_STRL("gd_info"), true};
-Variant imageloadfont{ZEND_STRL("imageloadfont"), true};
-Variant imagesetstyle{ZEND_STRL("imagesetstyle"), true};
-Variant imagecreatetruecolor{ZEND_STRL("imagecreatetruecolor"), true};
-Variant imageistruecolor{ZEND_STRL("imageistruecolor"), true};
-Variant imagetruecolortopalette{ZEND_STRL("imagetruecolortopalette"), true};
-Variant imagepalettetotruecolor{ZEND_STRL("imagepalettetotruecolor"), true};
-Variant imagecolormatch{ZEND_STRL("imagecolormatch"), true};
-Variant imagesetthickness{ZEND_STRL("imagesetthickness"), true};
-Variant imagefilledellipse{ZEND_STRL("imagefilledellipse"), true};
-Variant imagefilledarc{ZEND_STRL("imagefilledarc"), true};
-Variant imagealphablending{ZEND_STRL("imagealphablending"), true};
-Variant imagesavealpha{ZEND_STRL("imagesavealpha"), true};
-Variant imagelayereffect{ZEND_STRL("imagelayereffect"), true};
-Variant imagecolorallocatealpha{ZEND_STRL("imagecolorallocatealpha"), true};
-Variant imagecolorresolvealpha{ZEND_STRL("imagecolorresolvealpha"), true};
-Variant imagecolorclosestalpha{ZEND_STRL("imagecolorclosestalpha"), true};
-Variant imagecolorexactalpha{ZEND_STRL("imagecolorexactalpha"), true};
-Variant imagecopyresampled{ZEND_STRL("imagecopyresampled"), true};
-Variant imagerotate{ZEND_STRL("imagerotate"), true};
-Variant imagesettile{ZEND_STRL("imagesettile"), true};
-Variant imagesetbrush{ZEND_STRL("imagesetbrush"), true};
-Variant imagecreate{ZEND_STRL("imagecreate"), true};
-Variant imagetypes{ZEND_STRL("imagetypes"), true};
-Variant imagecreatefromstring{ZEND_STRL("imagecreatefromstring"), true};
-Variant imagecreatefromgif{ZEND_STRL("imagecreatefromgif"), true};
-Variant imagecreatefromjpeg{ZEND_STRL("imagecreatefromjpeg"), true};
-Variant imagecreatefrompng{ZEND_STRL("imagecreatefrompng"), true};
-Variant imagecreatefromwebp{ZEND_STRL("imagecreatefromwebp"), true};
-Variant imagecreatefromxbm{ZEND_STRL("imagecreatefromxbm"), true};
-Variant imagecreatefromwbmp{ZEND_STRL("imagecreatefromwbmp"), true};
-Variant imagecreatefromgd{ZEND_STRL("imagecreatefromgd"), true};
-Variant imagecreatefromgd2{ZEND_STRL("imagecreatefromgd2"), true};
-Variant imagecreatefromgd2part{ZEND_STRL("imagecreatefromgd2part"), true};
-Variant imagecreatefrombmp{ZEND_STRL("imagecreatefrombmp"), true};
-Variant imagecreatefromtga{ZEND_STRL("imagecreatefromtga"), true};
-Variant imagexbm{ZEND_STRL("imagexbm"), true};
-Variant imagegif{ZEND_STRL("imagegif"), true};
-Variant imagepng{ZEND_STRL("imagepng"), true};
-Variant imagewebp{ZEND_STRL("imagewebp"), true};
-Variant imagejpeg{ZEND_STRL("imagejpeg"), true};
-Variant imagewbmp{ZEND_STRL("imagewbmp"), true};
-Variant imagegd{ZEND_STRL("imagegd"), true};
-Variant imagegd2{ZEND_STRL("imagegd2"), true};
-Variant imagebmp{ZEND_STRL("imagebmp"), true};
-Variant imagedestroy{ZEND_STRL("imagedestroy"), true};
-Variant imagecolorallocate{ZEND_STRL("imagecolorallocate"), true};
-Variant imagepalettecopy{ZEND_STRL("imagepalettecopy"), true};
-Variant imagecolorat{ZEND_STRL("imagecolorat"), true};
-Variant imagecolorclosest{ZEND_STRL("imagecolorclosest"), true};
-Variant imagecolorclosesthwb{ZEND_STRL("imagecolorclosesthwb"), true};
-Variant imagecolordeallocate{ZEND_STRL("imagecolordeallocate"), true};
-Variant imagecolorresolve{ZEND_STRL("imagecolorresolve"), true};
-Variant imagecolorexact{ZEND_STRL("imagecolorexact"), true};
-Variant imagecolorset{ZEND_STRL("imagecolorset"), true};
-Variant imagecolorsforindex{ZEND_STRL("imagecolorsforindex"), true};
-Variant imagegammacorrect{ZEND_STRL("imagegammacorrect"), true};
-Variant imagesetpixel{ZEND_STRL("imagesetpixel"), true};
-Variant imageline{ZEND_STRL("imageline"), true};
-Variant imagedashedline{ZEND_STRL("imagedashedline"), true};
-Variant imagerectangle{ZEND_STRL("imagerectangle"), true};
-Variant imagefilledrectangle{ZEND_STRL("imagefilledrectangle"), true};
-Variant imagearc{ZEND_STRL("imagearc"), true};
-Variant imageellipse{ZEND_STRL("imageellipse"), true};
-Variant imagefilltoborder{ZEND_STRL("imagefilltoborder"), true};
-Variant imagefill{ZEND_STRL("imagefill"), true};
-Variant imagecolorstotal{ZEND_STRL("imagecolorstotal"), true};
-Variant imagecolortransparent{ZEND_STRL("imagecolortransparent"), true};
-Variant imageinterlace{ZEND_STRL("imageinterlace"), true};
-Variant imagepolygon{ZEND_STRL("imagepolygon"), true};
-Variant imageopenpolygon{ZEND_STRL("imageopenpolygon"), true};
-Variant imagefilledpolygon{ZEND_STRL("imagefilledpolygon"), true};
-Variant imagefontwidth{ZEND_STRL("imagefontwidth"), true};
-Variant imagefontheight{ZEND_STRL("imagefontheight"), true};
-Variant imagechar{ZEND_STRL("imagechar"), true};
-Variant imagecharup{ZEND_STRL("imagecharup"), true};
-Variant imagestring{ZEND_STRL("imagestring"), true};
-Variant imagestringup{ZEND_STRL("imagestringup"), true};
-Variant imagecopy{ZEND_STRL("imagecopy"), true};
-Variant imagecopymerge{ZEND_STRL("imagecopymerge"), true};
-Variant imagecopymergegray{ZEND_STRL("imagecopymergegray"), true};
-Variant imagecopyresized{ZEND_STRL("imagecopyresized"), true};
-Variant imagesx{ZEND_STRL("imagesx"), true};
-Variant imagesy{ZEND_STRL("imagesy"), true};
-Variant imagesetclip{ZEND_STRL("imagesetclip"), true};
-Variant imagegetclip{ZEND_STRL("imagegetclip"), true};
-Variant imagefilter{ZEND_STRL("imagefilter"), true};
-Variant imageconvolution{ZEND_STRL("imageconvolution"), true};
-Variant imageflip{ZEND_STRL("imageflip"), true};
-Variant imageantialias{ZEND_STRL("imageantialias"), true};
-Variant imagecrop{ZEND_STRL("imagecrop"), true};
-Variant imagecropauto{ZEND_STRL("imagecropauto"), true};
-Variant imagescale{ZEND_STRL("imagescale"), true};
-Variant imageaffine{ZEND_STRL("imageaffine"), true};
-Variant imageaffinematrixget{ZEND_STRL("imageaffinematrixget"), true};
-Variant imageaffinematrixconcat{ZEND_STRL("imageaffinematrixconcat"), true};
-Variant imagegetinterpolation{ZEND_STRL("imagegetinterpolation"), true};
-Variant imagesetinterpolation{ZEND_STRL("imagesetinterpolation"), true};
-Variant imageresolution{ZEND_STRL("imageresolution"), true};
+Variant gd_info() {
+    return call("gd_info", {});
+}
+Variant imageloadfont(const Variant &filename) {
+    return call("imageloadfont", {filename});
+}
+Variant imagesetstyle(const Variant &image, const Variant &style) {
+    return call("imagesetstyle", {image, style});
+}
+Variant imagecreatetruecolor(const Variant &width, const Variant &height) {
+    return call("imagecreatetruecolor", {width, height});
+}
+Variant imageistruecolor(const Variant &image) {
+    return call("imageistruecolor", {image});
+}
+Variant imagetruecolortopalette(const Variant &image, const Variant &dither, const Variant &num_colors) {
+    return call("imagetruecolortopalette", {image, dither, num_colors});
+}
+Variant imagepalettetotruecolor(const Variant &image) {
+    return call("imagepalettetotruecolor", {image});
+}
+Variant imagecolormatch(const Variant &image1, const Variant &image2) {
+    return call("imagecolormatch", {image1, image2});
+}
+Variant imagesetthickness(const Variant &image, const Variant &thickness) {
+    return call("imagesetthickness", {image, thickness});
+}
+Variant imagefilledellipse(const Variant &image, const Variant &center_x, const Variant &center_y, const Variant &width, const Variant &height, const Variant &color) {
+    return call("imagefilledellipse", {image, center_x, center_y, width, height, color});
+}
+Variant imagefilledarc(const Variant &image, const Variant &center_x, const Variant &center_y, const Variant &width, const Variant &height, const Variant &start_angle, const Variant &end_angle, const Variant &color, const Variant &style) {
+    return call("imagefilledarc", {image, center_x, center_y, width, height, start_angle, end_angle, color, style});
+}
+Variant imagealphablending(const Variant &image, const Variant &enable) {
+    return call("imagealphablending", {image, enable});
+}
+Variant imagesavealpha(const Variant &image, const Variant &enable) {
+    return call("imagesavealpha", {image, enable});
+}
+Variant imagelayereffect(const Variant &image, const Variant &effect) {
+    return call("imagelayereffect", {image, effect});
+}
+Variant imagecolorallocatealpha(const Variant &image, const Variant &red, const Variant &green, const Variant &blue, const Variant &alpha) {
+    return call("imagecolorallocatealpha", {image, red, green, blue, alpha});
+}
+Variant imagecolorresolvealpha(const Variant &image, const Variant &red, const Variant &green, const Variant &blue, const Variant &alpha) {
+    return call("imagecolorresolvealpha", {image, red, green, blue, alpha});
+}
+Variant imagecolorclosestalpha(const Variant &image, const Variant &red, const Variant &green, const Variant &blue, const Variant &alpha) {
+    return call("imagecolorclosestalpha", {image, red, green, blue, alpha});
+}
+Variant imagecolorexactalpha(const Variant &image, const Variant &red, const Variant &green, const Variant &blue, const Variant &alpha) {
+    return call("imagecolorexactalpha", {image, red, green, blue, alpha});
+}
+Variant imagecopyresampled(const Variant &dst_image, const Variant &src_image, const Variant &dst_x, const Variant &dst_y, const Variant &src_x, const Variant &src_y, const Variant &dst_width, const Variant &dst_height, const Variant &src_width, const Variant &src_height) {
+    return call("imagecopyresampled", {dst_image, src_image, dst_x, dst_y, src_x, src_y, dst_width, dst_height, src_width, src_height});
+}
+Variant imagerotate(const Variant &image, const Variant &angle, const Variant &background_color) {
+    return call("imagerotate", {image, angle, background_color});
+}
+Variant imagesettile(const Variant &image, const Variant &tile) {
+    return call("imagesettile", {image, tile});
+}
+Variant imagesetbrush(const Variant &image, const Variant &brush) {
+    return call("imagesetbrush", {image, brush});
+}
+Variant imagecreate(const Variant &width, const Variant &height) {
+    return call("imagecreate", {width, height});
+}
+Variant imagetypes() {
+    return call("imagetypes", {});
+}
+Variant imagecreatefromstring(const Variant &data) {
+    return call("imagecreatefromstring", {data});
+}
+Variant imagecreatefromgif(const Variant &filename) {
+    return call("imagecreatefromgif", {filename});
+}
+Variant imagecreatefromjpeg(const Variant &filename) {
+    return call("imagecreatefromjpeg", {filename});
+}
+Variant imagecreatefrompng(const Variant &filename) {
+    return call("imagecreatefrompng", {filename});
+}
+Variant imagecreatefromwebp(const Variant &filename) {
+    return call("imagecreatefromwebp", {filename});
+}
+Variant imagecreatefromxbm(const Variant &filename) {
+    return call("imagecreatefromxbm", {filename});
+}
+Variant imagecreatefromwbmp(const Variant &filename) {
+    return call("imagecreatefromwbmp", {filename});
+}
+Variant imagecreatefromgd(const Variant &filename) {
+    return call("imagecreatefromgd", {filename});
+}
+Variant imagecreatefromgd2(const Variant &filename) {
+    return call("imagecreatefromgd2", {filename});
+}
+Variant imagecreatefromgd2part(const Variant &filename, const Variant &x, const Variant &y, const Variant &width, const Variant &height) {
+    return call("imagecreatefromgd2part", {filename, x, y, width, height});
+}
+Variant imagecreatefrombmp(const Variant &filename) {
+    return call("imagecreatefrombmp", {filename});
+}
+Variant imagecreatefromtga(const Variant &filename) {
+    return call("imagecreatefromtga", {filename});
+}
+Variant imagexbm(const Variant &image, const Variant &filename, const Variant &foreground_color) {
+    return call("imagexbm", {image, filename, foreground_color});
+}
+Variant imagegif(const Variant &image, const Variant &file) {
+    return call("imagegif", {image, file});
+}
+Variant imagepng(const Variant &image, const Variant &file, const Variant &quality, const Variant &filters) {
+    return call("imagepng", {image, file, quality, filters});
+}
+Variant imagewebp(const Variant &image, const Variant &file, const Variant &quality) {
+    return call("imagewebp", {image, file, quality});
+}
+Variant imagejpeg(const Variant &image, const Variant &file, const Variant &quality) {
+    return call("imagejpeg", {image, file, quality});
+}
+Variant imagewbmp(const Variant &image, const Variant &file, const Variant &foreground_color) {
+    return call("imagewbmp", {image, file, foreground_color});
+}
+Variant imagegd(const Variant &image, const Variant &file) {
+    return call("imagegd", {image, file});
+}
+Variant imagegd2(const Variant &image, const Variant &file, const Variant &chunk_size, const Variant &mode) {
+    return call("imagegd2", {image, file, chunk_size, mode});
+}
+Variant imagebmp(const Variant &image, const Variant &file, const Variant &compressed) {
+    return call("imagebmp", {image, file, compressed});
+}
+Variant imagedestroy(const Variant &image) {
+    return call("imagedestroy", {image});
+}
+Variant imagecolorallocate(const Variant &image, const Variant &red, const Variant &green, const Variant &blue) {
+    return call("imagecolorallocate", {image, red, green, blue});
+}
+Variant imagepalettecopy(const Variant &dst, const Variant &src) {
+    return call("imagepalettecopy", {dst, src});
+}
+Variant imagecolorat(const Variant &image, const Variant &x, const Variant &y) {
+    return call("imagecolorat", {image, x, y});
+}
+Variant imagecolorclosest(const Variant &image, const Variant &red, const Variant &green, const Variant &blue) {
+    return call("imagecolorclosest", {image, red, green, blue});
+}
+Variant imagecolorclosesthwb(const Variant &image, const Variant &red, const Variant &green, const Variant &blue) {
+    return call("imagecolorclosesthwb", {image, red, green, blue});
+}
+Variant imagecolordeallocate(const Variant &image, const Variant &color) {
+    return call("imagecolordeallocate", {image, color});
+}
+Variant imagecolorresolve(const Variant &image, const Variant &red, const Variant &green, const Variant &blue) {
+    return call("imagecolorresolve", {image, red, green, blue});
+}
+Variant imagecolorexact(const Variant &image, const Variant &red, const Variant &green, const Variant &blue) {
+    return call("imagecolorexact", {image, red, green, blue});
+}
+Variant imagecolorset(const Variant &image, const Variant &color, const Variant &red, const Variant &green, const Variant &blue, const Variant &alpha) {
+    return call("imagecolorset", {image, color, red, green, blue, alpha});
+}
+Variant imagecolorsforindex(const Variant &image, const Variant &color) {
+    return call("imagecolorsforindex", {image, color});
+}
+Variant imagegammacorrect(const Variant &image, const Variant &input_gamma, const Variant &output_gamma) {
+    return call("imagegammacorrect", {image, input_gamma, output_gamma});
+}
+Variant imagesetpixel(const Variant &image, const Variant &x, const Variant &y, const Variant &color) {
+    return call("imagesetpixel", {image, x, y, color});
+}
+Variant imageline(const Variant &image, const Variant &x1, const Variant &y1, const Variant &x2, const Variant &y2, const Variant &color) {
+    return call("imageline", {image, x1, y1, x2, y2, color});
+}
+Variant imagedashedline(const Variant &image, const Variant &x1, const Variant &y1, const Variant &x2, const Variant &y2, const Variant &color) {
+    return call("imagedashedline", {image, x1, y1, x2, y2, color});
+}
+Variant imagerectangle(const Variant &image, const Variant &x1, const Variant &y1, const Variant &x2, const Variant &y2, const Variant &color) {
+    return call("imagerectangle", {image, x1, y1, x2, y2, color});
+}
+Variant imagefilledrectangle(const Variant &image, const Variant &x1, const Variant &y1, const Variant &x2, const Variant &y2, const Variant &color) {
+    return call("imagefilledrectangle", {image, x1, y1, x2, y2, color});
+}
+Variant imagearc(const Variant &image, const Variant &center_x, const Variant &center_y, const Variant &width, const Variant &height, const Variant &start_angle, const Variant &end_angle, const Variant &color) {
+    return call("imagearc", {image, center_x, center_y, width, height, start_angle, end_angle, color});
+}
+Variant imageellipse(const Variant &image, const Variant &center_x, const Variant &center_y, const Variant &width, const Variant &height, const Variant &color) {
+    return call("imageellipse", {image, center_x, center_y, width, height, color});
+}
+Variant imagefilltoborder(const Variant &image, const Variant &x, const Variant &y, const Variant &border_color, const Variant &color) {
+    return call("imagefilltoborder", {image, x, y, border_color, color});
+}
+Variant imagefill(const Variant &image, const Variant &x, const Variant &y, const Variant &color) {
+    return call("imagefill", {image, x, y, color});
+}
+Variant imagecolorstotal(const Variant &image) {
+    return call("imagecolorstotal", {image});
+}
+Variant imagecolortransparent(const Variant &image, const Variant &color) {
+    return call("imagecolortransparent", {image, color});
+}
+Variant imageinterlace(const Variant &image, const Variant &enable) {
+    return call("imageinterlace", {image, enable});
+}
+Variant imagepolygon(const Variant &image, const Variant &points, const Variant &num_points_or_color, const Variant &color) {
+    return call("imagepolygon", {image, points, num_points_or_color, color});
+}
+Variant imageopenpolygon(const Variant &image, const Variant &points, const Variant &num_points_or_color, const Variant &color) {
+    return call("imageopenpolygon", {image, points, num_points_or_color, color});
+}
+Variant imagefilledpolygon(const Variant &image, const Variant &points, const Variant &num_points_or_color, const Variant &color) {
+    return call("imagefilledpolygon", {image, points, num_points_or_color, color});
+}
+Variant imagefontwidth(const Variant &font) {
+    return call("imagefontwidth", {font});
+}
+Variant imagefontheight(const Variant &font) {
+    return call("imagefontheight", {font});
+}
+Variant imagechar(const Variant &image, const Variant &font, const Variant &x, const Variant &y, const Variant &_char, const Variant &color) {
+    return call("imagechar", {image, font, x, y, _char, color});
+}
+Variant imagecharup(const Variant &image, const Variant &font, const Variant &x, const Variant &y, const Variant &_char, const Variant &color) {
+    return call("imagecharup", {image, font, x, y, _char, color});
+}
+Variant imagestring(const Variant &image, const Variant &font, const Variant &x, const Variant &y, const Variant &string, const Variant &color) {
+    return call("imagestring", {image, font, x, y, string, color});
+}
+Variant imagestringup(const Variant &image, const Variant &font, const Variant &x, const Variant &y, const Variant &string, const Variant &color) {
+    return call("imagestringup", {image, font, x, y, string, color});
+}
+Variant imagecopy(const Variant &dst_image, const Variant &src_image, const Variant &dst_x, const Variant &dst_y, const Variant &src_x, const Variant &src_y, const Variant &src_width, const Variant &src_height) {
+    return call("imagecopy", {dst_image, src_image, dst_x, dst_y, src_x, src_y, src_width, src_height});
+}
+Variant imagecopymerge(const Variant &dst_image, const Variant &src_image, const Variant &dst_x, const Variant &dst_y, const Variant &src_x, const Variant &src_y, const Variant &src_width, const Variant &src_height, const Variant &pct) {
+    return call("imagecopymerge", {dst_image, src_image, dst_x, dst_y, src_x, src_y, src_width, src_height, pct});
+}
+Variant imagecopymergegray(const Variant &dst_image, const Variant &src_image, const Variant &dst_x, const Variant &dst_y, const Variant &src_x, const Variant &src_y, const Variant &src_width, const Variant &src_height, const Variant &pct) {
+    return call("imagecopymergegray", {dst_image, src_image, dst_x, dst_y, src_x, src_y, src_width, src_height, pct});
+}
+Variant imagecopyresized(const Variant &dst_image, const Variant &src_image, const Variant &dst_x, const Variant &dst_y, const Variant &src_x, const Variant &src_y, const Variant &dst_width, const Variant &dst_height, const Variant &src_width, const Variant &src_height) {
+    return call("imagecopyresized", {dst_image, src_image, dst_x, dst_y, src_x, src_y, dst_width, dst_height, src_width, src_height});
+}
+Variant imagesx(const Variant &image) {
+    return call("imagesx", {image});
+}
+Variant imagesy(const Variant &image) {
+    return call("imagesy", {image});
+}
+Variant imagesetclip(const Variant &image, const Variant &x1, const Variant &y1, const Variant &x2, const Variant &y2) {
+    return call("imagesetclip", {image, x1, y1, x2, y2});
+}
+Variant imagegetclip(const Variant &image) {
+    return call("imagegetclip", {image});
+}
+Variant imageconvolution(const Variant &image, const Variant &matrix, const Variant &divisor, const Variant &offset) {
+    return call("imageconvolution", {image, matrix, divisor, offset});
+}
+Variant imageflip(const Variant &image, const Variant &mode) {
+    return call("imageflip", {image, mode});
+}
+Variant imageantialias(const Variant &image, const Variant &enable) {
+    return call("imageantialias", {image, enable});
+}
+Variant imagecrop(const Variant &image, const Variant &rectangle) {
+    return call("imagecrop", {image, rectangle});
+}
+Variant imagecropauto(const Variant &image, const Variant &mode, const Variant &threshold, const Variant &color) {
+    return call("imagecropauto", {image, mode, threshold, color});
+}
+Variant imagescale(const Variant &image, const Variant &width, const Variant &height, const Variant &mode) {
+    return call("imagescale", {image, width, height, mode});
+}
+Variant imageaffine(const Variant &image, const Variant &affine, const Variant &clip) {
+    return call("imageaffine", {image, affine, clip});
+}
+Variant imageaffinematrixget(const Variant &type, const Variant &options) {
+    return call("imageaffinematrixget", {type, options});
+}
+Variant imageaffinematrixconcat(const Variant &matrix1, const Variant &matrix2) {
+    return call("imageaffinematrixconcat", {matrix1, matrix2});
+}
+Variant imagegetinterpolation(const Variant &image) {
+    return call("imagegetinterpolation", {image});
+}
+Variant imagesetinterpolation(const Variant &image, const Variant &method) {
+    return call("imagesetinterpolation", {image, method});
+}
+Variant imageresolution(const Variant &image, const Variant &resolution_x, const Variant &resolution_y) {
+    return call("imageresolution", {image, resolution_x, resolution_y});
+}
 }

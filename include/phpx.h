@@ -44,8 +44,6 @@ extern "C" {
 #include <map>
 #include <memory>
 
-#define PHPX_MAX_ARGC 10
-
 /**
  * All API names must be in lowercase camel case.
  */
@@ -153,6 +151,7 @@ PHPX_API Int toSize(const String &str);
 PHPX_API Array toArray(const Variant &v);
 PHPX_API Object toObject(const Variant &v);
 PHPX_API Object toObject(const Variant &v, const String &class_name);
+
 Resource *getResource(const std::string &name);
 
 void request_init();
@@ -363,6 +362,7 @@ class Variant {
     Variant(Variant *v) {
         copyRef(v);
     }
+    Variant(const Reference *ref);
     Variant(Box *v) {
         zend_resource *res = zend_register_resource(v, box_res_id);
         ZVAL_RES(&val, res);
@@ -712,55 +712,6 @@ class Variant {
         return toBool();
     }
     Variant operator()(const std::initializer_list<Variant> &args) const;
-
-    /* generator */
-    Variant operator()(const Variant &v1) const;
-    Variant operator()(const Variant &v1, const Variant &v2) const;
-    Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3) const;
-    Variant operator()(const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4) const;
-    Variant operator()(
-        const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5) const;
-    Variant operator()(const Variant &v1,
-                       const Variant &v2,
-                       const Variant &v3,
-                       const Variant &v4,
-                       const Variant &v5,
-                       const Variant &v6) const;
-    Variant operator()(const Variant &v1,
-                       const Variant &v2,
-                       const Variant &v3,
-                       const Variant &v4,
-                       const Variant &v5,
-                       const Variant &v6,
-                       const Variant &v7) const;
-    Variant operator()(const Variant &v1,
-                       const Variant &v2,
-                       const Variant &v3,
-                       const Variant &v4,
-                       const Variant &v5,
-                       const Variant &v6,
-                       const Variant &v7,
-                       const Variant &v8) const;
-    Variant operator()(const Variant &v1,
-                       const Variant &v2,
-                       const Variant &v3,
-                       const Variant &v4,
-                       const Variant &v5,
-                       const Variant &v6,
-                       const Variant &v7,
-                       const Variant &v8,
-                       const Variant &v9) const;
-    Variant operator()(const Variant &v1,
-                       const Variant &v2,
-                       const Variant &v3,
-                       const Variant &v4,
-                       const Variant &v5,
-                       const Variant &v6,
-                       const Variant &v7,
-                       const Variant &v8,
-                       const Variant &v9,
-                       const Variant &v10) const;
-    /* generator */
 };
 
 extern Variant null;
@@ -1184,78 +1135,22 @@ class Object : public Variant {
         ZVAL_LONG(&tmp, offset);
         object()->handlers->unset_dimension(object(), &tmp);
     }
-
-    /* generator */
-    Variant exec(const Variant &fn, const Variant &v1);
-    Variant exec(const Variant &fn, const Variant &v1, const Variant &v2);
-    Variant exec(const Variant &fn, const Variant &v1, const Variant &v2, const Variant &v3);
-    Variant exec(const Variant &fn, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4);
-    Variant exec(const Variant &fn,
-                 const Variant &v1,
-                 const Variant &v2,
-                 const Variant &v3,
-                 const Variant &v4,
-                 const Variant &v5);
-    Variant exec(const Variant &fn,
-                 const Variant &v1,
-                 const Variant &v2,
-                 const Variant &v3,
-                 const Variant &v4,
-                 const Variant &v5,
-                 const Variant &v6);
-    Variant exec(const Variant &fn,
-                 const Variant &v1,
-                 const Variant &v2,
-                 const Variant &v3,
-                 const Variant &v4,
-                 const Variant &v5,
-                 const Variant &v6,
-                 const Variant &v7);
-    Variant exec(const Variant &fn,
-                 const Variant &v1,
-                 const Variant &v2,
-                 const Variant &v3,
-                 const Variant &v4,
-                 const Variant &v5,
-                 const Variant &v6,
-                 const Variant &v7,
-                 const Variant &v8);
-    Variant exec(const Variant &fn,
-                 const Variant &v1,
-                 const Variant &v2,
-                 const Variant &v3,
-                 const Variant &v4,
-                 const Variant &v5,
-                 const Variant &v6,
-                 const Variant &v7,
-                 const Variant &v8,
-                 const Variant &v9);
-    Variant exec(const Variant &fn,
-                 const Variant &v1,
-                 const Variant &v2,
-                 const Variant &v3,
-                 const Variant &v4,
-                 const Variant &v5,
-                 const Variant &v6,
-                 const Variant &v7,
-                 const Variant &v8,
-                 const Variant &v9,
-                 const Variant &v10);
-    /* generator */
-
     Variant get(const String &name) const;
     void set(const String &name, const Variant &v) const {
         setProperty(name.str(), v);
     }
+
     template <class T>
     T *oGet(const String &name, const char *resource_name) {
         auto prop = get(name);
         return prop.toResource<T>(resource_name);
     }
+
     template <class T>
     void oSet(const String &name, const char *resource_name, T *ptr) {
         set(name, newResource<T>(resource_name, ptr));
     }
+
     String getClassName() const {
         return ce()->name;
     }
@@ -1331,6 +1226,12 @@ static inline Reference newReference() {
     return Reference{};
 }
 
+static inline Reference getEmptyArrayRef() {
+    Reference ref;
+    array_init(ref.refval());
+    return ref;
+}
+
 #if PHP_VERSION_ID >= 80200
 extern Object newClosure(const ClosureFn &fn, const ArgList &uses = {}, const Object &_this = {});
 #endif
@@ -1355,58 +1256,4 @@ static inline Object getEnumCase(zend_class_entry *ce, const String &name) {
 static inline String getEnumCaseName(Object &obj) {
     return {zend_enum_fetch_case_name(obj.object()), Ctor::Indirect};
 }
-
-/* generator */
-extern Object newObject(const char *name, const Variant &v1);
-extern Object newObject(const char *name, const Variant &v1, const Variant &v2);
-extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3);
-extern Object newObject(const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4);
-extern Object newObject(
-    const char *name, const Variant &v1, const Variant &v2, const Variant &v3, const Variant &v4, const Variant &v5);
-extern Object newObject(const char *name,
-                        const Variant &v1,
-                        const Variant &v2,
-                        const Variant &v3,
-                        const Variant &v4,
-                        const Variant &v5,
-                        const Variant &v6);
-extern Object newObject(const char *name,
-                        const Variant &v1,
-                        const Variant &v2,
-                        const Variant &v3,
-                        const Variant &v4,
-                        const Variant &v5,
-                        const Variant &v6,
-                        const Variant &v7);
-extern Object newObject(const char *name,
-                        const Variant &v1,
-                        const Variant &v2,
-                        const Variant &v3,
-                        const Variant &v4,
-                        const Variant &v5,
-                        const Variant &v6,
-                        const Variant &v7,
-                        const Variant &v8);
-extern Object newObject(const char *name,
-                        const Variant &v1,
-                        const Variant &v2,
-                        const Variant &v3,
-                        const Variant &v4,
-                        const Variant &v5,
-                        const Variant &v6,
-                        const Variant &v7,
-                        const Variant &v8,
-                        const Variant &v9);
-extern Object newObject(const char *name,
-                        const Variant &v1,
-                        const Variant &v2,
-                        const Variant &v3,
-                        const Variant &v4,
-                        const Variant &v5,
-                        const Variant &v6,
-                        const Variant &v7,
-                        const Variant &v8,
-                        const Variant &v9,
-                        const Variant &v10);
-/* generator */
 }  // namespace php

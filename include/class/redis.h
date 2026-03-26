@@ -10,28 +10,52 @@ class Redis {
     Variant _unserialize(const Variant &value);
     Variant _pack(const Variant &value);
     Variant _unpack(const Variant &value);
-    Variant acl(const Variant &subcmd, const Variant &args = {});
+    template <typename... Args>
+    Variant acl(const Variant &subcmd, const Args&... args) {
+        return call("acl", {subcmd, args...});
+    }
     Variant append(const Variant &key, const Variant &value);
     Variant auth(const Variant &credentials);
     Variant bgSave();
     Variant bgrewriteaof();
     Variant waitaof(const Variant &numlocal, const Variant &numreplicas, const Variant &timeout);
     Variant bitcount(const Variant &key, const Variant &start = 0, const Variant &end = -1, const Variant &bybit = false);
-    Variant bitop(const Variant &operation, const Variant &deskey, const Variant &srckey, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant bitop(const Variant &operation, const Variant &deskey, const Variant &srckey, const Args&... other_keys) {
+        return call("bitop", {operation, deskey, srckey, other_keys...});
+    }
     Variant bitpos(const Variant &key, const Variant &bit, const Variant &start = 0, const Variant &end = -1, const Variant &bybit = false);
-    Variant blPop(const Variant &key_or_keys, const Variant &timeout_or_key, const Variant &extra_args = {});
-    Variant brPop(const Variant &key_or_keys, const Variant &timeout_or_key, const Variant &extra_args = {});
+    template <typename... Args>
+    Variant blPop(const Variant &key_or_keys, const Variant &timeout_or_key, const Args&... extra_args) {
+        return call("blPop", {key_or_keys, timeout_or_key, extra_args...});
+    }
+    template <typename... Args>
+    Variant brPop(const Variant &key_or_keys, const Variant &timeout_or_key, const Args&... extra_args) {
+        return call("brPop", {key_or_keys, timeout_or_key, extra_args...});
+    }
     Variant brpoplpush(const Variant &src, const Variant &dst, const Variant &timeout);
-    Variant bzPopMax(const Variant &key, const Variant &timeout_or_key, const Variant &extra_args = {});
-    Variant bzPopMin(const Variant &key, const Variant &timeout_or_key, const Variant &extra_args = {});
+    template <typename... Args>
+    Variant bzPopMax(const Variant &key, const Variant &timeout_or_key, const Args&... extra_args) {
+        return call("bzPopMax", {key, timeout_or_key, extra_args...});
+    }
+    template <typename... Args>
+    Variant bzPopMin(const Variant &key, const Variant &timeout_or_key, const Args&... extra_args) {
+        return call("bzPopMin", {key, timeout_or_key, extra_args...});
+    }
     Variant bzmpop(const Variant &timeout, const Variant &keys, const Variant &from, const Variant &count = 1);
     Variant zmpop(const Variant &keys, const Variant &from, const Variant &count = 1);
     Variant blmpop(const Variant &timeout, const Variant &keys, const Variant &from, const Variant &count = 1);
     Variant lmpop(const Variant &keys, const Variant &from, const Variant &count = 1);
     Variant clearLastError();
-    Variant client(const Variant &opt, const Variant &args = {});
+    template <typename... Args>
+    Variant client(const Variant &opt, const Args&... args) {
+        return call("client", {opt, args...});
+    }
     Variant close();
-    Variant command(const Variant &opt = {}, const Variant &args = {});
+    template <typename... Args>
+    Variant command(const Variant &opt, const Args&... args) {
+        return call("command", {opt, args...});
+    }
     Variant config(const Variant &operation, const Variant &key_or_settings = {}, const Variant &value = {});
     Variant connect(const Variant &host, const Variant &port = 6379, const Variant &timeout = 0, const Variant &persistent_id = {}, const Variant &retry_interval = 0, const Variant &read_timeout = 0, const Variant &context = {});
     Variant copy(const Variant &src, const Variant &dst, const Variant &options = {});
@@ -39,42 +63,63 @@ class Redis {
     Variant debug(const Variant &key);
     Variant decr(const Variant &key, const Variant &by = 1);
     Variant decrBy(const Variant &key, const Variant &value);
-    Variant del(const Variant &key, const Variant &other_keys = {});
-    Variant _delete(const Variant &key, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant del(const Variant &key, const Args&... other_keys) {
+        return call("del", {key, other_keys...});
+    }
+    template <typename... Args>
+    Variant _delete(const Variant &key, const Args&... other_keys) {
+        return call("_delete", {key, other_keys...});
+    }
     Variant discard();
     Variant dump(const Variant &key);
     Variant echo(const Variant &str);
-    Variant eval(const Variant &script, const Array &args = {}, const Variant &num_keys = 0);
-    Variant eval_ro(const Variant &script_sha, const Array &args = {}, const Variant &num_keys = 0);
-    Variant evalsha(const Variant &sha1, const Array &args = {}, const Variant &num_keys = 0);
-    Variant evalsha_ro(const Variant &sha1, const Array &args = {}, const Variant &num_keys = 0);
+    Variant eval(const Variant &script, const Variant &args = Array{}, const Variant &num_keys = 0);
+    Variant eval_ro(const Variant &script_sha, const Variant &args = Array{}, const Variant &num_keys = 0);
+    Variant evalsha(const Variant &sha1, const Variant &args = Array{}, const Variant &num_keys = 0);
+    Variant evalsha_ro(const Variant &sha1, const Variant &args = Array{}, const Variant &num_keys = 0);
     Variant exec();
-    Variant exists(const Variant &key, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant exists(const Variant &key, const Args&... other_keys) {
+        return call("exists", {key, other_keys...});
+    }
     Variant expire(const Variant &key, const Variant &timeout, const Variant &mode = {});
     Variant expireAt(const Variant &key, const Variant &timestamp, const Variant &mode = {});
     Variant failover(const Variant &to = {}, const Variant &abort = false, const Variant &timeout = 0);
     Variant expiretime(const Variant &key);
     Variant pexpiretime(const Variant &key);
-    Variant fcall(const Variant &fn, const Array &keys = {}, const Array &args = {});
-    Variant fcall_ro(const Variant &fn, const Array &keys = {}, const Array &args = {});
+    Variant fcall(const Variant &fn, const Variant &keys = Array{}, const Variant &args = Array{});
+    Variant fcall_ro(const Variant &fn, const Variant &keys = Array{}, const Variant &args = Array{});
     Variant flushAll(const Variant &sync = {});
     Variant flushDB(const Variant &sync = {});
-    Variant function(const Variant &operation, const Variant &args = {});
-    Variant geoadd(const Variant &key, const Variant &lng, const Variant &lat, const Variant &member, const Variant &other_triples_and_options = {});
+    template <typename... Args>
+    Variant function(const Variant &operation, const Args&... args) {
+        return call("function", {operation, args...});
+    }
+    template <typename... Args>
+    Variant geoadd(const Variant &key, const Variant &lng, const Variant &lat, const Variant &member, const Args&... other_triples_and_options) {
+        return call("geoadd", {key, lng, lat, member, other_triples_and_options...});
+    }
     Variant geodist(const Variant &key, const Variant &src, const Variant &dst, const Variant &unit = {});
-    Variant geohash(const Variant &key, const Variant &member, const Variant &other_members = {});
-    Variant geopos(const Variant &key, const Variant &member, const Variant &other_members = {});
-    Variant georadius(const Variant &key, const Variant &lng, const Variant &lat, const Variant &radius, const Variant &unit, const Array &options = {});
-    Variant georadius_ro(const Variant &key, const Variant &lng, const Variant &lat, const Variant &radius, const Variant &unit, const Array &options = {});
-    Variant georadiusbymember(const Variant &key, const Variant &member, const Variant &radius, const Variant &unit, const Array &options = {});
-    Variant georadiusbymember_ro(const Variant &key, const Variant &member, const Variant &radius, const Variant &unit, const Array &options = {});
-    Variant geosearch(const Variant &key, const Variant &position, const Variant &shape, const Variant &unit, const Array &options = {});
-    Variant geosearchstore(const Variant &dst, const Variant &src, const Variant &position, const Variant &shape, const Variant &unit, const Array &options = {});
+    template <typename... Args>
+    Variant geohash(const Variant &key, const Variant &member, const Args&... other_members) {
+        return call("geohash", {key, member, other_members...});
+    }
+    template <typename... Args>
+    Variant geopos(const Variant &key, const Variant &member, const Args&... other_members) {
+        return call("geopos", {key, member, other_members...});
+    }
+    Variant georadius(const Variant &key, const Variant &lng, const Variant &lat, const Variant &radius, const Variant &unit, const Variant &options = Array{});
+    Variant georadius_ro(const Variant &key, const Variant &lng, const Variant &lat, const Variant &radius, const Variant &unit, const Variant &options = Array{});
+    Variant georadiusbymember(const Variant &key, const Variant &member, const Variant &radius, const Variant &unit, const Variant &options = Array{});
+    Variant georadiusbymember_ro(const Variant &key, const Variant &member, const Variant &radius, const Variant &unit, const Variant &options = Array{});
+    Variant geosearch(const Variant &key, const Variant &position, const Variant &shape, const Variant &unit, const Variant &options = Array{});
+    Variant geosearchstore(const Variant &dst, const Variant &src, const Variant &position, const Variant &shape, const Variant &unit, const Variant &options = Array{});
     Variant get(const Variant &key);
     Variant getWithMeta(const Variant &key);
     Variant getAuth();
     Variant getBit(const Variant &key, const Variant &idx);
-    Variant getEx(const Variant &key, const Array &options = {});
+    Variant getEx(const Variant &key, const Variant &options = Array{});
     Variant getDBNum();
     Variant getDel(const Variant &key);
     Variant getHost();
@@ -92,7 +137,10 @@ class Redis {
     Variant getTimeout();
     Variant getTransferredBytes();
     Variant clearTransferredBytes();
-    Variant hDel(const Variant &key, const Variant &field, const Variant &other_fields = {});
+    template <typename... Args>
+    Variant hDel(const Variant &key, const Variant &field, const Args&... other_fields) {
+        return call("hDel", {key, field, other_fields...});
+    }
     Variant hExists(const Variant &key, const Variant &field);
     Variant hGet(const Variant &key, const Variant &member);
     Variant hGetAll(const Variant &key);
@@ -103,17 +151,23 @@ class Redis {
     Variant hMget(const Variant &key, const Variant &fields);
     Variant hMset(const Variant &key, const Variant &fieldvals);
     Variant hRandField(const Variant &key, const Variant &options = {});
-    Variant hSet(const Variant &key, const Variant &fields_and_vals = {});
+    template <typename... Args>
+    Variant hSet(const Variant &key, const Args&... fields_and_vals) {
+        return call("hSet", {key, fields_and_vals...});
+    }
     Variant hSetNx(const Variant &key, const Variant &field, const Variant &value);
     Variant hStrLen(const Variant &key, const Variant &field);
     Variant hVals(const Variant &key);
-    Variant hscan(const Variant &key, const Variant &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    Variant hscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
     Variant expiremember(const Variant &key, const Variant &field, const Variant &ttl, const Variant &unit = {});
     Variant expirememberat(const Variant &key, const Variant &field, const Variant &timestamp);
     Variant incr(const Variant &key, const Variant &by = 1);
     Variant incrBy(const Variant &key, const Variant &value);
     Variant incrByFloat(const Variant &key, const Variant &value);
-    Variant info(const Variant &sections = {});
+    template <typename... Args>
+    Variant info(const Args&... sections) {
+        return call("info", {sections...});
+    }
     Variant isConnected();
     Variant keys(const Variant &pattern);
     Variant lInsert(const Variant &key, const Variant &pos, const Variant &pivot, const Variant &value);
@@ -122,8 +176,14 @@ class Redis {
     Variant blmove(const Variant &src, const Variant &dst, const Variant &wherefrom, const Variant &whereto, const Variant &timeout);
     Variant lPop(const Variant &key, const Variant &count = 0);
     Variant lPos(const Variant &key, const Variant &value, const Variant &options = {});
-    Variant lPush(const Variant &key, const Variant &elements = {});
-    Variant rPush(const Variant &key, const Variant &elements = {});
+    template <typename... Args>
+    Variant lPush(const Variant &key, const Args&... elements) {
+        return call("lPush", {key, elements...});
+    }
+    template <typename... Args>
+    Variant rPush(const Variant &key, const Args&... elements) {
+        return call("rPush", {key, elements...});
+    }
     Variant lPushx(const Variant &key, const Variant &value);
     Variant rPushx(const Variant &key, const Variant &value);
     Variant lSet(const Variant &key, const Variant &index, const Variant &value);
@@ -158,31 +218,61 @@ class Redis {
     Variant punsubscribe(const Variant &patterns);
     Variant rPop(const Variant &key, const Variant &count = 0);
     Variant randomKey();
-    Variant rawcommand(const Variant &command, const Variant &args = {});
+    template <typename... Args>
+    Variant rawcommand(const Variant &command, const Args&... args) {
+        return call("rawcommand", {command, args...});
+    }
     Variant rename(const Variant &old_name, const Variant &new_name);
     Variant renameNx(const Variant &key_src, const Variant &key_dst);
     Variant reset();
     Variant restore(const Variant &key, const Variant &ttl, const Variant &value, const Variant &options = {});
     Variant role();
     Variant rpoplpush(const Variant &srckey, const Variant &dstkey);
-    Variant sAdd(const Variant &key, const Variant &value, const Variant &other_values = {});
+    template <typename... Args>
+    Variant sAdd(const Variant &key, const Variant &value, const Args&... other_values) {
+        return call("sAdd", {key, value, other_values...});
+    }
     Variant sAddArray(const Variant &key, const Variant &values);
-    Variant sDiff(const Variant &key, const Variant &other_keys = {});
-    Variant sDiffStore(const Variant &dst, const Variant &key, const Variant &other_keys = {});
-    Variant sInter(const Variant &key, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant sDiff(const Variant &key, const Args&... other_keys) {
+        return call("sDiff", {key, other_keys...});
+    }
+    template <typename... Args>
+    Variant sDiffStore(const Variant &dst, const Variant &key, const Args&... other_keys) {
+        return call("sDiffStore", {dst, key, other_keys...});
+    }
+    template <typename... Args>
+    Variant sInter(const Variant &key, const Args&... other_keys) {
+        return call("sInter", {key, other_keys...});
+    }
     Variant sintercard(const Variant &keys, const Variant &limit = -1);
-    Variant sInterStore(const Variant &key, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant sInterStore(const Variant &key, const Args&... other_keys) {
+        return call("sInterStore", {key, other_keys...});
+    }
     Variant sMembers(const Variant &key);
-    Variant sMisMember(const Variant &key, const Variant &member, const Variant &other_members = {});
+    template <typename... Args>
+    Variant sMisMember(const Variant &key, const Variant &member, const Args&... other_members) {
+        return call("sMisMember", {key, member, other_members...});
+    }
     Variant sMove(const Variant &src, const Variant &dst, const Variant &value);
     Variant sPop(const Variant &key, const Variant &count = 0);
     Variant sRandMember(const Variant &key, const Variant &count = 0);
-    Variant sUnion(const Variant &key, const Variant &other_keys = {});
-    Variant sUnionStore(const Variant &dst, const Variant &key, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant sUnion(const Variant &key, const Args&... other_keys) {
+        return call("sUnion", {key, other_keys...});
+    }
+    template <typename... Args>
+    Variant sUnionStore(const Variant &dst, const Variant &key, const Args&... other_keys) {
+        return call("sUnionStore", {dst, key, other_keys...});
+    }
     Variant save();
-    Variant scan(const Variant &iterator, const Variant &pattern = {}, const Variant &count = 0, const Variant &type = {});
+    Variant scan(const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0, const Variant &type = {});
     Variant scard(const Variant &key);
-    Variant script(const Variant &command, const Variant &args = {});
+    template <typename... Args>
+    Variant script(const Variant &command, const Args&... args) {
+        return call("script", {command, args...});
+    }
     Variant select(const Variant &db);
     Variant set(const Variant &key, const Variant &value, const Variant &options = {});
     Variant setBit(const Variant &key, const Variant &idx, const Variant &value);
@@ -193,7 +283,10 @@ class Redis {
     Variant sismember(const Variant &key, const Variant &value);
     Variant slaveof(const Variant &host = {}, const Variant &port = 6379);
     Variant replicaof(const Variant &host = {}, const Variant &port = 6379);
-    Variant touch(const Variant &key_or_array, const Variant &more_keys = {});
+    template <typename... Args>
+    Variant touch(const Variant &key_or_array, const Args&... more_keys) {
+        return call("touch", {key_or_array, more_keys...});
+    }
     Variant slowlog(const Variant &operation, const Variant &length = 0);
     Variant sort(const Variant &key, const Variant &options = {});
     Variant sort_ro(const Variant &key, const Variant &options = {});
@@ -201,8 +294,11 @@ class Redis {
     Variant sortAscAlpha(const Variant &key, const Variant &pattern = {}, const Variant &get = {}, const Variant &offset = -1, const Variant &count = -1, const Variant &store = {});
     Variant sortDesc(const Variant &key, const Variant &pattern = {}, const Variant &get = {}, const Variant &offset = -1, const Variant &count = -1, const Variant &store = {});
     Variant sortDescAlpha(const Variant &key, const Variant &pattern = {}, const Variant &get = {}, const Variant &offset = -1, const Variant &count = -1, const Variant &store = {});
-    Variant srem(const Variant &key, const Variant &value, const Variant &other_values = {});
-    Variant sscan(const Variant &key, const Variant &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    template <typename... Args>
+    Variant srem(const Variant &key, const Variant &value, const Args&... other_values) {
+        return call("srem", {key, value, other_values...});
+    }
+    Variant sscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
     Variant ssubscribe(const Variant &channels, const Variant &cb);
     Variant strlen(const Variant &key);
     Variant subscribe(const Variant &channels, const Variant &cb);
@@ -211,10 +307,16 @@ class Redis {
     Variant time();
     Variant ttl(const Variant &key);
     Variant type(const Variant &key);
-    Variant unlink(const Variant &key, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant unlink(const Variant &key, const Args&... other_keys) {
+        return call("unlink", {key, other_keys...});
+    }
     Variant unsubscribe(const Variant &channels);
     Variant unwatch();
-    Variant watch(const Variant &key, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant watch(const Variant &key, const Args&... other_keys) {
+        return call("watch", {key, other_keys...});
+    }
     Variant wait(const Variant &numreplicas, const Variant &timeout);
     Variant xack(const Variant &key, const Variant &group, const Variant &ids);
     Variant xadd(const Variant &key, const Variant &id, const Variant &values, const Variant &maxlen = 0, const Variant &approx = false, const Variant &nomkstream = false);
@@ -230,27 +332,36 @@ class Redis {
     Variant xreadgroup(const Variant &group, const Variant &consumer, const Variant &streams, const Variant &count = 1, const Variant &block = 1);
     Variant xrevrange(const Variant &key, const Variant &end, const Variant &start, const Variant &count = -1);
     Variant xtrim(const Variant &key, const Variant &threshold, const Variant &approx = false, const Variant &minid = false, const Variant &limit = -1);
-    Variant zAdd(const Variant &key, const Variant &score_or_options, const Variant &more_scores_and_mems = {});
+    template <typename... Args>
+    Variant zAdd(const Variant &key, const Variant &score_or_options, const Args&... more_scores_and_mems) {
+        return call("zAdd", {key, score_or_options, more_scores_and_mems...});
+    }
     Variant zCard(const Variant &key);
     Variant zCount(const Variant &key, const Variant &start, const Variant &end);
     Variant zIncrBy(const Variant &key, const Variant &value, const Variant &member);
     Variant zLexCount(const Variant &key, const Variant &min, const Variant &max);
-    Variant zMscore(const Variant &key, const Variant &member, const Variant &other_members = {});
+    template <typename... Args>
+    Variant zMscore(const Variant &key, const Variant &member, const Args&... other_members) {
+        return call("zMscore", {key, member, other_members...});
+    }
     Variant zPopMax(const Variant &key, const Variant &count = {});
     Variant zPopMin(const Variant &key, const Variant &count = {});
     Variant zRange(const Variant &key, const Variant &start, const Variant &end, const Variant &options = {});
     Variant zRangeByLex(const Variant &key, const Variant &min, const Variant &max, const Variant &offset = -1, const Variant &count = -1);
-    Variant zRangeByScore(const Variant &key, const Variant &start, const Variant &end, const Array &options = {});
+    Variant zRangeByScore(const Variant &key, const Variant &start, const Variant &end, const Variant &options = Array{});
     Variant zrangestore(const Variant &dstkey, const Variant &srckey, const Variant &start, const Variant &end, const Variant &options = {});
     Variant zRandMember(const Variant &key, const Variant &options = {});
     Variant zRank(const Variant &key, const Variant &member);
-    Variant zRem(const Variant &key, const Variant &member, const Variant &other_members = {});
+    template <typename... Args>
+    Variant zRem(const Variant &key, const Variant &member, const Args&... other_members) {
+        return call("zRem", {key, member, other_members...});
+    }
     Variant zRemRangeByLex(const Variant &key, const Variant &min, const Variant &max);
     Variant zRemRangeByRank(const Variant &key, const Variant &start, const Variant &end);
     Variant zRemRangeByScore(const Variant &key, const Variant &start, const Variant &end);
     Variant zRevRange(const Variant &key, const Variant &start, const Variant &end, const Variant &scores = {});
     Variant zRevRangeByLex(const Variant &key, const Variant &max, const Variant &min, const Variant &offset = -1, const Variant &count = -1);
-    Variant zRevRangeByScore(const Variant &key, const Variant &max, const Variant &min, const Array &options = {});
+    Variant zRevRangeByScore(const Variant &key, const Variant &max, const Variant &min, const Variant &options = Array{});
     Variant zRevRank(const Variant &key, const Variant &member);
     Variant zScore(const Variant &key, const Variant &member);
     Variant zdiff(const Variant &keys, const Variant &options = {});
@@ -258,7 +369,7 @@ class Redis {
     Variant zinter(const Variant &keys, const Variant &weights = {}, const Variant &options = {});
     Variant zintercard(const Variant &keys, const Variant &limit = -1);
     Variant zinterstore(const Variant &dst, const Variant &keys, const Variant &weights = {}, const Variant &aggregate = {});
-    Variant zscan(const Variant &key, const Variant &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    Variant zscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
     Variant zunion(const Variant &keys, const Variant &weights = {}, const Variant &options = {});
     Variant zunionstore(const Variant &dst, const Variant &keys, const Variant &weights = {}, const Variant &aggregate = {});
 };
@@ -276,13 +387,16 @@ class RedisArray {
     Variant _rehash(const Variant &fn = {});
     Variant _target(const Variant &key);
     Variant bgsave();
-    Variant del(const Variant &key, const Variant &otherkeys = {});
+    template <typename... Args>
+    Variant del(const Variant &key, const Args&... otherkeys) {
+        return call("del", {key, otherkeys...});
+    }
     Variant discard();
     Variant exec();
     Variant flushall();
     Variant flushdb();
     Variant getOption(const Variant &opt);
-    Variant hscan(const Variant &key, const Variant &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    Variant hscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
     Variant info();
     Variant keys(const Variant &pattern);
     Variant mget(const Variant &keys);
@@ -290,13 +404,16 @@ class RedisArray {
     Variant multi(const Variant &host, const Variant &mode = {});
     Variant ping();
     Variant save();
-    Variant scan(const Variant &iterator, const Variant &node, const Variant &pattern = {}, const Variant &count = 0);
+    Variant scan(const Reference &iterator, const Variant &node, const Variant &pattern = {}, const Variant &count = 0);
     Variant select(const Variant &index);
     Variant setOption(const Variant &opt, const Variant &value);
-    Variant sscan(const Variant &key, const Variant &iterator, const Variant &pattern = {}, const Variant &count = 0);
-    Variant unlink(const Variant &key, const Variant &otherkeys = {});
+    Variant sscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    template <typename... Args>
+    Variant unlink(const Variant &key, const Args&... otherkeys) {
+        return call("unlink", {key, otherkeys...});
+    }
     Variant unwatch();
-    Variant zscan(const Variant &key, const Variant &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    Variant zscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
 };
 
 class RedisCluster {
@@ -312,21 +429,39 @@ class RedisCluster {
     Variant _prefix(const Variant &key);
     Variant _masters();
     Variant _redir();
-    Variant acl(const Variant &key_or_address, const Variant &subcmd, const Variant &args = {});
+    template <typename... Args>
+    Variant acl(const Variant &key_or_address, const Variant &subcmd, const Args&... args) {
+        return call("acl", {key_or_address, subcmd, args...});
+    }
     Variant append(const Variant &key, const Variant &value);
     Variant bgrewriteaof(const Variant &key_or_address);
     Variant waitaof(const Variant &key_or_address, const Variant &numlocal, const Variant &numreplicas, const Variant &timeout);
     Variant bgsave(const Variant &key_or_address);
     Variant bitcount(const Variant &key, const Variant &start = 0, const Variant &end = -1, const Variant &bybit = false);
-    Variant bitop(const Variant &operation, const Variant &deskey, const Variant &srckey, const Variant &otherkeys = {});
+    template <typename... Args>
+    Variant bitop(const Variant &operation, const Variant &deskey, const Variant &srckey, const Args&... otherkeys) {
+        return call("bitop", {operation, deskey, srckey, otherkeys...});
+    }
     Variant bitpos(const Variant &key, const Variant &bit, const Variant &start = 0, const Variant &end = -1, const Variant &bybit = false);
-    Variant blpop(const Variant &key, const Variant &timeout_or_key, const Variant &extra_args = {});
-    Variant brpop(const Variant &key, const Variant &timeout_or_key, const Variant &extra_args = {});
+    template <typename... Args>
+    Variant blpop(const Variant &key, const Variant &timeout_or_key, const Args&... extra_args) {
+        return call("blpop", {key, timeout_or_key, extra_args...});
+    }
+    template <typename... Args>
+    Variant brpop(const Variant &key, const Variant &timeout_or_key, const Args&... extra_args) {
+        return call("brpop", {key, timeout_or_key, extra_args...});
+    }
     Variant brpoplpush(const Variant &srckey, const Variant &deskey, const Variant &timeout);
     Variant lmove(const Variant &src, const Variant &dst, const Variant &wherefrom, const Variant &whereto);
     Variant blmove(const Variant &src, const Variant &dst, const Variant &wherefrom, const Variant &whereto, const Variant &timeout);
-    Variant bzpopmax(const Variant &key, const Variant &timeout_or_key, const Variant &extra_args = {});
-    Variant bzpopmin(const Variant &key, const Variant &timeout_or_key, const Variant &extra_args = {});
+    template <typename... Args>
+    Variant bzpopmax(const Variant &key, const Variant &timeout_or_key, const Args&... extra_args) {
+        return call("bzpopmax", {key, timeout_or_key, extra_args...});
+    }
+    template <typename... Args>
+    Variant bzpopmin(const Variant &key, const Variant &timeout_or_key, const Args&... extra_args) {
+        return call("bzpopmin", {key, timeout_or_key, extra_args...});
+    }
     Variant bzmpop(const Variant &timeout, const Variant &keys, const Variant &from, const Variant &count = 1);
     Variant zmpop(const Variant &keys, const Variant &from, const Variant &count = 1);
     Variant blmpop(const Variant &timeout, const Variant &keys, const Variant &from, const Variant &count = 1);
@@ -334,45 +469,72 @@ class RedisCluster {
     Variant clearlasterror();
     Variant client(const Variant &key_or_address, const Variant &subcommand, const Variant &arg = {});
     Variant close();
-    Variant cluster(const Variant &key_or_address, const Variant &command, const Variant &extra_args = {});
-    Variant command(const Variant &extra_args = {});
-    Variant config(const Variant &key_or_address, const Variant &subcommand, const Variant &extra_args = {});
+    template <typename... Args>
+    Variant cluster(const Variant &key_or_address, const Variant &command, const Args&... extra_args) {
+        return call("cluster", {key_or_address, command, extra_args...});
+    }
+    template <typename... Args>
+    Variant command(const Args&... extra_args) {
+        return call("command", {extra_args...});
+    }
+    template <typename... Args>
+    Variant config(const Variant &key_or_address, const Variant &subcommand, const Args&... extra_args) {
+        return call("config", {key_or_address, subcommand, extra_args...});
+    }
     Variant dbsize(const Variant &key_or_address);
     Variant copy(const Variant &src, const Variant &dst, const Variant &options = {});
     Variant decr(const Variant &key, const Variant &by = 1);
     Variant decrby(const Variant &key, const Variant &value);
     Variant decrbyfloat(const Variant &key, const Variant &value);
-    Variant del(const Variant &key, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant del(const Variant &key, const Args&... other_keys) {
+        return call("del", {key, other_keys...});
+    }
     Variant discard();
     Variant dump(const Variant &key);
     Variant echo(const Variant &key_or_address, const Variant &msg);
-    Variant eval(const Variant &script, const Array &args = {}, const Variant &num_keys = 0);
-    Variant eval_ro(const Variant &script, const Array &args = {}, const Variant &num_keys = 0);
-    Variant evalsha(const Variant &script_sha, const Array &args = {}, const Variant &num_keys = 0);
-    Variant evalsha_ro(const Variant &script_sha, const Array &args = {}, const Variant &num_keys = 0);
+    Variant eval(const Variant &script, const Variant &args = Array{}, const Variant &num_keys = 0);
+    Variant eval_ro(const Variant &script, const Variant &args = Array{}, const Variant &num_keys = 0);
+    Variant evalsha(const Variant &script_sha, const Variant &args = Array{}, const Variant &num_keys = 0);
+    Variant evalsha_ro(const Variant &script_sha, const Variant &args = Array{}, const Variant &num_keys = 0);
     Variant exec();
-    Variant exists(const Variant &key, const Variant &other_keys = {});
-    Variant touch(const Variant &key, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant exists(const Variant &key, const Args&... other_keys) {
+        return call("exists", {key, other_keys...});
+    }
+    template <typename... Args>
+    Variant touch(const Variant &key, const Args&... other_keys) {
+        return call("touch", {key, other_keys...});
+    }
     Variant expire(const Variant &key, const Variant &timeout, const Variant &mode = {});
     Variant expireat(const Variant &key, const Variant &timestamp, const Variant &mode = {});
     Variant expiretime(const Variant &key);
     Variant pexpiretime(const Variant &key);
     Variant flushall(const Variant &key_or_address, const Variant &async = false);
     Variant flushdb(const Variant &key_or_address, const Variant &async = false);
-    Variant geoadd(const Variant &key, const Variant &lng, const Variant &lat, const Variant &member, const Variant &other_triples_and_options = {});
+    template <typename... Args>
+    Variant geoadd(const Variant &key, const Variant &lng, const Variant &lat, const Variant &member, const Args&... other_triples_and_options) {
+        return call("geoadd", {key, lng, lat, member, other_triples_and_options...});
+    }
     Variant geodist(const Variant &key, const Variant &src, const Variant &dest, const Variant &unit = {});
-    Variant geohash(const Variant &key, const Variant &member, const Variant &other_members = {});
-    Variant geopos(const Variant &key, const Variant &member, const Variant &other_members = {});
-    Variant georadius(const Variant &key, const Variant &lng, const Variant &lat, const Variant &radius, const Variant &unit, const Array &options = {});
-    Variant georadius_ro(const Variant &key, const Variant &lng, const Variant &lat, const Variant &radius, const Variant &unit, const Array &options = {});
-    Variant georadiusbymember(const Variant &key, const Variant &member, const Variant &radius, const Variant &unit, const Array &options = {});
-    Variant georadiusbymember_ro(const Variant &key, const Variant &member, const Variant &radius, const Variant &unit, const Array &options = {});
-    Variant geosearch(const Variant &key, const Variant &position, const Variant &shape, const Variant &unit, const Array &options = {});
-    Variant geosearchstore(const Variant &dst, const Variant &src, const Variant &position, const Variant &shape, const Variant &unit, const Array &options = {});
+    template <typename... Args>
+    Variant geohash(const Variant &key, const Variant &member, const Args&... other_members) {
+        return call("geohash", {key, member, other_members...});
+    }
+    template <typename... Args>
+    Variant geopos(const Variant &key, const Variant &member, const Args&... other_members) {
+        return call("geopos", {key, member, other_members...});
+    }
+    Variant georadius(const Variant &key, const Variant &lng, const Variant &lat, const Variant &radius, const Variant &unit, const Variant &options = Array{});
+    Variant georadius_ro(const Variant &key, const Variant &lng, const Variant &lat, const Variant &radius, const Variant &unit, const Variant &options = Array{});
+    Variant georadiusbymember(const Variant &key, const Variant &member, const Variant &radius, const Variant &unit, const Variant &options = Array{});
+    Variant georadiusbymember_ro(const Variant &key, const Variant &member, const Variant &radius, const Variant &unit, const Variant &options = Array{});
+    Variant geosearch(const Variant &key, const Variant &position, const Variant &shape, const Variant &unit, const Variant &options = Array{});
+    Variant geosearchstore(const Variant &dst, const Variant &src, const Variant &position, const Variant &shape, const Variant &unit, const Variant &options = Array{});
     Variant get(const Variant &key);
     Variant getdel(const Variant &key);
     Variant getWithMeta(const Variant &key);
-    Variant getex(const Variant &key, const Array &options = {});
+    Variant getex(const Variant &key, const Variant &options = Array{});
     Variant getbit(const Variant &key, const Variant &value);
     Variant getlasterror();
     Variant getmode();
@@ -382,7 +544,10 @@ class RedisCluster {
     Variant getset(const Variant &key, const Variant &value);
     Variant gettransferredbytes();
     Variant cleartransferredbytes();
-    Variant hdel(const Variant &key, const Variant &member, const Variant &other_members = {});
+    template <typename... Args>
+    Variant hdel(const Variant &key, const Variant &member, const Args&... other_members) {
+        return call("hdel", {key, member, other_members...});
+    }
     Variant hexists(const Variant &key, const Variant &member);
     Variant hget(const Variant &key, const Variant &member);
     Variant hgetall(const Variant &key);
@@ -392,7 +557,7 @@ class RedisCluster {
     Variant hlen(const Variant &key);
     Variant hmget(const Variant &key, const Variant &keys);
     Variant hmset(const Variant &key, const Variant &key_values);
-    Variant hscan(const Variant &key, const Variant &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    Variant hscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
     Variant expiremember(const Variant &key, const Variant &field, const Variant &ttl, const Variant &unit = {});
     Variant expirememberat(const Variant &key, const Variant &field, const Variant &timestamp);
     Variant hrandfield(const Variant &key, const Variant &options = {});
@@ -403,7 +568,10 @@ class RedisCluster {
     Variant incr(const Variant &key, const Variant &by = 1);
     Variant incrby(const Variant &key, const Variant &value);
     Variant incrbyfloat(const Variant &key, const Variant &value);
-    Variant info(const Variant &key_or_address, const Variant &sections = {});
+    template <typename... Args>
+    Variant info(const Variant &key_or_address, const Args&... sections) {
+        return call("info", {key_or_address, sections...});
+    }
     Variant keys(const Variant &pattern);
     Variant lastsave(const Variant &key_or_address);
     Variant lget(const Variant &key, const Variant &index);
@@ -412,7 +580,10 @@ class RedisCluster {
     Variant llen(const Variant &key);
     Variant lpop(const Variant &key, const Variant &count = 0);
     Variant lpos(const Variant &key, const Variant &value, const Variant &options = {});
-    Variant lpush(const Variant &key, const Variant &value, const Variant &other_values = {});
+    template <typename... Args>
+    Variant lpush(const Variant &key, const Variant &value, const Args&... other_values) {
+        return call("lpush", {key, value, other_values...});
+    }
     Variant lpushx(const Variant &key, const Variant &value);
     Variant lrange(const Variant &key, const Variant &start, const Variant &end);
     Variant lrem(const Variant &key, const Variant &value, const Variant &count = 0);
@@ -434,57 +605,108 @@ class RedisCluster {
     Variant psubscribe(const Variant &patterns, const Variant &callback);
     Variant pttl(const Variant &key);
     Variant publish(const Variant &channel, const Variant &message);
-    Variant pubsub(const Variant &key_or_address, const Variant &values = {});
-    Variant punsubscribe(const Variant &pattern, const Variant &other_patterns = {});
+    template <typename... Args>
+    Variant pubsub(const Variant &key_or_address, const Args&... values) {
+        return call("pubsub", {key_or_address, values...});
+    }
+    template <typename... Args>
+    Variant punsubscribe(const Variant &pattern, const Args&... other_patterns) {
+        return call("punsubscribe", {pattern, other_patterns...});
+    }
     Variant randomkey(const Variant &key_or_address);
-    Variant rawcommand(const Variant &key_or_address, const Variant &command, const Variant &args = {});
+    template <typename... Args>
+    Variant rawcommand(const Variant &key_or_address, const Variant &command, const Args&... args) {
+        return call("rawcommand", {key_or_address, command, args...});
+    }
     Variant rename(const Variant &key_src, const Variant &key_dst);
     Variant renamenx(const Variant &key, const Variant &newkey);
     Variant restore(const Variant &key, const Variant &timeout, const Variant &value, const Variant &options = {});
     Variant role(const Variant &key_or_address);
     Variant rpop(const Variant &key, const Variant &count = 0);
     Variant rpoplpush(const Variant &src, const Variant &dst);
-    Variant rpush(const Variant &key, const Variant &elements = {});
+    template <typename... Args>
+    Variant rpush(const Variant &key, const Args&... elements) {
+        return call("rpush", {key, elements...});
+    }
     Variant rpushx(const Variant &key, const Variant &value);
-    Variant sadd(const Variant &key, const Variant &value, const Variant &other_values = {});
+    template <typename... Args>
+    Variant sadd(const Variant &key, const Variant &value, const Args&... other_values) {
+        return call("sadd", {key, value, other_values...});
+    }
     Variant saddarray(const Variant &key, const Variant &values);
     Variant save(const Variant &key_or_address);
-    Variant scan(const Variant &iterator, const Variant &key_or_address, const Variant &pattern = {}, const Variant &count = 0);
+    Variant scan(const Reference &iterator, const Variant &key_or_address, const Variant &pattern = {}, const Variant &count = 0);
     Variant scard(const Variant &key);
-    Variant script(const Variant &key_or_address, const Variant &args = {});
-    Variant sdiff(const Variant &key, const Variant &other_keys = {});
-    Variant sdiffstore(const Variant &dst, const Variant &key, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant script(const Variant &key_or_address, const Args&... args) {
+        return call("script", {key_or_address, args...});
+    }
+    template <typename... Args>
+    Variant sdiff(const Variant &key, const Args&... other_keys) {
+        return call("sdiff", {key, other_keys...});
+    }
+    template <typename... Args>
+    Variant sdiffstore(const Variant &dst, const Variant &key, const Args&... other_keys) {
+        return call("sdiffstore", {dst, key, other_keys...});
+    }
     Variant set(const Variant &key, const Variant &value, const Variant &options = {});
     Variant _setbit(const Variant &key, const Variant &offset, const Variant &onoff);
     Variant setex(const Variant &key, const Variant &expire, const Variant &value);
     Variant setnx(const Variant &key, const Variant &value);
     Variant setoption(const Variant &option, const Variant &value);
     Variant setrange(const Variant &key, const Variant &offset, const Variant &value);
-    Variant sinter(const Variant &key, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant sinter(const Variant &key, const Args&... other_keys) {
+        return call("sinter", {key, other_keys...});
+    }
     Variant sintercard(const Variant &keys, const Variant &limit = -1);
-    Variant sinterstore(const Variant &key, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant sinterstore(const Variant &key, const Args&... other_keys) {
+        return call("sinterstore", {key, other_keys...});
+    }
     Variant sismember(const Variant &key, const Variant &value);
-    Variant smismember(const Variant &key, const Variant &member, const Variant &other_members = {});
-    Variant slowlog(const Variant &key_or_address, const Variant &args = {});
+    template <typename... Args>
+    Variant smismember(const Variant &key, const Variant &member, const Args&... other_members) {
+        return call("smismember", {key, member, other_members...});
+    }
+    template <typename... Args>
+    Variant slowlog(const Variant &key_or_address, const Args&... args) {
+        return call("slowlog", {key_or_address, args...});
+    }
     Variant smembers(const Variant &key);
     Variant smove(const Variant &src, const Variant &dst, const Variant &member);
     Variant sort(const Variant &key, const Variant &options = {});
     Variant sort_ro(const Variant &key, const Variant &options = {});
     Variant spop(const Variant &key, const Variant &count = 0);
     Variant srandmember(const Variant &key, const Variant &count = 0);
-    Variant srem(const Variant &key, const Variant &value, const Variant &other_values = {});
-    Variant sscan(const Variant &key, const Variant &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    template <typename... Args>
+    Variant srem(const Variant &key, const Variant &value, const Args&... other_values) {
+        return call("srem", {key, value, other_values...});
+    }
+    Variant sscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
     Variant strlen(const Variant &key);
     Variant subscribe(const Variant &channels, const Variant &cb);
-    Variant sunion(const Variant &key, const Variant &other_keys = {});
-    Variant sunionstore(const Variant &dst, const Variant &key, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant sunion(const Variant &key, const Args&... other_keys) {
+        return call("sunion", {key, other_keys...});
+    }
+    template <typename... Args>
+    Variant sunionstore(const Variant &dst, const Variant &key, const Args&... other_keys) {
+        return call("sunionstore", {dst, key, other_keys...});
+    }
     Variant time(const Variant &key_or_address);
     Variant ttl(const Variant &key);
     Variant type(const Variant &key);
     Variant unsubscribe(const Variant &channels);
-    Variant unlink(const Variant &key, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant unlink(const Variant &key, const Args&... other_keys) {
+        return call("unlink", {key, other_keys...});
+    }
     Variant unwatch();
-    Variant watch(const Variant &key, const Variant &other_keys = {});
+    template <typename... Args>
+    Variant watch(const Variant &key, const Args&... other_keys) {
+        return call("watch", {key, other_keys...});
+    }
     Variant xack(const Variant &key, const Variant &group, const Variant &ids);
     Variant xadd(const Variant &key, const Variant &id, const Variant &values, const Variant &maxlen = 0, const Variant &approx = false);
     Variant xclaim(const Variant &key, const Variant &group, const Variant &consumer, const Variant &min_iddle, const Variant &ids, const Variant &options);
@@ -499,7 +721,10 @@ class RedisCluster {
     Variant xreadgroup(const Variant &group, const Variant &consumer, const Variant &streams, const Variant &count = 1, const Variant &block = 1);
     Variant xrevrange(const Variant &key, const Variant &start, const Variant &end, const Variant &count = -1);
     Variant xtrim(const Variant &key, const Variant &maxlen, const Variant &approx = false, const Variant &minid = false, const Variant &limit = -1);
-    Variant zadd(const Variant &key, const Variant &score_or_options, const Variant &more_scores_and_mems = {});
+    template <typename... Args>
+    Variant zadd(const Variant &key, const Variant &score_or_options, const Args&... more_scores_and_mems) {
+        return call("zadd", {key, score_or_options, more_scores_and_mems...});
+    }
     Variant zcard(const Variant &key);
     Variant zcount(const Variant &key, const Variant &start, const Variant &end);
     Variant zincrby(const Variant &key, const Variant &value, const Variant &member);
@@ -512,9 +737,12 @@ class RedisCluster {
     Variant zrangestore(const Variant &dstkey, const Variant &srckey, const Variant &start, const Variant &end, const Variant &options = {});
     Variant zrandmember(const Variant &key, const Variant &options = {});
     Variant zrangebylex(const Variant &key, const Variant &min, const Variant &max, const Variant &offset = -1, const Variant &count = -1);
-    Variant zrangebyscore(const Variant &key, const Variant &start, const Variant &end, const Array &options = {});
+    Variant zrangebyscore(const Variant &key, const Variant &start, const Variant &end, const Variant &options = Array{});
     Variant zrank(const Variant &key, const Variant &member);
-    Variant zrem(const Variant &key, const Variant &value, const Variant &other_values = {});
+    template <typename... Args>
+    Variant zrem(const Variant &key, const Variant &value, const Args&... other_values) {
+        return call("zrem", {key, value, other_values...});
+    }
     Variant zremrangebylex(const Variant &key, const Variant &min, const Variant &max);
     Variant zremrangebyrank(const Variant &key, const Variant &min, const Variant &max);
     Variant zremrangebyscore(const Variant &key, const Variant &min, const Variant &max);
@@ -522,9 +750,12 @@ class RedisCluster {
     Variant zrevrangebylex(const Variant &key, const Variant &min, const Variant &max, const Variant &options = {});
     Variant zrevrangebyscore(const Variant &key, const Variant &min, const Variant &max, const Variant &options = {});
     Variant zrevrank(const Variant &key, const Variant &member);
-    Variant zscan(const Variant &key, const Variant &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    Variant zscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
     Variant zscore(const Variant &key, const Variant &member);
-    Variant zmscore(const Variant &key, const Variant &member, const Variant &other_members = {});
+    template <typename... Args>
+    Variant zmscore(const Variant &key, const Variant &member, const Args&... other_members) {
+        return call("zmscore", {key, member, other_members...});
+    }
     Variant zunionstore(const Variant &dst, const Variant &keys, const Variant &weights = {}, const Variant &aggregate = {});
     Variant zinter(const Variant &keys, const Variant &weights = {}, const Variant &options = {});
     Variant zdiffstore(const Variant &dst, const Variant &keys);

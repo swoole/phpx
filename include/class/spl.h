@@ -454,7 +454,7 @@ class RecursiveTreeIterator {
 class ArrayObject {
     Object this_;
   public:
-    ArrayObject(const Array &array = {}, const Variant &flags = 0, const Variant &iterator_class = "ArrayIterator");
+    ArrayObject(const Variant &array = Array{}, const Variant &flags = 0, const Variant &iterator_class = "ArrayIterator");
     Variant offsetExists(const Variant &key);
     Variant offsetGet(const Variant &key);
     Variant offsetSet(const Variant &key, const Variant &value);
@@ -484,7 +484,7 @@ class ArrayObject {
 class _ArrayIterator {
     Object this_;
   public:
-    _ArrayIterator(const Array &array = {}, const Variant &flags = 0);
+    _ArrayIterator(const Variant &array = Array{}, const Variant &flags = 0);
     Variant offsetExists(const Variant &key);
     Variant offsetGet(const Variant &key);
     Variant offsetSet(const Variant &key, const Variant &value);
@@ -518,7 +518,7 @@ class RecursiveArrayIterator {
   public:
     Variant hasChildren();
     Variant getChildren();
-    RecursiveArrayIterator(const Array &array = {}, const Variant &flags = 0);
+    RecursiveArrayIterator(const Variant &array = Array{}, const Variant &flags = 0);
     Variant offsetExists(const Variant &key);
     Variant offsetGet(const Variant &key);
     Variant offsetSet(const Variant &key, const Variant &value);
@@ -779,13 +779,16 @@ class SplFileObject {
     Variant fputcsv(const Variant &fields, const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\", const Variant &eol = "\n");
     Variant setCsvControl(const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\");
     Variant getCsvControl();
-    Variant flock(const Variant &operation, const Variant &would_block = {});
+    Variant flock(const Variant &operation, const Reference &would_block = {});
     Variant fflush();
     Variant ftell();
     Variant fseek(const Variant &offset, const Variant &whence = 0);
     Variant fgetc();
     Variant fpassthru();
-    Variant fscanf(const Variant &format, const Variant &vars = {});
+    template <typename... Args>
+    Variant fscanf(const Variant &format, const Args&... vars) {
+        return call("fscanf", {format, vars...});
+    }
     Variant fwrite(const Variant &data, const Variant &length = 0);
     Variant fstat();
     Variant ftruncate(const Variant &size);
@@ -845,13 +848,16 @@ class SplTempFileObject {
     Variant fputcsv(const Variant &fields, const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\", const Variant &eol = "\n");
     Variant setCsvControl(const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\");
     Variant getCsvControl();
-    Variant flock(const Variant &operation, const Variant &would_block = {});
+    Variant flock(const Variant &operation, const Reference &would_block = {});
     Variant fflush();
     Variant ftell();
     Variant fseek(const Variant &offset, const Variant &whence = 0);
     Variant fgetc();
     Variant fpassthru();
-    Variant fscanf(const Variant &format, const Variant &vars = {});
+    template <typename... Args>
+    Variant fscanf(const Variant &format, const Args&... vars) {
+        return call("fscanf", {format, vars...});
+    }
     Variant fwrite(const Variant &data, const Variant &length = 0);
     Variant fstat();
     Variant ftruncate(const Variant &size);
@@ -1087,6 +1093,7 @@ class SplObjectStorage {
     Variant key();
     Variant current();
     Variant next();
+    Variant seek(const Variant &offset);
     Variant unserialize(const Variant &data);
     Variant serialize();
     Variant offsetExists(const Variant &object);

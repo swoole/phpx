@@ -26,6 +26,8 @@ extern Variant POSIX_RLIMIT_SIGPENDING;
 extern Variant POSIX_RLIMIT_STACK;
 extern Variant POSIX_RLIMIT_INFINITY;
 extern Variant POSIX_SC_ARG_MAX;
+extern Variant POSIX_SC_CHILD_MAX;
+extern Variant POSIX_SC_CLK_TCK;
 extern Variant POSIX_SC_PAGESIZE;
 extern Variant POSIX_SC_NPROCESSORS_CONF;
 extern Variant POSIX_SC_NPROCESSORS_ONLN;

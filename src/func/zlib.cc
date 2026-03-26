@@ -1,34 +1,94 @@
 #include "phpx.h"
 
 namespace php {
-Variant ob_gzhandler{ZEND_STRL("ob_gzhandler"), true};
-Variant zlib_get_coding_type{ZEND_STRL("zlib_get_coding_type"), true};
-Variant gzfile{ZEND_STRL("gzfile"), true};
-Variant gzopen{ZEND_STRL("gzopen"), true};
-Variant readgzfile{ZEND_STRL("readgzfile"), true};
-Variant zlib_encode{ZEND_STRL("zlib_encode"), true};
-Variant zlib_decode{ZEND_STRL("zlib_decode"), true};
-Variant gzdeflate{ZEND_STRL("gzdeflate"), true};
-Variant gzencode{ZEND_STRL("gzencode"), true};
-Variant gzcompress{ZEND_STRL("gzcompress"), true};
-Variant gzinflate{ZEND_STRL("gzinflate"), true};
-Variant gzdecode{ZEND_STRL("gzdecode"), true};
-Variant gzuncompress{ZEND_STRL("gzuncompress"), true};
-Variant gzwrite{ZEND_STRL("gzwrite"), true};
-Variant gzputs{ZEND_STRL("gzputs"), true};
-Variant gzrewind{ZEND_STRL("gzrewind"), true};
-Variant gzclose{ZEND_STRL("gzclose"), true};
-Variant gzeof{ZEND_STRL("gzeof"), true};
-Variant gzgetc{ZEND_STRL("gzgetc"), true};
-Variant gzpassthru{ZEND_STRL("gzpassthru"), true};
-Variant gzseek{ZEND_STRL("gzseek"), true};
-Variant gztell{ZEND_STRL("gztell"), true};
-Variant gzread{ZEND_STRL("gzread"), true};
-Variant gzgets{ZEND_STRL("gzgets"), true};
-Variant deflate_init{ZEND_STRL("deflate_init"), true};
-Variant deflate_add{ZEND_STRL("deflate_add"), true};
-Variant inflate_init{ZEND_STRL("inflate_init"), true};
-Variant inflate_add{ZEND_STRL("inflate_add"), true};
-Variant inflate_get_status{ZEND_STRL("inflate_get_status"), true};
-Variant inflate_get_read_len{ZEND_STRL("inflate_get_read_len"), true};
+Variant ob_gzhandler(const Variant &data, const Variant &flags) {
+    return call("ob_gzhandler", {data, flags});
+}
+Variant zlib_get_coding_type() {
+    return call("zlib_get_coding_type", {});
+}
+Variant gzfile(const Variant &filename, const Variant &use_include_path) {
+    return call("gzfile", {filename, use_include_path});
+}
+Variant gzopen(const Variant &filename, const Variant &mode, const Variant &use_include_path) {
+    return call("gzopen", {filename, mode, use_include_path});
+}
+Variant readgzfile(const Variant &filename, const Variant &use_include_path) {
+    return call("readgzfile", {filename, use_include_path});
+}
+Variant zlib_encode(const Variant &data, const Variant &encoding, const Variant &level) {
+    return call("zlib_encode", {data, encoding, level});
+}
+Variant zlib_decode(const Variant &data, const Variant &max_length) {
+    return call("zlib_decode", {data, max_length});
+}
+Variant gzdeflate(const Variant &data, const Variant &level, const Variant &encoding) {
+    return call("gzdeflate", {data, level, encoding});
+}
+Variant gzencode(const Variant &data, const Variant &level, const Variant &encoding) {
+    return call("gzencode", {data, level, encoding});
+}
+Variant gzcompress(const Variant &data, const Variant &level, const Variant &encoding) {
+    return call("gzcompress", {data, level, encoding});
+}
+Variant gzinflate(const Variant &data, const Variant &max_length) {
+    return call("gzinflate", {data, max_length});
+}
+Variant gzdecode(const Variant &data, const Variant &max_length) {
+    return call("gzdecode", {data, max_length});
+}
+Variant gzuncompress(const Variant &data, const Variant &max_length) {
+    return call("gzuncompress", {data, max_length});
+}
+Variant gzwrite(const Variant &stream, const Variant &data, const Variant &length) {
+    return call("gzwrite", {stream, data, length});
+}
+Variant gzputs(const Variant &stream, const Variant &data, const Variant &length) {
+    return call("gzputs", {stream, data, length});
+}
+Variant gzrewind(const Variant &stream) {
+    return call("gzrewind", {stream});
+}
+Variant gzclose(const Variant &stream) {
+    return call("gzclose", {stream});
+}
+Variant gzeof(const Variant &stream) {
+    return call("gzeof", {stream});
+}
+Variant gzgetc(const Variant &stream) {
+    return call("gzgetc", {stream});
+}
+Variant gzpassthru(const Variant &stream) {
+    return call("gzpassthru", {stream});
+}
+Variant gzseek(const Variant &stream, const Variant &offset, const Variant &whence) {
+    return call("gzseek", {stream, offset, whence});
+}
+Variant gztell(const Variant &stream) {
+    return call("gztell", {stream});
+}
+Variant gzread(const Variant &stream, const Variant &length) {
+    return call("gzread", {stream, length});
+}
+Variant gzgets(const Variant &stream, const Variant &length) {
+    return call("gzgets", {stream, length});
+}
+Variant deflate_init(const Variant &encoding, const Variant &options) {
+    return call("deflate_init", {encoding, options});
+}
+Variant deflate_add(const Variant &context, const Variant &data, const Variant &flush_mode) {
+    return call("deflate_add", {context, data, flush_mode});
+}
+Variant inflate_init(const Variant &encoding, const Variant &options) {
+    return call("inflate_init", {encoding, options});
+}
+Variant inflate_add(const Variant &context, const Variant &data, const Variant &flush_mode) {
+    return call("inflate_add", {context, data, flush_mode});
+}
+Variant inflate_get_status(const Variant &context) {
+    return call("inflate_get_status", {context});
+}
+Variant inflate_get_read_len(const Variant &context) {
+    return call("inflate_get_read_len", {context});
+}
 }

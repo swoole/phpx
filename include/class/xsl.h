@@ -11,6 +11,7 @@ class XSLTProcessor {
     Variant removeParameter(const Variant &_namespace, const Variant &name);
     Variant hasExsltSupport();
     Variant registerPHPFunctions(const Variant &functions = {});
+    Variant registerPHPFunctionNS(const Variant &namespace_u_r_i, const Variant &name, const Variant &callable);
     Variant setProfiling(const Variant &filename);
     Variant setSecurityPrefs(const Variant &preferences);
     Variant getSecurityPrefs();

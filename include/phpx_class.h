@@ -17,6 +17,7 @@
 #pragma once
 
 #include "phpx.h"
+#include "class/bcmath.h"
 #include "class/core.h"
 #include "class/curl.h"
 #include "class/date.h"
@@ -24,7 +25,10 @@
 #include "class/fileinfo.h"
 #include "class/hash.h"
 #include "class/json.h"
+#include "class/pcntl.h"
 #include "class/pdo.h"
+#include "class/pdo_mysql.h"
+#include "class/pdo_sqlite.h"
 #include "class/phar.h"
 #include "class/random.h"
 #include "class/redis.h"

@@ -1,11 +1,11 @@
 namespace php {
-extern Variant lcg_value;
-extern Variant mt_srand;
-extern Variant srand;
-extern Variant rand;
-extern Variant mt_rand;
-extern Variant mt_getrandmax;
-extern Variant getrandmax;
-extern Variant random_bytes;
-extern Variant random_int;
+Variant lcg_value();
+Variant mt_srand(const Variant &seed = {}, const Variant &mode = 0);
+Variant srand(const Variant &seed = {}, const Variant &mode = 0);
+Variant rand(const Variant &min = {}, const Variant &max = {});
+Variant mt_rand(const Variant &min = {}, const Variant &max = {});
+Variant mt_getrandmax();
+Variant getrandmax();
+Variant random_bytes(const Variant &length);
+Variant random_int(const Variant &min, const Variant &max);
 }

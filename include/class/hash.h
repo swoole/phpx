@@ -4,6 +4,7 @@ class HashContext {
   public:
     Variant __serialize();
     Variant __unserialize(const Variant &data);
+    Variant __debugInfo();
 };
 
 }

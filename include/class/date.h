@@ -10,6 +10,7 @@ class DateTime {
     static Variant createFromImmutable(const Variant &object);
     static Variant createFromInterface(const Variant &object);
     static Variant createFromFormat(const Variant &format, const Variant &datetime, const Variant &timezone = {});
+    static Variant createFromTimestamp(const Variant &timestamp);
     static Variant getLastErrors();
     Variant format(const Variant &format);
     Variant modify(const Variant &modifier);
@@ -18,10 +19,12 @@ class DateTime {
     Variant getTimezone();
     Variant setTimezone(const Variant &timezone);
     Variant getOffset();
+    Variant getMicrosecond();
     Variant setTime(const Variant &hour, const Variant &minute, const Variant &second = 0, const Variant &microsecond = 0);
     Variant setDate(const Variant &year, const Variant &month, const Variant &day);
     Variant setISODate(const Variant &year, const Variant &week, const Variant &day_of_week = 1);
     Variant setTimestamp(const Variant &timestamp);
+    Variant setMicrosecond(const Variant &microsecond);
     Variant getTimestamp();
     Variant diff(const Variant &target_object, const Variant &absolute = false);
 };
@@ -35,11 +38,13 @@ class DateTimeImmutable {
     Variant __wakeup();
     static Variant __set_state(const Variant &array);
     static Variant createFromFormat(const Variant &format, const Variant &datetime, const Variant &timezone = {});
+    static Variant createFromTimestamp(const Variant &timestamp);
     static Variant getLastErrors();
     Variant format(const Variant &format);
     Variant getTimezone();
     Variant getOffset();
     Variant getTimestamp();
+    Variant getMicrosecond();
     Variant diff(const Variant &target_object, const Variant &absolute = false);
     Variant modify(const Variant &modifier);
     Variant add(const Variant &interval);
@@ -49,6 +54,7 @@ class DateTimeImmutable {
     Variant setDate(const Variant &year, const Variant &month, const Variant &day);
     Variant setISODate(const Variant &year, const Variant &week, const Variant &day_of_week = 1);
     Variant setTimestamp(const Variant &timestamp);
+    Variant setMicrosecond(const Variant &microsecond);
     static Variant createFromMutable(const Variant &object);
     static Variant createFromInterface(const Variant &object);
 };

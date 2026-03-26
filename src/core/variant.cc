@@ -28,6 +28,11 @@ Variant null = {};
 Object null_object;
 Int zero = 0L;
 
+Variant::Variant(const Reference *ref) {
+    val = *ref->const_ptr();
+    addRef();
+}
+
 void Variant::copyFrom(const zval *src) {
     zval *zv = unwrap_ptr();
     if (UNEXPECTED(zval_is_string(zv) && isStrOffsetSet(zv) && zval_is_string(src))) {

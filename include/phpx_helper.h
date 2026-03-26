@@ -243,10 +243,4 @@ static inline Reference getCallArgByRef(uint32_t i, const Reference &defaultValu
         return getCallArgByRef(i);
     }
 }
-
-static inline Reference getEmptyArrayRef() {
-    Reference ref;
-    array_init(ref.refval());
-    return ref;
-}
 }  // namespace php

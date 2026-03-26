@@ -1,538 +1,1498 @@
 #include "phpx.h"
 
 namespace php {
-Variant set_time_limit{ZEND_STRL("set_time_limit"), true};
-Variant header_register_callback{ZEND_STRL("header_register_callback"), true};
-Variant ob_start{ZEND_STRL("ob_start"), true};
-Variant ob_flush{ZEND_STRL("ob_flush"), true};
-Variant ob_clean{ZEND_STRL("ob_clean"), true};
-Variant ob_end_flush{ZEND_STRL("ob_end_flush"), true};
-Variant ob_end_clean{ZEND_STRL("ob_end_clean"), true};
-Variant ob_get_flush{ZEND_STRL("ob_get_flush"), true};
-Variant ob_get_clean{ZEND_STRL("ob_get_clean"), true};
-Variant ob_get_contents{ZEND_STRL("ob_get_contents"), true};
-Variant ob_get_level{ZEND_STRL("ob_get_level"), true};
-Variant ob_get_length{ZEND_STRL("ob_get_length"), true};
-Variant ob_list_handlers{ZEND_STRL("ob_list_handlers"), true};
-Variant ob_get_status{ZEND_STRL("ob_get_status"), true};
-Variant ob_implicit_flush{ZEND_STRL("ob_implicit_flush"), true};
-Variant output_reset_rewrite_vars{ZEND_STRL("output_reset_rewrite_vars"), true};
-Variant output_add_rewrite_var{ZEND_STRL("output_add_rewrite_var"), true};
-Variant stream_wrapper_register{ZEND_STRL("stream_wrapper_register"), true};
-Variant stream_register_wrapper{ZEND_STRL("stream_register_wrapper"), true};
-Variant stream_wrapper_unregister{ZEND_STRL("stream_wrapper_unregister"), true};
-Variant stream_wrapper_restore{ZEND_STRL("stream_wrapper_restore"), true};
-Variant array_push{ZEND_STRL("array_push"), true};
-Variant krsort{ZEND_STRL("krsort"), true};
-Variant ksort{ZEND_STRL("ksort"), true};
-Variant count{ZEND_STRL("count"), true};
-Variant natsort{ZEND_STRL("natsort"), true};
-Variant natcasesort{ZEND_STRL("natcasesort"), true};
-Variant asort{ZEND_STRL("asort"), true};
-Variant arsort{ZEND_STRL("arsort"), true};
-Variant sort{ZEND_STRL("sort"), true};
-Variant rsort{ZEND_STRL("rsort"), true};
-Variant usort{ZEND_STRL("usort"), true};
-Variant uasort{ZEND_STRL("uasort"), true};
-Variant uksort{ZEND_STRL("uksort"), true};
-Variant end{ZEND_STRL("end"), true};
-Variant prev{ZEND_STRL("prev"), true};
-Variant next{ZEND_STRL("next"), true};
-Variant reset{ZEND_STRL("reset"), true};
-Variant current{ZEND_STRL("current"), true};
-Variant pos{ZEND_STRL("pos"), true};
-Variant key{ZEND_STRL("key"), true};
-Variant min{ZEND_STRL("min"), true};
-Variant max{ZEND_STRL("max"), true};
-Variant array_walk{ZEND_STRL("array_walk"), true};
-Variant array_walk_recursive{ZEND_STRL("array_walk_recursive"), true};
-Variant in_array{ZEND_STRL("in_array"), true};
-Variant array_search{ZEND_STRL("array_search"), true};
-Variant extract{ZEND_STRL("extract"), true};
-Variant compact{ZEND_STRL("compact"), true};
-Variant array_fill{ZEND_STRL("array_fill"), true};
-Variant array_fill_keys{ZEND_STRL("array_fill_keys"), true};
-Variant range{ZEND_STRL("range"), true};
-Variant shuffle{ZEND_STRL("shuffle"), true};
-Variant array_pop{ZEND_STRL("array_pop"), true};
-Variant array_shift{ZEND_STRL("array_shift"), true};
-Variant array_unshift{ZEND_STRL("array_unshift"), true};
-Variant array_splice{ZEND_STRL("array_splice"), true};
-Variant array_slice{ZEND_STRL("array_slice"), true};
-Variant array_merge{ZEND_STRL("array_merge"), true};
-Variant array_merge_recursive{ZEND_STRL("array_merge_recursive"), true};
-Variant array_replace{ZEND_STRL("array_replace"), true};
-Variant array_replace_recursive{ZEND_STRL("array_replace_recursive"), true};
-Variant array_keys{ZEND_STRL("array_keys"), true};
-Variant array_key_first{ZEND_STRL("array_key_first"), true};
-Variant array_key_last{ZEND_STRL("array_key_last"), true};
-Variant array_values{ZEND_STRL("array_values"), true};
-Variant array_count_values{ZEND_STRL("array_count_values"), true};
-Variant array_column{ZEND_STRL("array_column"), true};
-Variant array_reverse{ZEND_STRL("array_reverse"), true};
-Variant array_pad{ZEND_STRL("array_pad"), true};
-Variant array_flip{ZEND_STRL("array_flip"), true};
-Variant array_change_key_case{ZEND_STRL("array_change_key_case"), true};
-Variant array_unique{ZEND_STRL("array_unique"), true};
-Variant array_intersect_key{ZEND_STRL("array_intersect_key"), true};
-Variant array_intersect_ukey{ZEND_STRL("array_intersect_ukey"), true};
-Variant array_intersect{ZEND_STRL("array_intersect"), true};
-Variant array_uintersect{ZEND_STRL("array_uintersect"), true};
-Variant array_intersect_assoc{ZEND_STRL("array_intersect_assoc"), true};
-Variant array_uintersect_assoc{ZEND_STRL("array_uintersect_assoc"), true};
-Variant array_intersect_uassoc{ZEND_STRL("array_intersect_uassoc"), true};
-Variant array_uintersect_uassoc{ZEND_STRL("array_uintersect_uassoc"), true};
-Variant array_diff_key{ZEND_STRL("array_diff_key"), true};
-Variant array_diff_ukey{ZEND_STRL("array_diff_ukey"), true};
-Variant array_diff{ZEND_STRL("array_diff"), true};
-Variant array_udiff{ZEND_STRL("array_udiff"), true};
-Variant array_diff_assoc{ZEND_STRL("array_diff_assoc"), true};
-Variant array_diff_uassoc{ZEND_STRL("array_diff_uassoc"), true};
-Variant array_udiff_assoc{ZEND_STRL("array_udiff_assoc"), true};
-Variant array_udiff_uassoc{ZEND_STRL("array_udiff_uassoc"), true};
-Variant array_multisort{ZEND_STRL("array_multisort"), true};
-Variant array_rand{ZEND_STRL("array_rand"), true};
-Variant array_sum{ZEND_STRL("array_sum"), true};
-Variant array_product{ZEND_STRL("array_product"), true};
-Variant array_reduce{ZEND_STRL("array_reduce"), true};
-Variant array_filter{ZEND_STRL("array_filter"), true};
-Variant array_map{ZEND_STRL("array_map"), true};
-Variant array_key_exists{ZEND_STRL("array_key_exists"), true};
-Variant key_exists{ZEND_STRL("key_exists"), true};
-Variant array_chunk{ZEND_STRL("array_chunk"), true};
-Variant array_combine{ZEND_STRL("array_combine"), true};
-Variant array_is_list{ZEND_STRL("array_is_list"), true};
-Variant base64_encode{ZEND_STRL("base64_encode"), true};
-Variant base64_decode{ZEND_STRL("base64_decode"), true};
-Variant ip2long{ZEND_STRL("ip2long"), true};
-Variant long2ip{ZEND_STRL("long2ip"), true};
-Variant getenv{ZEND_STRL("getenv"), true};
-Variant putenv{ZEND_STRL("putenv"), true};
-Variant getopt{ZEND_STRL("getopt"), true};
-Variant flush{ZEND_STRL("flush"), true};
-Variant sleep{ZEND_STRL("sleep"), true};
-Variant usleep{ZEND_STRL("usleep"), true};
-Variant time_nanosleep{ZEND_STRL("time_nanosleep"), true};
-Variant time_sleep_until{ZEND_STRL("time_sleep_until"), true};
-Variant get_current_user{ZEND_STRL("get_current_user"), true};
-Variant get_cfg_var{ZEND_STRL("get_cfg_var"), true};
-Variant error_log{ZEND_STRL("error_log"), true};
-Variant error_get_last{ZEND_STRL("error_get_last"), true};
-Variant error_clear_last{ZEND_STRL("error_clear_last"), true};
-Variant call_user_func{ZEND_STRL("call_user_func"), true};
-Variant call_user_func_array{ZEND_STRL("call_user_func_array"), true};
-Variant forward_static_call{ZEND_STRL("forward_static_call"), true};
-Variant forward_static_call_array{ZEND_STRL("forward_static_call_array"), true};
-Variant register_shutdown_function{ZEND_STRL("register_shutdown_function"), true};
-Variant highlight_file{ZEND_STRL("highlight_file"), true};
-Variant show_source{ZEND_STRL("show_source"), true};
-Variant php_strip_whitespace{ZEND_STRL("php_strip_whitespace"), true};
-Variant highlight_string{ZEND_STRL("highlight_string"), true};
-Variant ini_get{ZEND_STRL("ini_get"), true};
-Variant ini_get_all{ZEND_STRL("ini_get_all"), true};
-Variant ini_set{ZEND_STRL("ini_set"), true};
-Variant ini_alter{ZEND_STRL("ini_alter"), true};
-Variant ini_restore{ZEND_STRL("ini_restore"), true};
-Variant ini_parse_quantity{ZEND_STRL("ini_parse_quantity"), true};
-Variant set_include_path{ZEND_STRL("set_include_path"), true};
-Variant get_include_path{ZEND_STRL("get_include_path"), true};
-Variant print_r{ZEND_STRL("print_r"), true};
-Variant connection_aborted{ZEND_STRL("connection_aborted"), true};
-Variant connection_status{ZEND_STRL("connection_status"), true};
-Variant ignore_user_abort{ZEND_STRL("ignore_user_abort"), true};
-Variant getservbyname{ZEND_STRL("getservbyname"), true};
-Variant getservbyport{ZEND_STRL("getservbyport"), true};
-Variant getprotobyname{ZEND_STRL("getprotobyname"), true};
-Variant getprotobynumber{ZEND_STRL("getprotobynumber"), true};
-Variant register_tick_function{ZEND_STRL("register_tick_function"), true};
-Variant unregister_tick_function{ZEND_STRL("unregister_tick_function"), true};
-Variant is_uploaded_file{ZEND_STRL("is_uploaded_file"), true};
-Variant move_uploaded_file{ZEND_STRL("move_uploaded_file"), true};
-Variant parse_ini_file{ZEND_STRL("parse_ini_file"), true};
-Variant parse_ini_string{ZEND_STRL("parse_ini_string"), true};
-Variant config_get_hash{ZEND_STRL("config_get_hash"), true};
-Variant sys_getloadavg{ZEND_STRL("sys_getloadavg"), true};
-Variant get_browser{ZEND_STRL("get_browser"), true};
-Variant crc32{ZEND_STRL("crc32"), true};
-Variant crypt{ZEND_STRL("crypt"), true};
-Variant strptime{ZEND_STRL("strptime"), true};
-Variant gethostname{ZEND_STRL("gethostname"), true};
-Variant gethostbyaddr{ZEND_STRL("gethostbyaddr"), true};
-Variant gethostbyname{ZEND_STRL("gethostbyname"), true};
-Variant gethostbynamel{ZEND_STRL("gethostbynamel"), true};
-Variant dns_check_record{ZEND_STRL("dns_check_record"), true};
-Variant checkdnsrr{ZEND_STRL("checkdnsrr"), true};
-Variant dns_get_record{ZEND_STRL("dns_get_record"), true};
-Variant dns_get_mx{ZEND_STRL("dns_get_mx"), true};
-Variant getmxrr{ZEND_STRL("getmxrr"), true};
-Variant net_get_interfaces{ZEND_STRL("net_get_interfaces"), true};
-Variant ftok{ZEND_STRL("ftok"), true};
-Variant hrtime{ZEND_STRL("hrtime"), true};
-Variant md5{ZEND_STRL("md5"), true};
-Variant md5_file{ZEND_STRL("md5_file"), true};
-Variant getmyuid{ZEND_STRL("getmyuid"), true};
-Variant getmygid{ZEND_STRL("getmygid"), true};
-Variant getmypid{ZEND_STRL("getmypid"), true};
-Variant getmyinode{ZEND_STRL("getmyinode"), true};
-Variant getlastmod{ZEND_STRL("getlastmod"), true};
-Variant sha1{ZEND_STRL("sha1"), true};
-Variant sha1_file{ZEND_STRL("sha1_file"), true};
-Variant openlog{ZEND_STRL("openlog"), true};
-Variant closelog{ZEND_STRL("closelog"), true};
-Variant syslog{ZEND_STRL("syslog"), true};
-Variant inet_ntop{ZEND_STRL("inet_ntop"), true};
-Variant inet_pton{ZEND_STRL("inet_pton"), true};
-Variant metaphone{ZEND_STRL("metaphone"), true};
-Variant header{ZEND_STRL("header"), true};
-Variant header_remove{ZEND_STRL("header_remove"), true};
-Variant setrawcookie{ZEND_STRL("setrawcookie"), true};
-Variant setcookie{ZEND_STRL("setcookie"), true};
-Variant http_response_code{ZEND_STRL("http_response_code"), true};
-Variant headers_sent{ZEND_STRL("headers_sent"), true};
-Variant headers_list{ZEND_STRL("headers_list"), true};
-Variant htmlspecialchars{ZEND_STRL("htmlspecialchars"), true};
-Variant htmlspecialchars_decode{ZEND_STRL("htmlspecialchars_decode"), true};
-Variant html_entity_decode{ZEND_STRL("html_entity_decode"), true};
-Variant htmlentities{ZEND_STRL("htmlentities"), true};
-Variant get_html_translation_table{ZEND_STRL("get_html_translation_table"), true};
-Variant assert{ZEND_STRL("assert"), true};
-Variant assert_options{ZEND_STRL("assert_options"), true};
-Variant bin2hex{ZEND_STRL("bin2hex"), true};
-Variant hex2bin{ZEND_STRL("hex2bin"), true};
-Variant strspn{ZEND_STRL("strspn"), true};
-Variant strcspn{ZEND_STRL("strcspn"), true};
-Variant nl_langinfo{ZEND_STRL("nl_langinfo"), true};
-Variant strcoll{ZEND_STRL("strcoll"), true};
-Variant trim{ZEND_STRL("trim"), true};
-Variant rtrim{ZEND_STRL("rtrim"), true};
-Variant chop{ZEND_STRL("chop"), true};
-Variant ltrim{ZEND_STRL("ltrim"), true};
-Variant wordwrap{ZEND_STRL("wordwrap"), true};
-Variant explode{ZEND_STRL("explode"), true};
-Variant implode{ZEND_STRL("implode"), true};
-Variant join{ZEND_STRL("join"), true};
-Variant strtok{ZEND_STRL("strtok"), true};
-Variant strtoupper{ZEND_STRL("strtoupper"), true};
-Variant strtolower{ZEND_STRL("strtolower"), true};
-Variant str_increment{ZEND_STRL("str_increment"), true};
-Variant str_decrement{ZEND_STRL("str_decrement"), true};
-Variant basename{ZEND_STRL("basename"), true};
-Variant dirname{ZEND_STRL("dirname"), true};
-Variant pathinfo{ZEND_STRL("pathinfo"), true};
-Variant stristr{ZEND_STRL("stristr"), true};
-Variant strstr{ZEND_STRL("strstr"), true};
-Variant strchr{ZEND_STRL("strchr"), true};
-Variant strpos{ZEND_STRL("strpos"), true};
-Variant stripos{ZEND_STRL("stripos"), true};
-Variant strrpos{ZEND_STRL("strrpos"), true};
-Variant strripos{ZEND_STRL("strripos"), true};
-Variant strrchr{ZEND_STRL("strrchr"), true};
-Variant str_contains{ZEND_STRL("str_contains"), true};
-Variant str_starts_with{ZEND_STRL("str_starts_with"), true};
-Variant str_ends_with{ZEND_STRL("str_ends_with"), true};
-Variant chunk_split{ZEND_STRL("chunk_split"), true};
-Variant substr{ZEND_STRL("substr"), true};
-Variant substr_replace{ZEND_STRL("substr_replace"), true};
-Variant quotemeta{ZEND_STRL("quotemeta"), true};
-Variant ord{ZEND_STRL("ord"), true};
-Variant chr{ZEND_STRL("chr"), true};
-Variant ucfirst{ZEND_STRL("ucfirst"), true};
-Variant lcfirst{ZEND_STRL("lcfirst"), true};
-Variant ucwords{ZEND_STRL("ucwords"), true};
-Variant strtr{ZEND_STRL("strtr"), true};
-Variant strrev{ZEND_STRL("strrev"), true};
-Variant similar_text{ZEND_STRL("similar_text"), true};
-Variant addcslashes{ZEND_STRL("addcslashes"), true};
-Variant addslashes{ZEND_STRL("addslashes"), true};
-Variant stripcslashes{ZEND_STRL("stripcslashes"), true};
-Variant stripslashes{ZEND_STRL("stripslashes"), true};
-Variant str_replace{ZEND_STRL("str_replace"), true};
-Variant str_ireplace{ZEND_STRL("str_ireplace"), true};
-Variant hebrev{ZEND_STRL("hebrev"), true};
-Variant nl2br{ZEND_STRL("nl2br"), true};
-Variant strip_tags{ZEND_STRL("strip_tags"), true};
-Variant setlocale{ZEND_STRL("setlocale"), true};
-Variant parse_str{ZEND_STRL("parse_str"), true};
-Variant str_getcsv{ZEND_STRL("str_getcsv"), true};
-Variant str_repeat{ZEND_STRL("str_repeat"), true};
-Variant count_chars{ZEND_STRL("count_chars"), true};
-Variant strnatcmp{ZEND_STRL("strnatcmp"), true};
-Variant localeconv{ZEND_STRL("localeconv"), true};
-Variant strnatcasecmp{ZEND_STRL("strnatcasecmp"), true};
-Variant substr_count{ZEND_STRL("substr_count"), true};
-Variant str_pad{ZEND_STRL("str_pad"), true};
-Variant sscanf{ZEND_STRL("sscanf"), true};
-Variant str_rot13{ZEND_STRL("str_rot13"), true};
-Variant str_shuffle{ZEND_STRL("str_shuffle"), true};
-Variant str_word_count{ZEND_STRL("str_word_count"), true};
-Variant str_split{ZEND_STRL("str_split"), true};
-Variant strpbrk{ZEND_STRL("strpbrk"), true};
-Variant substr_compare{ZEND_STRL("substr_compare"), true};
-Variant utf8_encode{ZEND_STRL("utf8_encode"), true};
-Variant utf8_decode{ZEND_STRL("utf8_decode"), true};
-Variant opendir{ZEND_STRL("opendir"), true};
-Variant dir{ZEND_STRL("dir"), true};
-Variant closedir{ZEND_STRL("closedir"), true};
-Variant chdir{ZEND_STRL("chdir"), true};
-Variant chroot{ZEND_STRL("chroot"), true};
-Variant getcwd{ZEND_STRL("getcwd"), true};
-Variant rewinddir{ZEND_STRL("rewinddir"), true};
-Variant readdir{ZEND_STRL("readdir"), true};
-Variant scandir{ZEND_STRL("scandir"), true};
-Variant glob{ZEND_STRL("glob"), true};
-Variant exec{ZEND_STRL("exec"), true};
-Variant system{ZEND_STRL("system"), true};
-Variant passthru{ZEND_STRL("passthru"), true};
-Variant escapeshellcmd{ZEND_STRL("escapeshellcmd"), true};
-Variant escapeshellarg{ZEND_STRL("escapeshellarg"), true};
-Variant shell_exec{ZEND_STRL("shell_exec"), true};
-Variant proc_nice{ZEND_STRL("proc_nice"), true};
-Variant flock{ZEND_STRL("flock"), true};
-Variant get_meta_tags{ZEND_STRL("get_meta_tags"), true};
-Variant pclose{ZEND_STRL("pclose"), true};
-Variant popen{ZEND_STRL("popen"), true};
-Variant readfile{ZEND_STRL("readfile"), true};
-Variant rewind{ZEND_STRL("rewind"), true};
-Variant rmdir{ZEND_STRL("rmdir"), true};
-Variant umask{ZEND_STRL("umask"), true};
-Variant fclose{ZEND_STRL("fclose"), true};
-Variant feof{ZEND_STRL("feof"), true};
-Variant fgetc{ZEND_STRL("fgetc"), true};
-Variant fgets{ZEND_STRL("fgets"), true};
-Variant fread{ZEND_STRL("fread"), true};
-Variant fopen{ZEND_STRL("fopen"), true};
-Variant fscanf{ZEND_STRL("fscanf"), true};
-Variant fpassthru{ZEND_STRL("fpassthru"), true};
-Variant ftruncate{ZEND_STRL("ftruncate"), true};
-Variant fstat{ZEND_STRL("fstat"), true};
-Variant fseek{ZEND_STRL("fseek"), true};
-Variant ftell{ZEND_STRL("ftell"), true};
-Variant fflush{ZEND_STRL("fflush"), true};
-Variant fsync{ZEND_STRL("fsync"), true};
-Variant fdatasync{ZEND_STRL("fdatasync"), true};
-Variant fwrite{ZEND_STRL("fwrite"), true};
-Variant fputs{ZEND_STRL("fputs"), true};
-Variant mkdir{ZEND_STRL("mkdir"), true};
-Variant rename{ZEND_STRL("rename"), true};
-Variant copy{ZEND_STRL("copy"), true};
-Variant tempnam{ZEND_STRL("tempnam"), true};
-Variant tmpfile{ZEND_STRL("tmpfile"), true};
-Variant file{ZEND_STRL("file"), true};
-Variant file_get_contents{ZEND_STRL("file_get_contents"), true};
-Variant unlink{ZEND_STRL("unlink"), true};
-Variant file_put_contents{ZEND_STRL("file_put_contents"), true};
-Variant fputcsv{ZEND_STRL("fputcsv"), true};
-Variant fgetcsv{ZEND_STRL("fgetcsv"), true};
-Variant realpath{ZEND_STRL("realpath"), true};
-Variant fnmatch{ZEND_STRL("fnmatch"), true};
-Variant sys_get_temp_dir{ZEND_STRL("sys_get_temp_dir"), true};
-Variant fileatime{ZEND_STRL("fileatime"), true};
-Variant filectime{ZEND_STRL("filectime"), true};
-Variant filegroup{ZEND_STRL("filegroup"), true};
-Variant fileinode{ZEND_STRL("fileinode"), true};
-Variant filemtime{ZEND_STRL("filemtime"), true};
-Variant fileowner{ZEND_STRL("fileowner"), true};
-Variant fileperms{ZEND_STRL("fileperms"), true};
-Variant filesize{ZEND_STRL("filesize"), true};
-Variant filetype{ZEND_STRL("filetype"), true};
-Variant file_exists{ZEND_STRL("file_exists"), true};
-Variant is_writable{ZEND_STRL("is_writable"), true};
-Variant is_writeable{ZEND_STRL("is_writeable"), true};
-Variant is_readable{ZEND_STRL("is_readable"), true};
-Variant is_executable{ZEND_STRL("is_executable"), true};
-Variant is_file{ZEND_STRL("is_file"), true};
-Variant is_dir{ZEND_STRL("is_dir"), true};
-Variant is_link{ZEND_STRL("is_link"), true};
-Variant stat{ZEND_STRL("stat"), true};
-Variant lstat{ZEND_STRL("lstat"), true};
-Variant chown{ZEND_STRL("chown"), true};
-Variant chgrp{ZEND_STRL("chgrp"), true};
-Variant lchown{ZEND_STRL("lchown"), true};
-Variant lchgrp{ZEND_STRL("lchgrp"), true};
-Variant chmod{ZEND_STRL("chmod"), true};
-Variant touch{ZEND_STRL("touch"), true};
-Variant clearstatcache{ZEND_STRL("clearstatcache"), true};
-Variant disk_total_space{ZEND_STRL("disk_total_space"), true};
-Variant disk_free_space{ZEND_STRL("disk_free_space"), true};
-Variant diskfreespace{ZEND_STRL("diskfreespace"), true};
-Variant realpath_cache_get{ZEND_STRL("realpath_cache_get"), true};
-Variant realpath_cache_size{ZEND_STRL("realpath_cache_size"), true};
-Variant sprintf{ZEND_STRL("sprintf"), true};
-Variant printf{ZEND_STRL("printf"), true};
-Variant vprintf{ZEND_STRL("vprintf"), true};
-Variant vsprintf{ZEND_STRL("vsprintf"), true};
-Variant fprintf{ZEND_STRL("fprintf"), true};
-Variant vfprintf{ZEND_STRL("vfprintf"), true};
-Variant fsockopen{ZEND_STRL("fsockopen"), true};
-Variant pfsockopen{ZEND_STRL("pfsockopen"), true};
-Variant http_build_query{ZEND_STRL("http_build_query"), true};
-Variant image_type_to_mime_type{ZEND_STRL("image_type_to_mime_type"), true};
-Variant image_type_to_extension{ZEND_STRL("image_type_to_extension"), true};
-Variant getimagesize{ZEND_STRL("getimagesize"), true};
-Variant getimagesizefromstring{ZEND_STRL("getimagesizefromstring"), true};
-Variant phpinfo{ZEND_STRL("phpinfo"), true};
-Variant phpversion{ZEND_STRL("phpversion"), true};
-Variant phpcredits{ZEND_STRL("phpcredits"), true};
-Variant php_sapi_name{ZEND_STRL("php_sapi_name"), true};
-Variant php_uname{ZEND_STRL("php_uname"), true};
-Variant php_ini_scanned_files{ZEND_STRL("php_ini_scanned_files"), true};
-Variant php_ini_loaded_file{ZEND_STRL("php_ini_loaded_file"), true};
-Variant iptcembed{ZEND_STRL("iptcembed"), true};
-Variant iptcparse{ZEND_STRL("iptcparse"), true};
-Variant levenshtein{ZEND_STRL("levenshtein"), true};
-Variant readlink{ZEND_STRL("readlink"), true};
-Variant linkinfo{ZEND_STRL("linkinfo"), true};
-Variant symlink{ZEND_STRL("symlink"), true};
-Variant link{ZEND_STRL("link"), true};
-Variant mail{ZEND_STRL("mail"), true};
-Variant abs{ZEND_STRL("abs"), true};
-Variant ceil{ZEND_STRL("ceil"), true};
-Variant floor{ZEND_STRL("floor"), true};
-Variant round{ZEND_STRL("round"), true};
-Variant sin{ZEND_STRL("sin"), true};
-Variant cos{ZEND_STRL("cos"), true};
-Variant tan{ZEND_STRL("tan"), true};
-Variant asin{ZEND_STRL("asin"), true};
-Variant acos{ZEND_STRL("acos"), true};
-Variant atan{ZEND_STRL("atan"), true};
-Variant atanh{ZEND_STRL("atanh"), true};
-Variant atan2{ZEND_STRL("atan2"), true};
-Variant sinh{ZEND_STRL("sinh"), true};
-Variant cosh{ZEND_STRL("cosh"), true};
-Variant tanh{ZEND_STRL("tanh"), true};
-Variant asinh{ZEND_STRL("asinh"), true};
-Variant acosh{ZEND_STRL("acosh"), true};
-Variant expm1{ZEND_STRL("expm1"), true};
-Variant log1p{ZEND_STRL("log1p"), true};
-Variant pi{ZEND_STRL("pi"), true};
-Variant is_finite{ZEND_STRL("is_finite"), true};
-Variant is_nan{ZEND_STRL("is_nan"), true};
-Variant intdiv{ZEND_STRL("intdiv"), true};
-Variant is_infinite{ZEND_STRL("is_infinite"), true};
-Variant pow{ZEND_STRL("pow"), true};
-Variant exp{ZEND_STRL("exp"), true};
-Variant log{ZEND_STRL("log"), true};
-Variant log10{ZEND_STRL("log10"), true};
-Variant sqrt{ZEND_STRL("sqrt"), true};
-Variant hypot{ZEND_STRL("hypot"), true};
-Variant deg2rad{ZEND_STRL("deg2rad"), true};
-Variant rad2deg{ZEND_STRL("rad2deg"), true};
-Variant bindec{ZEND_STRL("bindec"), true};
-Variant hexdec{ZEND_STRL("hexdec"), true};
-Variant octdec{ZEND_STRL("octdec"), true};
-Variant decbin{ZEND_STRL("decbin"), true};
-Variant decoct{ZEND_STRL("decoct"), true};
-Variant dechex{ZEND_STRL("dechex"), true};
-Variant base_convert{ZEND_STRL("base_convert"), true};
-Variant number_format{ZEND_STRL("number_format"), true};
-Variant fmod{ZEND_STRL("fmod"), true};
-Variant fdiv{ZEND_STRL("fdiv"), true};
-Variant microtime{ZEND_STRL("microtime"), true};
-Variant gettimeofday{ZEND_STRL("gettimeofday"), true};
-Variant getrusage{ZEND_STRL("getrusage"), true};
-Variant pack{ZEND_STRL("pack"), true};
-Variant unpack{ZEND_STRL("unpack"), true};
-Variant password_get_info{ZEND_STRL("password_get_info"), true};
-Variant password_hash{ZEND_STRL("password_hash"), true};
-Variant password_needs_rehash{ZEND_STRL("password_needs_rehash"), true};
-Variant password_verify{ZEND_STRL("password_verify"), true};
-Variant password_algos{ZEND_STRL("password_algos"), true};
-Variant proc_open{ZEND_STRL("proc_open"), true};
-Variant proc_close{ZEND_STRL("proc_close"), true};
-Variant proc_terminate{ZEND_STRL("proc_terminate"), true};
-Variant proc_get_status{ZEND_STRL("proc_get_status"), true};
-Variant quoted_printable_decode{ZEND_STRL("quoted_printable_decode"), true};
-Variant quoted_printable_encode{ZEND_STRL("quoted_printable_encode"), true};
-Variant soundex{ZEND_STRL("soundex"), true};
-Variant stream_select{ZEND_STRL("stream_select"), true};
-Variant stream_context_create{ZEND_STRL("stream_context_create"), true};
-Variant stream_context_set_params{ZEND_STRL("stream_context_set_params"), true};
-Variant stream_context_get_params{ZEND_STRL("stream_context_get_params"), true};
-Variant stream_context_set_option{ZEND_STRL("stream_context_set_option"), true};
-Variant stream_context_set_options{ZEND_STRL("stream_context_set_options"), true};
-Variant stream_context_get_options{ZEND_STRL("stream_context_get_options"), true};
-Variant stream_context_get_default{ZEND_STRL("stream_context_get_default"), true};
-Variant stream_context_set_default{ZEND_STRL("stream_context_set_default"), true};
-Variant stream_filter_prepend{ZEND_STRL("stream_filter_prepend"), true};
-Variant stream_filter_append{ZEND_STRL("stream_filter_append"), true};
-Variant stream_filter_remove{ZEND_STRL("stream_filter_remove"), true};
-Variant stream_socket_client{ZEND_STRL("stream_socket_client"), true};
-Variant stream_socket_server{ZEND_STRL("stream_socket_server"), true};
-Variant stream_socket_accept{ZEND_STRL("stream_socket_accept"), true};
-Variant stream_socket_get_name{ZEND_STRL("stream_socket_get_name"), true};
-Variant stream_socket_recvfrom{ZEND_STRL("stream_socket_recvfrom"), true};
-Variant stream_socket_sendto{ZEND_STRL("stream_socket_sendto"), true};
-Variant stream_socket_enable_crypto{ZEND_STRL("stream_socket_enable_crypto"), true};
-Variant stream_socket_shutdown{ZEND_STRL("stream_socket_shutdown"), true};
-Variant stream_socket_pair{ZEND_STRL("stream_socket_pair"), true};
-Variant stream_copy_to_stream{ZEND_STRL("stream_copy_to_stream"), true};
-Variant stream_get_contents{ZEND_STRL("stream_get_contents"), true};
-Variant stream_supports_lock{ZEND_STRL("stream_supports_lock"), true};
-Variant stream_set_write_buffer{ZEND_STRL("stream_set_write_buffer"), true};
-Variant set_file_buffer{ZEND_STRL("set_file_buffer"), true};
-Variant stream_set_read_buffer{ZEND_STRL("stream_set_read_buffer"), true};
-Variant stream_set_blocking{ZEND_STRL("stream_set_blocking"), true};
-Variant socket_set_blocking{ZEND_STRL("socket_set_blocking"), true};
-Variant stream_get_meta_data{ZEND_STRL("stream_get_meta_data"), true};
-Variant socket_get_status{ZEND_STRL("socket_get_status"), true};
-Variant stream_get_line{ZEND_STRL("stream_get_line"), true};
-Variant stream_resolve_include_path{ZEND_STRL("stream_resolve_include_path"), true};
-Variant stream_get_wrappers{ZEND_STRL("stream_get_wrappers"), true};
-Variant stream_get_transports{ZEND_STRL("stream_get_transports"), true};
-Variant stream_is_local{ZEND_STRL("stream_is_local"), true};
-Variant stream_isatty{ZEND_STRL("stream_isatty"), true};
-Variant stream_set_chunk_size{ZEND_STRL("stream_set_chunk_size"), true};
-Variant stream_set_timeout{ZEND_STRL("stream_set_timeout"), true};
-Variant socket_set_timeout{ZEND_STRL("socket_set_timeout"), true};
-Variant gettype{ZEND_STRL("gettype"), true};
-Variant get_debug_type{ZEND_STRL("get_debug_type"), true};
-Variant settype{ZEND_STRL("settype"), true};
-Variant intval{ZEND_STRL("intval"), true};
-Variant floatval{ZEND_STRL("floatval"), true};
-Variant doubleval{ZEND_STRL("doubleval"), true};
-Variant boolval{ZEND_STRL("boolval"), true};
-Variant strval{ZEND_STRL("strval"), true};
-Variant is_null{ZEND_STRL("is_null"), true};
-Variant is_resource{ZEND_STRL("is_resource"), true};
-Variant is_bool{ZEND_STRL("is_bool"), true};
-Variant is_int{ZEND_STRL("is_int"), true};
-Variant is_integer{ZEND_STRL("is_integer"), true};
-Variant is_long{ZEND_STRL("is_long"), true};
-Variant is_float{ZEND_STRL("is_float"), true};
-Variant is_double{ZEND_STRL("is_double"), true};
-Variant is_numeric{ZEND_STRL("is_numeric"), true};
-Variant is_string{ZEND_STRL("is_string"), true};
-Variant is_array{ZEND_STRL("is_array"), true};
-Variant is_object{ZEND_STRL("is_object"), true};
-Variant is_scalar{ZEND_STRL("is_scalar"), true};
-Variant is_callable{ZEND_STRL("is_callable"), true};
-Variant is_iterable{ZEND_STRL("is_iterable"), true};
-Variant is_countable{ZEND_STRL("is_countable"), true};
-Variant uniqid{ZEND_STRL("uniqid"), true};
-Variant parse_url{ZEND_STRL("parse_url"), true};
-Variant urlencode{ZEND_STRL("urlencode"), true};
-Variant urldecode{ZEND_STRL("urldecode"), true};
-Variant rawurlencode{ZEND_STRL("rawurlencode"), true};
-Variant rawurldecode{ZEND_STRL("rawurldecode"), true};
-Variant get_headers{ZEND_STRL("get_headers"), true};
-Variant stream_bucket_make_writeable{ZEND_STRL("stream_bucket_make_writeable"), true};
-Variant stream_bucket_prepend{ZEND_STRL("stream_bucket_prepend"), true};
-Variant stream_bucket_append{ZEND_STRL("stream_bucket_append"), true};
-Variant stream_bucket_new{ZEND_STRL("stream_bucket_new"), true};
-Variant stream_get_filters{ZEND_STRL("stream_get_filters"), true};
-Variant stream_filter_register{ZEND_STRL("stream_filter_register"), true};
-Variant convert_uuencode{ZEND_STRL("convert_uuencode"), true};
-Variant convert_uudecode{ZEND_STRL("convert_uudecode"), true};
-Variant var_dump{ZEND_STRL("var_dump"), true};
-Variant var_export{ZEND_STRL("var_export"), true};
-Variant debug_zval_dump{ZEND_STRL("debug_zval_dump"), true};
-Variant serialize{ZEND_STRL("serialize"), true};
-Variant unserialize{ZEND_STRL("unserialize"), true};
-Variant memory_get_usage{ZEND_STRL("memory_get_usage"), true};
-Variant memory_get_peak_usage{ZEND_STRL("memory_get_peak_usage"), true};
-Variant memory_reset_peak_usage{ZEND_STRL("memory_reset_peak_usage"), true};
-Variant version_compare{ZEND_STRL("version_compare"), true};
-Variant dl{ZEND_STRL("dl"), true};
-Variant cli_set_process_title{ZEND_STRL("cli_set_process_title"), true};
-Variant cli_get_process_title{ZEND_STRL("cli_get_process_title"), true};
+Variant set_time_limit(const Variant &seconds) {
+    return call("set_time_limit", {seconds});
+}
+Variant header_register_callback(const Variant &callback) {
+    return call("header_register_callback", {callback});
+}
+Variant ob_start(const Variant &callback, const Variant &chunk_size, const Variant &flags) {
+    return call("ob_start", {callback, chunk_size, flags});
+}
+Variant ob_flush() {
+    return call("ob_flush", {});
+}
+Variant ob_clean() {
+    return call("ob_clean", {});
+}
+Variant ob_end_flush() {
+    return call("ob_end_flush", {});
+}
+Variant ob_end_clean() {
+    return call("ob_end_clean", {});
+}
+Variant ob_get_flush() {
+    return call("ob_get_flush", {});
+}
+Variant ob_get_clean() {
+    return call("ob_get_clean", {});
+}
+Variant ob_get_contents() {
+    return call("ob_get_contents", {});
+}
+Variant ob_get_level() {
+    return call("ob_get_level", {});
+}
+Variant ob_get_length() {
+    return call("ob_get_length", {});
+}
+Variant ob_list_handlers() {
+    return call("ob_list_handlers", {});
+}
+Variant ob_get_status(const Variant &full_status) {
+    return call("ob_get_status", {full_status});
+}
+Variant ob_implicit_flush(const Variant &enable) {
+    return call("ob_implicit_flush", {enable});
+}
+Variant output_reset_rewrite_vars() {
+    return call("output_reset_rewrite_vars", {});
+}
+Variant output_add_rewrite_var(const Variant &name, const Variant &value) {
+    return call("output_add_rewrite_var", {name, value});
+}
+Variant stream_wrapper_register(const Variant &protocol, const Variant &_class, const Variant &flags) {
+    return call("stream_wrapper_register", {protocol, _class, flags});
+}
+Variant stream_register_wrapper(const Variant &protocol, const Variant &_class, const Variant &flags) {
+    return call("stream_register_wrapper", {protocol, _class, flags});
+}
+Variant stream_wrapper_unregister(const Variant &protocol) {
+    return call("stream_wrapper_unregister", {protocol});
+}
+Variant stream_wrapper_restore(const Variant &protocol) {
+    return call("stream_wrapper_restore", {protocol});
+}
+Variant krsort(const Reference &array, const Variant &flags) {
+    return call("krsort", {&array, flags});
+}
+Variant ksort(const Reference &array, const Variant &flags) {
+    return call("ksort", {&array, flags});
+}
+Variant count(const Variant &value, const Variant &mode) {
+    return call("count", {value, mode});
+}
+Variant natsort(const Reference &array) {
+    return call("natsort", {&array});
+}
+Variant natcasesort(const Reference &array) {
+    return call("natcasesort", {&array});
+}
+Variant asort(const Reference &array, const Variant &flags) {
+    return call("asort", {&array, flags});
+}
+Variant arsort(const Reference &array, const Variant &flags) {
+    return call("arsort", {&array, flags});
+}
+Variant sort(const Reference &array, const Variant &flags) {
+    return call("sort", {&array, flags});
+}
+Variant rsort(const Reference &array, const Variant &flags) {
+    return call("rsort", {&array, flags});
+}
+Variant usort(const Reference &array, const Variant &callback) {
+    return call("usort", {&array, callback});
+}
+Variant uasort(const Reference &array, const Variant &callback) {
+    return call("uasort", {&array, callback});
+}
+Variant uksort(const Reference &array, const Variant &callback) {
+    return call("uksort", {&array, callback});
+}
+Variant end(const Reference &array) {
+    return call("end", {&array});
+}
+Variant prev(const Reference &array) {
+    return call("prev", {&array});
+}
+Variant next(const Reference &array) {
+    return call("next", {&array});
+}
+Variant reset(const Reference &array) {
+    return call("reset", {&array});
+}
+Variant current(const Variant &array) {
+    return call("current", {array});
+}
+Variant pos(const Variant &array) {
+    return call("pos", {array});
+}
+Variant key(const Variant &array) {
+    return call("key", {array});
+}
+Variant array_walk(const Reference &array, const Variant &callback, const Variant &arg) {
+    return call("array_walk", {&array, callback, arg});
+}
+Variant array_walk_recursive(const Reference &array, const Variant &callback, const Variant &arg) {
+    return call("array_walk_recursive", {&array, callback, arg});
+}
+Variant in_array(const Variant &needle, const Variant &haystack, const Variant &strict) {
+    return call("in_array", {needle, haystack, strict});
+}
+Variant array_search(const Variant &needle, const Variant &haystack, const Variant &strict) {
+    return call("array_search", {needle, haystack, strict});
+}
+Variant extract(const Reference &array, const Variant &flags, const Variant &prefix) {
+    return call("extract", {&array, flags, prefix});
+}
+Variant array_fill(const Variant &start_index, const Variant &count, const Variant &value) {
+    return call("array_fill", {start_index, count, value});
+}
+Variant array_fill_keys(const Variant &keys, const Variant &value) {
+    return call("array_fill_keys", {keys, value});
+}
+Variant range(const Variant &start, const Variant &end, const Variant &step) {
+    return call("range", {start, end, step});
+}
+Variant shuffle(const Reference &array) {
+    return call("shuffle", {&array});
+}
+Variant array_pop(const Reference &array) {
+    return call("array_pop", {&array});
+}
+Variant array_shift(const Reference &array) {
+    return call("array_shift", {&array});
+}
+Variant array_splice(const Reference &array, const Variant &offset, const Variant &length, const Variant &replacement) {
+    return call("array_splice", {&array, offset, length, replacement});
+}
+Variant array_slice(const Variant &array, const Variant &offset, const Variant &length, const Variant &preserve_keys) {
+    return call("array_slice", {array, offset, length, preserve_keys});
+}
+Variant array_keys(const Variant &array, const Variant &filter_value, const Variant &strict) {
+    return call("array_keys", {array, filter_value, strict});
+}
+Variant array_key_first(const Variant &array) {
+    return call("array_key_first", {array});
+}
+Variant array_key_last(const Variant &array) {
+    return call("array_key_last", {array});
+}
+Variant array_values(const Variant &array) {
+    return call("array_values", {array});
+}
+Variant array_count_values(const Variant &array) {
+    return call("array_count_values", {array});
+}
+Variant array_column(const Variant &array, const Variant &column_key, const Variant &index_key) {
+    return call("array_column", {array, column_key, index_key});
+}
+Variant array_reverse(const Variant &array, const Variant &preserve_keys) {
+    return call("array_reverse", {array, preserve_keys});
+}
+Variant array_pad(const Variant &array, const Variant &length, const Variant &value) {
+    return call("array_pad", {array, length, value});
+}
+Variant array_flip(const Variant &array) {
+    return call("array_flip", {array});
+}
+Variant array_change_key_case(const Variant &array, const Variant &_case) {
+    return call("array_change_key_case", {array, _case});
+}
+Variant array_unique(const Variant &array, const Variant &flags) {
+    return call("array_unique", {array, flags});
+}
+Variant array_rand(const Variant &array, const Variant &num) {
+    return call("array_rand", {array, num});
+}
+Variant array_sum(const Variant &array) {
+    return call("array_sum", {array});
+}
+Variant array_product(const Variant &array) {
+    return call("array_product", {array});
+}
+Variant array_reduce(const Variant &array, const Variant &callback, const Variant &initial) {
+    return call("array_reduce", {array, callback, initial});
+}
+Variant array_filter(const Variant &array, const Variant &callback, const Variant &mode) {
+    return call("array_filter", {array, callback, mode});
+}
+Variant array_find(const Variant &array, const Variant &callback) {
+    return call("array_find", {array, callback});
+}
+Variant array_find_key(const Variant &array, const Variant &callback) {
+    return call("array_find_key", {array, callback});
+}
+Variant array_any(const Variant &array, const Variant &callback) {
+    return call("array_any", {array, callback});
+}
+Variant array_all(const Variant &array, const Variant &callback) {
+    return call("array_all", {array, callback});
+}
+Variant array_key_exists(const Variant &key, const Variant &array) {
+    return call("array_key_exists", {key, array});
+}
+Variant key_exists(const Variant &key, const Variant &array) {
+    return call("key_exists", {key, array});
+}
+Variant array_chunk(const Variant &array, const Variant &length, const Variant &preserve_keys) {
+    return call("array_chunk", {array, length, preserve_keys});
+}
+Variant array_combine(const Variant &keys, const Variant &values) {
+    return call("array_combine", {keys, values});
+}
+Variant array_is_list(const Variant &array) {
+    return call("array_is_list", {array});
+}
+Variant base64_encode(const Variant &string) {
+    return call("base64_encode", {string});
+}
+Variant base64_decode(const Variant &string, const Variant &strict) {
+    return call("base64_decode", {string, strict});
+}
+Variant ip2long(const Variant &ip) {
+    return call("ip2long", {ip});
+}
+Variant long2ip(const Variant &ip) {
+    return call("long2ip", {ip});
+}
+Variant getenv(const Variant &name, const Variant &local_only) {
+    return call("getenv", {name, local_only});
+}
+Variant putenv(const Variant &assignment) {
+    return call("putenv", {assignment});
+}
+Variant getopt(const Variant &short_options, const Variant &long_options, const Reference &rest_index) {
+    return call("getopt", {short_options, long_options, &rest_index});
+}
+Variant flush() {
+    return call("flush", {});
+}
+Variant sleep(const Variant &seconds) {
+    return call("sleep", {seconds});
+}
+Variant usleep(const Variant &microseconds) {
+    return call("usleep", {microseconds});
+}
+Variant time_nanosleep(const Variant &seconds, const Variant &nanoseconds) {
+    return call("time_nanosleep", {seconds, nanoseconds});
+}
+Variant time_sleep_until(const Variant &timestamp) {
+    return call("time_sleep_until", {timestamp});
+}
+Variant get_current_user() {
+    return call("get_current_user", {});
+}
+Variant get_cfg_var(const Variant &option) {
+    return call("get_cfg_var", {option});
+}
+Variant error_log(const Variant &message, const Variant &message_type, const Variant &destination, const Variant &additional_headers) {
+    return call("error_log", {message, message_type, destination, additional_headers});
+}
+Variant error_get_last() {
+    return call("error_get_last", {});
+}
+Variant error_clear_last() {
+    return call("error_clear_last", {});
+}
+Variant call_user_func_array(const Variant &callback, const Variant &args) {
+    return call("call_user_func_array", {callback, args});
+}
+Variant forward_static_call_array(const Variant &callback, const Variant &args) {
+    return call("forward_static_call_array", {callback, args});
+}
+Variant highlight_file(const Variant &filename, const Variant &_return) {
+    return call("highlight_file", {filename, _return});
+}
+Variant show_source(const Variant &filename, const Variant &_return) {
+    return call("show_source", {filename, _return});
+}
+Variant php_strip_whitespace(const Variant &filename) {
+    return call("php_strip_whitespace", {filename});
+}
+Variant highlight_string(const Variant &string, const Variant &_return) {
+    return call("highlight_string", {string, _return});
+}
+Variant ini_get(const Variant &option) {
+    return call("ini_get", {option});
+}
+Variant ini_get_all(const Variant &extension, const Variant &details) {
+    return call("ini_get_all", {extension, details});
+}
+Variant ini_set(const Variant &option, const Variant &value) {
+    return call("ini_set", {option, value});
+}
+Variant ini_alter(const Variant &option, const Variant &value) {
+    return call("ini_alter", {option, value});
+}
+Variant ini_restore(const Variant &option) {
+    return call("ini_restore", {option});
+}
+Variant ini_parse_quantity(const Variant &shorthand) {
+    return call("ini_parse_quantity", {shorthand});
+}
+Variant set_include_path(const Variant &include_path) {
+    return call("set_include_path", {include_path});
+}
+Variant get_include_path() {
+    return call("get_include_path", {});
+}
+Variant print_r(const Variant &value, const Variant &_return) {
+    return call("print_r", {value, _return});
+}
+Variant connection_aborted() {
+    return call("connection_aborted", {});
+}
+Variant connection_status() {
+    return call("connection_status", {});
+}
+Variant ignore_user_abort(const Variant &enable) {
+    return call("ignore_user_abort", {enable});
+}
+Variant getservbyname(const Variant &service, const Variant &protocol) {
+    return call("getservbyname", {service, protocol});
+}
+Variant getservbyport(const Variant &port, const Variant &protocol) {
+    return call("getservbyport", {port, protocol});
+}
+Variant getprotobyname(const Variant &protocol) {
+    return call("getprotobyname", {protocol});
+}
+Variant getprotobynumber(const Variant &protocol) {
+    return call("getprotobynumber", {protocol});
+}
+Variant unregister_tick_function(const Variant &callback) {
+    return call("unregister_tick_function", {callback});
+}
+Variant is_uploaded_file(const Variant &filename) {
+    return call("is_uploaded_file", {filename});
+}
+Variant move_uploaded_file(const Variant &from, const Variant &to) {
+    return call("move_uploaded_file", {from, to});
+}
+Variant parse_ini_file(const Variant &filename, const Variant &process_sections, const Variant &scanner_mode) {
+    return call("parse_ini_file", {filename, process_sections, scanner_mode});
+}
+Variant parse_ini_string(const Variant &ini_string, const Variant &process_sections, const Variant &scanner_mode) {
+    return call("parse_ini_string", {ini_string, process_sections, scanner_mode});
+}
+Variant config_get_hash() {
+    return call("config_get_hash", {});
+}
+Variant sys_getloadavg() {
+    return call("sys_getloadavg", {});
+}
+Variant get_browser(const Variant &user_agent, const Variant &return_array) {
+    return call("get_browser", {user_agent, return_array});
+}
+Variant crc32(const Variant &string) {
+    return call("crc32", {string});
+}
+Variant crypt(const Variant &string, const Variant &salt) {
+    return call("crypt", {string, salt});
+}
+Variant strptime(const Variant &timestamp, const Variant &format) {
+    return call("strptime", {timestamp, format});
+}
+Variant gethostname() {
+    return call("gethostname", {});
+}
+Variant gethostbyaddr(const Variant &ip) {
+    return call("gethostbyaddr", {ip});
+}
+Variant gethostbyname(const Variant &hostname) {
+    return call("gethostbyname", {hostname});
+}
+Variant gethostbynamel(const Variant &hostname) {
+    return call("gethostbynamel", {hostname});
+}
+Variant dns_check_record(const Variant &hostname, const Variant &type) {
+    return call("dns_check_record", {hostname, type});
+}
+Variant checkdnsrr(const Variant &hostname, const Variant &type) {
+    return call("checkdnsrr", {hostname, type});
+}
+Variant dns_get_record(const Variant &hostname, const Variant &type, const Reference &authoritative_name_servers, const Reference &additional_records, const Variant &raw) {
+    return call("dns_get_record", {hostname, type, &authoritative_name_servers, &additional_records, raw});
+}
+Variant dns_get_mx(const Variant &hostname, const Reference &hosts, const Reference &weights) {
+    return call("dns_get_mx", {hostname, &hosts, &weights});
+}
+Variant getmxrr(const Variant &hostname, const Reference &hosts, const Reference &weights) {
+    return call("getmxrr", {hostname, &hosts, &weights});
+}
+Variant net_get_interfaces() {
+    return call("net_get_interfaces", {});
+}
+Variant ftok(const Variant &filename, const Variant &project_id) {
+    return call("ftok", {filename, project_id});
+}
+Variant hrtime(const Variant &as_number) {
+    return call("hrtime", {as_number});
+}
+Variant md5(const Variant &string, const Variant &binary) {
+    return call("md5", {string, binary});
+}
+Variant md5_file(const Variant &filename, const Variant &binary) {
+    return call("md5_file", {filename, binary});
+}
+Variant getmyuid() {
+    return call("getmyuid", {});
+}
+Variant getmygid() {
+    return call("getmygid", {});
+}
+Variant getmypid() {
+    return call("getmypid", {});
+}
+Variant getmyinode() {
+    return call("getmyinode", {});
+}
+Variant getlastmod() {
+    return call("getlastmod", {});
+}
+Variant sha1(const Variant &string, const Variant &binary) {
+    return call("sha1", {string, binary});
+}
+Variant sha1_file(const Variant &filename, const Variant &binary) {
+    return call("sha1_file", {filename, binary});
+}
+Variant openlog(const Variant &prefix, const Variant &flags, const Variant &facility) {
+    return call("openlog", {prefix, flags, facility});
+}
+Variant closelog() {
+    return call("closelog", {});
+}
+Variant syslog(const Variant &priority, const Variant &message) {
+    return call("syslog", {priority, message});
+}
+Variant inet_ntop(const Variant &ip) {
+    return call("inet_ntop", {ip});
+}
+Variant inet_pton(const Variant &ip) {
+    return call("inet_pton", {ip});
+}
+Variant metaphone(const Variant &string, const Variant &max_phonemes) {
+    return call("metaphone", {string, max_phonemes});
+}
+Variant header(const Variant &header, const Variant &replace, const Variant &response_code) {
+    return call("header", {header, replace, response_code});
+}
+Variant header_remove(const Variant &name) {
+    return call("header_remove", {name});
+}
+Variant setrawcookie(const Variant &name, const Variant &value, const Variant &expires_or_options, const Variant &path, const Variant &domain, const Variant &secure, const Variant &httponly) {
+    return call("setrawcookie", {name, value, expires_or_options, path, domain, secure, httponly});
+}
+Variant setcookie(const Variant &name, const Variant &value, const Variant &expires_or_options, const Variant &path, const Variant &domain, const Variant &secure, const Variant &httponly) {
+    return call("setcookie", {name, value, expires_or_options, path, domain, secure, httponly});
+}
+Variant http_response_code(const Variant &response_code) {
+    return call("http_response_code", {response_code});
+}
+Variant headers_sent(const Reference &filename, const Reference &line) {
+    return call("headers_sent", {&filename, &line});
+}
+Variant headers_list() {
+    return call("headers_list", {});
+}
+Variant htmlspecialchars(const Variant &string, const Variant &flags, const Variant &encoding, const Variant &double_encode) {
+    return call("htmlspecialchars", {string, flags, encoding, double_encode});
+}
+Variant htmlspecialchars_decode(const Variant &string, const Variant &flags) {
+    return call("htmlspecialchars_decode", {string, flags});
+}
+Variant html_entity_decode(const Variant &string, const Variant &flags, const Variant &encoding) {
+    return call("html_entity_decode", {string, flags, encoding});
+}
+Variant htmlentities(const Variant &string, const Variant &flags, const Variant &encoding, const Variant &double_encode) {
+    return call("htmlentities", {string, flags, encoding, double_encode});
+}
+Variant get_html_translation_table(const Variant &table, const Variant &flags, const Variant &encoding) {
+    return call("get_html_translation_table", {table, flags, encoding});
+}
+Variant assert_options(const Variant &option, const Variant &value) {
+    return call("assert_options", {option, value});
+}
+Variant bin2hex(const Variant &string) {
+    return call("bin2hex", {string});
+}
+Variant hex2bin(const Variant &string) {
+    return call("hex2bin", {string});
+}
+Variant strspn(const Variant &string, const Variant &characters, const Variant &offset, const Variant &length) {
+    return call("strspn", {string, characters, offset, length});
+}
+Variant strcspn(const Variant &string, const Variant &characters, const Variant &offset, const Variant &length) {
+    return call("strcspn", {string, characters, offset, length});
+}
+Variant nl_langinfo(const Variant &item) {
+    return call("nl_langinfo", {item});
+}
+Variant strcoll(const Variant &string1, const Variant &string2) {
+    return call("strcoll", {string1, string2});
+}
+Variant trim(const Variant &string, const Variant &characters) {
+    return call("trim", {string, characters});
+}
+Variant rtrim(const Variant &string, const Variant &characters) {
+    return call("rtrim", {string, characters});
+}
+Variant chop(const Variant &string, const Variant &characters) {
+    return call("chop", {string, characters});
+}
+Variant ltrim(const Variant &string, const Variant &characters) {
+    return call("ltrim", {string, characters});
+}
+Variant wordwrap(const Variant &string, const Variant &width, const Variant &_break, const Variant &cut_long_words) {
+    return call("wordwrap", {string, width, _break, cut_long_words});
+}
+Variant explode(const Variant &separator, const Variant &string, const Variant &limit) {
+    return call("explode", {separator, string, limit});
+}
+Variant implode(const Variant &separator, const Variant &array) {
+    return call("implode", {separator, array});
+}
+Variant join(const Variant &separator, const Variant &array) {
+    return call("join", {separator, array});
+}
+Variant strtok(const Variant &string, const Variant &token) {
+    return call("strtok", {string, token});
+}
+Variant strtoupper(const Variant &string) {
+    return call("strtoupper", {string});
+}
+Variant strtolower(const Variant &string) {
+    return call("strtolower", {string});
+}
+Variant str_increment(const Variant &string) {
+    return call("str_increment", {string});
+}
+Variant str_decrement(const Variant &string) {
+    return call("str_decrement", {string});
+}
+Variant basename(const Variant &path, const Variant &suffix) {
+    return call("basename", {path, suffix});
+}
+Variant dirname(const Variant &path, const Variant &levels) {
+    return call("dirname", {path, levels});
+}
+Variant pathinfo(const Variant &path, const Variant &flags) {
+    return call("pathinfo", {path, flags});
+}
+Variant stristr(const Variant &haystack, const Variant &needle, const Variant &before_needle) {
+    return call("stristr", {haystack, needle, before_needle});
+}
+Variant strstr(const Variant &haystack, const Variant &needle, const Variant &before_needle) {
+    return call("strstr", {haystack, needle, before_needle});
+}
+Variant strchr(const Variant &haystack, const Variant &needle, const Variant &before_needle) {
+    return call("strchr", {haystack, needle, before_needle});
+}
+Variant strpos(const Variant &haystack, const Variant &needle, const Variant &offset) {
+    return call("strpos", {haystack, needle, offset});
+}
+Variant stripos(const Variant &haystack, const Variant &needle, const Variant &offset) {
+    return call("stripos", {haystack, needle, offset});
+}
+Variant strrpos(const Variant &haystack, const Variant &needle, const Variant &offset) {
+    return call("strrpos", {haystack, needle, offset});
+}
+Variant strripos(const Variant &haystack, const Variant &needle, const Variant &offset) {
+    return call("strripos", {haystack, needle, offset});
+}
+Variant strrchr(const Variant &haystack, const Variant &needle, const Variant &before_needle) {
+    return call("strrchr", {haystack, needle, before_needle});
+}
+Variant str_contains(const Variant &haystack, const Variant &needle) {
+    return call("str_contains", {haystack, needle});
+}
+Variant str_starts_with(const Variant &haystack, const Variant &needle) {
+    return call("str_starts_with", {haystack, needle});
+}
+Variant str_ends_with(const Variant &haystack, const Variant &needle) {
+    return call("str_ends_with", {haystack, needle});
+}
+Variant chunk_split(const Variant &string, const Variant &length, const Variant &separator) {
+    return call("chunk_split", {string, length, separator});
+}
+Variant substr(const Variant &string, const Variant &offset, const Variant &length) {
+    return call("substr", {string, offset, length});
+}
+Variant substr_replace(const Variant &string, const Variant &replace, const Variant &offset, const Variant &length) {
+    return call("substr_replace", {string, replace, offset, length});
+}
+Variant quotemeta(const Variant &string) {
+    return call("quotemeta", {string});
+}
+Variant ord(const Variant &character) {
+    return call("ord", {character});
+}
+Variant chr(const Variant &codepoint) {
+    return call("chr", {codepoint});
+}
+Variant ucfirst(const Variant &string) {
+    return call("ucfirst", {string});
+}
+Variant lcfirst(const Variant &string) {
+    return call("lcfirst", {string});
+}
+Variant ucwords(const Variant &string, const Variant &separators) {
+    return call("ucwords", {string, separators});
+}
+Variant strtr(const Variant &string, const Variant &from, const Variant &to) {
+    return call("strtr", {string, from, to});
+}
+Variant strrev(const Variant &string) {
+    return call("strrev", {string});
+}
+Variant similar_text(const Variant &string1, const Variant &string2, const Reference &percent) {
+    return call("similar_text", {string1, string2, &percent});
+}
+Variant addcslashes(const Variant &string, const Variant &characters) {
+    return call("addcslashes", {string, characters});
+}
+Variant addslashes(const Variant &string) {
+    return call("addslashes", {string});
+}
+Variant stripcslashes(const Variant &string) {
+    return call("stripcslashes", {string});
+}
+Variant stripslashes(const Variant &string) {
+    return call("stripslashes", {string});
+}
+Variant str_replace(const Variant &search, const Variant &replace, const Variant &subject, const Reference &count) {
+    return call("str_replace", {search, replace, subject, &count});
+}
+Variant str_ireplace(const Variant &search, const Variant &replace, const Variant &subject, const Reference &count) {
+    return call("str_ireplace", {search, replace, subject, &count});
+}
+Variant hebrev(const Variant &string, const Variant &max_chars_per_line) {
+    return call("hebrev", {string, max_chars_per_line});
+}
+Variant nl2br(const Variant &string, const Variant &use_xhtml) {
+    return call("nl2br", {string, use_xhtml});
+}
+Variant strip_tags(const Variant &string, const Variant &allowed_tags) {
+    return call("strip_tags", {string, allowed_tags});
+}
+Variant parse_str(const Variant &string, const Reference &result) {
+    return call("parse_str", {string, &result});
+}
+Variant str_getcsv(const Variant &string, const Variant &separator, const Variant &enclosure, const Variant &escape) {
+    return call("str_getcsv", {string, separator, enclosure, escape});
+}
+Variant str_repeat(const Variant &string, const Variant &times) {
+    return call("str_repeat", {string, times});
+}
+Variant count_chars(const Variant &string, const Variant &mode) {
+    return call("count_chars", {string, mode});
+}
+Variant localeconv() {
+    return call("localeconv", {});
+}
+Variant substr_count(const Variant &haystack, const Variant &needle, const Variant &offset, const Variant &length) {
+    return call("substr_count", {haystack, needle, offset, length});
+}
+Variant str_pad(const Variant &string, const Variant &length, const Variant &pad_string, const Variant &pad_type) {
+    return call("str_pad", {string, length, pad_string, pad_type});
+}
+Variant str_rot13(const Variant &string) {
+    return call("str_rot13", {string});
+}
+Variant str_shuffle(const Variant &string) {
+    return call("str_shuffle", {string});
+}
+Variant str_word_count(const Variant &string, const Variant &format, const Variant &characters) {
+    return call("str_word_count", {string, format, characters});
+}
+Variant str_split(const Variant &string, const Variant &length) {
+    return call("str_split", {string, length});
+}
+Variant strpbrk(const Variant &string, const Variant &characters) {
+    return call("strpbrk", {string, characters});
+}
+Variant substr_compare(const Variant &haystack, const Variant &needle, const Variant &offset, const Variant &length, const Variant &case_insensitive) {
+    return call("substr_compare", {haystack, needle, offset, length, case_insensitive});
+}
+Variant utf8_encode(const Variant &string) {
+    return call("utf8_encode", {string});
+}
+Variant utf8_decode(const Variant &string) {
+    return call("utf8_decode", {string});
+}
+Variant opendir(const Variant &directory, const Variant &context) {
+    return call("opendir", {directory, context});
+}
+Variant dir(const Variant &directory, const Variant &context) {
+    return call("dir", {directory, context});
+}
+Variant closedir(const Variant &dir_handle) {
+    return call("closedir", {dir_handle});
+}
+Variant chdir(const Variant &directory) {
+    return call("chdir", {directory});
+}
+Variant getcwd() {
+    return call("getcwd", {});
+}
+Variant rewinddir(const Variant &dir_handle) {
+    return call("rewinddir", {dir_handle});
+}
+Variant readdir(const Variant &dir_handle) {
+    return call("readdir", {dir_handle});
+}
+Variant scandir(const Variant &directory, const Variant &sorting_order, const Variant &context) {
+    return call("scandir", {directory, sorting_order, context});
+}
+Variant glob(const Variant &pattern, const Variant &flags) {
+    return call("glob", {pattern, flags});
+}
+Variant exec(const Variant &command, const Reference &output, const Reference &result_code) {
+    return call("exec", {command, &output, &result_code});
+}
+Variant system(const Variant &command, const Reference &result_code) {
+    return call("system", {command, &result_code});
+}
+Variant passthru(const Variant &command, const Reference &result_code) {
+    return call("passthru", {command, &result_code});
+}
+Variant escapeshellcmd(const Variant &command) {
+    return call("escapeshellcmd", {command});
+}
+Variant escapeshellarg(const Variant &arg) {
+    return call("escapeshellarg", {arg});
+}
+Variant shell_exec(const Variant &command) {
+    return call("shell_exec", {command});
+}
+Variant proc_nice(const Variant &priority) {
+    return call("proc_nice", {priority});
+}
+Variant flock(const Variant &stream, const Variant &operation, const Reference &would_block) {
+    return call("flock", {stream, operation, &would_block});
+}
+Variant get_meta_tags(const Variant &filename, const Variant &use_include_path) {
+    return call("get_meta_tags", {filename, use_include_path});
+}
+Variant pclose(const Variant &handle) {
+    return call("pclose", {handle});
+}
+Variant popen(const Variant &command, const Variant &mode) {
+    return call("popen", {command, mode});
+}
+Variant readfile(const Variant &filename, const Variant &use_include_path, const Variant &context) {
+    return call("readfile", {filename, use_include_path, context});
+}
+Variant rewind(const Variant &stream) {
+    return call("rewind", {stream});
+}
+Variant rmdir(const Variant &directory, const Variant &context) {
+    return call("rmdir", {directory, context});
+}
+Variant umask(const Variant &mask) {
+    return call("umask", {mask});
+}
+Variant fclose(const Variant &stream) {
+    return call("fclose", {stream});
+}
+Variant feof(const Variant &stream) {
+    return call("feof", {stream});
+}
+Variant fgetc(const Variant &stream) {
+    return call("fgetc", {stream});
+}
+Variant fgets(const Variant &stream, const Variant &length) {
+    return call("fgets", {stream, length});
+}
+Variant fread(const Variant &stream, const Variant &length) {
+    return call("fread", {stream, length});
+}
+Variant fopen(const Variant &filename, const Variant &mode, const Variant &use_include_path, const Variant &context) {
+    return call("fopen", {filename, mode, use_include_path, context});
+}
+Variant fpassthru(const Variant &stream) {
+    return call("fpassthru", {stream});
+}
+Variant ftruncate(const Variant &stream, const Variant &size) {
+    return call("ftruncate", {stream, size});
+}
+Variant fstat(const Variant &stream) {
+    return call("fstat", {stream});
+}
+Variant fseek(const Variant &stream, const Variant &offset, const Variant &whence) {
+    return call("fseek", {stream, offset, whence});
+}
+Variant ftell(const Variant &stream) {
+    return call("ftell", {stream});
+}
+Variant fflush(const Variant &stream) {
+    return call("fflush", {stream});
+}
+Variant fsync(const Variant &stream) {
+    return call("fsync", {stream});
+}
+Variant fdatasync(const Variant &stream) {
+    return call("fdatasync", {stream});
+}
+Variant fwrite(const Variant &stream, const Variant &data, const Variant &length) {
+    return call("fwrite", {stream, data, length});
+}
+Variant fputs(const Variant &stream, const Variant &data, const Variant &length) {
+    return call("fputs", {stream, data, length});
+}
+Variant mkdir(const Variant &directory, const Variant &permissions, const Variant &recursive, const Variant &context) {
+    return call("mkdir", {directory, permissions, recursive, context});
+}
+Variant rename(const Variant &from, const Variant &to, const Variant &context) {
+    return call("rename", {from, to, context});
+}
+Variant copy(const Variant &from, const Variant &to, const Variant &context) {
+    return call("copy", {from, to, context});
+}
+Variant tempnam(const Variant &directory, const Variant &prefix) {
+    return call("tempnam", {directory, prefix});
+}
+Variant tmpfile() {
+    return call("tmpfile", {});
+}
+Variant file(const Variant &filename, const Variant &flags, const Variant &context) {
+    return call("file", {filename, flags, context});
+}
+Variant file_get_contents(const Variant &filename, const Variant &use_include_path, const Variant &context, const Variant &offset, const Variant &length) {
+    return call("file_get_contents", {filename, use_include_path, context, offset, length});
+}
+Variant unlink(const Variant &filename, const Variant &context) {
+    return call("unlink", {filename, context});
+}
+Variant file_put_contents(const Variant &filename, const Variant &data, const Variant &flags, const Variant &context) {
+    return call("file_put_contents", {filename, data, flags, context});
+}
+Variant fputcsv(const Variant &stream, const Variant &fields, const Variant &separator, const Variant &enclosure, const Variant &escape, const Variant &eol) {
+    return call("fputcsv", {stream, fields, separator, enclosure, escape, eol});
+}
+Variant fgetcsv(const Variant &stream, const Variant &length, const Variant &separator, const Variant &enclosure, const Variant &escape) {
+    return call("fgetcsv", {stream, length, separator, enclosure, escape});
+}
+Variant realpath(const Variant &path) {
+    return call("realpath", {path});
+}
+Variant fnmatch(const Variant &pattern, const Variant &filename, const Variant &flags) {
+    return call("fnmatch", {pattern, filename, flags});
+}
+Variant sys_get_temp_dir() {
+    return call("sys_get_temp_dir", {});
+}
+Variant fileatime(const Variant &filename) {
+    return call("fileatime", {filename});
+}
+Variant filectime(const Variant &filename) {
+    return call("filectime", {filename});
+}
+Variant filegroup(const Variant &filename) {
+    return call("filegroup", {filename});
+}
+Variant fileinode(const Variant &filename) {
+    return call("fileinode", {filename});
+}
+Variant filemtime(const Variant &filename) {
+    return call("filemtime", {filename});
+}
+Variant fileowner(const Variant &filename) {
+    return call("fileowner", {filename});
+}
+Variant fileperms(const Variant &filename) {
+    return call("fileperms", {filename});
+}
+Variant filesize(const Variant &filename) {
+    return call("filesize", {filename});
+}
+Variant filetype(const Variant &filename) {
+    return call("filetype", {filename});
+}
+Variant file_exists(const Variant &filename) {
+    return call("file_exists", {filename});
+}
+Variant is_writable(const Variant &filename) {
+    return call("is_writable", {filename});
+}
+Variant is_writeable(const Variant &filename) {
+    return call("is_writeable", {filename});
+}
+Variant is_readable(const Variant &filename) {
+    return call("is_readable", {filename});
+}
+Variant is_executable(const Variant &filename) {
+    return call("is_executable", {filename});
+}
+Variant is_file(const Variant &filename) {
+    return call("is_file", {filename});
+}
+Variant is_dir(const Variant &filename) {
+    return call("is_dir", {filename});
+}
+Variant is_link(const Variant &filename) {
+    return call("is_link", {filename});
+}
+Variant stat(const Variant &filename) {
+    return call("stat", {filename});
+}
+Variant lstat(const Variant &filename) {
+    return call("lstat", {filename});
+}
+Variant chown(const Variant &filename, const Variant &user) {
+    return call("chown", {filename, user});
+}
+Variant chgrp(const Variant &filename, const Variant &group) {
+    return call("chgrp", {filename, group});
+}
+Variant lchown(const Variant &filename, const Variant &user) {
+    return call("lchown", {filename, user});
+}
+Variant lchgrp(const Variant &filename, const Variant &group) {
+    return call("lchgrp", {filename, group});
+}
+Variant chmod(const Variant &filename, const Variant &permissions) {
+    return call("chmod", {filename, permissions});
+}
+Variant touch(const Variant &filename, const Variant &mtime, const Variant &atime) {
+    return call("touch", {filename, mtime, atime});
+}
+Variant clearstatcache(const Variant &clear_realpath_cache, const Variant &filename) {
+    return call("clearstatcache", {clear_realpath_cache, filename});
+}
+Variant disk_total_space(const Variant &directory) {
+    return call("disk_total_space", {directory});
+}
+Variant disk_free_space(const Variant &directory) {
+    return call("disk_free_space", {directory});
+}
+Variant diskfreespace(const Variant &directory) {
+    return call("diskfreespace", {directory});
+}
+Variant realpath_cache_get() {
+    return call("realpath_cache_get", {});
+}
+Variant realpath_cache_size() {
+    return call("realpath_cache_size", {});
+}
+Variant vprintf(const Variant &format, const Variant &values) {
+    return call("vprintf", {format, values});
+}
+Variant vsprintf(const Variant &format, const Variant &values) {
+    return call("vsprintf", {format, values});
+}
+Variant vfprintf(const Variant &stream, const Variant &format, const Variant &values) {
+    return call("vfprintf", {stream, format, values});
+}
+Variant fsockopen(const Variant &hostname, const Variant &port, const Reference &error_code, const Reference &error_message, const Variant &timeout) {
+    return call("fsockopen", {hostname, port, &error_code, &error_message, timeout});
+}
+Variant pfsockopen(const Variant &hostname, const Variant &port, const Reference &error_code, const Reference &error_message, const Variant &timeout) {
+    return call("pfsockopen", {hostname, port, &error_code, &error_message, timeout});
+}
+Variant http_build_query(const Variant &data, const Variant &numeric_prefix, const Variant &arg_separator, const Variant &encoding_type) {
+    return call("http_build_query", {data, numeric_prefix, arg_separator, encoding_type});
+}
+Variant http_get_last_response_headers() {
+    return call("http_get_last_response_headers", {});
+}
+Variant http_clear_last_response_headers() {
+    return call("http_clear_last_response_headers", {});
+}
+Variant request_parse_body(const Variant &options) {
+    return call("request_parse_body", {options});
+}
+Variant image_type_to_mime_type(const Variant &image_type) {
+    return call("image_type_to_mime_type", {image_type});
+}
+Variant image_type_to_extension(const Variant &image_type, const Variant &include_dot) {
+    return call("image_type_to_extension", {image_type, include_dot});
+}
+Variant getimagesize(const Variant &filename, const Reference &image_info) {
+    return call("getimagesize", {filename, &image_info});
+}
+Variant getimagesizefromstring(const Variant &string, const Reference &image_info) {
+    return call("getimagesizefromstring", {string, &image_info});
+}
+Variant phpinfo(const Variant &flags) {
+    return call("phpinfo", {flags});
+}
+Variant phpversion(const Variant &extension) {
+    return call("phpversion", {extension});
+}
+Variant phpcredits(const Variant &flags) {
+    return call("phpcredits", {flags});
+}
+Variant php_sapi_name() {
+    return call("php_sapi_name", {});
+}
+Variant php_uname(const Variant &mode) {
+    return call("php_uname", {mode});
+}
+Variant php_ini_scanned_files() {
+    return call("php_ini_scanned_files", {});
+}
+Variant php_ini_loaded_file() {
+    return call("php_ini_loaded_file", {});
+}
+Variant iptcembed(const Variant &iptc_data, const Variant &filename, const Variant &spool) {
+    return call("iptcembed", {iptc_data, filename, spool});
+}
+Variant iptcparse(const Variant &iptc_block) {
+    return call("iptcparse", {iptc_block});
+}
+Variant levenshtein(const Variant &string1, const Variant &string2, const Variant &insertion_cost, const Variant &replacement_cost, const Variant &deletion_cost) {
+    return call("levenshtein", {string1, string2, insertion_cost, replacement_cost, deletion_cost});
+}
+Variant readlink(const Variant &path) {
+    return call("readlink", {path});
+}
+Variant linkinfo(const Variant &path) {
+    return call("linkinfo", {path});
+}
+Variant symlink(const Variant &target, const Variant &link) {
+    return call("symlink", {target, link});
+}
+Variant link(const Variant &target, const Variant &link) {
+    return call("link", {target, link});
+}
+Variant mail(const Variant &to, const Variant &subject, const Variant &message, const Variant &additional_headers, const Variant &additional_params) {
+    return call("mail", {to, subject, message, additional_headers, additional_params});
+}
+Variant abs(const Variant &num) {
+    return call("abs", {num});
+}
+Variant ceil(const Variant &num) {
+    return call("ceil", {num});
+}
+Variant floor(const Variant &num) {
+    return call("floor", {num});
+}
+Variant round(const Variant &num, const Variant &precision, const Variant &mode) {
+    return call("round", {num, precision, mode});
+}
+Variant sin(const Variant &num) {
+    return call("sin", {num});
+}
+Variant cos(const Variant &num) {
+    return call("cos", {num});
+}
+Variant tan(const Variant &num) {
+    return call("tan", {num});
+}
+Variant asin(const Variant &num) {
+    return call("asin", {num});
+}
+Variant acos(const Variant &num) {
+    return call("acos", {num});
+}
+Variant atan(const Variant &num) {
+    return call("atan", {num});
+}
+Variant atanh(const Variant &num) {
+    return call("atanh", {num});
+}
+Variant atan2(const Variant &y, const Variant &x) {
+    return call("atan2", {y, x});
+}
+Variant sinh(const Variant &num) {
+    return call("sinh", {num});
+}
+Variant cosh(const Variant &num) {
+    return call("cosh", {num});
+}
+Variant tanh(const Variant &num) {
+    return call("tanh", {num});
+}
+Variant asinh(const Variant &num) {
+    return call("asinh", {num});
+}
+Variant acosh(const Variant &num) {
+    return call("acosh", {num});
+}
+Variant expm1(const Variant &num) {
+    return call("expm1", {num});
+}
+Variant log1p(const Variant &num) {
+    return call("log1p", {num});
+}
+Variant pi() {
+    return call("pi", {});
+}
+Variant is_finite(const Variant &num) {
+    return call("is_finite", {num});
+}
+Variant is_nan(const Variant &num) {
+    return call("is_nan", {num});
+}
+Variant intdiv(const Variant &num1, const Variant &num2) {
+    return call("intdiv", {num1, num2});
+}
+Variant is_infinite(const Variant &num) {
+    return call("is_infinite", {num});
+}
+Variant pow(const Variant &num, const Variant &exponent) {
+    return call("pow", {num, exponent});
+}
+Variant exp(const Variant &num) {
+    return call("exp", {num});
+}
+Variant log(const Variant &num, const Variant &base) {
+    return call("log", {num, base});
+}
+Variant log10(const Variant &num) {
+    return call("log10", {num});
+}
+Variant sqrt(const Variant &num) {
+    return call("sqrt", {num});
+}
+Variant hypot(const Variant &x, const Variant &y) {
+    return call("hypot", {x, y});
+}
+Variant deg2rad(const Variant &num) {
+    return call("deg2rad", {num});
+}
+Variant rad2deg(const Variant &num) {
+    return call("rad2deg", {num});
+}
+Variant bindec(const Variant &binary_string) {
+    return call("bindec", {binary_string});
+}
+Variant hexdec(const Variant &hex_string) {
+    return call("hexdec", {hex_string});
+}
+Variant octdec(const Variant &octal_string) {
+    return call("octdec", {octal_string});
+}
+Variant decbin(const Variant &num) {
+    return call("decbin", {num});
+}
+Variant decoct(const Variant &num) {
+    return call("decoct", {num});
+}
+Variant dechex(const Variant &num) {
+    return call("dechex", {num});
+}
+Variant base_convert(const Variant &num, const Variant &from_base, const Variant &to_base) {
+    return call("base_convert", {num, from_base, to_base});
+}
+Variant number_format(const Variant &num, const Variant &decimals, const Variant &decimal_separator, const Variant &thousands_separator) {
+    return call("number_format", {num, decimals, decimal_separator, thousands_separator});
+}
+Variant fmod(const Variant &num1, const Variant &num2) {
+    return call("fmod", {num1, num2});
+}
+Variant fdiv(const Variant &num1, const Variant &num2) {
+    return call("fdiv", {num1, num2});
+}
+Variant fpow(const Variant &num, const Variant &exponent) {
+    return call("fpow", {num, exponent});
+}
+Variant microtime(const Variant &as_float) {
+    return call("microtime", {as_float});
+}
+Variant gettimeofday(const Variant &as_float) {
+    return call("gettimeofday", {as_float});
+}
+Variant getrusage(const Variant &mode) {
+    return call("getrusage", {mode});
+}
+Variant unpack(const Variant &format, const Variant &string, const Variant &offset) {
+    return call("unpack", {format, string, offset});
+}
+Variant password_get_info(const Variant &hash) {
+    return call("password_get_info", {hash});
+}
+Variant password_hash(const Variant &password, const Variant &algo, const Variant &options) {
+    return call("password_hash", {password, algo, options});
+}
+Variant password_needs_rehash(const Variant &hash, const Variant &algo, const Variant &options) {
+    return call("password_needs_rehash", {hash, algo, options});
+}
+Variant password_verify(const Variant &password, const Variant &hash) {
+    return call("password_verify", {password, hash});
+}
+Variant password_algos() {
+    return call("password_algos", {});
+}
+Variant proc_open(const Variant &command, const Variant &descriptor_spec, const Reference &pipes, const Variant &cwd, const Variant &env_vars, const Variant &options) {
+    return call("proc_open", {command, descriptor_spec, &pipes, cwd, env_vars, options});
+}
+Variant proc_close(const Variant &process) {
+    return call("proc_close", {process});
+}
+Variant proc_terminate(const Variant &process, const Variant &signal) {
+    return call("proc_terminate", {process, signal});
+}
+Variant proc_get_status(const Variant &process) {
+    return call("proc_get_status", {process});
+}
+Variant quoted_printable_decode(const Variant &string) {
+    return call("quoted_printable_decode", {string});
+}
+Variant quoted_printable_encode(const Variant &string) {
+    return call("quoted_printable_encode", {string});
+}
+Variant soundex(const Variant &string) {
+    return call("soundex", {string});
+}
+Variant stream_select(const Reference &read, const Reference &write, const Reference &except, const Variant &seconds, const Variant &microseconds) {
+    return call("stream_select", {&read, &write, &except, seconds, microseconds});
+}
+Variant stream_context_create(const Variant &options, const Variant &params) {
+    return call("stream_context_create", {options, params});
+}
+Variant stream_context_set_params(const Variant &context, const Variant &params) {
+    return call("stream_context_set_params", {context, params});
+}
+Variant stream_context_get_params(const Variant &context) {
+    return call("stream_context_get_params", {context});
+}
+Variant stream_context_set_option(const Variant &context, const Variant &wrapper_or_options, const Variant &option_name, const Variant &value) {
+    return call("stream_context_set_option", {context, wrapper_or_options, option_name, value});
+}
+Variant stream_context_set_options(const Variant &context, const Variant &options) {
+    return call("stream_context_set_options", {context, options});
+}
+Variant stream_context_get_options(const Variant &stream_or_context) {
+    return call("stream_context_get_options", {stream_or_context});
+}
+Variant stream_context_get_default(const Variant &options) {
+    return call("stream_context_get_default", {options});
+}
+Variant stream_context_set_default(const Variant &options) {
+    return call("stream_context_set_default", {options});
+}
+Variant stream_filter_prepend(const Variant &stream, const Variant &filter_name, const Variant &mode, const Variant &params) {
+    return call("stream_filter_prepend", {stream, filter_name, mode, params});
+}
+Variant stream_filter_append(const Variant &stream, const Variant &filter_name, const Variant &mode, const Variant &params) {
+    return call("stream_filter_append", {stream, filter_name, mode, params});
+}
+Variant stream_filter_remove(const Variant &stream_filter) {
+    return call("stream_filter_remove", {stream_filter});
+}
+Variant stream_socket_client(const Variant &address, const Reference &error_code, const Reference &error_message, const Variant &timeout, const Variant &flags, const Variant &context) {
+    return call("stream_socket_client", {address, &error_code, &error_message, timeout, flags, context});
+}
+Variant stream_socket_server(const Variant &address, const Reference &error_code, const Reference &error_message, const Variant &flags, const Variant &context) {
+    return call("stream_socket_server", {address, &error_code, &error_message, flags, context});
+}
+Variant stream_socket_accept(const Variant &socket, const Variant &timeout, const Reference &peer_name) {
+    return call("stream_socket_accept", {socket, timeout, &peer_name});
+}
+Variant stream_socket_get_name(const Variant &socket, const Variant &remote) {
+    return call("stream_socket_get_name", {socket, remote});
+}
+Variant stream_socket_recvfrom(const Variant &socket, const Variant &length, const Variant &flags, const Reference &address) {
+    return call("stream_socket_recvfrom", {socket, length, flags, &address});
+}
+Variant stream_socket_sendto(const Variant &socket, const Variant &data, const Variant &flags, const Variant &address) {
+    return call("stream_socket_sendto", {socket, data, flags, address});
+}
+Variant stream_socket_enable_crypto(const Variant &stream, const Variant &enable, const Variant &crypto_method, const Variant &session_stream) {
+    return call("stream_socket_enable_crypto", {stream, enable, crypto_method, session_stream});
+}
+Variant stream_socket_shutdown(const Variant &stream, const Variant &mode) {
+    return call("stream_socket_shutdown", {stream, mode});
+}
+Variant stream_socket_pair(const Variant &domain, const Variant &type, const Variant &protocol) {
+    return call("stream_socket_pair", {domain, type, protocol});
+}
+Variant stream_copy_to_stream(const Variant &from, const Variant &to, const Variant &length, const Variant &offset) {
+    return call("stream_copy_to_stream", {from, to, length, offset});
+}
+Variant stream_get_contents(const Variant &stream, const Variant &length, const Variant &offset) {
+    return call("stream_get_contents", {stream, length, offset});
+}
+Variant stream_supports_lock(const Variant &stream) {
+    return call("stream_supports_lock", {stream});
+}
+Variant stream_set_write_buffer(const Variant &stream, const Variant &size) {
+    return call("stream_set_write_buffer", {stream, size});
+}
+Variant set_file_buffer(const Variant &stream, const Variant &size) {
+    return call("set_file_buffer", {stream, size});
+}
+Variant stream_set_read_buffer(const Variant &stream, const Variant &size) {
+    return call("stream_set_read_buffer", {stream, size});
+}
+Variant stream_set_blocking(const Variant &stream, const Variant &enable) {
+    return call("stream_set_blocking", {stream, enable});
+}
+Variant socket_set_blocking(const Variant &stream, const Variant &enable) {
+    return call("socket_set_blocking", {stream, enable});
+}
+Variant stream_get_meta_data(const Variant &stream) {
+    return call("stream_get_meta_data", {stream});
+}
+Variant socket_get_status(const Variant &stream) {
+    return call("socket_get_status", {stream});
+}
+Variant stream_get_line(const Variant &stream, const Variant &length, const Variant &ending) {
+    return call("stream_get_line", {stream, length, ending});
+}
+Variant stream_resolve_include_path(const Variant &filename) {
+    return call("stream_resolve_include_path", {filename});
+}
+Variant stream_get_wrappers() {
+    return call("stream_get_wrappers", {});
+}
+Variant stream_get_transports() {
+    return call("stream_get_transports", {});
+}
+Variant stream_is_local(const Variant &stream) {
+    return call("stream_is_local", {stream});
+}
+Variant stream_isatty(const Variant &stream) {
+    return call("stream_isatty", {stream});
+}
+Variant stream_set_chunk_size(const Variant &stream, const Variant &size) {
+    return call("stream_set_chunk_size", {stream, size});
+}
+Variant stream_set_timeout(const Variant &stream, const Variant &seconds, const Variant &microseconds) {
+    return call("stream_set_timeout", {stream, seconds, microseconds});
+}
+Variant socket_set_timeout(const Variant &stream, const Variant &seconds, const Variant &microseconds) {
+    return call("socket_set_timeout", {stream, seconds, microseconds});
+}
+Variant gettype(const Variant &value) {
+    return call("gettype", {value});
+}
+Variant get_debug_type(const Variant &value) {
+    return call("get_debug_type", {value});
+}
+Variant settype(const Reference &var, const Variant &type) {
+    return call("settype", {&var, type});
+}
+Variant intval(const Variant &value, const Variant &base) {
+    return call("intval", {value, base});
+}
+Variant floatval(const Variant &value) {
+    return call("floatval", {value});
+}
+Variant doubleval(const Variant &value) {
+    return call("doubleval", {value});
+}
+Variant boolval(const Variant &value) {
+    return call("boolval", {value});
+}
+Variant strval(const Variant &value) {
+    return call("strval", {value});
+}
+Variant is_null(const Variant &value) {
+    return call("is_null", {value});
+}
+Variant is_resource(const Variant &value) {
+    return call("is_resource", {value});
+}
+Variant is_bool(const Variant &value) {
+    return call("is_bool", {value});
+}
+Variant is_int(const Variant &value) {
+    return call("is_int", {value});
+}
+Variant is_integer(const Variant &value) {
+    return call("is_integer", {value});
+}
+Variant is_long(const Variant &value) {
+    return call("is_long", {value});
+}
+Variant is_float(const Variant &value) {
+    return call("is_float", {value});
+}
+Variant is_double(const Variant &value) {
+    return call("is_double", {value});
+}
+Variant is_numeric(const Variant &value) {
+    return call("is_numeric", {value});
+}
+Variant is_string(const Variant &value) {
+    return call("is_string", {value});
+}
+Variant is_array(const Variant &value) {
+    return call("is_array", {value});
+}
+Variant is_object(const Variant &value) {
+    return call("is_object", {value});
+}
+Variant is_scalar(const Variant &value) {
+    return call("is_scalar", {value});
+}
+Variant is_callable(const Variant &value, const Variant &syntax_only, const Reference &callable_name) {
+    return call("is_callable", {value, syntax_only, &callable_name});
+}
+Variant is_iterable(const Variant &value) {
+    return call("is_iterable", {value});
+}
+Variant is_countable(const Variant &value) {
+    return call("is_countable", {value});
+}
+Variant uniqid(const Variant &prefix, const Variant &more_entropy) {
+    return call("uniqid", {prefix, more_entropy});
+}
+Variant parse_url(const Variant &url, const Variant &component) {
+    return call("parse_url", {url, component});
+}
+Variant urlencode(const Variant &string) {
+    return call("urlencode", {string});
+}
+Variant urldecode(const Variant &string) {
+    return call("urldecode", {string});
+}
+Variant rawurlencode(const Variant &string) {
+    return call("rawurlencode", {string});
+}
+Variant rawurldecode(const Variant &string) {
+    return call("rawurldecode", {string});
+}
+Variant get_headers(const Variant &url, const Variant &associative, const Variant &context) {
+    return call("get_headers", {url, associative, context});
+}
+Variant stream_bucket_make_writeable(const Variant &brigade) {
+    return call("stream_bucket_make_writeable", {brigade});
+}
+Variant stream_bucket_prepend(const Variant &brigade, const Variant &bucket) {
+    return call("stream_bucket_prepend", {brigade, bucket});
+}
+Variant stream_bucket_append(const Variant &brigade, const Variant &bucket) {
+    return call("stream_bucket_append", {brigade, bucket});
+}
+Variant stream_bucket_new(const Variant &stream, const Variant &buffer) {
+    return call("stream_bucket_new", {stream, buffer});
+}
+Variant stream_get_filters() {
+    return call("stream_get_filters", {});
+}
+Variant stream_filter_register(const Variant &filter_name, const Variant &_class) {
+    return call("stream_filter_register", {filter_name, _class});
+}
+Variant convert_uuencode(const Variant &string) {
+    return call("convert_uuencode", {string});
+}
+Variant convert_uudecode(const Variant &string) {
+    return call("convert_uudecode", {string});
+}
+Variant var_export(const Variant &value, const Variant &_return) {
+    return call("var_export", {value, _return});
+}
+Variant serialize(const Variant &value) {
+    return call("serialize", {value});
+}
+Variant unserialize(const Variant &data, const Variant &options) {
+    return call("unserialize", {data, options});
+}
+Variant memory_get_usage(const Variant &real_usage) {
+    return call("memory_get_usage", {real_usage});
+}
+Variant memory_get_peak_usage(const Variant &real_usage) {
+    return call("memory_get_peak_usage", {real_usage});
+}
+Variant memory_reset_peak_usage() {
+    return call("memory_reset_peak_usage", {});
+}
+Variant version_compare(const Variant &version1, const Variant &version2, const Variant &_operator) {
+    return call("version_compare", {version1, version2, _operator});
+}
+Variant dl(const Variant &extension_filename) {
+    return call("dl", {extension_filename});
+}
+Variant cli_set_process_title(const Variant &title) {
+    return call("cli_set_process_title", {title});
+}
+Variant cli_get_process_title() {
+    return call("cli_get_process_title", {});
+}
 }

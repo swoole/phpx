@@ -1,15 +1,37 @@
 #include "phpx.h"
 
 namespace php {
-Variant ctype_alnum{ZEND_STRL("ctype_alnum"), true};
-Variant ctype_alpha{ZEND_STRL("ctype_alpha"), true};
-Variant ctype_cntrl{ZEND_STRL("ctype_cntrl"), true};
-Variant ctype_digit{ZEND_STRL("ctype_digit"), true};
-Variant ctype_lower{ZEND_STRL("ctype_lower"), true};
-Variant ctype_graph{ZEND_STRL("ctype_graph"), true};
-Variant ctype_print{ZEND_STRL("ctype_print"), true};
-Variant ctype_punct{ZEND_STRL("ctype_punct"), true};
-Variant ctype_space{ZEND_STRL("ctype_space"), true};
-Variant ctype_upper{ZEND_STRL("ctype_upper"), true};
-Variant ctype_xdigit{ZEND_STRL("ctype_xdigit"), true};
+Variant ctype_alnum(const Variant &text) {
+    return call("ctype_alnum", {text});
+}
+Variant ctype_alpha(const Variant &text) {
+    return call("ctype_alpha", {text});
+}
+Variant ctype_cntrl(const Variant &text) {
+    return call("ctype_cntrl", {text});
+}
+Variant ctype_digit(const Variant &text) {
+    return call("ctype_digit", {text});
+}
+Variant ctype_lower(const Variant &text) {
+    return call("ctype_lower", {text});
+}
+Variant ctype_graph(const Variant &text) {
+    return call("ctype_graph", {text});
+}
+Variant ctype_print(const Variant &text) {
+    return call("ctype_print", {text});
+}
+Variant ctype_punct(const Variant &text) {
+    return call("ctype_punct", {text});
+}
+Variant ctype_space(const Variant &text) {
+    return call("ctype_space", {text});
+}
+Variant ctype_upper(const Variant &text) {
+    return call("ctype_upper", {text});
+}
+Variant ctype_xdigit(const Variant &text) {
+    return call("ctype_xdigit", {text});
+}
 }

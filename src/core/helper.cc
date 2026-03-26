@@ -28,7 +28,7 @@ Variant abs(const Variant &v) {
     case IS_DOUBLE:
         return std::fabs(v.toFloat());
     default:
-        return php::abs(v);
+        return php::abs({v});
     }
 }
 }  // namespace math

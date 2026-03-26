@@ -175,12 +175,30 @@ class UnhandledMatchError {
     Variant __toString();
 };
 
+class RequestParseBodyException {
+    Object this_;
+  public:
+    RequestParseBodyException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Variant __wakeup();
+    Variant getMessage();
+    Variant getCode();
+    Variant getFile();
+    Variant getLine();
+    Variant getTrace();
+    Variant getPrevious();
+    Variant getTraceAsString();
+    Variant __toString();
+};
+
 class Closure {
     Object this_;
   public:
     static Variant bind(const Variant &closure, const Variant &new_this, const Variant &new_scope = "static");
     Variant bindTo(const Variant &new_this, const Variant &new_scope = "static");
-    Variant call(const Variant &new_this, const Variant &args = {});
+    template <typename... Args>
+    Variant call(const Variant &new_this, const Args&... args) {
+        return call("call", {new_this, args...});
+    }
     static Variant fromCallable(const Variant &callback);
     Variant __invoke();
 };
@@ -196,6 +214,7 @@ class Generator {
     Variant send(const Variant &value);
     Variant _throw(const Variant &exception);
     Variant getReturn();
+    Variant __debugInfo();
 };
 
 class ClosedGeneratorException {
@@ -270,11 +289,20 @@ class Override {
     Override();
 };
 
+class Deprecated {
+    Object this_;
+  public:
+    Deprecated(const Variant &message = {}, const Variant &since = {});
+};
+
 class Fiber {
     Object this_;
   public:
     Fiber(const Variant &callback);
-    Variant start(const Variant &args = {});
+    template <typename... Args>
+    Variant start(const Args&... args) {
+        return call("start", {args...});
+    }
     Variant resume(const Variant &value = {});
     Variant _throw(const Variant &exception);
     Variant isStarted();

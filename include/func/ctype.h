@@ -1,13 +1,13 @@
 namespace php {
-extern Variant ctype_alnum;
-extern Variant ctype_alpha;
-extern Variant ctype_cntrl;
-extern Variant ctype_digit;
-extern Variant ctype_lower;
-extern Variant ctype_graph;
-extern Variant ctype_print;
-extern Variant ctype_punct;
-extern Variant ctype_space;
-extern Variant ctype_upper;
-extern Variant ctype_xdigit;
+Variant ctype_alnum(const Variant &text);
+Variant ctype_alpha(const Variant &text);
+Variant ctype_cntrl(const Variant &text);
+Variant ctype_digit(const Variant &text);
+Variant ctype_lower(const Variant &text);
+Variant ctype_graph(const Variant &text);
+Variant ctype_print(const Variant &text);
+Variant ctype_punct(const Variant &text);
+Variant ctype_space(const Variant &text);
+Variant ctype_upper(const Variant &text);
+Variant ctype_xdigit(const Variant &text);
 }

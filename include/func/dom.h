@@ -1,3 +1,4 @@
 namespace php {
-extern Variant dom_import_simplexml;
+Variant dom_import_simplexml(const Variant &node);
+Variant Dom_import_simplexml(const Variant &node);
 }

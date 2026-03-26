@@ -1,37 +1,103 @@
 #include "phpx.h"
 
 namespace php {
-Variant curl_close{ZEND_STRL("curl_close"), true};
-Variant curl_copy_handle{ZEND_STRL("curl_copy_handle"), true};
-Variant curl_errno{ZEND_STRL("curl_errno"), true};
-Variant curl_error{ZEND_STRL("curl_error"), true};
-Variant curl_escape{ZEND_STRL("curl_escape"), true};
-Variant curl_unescape{ZEND_STRL("curl_unescape"), true};
-Variant curl_multi_setopt{ZEND_STRL("curl_multi_setopt"), true};
-Variant curl_exec{ZEND_STRL("curl_exec"), true};
-Variant curl_file_create{ZEND_STRL("curl_file_create"), true};
-Variant curl_getinfo{ZEND_STRL("curl_getinfo"), true};
-Variant curl_init{ZEND_STRL("curl_init"), true};
-Variant curl_upkeep{ZEND_STRL("curl_upkeep"), true};
-Variant curl_multi_add_handle{ZEND_STRL("curl_multi_add_handle"), true};
-Variant curl_multi_close{ZEND_STRL("curl_multi_close"), true};
-Variant curl_multi_errno{ZEND_STRL("curl_multi_errno"), true};
-Variant curl_multi_exec{ZEND_STRL("curl_multi_exec"), true};
-Variant curl_multi_getcontent{ZEND_STRL("curl_multi_getcontent"), true};
-Variant curl_multi_info_read{ZEND_STRL("curl_multi_info_read"), true};
-Variant curl_multi_init{ZEND_STRL("curl_multi_init"), true};
-Variant curl_multi_remove_handle{ZEND_STRL("curl_multi_remove_handle"), true};
-Variant curl_multi_select{ZEND_STRL("curl_multi_select"), true};
-Variant curl_multi_strerror{ZEND_STRL("curl_multi_strerror"), true};
-Variant curl_pause{ZEND_STRL("curl_pause"), true};
-Variant curl_reset{ZEND_STRL("curl_reset"), true};
-Variant curl_setopt_array{ZEND_STRL("curl_setopt_array"), true};
-Variant curl_setopt{ZEND_STRL("curl_setopt"), true};
-Variant curl_share_close{ZEND_STRL("curl_share_close"), true};
-Variant curl_share_errno{ZEND_STRL("curl_share_errno"), true};
-Variant curl_share_init{ZEND_STRL("curl_share_init"), true};
-Variant curl_share_setopt{ZEND_STRL("curl_share_setopt"), true};
-Variant curl_share_strerror{ZEND_STRL("curl_share_strerror"), true};
-Variant curl_strerror{ZEND_STRL("curl_strerror"), true};
-Variant curl_version{ZEND_STRL("curl_version"), true};
+Variant curl_close(const Variant &handle) {
+    return call("curl_close", {handle});
+}
+Variant curl_copy_handle(const Variant &handle) {
+    return call("curl_copy_handle", {handle});
+}
+Variant curl_errno(const Variant &handle) {
+    return call("curl_errno", {handle});
+}
+Variant curl_error(const Variant &handle) {
+    return call("curl_error", {handle});
+}
+Variant curl_escape(const Variant &handle, const Variant &string) {
+    return call("curl_escape", {handle, string});
+}
+Variant curl_unescape(const Variant &handle, const Variant &string) {
+    return call("curl_unescape", {handle, string});
+}
+Variant curl_multi_setopt(const Variant &multi_handle, const Variant &option, const Variant &value) {
+    return call("curl_multi_setopt", {multi_handle, option, value});
+}
+Variant curl_exec(const Variant &handle) {
+    return call("curl_exec", {handle});
+}
+Variant curl_file_create(const Variant &filename, const Variant &mime_type, const Variant &posted_filename) {
+    return call("curl_file_create", {filename, mime_type, posted_filename});
+}
+Variant curl_getinfo(const Variant &handle, const Variant &option) {
+    return call("curl_getinfo", {handle, option});
+}
+Variant curl_init(const Variant &url) {
+    return call("curl_init", {url});
+}
+Variant curl_upkeep(const Variant &handle) {
+    return call("curl_upkeep", {handle});
+}
+Variant curl_multi_add_handle(const Variant &multi_handle, const Variant &handle) {
+    return call("curl_multi_add_handle", {multi_handle, handle});
+}
+Variant curl_multi_close(const Variant &multi_handle) {
+    return call("curl_multi_close", {multi_handle});
+}
+Variant curl_multi_errno(const Variant &multi_handle) {
+    return call("curl_multi_errno", {multi_handle});
+}
+Variant curl_multi_exec(const Variant &multi_handle, const Reference &still_running) {
+    return call("curl_multi_exec", {multi_handle, &still_running});
+}
+Variant curl_multi_getcontent(const Variant &handle) {
+    return call("curl_multi_getcontent", {handle});
+}
+Variant curl_multi_info_read(const Variant &multi_handle, const Reference &queued_messages) {
+    return call("curl_multi_info_read", {multi_handle, &queued_messages});
+}
+Variant curl_multi_init() {
+    return call("curl_multi_init", {});
+}
+Variant curl_multi_remove_handle(const Variant &multi_handle, const Variant &handle) {
+    return call("curl_multi_remove_handle", {multi_handle, handle});
+}
+Variant curl_multi_select(const Variant &multi_handle, const Variant &timeout) {
+    return call("curl_multi_select", {multi_handle, timeout});
+}
+Variant curl_multi_strerror(const Variant &error_code) {
+    return call("curl_multi_strerror", {error_code});
+}
+Variant curl_pause(const Variant &handle, const Variant &flags) {
+    return call("curl_pause", {handle, flags});
+}
+Variant curl_reset(const Variant &handle) {
+    return call("curl_reset", {handle});
+}
+Variant curl_setopt_array(const Variant &handle, const Variant &options) {
+    return call("curl_setopt_array", {handle, options});
+}
+Variant curl_setopt(const Variant &handle, const Variant &option, const Variant &value) {
+    return call("curl_setopt", {handle, option, value});
+}
+Variant curl_share_close(const Variant &share_handle) {
+    return call("curl_share_close", {share_handle});
+}
+Variant curl_share_errno(const Variant &share_handle) {
+    return call("curl_share_errno", {share_handle});
+}
+Variant curl_share_init() {
+    return call("curl_share_init", {});
+}
+Variant curl_share_setopt(const Variant &share_handle, const Variant &option, const Variant &value) {
+    return call("curl_share_setopt", {share_handle, option, value});
+}
+Variant curl_share_strerror(const Variant &error_code) {
+    return call("curl_share_strerror", {error_code});
+}
+Variant curl_strerror(const Variant &error_code) {
+    return call("curl_strerror", {error_code});
+}
+Variant curl_version() {
+    return call("curl_version", {});
+}
 }

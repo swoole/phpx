@@ -1,6 +1,10 @@
 #include "phpx.h"
 
 namespace php {
-Variant token_get_all{ZEND_STRL("token_get_all"), true};
-Variant token_name{ZEND_STRL("token_name"), true};
+Variant token_get_all(const Variant &code, const Variant &flags) {
+    return call("token_get_all", {code, flags});
+}
+Variant token_name(const Variant &id) {
+    return call("token_name", {id});
+}
 }

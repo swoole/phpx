@@ -1,19 +1,49 @@
 #include "phpx.h"
 
 namespace php {
-Variant class_implements{ZEND_STRL("class_implements"), true};
-Variant class_parents{ZEND_STRL("class_parents"), true};
-Variant class_uses{ZEND_STRL("class_uses"), true};
-Variant spl_autoload{ZEND_STRL("spl_autoload"), true};
-Variant spl_autoload_call{ZEND_STRL("spl_autoload_call"), true};
-Variant spl_autoload_extensions{ZEND_STRL("spl_autoload_extensions"), true};
-Variant spl_autoload_functions{ZEND_STRL("spl_autoload_functions"), true};
-Variant spl_autoload_register{ZEND_STRL("spl_autoload_register"), true};
-Variant spl_autoload_unregister{ZEND_STRL("spl_autoload_unregister"), true};
-Variant spl_classes{ZEND_STRL("spl_classes"), true};
-Variant spl_object_hash{ZEND_STRL("spl_object_hash"), true};
-Variant spl_object_id{ZEND_STRL("spl_object_id"), true};
-Variant iterator_apply{ZEND_STRL("iterator_apply"), true};
-Variant iterator_count{ZEND_STRL("iterator_count"), true};
-Variant iterator_to_array{ZEND_STRL("iterator_to_array"), true};
+Variant class_implements(const Variant &object_or_class, const Variant &autoload) {
+    return call("class_implements", {object_or_class, autoload});
+}
+Variant class_parents(const Variant &object_or_class, const Variant &autoload) {
+    return call("class_parents", {object_or_class, autoload});
+}
+Variant class_uses(const Variant &object_or_class, const Variant &autoload) {
+    return call("class_uses", {object_or_class, autoload});
+}
+Variant spl_autoload(const Variant &_class, const Variant &file_extensions) {
+    return call("spl_autoload", {_class, file_extensions});
+}
+Variant spl_autoload_call(const Variant &_class) {
+    return call("spl_autoload_call", {_class});
+}
+Variant spl_autoload_extensions(const Variant &file_extensions) {
+    return call("spl_autoload_extensions", {file_extensions});
+}
+Variant spl_autoload_functions() {
+    return call("spl_autoload_functions", {});
+}
+Variant spl_autoload_register(const Variant &callback, const Variant &_throw, const Variant &prepend) {
+    return call("spl_autoload_register", {callback, _throw, prepend});
+}
+Variant spl_autoload_unregister(const Variant &callback) {
+    return call("spl_autoload_unregister", {callback});
+}
+Variant spl_classes() {
+    return call("spl_classes", {});
+}
+Variant spl_object_hash(const Variant &object) {
+    return call("spl_object_hash", {object});
+}
+Variant spl_object_id(const Variant &object) {
+    return call("spl_object_id", {object});
+}
+Variant iterator_apply(const Variant &iterator, const Variant &callback, const Variant &args) {
+    return call("iterator_apply", {iterator, callback, args});
+}
+Variant iterator_count(const Variant &iterator) {
+    return call("iterator_count", {iterator});
+}
+Variant iterator_to_array(const Variant &iterator, const Variant &preserve_keys) {
+    return call("iterator_to_array", {iterator, preserve_keys});
+}
 }

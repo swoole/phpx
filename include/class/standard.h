@@ -14,10 +14,16 @@ class AssertionError {
     Variant __toString();
 };
 
+class RoundingMode {
+    Object this_;
+  public:
+    static Variant cases();
+};
+
 class php_user_filter {
     Object this_;
   public:
-    Variant filter(const Variant &in, const Variant &out, const Variant &consumed, const Variant &closing);
+    Variant filter(const Variant &in, const Variant &out, const Reference &consumed, const Variant &closing);
     Variant onCreate();
     Variant onClose();
 };

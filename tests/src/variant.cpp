@@ -501,12 +501,13 @@ TEST(variant, json) {
 
 TEST(variant, ref0) {
     Array arr;
-    Variant ref = &arr;
+    auto ref = arr.toReference();
     array_push(ref, "php", "java", "go");
-    ASSERT_EQ((*ref).length(), 3);
+    var_dump(ref);
+    ASSERT_EQ(ref.length(), 3);
 
     array_push(ref, "c++", "rust", "erlang", "node.js");
-    ASSERT_EQ((*ref).length(), 7);
+    ASSERT_EQ(ref.length(), 7);
 
     array_push(ref, "python", "ruby", "lua", "perl", "vue");
     ASSERT_EQ(ref.getRefValue().length(), 12);
@@ -517,7 +518,7 @@ TEST(variant, ref0) {
 
 TEST(variant, ref1) {
     Array arr;
-    Variant ref(&arr);
+    Reference ref = arr.toReference();
     parse_str("first=value1&second=value2", ref);
     Array v3 = ref.getRefValue();
     ASSERT_EQ(v3.count(), 2);
@@ -531,7 +532,7 @@ TEST(variant, ref1) {
 
 TEST(variant, ref2) {
     Array arr;
-    Variant ref = &arr;
+    Reference ref = arr.toReference();
     parse_str("first=value1&second=value2", ref);
     Array v3 = *ref;
     ASSERT_EQ(v3.count(), 2);
@@ -539,7 +540,7 @@ TEST(variant, ref2) {
 
 TEST(variant, ref3) {
     Array arr;
-    Variant ref = &arr;
+    Reference ref = arr.toReference();
     array_push(ref, "php", "java", "go");
     ASSERT_EQ((*ref).length(), 3);
 
@@ -549,11 +550,10 @@ TEST(variant, ref3) {
 
 TEST(variant, ref4) {
     Array arr;
-    Variant ref;
-    ref = &arr;
+    Reference ref = arr.toReference();
 
     array_push(ref, "php", "java", "go");
-    ASSERT_EQ((*ref).length(), 3);
+    ASSERT_EQ(ref.length(), 3);
 }
 
 TEST(variant, ref5) {
@@ -970,7 +970,7 @@ TEST(variant, unsetProperty) {
 }
 
 TEST(variant, newReference) {
-    var ref = newReference();
+    auto ref = newReference();
 
     var str = "first=value&arr[]=foo+bar&arr[]=baz";
     parse_str(str, ref);

@@ -89,7 +89,7 @@ class Random_Randomizer {
     Random_Randomizer(const Variant &engine = {});
     Variant nextInt();
     Variant nextFloat();
-    Variant getFloat(const Variant &min, const Variant &max, const Object &boundary = {});
+    Variant getFloat(const Variant &min, const Variant &max, const Variant &boundary = {});
     Variant getInt(const Variant &min, const Variant &max);
     Variant getBytes(const Variant &length);
     Variant getBytesFromString(const Variant &string, const Variant &length);

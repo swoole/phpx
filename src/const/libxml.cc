@@ -4,6 +4,7 @@ namespace php {
 Variant LIBXML_VERSION { 20913 };
 Variant LIBXML_DOTTED_VERSION { ZEND_STRL("2.9.13"), true };
 Variant LIBXML_LOADED_VERSION { ZEND_STRL("20913"), true };
+Variant LIBXML_RECOVER { 1 };
 Variant LIBXML_NOENT { 2 };
 Variant LIBXML_DTDLOAD { 4 };
 Variant LIBXML_DTDATTR { 8 };

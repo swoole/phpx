@@ -2,6 +2,7 @@ namespace php {
 extern Variant LIBXML_VERSION;
 extern Variant LIBXML_DOTTED_VERSION;
 extern Variant LIBXML_LOADED_VERSION;
+extern Variant LIBXML_RECOVER;
 extern Variant LIBXML_NOENT;
 extern Variant LIBXML_DTDLOAD;
 extern Variant LIBXML_DTDATTR;

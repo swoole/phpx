@@ -46,7 +46,7 @@ class SQLite3 {
 class SQLite3Stmt {
     Object this_;
   public:
-    Variant bindParam(const Variant &param, const Variant &var, const Variant &type = 3);
+    Variant bindParam(const Variant &param, const Reference &var, const Variant &type = 3);
     Variant bindValue(const Variant &param, const Variant &value, const Variant &type = 3);
     Variant clear();
     Variant close();

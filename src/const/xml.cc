@@ -27,5 +27,6 @@ Variant XML_OPTION_CASE_FOLDING { 1 };
 Variant XML_OPTION_TARGET_ENCODING { 2 };
 Variant XML_OPTION_SKIP_TAGSTART { 3 };
 Variant XML_OPTION_SKIP_WHITE { 4 };
+Variant XML_OPTION_PARSE_HUGE { 5 };
 Variant XML_SAX_IMPL { ZEND_STRL("libxml"), true };
 }

@@ -20,7 +20,7 @@ TEST(closure, base) {
     };
 
     auto o = newClosure(fn, {"hello", "swoole"});
-    auto rs = o("java", "php");
+    auto rs = o({"java", "php"});
     ASSERT_EQ(rs.toInt(), 1000);
 }
 

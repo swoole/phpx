@@ -14,18 +14,30 @@ use RuntimeException;
 class Generator
 {
     protected string $extension;
-    protected ReflectionExtension $rf_ext;
+    protected ReflectionExtension $extRef;
     public static string $rootDir = '';
 
-    const BUILTIN_FUNCTIONS = [
+    const array BUILTIN_FUNCTIONS = [
         'sizeof',
+        'exit',
+        'constant',
+        'assert',
+        'strlen',
+        'strnatcmp',
+        'strnatcasecmp',
     ];
 
     const BUILTIN_CLASSES = [
         'ArrayIterator',
     ];
 
-    const KEYWORDS = ['delete', 'auto', 'setbit', 'throw', 'getThis', 'namespace', 'class', 'default'];
+    const KEYWORDS = [
+        'delete', 'auto', 'setbit', 'throw', 'getThis', 'namespace', 'class', 'default', 'case', 'break', 'continue',
+        'return',
+        'enum',
+        'char',
+        'operator',
+    ];
 
     public static function getRootDir(): string
     {
@@ -63,51 +75,7 @@ class Generator
         file_put_contents($outFile, $out);
     }
 
-    public static function makeArgs(int $n): string
-    {
-        $code = '';
-        for ($j = 1; $j <= $n; $j++) {
-            $code .= 'const Variant &v' . ($j == $n ? $j : $j . ', ');
-        }
-        return $code;
-    }
-
-    public static function makeCaller(): void
-    {
-        $DELIMITER = '/* generator */';
-        $header_file = self::getRootDir() . '/include/phpx.h';
-        $src = file_get_contents($header_file);
-        $r = preg_match('/\#define\s+PHPX_MAX_ARGC\s+(\d+)/', $src, $match);
-        if (!$r) {
-            exit("no PHPX_MAX_ARGC\n");
-        }
-
-        $maxArgc = $match[1];
-        self::render(__DIR__ . '/templates/caller.tpl', self::getRootDir() . '/src/core/caller.cc', compact('maxArgc'));
-
-        $exec_function_code = PHP_EOL;
-        $exec_method_code = PHP_EOL;
-        $new_object_code = PHP_EOL;
-        for ($i = 1; $i <= $maxArgc; $i++) {
-            $exec_function_code .= 'Variant operator()(' . self::makeArgs($i) . ') const;' . PHP_EOL;
-            $exec_method_code .= 'Variant exec(const Variant &fn, ' . self::makeArgs($i) . ');' . PHP_EOL;
-            $new_object_code .= "extern Object newObject(const char *name, " . self::makeArgs($i) . ");" . PHP_EOL;
-        }
-
-        $parts = explode($DELIMITER, $src);
-        $src = implode($DELIMITER, [
-            $parts[0],
-            $exec_function_code,
-            $parts[2],
-            $exec_method_code,
-            $parts[4],
-            $new_object_code,
-            $parts[6],
-        ]);
-        file_put_contents($header_file, $src);
-    }
-
-    public static function valueToCppRepr($v): ?string
+    public static function valueToCppRepr($v, bool $byRef = false): ?string
     {
         if (is_string($v)) {
             $v = str_replace(
@@ -132,12 +100,16 @@ class Generator
             return $v ? 'true' : 'false';
         } elseif (is_array($v)) {
             if (empty($v)) {
-                return '{}';
+                if ($byRef) {
+                    return 'getEmptyArrayRef()';
+                } else {
+                    return 'Array{}';
+                }
             }
             if (array_is_list($v)) {
-                return '{' . implode(', ', array_map([self::class, 'valueToCppRepr'], $v)) . '}';
+                return 'Array{' . implode(', ', array_map([self::class, 'valueToCppRepr'], $v)) . '}';
             } else {
-                return '{' . implode(', ', array_map(
+                return 'Array{' . implode(', ', array_map(
                     function ($k, $v) {
                         '{ '. self::valueToCppRepr($k) . ', ' . self::valueToCppRepr($v) . ' }';
                     },
@@ -163,7 +135,7 @@ class Generator
         }
 
         $this->extension = $extension;
-        $this->rf_ext = new ReflectionExtension($this->extension);
+        $this->extRef = new ReflectionExtension($this->extension);
     }
 
     public function export(): void
@@ -179,7 +151,7 @@ class Generator
             );
 
             self::render(
-                __DIR__ . '/templates/const-declare.tpl',
+                __DIR__ . '/templates/const-decl.tpl',
                 self::$rootDir . '/include/const/' . $ext . '.h',
                 compact('constants')
             );
@@ -194,7 +166,7 @@ class Generator
             );
 
             self::render(
-                __DIR__ . '/templates/func-declare.tpl',
+                __DIR__ . '/templates/func-decl.tpl',
                 self::$rootDir . '/include/func/' . $ext . '.h',
                 compact('functions')
             );
@@ -209,7 +181,7 @@ class Generator
             );
 
             self::render(
-                __DIR__ . '/templates/class-declare.tpl',
+                __DIR__ . '/templates/class-decl.tpl',
                 self::$rootDir . '/include/class/' . $ext . '.h',
                 compact('classes', 'ext')
             );
@@ -219,12 +191,21 @@ class Generator
     protected function getFunctions(): array
     {
         $functions = [];
-        foreach ($this->rf_ext->getFunctions() as $function) {
+        foreach ($this->extRef->getFunctions() as $function) {
             $fn_name = $function->getName();
             if (in_array($fn_name, self::BUILTIN_FUNCTIONS)) {
                 continue;
             }
-            $functions[] = $fn_name;
+            self::nameSafety($fn_name);
+
+            [$args, $call, $args_impl, $variadic] = $this->getArgs($function->getParameters());
+            $functions[$fn_name] = [
+                'args' => $args ? implode(', ', $args) : '',
+                'args_impl' => $args ? implode(', ', $args_impl) : '',
+                'call' => $call ? '{' . implode(', ', $call) . '}' : '{}',
+                'name' => $fn_name,
+                'variadic' => $variadic,
+            ];
         }
         return $functions;
     }
@@ -239,26 +220,33 @@ class Generator
         if (in_array($name, self::KEYWORDS)) {
             $name = '_' . $name;
         }
+        $name = str_replace('\\', '_', $name);
     }
 
-    protected function getArgs($params): array
+    /**
+     * @param array<ReflectionParameter> $params
+     * @return array
+     */
+    protected function getArgs(array $params): array
     {
         $args_impl = $call = $args = [];
+        $variadic = false;
         foreach ($params as $param) {
             $arg_name = $param->name;
             self::nameSafety($arg_name);
             self::changeCasePascal2Snake($arg_name);
-            $type = 'const Variant';
+            $type = 'const ' . ($param->isPassedByReference() ? 'Reference' : 'Variant');
 
-            if ($param->isOptional()) {
+            if ($param->isVariadic()) {
+                $variadic = true;
+                $args[] = 'const Args&... ' . $arg_name;
+                $call[] = $arg_name . '...';
+                $args_impl[] = 'const Args&... ' . $arg_name;
+                break;
+            } elseif ($param->isOptional()) {
                 if ($param->isDefaultValueAvailable()) {
                     $default_value = $param->getDefaultValue();
-                    if (is_array($default_value)) {
-                        $type = 'const Array';
-                    } elseif (is_object($default_value)) {
-                        $type = 'const Object';
-                    }
-                    $args[] = "$type &$arg_name = " . self::valueToCppRepr($default_value);
+                    $args[] = "$type &$arg_name = " . self::valueToCppRepr($default_value, $param->isPassedByReference());
                 } else {
                     $args[] = "$type &$arg_name = " . '{}';
                 }
@@ -266,20 +254,21 @@ class Generator
                 $args[] = "$type &$arg_name";
             }
             $args_impl[] = "$type &$arg_name";
-            $call[] = $arg_name;
+            $call[] = $param->isPassedByReference() ? '&' . $arg_name : $arg_name;
         }
 
         return [
             $args,
             $call,
             $args_impl,
+            $variadic,
         ];
     }
 
     protected function getClasses(): array
     {
         $classes = [];
-        $list = $this->rf_ext->getClasses();
+        $list = $this->extRef->getClasses();
         foreach ($list as $className => $ref) {
             $methods = [];
             $className = str_replace("\\", '_', $className);
@@ -303,18 +292,15 @@ class Generator
                 }
                 self::nameSafety($fn_name);
 
-                [$args, $call, $args_impl] = $this->getArgs($params);
-                $static = $method->isStatic();
-                if (!$static) {
-                    array_unshift($call, '');
-                }
+                [$args, $call, $args_impl, $variadic] = $this->getArgs($params);
                 $methods[$fn_name] = [
                     'args' => $args ? implode(', ', $args) : '',
                     'args_impl' => $args ? implode(', ', $args_impl) : '',
-                    'call' => $call ? implode(', ', $call) : '',
+                    'call' => $call ? '{' . implode(', ', $call) . '}' : '{}',
                     'static' => $method->isStatic(),
                     'ctor' => $method->isConstructor(),
                     'name' => $method->getName(),
+                    'variadic' => $variadic,
                 ];
             }
 
@@ -333,8 +319,8 @@ class Generator
     protected function getConstants(): array
     {
         $constants = [];
-        if ($this->rf_ext->getConstants()) {
-            foreach ($this->rf_ext->getConstants() as $name => $value) {
+        if ($this->extRef->getConstants()) {
+            foreach ($this->extRef->getConstants() as $name => $value) {
                 if (is_array($value) or is_object($value) or is_resource($value)) {
                     continue;
                 }

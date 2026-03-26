@@ -42,7 +42,7 @@ TEST(caller, method) {
     auto retval = DateTime::createFromFormat("j-M-Y", "15-Feb-2009");
     ASSERT_TRUE(retval.isObject());
     Object o(retval);
-    auto _date = o.exec("format", "Y-m-d");
+    auto _date = o.exec("format", {"Y-m-d"});
     ASSERT_STREQ(_date.toCString(), g_date);
 }
 
@@ -79,23 +79,24 @@ TEST(caller, curl) {
 }
 
 TEST(caller, call) {
-    auto rs = call(php_uname);
+	String php_uname_fn("php_uname");
+    auto rs = call(php_uname_fn);
     ASSERT_TRUE(rs.isString());
     ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
 
-    rs = call(php_uname, {"m"});
+    rs = call(php_uname_fn, {"m"});
     ASSERT_TRUE(rs.isString());
     ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
 
     Array arr;
     arr.append("m");
-    rs = call(php_uname, arr);
+    rs = call(php_uname_fn, arr);
     ASSERT_TRUE(rs.isString());
     ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
 
     Args args;
     args.append("m");
-    rs = call(php_uname, args);
+    rs = call(php_uname_fn, args);
     ASSERT_TRUE(rs.isString());
     ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
 }
@@ -118,7 +119,7 @@ TEST(caller, md5) {
     auto rdata = random_bytes({l});
     ASSERT_EQ(rdata.length(), l);
     auto hash1 = md5(rdata);
-    auto hash2 = hash({"md5", rdata});
+    auto hash2 = hash("md5", rdata);
     ASSERT_STREQ(hash1.toCString(), hash2.toCString());
 }
 
@@ -127,6 +128,6 @@ TEST(caller, sha1) {
     auto rdata = random_bytes({l});
     ASSERT_EQ(rdata.length(), l);
     auto hash1 = sha1(rdata);
-    auto hash2 = hash({"sha1", rdata});
+    auto hash2 = hash("sha1", rdata);
     ASSERT_STREQ(hash1.toCString(), hash2.toCString());
 }
