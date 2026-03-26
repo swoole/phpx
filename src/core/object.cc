@@ -200,10 +200,18 @@ Variant Object::get(const String &name) const {
 
 Object Object::clone() const {
     if (UNEXPECTED(isNull())) {
-        throwError("clone on null");
+        throwError("Attempt to clone on null");
         return {};
     }
-    const auto new_object = zend_objects_clone_obj(object());
+
+    auto clone_obj = ce()->default_object_handlers->clone_obj;
+    if (clone_obj == nullptr) {
+    	throwError("Trying to clone an uncloneable object of class %s", ZSTR_VAL(ce()->name));
+        return {};
+    }
+    const auto new_object = clone_obj(object());
+    throwErrorIfOccurred();
+
     Object retval;
     ZVAL_OBJ(retval.ptr(), new_object);
     return retval;

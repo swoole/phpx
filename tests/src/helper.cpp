@@ -78,3 +78,22 @@ TEST(helper, same) {
     ASSERT_TRUE(php::same(2.0, 2L));
     ASSERT_TRUE(php::same(3L, 3.0));
 }
+
+TEST(helper, clone) {
+	try_call([]() { clone(null); }, "Attempt to clone on null");
+    var o1 = newObject("ArrayObject");
+    o1.newItem() = "hello";
+
+    var o2 = clone(o1);
+    o1.newItem() = "world";
+
+    ASSERT_EQ(o1.length(), 2);
+    ASSERT_EQ(o2.length(), 1);
+}
+
+TEST(helper, getEmptyArrayRef) {
+	auto ref = getEmptyArrayRef();
+	ref.newItem() = "php";
+	ref.newItem() = "java";
+    ASSERT_EQ(ref.length(), 2);
+}
