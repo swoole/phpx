@@ -204,7 +204,7 @@ Object Object::clone() const {
         return {};
     }
 
-    auto clone_obj = ce()->default_object_handlers->clone_obj;
+    auto clone_obj = object()->handlers->clone_obj;
     if (clone_obj == nullptr) {
     	throwError("Trying to clone an uncloneable object of class %s", ZSTR_VAL(ce()->name));
         return {};
