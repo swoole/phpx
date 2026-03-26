@@ -149,10 +149,10 @@ PHPX_API bool hasStaticProperty(const String &class_name, const String &prop);
 PHPX_API uint32_t getPropertyOffset(const String &class_name, const String &prop);
 PHPX_API uint32_t getPropertyOffset(zend_class_entry *ce, const String &prop);
 
-Int atoi(const String &str);
-Array toArray(const Variant &v);
-Object toObject(const Variant &v);
-Object toObject(const Variant &v, const String &class_name);
+PHPX_API Int toInt(const String &str);
+PHPX_API Array toArray(const Variant &v);
+PHPX_API Object toObject(const Variant &v);
+PHPX_API Object toObject(const Variant &v, const String &class_name);
 Resource *getResource(const std::string &name);
 
 void request_init();
@@ -166,6 +166,8 @@ bool is_callable_ex(zval *callable,
                     char **error);
 int array_data_compare(Bucket *f, Bucket *s);
 bool prepare_slice(long &offset, long &length, size_t total);
+Variant call_impl(const zval *object, const zval *func, Args &args);
+Variant call_impl(const zval *object, const zval *func);
 
 #ifdef ZTS
 #define THREAD_LOCAL thread_local
@@ -1089,8 +1091,6 @@ class Args {
 
 PHPX_API extern zend_function *getFunction(const String &name);
 PHPX_API extern zend_function *getMethod(zend_class_entry *ce, const String &name);
-extern Variant call_impl(const zval *object, const zval *func, Args &args);
-extern Variant call_impl(const zval *object, const zval *func);
 
 static inline Variant call(const Variant &func) {
     return call_impl(nullptr, func.const_ptr());

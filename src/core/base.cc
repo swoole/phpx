@@ -239,7 +239,7 @@ Object catchException() {
     return result;
 }
 
-Int atoi(const String &str) {
+Int toInt(const String &str) {
 #if PHP_VERSION_ID >= 80200
     zend_string *errstr;
     Int size = zend_ini_parse_quantity(str.str(), &errstr);

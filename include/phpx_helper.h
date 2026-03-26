@@ -203,6 +203,15 @@ static inline bool instanceOf(const Variant &v, zend_class_entry *ce) {
     return tmp.instanceOf(ce);
 }
 
+static inline Object clone(const Variant &v) {
+    if (!v.isObject()) {
+        throwError("Attempt to clone on %s", v.typeStr());
+        return {};
+    }
+    Object tmp(v);
+    return tmp.clone();
+}
+
 static inline bool instanceOf(const Object &v, const String &cls) {
     return v.instanceOf(cls);
 }
@@ -225,5 +234,19 @@ static inline Variant getCallArg(uint32_t i, const Variant &defaultValue) {
     } else {
         return getCallArg(i);
     }
+}
+
+static inline Reference getCallArgByRef(uint32_t i, const Reference &defaultValue) {
+    if (i >= getCallArgNum()) {
+        return defaultValue;
+    } else {
+        return getCallArgByRef(i);
+    }
+}
+
+static inline Reference getEmptyArrayRef() {
+    Reference ref;
+    array_init(ref.refval());
+    return ref;
 }
 }  // namespace php

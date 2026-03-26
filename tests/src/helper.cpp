@@ -10,7 +10,7 @@ TEST(helper, empty_str_to_int) {
 }
 
 TEST(helper, toInt) {
-    auto v = php::atoi("512k");
+    auto v = php::toInt("512k");
     ASSERT_EQ(v, 512 * 1024);
 
     ASSERT_EQ(php::toInt(true), 1);

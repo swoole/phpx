@@ -776,7 +776,7 @@ TEST(variant, calc2) {
     var g = 2 << g0;
     ASSERT_EQ(g.toInt(), 2 << 16);
 
-    auto v = php::atoi("512k");
+    auto v = php::toInt("512k");
     var h = v >> g0;
     ASSERT_EQ(h.toInt(), v >> 16);
 

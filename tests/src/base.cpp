@@ -217,9 +217,12 @@ TEST(base, exception3) {
     try_call([]() { throwException("TestClassNotExists", "test"); }, "class 'TestClassNotExists' undefined.");
 }
 
-TEST(base, atoi) {
-    auto i = php::atoi("hello");
-    ASSERT_EQ(i, 0);
+TEST(base, toInt) {
+    auto i1 = php::toInt("hello");
+    ASSERT_EQ(i1, 0);
+
+    auto i2 = php::toInt("2025");
+    ASSERT_EQ(i2, 2025);
 }
 
 TEST(base, concat) {
