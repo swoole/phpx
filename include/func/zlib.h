@@ -1,3 +1,6 @@
+#include "phpx.h"
+#include "phpx_literal_string.h"
+
 namespace php {
 Variant ob_gzhandler(const Variant &data, const Variant &flags);
 Variant zlib_get_coding_type();
@@ -29,4 +32,4 @@ Variant inflate_init(const Variant &encoding, const Variant &options = Array{});
 Variant inflate_add(const Variant &context, const Variant &data, const Variant &flush_mode = 2);
 Variant inflate_get_status(const Variant &context);
 Variant inflate_get_read_len(const Variant &context);
-}
+}  // namespace php

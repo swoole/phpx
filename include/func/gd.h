@@ -1,3 +1,6 @@
+#include "phpx.h"
+#include "phpx_literal_string.h"
+
 namespace php {
 Variant gd_info();
 Variant imageloadfont(const Variant &filename);
@@ -8,16 +11,42 @@ Variant imagetruecolortopalette(const Variant &image, const Variant &dither, con
 Variant imagepalettetotruecolor(const Variant &image);
 Variant imagecolormatch(const Variant &image1, const Variant &image2);
 Variant imagesetthickness(const Variant &image, const Variant &thickness);
-Variant imagefilledellipse(const Variant &image, const Variant &center_x, const Variant &center_y, const Variant &width, const Variant &height, const Variant &color);
-Variant imagefilledarc(const Variant &image, const Variant &center_x, const Variant &center_y, const Variant &width, const Variant &height, const Variant &start_angle, const Variant &end_angle, const Variant &color, const Variant &style);
+Variant imagefilledellipse(const Variant &image,
+                           const Variant &center_x,
+                           const Variant &center_y,
+                           const Variant &width,
+                           const Variant &height,
+                           const Variant &color);
+Variant imagefilledarc(const Variant &image,
+                       const Variant &center_x,
+                       const Variant &center_y,
+                       const Variant &width,
+                       const Variant &height,
+                       const Variant &start_angle,
+                       const Variant &end_angle,
+                       const Variant &color,
+                       const Variant &style);
 Variant imagealphablending(const Variant &image, const Variant &enable);
 Variant imagesavealpha(const Variant &image, const Variant &enable);
 Variant imagelayereffect(const Variant &image, const Variant &effect);
-Variant imagecolorallocatealpha(const Variant &image, const Variant &red, const Variant &green, const Variant &blue, const Variant &alpha);
-Variant imagecolorresolvealpha(const Variant &image, const Variant &red, const Variant &green, const Variant &blue, const Variant &alpha);
-Variant imagecolorclosestalpha(const Variant &image, const Variant &red, const Variant &green, const Variant &blue, const Variant &alpha);
-Variant imagecolorexactalpha(const Variant &image, const Variant &red, const Variant &green, const Variant &blue, const Variant &alpha);
-Variant imagecopyresampled(const Variant &dst_image, const Variant &src_image, const Variant &dst_x, const Variant &dst_y, const Variant &src_x, const Variant &src_y, const Variant &dst_width, const Variant &dst_height, const Variant &src_width, const Variant &src_height);
+Variant imagecolorallocatealpha(
+    const Variant &image, const Variant &red, const Variant &green, const Variant &blue, const Variant &alpha);
+Variant imagecolorresolvealpha(
+    const Variant &image, const Variant &red, const Variant &green, const Variant &blue, const Variant &alpha);
+Variant imagecolorclosestalpha(
+    const Variant &image, const Variant &red, const Variant &green, const Variant &blue, const Variant &alpha);
+Variant imagecolorexactalpha(
+    const Variant &image, const Variant &red, const Variant &green, const Variant &blue, const Variant &alpha);
+Variant imagecopyresampled(const Variant &dst_image,
+                           const Variant &src_image,
+                           const Variant &dst_x,
+                           const Variant &dst_y,
+                           const Variant &src_x,
+                           const Variant &src_y,
+                           const Variant &dst_width,
+                           const Variant &dst_height,
+                           const Variant &src_width,
+                           const Variant &src_height);
 Variant imagerotate(const Variant &image, const Variant &angle, const Variant &background_color);
 Variant imagesettile(const Variant &image, const Variant &tile);
 Variant imagesetbrush(const Variant &image, const Variant &brush);
@@ -32,17 +61,24 @@ Variant imagecreatefromxbm(const Variant &filename);
 Variant imagecreatefromwbmp(const Variant &filename);
 Variant imagecreatefromgd(const Variant &filename);
 Variant imagecreatefromgd2(const Variant &filename);
-Variant imagecreatefromgd2part(const Variant &filename, const Variant &x, const Variant &y, const Variant &width, const Variant &height);
+Variant imagecreatefromgd2part(
+    const Variant &filename, const Variant &x, const Variant &y, const Variant &width, const Variant &height);
 Variant imagecreatefrombmp(const Variant &filename);
 Variant imagecreatefromtga(const Variant &filename);
 Variant imagexbm(const Variant &image, const Variant &filename, const Variant &foreground_color = {});
 Variant imagegif(const Variant &image, const Variant &file = {});
-Variant imagepng(const Variant &image, const Variant &file = {}, const Variant &quality = -1, const Variant &filters = -1);
+Variant imagepng(const Variant &image,
+                 const Variant &file = {},
+                 const Variant &quality = -1,
+                 const Variant &filters = -1);
 Variant imagewebp(const Variant &image, const Variant &file = {}, const Variant &quality = -1);
 Variant imagejpeg(const Variant &image, const Variant &file = {}, const Variant &quality = -1);
 Variant imagewbmp(const Variant &image, const Variant &file = {}, const Variant &foreground_color = {});
 Variant imagegd(const Variant &image, const Variant &file = {});
-Variant imagegd2(const Variant &image, const Variant &file = {}, const Variant &chunk_size = 128, const Variant &mode = 1);
+Variant imagegd2(const Variant &image,
+                 const Variant &file = {},
+                 const Variant &chunk_size = 128,
+                 const Variant &mode = 1);
 Variant imagebmp(const Variant &image, const Variant &file = {}, const Variant &compressed = true);
 Variant imagedestroy(const Variant &image);
 Variant imagecolorallocate(const Variant &image, const Variant &red, const Variant &green, const Variant &blue);
@@ -53,47 +89,149 @@ Variant imagecolorclosesthwb(const Variant &image, const Variant &red, const Var
 Variant imagecolordeallocate(const Variant &image, const Variant &color);
 Variant imagecolorresolve(const Variant &image, const Variant &red, const Variant &green, const Variant &blue);
 Variant imagecolorexact(const Variant &image, const Variant &red, const Variant &green, const Variant &blue);
-Variant imagecolorset(const Variant &image, const Variant &color, const Variant &red, const Variant &green, const Variant &blue, const Variant &alpha = 0);
+Variant imagecolorset(const Variant &image,
+                      const Variant &color,
+                      const Variant &red,
+                      const Variant &green,
+                      const Variant &blue,
+                      const Variant &alpha = 0);
 Variant imagecolorsforindex(const Variant &image, const Variant &color);
 Variant imagegammacorrect(const Variant &image, const Variant &input_gamma, const Variant &output_gamma);
 Variant imagesetpixel(const Variant &image, const Variant &x, const Variant &y, const Variant &color);
-Variant imageline(const Variant &image, const Variant &x1, const Variant &y1, const Variant &x2, const Variant &y2, const Variant &color);
-Variant imagedashedline(const Variant &image, const Variant &x1, const Variant &y1, const Variant &x2, const Variant &y2, const Variant &color);
-Variant imagerectangle(const Variant &image, const Variant &x1, const Variant &y1, const Variant &x2, const Variant &y2, const Variant &color);
-Variant imagefilledrectangle(const Variant &image, const Variant &x1, const Variant &y1, const Variant &x2, const Variant &y2, const Variant &color);
-Variant imagearc(const Variant &image, const Variant &center_x, const Variant &center_y, const Variant &width, const Variant &height, const Variant &start_angle, const Variant &end_angle, const Variant &color);
-Variant imageellipse(const Variant &image, const Variant &center_x, const Variant &center_y, const Variant &width, const Variant &height, const Variant &color);
-Variant imagefilltoborder(const Variant &image, const Variant &x, const Variant &y, const Variant &border_color, const Variant &color);
+Variant imageline(const Variant &image,
+                  const Variant &x1,
+                  const Variant &y1,
+                  const Variant &x2,
+                  const Variant &y2,
+                  const Variant &color);
+Variant imagedashedline(const Variant &image,
+                        const Variant &x1,
+                        const Variant &y1,
+                        const Variant &x2,
+                        const Variant &y2,
+                        const Variant &color);
+Variant imagerectangle(const Variant &image,
+                       const Variant &x1,
+                       const Variant &y1,
+                       const Variant &x2,
+                       const Variant &y2,
+                       const Variant &color);
+Variant imagefilledrectangle(const Variant &image,
+                             const Variant &x1,
+                             const Variant &y1,
+                             const Variant &x2,
+                             const Variant &y2,
+                             const Variant &color);
+Variant imagearc(const Variant &image,
+                 const Variant &center_x,
+                 const Variant &center_y,
+                 const Variant &width,
+                 const Variant &height,
+                 const Variant &start_angle,
+                 const Variant &end_angle,
+                 const Variant &color);
+Variant imageellipse(const Variant &image,
+                     const Variant &center_x,
+                     const Variant &center_y,
+                     const Variant &width,
+                     const Variant &height,
+                     const Variant &color);
+Variant imagefilltoborder(
+    const Variant &image, const Variant &x, const Variant &y, const Variant &border_color, const Variant &color);
 Variant imagefill(const Variant &image, const Variant &x, const Variant &y, const Variant &color);
 Variant imagecolorstotal(const Variant &image);
 Variant imagecolortransparent(const Variant &image, const Variant &color = {});
 Variant imageinterlace(const Variant &image, const Variant &enable = {});
-Variant imagepolygon(const Variant &image, const Variant &points, const Variant &num_points_or_color, const Variant &color = {});
-Variant imageopenpolygon(const Variant &image, const Variant &points, const Variant &num_points_or_color, const Variant &color = {});
-Variant imagefilledpolygon(const Variant &image, const Variant &points, const Variant &num_points_or_color, const Variant &color = {});
+Variant imagepolygon(const Variant &image,
+                     const Variant &points,
+                     const Variant &num_points_or_color,
+                     const Variant &color = {});
+Variant imageopenpolygon(const Variant &image,
+                         const Variant &points,
+                         const Variant &num_points_or_color,
+                         const Variant &color = {});
+Variant imagefilledpolygon(const Variant &image,
+                           const Variant &points,
+                           const Variant &num_points_or_color,
+                           const Variant &color = {});
 Variant imagefontwidth(const Variant &font);
 Variant imagefontheight(const Variant &font);
-Variant imagechar(const Variant &image, const Variant &font, const Variant &x, const Variant &y, const Variant &_char, const Variant &color);
-Variant imagecharup(const Variant &image, const Variant &font, const Variant &x, const Variant &y, const Variant &_char, const Variant &color);
-Variant imagestring(const Variant &image, const Variant &font, const Variant &x, const Variant &y, const Variant &string, const Variant &color);
-Variant imagestringup(const Variant &image, const Variant &font, const Variant &x, const Variant &y, const Variant &string, const Variant &color);
-Variant imagecopy(const Variant &dst_image, const Variant &src_image, const Variant &dst_x, const Variant &dst_y, const Variant &src_x, const Variant &src_y, const Variant &src_width, const Variant &src_height);
-Variant imagecopymerge(const Variant &dst_image, const Variant &src_image, const Variant &dst_x, const Variant &dst_y, const Variant &src_x, const Variant &src_y, const Variant &src_width, const Variant &src_height, const Variant &pct);
-Variant imagecopymergegray(const Variant &dst_image, const Variant &src_image, const Variant &dst_x, const Variant &dst_y, const Variant &src_x, const Variant &src_y, const Variant &src_width, const Variant &src_height, const Variant &pct);
-Variant imagecopyresized(const Variant &dst_image, const Variant &src_image, const Variant &dst_x, const Variant &dst_y, const Variant &src_x, const Variant &src_y, const Variant &dst_width, const Variant &dst_height, const Variant &src_width, const Variant &src_height);
+Variant imagechar(const Variant &image,
+                  const Variant &font,
+                  const Variant &x,
+                  const Variant &y,
+                  const Variant &_char,
+                  const Variant &color);
+Variant imagecharup(const Variant &image,
+                    const Variant &font,
+                    const Variant &x,
+                    const Variant &y,
+                    const Variant &_char,
+                    const Variant &color);
+Variant imagestring(const Variant &image,
+                    const Variant &font,
+                    const Variant &x,
+                    const Variant &y,
+                    const Variant &string,
+                    const Variant &color);
+Variant imagestringup(const Variant &image,
+                      const Variant &font,
+                      const Variant &x,
+                      const Variant &y,
+                      const Variant &string,
+                      const Variant &color);
+Variant imagecopy(const Variant &dst_image,
+                  const Variant &src_image,
+                  const Variant &dst_x,
+                  const Variant &dst_y,
+                  const Variant &src_x,
+                  const Variant &src_y,
+                  const Variant &src_width,
+                  const Variant &src_height);
+Variant imagecopymerge(const Variant &dst_image,
+                       const Variant &src_image,
+                       const Variant &dst_x,
+                       const Variant &dst_y,
+                       const Variant &src_x,
+                       const Variant &src_y,
+                       const Variant &src_width,
+                       const Variant &src_height,
+                       const Variant &pct);
+Variant imagecopymergegray(const Variant &dst_image,
+                           const Variant &src_image,
+                           const Variant &dst_x,
+                           const Variant &dst_y,
+                           const Variant &src_x,
+                           const Variant &src_y,
+                           const Variant &src_width,
+                           const Variant &src_height,
+                           const Variant &pct);
+Variant imagecopyresized(const Variant &dst_image,
+                         const Variant &src_image,
+                         const Variant &dst_x,
+                         const Variant &dst_y,
+                         const Variant &src_x,
+                         const Variant &src_y,
+                         const Variant &dst_width,
+                         const Variant &dst_height,
+                         const Variant &src_width,
+                         const Variant &src_height);
 Variant imagesx(const Variant &image);
 Variant imagesy(const Variant &image);
 Variant imagesetclip(const Variant &image, const Variant &x1, const Variant &y1, const Variant &x2, const Variant &y2);
 Variant imagegetclip(const Variant &image);
 template <typename... Args>
-Variant imagefilter(const Variant &image, const Variant &filter, const Args&... args) {
-    return call("imagefilter", {image, filter, args...});
+Variant imagefilter(const Variant &image, const Variant &filter, const Args &...args) {
+    return call(LITERAL_STRING[595], {image, filter, args...});
 }
 Variant imageconvolution(const Variant &image, const Variant &matrix, const Variant &divisor, const Variant &offset);
 Variant imageflip(const Variant &image, const Variant &mode);
 Variant imageantialias(const Variant &image, const Variant &enable);
 Variant imagecrop(const Variant &image, const Variant &rectangle);
-Variant imagecropauto(const Variant &image, const Variant &mode = 0, const Variant &threshold = 0.5, const Variant &color = -1);
+Variant imagecropauto(const Variant &image,
+                      const Variant &mode = 0,
+                      const Variant &threshold = 0.5,
+                      const Variant &color = -1);
 Variant imagescale(const Variant &image, const Variant &width, const Variant &height = -1, const Variant &mode = 3);
 Variant imageaffine(const Variant &image, const Variant &affine, const Variant &clip = {});
 Variant imageaffinematrixget(const Variant &type, const Variant &options);
@@ -101,4 +239,4 @@ Variant imageaffinematrixconcat(const Variant &matrix1, const Variant &matrix2);
 Variant imagegetinterpolation(const Variant &image);
 Variant imagesetinterpolation(const Variant &image, const Variant &method = 3);
 Variant imageresolution(const Variant &image, const Variant &resolution_x = {}, const Variant &resolution_y = {});
-}
+}  // namespace php

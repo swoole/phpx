@@ -1,3 +1,6 @@
+#include "phpx.h"
+#include "phpx_literal_string.h"
+
 namespace php {
 Variant bcadd(const Variant &num1, const Variant &num2, const Variant &scale = {});
 Variant bcsub(const Variant &num1, const Variant &num2, const Variant &scale = {});
@@ -13,4 +16,4 @@ Variant bcscale(const Variant &scale = {});
 Variant bcfloor(const Variant &num);
 Variant bcceil(const Variant &num);
 Variant bcround(const Variant &num, const Variant &precision = 0, const Variant &mode = {});
-}
+}  // namespace php

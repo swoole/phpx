@@ -666,4 +666,4 @@ extern Variant CURL_PREREQFUNC_ABORT;
 extern Variant CURLOPT_MIME_OPTIONS;
 extern Variant CURLMIMEOPT_FORMESCAPE;
 extern Variant CURLOPT_SAFE_UPLOAD;
-}
+}  // namespace php

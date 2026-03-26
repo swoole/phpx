@@ -4,20 +4,9 @@
 namespace php {
 <?php foreach ($classes as $className => $info): ?>
 <?php foreach ($info['methods'] as $name => $minfo): ?>
-<?php if (!$minfo['variadic']): ?>
-<?=!$minfo['ctor'] ? 'Variant ' : '' ?><?=$className?>::<?=$name?>(<?=$minfo['args_impl']?>) {
-<?php if ($minfo['ctor']): ?>
-    this_ = newObject(<?=$info['class']?>, <?=$minfo['call']?>);
-<?php elseif ($minfo['static']): ?>
-    static Variant fn { ZEND_STRL("<?=$className?>::<?=$name?>"), true };
-    return fn(<?=$minfo['call']?>);
-<?php else: ?>
-    return this_.exec("<?=$minfo['name']?>", <?=$minfo['call']?>);
-<?php endif; // ctor ?>
-}
-<?php endif; // variadic  ?>
-
+<?php if (!$minfo['variadic']):?>
+<?=$minfo['impl_code']?>
+<?php endif;?>
 <?php endforeach; ?>
-
 <?php endforeach; ?>
 }

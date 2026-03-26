@@ -10,4 +10,4 @@ extern Variant FILEINFO_PRESERVE_ATIME;
 extern Variant FILEINFO_RAW;
 extern Variant FILEINFO_APPLE;
 extern Variant FILEINFO_EXTENSION;
-}
+}  // namespace php

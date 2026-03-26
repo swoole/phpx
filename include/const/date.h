@@ -16,4 +16,4 @@ extern Variant DATE_W3C;
 extern Variant SUNFUNCS_RET_TIMESTAMP;
 extern Variant SUNFUNCS_RET_STRING;
 extern Variant SUNFUNCS_RET_DOUBLE;
-}
+}  // namespace php

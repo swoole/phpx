@@ -1,6 +1,9 @@
+#include "phpx_literal_string.h"
+
 namespace php {
 class XMLReader {
     Object this_;
+
   public:
     Variant close();
     Variant getAttribute(const Variant &name);
@@ -19,7 +22,10 @@ class XMLReader {
     Variant next(const Variant &name = {});
     static Variant open(const Variant &uri, const Variant &encoding = {}, const Variant &flags = 0);
     static Variant fromUri(const Variant &uri, const Variant &encoding = {}, const Variant &flags = 0);
-    static Variant fromStream(const Variant &stream, const Variant &encoding = {}, const Variant &flags = 0, const Variant &document_uri = {});
+    static Variant fromStream(const Variant &stream,
+                              const Variant &encoding = {},
+                              const Variant &flags = 0,
+                              const Variant &document_uri = {});
     Variant readInnerXml();
     Variant readOuterXml();
     Variant readString();
@@ -32,4 +38,4 @@ class XMLReader {
     Variant expand(const Variant &base_node = {});
 };
 
-}
+}  // namespace php

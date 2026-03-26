@@ -1,6 +1,9 @@
+#include "phpx_literal_string.h"
+
 namespace php {
 class SessionHandler {
     Object this_;
+
   public:
     Variant open(const Variant &path, const Variant &name);
     Variant close();
@@ -11,4 +14,4 @@ class SessionHandler {
     Variant create_sid();
 };
 
-}
+}  // namespace php

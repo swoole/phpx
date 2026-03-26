@@ -1,6 +1,9 @@
+#include "phpx_literal_string.h"
+
 namespace php {
 class InternalIterator {
     Object this_;
+
   public:
     Variant current();
     Variant key();
@@ -11,6 +14,7 @@ class InternalIterator {
 
 class Exception {
     Object this_;
+
   public:
     Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -26,8 +30,14 @@ class Exception {
 
 class ErrorException {
     Object this_;
+
   public:
-    ErrorException(const Variant &message = "", const Variant &code = 0, const Variant &severity = 1, const Variant &filename = {}, const Variant &line = {}, const Variant &previous = {});
+    ErrorException(const Variant &message = "",
+                   const Variant &code = 0,
+                   const Variant &severity = 1,
+                   const Variant &filename = {},
+                   const Variant &line = {},
+                   const Variant &previous = {});
     Variant getSeverity();
     Variant __wakeup();
     Variant getMessage();
@@ -42,6 +52,7 @@ class ErrorException {
 
 class Error {
     Object this_;
+
   public:
     Error(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -57,6 +68,7 @@ class Error {
 
 class CompileError {
     Object this_;
+
   public:
     CompileError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -72,6 +84,7 @@ class CompileError {
 
 class ParseError {
     Object this_;
+
   public:
     ParseError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -87,6 +100,7 @@ class ParseError {
 
 class TypeError {
     Object this_;
+
   public:
     TypeError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -102,6 +116,7 @@ class TypeError {
 
 class ArgumentCountError {
     Object this_;
+
   public:
     ArgumentCountError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -117,6 +132,7 @@ class ArgumentCountError {
 
 class ValueError {
     Object this_;
+
   public:
     ValueError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -132,6 +148,7 @@ class ValueError {
 
 class ArithmeticError {
     Object this_;
+
   public:
     ArithmeticError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -147,6 +164,7 @@ class ArithmeticError {
 
 class DivisionByZeroError {
     Object this_;
+
   public:
     DivisionByZeroError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -162,6 +180,7 @@ class DivisionByZeroError {
 
 class UnhandledMatchError {
     Object this_;
+
   public:
     UnhandledMatchError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -177,6 +196,7 @@ class UnhandledMatchError {
 
 class RequestParseBodyException {
     Object this_;
+
   public:
     RequestParseBodyException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -192,12 +212,13 @@ class RequestParseBodyException {
 
 class Closure {
     Object this_;
+
   public:
     static Variant bind(const Variant &closure, const Variant &new_this, const Variant &new_scope = "static");
     Variant bindTo(const Variant &new_this, const Variant &new_scope = "static");
     template <typename... Args>
-    Variant call(const Variant &new_this, const Args&... args) {
-        return call("call", {new_this, args...});
+    Variant call(const Variant &new_this, const Args &...args) {
+        return this_.exec(LITERAL_STRING[119], {new_this, args...});
     }
     static Variant fromCallable(const Variant &callback);
     Variant __invoke();
@@ -205,6 +226,7 @@ class Closure {
 
 class Generator {
     Object this_;
+
   public:
     Variant rewind();
     Variant valid();
@@ -219,6 +241,7 @@ class Generator {
 
 class ClosedGeneratorException {
     Object this_;
+
   public:
     ClosedGeneratorException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -234,6 +257,7 @@ class ClosedGeneratorException {
 
 class WeakReference {
     Object this_;
+
   public:
     WeakReference();
     static Variant create(const Variant &object);
@@ -242,6 +266,7 @@ class WeakReference {
 
 class WeakMap {
     Object this_;
+
   public:
     Variant offsetGet(const Variant &object);
     Variant offsetSet(const Variant &object, const Variant &value);
@@ -253,30 +278,35 @@ class WeakMap {
 
 class Attribute {
     Object this_;
+
   public:
     Attribute(const Variant &flags = 63);
 };
 
 class ReturnTypeWillChange {
     Object this_;
+
   public:
     ReturnTypeWillChange();
 };
 
 class AllowDynamicProperties {
     Object this_;
+
   public:
     AllowDynamicProperties();
 };
 
 class SensitiveParameter {
     Object this_;
+
   public:
     SensitiveParameter();
 };
 
 class SensitiveParameterValue {
     Object this_;
+
   public:
     SensitiveParameterValue(const Variant &value);
     Variant getValue();
@@ -285,23 +315,26 @@ class SensitiveParameterValue {
 
 class Override {
     Object this_;
+
   public:
     Override();
 };
 
 class Deprecated {
     Object this_;
+
   public:
     Deprecated(const Variant &message = {}, const Variant &since = {});
 };
 
 class Fiber {
     Object this_;
+
   public:
     Fiber(const Variant &callback);
     template <typename... Args>
-    Variant start(const Args&... args) {
-        return call("start", {args...});
+    Variant start(const Args &...args) {
+        return this_.exec(LITERAL_STRING[148], {args...});
     }
     Variant resume(const Variant &value = {});
     Variant _throw(const Variant &exception);
@@ -316,6 +349,7 @@ class Fiber {
 
 class FiberError {
     Object this_;
+
   public:
     FiberError();
     Variant __wakeup();
@@ -329,4 +363,4 @@ class FiberError {
     Variant __toString();
 };
 
-}
+}  // namespace php

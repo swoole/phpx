@@ -88,4 +88,4 @@ extern Variant PNG_FILTER_UP;
 extern Variant PNG_FILTER_AVG;
 extern Variant PNG_FILTER_PAETH;
 extern Variant PNG_ALL_FILTERS;
-}
+}  // namespace php

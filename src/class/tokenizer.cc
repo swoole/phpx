@@ -3,29 +3,21 @@
 
 namespace php {
 Variant PhpToken::tokenize(const Variant &code, const Variant &flags) {
-    static Variant fn { ZEND_STRL("PhpToken::tokenize"), true };
-    return fn({code, flags});
+    return php::call(LITERAL_STRING[2355], {code, flags});
 }
-
 PhpToken::PhpToken(const Variant &id, const Variant &text, const Variant &line, const Variant &pos) {
-    this_ = newObject("PhpToken", {id, text, line, pos});
+    this_ = newObject(LITERAL_STRING[2356], {id, text, line, pos});
 }
-
 Variant PhpToken::is(const Variant &kind) {
-    return this_.exec("is", {kind});
+    return this_.exec(LITERAL_STRING[2357], {kind});
 }
-
 Variant PhpToken::isIgnorable() {
-    return this_.exec("isIgnorable", {});
+    return this_.exec(LITERAL_STRING[2358], {});
 }
-
 Variant PhpToken::getTokenName() {
-    return this_.exec("getTokenName", {});
+    return this_.exec(LITERAL_STRING[2359], {});
 }
-
 Variant PhpToken::__toString() {
-    return this_.exec("__toString", {});
+    return this_.exec(LITERAL_STRING[29], {});
 }
-
-
-}
+}  // namespace php

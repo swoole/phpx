@@ -11,4 +11,4 @@ extern Variant SQLITE3_OPEN_READONLY;
 extern Variant SQLITE3_OPEN_READWRITE;
 extern Variant SQLITE3_OPEN_CREATE;
 extern Variant SQLITE3_DETERMINISTIC;
-}
+}  // namespace php

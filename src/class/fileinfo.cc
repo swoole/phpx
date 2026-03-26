@@ -3,20 +3,15 @@
 
 namespace php {
 finfo::finfo(const Variant &flags, const Variant &magic_database) {
-    this_ = newObject("finfo", {flags, magic_database});
+    this_ = newObject(LITERAL_STRING[498], {flags, magic_database});
 }
-
 Variant finfo::file(const Variant &filename, const Variant &flags, const Variant &context) {
-    return this_.exec("file", {filename, flags, context});
+    return this_.exec(LITERAL_STRING[499], {filename, flags, context});
 }
-
 Variant finfo::buffer(const Variant &string, const Variant &flags, const Variant &context) {
-    return this_.exec("buffer", {string, flags, context});
+    return this_.exec(LITERAL_STRING[500], {string, flags, context});
 }
-
 Variant finfo::set_flags(const Variant &flags) {
-    return this_.exec("set_flags", {flags});
+    return this_.exec(LITERAL_STRING[501], {flags});
 }
-
-
-}
+}  // namespace php

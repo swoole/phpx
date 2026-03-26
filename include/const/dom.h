@@ -60,4 +60,4 @@ extern Variant Dom_INVALID_MODIFICATION_ERR;
 extern Variant Dom_NAMESPACE_ERR;
 extern Variant Dom_VALIDATION_ERR;
 extern Variant Dom_HTML_NO_DEFAULT_NS;
-}
+}  // namespace php

@@ -1,3 +1,6 @@
+#include "phpx.h"
+#include "phpx_literal_string.h"
+
 namespace php {
 Variant set_time_limit(const Variant &seconds);
 Variant header_register_callback(const Variant &callback);
@@ -21,8 +24,8 @@ Variant stream_register_wrapper(const Variant &protocol, const Variant &_class, 
 Variant stream_wrapper_unregister(const Variant &protocol);
 Variant stream_wrapper_restore(const Variant &protocol);
 template <typename... Args>
-Variant array_push(const Reference &array, const Args&... values) {
-    return call("array_push", {&array, values...});
+Variant array_push(const Reference &array, const Args &...values) {
+    return call(LITERAL_STRING[1873], {&array, values...});
 }
 Variant krsort(const Reference &array, const Variant &flags = 0);
 Variant ksort(const Reference &array, const Variant &flags = 0);
@@ -44,12 +47,12 @@ Variant current(const Variant &array);
 Variant pos(const Variant &array);
 Variant key(const Variant &array);
 template <typename... Args>
-Variant min(const Variant &value, const Args&... values) {
-    return call("min", {value, values...});
+Variant min(const Variant &value, const Args &...values) {
+    return call(LITERAL_STRING[1880], {value, values...});
 }
 template <typename... Args>
-Variant max(const Variant &value, const Args&... values) {
-    return call("max", {value, values...});
+Variant max(const Variant &value, const Args &...values) {
+    return call(LITERAL_STRING[1881], {value, values...});
 }
 Variant array_walk(const Reference &array, const Variant &callback, const Variant &arg = {});
 Variant array_walk_recursive(const Reference &array, const Variant &callback, const Variant &arg = {});
@@ -57,8 +60,8 @@ Variant in_array(const Variant &needle, const Variant &haystack, const Variant &
 Variant array_search(const Variant &needle, const Variant &haystack, const Variant &strict = false);
 Variant extract(const Reference &array, const Variant &flags = 0, const Variant &prefix = "");
 template <typename... Args>
-Variant compact(const Variant &var_name, const Args&... var_names) {
-    return call("compact", {var_name, var_names...});
+Variant compact(const Variant &var_name, const Args &...var_names) {
+    return call(LITERAL_STRING[1886], {var_name, var_names...});
 }
 Variant array_fill(const Variant &start_index, const Variant &count, const Variant &value);
 Variant array_fill_keys(const Variant &keys, const Variant &value);
@@ -67,26 +70,32 @@ Variant shuffle(const Reference &array);
 Variant array_pop(const Reference &array);
 Variant array_shift(const Reference &array);
 template <typename... Args>
-Variant array_unshift(const Reference &array, const Args&... values) {
-    return call("array_unshift", {&array, values...});
+Variant array_unshift(const Reference &array, const Args &...values) {
+    return call(LITERAL_STRING[1893], {&array, values...});
 }
-Variant array_splice(const Reference &array, const Variant &offset, const Variant &length = {}, const Variant &replacement = Array{});
-Variant array_slice(const Variant &array, const Variant &offset, const Variant &length = {}, const Variant &preserve_keys = false);
+Variant array_splice(const Reference &array,
+                     const Variant &offset,
+                     const Variant &length = {},
+                     const Variant &replacement = Array{});
+Variant array_slice(const Variant &array,
+                    const Variant &offset,
+                    const Variant &length = {},
+                    const Variant &preserve_keys = false);
 template <typename... Args>
-Variant array_merge(const Args&... arrays) {
-    return call("array_merge", {arrays...});
-}
-template <typename... Args>
-Variant array_merge_recursive(const Args&... arrays) {
-    return call("array_merge_recursive", {arrays...});
-}
-template <typename... Args>
-Variant array_replace(const Variant &array, const Args&... replacements) {
-    return call("array_replace", {array, replacements...});
+Variant array_merge(const Args &...arrays) {
+    return call(LITERAL_STRING[1896], {arrays...});
 }
 template <typename... Args>
-Variant array_replace_recursive(const Variant &array, const Args&... replacements) {
-    return call("array_replace_recursive", {array, replacements...});
+Variant array_merge_recursive(const Args &...arrays) {
+    return call(LITERAL_STRING[1897], {arrays...});
+}
+template <typename... Args>
+Variant array_replace(const Variant &array, const Args &...replacements) {
+    return call(LITERAL_STRING[1898], {array, replacements...});
+}
+template <typename... Args>
+Variant array_replace_recursive(const Variant &array, const Args &...replacements) {
+    return call(LITERAL_STRING[1899], {array, replacements...});
 }
 Variant array_keys(const Variant &array, const Variant &filter_value = {}, const Variant &strict = false);
 Variant array_key_first(const Variant &array);
@@ -100,72 +109,72 @@ Variant array_flip(const Variant &array);
 Variant array_change_key_case(const Variant &array, const Variant &_case = 0);
 Variant array_unique(const Variant &array, const Variant &flags = 2);
 template <typename... Args>
-Variant array_intersect_key(const Variant &array, const Args&... arrays) {
-    return call("array_intersect_key", {array, arrays...});
+Variant array_intersect_key(const Variant &array, const Args &...arrays) {
+    return call(LITERAL_STRING[1911], {array, arrays...});
 }
 template <typename... Args>
-Variant array_intersect_ukey(const Variant &array, const Args&... rest) {
-    return call("array_intersect_ukey", {array, rest...});
+Variant array_intersect_ukey(const Variant &array, const Args &...rest) {
+    return call(LITERAL_STRING[1912], {array, rest...});
 }
 template <typename... Args>
-Variant array_intersect(const Variant &array, const Args&... arrays) {
-    return call("array_intersect", {array, arrays...});
+Variant array_intersect(const Variant &array, const Args &...arrays) {
+    return call(LITERAL_STRING[1913], {array, arrays...});
 }
 template <typename... Args>
-Variant array_uintersect(const Variant &array, const Args&... rest) {
-    return call("array_uintersect", {array, rest...});
+Variant array_uintersect(const Variant &array, const Args &...rest) {
+    return call(LITERAL_STRING[1914], {array, rest...});
 }
 template <typename... Args>
-Variant array_intersect_assoc(const Variant &array, const Args&... arrays) {
-    return call("array_intersect_assoc", {array, arrays...});
+Variant array_intersect_assoc(const Variant &array, const Args &...arrays) {
+    return call(LITERAL_STRING[1915], {array, arrays...});
 }
 template <typename... Args>
-Variant array_uintersect_assoc(const Variant &array, const Args&... rest) {
-    return call("array_uintersect_assoc", {array, rest...});
+Variant array_uintersect_assoc(const Variant &array, const Args &...rest) {
+    return call(LITERAL_STRING[1916], {array, rest...});
 }
 template <typename... Args>
-Variant array_intersect_uassoc(const Variant &array, const Args&... rest) {
-    return call("array_intersect_uassoc", {array, rest...});
+Variant array_intersect_uassoc(const Variant &array, const Args &...rest) {
+    return call(LITERAL_STRING[1917], {array, rest...});
 }
 template <typename... Args>
-Variant array_uintersect_uassoc(const Variant &array, const Args&... rest) {
-    return call("array_uintersect_uassoc", {array, rest...});
+Variant array_uintersect_uassoc(const Variant &array, const Args &...rest) {
+    return call(LITERAL_STRING[1918], {array, rest...});
 }
 template <typename... Args>
-Variant array_diff_key(const Variant &array, const Args&... arrays) {
-    return call("array_diff_key", {array, arrays...});
+Variant array_diff_key(const Variant &array, const Args &...arrays) {
+    return call(LITERAL_STRING[1919], {array, arrays...});
 }
 template <typename... Args>
-Variant array_diff_ukey(const Variant &array, const Args&... rest) {
-    return call("array_diff_ukey", {array, rest...});
+Variant array_diff_ukey(const Variant &array, const Args &...rest) {
+    return call(LITERAL_STRING[1920], {array, rest...});
 }
 template <typename... Args>
-Variant array_diff(const Variant &array, const Args&... arrays) {
-    return call("array_diff", {array, arrays...});
+Variant array_diff(const Variant &array, const Args &...arrays) {
+    return call(LITERAL_STRING[1921], {array, arrays...});
 }
 template <typename... Args>
-Variant array_udiff(const Variant &array, const Args&... rest) {
-    return call("array_udiff", {array, rest...});
+Variant array_udiff(const Variant &array, const Args &...rest) {
+    return call(LITERAL_STRING[1922], {array, rest...});
 }
 template <typename... Args>
-Variant array_diff_assoc(const Variant &array, const Args&... arrays) {
-    return call("array_diff_assoc", {array, arrays...});
+Variant array_diff_assoc(const Variant &array, const Args &...arrays) {
+    return call(LITERAL_STRING[1923], {array, arrays...});
 }
 template <typename... Args>
-Variant array_diff_uassoc(const Variant &array, const Args&... rest) {
-    return call("array_diff_uassoc", {array, rest...});
+Variant array_diff_uassoc(const Variant &array, const Args &...rest) {
+    return call(LITERAL_STRING[1924], {array, rest...});
 }
 template <typename... Args>
-Variant array_udiff_assoc(const Variant &array, const Args&... rest) {
-    return call("array_udiff_assoc", {array, rest...});
+Variant array_udiff_assoc(const Variant &array, const Args &...rest) {
+    return call(LITERAL_STRING[1925], {array, rest...});
 }
 template <typename... Args>
-Variant array_udiff_uassoc(const Variant &array, const Args&... rest) {
-    return call("array_udiff_uassoc", {array, rest...});
+Variant array_udiff_uassoc(const Variant &array, const Args &...rest) {
+    return call(LITERAL_STRING[1926], {array, rest...});
 }
 template <typename... Args>
-Variant array_multisort(const Reference &array, const Args&... rest) {
-    return call("array_multisort", {&array, rest...});
+Variant array_multisort(const Reference &array, const Args &...rest) {
+    return call(LITERAL_STRING[1927], {&array, rest...});
 }
 Variant array_rand(const Variant &array, const Variant &num = 1);
 Variant array_sum(const Variant &array);
@@ -177,8 +186,8 @@ Variant array_find_key(const Variant &array, const Variant &callback);
 Variant array_any(const Variant &array, const Variant &callback);
 Variant array_all(const Variant &array, const Variant &callback);
 template <typename... Args>
-Variant array_map(const Variant &callback, const Variant &array, const Args&... arrays) {
-    return call("array_map", {callback, array, arrays...});
+Variant array_map(const Variant &callback, const Variant &array, const Args &...arrays) {
+    return call(LITERAL_STRING[1937], {callback, array, arrays...});
 }
 Variant array_key_exists(const Variant &key, const Variant &array);
 Variant key_exists(const Variant &key, const Variant &array);
@@ -199,22 +208,25 @@ Variant time_nanosleep(const Variant &seconds, const Variant &nanoseconds);
 Variant time_sleep_until(const Variant &timestamp);
 Variant get_current_user();
 Variant get_cfg_var(const Variant &option);
-Variant error_log(const Variant &message, const Variant &message_type = 0, const Variant &destination = {}, const Variant &additional_headers = {});
+Variant error_log(const Variant &message,
+                  const Variant &message_type = 0,
+                  const Variant &destination = {},
+                  const Variant &additional_headers = {});
 Variant error_get_last();
 Variant error_clear_last();
 template <typename... Args>
-Variant call_user_func(const Variant &callback, const Args&... args) {
-    return call("call_user_func", {callback, args...});
+Variant call_user_func(const Variant &callback, const Args &...args) {
+    return call(LITERAL_STRING[1960], {callback, args...});
 }
 Variant call_user_func_array(const Variant &callback, const Variant &args);
 template <typename... Args>
-Variant forward_static_call(const Variant &callback, const Args&... args) {
-    return call("forward_static_call", {callback, args...});
+Variant forward_static_call(const Variant &callback, const Args &...args) {
+    return call(LITERAL_STRING[1962], {callback, args...});
 }
 Variant forward_static_call_array(const Variant &callback, const Variant &args);
 template <typename... Args>
-Variant register_shutdown_function(const Variant &callback, const Args&... args) {
-    return call("register_shutdown_function", {callback, args...});
+Variant register_shutdown_function(const Variant &callback, const Args &...args) {
+    return call(LITERAL_STRING[1964], {callback, args...});
 }
 Variant highlight_file(const Variant &filename, const Variant &_return = false);
 Variant show_source(const Variant &filename, const Variant &_return = false);
@@ -237,14 +249,18 @@ Variant getservbyport(const Variant &port, const Variant &protocol);
 Variant getprotobyname(const Variant &protocol);
 Variant getprotobynumber(const Variant &protocol);
 template <typename... Args>
-Variant register_tick_function(const Variant &callback, const Args&... args) {
-    return call("register_tick_function", {callback, args...});
+Variant register_tick_function(const Variant &callback, const Args &...args) {
+    return call(LITERAL_STRING[1985], {callback, args...});
 }
 Variant unregister_tick_function(const Variant &callback);
 Variant is_uploaded_file(const Variant &filename);
 Variant move_uploaded_file(const Variant &from, const Variant &to);
-Variant parse_ini_file(const Variant &filename, const Variant &process_sections = false, const Variant &scanner_mode = 0);
-Variant parse_ini_string(const Variant &ini_string, const Variant &process_sections = false, const Variant &scanner_mode = 0);
+Variant parse_ini_file(const Variant &filename,
+                       const Variant &process_sections = false,
+                       const Variant &scanner_mode = 0);
+Variant parse_ini_string(const Variant &ini_string,
+                         const Variant &process_sections = false,
+                         const Variant &scanner_mode = 0);
 Variant config_get_hash();
 Variant sys_getloadavg();
 Variant get_browser(const Variant &user_agent = {}, const Variant &return_array = false);
@@ -257,7 +273,11 @@ Variant gethostbyname(const Variant &hostname);
 Variant gethostbynamel(const Variant &hostname);
 Variant dns_check_record(const Variant &hostname, const Variant &type = "MX");
 Variant checkdnsrr(const Variant &hostname, const Variant &type = "MX");
-Variant dns_get_record(const Variant &hostname, const Variant &type = 268435456, const Reference &authoritative_name_servers = {}, const Reference &additional_records = {}, const Variant &raw = false);
+Variant dns_get_record(const Variant &hostname,
+                       const Variant &type = 268435456,
+                       const Reference &authoritative_name_servers = {},
+                       const Reference &additional_records = {},
+                       const Variant &raw = false);
 Variant dns_get_mx(const Variant &hostname, const Reference &hosts, const Reference &weights = {});
 Variant getmxrr(const Variant &hostname, const Reference &hosts, const Reference &weights = {});
 Variant net_get_interfaces();
@@ -280,28 +300,54 @@ Variant inet_pton(const Variant &ip);
 Variant metaphone(const Variant &string, const Variant &max_phonemes = 0);
 Variant header(const Variant &header, const Variant &replace = true, const Variant &response_code = 0);
 Variant header_remove(const Variant &name = {});
-Variant setrawcookie(const Variant &name, const Variant &value = "", const Variant &expires_or_options = 0, const Variant &path = "", const Variant &domain = "", const Variant &secure = false, const Variant &httponly = false);
-Variant setcookie(const Variant &name, const Variant &value = "", const Variant &expires_or_options = 0, const Variant &path = "", const Variant &domain = "", const Variant &secure = false, const Variant &httponly = false);
+Variant setrawcookie(const Variant &name,
+                     const Variant &value = "",
+                     const Variant &expires_or_options = 0,
+                     const Variant &path = "",
+                     const Variant &domain = "",
+                     const Variant &secure = false,
+                     const Variant &httponly = false);
+Variant setcookie(const Variant &name,
+                  const Variant &value = "",
+                  const Variant &expires_or_options = 0,
+                  const Variant &path = "",
+                  const Variant &domain = "",
+                  const Variant &secure = false,
+                  const Variant &httponly = false);
 Variant http_response_code(const Variant &response_code = 0);
 Variant headers_sent(const Reference &filename = {}, const Reference &line = {});
 Variant headers_list();
-Variant htmlspecialchars(const Variant &string, const Variant &flags = 11, const Variant &encoding = {}, const Variant &double_encode = true);
+Variant htmlspecialchars(const Variant &string,
+                         const Variant &flags = 11,
+                         const Variant &encoding = {},
+                         const Variant &double_encode = true);
 Variant htmlspecialchars_decode(const Variant &string, const Variant &flags = 11);
 Variant html_entity_decode(const Variant &string, const Variant &flags = 11, const Variant &encoding = {});
-Variant htmlentities(const Variant &string, const Variant &flags = 11, const Variant &encoding = {}, const Variant &double_encode = true);
-Variant get_html_translation_table(const Variant &table = 0, const Variant &flags = 11, const Variant &encoding = "UTF-8");
+Variant htmlentities(const Variant &string,
+                     const Variant &flags = 11,
+                     const Variant &encoding = {},
+                     const Variant &double_encode = true);
+Variant get_html_translation_table(const Variant &table = 0,
+                                   const Variant &flags = 11,
+                                   const Variant &encoding = "UTF-8");
 Variant assert_options(const Variant &option, const Variant &value = {});
 Variant bin2hex(const Variant &string);
 Variant hex2bin(const Variant &string);
 Variant strspn(const Variant &string, const Variant &characters, const Variant &offset = 0, const Variant &length = {});
-Variant strcspn(const Variant &string, const Variant &characters, const Variant &offset = 0, const Variant &length = {});
+Variant strcspn(const Variant &string,
+                const Variant &characters,
+                const Variant &offset = 0,
+                const Variant &length = {});
 Variant nl_langinfo(const Variant &item);
 Variant strcoll(const Variant &string1, const Variant &string2);
-Variant trim(const Variant &string, const Variant &characters = " \n\r\t\v\x00");
-Variant rtrim(const Variant &string, const Variant &characters = " \n\r\t\v\x00");
-Variant chop(const Variant &string, const Variant &characters = " \n\r\t\v\x00");
-Variant ltrim(const Variant &string, const Variant &characters = " \n\r\t\v\x00");
-Variant wordwrap(const Variant &string, const Variant &width = 75, const Variant &_break = "\n", const Variant &cut_long_words = false);
+Variant trim(const Variant &string, const Variant &characters = " \n\r\t\v\000");
+Variant rtrim(const Variant &string, const Variant &characters = " \n\r\t\v\000");
+Variant chop(const Variant &string, const Variant &characters = " \n\r\t\v\000");
+Variant ltrim(const Variant &string, const Variant &characters = " \n\r\t\v\000");
+Variant wordwrap(const Variant &string,
+                 const Variant &width = 75,
+                 const Variant &_break = "\n",
+                 const Variant &cut_long_words = false);
 Variant explode(const Variant &separator, const Variant &string, const Variant &limit = LONG_MAX);
 Variant implode(const Variant &separator, const Variant &array = {});
 Variant join(const Variant &separator, const Variant &array = {});
@@ -326,13 +372,16 @@ Variant str_starts_with(const Variant &haystack, const Variant &needle);
 Variant str_ends_with(const Variant &haystack, const Variant &needle);
 Variant chunk_split(const Variant &string, const Variant &length = 76, const Variant &separator = "\r\n");
 Variant substr(const Variant &string, const Variant &offset, const Variant &length = {});
-Variant substr_replace(const Variant &string, const Variant &replace, const Variant &offset, const Variant &length = {});
+Variant substr_replace(const Variant &string,
+                       const Variant &replace,
+                       const Variant &offset,
+                       const Variant &length = {});
 Variant quotemeta(const Variant &string);
 Variant ord(const Variant &character);
 Variant chr(const Variant &codepoint);
 Variant ucfirst(const Variant &string);
 Variant lcfirst(const Variant &string);
-Variant ucwords(const Variant &string, const Variant &separators = " \t\r\n\v");
+Variant ucwords(const Variant &string, const Variant &separators = " \t\r\n\f\v");
 Variant strtr(const Variant &string, const Variant &from, const Variant &to = {});
 Variant strrev(const Variant &string);
 Variant similar_text(const Variant &string1, const Variant &string2, const Reference &percent = {});
@@ -341,31 +390,47 @@ Variant addslashes(const Variant &string);
 Variant stripcslashes(const Variant &string);
 Variant stripslashes(const Variant &string);
 Variant str_replace(const Variant &search, const Variant &replace, const Variant &subject, const Reference &count = {});
-Variant str_ireplace(const Variant &search, const Variant &replace, const Variant &subject, const Reference &count = {});
+Variant str_ireplace(const Variant &search,
+                     const Variant &replace,
+                     const Variant &subject,
+                     const Reference &count = {});
 Variant hebrev(const Variant &string, const Variant &max_chars_per_line = 0);
 Variant nl2br(const Variant &string, const Variant &use_xhtml = true);
 Variant strip_tags(const Variant &string, const Variant &allowed_tags = {});
 template <typename... Args>
-Variant setlocale(const Variant &category, const Variant &locales, const Args&... rest) {
-    return call("setlocale", {category, locales, rest...});
+Variant setlocale(const Variant &category, const Variant &locales, const Args &...rest) {
+    return call(LITERAL_STRING[2090], {category, locales, rest...});
 }
 Variant parse_str(const Variant &string, const Reference &result);
-Variant str_getcsv(const Variant &string, const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\");
+Variant str_getcsv(const Variant &string,
+                   const Variant &separator = ",",
+                   const Variant &enclosure = "\"",
+                   const Variant &escape = "\\");
 Variant str_repeat(const Variant &string, const Variant &times);
 Variant count_chars(const Variant &string, const Variant &mode = 0);
 Variant localeconv();
-Variant substr_count(const Variant &haystack, const Variant &needle, const Variant &offset = 0, const Variant &length = {});
-Variant str_pad(const Variant &string, const Variant &length, const Variant &pad_string = " ", const Variant &pad_type = 1);
+Variant substr_count(const Variant &haystack,
+                     const Variant &needle,
+                     const Variant &offset = 0,
+                     const Variant &length = {});
+Variant str_pad(const Variant &string,
+                const Variant &length,
+                const Variant &pad_string = " ",
+                const Variant &pad_type = 1);
 template <typename... Args>
-Variant sscanf(const Variant &string, const Variant &format, const Args&... vars) {
-    return call("sscanf", {string, format, vars...});
+Variant sscanf(const Variant &string, const Variant &format, const Args &...vars) {
+    return call(LITERAL_STRING[2098], {string, format, vars...});
 }
 Variant str_rot13(const Variant &string);
 Variant str_shuffle(const Variant &string);
 Variant str_word_count(const Variant &string, const Variant &format = 0, const Variant &characters = {});
 Variant str_split(const Variant &string, const Variant &length = 1);
 Variant strpbrk(const Variant &string, const Variant &characters);
-Variant substr_compare(const Variant &haystack, const Variant &needle, const Variant &offset, const Variant &length = {}, const Variant &case_insensitive = false);
+Variant substr_compare(const Variant &haystack,
+                       const Variant &needle,
+                       const Variant &offset,
+                       const Variant &length = {},
+                       const Variant &case_insensitive = false);
 Variant utf8_encode(const Variant &string);
 Variant utf8_decode(const Variant &string);
 Variant opendir(const Variant &directory, const Variant &context = {});
@@ -397,10 +462,13 @@ Variant feof(const Variant &stream);
 Variant fgetc(const Variant &stream);
 Variant fgets(const Variant &stream, const Variant &length = {});
 Variant fread(const Variant &stream, const Variant &length);
-Variant fopen(const Variant &filename, const Variant &mode, const Variant &use_include_path = false, const Variant &context = {});
+Variant fopen(const Variant &filename,
+              const Variant &mode,
+              const Variant &use_include_path = false,
+              const Variant &context = {});
 template <typename... Args>
-Variant fscanf(const Variant &stream, const Variant &format, const Args&... vars) {
-    return call("fscanf", {stream, format, vars...});
+Variant fscanf(const Variant &stream, const Variant &format, const Args &...vars) {
+    return call(LITERAL_STRING[1775], {stream, format, vars...});
 }
 Variant fpassthru(const Variant &stream);
 Variant ftruncate(const Variant &stream, const Variant &size);
@@ -412,17 +480,36 @@ Variant fsync(const Variant &stream);
 Variant fdatasync(const Variant &stream);
 Variant fwrite(const Variant &stream, const Variant &data, const Variant &length = {});
 Variant fputs(const Variant &stream, const Variant &data, const Variant &length = {});
-Variant mkdir(const Variant &directory, const Variant &permissions = 511, const Variant &recursive = false, const Variant &context = {});
+Variant mkdir(const Variant &directory,
+              const Variant &permissions = 511,
+              const Variant &recursive = false,
+              const Variant &context = {});
 Variant rename(const Variant &from, const Variant &to, const Variant &context = {});
 Variant copy(const Variant &from, const Variant &to, const Variant &context = {});
 Variant tempnam(const Variant &directory, const Variant &prefix);
 Variant tmpfile();
 Variant file(const Variant &filename, const Variant &flags = 0, const Variant &context = {});
-Variant file_get_contents(const Variant &filename, const Variant &use_include_path = false, const Variant &context = {}, const Variant &offset = 0, const Variant &length = {});
+Variant file_get_contents(const Variant &filename,
+                          const Variant &use_include_path = false,
+                          const Variant &context = {},
+                          const Variant &offset = 0,
+                          const Variant &length = {});
 Variant unlink(const Variant &filename, const Variant &context = {});
-Variant file_put_contents(const Variant &filename, const Variant &data, const Variant &flags = 0, const Variant &context = {});
-Variant fputcsv(const Variant &stream, const Variant &fields, const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\", const Variant &eol = "\n");
-Variant fgetcsv(const Variant &stream, const Variant &length = {}, const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\");
+Variant file_put_contents(const Variant &filename,
+                          const Variant &data,
+                          const Variant &flags = 0,
+                          const Variant &context = {});
+Variant fputcsv(const Variant &stream,
+                const Variant &fields,
+                const Variant &separator = ",",
+                const Variant &enclosure = "\"",
+                const Variant &escape = "\\",
+                const Variant &eol = "\n");
+Variant fgetcsv(const Variant &stream,
+                const Variant &length = {},
+                const Variant &separator = ",",
+                const Variant &enclosure = "\"",
+                const Variant &escape = "\\");
 Variant realpath(const Variant &path);
 Variant fnmatch(const Variant &pattern, const Variant &filename, const Variant &flags = 0);
 Variant sys_get_temp_dir();
@@ -458,23 +545,34 @@ Variant diskfreespace(const Variant &directory);
 Variant realpath_cache_get();
 Variant realpath_cache_size();
 template <typename... Args>
-Variant sprintf(const Variant &format, const Args&... values) {
-    return call("sprintf", {format, values...});
+Variant sprintf(const Variant &format, const Args &...values) {
+    return call(LITERAL_STRING[2170], {format, values...});
 }
 template <typename... Args>
-Variant printf(const Variant &format, const Args&... values) {
-    return call("printf", {format, values...});
+Variant printf(const Variant &format, const Args &...values) {
+    return call(LITERAL_STRING[2171], {format, values...});
 }
 Variant vprintf(const Variant &format, const Variant &values);
 Variant vsprintf(const Variant &format, const Variant &values);
 template <typename... Args>
-Variant fprintf(const Variant &stream, const Variant &format, const Args&... values) {
-    return call("fprintf", {stream, format, values...});
+Variant fprintf(const Variant &stream, const Variant &format, const Args &...values) {
+    return call(LITERAL_STRING[2174], {stream, format, values...});
 }
 Variant vfprintf(const Variant &stream, const Variant &format, const Variant &values);
-Variant fsockopen(const Variant &hostname, const Variant &port = -1, const Reference &error_code = {}, const Reference &error_message = {}, const Variant &timeout = {});
-Variant pfsockopen(const Variant &hostname, const Variant &port = -1, const Reference &error_code = {}, const Reference &error_message = {}, const Variant &timeout = {});
-Variant http_build_query(const Variant &data, const Variant &numeric_prefix = "", const Variant &arg_separator = {}, const Variant &encoding_type = 1);
+Variant fsockopen(const Variant &hostname,
+                  const Variant &port = -1,
+                  const Reference &error_code = {},
+                  const Reference &error_message = {},
+                  const Variant &timeout = {});
+Variant pfsockopen(const Variant &hostname,
+                   const Variant &port = -1,
+                   const Reference &error_code = {},
+                   const Reference &error_message = {},
+                   const Variant &timeout = {});
+Variant http_build_query(const Variant &data,
+                         const Variant &numeric_prefix = "",
+                         const Variant &arg_separator = {},
+                         const Variant &encoding_type = 1);
 Variant http_get_last_response_headers();
 Variant http_clear_last_response_headers();
 Variant request_parse_body(const Variant &options = {});
@@ -491,12 +589,20 @@ Variant php_ini_scanned_files();
 Variant php_ini_loaded_file();
 Variant iptcembed(const Variant &iptc_data, const Variant &filename, const Variant &spool = 0);
 Variant iptcparse(const Variant &iptc_block);
-Variant levenshtein(const Variant &string1, const Variant &string2, const Variant &insertion_cost = 1, const Variant &replacement_cost = 1, const Variant &deletion_cost = 1);
+Variant levenshtein(const Variant &string1,
+                    const Variant &string2,
+                    const Variant &insertion_cost = 1,
+                    const Variant &replacement_cost = 1,
+                    const Variant &deletion_cost = 1);
 Variant readlink(const Variant &path);
 Variant linkinfo(const Variant &path);
 Variant symlink(const Variant &target, const Variant &link);
 Variant link(const Variant &target, const Variant &link);
-Variant mail(const Variant &to, const Variant &subject, const Variant &message, const Variant &additional_headers = Array{}, const Variant &additional_params = "");
+Variant mail(const Variant &to,
+             const Variant &subject,
+             const Variant &message,
+             const Variant &additional_headers = Array{},
+             const Variant &additional_params = "");
 Variant abs(const Variant &num);
 Variant ceil(const Variant &num);
 Variant floor(const Variant &num);
@@ -536,7 +642,10 @@ Variant decbin(const Variant &num);
 Variant decoct(const Variant &num);
 Variant dechex(const Variant &num);
 Variant base_convert(const Variant &num, const Variant &from_base, const Variant &to_base);
-Variant number_format(const Variant &num, const Variant &decimals = 0, const Variant &decimal_separator = ".", const Variant &thousands_separator = ",");
+Variant number_format(const Variant &num,
+                      const Variant &decimals = 0,
+                      const Variant &decimal_separator = ".",
+                      const Variant &thousands_separator = ",");
 Variant fmod(const Variant &num1, const Variant &num2);
 Variant fdiv(const Variant &num1, const Variant &num2);
 Variant fpow(const Variant &num, const Variant &exponent);
@@ -544,8 +653,8 @@ Variant microtime(const Variant &as_float = false);
 Variant gettimeofday(const Variant &as_float = false);
 Variant getrusage(const Variant &mode = 0);
 template <typename... Args>
-Variant pack(const Variant &format, const Args&... values) {
-    return call("pack", {format, values...});
+Variant pack(const Variant &format, const Args &...values) {
+    return call(LITERAL_STRING[2242], {format, values...});
 }
 Variant unpack(const Variant &format, const Variant &string, const Variant &offset = 0);
 Variant password_get_info(const Variant &hash);
@@ -553,35 +662,74 @@ Variant password_hash(const Variant &password, const Variant &algo, const Varian
 Variant password_needs_rehash(const Variant &hash, const Variant &algo, const Variant &options = Array{});
 Variant password_verify(const Variant &password, const Variant &hash);
 Variant password_algos();
-Variant proc_open(const Variant &command, const Variant &descriptor_spec, const Reference &pipes, const Variant &cwd = {}, const Variant &env_vars = {}, const Variant &options = {});
+Variant proc_open(const Variant &command,
+                  const Variant &descriptor_spec,
+                  const Reference &pipes,
+                  const Variant &cwd = {},
+                  const Variant &env_vars = {},
+                  const Variant &options = {});
 Variant proc_close(const Variant &process);
 Variant proc_terminate(const Variant &process, const Variant &signal = 15);
 Variant proc_get_status(const Variant &process);
 Variant quoted_printable_decode(const Variant &string);
 Variant quoted_printable_encode(const Variant &string);
 Variant soundex(const Variant &string);
-Variant stream_select(const Reference &read, const Reference &write, const Reference &except, const Variant &seconds, const Variant &microseconds = {});
+Variant stream_select(const Reference &read,
+                      const Reference &write,
+                      const Reference &except,
+                      const Variant &seconds,
+                      const Variant &microseconds = {});
 Variant stream_context_create(const Variant &options = {}, const Variant &params = {});
 Variant stream_context_set_params(const Variant &context, const Variant &params);
 Variant stream_context_get_params(const Variant &context);
-Variant stream_context_set_option(const Variant &context, const Variant &wrapper_or_options, const Variant &option_name = {}, const Variant &value = {});
+Variant stream_context_set_option(const Variant &context,
+                                  const Variant &wrapper_or_options,
+                                  const Variant &option_name = {},
+                                  const Variant &value = {});
 Variant stream_context_set_options(const Variant &context, const Variant &options);
 Variant stream_context_get_options(const Variant &stream_or_context);
 Variant stream_context_get_default(const Variant &options = {});
 Variant stream_context_set_default(const Variant &options);
-Variant stream_filter_prepend(const Variant &stream, const Variant &filter_name, const Variant &mode = 0, const Variant &params = {});
-Variant stream_filter_append(const Variant &stream, const Variant &filter_name, const Variant &mode = 0, const Variant &params = {});
+Variant stream_filter_prepend(const Variant &stream,
+                              const Variant &filter_name,
+                              const Variant &mode = 0,
+                              const Variant &params = {});
+Variant stream_filter_append(const Variant &stream,
+                             const Variant &filter_name,
+                             const Variant &mode = 0,
+                             const Variant &params = {});
 Variant stream_filter_remove(const Variant &stream_filter);
-Variant stream_socket_client(const Variant &address, const Reference &error_code = {}, const Reference &error_message = {}, const Variant &timeout = {}, const Variant &flags = 4, const Variant &context = {});
-Variant stream_socket_server(const Variant &address, const Reference &error_code = {}, const Reference &error_message = {}, const Variant &flags = 12, const Variant &context = {});
+Variant stream_socket_client(const Variant &address,
+                             const Reference &error_code = {},
+                             const Reference &error_message = {},
+                             const Variant &timeout = {},
+                             const Variant &flags = 4,
+                             const Variant &context = {});
+Variant stream_socket_server(const Variant &address,
+                             const Reference &error_code = {},
+                             const Reference &error_message = {},
+                             const Variant &flags = 12,
+                             const Variant &context = {});
 Variant stream_socket_accept(const Variant &socket, const Variant &timeout = {}, const Reference &peer_name = {});
 Variant stream_socket_get_name(const Variant &socket, const Variant &remote);
-Variant stream_socket_recvfrom(const Variant &socket, const Variant &length, const Variant &flags = 0, const Reference &address = {});
-Variant stream_socket_sendto(const Variant &socket, const Variant &data, const Variant &flags = 0, const Variant &address = "");
-Variant stream_socket_enable_crypto(const Variant &stream, const Variant &enable, const Variant &crypto_method = {}, const Variant &session_stream = {});
+Variant stream_socket_recvfrom(const Variant &socket,
+                               const Variant &length,
+                               const Variant &flags = 0,
+                               const Reference &address = {});
+Variant stream_socket_sendto(const Variant &socket,
+                             const Variant &data,
+                             const Variant &flags = 0,
+                             const Variant &address = "");
+Variant stream_socket_enable_crypto(const Variant &stream,
+                                    const Variant &enable,
+                                    const Variant &crypto_method = {},
+                                    const Variant &session_stream = {});
 Variant stream_socket_shutdown(const Variant &stream, const Variant &mode);
 Variant stream_socket_pair(const Variant &domain, const Variant &type, const Variant &protocol);
-Variant stream_copy_to_stream(const Variant &from, const Variant &to, const Variant &length = {}, const Variant &offset = 0);
+Variant stream_copy_to_stream(const Variant &from,
+                              const Variant &to,
+                              const Variant &length = {},
+                              const Variant &offset = 0);
 Variant stream_get_contents(const Variant &stream, const Variant &length = {}, const Variant &offset = -1);
 Variant stream_supports_lock(const Variant &stream);
 Variant stream_set_write_buffer(const Variant &stream, const Variant &size);
@@ -640,13 +788,13 @@ Variant stream_filter_register(const Variant &filter_name, const Variant &_class
 Variant convert_uuencode(const Variant &string);
 Variant convert_uudecode(const Variant &string);
 template <typename... Args>
-Variant var_dump(const Variant &value, const Args&... values) {
-    return call("var_dump", {value, values...});
+Variant var_dump(const Variant &value, const Args &...values) {
+    return call(LITERAL_STRING[2335], {value, values...});
 }
 Variant var_export(const Variant &value, const Variant &_return = false);
 template <typename... Args>
-Variant debug_zval_dump(const Variant &value, const Args&... values) {
-    return call("debug_zval_dump", {value, values...});
+Variant debug_zval_dump(const Variant &value, const Args &...values) {
+    return call(LITERAL_STRING[2337], {value, values...});
 }
 Variant serialize(const Variant &value);
 Variant unserialize(const Variant &data, const Variant &options = Array{});
@@ -657,4 +805,4 @@ Variant version_compare(const Variant &version1, const Variant &version2, const 
 Variant dl(const Variant &extension_filename);
 Variant cli_set_process_title(const Variant &title);
 Variant cli_get_process_title();
-}
+}  // namespace php

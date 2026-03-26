@@ -1,14 +1,28 @@
+#include "phpx.h"
+#include "phpx_literal_string.h"
+
 namespace php {
 Variant pcntl_fork();
-Variant pcntl_waitpid(const Variant &process_id, const Reference &status, const Variant &flags = 0, const Reference &resource_usage = getEmptyArrayRef());
-Variant pcntl_waitid(const Variant &idtype = 0, const Variant &id = {}, const Reference &info = getEmptyArrayRef(), const Variant &flags = 4);
-Variant pcntl_wait(const Reference &status, const Variant &flags = 0, const Reference &resource_usage = getEmptyArrayRef());
+Variant pcntl_waitpid(const Variant &process_id,
+                      const Reference &status,
+                      const Variant &flags = 0,
+                      const Reference &resource_usage = getEmptyArrayRef());
+Variant pcntl_waitid(const Variant &idtype = 0,
+                     const Variant &id = {},
+                     const Reference &info = getEmptyArrayRef(),
+                     const Variant &flags = 4);
+Variant pcntl_wait(const Reference &status,
+                   const Variant &flags = 0,
+                   const Reference &resource_usage = getEmptyArrayRef());
 Variant pcntl_signal(const Variant &signal, const Variant &handler, const Variant &restart_syscalls = true);
 Variant pcntl_signal_get_handler(const Variant &signal);
 Variant pcntl_signal_dispatch();
 Variant pcntl_sigprocmask(const Variant &mode, const Variant &signals, const Reference &old_signals = {});
 Variant pcntl_sigwaitinfo(const Variant &signals, const Reference &info = getEmptyArrayRef());
-Variant pcntl_sigtimedwait(const Variant &signals, const Reference &info = getEmptyArrayRef(), const Variant &seconds = 0, const Variant &nanoseconds = 0);
+Variant pcntl_sigtimedwait(const Variant &signals,
+                           const Reference &info = getEmptyArrayRef(),
+                           const Variant &seconds = 0,
+                           const Variant &nanoseconds = 0);
 Variant pcntl_wifexited(const Variant &status);
 Variant pcntl_wifstopped(const Variant &status);
 Variant pcntl_wifcontinued(const Variant &status);
@@ -28,4 +42,4 @@ Variant pcntl_unshare(const Variant &flags);
 Variant pcntl_getcpuaffinity(const Variant &process_id = {});
 Variant pcntl_setcpuaffinity(const Variant &process_id = {}, const Variant &cpu_ids = Array{});
 Variant pcntl_getcpu();
-}
+}  // namespace php

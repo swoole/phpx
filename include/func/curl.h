@@ -1,3 +1,6 @@
+#include "phpx.h"
+#include "phpx_literal_string.h"
+
 namespace php {
 Variant curl_close(const Variant &handle);
 Variant curl_copy_handle(const Variant &handle);
@@ -32,4 +35,4 @@ Variant curl_share_setopt(const Variant &share_handle, const Variant &option, co
 Variant curl_share_strerror(const Variant &error_code);
 Variant curl_strerror(const Variant &error_code);
 Variant curl_version();
-}
+}  // namespace php

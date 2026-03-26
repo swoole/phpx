@@ -108,3 +108,5 @@ foreach ($extensions as $extension) {
 
     echo "Generate C++ facade code for ext-{$extension} successfully.\n";
 }
+
+Generator::makeLiteralString();

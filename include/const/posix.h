@@ -41,4 +41,4 @@ extern Variant POSIX_PC_CHOWN_RESTRICTED;
 extern Variant POSIX_PC_NO_TRUNC;
 extern Variant POSIX_PC_ALLOC_SIZE_MIN;
 extern Variant POSIX_PC_SYMLINK_MAX;
-}
+}  // namespace php

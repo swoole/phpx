@@ -1,3 +1,6 @@
+#include "phpx.h"
+#include "phpx_literal_string.h"
+
 namespace php {
 Variant posix_kill(const Variant &process_id, const Variant &signal);
 Variant posix_getpid();
@@ -40,4 +43,4 @@ Variant posix_initgroups(const Variant &username, const Variant &group_id);
 Variant posix_sysconf(const Variant &conf_id);
 Variant posix_pathconf(const Variant &path, const Variant &name);
 Variant posix_fpathconf(const Variant &file_descriptor, const Variant &name);
-}
+}  // namespace php

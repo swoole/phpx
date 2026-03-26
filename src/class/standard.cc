@@ -3,76 +3,57 @@
 
 namespace php {
 AssertionError::AssertionError(const Variant &message, const Variant &code, const Variant &previous) {
-    this_ = newObject("AssertionError", {message, code, previous});
+    this_ = newObject(LITERAL_STRING[2345], {message, code, previous});
 }
-
 Variant AssertionError::__wakeup() {
-    return this_.exec("__wakeup", {});
+    return this_.exec(LITERAL_STRING[97], {});
 }
-
 Variant AssertionError::getMessage() {
-    return this_.exec("getMessage", {});
+    return this_.exec(LITERAL_STRING[98], {});
 }
-
 Variant AssertionError::getCode() {
-    return this_.exec("getCode", {});
+    return this_.exec(LITERAL_STRING[99], {});
 }
-
 Variant AssertionError::getFile() {
-    return this_.exec("getFile", {});
+    return this_.exec(LITERAL_STRING[100], {});
 }
-
 Variant AssertionError::getLine() {
-    return this_.exec("getLine", {});
+    return this_.exec(LITERAL_STRING[101], {});
 }
-
 Variant AssertionError::getTrace() {
-    return this_.exec("getTrace", {});
+    return this_.exec(LITERAL_STRING[102], {});
 }
-
 Variant AssertionError::getPrevious() {
-    return this_.exec("getPrevious", {});
+    return this_.exec(LITERAL_STRING[103], {});
 }
-
 Variant AssertionError::getTraceAsString() {
-    return this_.exec("getTraceAsString", {});
+    return this_.exec(LITERAL_STRING[104], {});
 }
-
 Variant AssertionError::__toString() {
-    return this_.exec("__toString", {});
+    return this_.exec(LITERAL_STRING[29], {});
 }
-
-
 Variant RoundingMode::cases() {
-    static Variant fn { ZEND_STRL("RoundingMode::cases"), true };
-    return fn({});
+    return php::call(LITERAL_STRING[2346], {});
 }
-
-
-Variant php_user_filter::filter(const Variant &in, const Variant &out, const Reference &consumed, const Variant &closing) {
-    return this_.exec("filter", {in, out, &consumed, closing});
+Variant php_user_filter::filter(const Variant &in,
+                                const Variant &out,
+                                const Reference &consumed,
+                                const Variant &closing) {
+    return this_.exec(LITERAL_STRING[2348], {in, out, &consumed, closing});
 }
-
 Variant php_user_filter::onCreate() {
-    return this_.exec("onCreate", {});
+    return this_.exec(LITERAL_STRING[2349], {});
 }
-
 Variant php_user_filter::onClose() {
-    return this_.exec("onClose", {});
+    return this_.exec(LITERAL_STRING[2350], {});
 }
-
-
 Variant Directory::close() {
-    return this_.exec("close", {});
+    return this_.exec(LITERAL_STRING[1068], {});
 }
-
 Variant Directory::rewind() {
-    return this_.exec("rewind", {});
+    return this_.exec(LITERAL_STRING[94], {});
 }
-
 Variant Directory::read() {
-    return this_.exec("read", {});
+    return this_.exec(LITERAL_STRING[1615], {});
 }
-
-
-}
+}  // namespace php

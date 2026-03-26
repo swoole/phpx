@@ -1,6 +1,9 @@
+#include "phpx_literal_string.h"
+
 namespace php {
 class Dom_AdjacentPosition {
     Object this_;
+
   public:
     static Variant cases();
     static Variant from(const Variant &value);
@@ -9,6 +12,7 @@ class Dom_AdjacentPosition {
 
 class DOMException {
     Object this_;
+
   public:
     DOMException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -24,6 +28,7 @@ class DOMException {
 
 class dom_domexception {
     Object this_;
+
   public:
     dom_domexception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -39,14 +44,20 @@ class dom_domexception {
 
 class DOMImplementation {
     Object this_;
+
   public:
     Variant hasFeature(const Variant &feature, const Variant &version);
-    Variant createDocumentType(const Variant &qualified_name, const Variant &public_id = "", const Variant &system_id = "");
-    Variant createDocument(const Variant &_namespace = {}, const Variant &qualified_name = "", const Variant &doctype = {});
+    Variant createDocumentType(const Variant &qualified_name,
+                               const Variant &public_id = "",
+                               const Variant &system_id = "");
+    Variant createDocument(const Variant &_namespace = {},
+                           const Variant &qualified_name = "",
+                           const Variant &doctype = {});
 };
 
 class Dom_Implementation {
     Object this_;
+
   public:
     Variant createDocumentType(const Variant &qualified_name, const Variant &public_id, const Variant &system_id);
     Variant createDocument(const Variant &_namespace, const Variant &qualified_name, const Variant &doctype = {});
@@ -55,10 +66,18 @@ class Dom_Implementation {
 
 class DOMNode {
     Object this_;
+
   public:
     Variant appendChild(const Variant &node);
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant cloneNode(const Variant &deep = false);
     Variant getLineNo();
     Variant getNodePath();
@@ -83,6 +102,7 @@ class DOMNode {
 
 class Dom_Node {
     Object this_;
+
   public:
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -101,14 +121,22 @@ class Dom_Node {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class DOMNameSpaceNode {
     Object this_;
+
   public:
     Variant __sleep();
     Variant __wakeup();
@@ -116,24 +144,32 @@ class DOMNameSpaceNode {
 
 class DOMDocumentFragment {
     Object this_;
+
   public:
     DOMDocumentFragment();
     Variant appendXML(const Variant &data);
     template <typename... Args>
-    Variant append(const Args&... nodes) {
-        return call("append", {nodes...});
+    Variant append(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
-    Variant prepend(const Args&... nodes) {
-        return call("prepend", {nodes...});
+    Variant prepend(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
-    Variant replaceChildren(const Args&... nodes) {
-        return call("replaceChildren", {nodes...});
+    Variant replaceChildren(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[351], {nodes...});
     }
     Variant appendChild(const Variant &node);
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant cloneNode(const Variant &deep = false);
     Variant getLineNo();
     Variant getNodePath();
@@ -158,19 +194,20 @@ class DOMDocumentFragment {
 
 class Dom_DocumentFragment {
     Object this_;
+
   public:
     Variant appendXml(const Variant &data);
     template <typename... Args>
-    Variant append(const Args&... nodes) {
-        return call("append", {nodes...});
+    Variant append(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
-    Variant prepend(const Args&... nodes) {
-        return call("prepend", {nodes...});
+    Variant prepend(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
-    Variant replaceChildren(const Args&... nodes) {
-        return call("replaceChildren", {nodes...});
+    Variant replaceChildren(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[351], {nodes...});
     }
     Variant querySelector(const Variant &selectors);
     Variant querySelectorAll(const Variant &selectors);
@@ -191,14 +228,22 @@ class Dom_DocumentFragment {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class DOMDocument {
     Object this_;
+
   public:
     DOMDocument(const Variant &version = "1.0", const Variant &encoding = "");
     Variant createAttribute(const Variant &local_name);
@@ -233,20 +278,27 @@ class DOMDocument {
     Variant xinclude(const Variant &options = 0);
     Variant adoptNode(const Variant &node);
     template <typename... Args>
-    Variant append(const Args&... nodes) {
-        return call("append", {nodes...});
+    Variant append(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
-    Variant prepend(const Args&... nodes) {
-        return call("prepend", {nodes...});
+    Variant prepend(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
-    Variant replaceChildren(const Args&... nodes) {
-        return call("replaceChildren", {nodes...});
+    Variant replaceChildren(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[351], {nodes...});
     }
     Variant appendChild(const Variant &node);
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant cloneNode(const Variant &deep = false);
     Variant getLineNo();
     Variant getNodePath();
@@ -271,10 +323,15 @@ class DOMDocument {
 
 class Dom_HTMLDocument {
     Object this_;
+
   public:
     static Variant createEmpty(const Variant &encoding = "UTF-8");
-    static Variant createFromFile(const Variant &path, const Variant &options = 0, const Variant &override_encoding = {});
-    static Variant createFromString(const Variant &source, const Variant &options = 0, const Variant &override_encoding = {});
+    static Variant createFromFile(const Variant &path,
+                                  const Variant &options = 0,
+                                  const Variant &override_encoding = {});
+    static Variant createFromString(const Variant &source,
+                                    const Variant &options = 0,
+                                    const Variant &override_encoding = {});
     Variant saveXml(const Variant &node = {}, const Variant &options = 0);
     Variant saveXmlFile(const Variant &filename, const Variant &options = 0);
     Variant saveHtml(const Variant &node = {});
@@ -300,16 +357,16 @@ class Dom_HTMLDocument {
     Variant relaxNgValidate(const Variant &filename);
     Variant relaxNgValidateSource(const Variant &source);
     template <typename... Args>
-    Variant append(const Args&... nodes) {
-        return call("append", {nodes...});
+    Variant append(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
-    Variant prepend(const Args&... nodes) {
-        return call("prepend", {nodes...});
+    Variant prepend(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
-    Variant replaceChildren(const Args&... nodes) {
-        return call("replaceChildren", {nodes...});
+    Variant replaceChildren(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[351], {nodes...});
     }
     Variant importLegacyNode(const Variant &node, const Variant &deep = false);
     Variant querySelector(const Variant &selectors);
@@ -331,18 +388,30 @@ class Dom_HTMLDocument {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class Dom_XMLDocument {
     Object this_;
+
   public:
     static Variant createEmpty(const Variant &version = "1.0", const Variant &encoding = "UTF-8");
-    static Variant createFromFile(const Variant &path, const Variant &options = 0, const Variant &override_encoding = {});
-    static Variant createFromString(const Variant &source, const Variant &options = 0, const Variant &override_encoding = {});
+    static Variant createFromFile(const Variant &path,
+                                  const Variant &options = 0,
+                                  const Variant &override_encoding = {});
+    static Variant createFromString(const Variant &source,
+                                    const Variant &options = 0,
+                                    const Variant &override_encoding = {});
     Variant createEntityReference(const Variant &name);
     Variant validate();
     Variant xinclude(const Variant &options = 0);
@@ -368,16 +437,16 @@ class Dom_XMLDocument {
     Variant relaxNgValidate(const Variant &filename);
     Variant relaxNgValidateSource(const Variant &source);
     template <typename... Args>
-    Variant append(const Args&... nodes) {
-        return call("append", {nodes...});
+    Variant append(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
-    Variant prepend(const Args&... nodes) {
-        return call("prepend", {nodes...});
+    Variant prepend(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
-    Variant replaceChildren(const Args&... nodes) {
-        return call("replaceChildren", {nodes...});
+    Variant replaceChildren(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[351], {nodes...});
     }
     Variant importLegacyNode(const Variant &node, const Variant &deep = false);
     Variant querySelector(const Variant &selectors);
@@ -399,14 +468,22 @@ class Dom_XMLDocument {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class DOMNodeList {
     Object this_;
+
   public:
     Variant count();
     Variant getIterator();
@@ -415,6 +492,7 @@ class DOMNodeList {
 
 class Dom_NodeList {
     Object this_;
+
   public:
     Variant count();
     Variant getIterator();
@@ -423,6 +501,7 @@ class Dom_NodeList {
 
 class DOMNamedNodeMap {
     Object this_;
+
   public:
     Variant getNamedItem(const Variant &qualified_name);
     Variant getNamedItemNS(const Variant &_namespace, const Variant &local_name);
@@ -433,6 +512,7 @@ class DOMNamedNodeMap {
 
 class Dom_NamedNodeMap {
     Object this_;
+
   public:
     Variant item(const Variant &index);
     Variant getNamedItem(const Variant &qualified_name);
@@ -443,6 +523,7 @@ class Dom_NamedNodeMap {
 
 class Dom_DtdNamedNodeMap {
     Object this_;
+
   public:
     Variant item(const Variant &index);
     Variant getNamedItem(const Variant &qualified_name);
@@ -453,6 +534,7 @@ class Dom_DtdNamedNodeMap {
 
 class Dom_HTMLCollection {
     Object this_;
+
   public:
     Variant item(const Variant &index);
     Variant namedItem(const Variant &key);
@@ -462,6 +544,7 @@ class Dom_HTMLCollection {
 
 class DOMCharacterData {
     Object this_;
+
   public:
     Variant appendData(const Variant &data);
     Variant substringData(const Variant &offset, const Variant &count);
@@ -469,21 +552,28 @@ class DOMCharacterData {
     Variant deleteData(const Variant &offset, const Variant &count);
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     template <typename... Args>
-    Variant replaceWith(const Args&... nodes) {
-        return call("replaceWith", {nodes...});
+    Variant replaceWith(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[419], {nodes...});
     }
     Variant remove();
     template <typename... Args>
-    Variant before(const Args&... nodes) {
-        return call("before", {nodes...});
+    Variant before(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
-    Variant after(const Args&... nodes) {
-        return call("after", {nodes...});
+    Variant after(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[422], {nodes...});
     }
     Variant appendChild(const Variant &node);
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant cloneNode(const Variant &deep = false);
     Variant getLineNo();
     Variant getNodePath();
@@ -508,6 +598,7 @@ class DOMCharacterData {
 
 class Dom_CharacterData {
     Object this_;
+
   public:
     Variant substringData(const Variant &offset, const Variant &count);
     Variant appendData(const Variant &data);
@@ -516,16 +607,16 @@ class Dom_CharacterData {
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     Variant remove();
     template <typename... Args>
-    Variant before(const Args&... nodes) {
-        return call("before", {nodes...});
+    Variant before(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
-    Variant after(const Args&... nodes) {
-        return call("after", {nodes...});
+    Variant after(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
-    Variant replaceWith(const Args&... nodes) {
-        return call("replaceWith", {nodes...});
+    Variant replaceWith(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[419], {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -544,20 +635,35 @@ class Dom_CharacterData {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class DOMAttr {
     Object this_;
+
   public:
     DOMAttr(const Variant &name, const Variant &value = "");
     Variant isId();
     Variant appendChild(const Variant &node);
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant cloneNode(const Variant &deep = false);
     Variant getLineNo();
     Variant getNodePath();
@@ -582,6 +688,7 @@ class DOMAttr {
 
 class Dom_Attr {
     Object this_;
+
   public:
     Variant isId();
     Variant rename(const Variant &namespace_u_r_i, const Variant &qualified_name);
@@ -602,14 +709,22 @@ class Dom_Attr {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class DOMElement {
     Object this_;
+
   public:
     DOMElement(const Variant &qualified_name, const Variant &value = {}, const Variant &_namespace = "");
     Variant getAttribute(const Variant &qualified_name);
@@ -634,34 +749,41 @@ class DOMElement {
     Variant toggleAttribute(const Variant &qualified_name, const Variant &force = {});
     Variant remove();
     template <typename... Args>
-    Variant before(const Args&... nodes) {
-        return call("before", {nodes...});
+    Variant before(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
-    Variant after(const Args&... nodes) {
-        return call("after", {nodes...});
+    Variant after(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
-    Variant replaceWith(const Args&... nodes) {
-        return call("replaceWith", {nodes...});
+    Variant replaceWith(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[419], {nodes...});
     }
     template <typename... Args>
-    Variant append(const Args&... nodes) {
-        return call("append", {nodes...});
+    Variant append(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
-    Variant prepend(const Args&... nodes) {
-        return call("prepend", {nodes...});
+    Variant prepend(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
-    Variant replaceChildren(const Args&... nodes) {
-        return call("replaceChildren", {nodes...});
+    Variant replaceChildren(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[351], {nodes...});
     }
     Variant insertAdjacentElement(const Variant &where, const Variant &element);
     Variant insertAdjacentText(const Variant &where, const Variant &data);
     Variant appendChild(const Variant &node);
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant cloneNode(const Variant &deep = false);
     Variant getLineNo();
     Variant getNodePath();
@@ -686,6 +808,7 @@ class DOMElement {
 
 class Dom_Element {
     Object this_;
+
   public:
     Variant hasAttributes();
     Variant getAttributeNames();
@@ -712,28 +835,28 @@ class Dom_Element {
     Variant setIdAttributeNode(const Variant &attr, const Variant &is_id);
     Variant remove();
     template <typename... Args>
-    Variant before(const Args&... nodes) {
-        return call("before", {nodes...});
+    Variant before(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
-    Variant after(const Args&... nodes) {
-        return call("after", {nodes...});
+    Variant after(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
-    Variant replaceWith(const Args&... nodes) {
-        return call("replaceWith", {nodes...});
+    Variant replaceWith(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[419], {nodes...});
     }
     template <typename... Args>
-    Variant append(const Args&... nodes) {
-        return call("append", {nodes...});
+    Variant append(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
-    Variant prepend(const Args&... nodes) {
-        return call("prepend", {nodes...});
+    Variant prepend(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
-    Variant replaceChildren(const Args&... nodes) {
-        return call("replaceChildren", {nodes...});
+    Variant replaceChildren(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[351], {nodes...});
     }
     Variant querySelector(const Variant &selectors);
     Variant querySelectorAll(const Variant &selectors);
@@ -759,14 +882,22 @@ class Dom_Element {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class Dom_HTMLElement {
     Object this_;
+
   public:
     Variant hasAttributes();
     Variant getAttributeNames();
@@ -793,28 +924,28 @@ class Dom_HTMLElement {
     Variant setIdAttributeNode(const Variant &attr, const Variant &is_id);
     Variant remove();
     template <typename... Args>
-    Variant before(const Args&... nodes) {
-        return call("before", {nodes...});
+    Variant before(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
-    Variant after(const Args&... nodes) {
-        return call("after", {nodes...});
+    Variant after(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
-    Variant replaceWith(const Args&... nodes) {
-        return call("replaceWith", {nodes...});
+    Variant replaceWith(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[419], {nodes...});
     }
     template <typename... Args>
-    Variant append(const Args&... nodes) {
-        return call("append", {nodes...});
+    Variant append(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
-    Variant prepend(const Args&... nodes) {
-        return call("prepend", {nodes...});
+    Variant prepend(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
-    Variant replaceChildren(const Args&... nodes) {
-        return call("replaceChildren", {nodes...});
+    Variant replaceChildren(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[351], {nodes...});
     }
     Variant querySelector(const Variant &selectors);
     Variant querySelectorAll(const Variant &selectors);
@@ -840,14 +971,22 @@ class Dom_HTMLElement {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class DOMText {
     Object this_;
+
   public:
     DOMText(const Variant &data = "");
     Variant isWhitespaceInElementContent();
@@ -859,21 +998,28 @@ class DOMText {
     Variant deleteData(const Variant &offset, const Variant &count);
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     template <typename... Args>
-    Variant replaceWith(const Args&... nodes) {
-        return call("replaceWith", {nodes...});
+    Variant replaceWith(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[419], {nodes...});
     }
     Variant remove();
     template <typename... Args>
-    Variant before(const Args&... nodes) {
-        return call("before", {nodes...});
+    Variant before(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
-    Variant after(const Args&... nodes) {
-        return call("after", {nodes...});
+    Variant after(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[422], {nodes...});
     }
     Variant appendChild(const Variant &node);
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant cloneNode(const Variant &deep = false);
     Variant getLineNo();
     Variant getNodePath();
@@ -898,6 +1044,7 @@ class DOMText {
 
 class Dom_Text {
     Object this_;
+
   public:
     Variant splitText(const Variant &offset);
     Variant substringData(const Variant &offset, const Variant &count);
@@ -907,16 +1054,16 @@ class Dom_Text {
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     Variant remove();
     template <typename... Args>
-    Variant before(const Args&... nodes) {
-        return call("before", {nodes...});
+    Variant before(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
-    Variant after(const Args&... nodes) {
-        return call("after", {nodes...});
+    Variant after(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
-    Variant replaceWith(const Args&... nodes) {
-        return call("replaceWith", {nodes...});
+    Variant replaceWith(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[419], {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -935,14 +1082,22 @@ class Dom_Text {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class DOMComment {
     Object this_;
+
   public:
     DOMComment(const Variant &data = "");
     Variant appendData(const Variant &data);
@@ -951,21 +1106,28 @@ class DOMComment {
     Variant deleteData(const Variant &offset, const Variant &count);
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     template <typename... Args>
-    Variant replaceWith(const Args&... nodes) {
-        return call("replaceWith", {nodes...});
+    Variant replaceWith(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[419], {nodes...});
     }
     Variant remove();
     template <typename... Args>
-    Variant before(const Args&... nodes) {
-        return call("before", {nodes...});
+    Variant before(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
-    Variant after(const Args&... nodes) {
-        return call("after", {nodes...});
+    Variant after(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[422], {nodes...});
     }
     Variant appendChild(const Variant &node);
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant cloneNode(const Variant &deep = false);
     Variant getLineNo();
     Variant getNodePath();
@@ -990,6 +1152,7 @@ class DOMComment {
 
 class Dom_Comment {
     Object this_;
+
   public:
     Variant substringData(const Variant &offset, const Variant &count);
     Variant appendData(const Variant &data);
@@ -998,16 +1161,16 @@ class Dom_Comment {
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     Variant remove();
     template <typename... Args>
-    Variant before(const Args&... nodes) {
-        return call("before", {nodes...});
+    Variant before(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
-    Variant after(const Args&... nodes) {
-        return call("after", {nodes...});
+    Variant after(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
-    Variant replaceWith(const Args&... nodes) {
-        return call("replaceWith", {nodes...});
+    Variant replaceWith(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[419], {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1026,14 +1189,22 @@ class Dom_Comment {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class DOMCdataSection {
     Object this_;
+
   public:
     DOMCdataSection(const Variant &data);
     Variant isWhitespaceInElementContent();
@@ -1045,21 +1216,28 @@ class DOMCdataSection {
     Variant deleteData(const Variant &offset, const Variant &count);
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     template <typename... Args>
-    Variant replaceWith(const Args&... nodes) {
-        return call("replaceWith", {nodes...});
+    Variant replaceWith(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[419], {nodes...});
     }
     Variant remove();
     template <typename... Args>
-    Variant before(const Args&... nodes) {
-        return call("before", {nodes...});
+    Variant before(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
-    Variant after(const Args&... nodes) {
-        return call("after", {nodes...});
+    Variant after(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[422], {nodes...});
     }
     Variant appendChild(const Variant &node);
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant cloneNode(const Variant &deep = false);
     Variant getLineNo();
     Variant getNodePath();
@@ -1084,6 +1262,7 @@ class DOMCdataSection {
 
 class Dom_CDATASection {
     Object this_;
+
   public:
     Variant splitText(const Variant &offset);
     Variant substringData(const Variant &offset, const Variant &count);
@@ -1093,16 +1272,16 @@ class Dom_CDATASection {
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     Variant remove();
     template <typename... Args>
-    Variant before(const Args&... nodes) {
-        return call("before", {nodes...});
+    Variant before(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
-    Variant after(const Args&... nodes) {
-        return call("after", {nodes...});
+    Variant after(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
-    Variant replaceWith(const Args&... nodes) {
-        return call("replaceWith", {nodes...});
+    Variant replaceWith(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[419], {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1121,18 +1300,33 @@ class Dom_CDATASection {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class DOMDocumentType {
     Object this_;
+
   public:
     Variant appendChild(const Variant &node);
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant cloneNode(const Variant &deep = false);
     Variant getLineNo();
     Variant getNodePath();
@@ -1157,19 +1351,20 @@ class DOMDocumentType {
 
 class Dom_DocumentType {
     Object this_;
+
   public:
     Variant remove();
     template <typename... Args>
-    Variant before(const Args&... nodes) {
-        return call("before", {nodes...});
+    Variant before(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
-    Variant after(const Args&... nodes) {
-        return call("after", {nodes...});
+    Variant after(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
-    Variant replaceWith(const Args&... nodes) {
-        return call("replaceWith", {nodes...});
+    Variant replaceWith(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[419], {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1188,18 +1383,33 @@ class Dom_DocumentType {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class DOMNotation {
     Object this_;
+
   public:
     Variant appendChild(const Variant &node);
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant cloneNode(const Variant &deep = false);
     Variant getLineNo();
     Variant getNodePath();
@@ -1224,6 +1434,7 @@ class DOMNotation {
 
 class Dom_Notation {
     Object this_;
+
   public:
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1242,18 +1453,33 @@ class Dom_Notation {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class DOMEntity {
     Object this_;
+
   public:
     Variant appendChild(const Variant &node);
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant cloneNode(const Variant &deep = false);
     Variant getLineNo();
     Variant getNodePath();
@@ -1278,6 +1504,7 @@ class DOMEntity {
 
 class Dom_Entity {
     Object this_;
+
   public:
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1296,19 +1523,34 @@ class Dom_Entity {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class DOMEntityReference {
     Object this_;
+
   public:
     DOMEntityReference(const Variant &name);
     Variant appendChild(const Variant &node);
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant cloneNode(const Variant &deep = false);
     Variant getLineNo();
     Variant getNodePath();
@@ -1333,6 +1575,7 @@ class DOMEntityReference {
 
 class Dom_EntityReference {
     Object this_;
+
   public:
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1351,19 +1594,34 @@ class Dom_EntityReference {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class DOMProcessingInstruction {
     Object this_;
+
   public:
     DOMProcessingInstruction(const Variant &name, const Variant &value = "");
     Variant appendChild(const Variant &node);
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant cloneNode(const Variant &deep = false);
     Variant getLineNo();
     Variant getNodePath();
@@ -1388,6 +1646,7 @@ class DOMProcessingInstruction {
 
 class Dom_ProcessingInstruction {
     Object this_;
+
   public:
     Variant substringData(const Variant &offset, const Variant &count);
     Variant appendData(const Variant &data);
@@ -1396,16 +1655,16 @@ class Dom_ProcessingInstruction {
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     Variant remove();
     template <typename... Args>
-    Variant before(const Args&... nodes) {
-        return call("before", {nodes...});
+    Variant before(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
-    Variant after(const Args&... nodes) {
-        return call("after", {nodes...});
+    Variant after(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
-    Variant replaceWith(const Args&... nodes) {
-        return call("replaceWith", {nodes...});
+    Variant replaceWith(const Args &...nodes) {
+        return this_.exec(LITERAL_STRING[419], {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1424,17 +1683,27 @@ class Dom_ProcessingInstruction {
     Variant removeChild(const Variant &child);
     Variant getLineNo();
     Variant getNodePath();
-    Variant C14N(const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
-    Variant C14NFile(const Variant &uri, const Variant &exclusive = false, const Variant &with_comments = false, const Variant &xpath = {}, const Variant &ns_prefixes = {});
+    Variant C14N(const Variant &exclusive = false,
+                 const Variant &with_comments = false,
+                 const Variant &xpath = {},
+                 const Variant &ns_prefixes = {});
+    Variant C14NFile(const Variant &uri,
+                     const Variant &exclusive = false,
+                     const Variant &with_comments = false,
+                     const Variant &xpath = {},
+                     const Variant &ns_prefixes = {});
     Variant __sleep();
     Variant __wakeup();
 };
 
 class DOMXPath {
     Object this_;
+
   public:
     DOMXPath(const Variant &document, const Variant &register_node_n_s = true);
-    Variant evaluate(const Variant &expression, const Variant &context_node = {}, const Variant &register_node_n_s = true);
+    Variant evaluate(const Variant &expression,
+                     const Variant &context_node = {},
+                     const Variant &register_node_n_s = true);
     Variant query(const Variant &expression, const Variant &context_node = {}, const Variant &register_node_n_s = true);
     Variant registerNamespace(const Variant &prefix, const Variant &_namespace);
     Variant registerPhpFunctions(const Variant &restrict = {});
@@ -1444,9 +1713,12 @@ class DOMXPath {
 
 class Dom_XPath {
     Object this_;
+
   public:
     Dom_XPath(const Variant &document, const Variant &register_node_n_s = true);
-    Variant evaluate(const Variant &expression, const Variant &context_node = {}, const Variant &register_node_n_s = true);
+    Variant evaluate(const Variant &expression,
+                     const Variant &context_node = {},
+                     const Variant &register_node_n_s = true);
     Variant query(const Variant &expression, const Variant &context_node = {}, const Variant &register_node_n_s = true);
     Variant registerNamespace(const Variant &prefix, const Variant &_namespace);
     Variant registerPhpFunctions(const Variant &restrict = {});
@@ -1456,16 +1728,17 @@ class Dom_XPath {
 
 class Dom_TokenList {
     Object this_;
+
   public:
     Variant item(const Variant &index);
     Variant contains(const Variant &token);
     template <typename... Args>
-    Variant add(const Args&... tokens) {
-        return call("add", {tokens...});
+    Variant add(const Args &...tokens) {
+        return this_.exec(LITERAL_STRING[16], {tokens...});
     }
     template <typename... Args>
-    Variant remove(const Args&... tokens) {
-        return call("remove", {tokens...});
+    Variant remove(const Args &...tokens) {
+        return this_.exec(LITERAL_STRING[420], {tokens...});
     }
     Variant toggle(const Variant &token, const Variant &force = {});
     Variant replace(const Variant &token, const Variant &new_token);
@@ -1474,4 +1747,4 @@ class Dom_TokenList {
     Variant getIterator();
 };
 
-}
+}  // namespace php

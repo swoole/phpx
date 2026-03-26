@@ -54,4 +54,4 @@ extern Variant FILTER_FLAG_NO_PRIV_RANGE;
 extern Variant FILTER_FLAG_GLOBAL_RANGE;
 extern Variant FILTER_FLAG_HOSTNAME;
 extern Variant FILTER_FLAG_EMAIL_UNICODE;
-}
+}  // namespace php

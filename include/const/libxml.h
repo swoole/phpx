@@ -27,4 +27,4 @@ extern Variant LIBXML_ERR_NONE;
 extern Variant LIBXML_ERR_WARNING;
 extern Variant LIBXML_ERR_ERROR;
 extern Variant LIBXML_ERR_FATAL;
-}
+}  // namespace php

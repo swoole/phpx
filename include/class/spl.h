@@ -1,6 +1,9 @@
+#include "phpx_literal_string.h"
+
 namespace php {
 class LogicException {
     Object this_;
+
   public:
     LogicException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -16,6 +19,7 @@ class LogicException {
 
 class BadFunctionCallException {
     Object this_;
+
   public:
     BadFunctionCallException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -31,6 +35,7 @@ class BadFunctionCallException {
 
 class BadMethodCallException {
     Object this_;
+
   public:
     BadMethodCallException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -46,6 +51,7 @@ class BadMethodCallException {
 
 class DomainException {
     Object this_;
+
   public:
     DomainException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -61,6 +67,7 @@ class DomainException {
 
 class InvalidArgumentException {
     Object this_;
+
   public:
     InvalidArgumentException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -76,6 +83,7 @@ class InvalidArgumentException {
 
 class LengthException {
     Object this_;
+
   public:
     LengthException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -91,6 +99,7 @@ class LengthException {
 
 class OutOfRangeException {
     Object this_;
+
   public:
     OutOfRangeException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -106,6 +115,7 @@ class OutOfRangeException {
 
 class RuntimeException {
     Object this_;
+
   public:
     RuntimeException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -121,6 +131,7 @@ class RuntimeException {
 
 class OutOfBoundsException {
     Object this_;
+
   public:
     OutOfBoundsException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -136,6 +147,7 @@ class OutOfBoundsException {
 
 class OverflowException {
     Object this_;
+
   public:
     OverflowException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -151,6 +163,7 @@ class OverflowException {
 
 class RangeException {
     Object this_;
+
   public:
     RangeException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -166,6 +179,7 @@ class RangeException {
 
 class UnderflowException {
     Object this_;
+
   public:
     UnderflowException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -181,6 +195,7 @@ class UnderflowException {
 
 class UnexpectedValueException {
     Object this_;
+
   public:
     UnexpectedValueException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -196,6 +211,7 @@ class UnexpectedValueException {
 
 class RecursiveIteratorIterator {
     Object this_;
+
   public:
     RecursiveIteratorIterator(const Variant &iterator, const Variant &mode = 0, const Variant &flags = 0);
     Variant rewind();
@@ -219,6 +235,7 @@ class RecursiveIteratorIterator {
 
 class IteratorIterator {
     Object this_;
+
   public:
     IteratorIterator(const Variant &iterator, const Variant &_class = {});
     Variant getInnerIterator();
@@ -231,6 +248,7 @@ class IteratorIterator {
 
 class CallbackFilterIterator {
     Object this_;
+
   public:
     CallbackFilterIterator(const Variant &iterator, const Variant &callback);
     Variant accept();
@@ -244,6 +262,7 @@ class CallbackFilterIterator {
 
 class RecursiveCallbackFilterIterator {
     Object this_;
+
   public:
     RecursiveCallbackFilterIterator(const Variant &iterator, const Variant &callback);
     Variant hasChildren();
@@ -259,6 +278,7 @@ class RecursiveCallbackFilterIterator {
 
 class ParentIterator {
     Object this_;
+
   public:
     ParentIterator(const Variant &iterator);
     Variant accept();
@@ -274,6 +294,7 @@ class ParentIterator {
 
 class LimitIterator {
     Object this_;
+
   public:
     LimitIterator(const Variant &iterator, const Variant &offset = 0, const Variant &limit = -1);
     Variant rewind();
@@ -288,6 +309,7 @@ class LimitIterator {
 
 class CachingIterator {
     Object this_;
+
   public:
     CachingIterator(const Variant &iterator, const Variant &flags = 1);
     Variant rewind();
@@ -310,6 +332,7 @@ class CachingIterator {
 
 class RecursiveCachingIterator {
     Object this_;
+
   public:
     RecursiveCachingIterator(const Variant &iterator, const Variant &flags = 1);
     Variant hasChildren();
@@ -334,6 +357,7 @@ class RecursiveCachingIterator {
 
 class NoRewindIterator {
     Object this_;
+
   public:
     NoRewindIterator(const Variant &iterator);
     Variant rewind();
@@ -346,6 +370,7 @@ class NoRewindIterator {
 
 class AppendIterator {
     Object this_;
+
   public:
     AppendIterator();
     Variant append(const Variant &iterator);
@@ -361,6 +386,7 @@ class AppendIterator {
 
 class InfiniteIterator {
     Object this_;
+
   public:
     InfiniteIterator(const Variant &iterator);
     Variant next();
@@ -373,8 +399,13 @@ class InfiniteIterator {
 
 class RegexIterator {
     Object this_;
+
   public:
-    RegexIterator(const Variant &iterator, const Variant &pattern, const Variant &mode = 0, const Variant &flags = 0, const Variant &preg_flags = 0);
+    RegexIterator(const Variant &iterator,
+                  const Variant &pattern,
+                  const Variant &mode = 0,
+                  const Variant &flags = 0,
+                  const Variant &preg_flags = 0);
     Variant accept();
     Variant getMode();
     Variant setMode(const Variant &mode);
@@ -393,8 +424,13 @@ class RegexIterator {
 
 class RecursiveRegexIterator {
     Object this_;
+
   public:
-    RecursiveRegexIterator(const Variant &iterator, const Variant &pattern, const Variant &mode = 0, const Variant &flags = 0, const Variant &preg_flags = 0);
+    RecursiveRegexIterator(const Variant &iterator,
+                           const Variant &pattern,
+                           const Variant &mode = 0,
+                           const Variant &flags = 0,
+                           const Variant &preg_flags = 0);
     Variant accept();
     Variant hasChildren();
     Variant getChildren();
@@ -415,6 +451,7 @@ class RecursiveRegexIterator {
 
 class EmptyIterator {
     Object this_;
+
   public:
     Variant current();
     Variant next();
@@ -425,8 +462,12 @@ class EmptyIterator {
 
 class RecursiveTreeIterator {
     Object this_;
+
   public:
-    RecursiveTreeIterator(const Variant &iterator, const Variant &flags = 8, const Variant &caching_iterator_flags = 16, const Variant &mode = 1);
+    RecursiveTreeIterator(const Variant &iterator,
+                          const Variant &flags = 8,
+                          const Variant &caching_iterator_flags = 16,
+                          const Variant &mode = 1);
     Variant key();
     Variant current();
     Variant getPrefix();
@@ -453,8 +494,11 @@ class RecursiveTreeIterator {
 
 class ArrayObject {
     Object this_;
+
   public:
-    ArrayObject(const Variant &array = Array{}, const Variant &flags = 0, const Variant &iterator_class = "ArrayIterator");
+    ArrayObject(const Variant &array = Array{},
+                const Variant &flags = 0,
+                const Variant &iterator_class = "ArrayIterator");
     Variant offsetExists(const Variant &key);
     Variant offsetGet(const Variant &key);
     Variant offsetSet(const Variant &key, const Variant &value);
@@ -483,6 +527,7 @@ class ArrayObject {
 
 class _ArrayIterator {
     Object this_;
+
   public:
     _ArrayIterator(const Variant &array = Array{}, const Variant &flags = 0);
     Variant offsetExists(const Variant &key);
@@ -515,6 +560,7 @@ class _ArrayIterator {
 
 class RecursiveArrayIterator {
     Object this_;
+
   public:
     Variant hasChildren();
     Variant getChildren();
@@ -549,6 +595,7 @@ class RecursiveArrayIterator {
 
 class SplFileInfo {
     Object this_;
+
   public:
     SplFileInfo(const Variant &filename);
     Variant getPath();
@@ -585,6 +632,7 @@ class SplFileInfo {
 
 class DirectoryIterator {
     Object this_;
+
   public:
     DirectoryIterator(const Variant &directory);
     Variant getFilename();
@@ -628,6 +676,7 @@ class DirectoryIterator {
 
 class FilesystemIterator {
     Object this_;
+
   public:
     FilesystemIterator(const Variant &directory, const Variant &flags = 4096);
     Variant rewind();
@@ -673,6 +722,7 @@ class FilesystemIterator {
 
 class RecursiveDirectoryIterator {
     Object this_;
+
   public:
     RecursiveDirectoryIterator(const Variant &directory, const Variant &flags = 0);
     Variant hasChildren(const Variant &allow_links = false);
@@ -722,6 +772,7 @@ class RecursiveDirectoryIterator {
 
 class GlobIterator {
     Object this_;
+
   public:
     GlobIterator(const Variant &pattern, const Variant &flags = 0);
     Variant count();
@@ -768,16 +819,26 @@ class GlobIterator {
 
 class SplFileObject {
     Object this_;
+
   public:
-    SplFileObject(const Variant &filename, const Variant &mode = "r", const Variant &use_include_path = false, const Variant &context = {});
+    SplFileObject(const Variant &filename,
+                  const Variant &mode = "r",
+                  const Variant &use_include_path = false,
+                  const Variant &context = {});
     Variant rewind();
     Variant eof();
     Variant valid();
     Variant fgets();
     Variant fread(const Variant &length);
     Variant fgetcsv(const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\");
-    Variant fputcsv(const Variant &fields, const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\", const Variant &eol = "\n");
-    Variant setCsvControl(const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\");
+    Variant fputcsv(const Variant &fields,
+                    const Variant &separator = ",",
+                    const Variant &enclosure = "\"",
+                    const Variant &escape = "\\",
+                    const Variant &eol = "\n");
+    Variant setCsvControl(const Variant &separator = ",",
+                          const Variant &enclosure = "\"",
+                          const Variant &escape = "\\");
     Variant getCsvControl();
     Variant flock(const Variant &operation, const Reference &would_block = {});
     Variant fflush();
@@ -786,8 +847,8 @@ class SplFileObject {
     Variant fgetc();
     Variant fpassthru();
     template <typename... Args>
-    Variant fscanf(const Variant &format, const Args&... vars) {
-        return call("fscanf", {format, vars...});
+    Variant fscanf(const Variant &format, const Args &...vars) {
+        return this_.exec(LITERAL_STRING[1775], {format, vars...});
     }
     Variant fwrite(const Variant &data, const Variant &length = 0);
     Variant fstat();
@@ -837,6 +898,7 @@ class SplFileObject {
 
 class SplTempFileObject {
     Object this_;
+
   public:
     SplTempFileObject(const Variant &max_memory = 2097152);
     Variant rewind();
@@ -845,8 +907,14 @@ class SplTempFileObject {
     Variant fgets();
     Variant fread(const Variant &length);
     Variant fgetcsv(const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\");
-    Variant fputcsv(const Variant &fields, const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\", const Variant &eol = "\n");
-    Variant setCsvControl(const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\");
+    Variant fputcsv(const Variant &fields,
+                    const Variant &separator = ",",
+                    const Variant &enclosure = "\"",
+                    const Variant &escape = "\\",
+                    const Variant &eol = "\n");
+    Variant setCsvControl(const Variant &separator = ",",
+                          const Variant &enclosure = "\"",
+                          const Variant &escape = "\\");
     Variant getCsvControl();
     Variant flock(const Variant &operation, const Reference &would_block = {});
     Variant fflush();
@@ -855,8 +923,8 @@ class SplTempFileObject {
     Variant fgetc();
     Variant fpassthru();
     template <typename... Args>
-    Variant fscanf(const Variant &format, const Args&... vars) {
-        return call("fscanf", {format, vars...});
+    Variant fscanf(const Variant &format, const Args &...vars) {
+        return this_.exec(LITERAL_STRING[1775], {format, vars...});
     }
     Variant fwrite(const Variant &data, const Variant &length = 0);
     Variant fstat();
@@ -906,6 +974,7 @@ class SplTempFileObject {
 
 class SplDoublyLinkedList {
     Object this_;
+
   public:
     Variant add(const Variant &index, const Variant &value);
     Variant pop();
@@ -937,6 +1006,7 @@ class SplDoublyLinkedList {
 
 class SplQueue {
     Object this_;
+
   public:
     Variant enqueue(const Variant &value);
     Variant dequeue();
@@ -970,6 +1040,7 @@ class SplQueue {
 
 class SplStack {
     Object this_;
+
   public:
     Variant add(const Variant &index, const Variant &value);
     Variant pop();
@@ -1001,6 +1072,7 @@ class SplStack {
 
 class SplMinHeap {
     Object this_;
+
   public:
     Variant extract();
     Variant insert(const Variant &value);
@@ -1019,6 +1091,7 @@ class SplMinHeap {
 
 class SplMaxHeap {
     Object this_;
+
   public:
     Variant extract();
     Variant insert(const Variant &value);
@@ -1037,6 +1110,7 @@ class SplMaxHeap {
 
 class SplPriorityQueue {
     Object this_;
+
   public:
     Variant compare(const Variant &priority1, const Variant &priority2);
     Variant insert(const Variant &value, const Variant &priority);
@@ -1058,6 +1132,7 @@ class SplPriorityQueue {
 
 class SplFixedArray {
     Object this_;
+
   public:
     SplFixedArray(const Variant &size = 0);
     Variant __wakeup();
@@ -1078,6 +1153,7 @@ class SplFixedArray {
 
 class SplObjectStorage {
     Object this_;
+
   public:
     Variant attach(const Variant &object, const Variant &info = {});
     Variant detach(const Variant &object);
@@ -1108,6 +1184,7 @@ class SplObjectStorage {
 
 class MultipleIterator {
     Object this_;
+
   public:
     MultipleIterator(const Variant &flags = 1);
     Variant getFlags();
@@ -1124,4 +1201,4 @@ class MultipleIterator {
     Variant __debugInfo();
 };
 
-}
+}  // namespace php

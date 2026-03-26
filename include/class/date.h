@@ -1,6 +1,9 @@
+#include "phpx_literal_string.h"
+
 namespace php {
 class DateTime {
     Object this_;
+
   public:
     DateTime(const Variant &datetime = "now", const Variant &timezone = {});
     Variant __serialize();
@@ -20,7 +23,10 @@ class DateTime {
     Variant setTimezone(const Variant &timezone);
     Variant getOffset();
     Variant getMicrosecond();
-    Variant setTime(const Variant &hour, const Variant &minute, const Variant &second = 0, const Variant &microsecond = 0);
+    Variant setTime(const Variant &hour,
+                    const Variant &minute,
+                    const Variant &second = 0,
+                    const Variant &microsecond = 0);
     Variant setDate(const Variant &year, const Variant &month, const Variant &day);
     Variant setISODate(const Variant &year, const Variant &week, const Variant &day_of_week = 1);
     Variant setTimestamp(const Variant &timestamp);
@@ -31,6 +37,7 @@ class DateTime {
 
 class DateTimeImmutable {
     Object this_;
+
   public:
     DateTimeImmutable(const Variant &datetime = "now", const Variant &timezone = {});
     Variant __serialize();
@@ -50,7 +57,10 @@ class DateTimeImmutable {
     Variant add(const Variant &interval);
     Variant sub(const Variant &interval);
     Variant setTimezone(const Variant &timezone);
-    Variant setTime(const Variant &hour, const Variant &minute, const Variant &second = 0, const Variant &microsecond = 0);
+    Variant setTime(const Variant &hour,
+                    const Variant &minute,
+                    const Variant &second = 0,
+                    const Variant &microsecond = 0);
     Variant setDate(const Variant &year, const Variant &month, const Variant &day);
     Variant setISODate(const Variant &year, const Variant &week, const Variant &day_of_week = 1);
     Variant setTimestamp(const Variant &timestamp);
@@ -61,6 +71,7 @@ class DateTimeImmutable {
 
 class DateTimeZone {
     Object this_;
+
   public:
     DateTimeZone(const Variant &timezone);
     Variant getName();
@@ -77,6 +88,7 @@ class DateTimeZone {
 
 class DateInterval {
     Object this_;
+
   public:
     DateInterval(const Variant &duration);
     static Variant createFromDateString(const Variant &datetime);
@@ -89,9 +101,13 @@ class DateInterval {
 
 class DatePeriod {
     Object this_;
+
   public:
     static Variant createFromISO8601String(const Variant &specification, const Variant &options = 0);
-    DatePeriod(const Variant &start, const Variant &interval = {}, const Variant &end = {}, const Variant &options = {});
+    DatePeriod(const Variant &start,
+               const Variant &interval = {},
+               const Variant &end = {},
+               const Variant &options = {});
     Variant getStartDate();
     Variant getEndDate();
     Variant getDateInterval();
@@ -105,6 +121,7 @@ class DatePeriod {
 
 class DateError {
     Object this_;
+
   public:
     DateError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -120,6 +137,7 @@ class DateError {
 
 class DateObjectError {
     Object this_;
+
   public:
     DateObjectError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -135,6 +153,7 @@ class DateObjectError {
 
 class DateRangeError {
     Object this_;
+
   public:
     DateRangeError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -150,6 +169,7 @@ class DateRangeError {
 
 class DateException {
     Object this_;
+
   public:
     DateException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -165,6 +185,7 @@ class DateException {
 
 class DateInvalidTimeZoneException {
     Object this_;
+
   public:
     DateInvalidTimeZoneException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -180,6 +201,7 @@ class DateInvalidTimeZoneException {
 
 class DateInvalidOperationException {
     Object this_;
+
   public:
     DateInvalidOperationException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -195,6 +217,7 @@ class DateInvalidOperationException {
 
 class DateMalformedStringException {
     Object this_;
+
   public:
     DateMalformedStringException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -210,8 +233,11 @@ class DateMalformedStringException {
 
 class DateMalformedIntervalStringException {
     Object this_;
+
   public:
-    DateMalformedIntervalStringException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    DateMalformedIntervalStringException(const Variant &message = "",
+                                         const Variant &code = 0,
+                                         const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
     Variant getCode();
@@ -225,8 +251,11 @@ class DateMalformedIntervalStringException {
 
 class DateMalformedPeriodStringException {
     Object this_;
+
   public:
-    DateMalformedPeriodStringException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    DateMalformedPeriodStringException(const Variant &message = "",
+                                       const Variant &code = 0,
+                                       const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
     Variant getCode();
@@ -238,4 +267,4 @@ class DateMalformedPeriodStringException {
     Variant __toString();
 };
 
-}
+}  // namespace php

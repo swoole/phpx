@@ -1,5 +1,12 @@
+#include "phpx.h"
+#include "phpx_literal_string.h"
+
 namespace php {
-Variant socket_select(const Reference &read, const Reference &write, const Reference &except, const Variant &seconds, const Variant &microseconds = 0);
+Variant socket_select(const Reference &read,
+                      const Reference &write,
+                      const Reference &except,
+                      const Variant &seconds,
+                      const Variant &microseconds = 0);
 Variant socket_create_listen(const Variant &port, const Variant &backlog = 4096);
 Variant socket_accept(const Variant &socket);
 Variant socket_set_nonblock(const Variant &socket);
@@ -16,8 +23,18 @@ Variant socket_strerror(const Variant &error_code);
 Variant socket_bind(const Variant &socket, const Variant &address, const Variant &port = 0);
 Variant socket_recv(const Variant &socket, const Reference &data, const Variant &length, const Variant &flags);
 Variant socket_send(const Variant &socket, const Variant &data, const Variant &length, const Variant &flags);
-Variant socket_recvfrom(const Variant &socket, const Reference &data, const Variant &length, const Variant &flags, const Reference &address, const Reference &port = {});
-Variant socket_sendto(const Variant &socket, const Variant &data, const Variant &length, const Variant &flags, const Variant &address, const Variant &port = {});
+Variant socket_recvfrom(const Variant &socket,
+                        const Reference &data,
+                        const Variant &length,
+                        const Variant &flags,
+                        const Reference &address,
+                        const Reference &port = {});
+Variant socket_sendto(const Variant &socket,
+                      const Variant &data,
+                      const Variant &length,
+                      const Variant &flags,
+                      const Variant &address,
+                      const Variant &port = {});
 Variant socket_get_option(const Variant &socket, const Variant &level, const Variant &option);
 Variant socket_getopt(const Variant &socket, const Variant &level, const Variant &option);
 Variant socket_set_option(const Variant &socket, const Variant &level, const Variant &option, const Variant &value);
@@ -36,4 +53,4 @@ Variant socket_addrinfo_lookup(const Variant &host, const Variant &service = {},
 Variant socket_addrinfo_connect(const Variant &address);
 Variant socket_addrinfo_bind(const Variant &address);
 Variant socket_addrinfo_explain(const Variant &address);
-}
+}  // namespace php

@@ -1,6 +1,9 @@
+#include "phpx_literal_string.h"
+
 namespace php {
 class JsonException {
     Object this_;
+
   public:
     JsonException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -14,4 +17,4 @@ class JsonException {
     Variant __toString();
 };
 
-}
+}  // namespace php

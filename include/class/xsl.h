@@ -1,6 +1,9 @@
+#include "phpx_literal_string.h"
+
 namespace php {
 class XSLTProcessor {
     Object this_;
+
   public:
     Variant importStylesheet(const Variant &stylesheet);
     Variant transformToDoc(const Variant &document, const Variant &return_class = {});
@@ -17,4 +20,4 @@ class XSLTProcessor {
     Variant getSecurityPrefs();
 };
 
-}
+}  // namespace php

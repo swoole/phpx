@@ -26,4 +26,4 @@ extern Variant ZLIB_DATA_ERROR;
 extern Variant ZLIB_MEM_ERROR;
 extern Variant ZLIB_BUF_ERROR;
 extern Variant ZLIB_VERSION_ERROR;
-}
+}  // namespace php

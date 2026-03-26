@@ -151,4 +151,4 @@ extern Variant T_AMPERSAND_NOT_FOLLOWED_BY_VAR_OR_VARARG;
 extern Variant T_BAD_CHARACTER;
 extern Variant T_DOUBLE_COLON;
 extern Variant TOKEN_PARSE;
-}
+}  // namespace php

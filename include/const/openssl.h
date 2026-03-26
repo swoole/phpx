@@ -64,4 +64,4 @@ extern Variant OPENSSL_TLSEXT_SERVER_NAME;
 extern Variant OPENSSL_ENCODING_DER;
 extern Variant OPENSSL_ENCODING_SMIME;
 extern Variant OPENSSL_ENCODING_PEM;
-}
+}  // namespace php

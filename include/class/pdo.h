@@ -1,6 +1,9 @@
+#include "phpx_literal_string.h"
+
 namespace php {
 class PDOException {
     Object this_;
+
   public:
     PDOException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -16,9 +19,13 @@ class PDOException {
 
 class PDO {
     Object this_;
+
   public:
     PDO(const Variant &dsn, const Variant &username = {}, const Variant &password = {}, const Variant &options = {});
-    static Variant connect(const Variant &dsn, const Variant &username = {}, const Variant &password = {}, const Variant &options = {});
+    static Variant connect(const Variant &dsn,
+                           const Variant &username = {},
+                           const Variant &password = {},
+                           const Variant &options = {});
     Variant beginTransaction();
     Variant commit();
     Variant errorCode();
@@ -30,8 +37,8 @@ class PDO {
     Variant lastInsertId(const Variant &name = {});
     Variant prepare(const Variant &query, const Variant &options = Array{});
     template <typename... Args>
-    Variant query(const Variant &query, const Variant &fetch_mode, const Args&... fetch_mode_args) {
-        return call("query", {query, fetch_mode, fetch_mode_args...});
+    Variant query(const Variant &query, const Variant &fetch_mode, const Args &...fetch_mode_args) {
+        return this_.exec(LITERAL_STRING[477], {query, fetch_mode, fetch_mode_args...});
     }
     Variant quote(const Variant &string, const Variant &type = 2);
     Variant rollBack();
@@ -40,9 +47,18 @@ class PDO {
 
 class PDOStatement {
     Object this_;
+
   public:
-    Variant bindColumn(const Variant &column, const Reference &var, const Variant &type = 2, const Variant &max_length = 0, const Variant &driver_options = {});
-    Variant bindParam(const Variant &param, const Reference &var, const Variant &type = 2, const Variant &max_length = 0, const Variant &driver_options = {});
+    Variant bindColumn(const Variant &column,
+                       const Reference &var,
+                       const Variant &type = 2,
+                       const Variant &max_length = 0,
+                       const Variant &driver_options = {});
+    Variant bindParam(const Variant &param,
+                      const Reference &var,
+                      const Variant &type = 2,
+                      const Variant &max_length = 0,
+                      const Variant &driver_options = {});
     Variant bindValue(const Variant &param, const Variant &value, const Variant &type = 2);
     Variant closeCursor();
     Variant columnCount();
@@ -52,8 +68,8 @@ class PDOStatement {
     Variant execute(const Variant &params = {});
     Variant fetch(const Variant &mode = 0, const Variant &cursor_orientation = 0, const Variant &cursor_offset = 0);
     template <typename... Args>
-    Variant fetchAll(const Variant &mode, const Args&... args) {
-        return call("fetchAll", {mode, args...});
+    Variant fetchAll(const Variant &mode, const Args &...args) {
+        return this_.exec(LITERAL_STRING[842], {mode, args...});
     }
     Variant fetchColumn(const Variant &column = 0);
     Variant fetchObject(const Variant &_class = "stdClass", const Variant &constructor_args = Array{});
@@ -63,10 +79,10 @@ class PDOStatement {
     Variant rowCount();
     Variant setAttribute(const Variant &attribute, const Variant &value);
     template <typename... Args>
-    Variant setFetchMode(const Variant &mode, const Args&... args) {
-        return call("setFetchMode", {mode, args...});
+    Variant setFetchMode(const Variant &mode, const Args &...args) {
+        return this_.exec(LITERAL_STRING[848], {mode, args...});
     }
     Variant getIterator();
 };
 
-}
+}  // namespace php

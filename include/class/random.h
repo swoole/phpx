@@ -1,6 +1,9 @@
+#include "phpx_literal_string.h"
+
 namespace php {
 class Random_RandomError {
     Object this_;
+
   public:
     Random_RandomError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -16,6 +19,7 @@ class Random_RandomError {
 
 class Random_BrokenRandomEngineError {
     Object this_;
+
   public:
     Random_BrokenRandomEngineError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -31,6 +35,7 @@ class Random_BrokenRandomEngineError {
 
 class Random_RandomException {
     Object this_;
+
   public:
     Random_RandomException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -46,6 +51,7 @@ class Random_RandomException {
 
 class Random_Engine_Mt19937 {
     Object this_;
+
   public:
     Random_Engine_Mt19937(const Variant &seed = {}, const Variant &mode = 0);
     Variant generate();
@@ -56,6 +62,7 @@ class Random_Engine_Mt19937 {
 
 class Random_Engine_PcgOneseq128XslRr64 {
     Object this_;
+
   public:
     Random_Engine_PcgOneseq128XslRr64(const Variant &seed = {});
     Variant generate();
@@ -67,6 +74,7 @@ class Random_Engine_PcgOneseq128XslRr64 {
 
 class Random_Engine_Xoshiro256StarStar {
     Object this_;
+
   public:
     Random_Engine_Xoshiro256StarStar(const Variant &seed = {});
     Variant generate();
@@ -79,12 +87,14 @@ class Random_Engine_Xoshiro256StarStar {
 
 class Random_Engine_Secure {
     Object this_;
+
   public:
     Variant generate();
 };
 
 class Random_Randomizer {
     Object this_;
+
   public:
     Random_Randomizer(const Variant &engine = {});
     Variant nextInt();
@@ -102,8 +112,9 @@ class Random_Randomizer {
 
 class Random_IntervalBoundary {
     Object this_;
+
   public:
     static Variant cases();
 };
 
-}
+}  // namespace php

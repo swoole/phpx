@@ -1,25 +1,58 @@
+#include "phpx.h"
+#include "phpx_literal_string.h"
+
 namespace php {
-Variant openssl_x509_export_to_file(const Variant &certificate, const Variant &output_filename, const Variant &no_text = true);
+Variant openssl_x509_export_to_file(const Variant &certificate,
+                                    const Variant &output_filename,
+                                    const Variant &no_text = true);
 Variant openssl_x509_export(const Variant &certificate, const Reference &output, const Variant &no_text = true);
-Variant openssl_x509_fingerprint(const Variant &certificate, const Variant &digest_algo = "sha1", const Variant &binary = false);
+Variant openssl_x509_fingerprint(const Variant &certificate,
+                                 const Variant &digest_algo = "sha1",
+                                 const Variant &binary = false);
 Variant openssl_x509_check_private_key(const Variant &certificate, const Variant &private_key);
 Variant openssl_x509_verify(const Variant &certificate, const Variant &public_key);
 Variant openssl_x509_parse(const Variant &certificate, const Variant &short_names = true);
-Variant openssl_x509_checkpurpose(const Variant &certificate, const Variant &purpose, const Variant &ca_info = Array{}, const Variant &untrusted_certificates_file = {});
+Variant openssl_x509_checkpurpose(const Variant &certificate,
+                                  const Variant &purpose,
+                                  const Variant &ca_info = Array{},
+                                  const Variant &untrusted_certificates_file = {});
 Variant openssl_x509_read(const Variant &certificate);
 Variant openssl_x509_free(const Variant &certificate);
-Variant openssl_pkcs12_export_to_file(const Variant &certificate, const Variant &output_filename, const Variant &private_key, const Variant &passphrase, const Variant &options = Array{});
-Variant openssl_pkcs12_export(const Variant &certificate, const Reference &output, const Variant &private_key, const Variant &passphrase, const Variant &options = Array{});
+Variant openssl_pkcs12_export_to_file(const Variant &certificate,
+                                      const Variant &output_filename,
+                                      const Variant &private_key,
+                                      const Variant &passphrase,
+                                      const Variant &options = Array{});
+Variant openssl_pkcs12_export(const Variant &certificate,
+                              const Reference &output,
+                              const Variant &private_key,
+                              const Variant &passphrase,
+                              const Variant &options = Array{});
 Variant openssl_pkcs12_read(const Variant &pkcs12, const Reference &certificates, const Variant &passphrase);
 Variant openssl_csr_export_to_file(const Variant &csr, const Variant &output_filename, const Variant &no_text = true);
 Variant openssl_csr_export(const Variant &csr, const Reference &output, const Variant &no_text = true);
-Variant openssl_csr_sign(const Variant &csr, const Variant &ca_certificate, const Variant &private_key, const Variant &days, const Variant &options = {}, const Variant &serial = 0, const Variant &serial_hex = {});
-Variant openssl_csr_new(const Variant &distinguished_names, const Reference &private_key, const Variant &options = {}, const Variant &extra_attributes = {});
+Variant openssl_csr_sign(const Variant &csr,
+                         const Variant &ca_certificate,
+                         const Variant &private_key,
+                         const Variant &days,
+                         const Variant &options = {},
+                         const Variant &serial = 0,
+                         const Variant &serial_hex = {});
+Variant openssl_csr_new(const Variant &distinguished_names,
+                        const Reference &private_key,
+                        const Variant &options = {},
+                        const Variant &extra_attributes = {});
 Variant openssl_csr_get_subject(const Variant &csr, const Variant &short_names = true);
 Variant openssl_csr_get_public_key(const Variant &csr, const Variant &short_names = true);
 Variant openssl_pkey_new(const Variant &options = {});
-Variant openssl_pkey_export_to_file(const Variant &key, const Variant &output_filename, const Variant &passphrase = {}, const Variant &options = {});
-Variant openssl_pkey_export(const Variant &key, const Reference &output, const Variant &passphrase = {}, const Variant &options = {});
+Variant openssl_pkey_export_to_file(const Variant &key,
+                                    const Variant &output_filename,
+                                    const Variant &passphrase = {},
+                                    const Variant &options = {});
+Variant openssl_pkey_export(const Variant &key,
+                            const Reference &output,
+                            const Variant &passphrase = {},
+                            const Variant &options = {});
 Variant openssl_pkey_get_public(const Variant &public_key);
 Variant openssl_get_publickey(const Variant &public_key);
 Variant openssl_pkey_free(const Variant &key);
@@ -27,32 +60,122 @@ Variant openssl_free_key(const Variant &key);
 Variant openssl_pkey_get_private(const Variant &private_key, const Variant &passphrase = {});
 Variant openssl_get_privatekey(const Variant &private_key, const Variant &passphrase = {});
 Variant openssl_pkey_get_details(const Variant &key);
-Variant openssl_pbkdf2(const Variant &password, const Variant &salt, const Variant &key_length, const Variant &iterations, const Variant &digest_algo = "sha1");
-Variant openssl_pkcs7_verify(const Variant &input_filename, const Variant &flags, const Variant &signers_certificates_filename = {}, const Variant &ca_info = Array{}, const Variant &untrusted_certificates_filename = {}, const Variant &content = {}, const Variant &output_filename = {});
-Variant openssl_pkcs7_encrypt(const Variant &input_filename, const Variant &output_filename, const Variant &certificate, const Variant &headers, const Variant &flags = 0, const Variant &cipher_algo = 5);
-Variant openssl_pkcs7_sign(const Variant &input_filename, const Variant &output_filename, const Variant &certificate, const Variant &private_key, const Variant &headers, const Variant &flags = 64, const Variant &untrusted_certificates_filename = {});
-Variant openssl_pkcs7_decrypt(const Variant &input_filename, const Variant &output_filename, const Variant &certificate, const Variant &private_key = {});
+Variant openssl_pbkdf2(const Variant &password,
+                       const Variant &salt,
+                       const Variant &key_length,
+                       const Variant &iterations,
+                       const Variant &digest_algo = "sha1");
+Variant openssl_pkcs7_verify(const Variant &input_filename,
+                             const Variant &flags,
+                             const Variant &signers_certificates_filename = {},
+                             const Variant &ca_info = Array{},
+                             const Variant &untrusted_certificates_filename = {},
+                             const Variant &content = {},
+                             const Variant &output_filename = {});
+Variant openssl_pkcs7_encrypt(const Variant &input_filename,
+                              const Variant &output_filename,
+                              const Variant &certificate,
+                              const Variant &headers,
+                              const Variant &flags = 0,
+                              const Variant &cipher_algo = 5);
+Variant openssl_pkcs7_sign(const Variant &input_filename,
+                           const Variant &output_filename,
+                           const Variant &certificate,
+                           const Variant &private_key,
+                           const Variant &headers,
+                           const Variant &flags = 64,
+                           const Variant &untrusted_certificates_filename = {});
+Variant openssl_pkcs7_decrypt(const Variant &input_filename,
+                              const Variant &output_filename,
+                              const Variant &certificate,
+                              const Variant &private_key = {});
 Variant openssl_pkcs7_read(const Variant &data, const Reference &certificates);
-Variant openssl_cms_verify(const Variant &input_filename, const Variant &flags = 0, const Variant &certificates = {}, const Variant &ca_info = Array{}, const Variant &untrusted_certificates_filename = {}, const Variant &content = {}, const Variant &pk7 = {}, const Variant &sigfile = {}, const Variant &encoding = 1);
-Variant openssl_cms_encrypt(const Variant &input_filename, const Variant &output_filename, const Variant &certificate, const Variant &headers, const Variant &flags = 0, const Variant &encoding = 1, const Variant &cipher_algo = 5);
-Variant openssl_cms_sign(const Variant &input_filename, const Variant &output_filename, const Variant &certificate, const Variant &private_key, const Variant &headers, const Variant &flags = 0, const Variant &encoding = 1, const Variant &untrusted_certificates_filename = {});
-Variant openssl_cms_decrypt(const Variant &input_filename, const Variant &output_filename, const Variant &certificate, const Variant &private_key = {}, const Variant &encoding = 1);
+Variant openssl_cms_verify(const Variant &input_filename,
+                           const Variant &flags = 0,
+                           const Variant &certificates = {},
+                           const Variant &ca_info = Array{},
+                           const Variant &untrusted_certificates_filename = {},
+                           const Variant &content = {},
+                           const Variant &pk7 = {},
+                           const Variant &sigfile = {},
+                           const Variant &encoding = 1);
+Variant openssl_cms_encrypt(const Variant &input_filename,
+                            const Variant &output_filename,
+                            const Variant &certificate,
+                            const Variant &headers,
+                            const Variant &flags = 0,
+                            const Variant &encoding = 1,
+                            const Variant &cipher_algo = 5);
+Variant openssl_cms_sign(const Variant &input_filename,
+                         const Variant &output_filename,
+                         const Variant &certificate,
+                         const Variant &private_key,
+                         const Variant &headers,
+                         const Variant &flags = 0,
+                         const Variant &encoding = 1,
+                         const Variant &untrusted_certificates_filename = {});
+Variant openssl_cms_decrypt(const Variant &input_filename,
+                            const Variant &output_filename,
+                            const Variant &certificate,
+                            const Variant &private_key = {},
+                            const Variant &encoding = 1);
 Variant openssl_cms_read(const Variant &input_filename, const Reference &certificates);
-Variant openssl_private_encrypt(const Variant &data, const Reference &encrypted_data, const Variant &private_key, const Variant &padding = 1);
-Variant openssl_private_decrypt(const Variant &data, const Reference &decrypted_data, const Variant &private_key, const Variant &padding = 1);
-Variant openssl_public_encrypt(const Variant &data, const Reference &encrypted_data, const Variant &public_key, const Variant &padding = 1);
-Variant openssl_public_decrypt(const Variant &data, const Reference &decrypted_data, const Variant &public_key, const Variant &padding = 1);
+Variant openssl_private_encrypt(const Variant &data,
+                                const Reference &encrypted_data,
+                                const Variant &private_key,
+                                const Variant &padding = 1);
+Variant openssl_private_decrypt(const Variant &data,
+                                const Reference &decrypted_data,
+                                const Variant &private_key,
+                                const Variant &padding = 1);
+Variant openssl_public_encrypt(const Variant &data,
+                               const Reference &encrypted_data,
+                               const Variant &public_key,
+                               const Variant &padding = 1);
+Variant openssl_public_decrypt(const Variant &data,
+                               const Reference &decrypted_data,
+                               const Variant &public_key,
+                               const Variant &padding = 1);
 Variant openssl_error_string();
-Variant openssl_sign(const Variant &data, const Reference &signature, const Variant &private_key, const Variant &algorithm = 1);
-Variant openssl_verify(const Variant &data, const Variant &signature, const Variant &public_key, const Variant &algorithm = 1);
-Variant openssl_seal(const Variant &data, const Reference &sealed_data, const Reference &encrypted_keys, const Variant &public_key, const Variant &cipher_algo, const Reference &iv = {});
-Variant openssl_open(const Variant &data, const Reference &output, const Variant &encrypted_key, const Variant &private_key, const Variant &cipher_algo, const Variant &iv = {});
+Variant openssl_sign(const Variant &data,
+                     const Reference &signature,
+                     const Variant &private_key,
+                     const Variant &algorithm = 1);
+Variant openssl_verify(const Variant &data,
+                       const Variant &signature,
+                       const Variant &public_key,
+                       const Variant &algorithm = 1);
+Variant openssl_seal(const Variant &data,
+                     const Reference &sealed_data,
+                     const Reference &encrypted_keys,
+                     const Variant &public_key,
+                     const Variant &cipher_algo,
+                     const Reference &iv = {});
+Variant openssl_open(const Variant &data,
+                     const Reference &output,
+                     const Variant &encrypted_key,
+                     const Variant &private_key,
+                     const Variant &cipher_algo,
+                     const Variant &iv = {});
 Variant openssl_get_md_methods(const Variant &aliases = false);
 Variant openssl_get_cipher_methods(const Variant &aliases = false);
 Variant openssl_get_curve_names();
 Variant openssl_digest(const Variant &data, const Variant &digest_algo, const Variant &binary = false);
-Variant openssl_encrypt(const Variant &data, const Variant &cipher_algo, const Variant &passphrase, const Variant &options = 0, const Variant &iv = "", const Reference &tag = {}, const Variant &aad = "", const Variant &tag_length = 16);
-Variant openssl_decrypt(const Variant &data, const Variant &cipher_algo, const Variant &passphrase, const Variant &options = 0, const Variant &iv = "", const Variant &tag = {}, const Variant &aad = "");
+Variant openssl_encrypt(const Variant &data,
+                        const Variant &cipher_algo,
+                        const Variant &passphrase,
+                        const Variant &options = 0,
+                        const Variant &iv = "",
+                        const Reference &tag = {},
+                        const Variant &aad = "",
+                        const Variant &tag_length = 16);
+Variant openssl_decrypt(const Variant &data,
+                        const Variant &cipher_algo,
+                        const Variant &passphrase,
+                        const Variant &options = 0,
+                        const Variant &iv = "",
+                        const Variant &tag = {},
+                        const Variant &aad = "");
 Variant openssl_cipher_iv_length(const Variant &cipher_algo);
 Variant openssl_cipher_key_length(const Variant &cipher_algo);
 Variant openssl_dh_compute_key(const Variant &public_key, const Variant &private_key);
@@ -63,4 +186,4 @@ Variant openssl_spki_verify(const Variant &spki);
 Variant openssl_spki_export(const Variant &spki);
 Variant openssl_spki_export_challenge(const Variant &spki);
 Variant openssl_get_cert_locations();
-}
+}  // namespace php

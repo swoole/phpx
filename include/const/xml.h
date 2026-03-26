@@ -27,4 +27,4 @@ extern Variant XML_OPTION_SKIP_TAGSTART;
 extern Variant XML_OPTION_SKIP_WHITE;
 extern Variant XML_OPTION_PARSE_HUGE;
 extern Variant XML_SAX_IMPL;
-}
+}  // namespace php

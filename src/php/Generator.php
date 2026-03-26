@@ -16,6 +16,11 @@ class Generator
     protected string $extension;
     protected ReflectionExtension $extRef;
     public static string $rootDir = '';
+    /**
+     * @var array<string, int>
+     */
+    static protected array $literalString = [];
+    static protected int $literalStringIndex = 0;
 
     const array BUILTIN_FUNCTIONS = [
         'sizeof',
@@ -27,11 +32,11 @@ class Generator
         'strnatcasecmp',
     ];
 
-    const BUILTIN_CLASSES = [
+    const array BUILTIN_CLASSES = [
         'ArrayIterator',
     ];
 
-    const KEYWORDS = [
+    const array KEYWORDS = [
         'delete', 'auto', 'setbit', 'throw', 'getThis', 'namespace', 'class', 'default', 'case', 'break', 'continue',
         'return',
         'enum',
@@ -60,6 +65,24 @@ class Generator
         $generator->export();
     }
 
+    public static function makeLiteralString(): void
+    {
+
+        $code = "#include <phpx.h>\n";
+        $code .= "extern php::Variant LITERAL_STRING[".count(self::$literalString). "];\n";
+
+        file_put_contents(self::getRootDir() . '/include/phpx_literal_string.h', $code);
+
+        $code = "#include <phpx.h>\n";
+        $code .= "php::Variant LITERAL_STRING[" . count(self::$literalString) . "] = {\n";
+        foreach (self::$literalString as $symbol => $index) {
+            $code .= "\t{ ZEND_STRL(\"" . self::escapeString($symbol) . "\"), true }, // [$index]\n";
+        }
+        $code .= "};\n";
+
+        file_put_contents(self::getRootDir() . '/src/core/literal_string.cc', $code);
+    }
+
     public static function render($tplFile, $outFile, $vars, $prefix = ''): void
     {
         extract($vars);
@@ -73,16 +96,18 @@ class Generator
         }
 
         file_put_contents($outFile, $out);
+        shell_exec("clang-format -i " . $outFile);
+    }
+
+    public static function escapeString(string $string): string
+    {
+        return addcslashes($string, "\\\"\n\r\t\v\f\0\x01..\x1f\x7f..\xff");
     }
 
     public static function valueToCppRepr($v, bool $byRef = false): ?string
     {
         if (is_string($v)) {
-            $v = str_replace(
-                ["\\", "\n", "\r", "\t", "\v", "\x00", "\""],
-                ["\\\\", "\\n", "\\r", "\\t", "\\v", "\\x00", "\\\""],
-                $v
-            );
+            $v = self::escapeString($v);
             return "\"$v\"";
         } elseif (is_numeric($v)) {
             if (is_infinite($v)) {
@@ -138,11 +163,22 @@ class Generator
         $this->extRef = new ReflectionExtension($this->extension);
     }
 
+    static public function addLiteralString(string $symbol): string
+    {
+        if (!isset(self::$literalString[$symbol])) {
+            self::$literalString[$symbol] = self::$literalStringIndex++;
+        }
+        return 'LITERAL_STRING[' . self::$literalString[$symbol] . ']';
+    }
+
     public function export(): void
     {
         $ext = strtolower($this->extension);
 
+        $functions = $this->getFunctions();
         $constants = $this->getConstants();
+        $classes = $this->getClasses();
+
         if (!empty($constants)) {
             self::render(
                 __DIR__ . '/templates/const-impl.tpl',
@@ -157,7 +193,6 @@ class Generator
             );
         }
 
-        $functions = $this->getFunctions();
         if (!empty($functions)) {
             self::render(
                 __DIR__ . '/templates/func-impl.tpl',
@@ -172,7 +207,6 @@ class Generator
             );
         }
 
-        $classes = $this->getClasses();
         if (!empty($classes)) {
             self::render(
                 __DIR__ . '/templates/class-impl.tpl',
@@ -192,18 +226,19 @@ class Generator
     {
         $functions = [];
         foreach ($this->extRef->getFunctions() as $function) {
-            $fn_name = $function->getName();
-            if (in_array($fn_name, self::BUILTIN_FUNCTIONS)) {
+            $name = $function->getName();
+            if (in_array($name, self::BUILTIN_FUNCTIONS)) {
                 continue;
             }
-            self::nameSafety($fn_name);
+            self::nameSafety($name);
 
             [$args, $call, $args_impl, $variadic] = $this->getArgs($function->getParameters());
-            $functions[$fn_name] = [
+            $symbol = $function->getName();
+            $functions[$name] = [
                 'args' => $args ? implode(', ', $args) : '',
                 'args_impl' => $args ? implode(', ', $args_impl) : '',
                 'call' => $call ? '{' . implode(', ', $call) . '}' : '{}',
-                'name' => $fn_name,
+                'symbol' => self::addLiteralString($symbol),
                 'variadic' => $variadic,
             ];
         }
@@ -271,11 +306,12 @@ class Generator
         $list = $this->extRef->getClasses();
         foreach ($list as $className => $ref) {
             $methods = [];
-            $className = str_replace("\\", '_', $className);
             if (in_array($className, self::BUILTIN_CLASSES)) {
                 $className = '_' . $className;
             }
 
+            $classSymbol = $ref->getName();
+            $className = str_replace("\\", '_', $className);
             if ($ref->isAbstract() || $ref->isInterface() || $ref->isTrait()) {
                 continue;
             }
@@ -285,23 +321,43 @@ class Generator
                     continue;
                 }
                 $params = $method->getParameters();
-                $fn_name = $method->getName();
+                $name = $method->getName();
 
                 if ($method->isConstructor()) {
-                    $fn_name = $className;
+                    $name = $className;
                 }
-                self::nameSafety($fn_name);
+                self::nameSafety($name);
 
                 [$args, $call, $args_impl, $variadic] = $this->getArgs($params);
-                $methods[$fn_name] = [
+                $symbol = $method->isStatic() ? $className . '::' . $method->getName() : $method->getName();
+
+                $info =[
                     'args' => $args ? implode(', ', $args) : '',
                     'args_impl' => $args ? implode(', ', $args_impl) : '',
                     'call' => $call ? '{' . implode(', ', $call) . '}' : '{}',
                     'static' => $method->isStatic(),
                     'ctor' => $method->isConstructor(),
-                    'name' => $method->getName(),
+                    'symbol' => self::addLiteralString($symbol),
                     'variadic' => $variadic,
                 ];
+
+                $code = '';
+                if (!$info['ctor']) {
+                    $code .= 'Variant ';
+                }
+                $code .= $variadic ? $name : $className . '::' . $name;
+                $code .= "({$info['args_impl']}) {" . "\n";
+                 if ($info['ctor']) {
+                    $classSymbolLiteralString = self::addLiteralString($classSymbol);
+                     $code .= "\tthis_ = newObject({$classSymbolLiteralString}, {$info['call']});\n";
+                 } elseif ($info['static']) {
+                     $code .= "\treturn php::call({$info['symbol']}, {$info['call']});\n";
+                 } else {
+                     $code .= "\treturn this_.exec({$info['symbol']}, {$info['call']});\n";
+                 }
+                $code .= "}\n";
+                 $info['impl_code'] = $code;
+                $methods[$name] = $info;
             }
 
             if (empty($constants) and empty($methods)) {
@@ -310,7 +366,7 @@ class Generator
 
             $classes[$className] = [
                 'methods' => $methods,
-                'class' => self::valueToCppRepr($ref->getName()),
+                'class' => self::addLiteralString($classSymbol),
             ];
         }
         return $classes;

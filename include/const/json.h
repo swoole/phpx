@@ -28,4 +28,4 @@ extern Variant JSON_ERROR_UNSUPPORTED_TYPE;
 extern Variant JSON_ERROR_INVALID_PROPERTY_NAME;
 extern Variant JSON_ERROR_UTF16;
 extern Variant JSON_ERROR_NON_BACKED_ENUM;
-}
+}  // namespace php

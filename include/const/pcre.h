@@ -18,4 +18,4 @@ extern Variant PCRE_VERSION;
 extern Variant PCRE_VERSION_MAJOR;
 extern Variant PCRE_VERSION_MINOR;
 extern Variant PCRE_JIT_SUPPORT;
-}
+}  // namespace php

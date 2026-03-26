@@ -1,6 +1,9 @@
+#include "phpx_literal_string.h"
+
 namespace php {
 class ReflectionException {
     Object this_;
+
   public:
     ReflectionException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -16,20 +19,22 @@ class ReflectionException {
 
 class Reflection {
     Object this_;
+
   public:
     static Variant getModifierNames(const Variant &modifiers);
 };
 
 class ReflectionFunction {
     Object this_;
+
   public:
     ReflectionFunction(const Variant &function);
     Variant __toString();
     Variant isAnonymous();
     Variant isDisabled();
     template <typename... Args>
-    Variant invoke(const Args&... args) {
-        return call("invoke", {args...});
+    Variant invoke(const Args &...args) {
+        return this_.exec(LITERAL_STRING[1414], {args...});
     }
     Variant invokeArgs(const Variant &args);
     Variant getClosure();
@@ -68,6 +73,7 @@ class ReflectionFunction {
 
 class ReflectionGenerator {
     Object this_;
+
   public:
     ReflectionGenerator(const Variant &generator);
     Variant getExecutingLine();
@@ -81,6 +87,7 @@ class ReflectionGenerator {
 
 class ReflectionParameter {
     Object this_;
+
   public:
     ReflectionParameter(const Variant &function, const Variant &param);
     Variant __toString();
@@ -108,6 +115,7 @@ class ReflectionParameter {
 
 class ReflectionNamedType {
     Object this_;
+
   public:
     Variant getName();
     Variant isBuiltin();
@@ -117,6 +125,7 @@ class ReflectionNamedType {
 
 class ReflectionUnionType {
     Object this_;
+
   public:
     Variant getTypes();
     Variant allowsNull();
@@ -125,6 +134,7 @@ class ReflectionUnionType {
 
 class ReflectionIntersectionType {
     Object this_;
+
   public:
     Variant getTypes();
     Variant allowsNull();
@@ -133,6 +143,7 @@ class ReflectionIntersectionType {
 
 class ReflectionMethod {
     Object this_;
+
   public:
     ReflectionMethod(const Variant &object_or_method, const Variant &method = {});
     static Variant createFromMethodName(const Variant &method);
@@ -147,8 +158,8 @@ class ReflectionMethod {
     Variant getClosure(const Variant &object = {});
     Variant getModifiers();
     template <typename... Args>
-    Variant invoke(const Variant &object, const Args&... args) {
-        return call("invoke", {object, args...});
+    Variant invoke(const Variant &object, const Args &...args) {
+        return this_.exec(LITERAL_STRING[1414], {object, args...});
     }
     Variant invokeArgs(const Variant &object, const Variant &args);
     Variant getDeclaringClass();
@@ -190,6 +201,7 @@ class ReflectionMethod {
 
 class ReflectionClass {
     Object this_;
+
   public:
     ReflectionClass(const Variant &object_or_class);
     Variant __toString();
@@ -229,8 +241,8 @@ class ReflectionClass {
     Variant getModifiers();
     Variant isInstance(const Variant &object);
     template <typename... Args>
-    Variant newInstance(const Args&... args) {
-        return call("newInstance", {args...});
+    Variant newInstance(const Args &...args) {
+        return this_.exec(LITERAL_STRING[1513], {args...});
     }
     Variant newInstanceWithoutConstructor();
     Variant newInstanceArgs(const Variant &args = Array{});
@@ -261,6 +273,7 @@ class ReflectionClass {
 
 class ReflectionObject {
     Object this_;
+
   public:
     ReflectionObject(const Variant &object);
     Variant __toString();
@@ -300,8 +313,8 @@ class ReflectionObject {
     Variant getModifiers();
     Variant isInstance(const Variant &object);
     template <typename... Args>
-    Variant newInstance(const Args&... args) {
-        return call("newInstance", {args...});
+    Variant newInstance(const Args &...args) {
+        return this_.exec(LITERAL_STRING[1513], {args...});
     }
     Variant newInstanceWithoutConstructor();
     Variant newInstanceArgs(const Variant &args = Array{});
@@ -332,6 +345,7 @@ class ReflectionObject {
 
 class ReflectionProperty {
     Object this_;
+
   public:
     ReflectionProperty(const Variant &_class, const Variant &property);
     Variant __toString();
@@ -375,6 +389,7 @@ class ReflectionProperty {
 
 class ReflectionClassConstant {
     Object this_;
+
   public:
     ReflectionClassConstant(const Variant &_class, const Variant &constant);
     Variant __toString();
@@ -396,6 +411,7 @@ class ReflectionClassConstant {
 
 class ReflectionExtension {
     Object this_;
+
   public:
     ReflectionExtension(const Variant &name);
     Variant __toString();
@@ -414,6 +430,7 @@ class ReflectionExtension {
 
 class ReflectionZendExtension {
     Object this_;
+
   public:
     ReflectionZendExtension(const Variant &name);
     Variant __toString();
@@ -426,6 +443,7 @@ class ReflectionZendExtension {
 
 class ReflectionReference {
     Object this_;
+
   public:
     static Variant fromArrayElement(const Variant &array, const Variant &key);
     Variant getId();
@@ -433,6 +451,7 @@ class ReflectionReference {
 
 class ReflectionAttribute {
     Object this_;
+
   public:
     Variant getName();
     Variant getTarget();
@@ -444,6 +463,7 @@ class ReflectionAttribute {
 
 class ReflectionEnum {
     Object this_;
+
   public:
     ReflectionEnum(const Variant &object_or_class);
     Variant hasCase(const Variant &name);
@@ -488,8 +508,8 @@ class ReflectionEnum {
     Variant getModifiers();
     Variant isInstance(const Variant &object);
     template <typename... Args>
-    Variant newInstance(const Args&... args) {
-        return call("newInstance", {args...});
+    Variant newInstance(const Args &...args) {
+        return this_.exec(LITERAL_STRING[1513], {args...});
     }
     Variant newInstanceWithoutConstructor();
     Variant newInstanceArgs(const Variant &args = Array{});
@@ -520,6 +540,7 @@ class ReflectionEnum {
 
 class ReflectionEnumUnitCase {
     Object this_;
+
   public:
     ReflectionEnumUnitCase(const Variant &_class, const Variant &constant);
     Variant getEnum();
@@ -542,6 +563,7 @@ class ReflectionEnumUnitCase {
 
 class ReflectionEnumBackedCase {
     Object this_;
+
   public:
     ReflectionEnumBackedCase(const Variant &_class, const Variant &constant);
     Variant getBackingValue();
@@ -565,6 +587,7 @@ class ReflectionEnumBackedCase {
 
 class ReflectionFiber {
     Object this_;
+
   public:
     ReflectionFiber(const Variant &fiber);
     Variant getFiber();
@@ -576,6 +599,7 @@ class ReflectionFiber {
 
 class ReflectionConstant {
     Object this_;
+
   public:
     ReflectionConstant(const Variant &name);
     Variant getName();
@@ -588,10 +612,11 @@ class ReflectionConstant {
 
 class PropertyHookType {
     Object this_;
+
   public:
     static Variant cases();
     static Variant from(const Variant &value);
     static Variant tryFrom(const Variant &value);
 };
 
-}
+}  // namespace php

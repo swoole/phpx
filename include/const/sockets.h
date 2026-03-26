@@ -100,4 +100,4 @@ extern Variant SOCKET_EREMOTEIO;
 extern Variant SOCKET_EDQUOT;
 extern Variant SOCKET_ENOMEDIUM;
 extern Variant SOCKET_EMEDIUMTYPE;
-}
+}  // namespace php

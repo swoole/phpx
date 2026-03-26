@@ -1,37 +1,38 @@
 #include "phpx.h"
+#include "phpx_literal_string.h"
 
 namespace php {
 Variant ctype_alnum(const Variant &text) {
-    return call("ctype_alnum", {text});
+    return call(LITERAL_STRING[157], {text});
 }
 Variant ctype_alpha(const Variant &text) {
-    return call("ctype_alpha", {text});
+    return call(LITERAL_STRING[158], {text});
 }
 Variant ctype_cntrl(const Variant &text) {
-    return call("ctype_cntrl", {text});
+    return call(LITERAL_STRING[159], {text});
 }
 Variant ctype_digit(const Variant &text) {
-    return call("ctype_digit", {text});
+    return call(LITERAL_STRING[160], {text});
 }
 Variant ctype_lower(const Variant &text) {
-    return call("ctype_lower", {text});
+    return call(LITERAL_STRING[161], {text});
 }
 Variant ctype_graph(const Variant &text) {
-    return call("ctype_graph", {text});
+    return call(LITERAL_STRING[162], {text});
 }
 Variant ctype_print(const Variant &text) {
-    return call("ctype_print", {text});
+    return call(LITERAL_STRING[163], {text});
 }
 Variant ctype_punct(const Variant &text) {
-    return call("ctype_punct", {text});
+    return call(LITERAL_STRING[164], {text});
 }
 Variant ctype_space(const Variant &text) {
-    return call("ctype_space", {text});
+    return call(LITERAL_STRING[165], {text});
 }
 Variant ctype_upper(const Variant &text) {
-    return call("ctype_upper", {text});
+    return call(LITERAL_STRING[166], {text});
 }
 Variant ctype_xdigit(const Variant &text) {
-    return call("ctype_xdigit", {text});
+    return call(LITERAL_STRING[167], {text});
 }
-}
+}  // namespace php

@@ -1,6 +1,9 @@
+#include "phpx_literal_string.h"
+
 namespace php {
 class PharException {
     Object this_;
+
   public:
     PharException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
@@ -16,6 +19,7 @@ class PharException {
 
 class Phar {
     Object this_;
+
   public:
     Phar(const Variant &filename, const Variant &flags = 12288, const Variant &alias = {});
     Variant addEmptyDir(const Variant &directory);
@@ -27,7 +31,9 @@ class Phar {
     Variant decompressFiles();
     Variant compress(const Variant &compression, const Variant &extension = {});
     Variant decompress(const Variant &extension = {});
-    Variant convertToExecutable(const Variant &format = {}, const Variant &compression = {}, const Variant &extension = {});
+    Variant convertToExecutable(const Variant &format = {},
+                                const Variant &compression = {},
+                                const Variant &extension = {});
     Variant convertToData(const Variant &format = {}, const Variant &compression = {}, const Variant &extension = {});
     Variant copy(const Variant &from, const Variant &to);
     Variant count(const Variant &mode = 0);
@@ -71,7 +77,11 @@ class Phar {
     static Variant mount(const Variant &phar_path, const Variant &external_path);
     static Variant mungServer(const Variant &variables);
     static Variant unlinkArchive(const Variant &filename);
-    static Variant webPhar(const Variant &alias = {}, const Variant &index = {}, const Variant &file_not_found_script = {}, const Variant &mime_types = Array{}, const Variant &rewrite = {});
+    static Variant webPhar(const Variant &alias = {},
+                           const Variant &index = {},
+                           const Variant &file_not_found_script = {},
+                           const Variant &mime_types = Array{},
+                           const Variant &rewrite = {});
     Variant hasChildren(const Variant &allow_links = false);
     Variant getChildren();
     Variant getSubPath();
@@ -117,8 +127,12 @@ class Phar {
 
 class PharData {
     Object this_;
+
   public:
-    PharData(const Variant &filename, const Variant &flags = 12288, const Variant &alias = {}, const Variant &format = 0);
+    PharData(const Variant &filename,
+             const Variant &flags = 12288,
+             const Variant &alias = {},
+             const Variant &format = 0);
     Variant addEmptyDir(const Variant &directory);
     Variant addFile(const Variant &filename, const Variant &local_name = {});
     Variant addFromString(const Variant &local_name, const Variant &contents);
@@ -128,7 +142,9 @@ class PharData {
     Variant decompressFiles();
     Variant compress(const Variant &compression, const Variant &extension = {});
     Variant decompress(const Variant &extension = {});
-    Variant convertToExecutable(const Variant &format = {}, const Variant &compression = {}, const Variant &extension = {});
+    Variant convertToExecutable(const Variant &format = {},
+                                const Variant &compression = {},
+                                const Variant &extension = {});
     Variant convertToData(const Variant &format = {}, const Variant &compression = {}, const Variant &extension = {});
     Variant copy(const Variant &from, const Variant &to);
     Variant count(const Variant &mode = 0);
@@ -172,7 +188,11 @@ class PharData {
     static Variant mount(const Variant &phar_path, const Variant &external_path);
     static Variant mungServer(const Variant &variables);
     static Variant unlinkArchive(const Variant &filename);
-    static Variant webPhar(const Variant &alias = {}, const Variant &index = {}, const Variant &file_not_found_script = {}, const Variant &mime_types = Array{}, const Variant &rewrite = {});
+    static Variant webPhar(const Variant &alias = {},
+                           const Variant &index = {},
+                           const Variant &file_not_found_script = {},
+                           const Variant &mime_types = Array{},
+                           const Variant &rewrite = {});
     Variant hasChildren(const Variant &allow_links = false);
     Variant getChildren();
     Variant getSubPath();
@@ -218,6 +238,7 @@ class PharData {
 
 class PharFileInfo {
     Object this_;
+
   public:
     PharFileInfo(const Variant &filename);
     Variant chmod(const Variant &perms);
@@ -265,4 +286,4 @@ class PharFileInfo {
     Variant _bad_state_ex();
 };
 
-}
+}  // namespace php

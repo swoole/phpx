@@ -13,4 +13,4 @@ extern Variant LIBXSLT_VERSION;
 extern Variant LIBXSLT_DOTTED_VERSION;
 extern Variant LIBEXSLT_VERSION;
 extern Variant LIBEXSLT_DOTTED_VERSION;
-}
+}  // namespace php
