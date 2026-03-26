@@ -149,7 +149,7 @@ PHPX_API bool hasStaticProperty(const String &class_name, const String &prop);
 PHPX_API uint32_t getPropertyOffset(const String &class_name, const String &prop);
 PHPX_API uint32_t getPropertyOffset(zend_class_entry *ce, const String &prop);
 
-PHPX_API Int toInt(const String &str);
+PHPX_API Int toSize(const String &str);
 PHPX_API Array toArray(const Variant &v);
 PHPX_API Object toObject(const Variant &v);
 PHPX_API Object toObject(const Variant &v, const String &class_name);

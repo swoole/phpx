@@ -217,12 +217,15 @@ TEST(base, exception3) {
     try_call([]() { throwException("TestClassNotExists", "test"); }, "class 'TestClassNotExists' undefined.");
 }
 
-TEST(base, toInt) {
-    auto i1 = php::toInt("hello");
+TEST(base, toSize) {
+    auto i1 = php::toSize("hello");
     ASSERT_EQ(i1, 0);
 
-    auto i2 = php::toInt("2025");
+    auto i2 = php::toSize("2025");
     ASSERT_EQ(i2, 2025);
+
+    auto i3 = php::toSize("17M");
+    ASSERT_EQ(i3, 17 * 1024 * 1024);
 }
 
 TEST(base, concat) {

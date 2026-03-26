@@ -293,6 +293,9 @@ TEST(object, toObject) {
 TEST(object, toObject3) {
     auto arr = create_map();
     GC_SET_REFCOUNT(arr.array(), 2);
+    /**
+     * Unsafe operation. Memory leak may occur here. It is only used to test the IS_ARRAY_IMMUTABLE flag bit
+     */
     GC_TYPE_INFO(arr.array()) = GC_ARRAY | ((IS_ARRAY_IMMUTABLE | GC_NOT_COLLECTABLE) << GC_FLAGS_SHIFT);
     auto o = toObject(arr);
     ASSERT_EQ(o.attr("php").toInt(), 3);
