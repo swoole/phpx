@@ -18,12 +18,6 @@ C++ wrapper for Zend API
 - GCC 4.8 or later
 - Composer
 
-## Build phpx (bin)
-```shell
-./build.sh
-sudo cp bin/phpx /usr/local/bin
-```
-
 ## Build libphpx.so
 ```shell
 cmake .
@@ -34,7 +28,8 @@ sudo ldconfig
 
 ## Create Project
 ```shell
-phpx create cpp_ext
+# extension
+composer create-project swoole/phpx-ext test
 ```
 
 ## Generate ArgInfo & Function Entires
@@ -44,13 +39,14 @@ php bin/gen_stub.php your_stub_dir
 
 ## Build extension
 ```shell
-cd examples/cpp_ext
-phpx build -v
-sudo phpx install
+cd test
+cmake .
+make -j 4
+make install
 ```
 
 ## Load your extension
-Edit `php.ini`, add `extension=cpp_ext.so`
+Edit `php.ini`, add `extension=test.so`
 
 ## Run
 ```shell

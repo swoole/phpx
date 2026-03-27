@@ -48,7 +48,7 @@ void on_main_window_destroy(GtkApplication *app, gpointer user_data) {
 PHPX_METHOD(Gtk_Application, __construct) {
     if (args.count() < 2) {
         error(E_ERROR, "invalid parameters.");
-        return {};
+        return null;
     }
 
     int argc = 0;
@@ -57,13 +57,13 @@ PHPX_METHOD(Gtk_Application, __construct) {
     GtkBuilder *builder = gtk_builder_new_from_file(args[0].toCString());
     if (builder == nullptr) {
         error(E_ERROR, "invalid parameters.");
-        return {};
+        return null;
     }
 
     GtkWindow *window = GTK_WINDOW(gtk_builder_get_object(builder, args[1].toCString()));
     if (window == nullptr) {
         error(E_ERROR, "main window[id=%s] is not eixsts.", args[1].toCString());
-        return {};
+        return null;
     }
 
     auto app_object = new Variant(_this);
@@ -76,7 +76,7 @@ PHPX_METHOD(Gtk_Application, __construct) {
     auto res = newResource<PHP_Gtk_Application>("GtkApplication", app);
     _this.set("app", res);
 
-    return {};
+    return null;
 }
 
 PHPX_METHOD(Gtk_Application, run) {
@@ -84,13 +84,13 @@ PHPX_METHOD(Gtk_Application, run) {
     PHP_Gtk_Application *app = _this.get("app").toResource<PHP_Gtk_Application>("GtkApplication");
     gtk_widget_show(GTK_WIDGET(app->main_window));
     gtk_main();
-    return {};
+    return null;
 }
 
 PHPX_METHOD(Gtk_Application, setTitle) {
     PHP_Gtk_Application *app = _this.get("app").toResource<PHP_Gtk_Application>("GtkApplication");
     gtk_window_set_title(app->main_window, args[0].toCString());
-    return {};
+    return null;
 }
 
 PHPX_METHOD(Gtk_Application, setIcon) {
@@ -137,7 +137,7 @@ PHPX_METHOD(Gtk_Application, quit) {
         auto callback = callbacks[i];
         delete callbacks[i];
     }
-    return {};
+    return null;
 }
 
 PHPX_METHOD(Gtk_Widget, on) {
@@ -145,7 +145,7 @@ PHPX_METHOD(Gtk_Widget, on) {
     auto callback = new var(args[1]);
     g_signal_connect(object, args[0].toCString(), G_CALLBACK(PHP_Gtk_callback), callback);
     callbacks.push_back(callback);
-    return {};
+    return null;
 }
 
 PHPX_METHOD(Gtk_Entry, getText) {
@@ -157,7 +157,7 @@ PHPX_METHOD(Gtk_Entry, getText) {
 PHPX_METHOD(Gtk_Entry, setText) {
     GtkEntry *entry = GTK_ENTRY(_this.get("resource").toResource<GObject>("GObject"));
     gtk_entry_set_text(entry, args[0].toCString());
-    return {};
+    return null;
 }
 
 PHPX_METHOD(Gtk_Label, getText) {
@@ -168,7 +168,7 @@ PHPX_METHOD(Gtk_Label, getText) {
 PHPX_METHOD(Gtk_Label, setText) {
     GtkLabel *label = GTK_LABEL(_this.get("resource").toResource<GObject>("GObject"));
     gtk_label_set_text(label, args[0].toCString());
-    return {};
+    return null;
 }
 
 void GtkApplication_dtor(zend_resource *res) {
