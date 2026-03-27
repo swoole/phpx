@@ -34,7 +34,7 @@ composer create-project swoole/phpx-ext test
 
 ## Generate ArgInfo & Function Entires
 ```shell
-php bin/gen_stub.php your_stub_dir
+php vendor/swoole/phpx/bin/gen_stub.php your_stub_dir
 ```
 
 ## Build extension
