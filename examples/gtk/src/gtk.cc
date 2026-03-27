@@ -14,7 +14,7 @@
   +----------------------------------------------------------------------+
 */
 
-#include "phpx.h"
+#include "phpx_ext.h"
 
 BEGIN_EXTERN_C()
 #include "gtk_arginfo.h"
@@ -42,7 +42,7 @@ void PHP_Gtk_callback(GtkApplication *app, gpointer user_data) {
 void on_main_window_destroy(GtkApplication *app, gpointer user_data) {
     Variant v = *(Variant *) user_data;
     Object o(v);
-    o.exec("quit");
+    o.call("quit");
 }
 
 PHPX_METHOD(Gtk_Application, __construct) {

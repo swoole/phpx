@@ -1,4 +1,4 @@
-#include "phpx.h"
+#include "phpx_ext.h"
 #include "ext/swoole/include/swoole.h"
 #include "ext/swoole/include/swoole_lock.h"
 #include "ext/swoole/include/swoole_file.h"
@@ -181,7 +181,7 @@ PHPX_METHOD(BloomFilter, load) {
         goto fail;
     }
 
-    auto o = newObject("BloomFilter", (long) capacity);
+    auto o = newObject("BloomFilter", {capacity});
     BloomFilterObject *bf = o.oGet<BloomFilterObject>(PROPERTY_NAME, RESOURCE_NAME);
     if (fp.read(bf->array, capacity) == 0) {
         goto fail;

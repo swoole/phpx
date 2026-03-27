@@ -14,7 +14,7 @@
  +----------------------------------------------------------------------+
  */
 
-#include "phpx.h"
+#include "phpx_ext.h"
 #include "rocksdb/db.h"
 #include "rocksdb/utilities/db_ttl.h"
 #include "rocksdb/merge_operator.h"
@@ -113,8 +113,8 @@ PHPX_METHOD(rocksDB, __construct) {
     if (_ttl.isInt() && _ttl.toInt() > 0) {
         ttl = (int32_t) _ttl.toInt();
     }
-    string path = _path.toStdString();
-    string secondary_path = _secondary_path.toStdString();
+    std::string path = _path.toStdString();
+    std::string secondary_path = _secondary_path.toStdString();
     if (!_option.isArray()) {
         throwException("\\Exception", "RocksDB construct function parameter 2 open option should be array.");
         return nullptr;
@@ -148,7 +148,7 @@ PHPX_METHOD(rocksDB, __construct) {
         s = DBWithTTL::Open(options, path, &db, ttl);
         //抛出异常
         if (!s.ok()) {
-            string name = "RocksDB open failed msg" + s.ToString();
+        	std::string name = "RocksDB open failed msg" + s.ToString();
             throwException("\\Exception", name.c_str());
             return nullptr;
         }
@@ -158,7 +158,7 @@ PHPX_METHOD(rocksDB, __construct) {
         s = DBWithTTL::Open(options, path, &db, ttl, true);
         //抛出异常
         if (!s.ok()) {
-            string name = "RocksDB open failed msg" + s.ToString();
+        	std::string name = "RocksDB open failed msg" + s.ToString();
             throwException("\\Exception", name.c_str());
             return nullptr;
         }
@@ -168,7 +168,7 @@ PHPX_METHOD(rocksDB, __construct) {
         s = DB::Open(options, path, &db);
         //抛出异常
         if (!s.ok()) {
-            string name = "RocksDB open failed msg" + s.ToString();
+        	std::string name = "RocksDB open failed msg" + s.ToString();
             throwException("\\Exception", name.c_str());
             return nullptr;
         }
@@ -178,7 +178,7 @@ PHPX_METHOD(rocksDB, __construct) {
         s = DB::OpenForReadOnly(options, path, &db);
         //抛出异常
         if (!s.ok()) {
-            string name = "RocksDB open failed msg" + s.ToString();
+        	std::string name = "RocksDB open failed msg" + s.ToString();
             throwException("\\Exception", name.c_str());
             return nullptr;
         }
@@ -219,8 +219,8 @@ PHPX_METHOD(rocksDB, put) {
 
     auto _key = args[0];
     auto _value = args[1];
-    string key = _key.toStdString();
-    string value = _value.toStdString();
+    std::string key = _key.toStdString();
+    std::string value = _value.toStdString();
     Status s = db->Put(*wop, key, value);
     if (!s.ok()) {
         throwException("\\Exception", "RocksDB put with read only mode");
@@ -237,8 +237,8 @@ PHPX_METHOD(rocksDB, merge) {
 
     auto _key = args[0];
     auto _val = args[1];
-    string key = _key.toStdString();
-    string val = _val.toStdString();
+    std::string key = _key.toStdString();
+    std::string val = _val.toStdString();
     Status s = db->Merge(*wop, key, val);
     return s.ok();
 }
@@ -249,8 +249,8 @@ PHPX_METHOD(rocksDB, get) {
     DB *db = _this.oGet<DB>("rocksdb", "dbResource");
 
     auto _key = args[0];
-    string key = _key.toStdString();
-    string value;
+    std::string key = _key.toStdString();
+    std::string value;
     Status s = db->Get(*rop, key, &value);
     if (!s.ok()) {
         return false;
@@ -265,7 +265,7 @@ PHPX_METHOD(rocksDB, delete) {
     DB *db = _this.get("rocksdb").toResource<DB>("dbResource");
 
     auto _key = args[0];
-    string key = _key.toStdString();
+    std::string key = _key.toStdString();
     Status s = db->Delete(*wop, key);
     return s.ok();
 }

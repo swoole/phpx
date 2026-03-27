@@ -45,10 +45,10 @@ void testRedis() {
     cout << "=====================Test Redis==================\n";
     Object redis = newObject("redis");
     var_dump(redis);
-    auto ret1 = redis.exec("connect", "127.0.0.1", 6379);
+    auto ret1 = redis.call("connect", {"127.0.0.1", 6379});
     // connect success
     if (ret1.toBool()) {
-        auto ret2 = redis.exec("get", "key");
+        auto ret2 = redis.call("get", {"key"});
         ::printf("value=%s\n", ret2.toCString());
     } else {
         cout << "connect to redis server failed." << endl;
@@ -109,13 +109,13 @@ void php_main() {
     cout << "SWOOLE_BASE = " << c1.toInt() << endl;
 
     auto obj = newObject("Test");
-    auto ret = obj.exec("getName");
+    auto ret = obj.call("getName");
 
     cout << ret.toStdString() << endl;
 
     obj.set("name", "Tianfeng");
 
-    auto ret2 = obj.exec("getName");
+    auto ret2 = obj.call("getName");
     cout << ret2.toStdString() << endl;
 
     Array arr;
