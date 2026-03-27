@@ -715,7 +715,7 @@ Variant Variant::item(zend_long offset, bool update) {
         if (update) {
             auto str = Z_STR_P(zvar);
             if (offset >= str->len) {
-                throwError("String offset `%ld` out of range", offset);
+                throwError("String offset `" ZEND_LONG_FMT "` out of range", offset);
                 return {};
             }
             str->h = offset;
@@ -730,7 +730,8 @@ Variant Variant::item(zend_long offset, bool update) {
             array_init(zvar);
             retval = zend_hash_index_update(Z_ARRVAL_P(zvar), offset, undef());
         } else {
-            throwError("Only array/object/string support the item(%ld) method, got `%s`", offset, typeStr());
+            throwError(
+                "Only array/object/string support the item(" ZEND_LONG_FMT ") method, got `%s`", offset, typeStr());
             return Variant{undef()};
         }
     }
@@ -891,8 +892,8 @@ Variant Variant::call(const Variant &fn, const ArgList &args) {
 }
 
 Variant Variant::call(const Variant &fn, Array &args) {
-	Args _args(args);
-	return call(fn, _args);
+    Args _args(args);
+    return call(fn, _args);
 }
 
 Variant Variant::call(zend_function *fn) {

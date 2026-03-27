@@ -43,6 +43,7 @@ extern "C" {
 #include <functional>
 #include <map>
 #include <memory>
+#include <type_traits>
 
 /**
  * All API names must be in lowercase camel case.
@@ -264,11 +265,20 @@ class Variant {
     Variant(std::nullptr_t) noexcept {
         ZVAL_NULL(&val);
     }
-    Variant(long v) noexcept {
-        ZVAL_LONG(&val, v);
+    template <typename T,
+              typename std::enable_if<std::is_integral<typename std::decay<T>::type>::value &&
+                                          !std::is_same<typename std::decay<T>::type, bool>::value,
+                                      int>::type = 0>
+    Variant(T v) noexcept {
+        ZVAL_LONG(&val, static_cast<zend_long>(v));
     }
-    Variant(int v) noexcept {
-        ZVAL_LONG(&val, (long) v);
+    template <typename T,
+              typename std::enable_if<std::is_floating_point<typename std::decay<T>::type>::value, int>::type = 0>
+    Variant(T v) noexcept {
+        ZVAL_DOUBLE(&val, static_cast<double>(v));
+    }
+    Variant(bool v) noexcept {
+        ZVAL_BOOL(&val, v);
     }
     Variant(const char *str) {
         ZVAL_STRING(&val, str);
@@ -294,12 +304,6 @@ class Variant {
     }
     Variant(const std::string &str) {
         ZVAL_STRINGL(&val, str.c_str(), str.length());
-    }
-    Variant(double v) noexcept {
-        ZVAL_DOUBLE(&val, v);
-    }
-    Variant(bool v) noexcept {
-        ZVAL_BOOL(&val, v);
     }
     Variant(const zval *v, Ctor method = Ctor::Copy) noexcept {
         /**
@@ -383,14 +387,25 @@ class Variant {
             destroy();
         }
     }
-    Variant &operator=(int v) {
+    template <typename T,
+              typename D = typename std::decay<T>::type,
+              typename std::enable_if<std::is_integral<D>::value && !std::is_same<D, bool>::value, int>::type = 0>
+    Variant &operator=(T v) {
         destroy();
-        ZVAL_LONG(unwrap_ptr(), (long) v);
+        ZVAL_LONG(unwrap_ptr(), static_cast<zend_long>(v));
         return *this;
     }
-    Variant &operator=(long v) {
+    template <typename T,
+              typename D = typename std::decay<T>::type,
+              typename std::enable_if<std::is_floating_point<D>::value, int>::type = 0>
+    Variant &operator=(T v) {
         destroy();
-        ZVAL_LONG(unwrap_ptr(), v);
+        ZVAL_DOUBLE(unwrap_ptr(), static_cast<double>(v));
+        return *this;
+    }
+    Variant &operator=(bool v) {
+        destroy();
+        ZVAL_BOOL(unwrap_ptr(), v);
         return *this;
     }
     Variant &operator=(const std::string &str) {
@@ -409,16 +424,6 @@ class Variant {
             destroy();
             ZVAL_STRING(unwrap_ptr(), str);
         }
-        return *this;
-    }
-    Variant &operator=(double v) {
-        destroy();
-        ZVAL_DOUBLE(unwrap_ptr(), v);
-        return *this;
-    }
-    Variant &operator=(bool v) {
-        destroy();
-        ZVAL_BOOL(unwrap_ptr(), v);
         return *this;
     }
     Variant &operator=(zend_string *v) {
@@ -638,22 +643,22 @@ class Variant {
     Variant attr(uintptr_t offset, bool update = false) const {
         auto member_p = OBJ_PROP(object(), offset);
         return Variant{member_p, zval_wrap(member_p)};
-	}
-	/**
-	 * call object methods
-	 */
-	Variant call(const Variant &fn) {
-		return call_impl(unwrap_ptr(), fn.const_ptr());
-	}
+    }
+    /**
+     * call object methods
+     */
+    Variant call(const Variant &fn) {
+        return call_impl(unwrap_ptr(), fn.const_ptr());
+    }
     Variant call(const Variant &fn, Args &args) {
         return call_impl(ptr(), fn.const_ptr(), args);
     }
-	Variant call(const Variant &fn, Array &args);
-	Variant call(const Variant &fn, const ArgList &args);
-	Variant call(zend_function *fn);
-	Variant call(zend_function *fn, Args &args);
-	Variant call(zend_function *fn, Array &args);
-	Variant call(zend_function *fn, const ArgList &args);
+    Variant call(const Variant &fn, Array &args);
+    Variant call(const Variant &fn, const ArgList &args);
+    Variant call(zend_function *fn);
+    Variant call(zend_function *fn, Args &args);
+    Variant call(zend_function *fn, Array &args);
+    Variant call(zend_function *fn, const ArgList &args);
 
     bool operator==(const Variant &v) const {
         return equals(v);
