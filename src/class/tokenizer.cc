@@ -9,15 +9,15 @@ PhpToken::PhpToken(const Variant &id, const Variant &text, const Variant &line, 
     this_ = newObject(LITERAL_STRING[2356], {id, text, line, pos});
 }
 Variant PhpToken::is(const Variant &kind) {
-    return this_.exec(LITERAL_STRING[2357], {kind});
+    return this_.call(LITERAL_STRING[2357], {kind});
 }
 Variant PhpToken::isIgnorable() {
-    return this_.exec(LITERAL_STRING[2358], {});
+    return this_.call(LITERAL_STRING[2358], {});
 }
 Variant PhpToken::getTokenName() {
-    return this_.exec(LITERAL_STRING[2359], {});
+    return this_.call(LITERAL_STRING[2359], {});
 }
 Variant PhpToken::__toString() {
-    return this_.exec(LITERAL_STRING[29], {});
+    return this_.call(LITERAL_STRING[29], {});
 }
 }  // namespace php

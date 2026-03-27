@@ -579,7 +579,7 @@ TEST(variant, ref6) {
         Ref ref2{s2.ptr()};
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto msg = e.exec("getMessage");
+        auto msg = e.call("getMessage");
         ASSERT_TRUE(str_contains(msg, "parameter 1 must be `reference`").isTrue());
     }
 }
@@ -934,7 +934,7 @@ TEST(variant, offsetSet3) {
         s.offsetUnset(2);
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto msg = e.exec("getMessage");
+        auto msg = e.call("getMessage");
         ASSERT_TRUE(str_contains(msg, "Cannot unset offsets").isTrue());
     }
 
@@ -942,7 +942,7 @@ TEST(variant, offsetSet3) {
         s.offsetUnset("1");
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto msg = e.exec("getMessage");
+        auto msg = e.call("getMessage");
         ASSERT_TRUE(str_contains(msg, "Cannot unset offsets").isTrue());
     }
 }
@@ -1125,7 +1125,7 @@ TEST(variant, item3) {
         auto res = v2.item(2);
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto msg = e.exec("getMessage");
+        auto msg = e.call("getMessage");
         ASSERT_TRUE(str_contains(msg, "Only array/object/string support the item").isTrue());
     }
 }
@@ -1191,7 +1191,7 @@ TEST(variant, append) {
         v2.append(9999);
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto msg = e.exec("getMessage");
+        auto msg = e.call("getMessage");
         ASSERT_TRUE(str_contains(msg, "Cannot append element").isTrue());
     }
 }

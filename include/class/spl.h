@@ -848,7 +848,7 @@ class SplFileObject {
     Variant fpassthru();
     template <typename... Args>
     Variant fscanf(const Variant &format, const Args &...vars) {
-        return this_.exec(LITERAL_STRING[1775], {format, vars...});
+        return this_.call(LITERAL_STRING[1775], {format, vars...});
     }
     Variant fwrite(const Variant &data, const Variant &length = 0);
     Variant fstat();
@@ -924,7 +924,7 @@ class SplTempFileObject {
     Variant fpassthru();
     template <typename... Args>
     Variant fscanf(const Variant &format, const Args &...vars) {
-        return this_.exec(LITERAL_STRING[1775], {format, vars...});
+        return this_.call(LITERAL_STRING[1775], {format, vars...});
     }
     Variant fwrite(const Variant &data, const Variant &length = 0);
     Variant fstat();

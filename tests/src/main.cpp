@@ -48,11 +48,15 @@ void try_call(const std::function<void(void)> &fn, const php::String &msg, bool 
         fn();
     } catch (zend_object *ex) {
         auto e = php::catchException();
-        auto s = e.exec("getMessage");
+        auto s = e.call("getMessage");
         if (print) {
             s.print();
         }
-        EXPECT_TRUE(php::str_contains(s, msg).toBool());
+        bool expected = php::str_contains(s, msg).toBool();
+        if (!expected) {
+        	fprintf(stderr, "ERROR: %s\n", s.toCString());
+        }
+        EXPECT_TRUE(expected);
     }
 }
 

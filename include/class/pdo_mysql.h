@@ -26,7 +26,7 @@ class Pdo_Mysql {
     Variant prepare(const Variant &query, const Variant &options = Array{});
     template <typename... Args>
     Variant query(const Variant &query, const Variant &fetch_mode, const Args &...fetch_mode_args) {
-        return this_.exec(LITERAL_STRING[477], {query, fetch_mode, fetch_mode_args...});
+        return this_.call(LITERAL_STRING[477], {query, fetch_mode, fetch_mode_args...});
     }
     Variant quote(const Variant &string, const Variant &type = 2);
     Variant rollBack();

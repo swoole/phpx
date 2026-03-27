@@ -638,7 +638,21 @@ class Variant {
     Variant attr(uintptr_t offset, bool update = false) const {
         auto member_p = OBJ_PROP(object(), offset);
         return Variant{member_p, zval_wrap(member_p)};
+	}
+	/**
+	 * call object methods
+	 */
+	Variant call(const Variant &fn) {
+		return call_impl(unwrap_ptr(), fn.const_ptr());
+	}
+    Variant call(const Variant &fn, Args &args) {
+        return call_impl(ptr(), fn.const_ptr(), args);
     }
+	Variant call(const Variant &fn, const ArgList &args);
+	Variant call(zend_function *fn);
+	Variant call(zend_function *fn, Args &args);
+	Variant call(zend_function *fn, Array &args);
+	Variant call(zend_function *fn, const ArgList &args);
 
     bool operator==(const Variant &v) const {
         return equals(v);
@@ -1078,9 +1092,6 @@ class Object : public Variant {
     }
     Object(const Variant &v, Ctor method = Ctor::Copy) : Object(v.unwrap_ptr(), method) {}
     Object() = default;
-    Variant call(const Variant &func, Args &args) {
-        return call_impl(ptr(), func.const_ptr(), args);
-    }
     zend_class_entry *parent_ce() {
         return Z_OBJCE_P(unwrap_ptr())->parent;
     }
@@ -1088,14 +1099,6 @@ class Object : public Variant {
         return callParentMethod(func, {});
     }
     Variant callParentMethod(const String &func, const ArgList &args);
-    Variant exec(const Variant &fn) {
-        return call_impl(unwrap_ptr(), fn.const_ptr());
-    }
-    Variant exec(const Variant &fn, const ArgList &args);
-    Variant exec(zend_function *fn);
-    Variant exec(zend_function *fn, Args &args);
-    Variant exec(zend_function *fn, Array &args);
-    Variant exec(zend_function *fn, const ArgList &args);
 
     void appendArrayProperty(const String &name, const Variant &value);
     void updateArrayProperty(const String &name, zend_long offset, const Variant &value);

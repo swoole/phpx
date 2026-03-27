@@ -290,7 +290,7 @@ TEST(array, bad_type) {
         Array o(v);
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto s = e.exec("getMessage");
+        auto s = e.call("getMessage");
         ASSERT_TRUE(str_contains(s, "parameter 1 must be `array`, got `string`").toBool());
     }
 }

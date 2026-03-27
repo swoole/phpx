@@ -31,11 +31,11 @@ TEST(object, base) {
     ASSERT_EQ(object.get(str).toInt(), rand_num);
     ASSERT_NE(ZSTR_H(str.str()), 0);
 
-    object.exec("offsetSet", {"python", 9});
+    object.call("offsetSet", {"python", 9});
     auto r2 = object.get("python");
     ASSERT_EQ(r2.toInt(), 9);
 
-    auto flags = object.exec("getFlags");
+    auto flags = object.call("getFlags");
     ASSERT_TRUE(flags.isInt());
     ASSERT_TRUE(flags.toInt() & constant("ArrayObject::ARRAY_AS_PROPS").toInt());
     flags.debug();
@@ -78,7 +78,7 @@ TEST(object, ctor) {
 TEST(object, method) {
     auto obj = newObject("DateTimeImmutable");
     ASSERT_TRUE(obj.isObject());
-    auto str = obj.exec("format", {"Y-m-d H:i:s"});
+    auto str = obj.call("format", {"Y-m-d H:i:s"});
     ASSERT_TRUE(str.isString());
     ASSERT_GT(str.length(), 0);
 }
@@ -123,7 +123,7 @@ TEST(object, mixed) {
         auto o2 = newObject("TestAbstract");
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto s = e.exec("getMessage");
+        auto s = e.call("getMessage");
         ASSERT_TRUE(str_contains(s, "Cannot instantiate abstract class").toBool());
     }
 
@@ -132,7 +132,7 @@ TEST(object, mixed) {
         toObject(arr, "TestClass2");
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto s = e.exec("getMessage");
+        auto s = e.call("getMessage");
         ASSERT_TRUE(str_contains(s, "parameter 1 must be `object`").toBool());
     }
 
@@ -140,7 +140,7 @@ TEST(object, mixed) {
         toObject(obj, "TestNotExists");
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto s = e.exec("getMessage");
+        auto s = e.call("getMessage");
         ASSERT_TRUE(str_contains(s, "class 'TestNotExists' is undefined.").toBool());
     }
 
@@ -148,7 +148,7 @@ TEST(object, mixed) {
         toObject(obj, "stdClass");
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto s = e.exec("getMessage");
+        auto s = e.call("getMessage");
         ASSERT_TRUE(str_contains(s, "must be instance of class `stdClass`").toBool());
     }
 }
@@ -173,10 +173,10 @@ TEST(object, call_parent_method) {
 
     // This method inherits from the parent class and is not defined in the child class
     ASSERT_TRUE(obj.methodExists("fun"));
-    auto rs0 = obj.exec("fun");
+    auto rs0 = obj.call("fun");
     ASSERT_TRUE(rs0.isFloat());
 
-    auto rs1 = obj.exec("test");
+    auto rs1 = obj.call("test");
     ASSERT_STREQ(rs1.toCString(), "child test");
 
     // The child class and parent class have methods with the same name
@@ -243,7 +243,7 @@ TEST(object, bad_type) {
         Object o(v);
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto s = e.exec("getMessage");
+        auto s = e.call("getMessage");
         ASSERT_TRUE(str_contains(s, "parameter 1 must be `object`, got `string`").toBool());
     }
 }
@@ -257,7 +257,7 @@ TEST(object, call_parent_method_error) {
         auto rs2 = obj.callParentMethod("test1990", {});
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto s = e.exec("getMessage");
+        auto s = e.call("getMessage");
         ASSERT_TRUE(str_contains(s, "Couldn't find implementation for method").toBool());
     }
 }
@@ -267,7 +267,7 @@ TEST(object, static_property_error1) {
         getStaticProperty("TestClassNotFound", "propInt");
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto s = e.exec("getMessage");
+        auto s = e.call("getMessage");
         ASSERT_TRUE(str_contains(s, "class 'TestClassNotFound' is undefined.").toBool());
     }
 }
@@ -277,7 +277,7 @@ TEST(object, static_property_error2) {
         setStaticProperty("TestClassNotFound", "propInt", 1990);
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto s = e.exec("getMessage");
+        auto s = e.call("getMessage");
         ASSERT_TRUE(str_contains(s, "class 'TestClassNotFound' is undefined.").toBool());
     }
 }
@@ -417,7 +417,7 @@ TEST(object, ArrayProperty2) {
 TEST(object, toObject2) {
     auto v = date_create("now");
     auto o = toObject(v, "DateTime");
-    auto ts = o.exec("getTimestamp");
+    auto ts = o.call("getTimestamp");
     ASSERT_GE(ts.toInt(), 10000000);
 }
 
@@ -450,7 +450,7 @@ TEST(object, newItem) {
 }
 
 TEST(object, null) {
-    try_call([]() { null_object.exec("foo", {}); }, "call method `foo` on null");
+    try_call([]() { null_object.call("foo", {}); }, "call method `foo` on null");
     try_call([]() { null_object.callParentMethod("foo", {}); }, "call method `foo` on null");
     try_call([]() { null_object.attr("bar"); }, "Attempt to read property `bar` on null");
     try_call([]() { null_object.attrRef("bar"); }, "Attempt to read property `bar` on null");
@@ -628,11 +628,11 @@ TEST(object, enum_class) {
 TEST(object, exec) {
     auto obj = newObject("DateTime", {"2000-01-01"});
     auto fn = getMethod(obj.ce(), "format");
-    auto rs = obj.exec(fn, {"Y-m-d H:i:s"});
+    auto rs = obj.call(fn, {"Y-m-d H:i:s"});
     ASSERT_STREQ(rs.toCString(), "2000-01-01 00:00:00");
 
     auto fn2 = getMethod(obj.ce(), "getTimestamp");
-    auto rs2 = obj.exec(fn2);
+    auto rs2 = obj.call(fn2);
     ASSERT_GT(rs2.toInt(), 100000000);
 }
 
@@ -640,7 +640,7 @@ TEST(object, call_array) {
     auto obj = newObject("DateTime", {"2000-01-01"});
     auto fn = getMethod(obj.ce(), "setTime");
     Array arr({10, 10, 10});
-    obj.exec(fn, arr);
-    auto rs = obj.exec("format", {"Y-m-d H:i:s"});
+    obj.call(fn, arr);
+    auto rs = obj.call("format", {"Y-m-d H:i:s"});
     ASSERT_STREQ(rs.toCString(), "2000-01-01 10:10:10");
 }

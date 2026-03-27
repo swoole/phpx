@@ -3,12 +3,12 @@
 
 namespace php {
 Variant HashContext::__serialize() {
-    return this_.exec(LITERAL_STRING[30], {});
+    return this_.call(LITERAL_STRING[30], {});
 }
 Variant HashContext::__unserialize(const Variant &data) {
-    return this_.exec(LITERAL_STRING[31], {data});
+    return this_.call(LITERAL_STRING[31], {data});
 }
 Variant HashContext::__debugInfo() {
-    return this_.exec(LITERAL_STRING[126], {});
+    return this_.call(LITERAL_STRING[126], {});
 }
 }  // namespace php

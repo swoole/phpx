@@ -34,7 +34,7 @@ class ReflectionFunction {
     Variant isDisabled();
     template <typename... Args>
     Variant invoke(const Args &...args) {
-        return this_.exec(LITERAL_STRING[1414], {args...});
+        return this_.call(LITERAL_STRING[1414], {args...});
     }
     Variant invokeArgs(const Variant &args);
     Variant getClosure();
@@ -159,7 +159,7 @@ class ReflectionMethod {
     Variant getModifiers();
     template <typename... Args>
     Variant invoke(const Variant &object, const Args &...args) {
-        return this_.exec(LITERAL_STRING[1414], {object, args...});
+        return this_.call(LITERAL_STRING[1414], {object, args...});
     }
     Variant invokeArgs(const Variant &object, const Variant &args);
     Variant getDeclaringClass();
@@ -242,7 +242,7 @@ class ReflectionClass {
     Variant isInstance(const Variant &object);
     template <typename... Args>
     Variant newInstance(const Args &...args) {
-        return this_.exec(LITERAL_STRING[1513], {args...});
+        return this_.call(LITERAL_STRING[1513], {args...});
     }
     Variant newInstanceWithoutConstructor();
     Variant newInstanceArgs(const Variant &args = Array{});
@@ -314,7 +314,7 @@ class ReflectionObject {
     Variant isInstance(const Variant &object);
     template <typename... Args>
     Variant newInstance(const Args &...args) {
-        return this_.exec(LITERAL_STRING[1513], {args...});
+        return this_.call(LITERAL_STRING[1513], {args...});
     }
     Variant newInstanceWithoutConstructor();
     Variant newInstanceArgs(const Variant &args = Array{});
@@ -509,7 +509,7 @@ class ReflectionEnum {
     Variant isInstance(const Variant &object);
     template <typename... Args>
     Variant newInstance(const Args &...args) {
-        return this_.exec(LITERAL_STRING[1513], {args...});
+        return this_.call(LITERAL_STRING[1513], {args...});
     }
     Variant newInstanceWithoutConstructor();
     Variant newInstanceArgs(const Variant &args = Array{});

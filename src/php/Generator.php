@@ -353,10 +353,10 @@ class Generator
                  } elseif ($info['static']) {
                      $code .= "\treturn php::call({$info['symbol']}, {$info['call']});\n";
                  } else {
-                     $code .= "\treturn this_.exec({$info['symbol']}, {$info['call']});\n";
+                     $code .= "\treturn this_.call({$info['symbol']}, {$info['call']});\n";
                  }
                 $code .= "}\n";
-                 $info['impl_code'] = $code;
+                $info['impl_code'] = $code;
                 $methods[$name] = $info;
             }
 

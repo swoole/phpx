@@ -218,7 +218,7 @@ class Closure {
     Variant bindTo(const Variant &new_this, const Variant &new_scope = "static");
     template <typename... Args>
     Variant call(const Variant &new_this, const Args &...args) {
-        return this_.exec(LITERAL_STRING[119], {new_this, args...});
+        return this_.call(LITERAL_STRING[119], {new_this, args...});
     }
     static Variant fromCallable(const Variant &callback);
     Variant __invoke();
@@ -334,7 +334,7 @@ class Fiber {
     Fiber(const Variant &callback);
     template <typename... Args>
     Variant start(const Args &...args) {
-        return this_.exec(LITERAL_STRING[148], {args...});
+        return this_.call(LITERAL_STRING[148], {args...});
     }
     Variant resume(const Variant &value = {});
     Variant _throw(const Variant &exception);

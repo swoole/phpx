@@ -184,7 +184,7 @@ TEST(base, eval2) {
     } catch (zend_object *ex) {
         ASSERT_TRUE(rs.isNull());
         auto e = catchException();
-        auto msg = e.exec("getMessage");
+        auto msg = e.call("getMessage");
         ASSERT_STREQ(msg.toCString(), "phpx error");
     }
 }
@@ -198,7 +198,7 @@ TEST(base, exception) {
     } catch (zend_object *ex) {
         auto e = catchException();
         ASSERT_TRUE(e.getClassName().equals("RuntimeException"));
-        auto msg = e.exec("getMessage");
+        auto msg = e.call("getMessage");
 
         ASSERT_TRUE(msg.isString());
         ASSERT_TRUE(str_contains(msg, "phpx exception test").isTrue());
@@ -305,7 +305,7 @@ TEST(base, call_bad_func) {
         call("func_not_exists");
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto msg = e.exec("getMessage");
+        auto msg = e.call("getMessage");
         ASSERT_TRUE(str_contains(msg, "Invalid callback func_not_exists").toBool());
     }
 }
@@ -353,7 +353,7 @@ TEST(base, staticMethod1) {
              "method 'DateTime::methodNotExists' is undefined");
 
     auto o = call(ce, fn, {"j-M-Y", "15-Feb-2009"}).toObject();
-    auto rs = o.exec("format", {"Y-m-d"});
+    auto rs = o.call("format", {"Y-m-d"});
     ASSERT_STREQ(rs.toCString(), "2009-02-15");
 }
 
@@ -394,8 +394,8 @@ TEST(base, debugInfo) {
         throwError("phpx error");
     } catch (zend_object *ex) {
         auto e = php::catchException();
-        auto f = e.exec("getFile");
-        auto l = e.exec("getLine");
+        auto f = e.call("getFile");
+        auto l = e.call("getLine");
 
         ASSERT_STREQ(f.toCString(), "test.php");
         ASSERT_EQ(l.toInt(), 999);

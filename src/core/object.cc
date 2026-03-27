@@ -51,39 +51,6 @@ bool Object::propertyExists(const String &name, PropertyOperation op) const {
     return rs;
 }
 
-Variant Object::exec(const Variant &fn, const ArgList &args) {
-    if (UNEXPECTED(isNull())) {
-        throwError("call method `%s` on null", fn.toCString());
-        return {};
-    }
-    Args _args(args);
-    return call_impl(unwrap_ptr(), fn.const_ptr(), _args);
-}
-
-Variant Object::exec(zend_function *fn) {
-    Variant retval{};
-    zend_call_known_function(fn, object(), ce(), retval.ptr(), 0, nullptr, nullptr);
-    throwErrorIfOccurred();
-    return retval;
-}
-
-Variant Object::exec(zend_function *fn, Args &_args) {
-    Variant retval{};
-    zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), nullptr);
-    throwErrorIfOccurred();
-    return retval;
-}
-
-Variant Object::exec(zend_function *fn, Array &args) {
-    Args _args(args);
-    return exec(fn, _args);
-}
-
-Variant Object::exec(zend_function *fn, const ArgList &args) {
-    Args _args(args);
-    return exec(fn, _args);
-}
-
 bool Object::instanceOf(const String &name) const {
     auto cls_ce = getClassEntry(name);
     if (!cls_ce) {

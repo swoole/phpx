@@ -150,15 +150,15 @@ class DOMDocumentFragment {
     Variant appendXML(const Variant &data);
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[349], {nodes...});
+        return this_.call(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[350], {nodes...});
+        return this_.call(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[351], {nodes...});
+        return this_.call(LITERAL_STRING[351], {nodes...});
     }
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
@@ -199,15 +199,15 @@ class Dom_DocumentFragment {
     Variant appendXml(const Variant &data);
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[349], {nodes...});
+        return this_.call(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[350], {nodes...});
+        return this_.call(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[351], {nodes...});
+        return this_.call(LITERAL_STRING[351], {nodes...});
     }
     Variant querySelector(const Variant &selectors);
     Variant querySelectorAll(const Variant &selectors);
@@ -279,15 +279,15 @@ class DOMDocument {
     Variant adoptNode(const Variant &node);
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[349], {nodes...});
+        return this_.call(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[350], {nodes...});
+        return this_.call(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[351], {nodes...});
+        return this_.call(LITERAL_STRING[351], {nodes...});
     }
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
@@ -358,15 +358,15 @@ class Dom_HTMLDocument {
     Variant relaxNgValidateSource(const Variant &source);
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[349], {nodes...});
+        return this_.call(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[350], {nodes...});
+        return this_.call(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[351], {nodes...});
+        return this_.call(LITERAL_STRING[351], {nodes...});
     }
     Variant importLegacyNode(const Variant &node, const Variant &deep = false);
     Variant querySelector(const Variant &selectors);
@@ -438,15 +438,15 @@ class Dom_XMLDocument {
     Variant relaxNgValidateSource(const Variant &source);
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[349], {nodes...});
+        return this_.call(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[350], {nodes...});
+        return this_.call(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[351], {nodes...});
+        return this_.call(LITERAL_STRING[351], {nodes...});
     }
     Variant importLegacyNode(const Variant &node, const Variant &deep = false);
     Variant querySelector(const Variant &selectors);
@@ -553,16 +553,16 @@ class DOMCharacterData {
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[419], {nodes...});
+        return this_.call(LITERAL_STRING[419], {nodes...});
     }
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[421], {nodes...});
+        return this_.call(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[422], {nodes...});
+        return this_.call(LITERAL_STRING[422], {nodes...});
     }
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
@@ -608,15 +608,15 @@ class Dom_CharacterData {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[421], {nodes...});
+        return this_.call(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[422], {nodes...});
+        return this_.call(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[419], {nodes...});
+        return this_.call(LITERAL_STRING[419], {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -750,27 +750,27 @@ class DOMElement {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[421], {nodes...});
+        return this_.call(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[422], {nodes...});
+        return this_.call(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[419], {nodes...});
+        return this_.call(LITERAL_STRING[419], {nodes...});
     }
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[349], {nodes...});
+        return this_.call(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[350], {nodes...});
+        return this_.call(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[351], {nodes...});
+        return this_.call(LITERAL_STRING[351], {nodes...});
     }
     Variant insertAdjacentElement(const Variant &where, const Variant &element);
     Variant insertAdjacentText(const Variant &where, const Variant &data);
@@ -836,27 +836,27 @@ class Dom_Element {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[421], {nodes...});
+        return this_.call(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[422], {nodes...});
+        return this_.call(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[419], {nodes...});
+        return this_.call(LITERAL_STRING[419], {nodes...});
     }
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[349], {nodes...});
+        return this_.call(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[350], {nodes...});
+        return this_.call(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[351], {nodes...});
+        return this_.call(LITERAL_STRING[351], {nodes...});
     }
     Variant querySelector(const Variant &selectors);
     Variant querySelectorAll(const Variant &selectors);
@@ -925,27 +925,27 @@ class Dom_HTMLElement {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[421], {nodes...});
+        return this_.call(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[422], {nodes...});
+        return this_.call(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[419], {nodes...});
+        return this_.call(LITERAL_STRING[419], {nodes...});
     }
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[349], {nodes...});
+        return this_.call(LITERAL_STRING[349], {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[350], {nodes...});
+        return this_.call(LITERAL_STRING[350], {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[351], {nodes...});
+        return this_.call(LITERAL_STRING[351], {nodes...});
     }
     Variant querySelector(const Variant &selectors);
     Variant querySelectorAll(const Variant &selectors);
@@ -999,16 +999,16 @@ class DOMText {
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[419], {nodes...});
+        return this_.call(LITERAL_STRING[419], {nodes...});
     }
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[421], {nodes...});
+        return this_.call(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[422], {nodes...});
+        return this_.call(LITERAL_STRING[422], {nodes...});
     }
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
@@ -1055,15 +1055,15 @@ class Dom_Text {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[421], {nodes...});
+        return this_.call(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[422], {nodes...});
+        return this_.call(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[419], {nodes...});
+        return this_.call(LITERAL_STRING[419], {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1107,16 +1107,16 @@ class DOMComment {
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[419], {nodes...});
+        return this_.call(LITERAL_STRING[419], {nodes...});
     }
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[421], {nodes...});
+        return this_.call(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[422], {nodes...});
+        return this_.call(LITERAL_STRING[422], {nodes...});
     }
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
@@ -1162,15 +1162,15 @@ class Dom_Comment {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[421], {nodes...});
+        return this_.call(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[422], {nodes...});
+        return this_.call(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[419], {nodes...});
+        return this_.call(LITERAL_STRING[419], {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1217,16 +1217,16 @@ class DOMCdataSection {
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[419], {nodes...});
+        return this_.call(LITERAL_STRING[419], {nodes...});
     }
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[421], {nodes...});
+        return this_.call(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[422], {nodes...});
+        return this_.call(LITERAL_STRING[422], {nodes...});
     }
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
@@ -1273,15 +1273,15 @@ class Dom_CDATASection {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[421], {nodes...});
+        return this_.call(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[422], {nodes...});
+        return this_.call(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[419], {nodes...});
+        return this_.call(LITERAL_STRING[419], {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1356,15 +1356,15 @@ class Dom_DocumentType {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[421], {nodes...});
+        return this_.call(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[422], {nodes...});
+        return this_.call(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[419], {nodes...});
+        return this_.call(LITERAL_STRING[419], {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1656,15 +1656,15 @@ class Dom_ProcessingInstruction {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[421], {nodes...});
+        return this_.call(LITERAL_STRING[421], {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[422], {nodes...});
+        return this_.call(LITERAL_STRING[422], {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.exec(LITERAL_STRING[419], {nodes...});
+        return this_.call(LITERAL_STRING[419], {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1734,11 +1734,11 @@ class Dom_TokenList {
     Variant contains(const Variant &token);
     template <typename... Args>
     Variant add(const Args &...tokens) {
-        return this_.exec(LITERAL_STRING[16], {tokens...});
+        return this_.call(LITERAL_STRING[16], {tokens...});
     }
     template <typename... Args>
     Variant remove(const Args &...tokens) {
-        return this_.exec(LITERAL_STRING[420], {tokens...});
+        return this_.call(LITERAL_STRING[420], {tokens...});
     }
     Variant toggle(const Variant &token, const Variant &force = {});
     Variant replace(const Variant &token, const Variant &new_token);

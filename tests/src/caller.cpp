@@ -42,7 +42,7 @@ TEST(caller, method) {
     auto retval = DateTime::createFromFormat("j-M-Y", "15-Feb-2009");
     ASSERT_TRUE(retval.isObject());
     Object o(retval);
-    auto _date = o.exec("format", {"Y-m-d"});
+    auto _date = o.call("format", {"Y-m-d"});
     ASSERT_STREQ(_date.toCString(), g_date);
 }
 

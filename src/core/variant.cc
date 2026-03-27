@@ -880,4 +880,37 @@ Variant Variant::newItem() {
 
     return Variant{retval, Ctor::Indirect};
 }
+
+Variant Variant::call(const Variant &fn, const ArgList &args) {
+    if (UNEXPECTED(!isObject())) {
+        throwError("call method `%s` on %s", fn.toCString(), typeStr());
+        return {};
+    }
+    Args _args(args);
+    return call_impl(unwrap_ptr(), fn.const_ptr(), _args);
+}
+
+Variant Variant::call(zend_function *fn) {
+    Variant retval{};
+    zend_call_known_function(fn, object(), ce(), retval.ptr(), 0, nullptr, nullptr);
+    throwErrorIfOccurred();
+    return retval;
+}
+
+Variant Variant::call(zend_function *fn, Args &_args) {
+    Variant retval{};
+    zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), nullptr);
+    throwErrorIfOccurred();
+    return retval;
+}
+
+Variant Variant::call(zend_function *fn, Array &args) {
+    Args _args(args);
+    return this->call(fn, _args);
+}
+
+Variant Variant::call(zend_function *fn, const ArgList &args) {
+    Args _args(args);
+    return this->call(fn, _args);
+}
 }  // namespace php
