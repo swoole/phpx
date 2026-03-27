@@ -45,7 +45,7 @@ TEST(helper, instanceOf) {
     ASSERT_TRUE(instanceOf(o, ce));
 }
 
-TEST(helper, abs) {
+TEST(helper, math) {
     var a = "-10";
     ASSERT_EQ(php::math::abs(a).toInt(), 10);
 
@@ -54,6 +54,10 @@ TEST(helper, abs) {
 
     var c = 199;
     ASSERT_EQ(php::math::abs(c).toInt(), 199);
+
+    var e = 3;
+    var d = 4;
+    ASSERT_EQ(php::math::pow(e, d).toInt(), std::pow(3, 4));
 }
 
 TEST(helper, function_exists) {

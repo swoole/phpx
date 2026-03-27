@@ -648,6 +648,7 @@ class Variant {
     Variant call(const Variant &fn, Args &args) {
         return call_impl(ptr(), fn.const_ptr(), args);
     }
+	Variant call(const Variant &fn, Array &args);
 	Variant call(const Variant &fn, const ArgList &args);
 	Variant call(zend_function *fn);
 	Variant call(zend_function *fn, Args &args);

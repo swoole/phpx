@@ -33,5 +33,9 @@ Variant abs(const Variant &v);
 static inline Variant mod(const Variant &a, const Variant &b) {
     return a % b;
 }
+
+static inline Variant pow(const Variant &a, const Variant &b) {
+    return a.pow(b);
+}
 }  // namespace math
 }  // namespace php
