@@ -54,7 +54,7 @@ void try_call(const std::function<void(void)> &fn, const php::String &msg, bool 
         }
         bool expected = php::str_contains(s, msg).toBool();
         if (!expected) {
-        	fprintf(stderr, "ERROR: %s\n", s.toCString());
+            fprintf(stderr, "ERROR: %s\n", s.toCString());
         }
         EXPECT_TRUE(expected);
     }

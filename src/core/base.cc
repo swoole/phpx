@@ -207,25 +207,23 @@ void request_shutdown() {
     }
 }
 
-void throwException(const String &class_name, const char *message, int code) {
-    zend_class_entry *ce = getClassEntry(class_name);
-    if (ce == nullptr) {
-        throwError("class '%s' undefined.", class_name.toCString());
-        return;
-    }
+Variant throwException(const String &class_name, const char *message, int code) {
+    zend_class_entry *ce = getClassEntrySafe(class_name);
     zend_throw_exception(ce, message, code);
     if (throw_impl) {
         throw_impl(EG(exception));
     }
+    return {};
 }
 
-void throwException(const Object &e) {
+Variant throwException(const Object &e) {
     auto zv = NO_CONST_V(e);
     zval_add_ref(zv);
     EG(exception) = Z_OBJ_P(zv);
     if (throw_impl) {
         throw_impl(EG(exception));
     }
+    return {};
 }
 
 Object catchException() {

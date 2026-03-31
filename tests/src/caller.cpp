@@ -79,7 +79,7 @@ TEST(caller, curl) {
 }
 
 TEST(caller, call) {
-	String php_uname_fn("php_uname");
+    String php_uname_fn("php_uname");
     auto rs = call(php_uname_fn);
     ASSERT_TRUE(rs.isString());
     ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());

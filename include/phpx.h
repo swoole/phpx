@@ -106,8 +106,8 @@ PHPX_API Variant call(zend_function *func, Array &args);
 PHPX_API Variant call(zend_function *func, const ArgList &args);
 PHPX_API Variant call(zend_class_entry *ce, zend_function *func);
 PHPX_API Variant call(zend_class_entry *ce, zend_function *func, const ArgList &args);
-PHPX_API void throwException(const String &class_name, const char *message, int code = 0);
-PHPX_API void throwException(const Object &e);
+PHPX_API Variant throwException(const String &class_name, const char *message, int code = 0);
+PHPX_API Variant throwException(const Object &e);
 PHPX_API bool empty(const Variant &v, const OperationChain &list);
 PHPX_API bool exists(const Variant &v, const OperationChain &list);
 PHPX_API Reference toReference(const Variant &v, const OperationChain &list);
@@ -640,7 +640,7 @@ class Variant {
     Variant newItem();
     Reference attrRef(const String &name);
     Variant attr(const Variant &name, bool update = false) const;
-    Variant attr(uintptr_t offset) const {
+    Variant attr(uintptr_t offset, bool update = false) const {
         auto member_p = OBJ_PROP(object(), offset);
         return Variant{member_p, zval_wrap(member_p)};
     }

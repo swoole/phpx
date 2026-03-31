@@ -1524,7 +1524,7 @@ TEST(variant, copy_self_2) {
 }
 
 TEST(variant, assign_ref1) {
-	var v1("hello world");
+    var v1("hello world");
     ASSERT_TRUE(v1.isString());
 
     Array arr;
