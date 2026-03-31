@@ -95,8 +95,12 @@ String Variant::toString() const {
 }
 
 Reference Variant::toReference() {
-    Variant tmp{this};
-    return Reference{tmp.const_ptr()};
+    if (isReference()) {
+        return Reference{direct_ptr(), Ctor::CopyRef};
+    } else {
+        Variant tmp{this};
+        return Reference{tmp.const_ptr()};
+    }
 }
 
 Array Variant::toArray() const {
@@ -740,7 +744,7 @@ Variant Variant::item(zend_long offset, bool update) {
 }
 
 Variant Variant::item(const Variant &key, bool update) {
-    auto zvar = unwrap_zval(ptr());
+    auto zvar = unwrap_ptr();
     zval *retval;
     zval rv;
 
@@ -769,13 +773,16 @@ Variant Variant::item(const Variant &key, bool update) {
             throwErrorIfOccurred();
             return Variant{retval};
         }
+    } else if (zval_is_ref(zvar)) {
+        Variant tmp(Z_REFVAL_P(zvar), Ctor::Indirect);
+        return tmp.item(key, update);
     } else {
         if (update) {
             array_init(zvar);
             auto skey = key.toString();
             retval = zend_hash_update(Z_ARRVAL_P(zvar), skey.str(), undef());
         } else {
-            throwError("Only array/object/string support the item() method");
+            throwError("Only array/object/string support the item() method, type `%s` given", typeStr());
             return Variant{undef()};
         }
     }
@@ -850,7 +857,7 @@ Variant Variant::attr(const Variant &name, bool update) const {
 }
 
 Variant Variant::newItem() {
-    auto zvar = unwrap_zval(ptr());
+    auto zvar = unwrap_ptr();
     zval *retval;
     zval rv;
 

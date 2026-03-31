@@ -526,16 +526,14 @@ class Variant {
         return Z_TYPE_P(const_ptr()) == IS_RESOURCE;
     }
     bool isReference() const {
-        return Z_TYPE_P(const_ptr()) == IS_REFERENCE;
+        return Z_TYPE_P(direct_ptr()) == IS_REFERENCE;
     }
     bool isIndirect() const {
         return Z_TYPE_P(const_ptr()) == IS_INDIRECT;
     }
-
     bool isScalar() const {
         return isBool() || isInt() || isFloat() || isString();
     }
-
     bool isNumeric() const;
     bool empty() const {
         return toBool() == false;
@@ -1195,6 +1193,9 @@ class Reference : public Variant {
 
   public:
     Reference() noexcept {
+        ref_init(&val);
+    }
+    Reference(std::nullptr_t) noexcept {
         ref_init(&val);
     }
     Reference(const Reference &v) noexcept {
