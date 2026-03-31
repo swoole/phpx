@@ -625,7 +625,7 @@ TEST(object, enum_class) {
     ASSERT_STREQ(name.data(), "Spades");
 }
 
-TEST(object, exec) {
+TEST(object, call) {
     auto obj = newObject("DateTime", {"2000-01-01"});
     auto fn = getMethod(obj.ce(), "format");
     auto rs = obj.call(fn, {"Y-m-d H:i:s"});
@@ -634,6 +634,16 @@ TEST(object, exec) {
     auto fn2 = getMethod(obj.ce(), "getTimestamp");
     auto rs2 = obj.call(fn2);
     ASSERT_GT(rs2.toInt(), 100000000);
+
+    Args args;
+    args.append("Y-m-d H:i:s");
+    rs = obj.call("format", args);
+    ASSERT_STREQ(rs.toCString(), "2000-01-01 00:00:00");
+
+    Array array;
+    array.append("Y-m-d H:i:s");
+    rs = obj.call("format", array);
+    ASSERT_STREQ(rs.toCString(), "2000-01-01 00:00:00");
 }
 
 TEST(object, call_array) {

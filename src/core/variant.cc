@@ -773,9 +773,6 @@ Variant Variant::item(const Variant &key, bool update) {
             throwErrorIfOccurred();
             return Variant{retval};
         }
-    } else if (zval_is_ref(zvar)) {
-        Variant tmp(Z_REFVAL_P(zvar), Ctor::Indirect);
-        return tmp.item(key, update);
     } else {
         if (update) {
             array_init(zvar);
