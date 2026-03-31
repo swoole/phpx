@@ -214,7 +214,7 @@ TEST(base, exception2) {
 }
 
 TEST(base, exception3) {
-    try_call([]() { throwException("TestClassNotExists", "test"); }, "class 'TestClassNotExists' undefined.");
+    try_call([]() { throwException("TestClassNotExists", "test"); }, "class 'TestClassNotExists' is undefined.");
 }
 
 TEST(base, toSize) {
