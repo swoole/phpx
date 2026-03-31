@@ -239,6 +239,11 @@ TEST(base, concat) {
 
     var e = concat({});
     ASSERT_TRUE(e.isNull());
+
+    var i = 1990;
+    var f = concat({i, " ", 4.04});
+    ASSERT_STREQ(f.toCString(), "1990 4.04");
+    ASSERT_TRUE(i.isInt());
 }
 
 TEST(base, compare) {

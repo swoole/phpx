@@ -73,7 +73,7 @@ Variant concat(const ArgList &args) {
     }
 
     auto it = args.begin();
-    Variant result = *it;
+    Variant result = it->toString();
     ++it;
 
     for (; it != args.end(); ++it) {
