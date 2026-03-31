@@ -209,9 +209,11 @@ void request_shutdown() {
 
 Variant throwException(const String &class_name, const char *message, int code) {
     zend_class_entry *ce = getClassEntrySafe(class_name);
-    zend_throw_exception(ce, message, code);
-    if (throw_impl) {
-        throw_impl(EG(exception));
+    if (EXPECTED(ce != nullptr)) {
+        zend_throw_exception(ce, message, code);
+        if (throw_impl) {
+            throw_impl(EG(exception));
+        }
     }
     return {};
 }
