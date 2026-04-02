@@ -525,8 +525,8 @@ int compare(const Variant &a, const Variant &b) {
     return zend_compare(NO_CONST_V(a), NO_CONST_V(b));
 }
 
-bool empty(const Variant &v, const OperationChain &list) {
-    Variant tmp(v.const_ptr());
+bool empty(const Variant &v, const OperationChain &list, Variant &tmp) {
+    tmp = v;
     for (const auto &expr : list) {
         if (expr.first == ArrayDimFetch) {
             if (!tmp.isArray() && !tmp.isObject()) {
@@ -551,8 +551,13 @@ bool empty(const Variant &v, const OperationChain &list) {
     return !tmp;
 }
 
-bool exists(const Variant &v, const OperationChain &list) {
-    Variant tmp = v;
+bool empty(const Variant &v, const OperationChain &list) {
+    Variant tmp;
+    return empty(v, list, tmp);
+}
+
+bool exists(const Variant &v, const OperationChain &list, Variant &tmp) {
+    tmp = v;
     if (tmp.isNull() || tmp.isUndef()) {
         return false;
     }
@@ -586,6 +591,11 @@ bool exists(const Variant &v, const OperationChain &list) {
     }
 
     return true;
+}
+
+bool exists(const Variant &v, const OperationChain &list) {
+    Variant tmp;
+    return exists(v, list, tmp);
 }
 
 Reference toReference(const Variant &v, const OperationChain &list) {

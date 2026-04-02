@@ -109,7 +109,9 @@ PHPX_API Variant call(zend_class_entry *ce, zend_function *func, const ArgList &
 PHPX_API Variant throwException(const String &class_name, const char *message, int code = 0);
 PHPX_API Variant throwException(const Object &e);
 PHPX_API bool empty(const Variant &v, const OperationChain &list);
+PHPX_API bool empty(const Variant &v, const OperationChain &list, Variant &result);
 PHPX_API bool exists(const Variant &v, const OperationChain &list);
+PHPX_API bool exists(const Variant &v, const OperationChain &list, Variant &result);
 PHPX_API Reference toReference(const Variant &v, const OperationChain &list);
 
 void setDebugInfo();

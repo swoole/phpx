@@ -470,6 +470,16 @@ TEST(exists, complex_mixed_paths) {
                         {PropertyFetch, "inner_arr"},
                         {ArrayDimFetch, "final_key"}}));
 
+    var result;
+    exists(v,
+           {{ArrayDimFetch, "obj1"},
+            {PropertyFetch, "mid_arr"},
+            {ArrayDimFetch, "obj2"},
+            {PropertyFetch, "inner_arr"},
+            {ArrayDimFetch, "final_key"}},
+           result);
+    ASSERT_STREQ(result.toCString(), "final_value");
+
     ASSERT_TRUE(exists(v,
                        {{ArrayDimFetch, "obj1"},
                         {PropertyFetch, "mid_arr"},
