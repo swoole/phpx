@@ -247,6 +247,11 @@ static inline Ctor zval_wrap(zval *v) {
     return zval_is_ref(v) ? Ctor::CopyRef : Ctor::Indirect;
 }
 
+#ifndef Z_TYPE_EXTRA_P
+#define Z_TYPE_EXTRA(zval)			(zval).u1.v.u.extra
+#define Z_TYPE_EXTRA_P(zval_p)		Z_TYPE_EXTRA(*(zval_p))
+#endif
+
 class Variant {
   protected:
     zval val;
@@ -427,7 +432,7 @@ class Variant {
     }
     Variant &operator=(const std::string &str) {
         if (UNEXPECTED(isByteOfStr())) {
-            setByteOfStr(str.c_str()[0]);
+            setByteOfStr(str.at(0));
         } else {
             destroy();
             ZVAL_STRINGL(unwrap_ptr(), str.c_str(), str.length());
