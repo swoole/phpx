@@ -51,7 +51,7 @@ extern "C" {
 #define PHPX_API PHPAPI
 #define PHPX_UNSAFE
 
-#define IS_STR_OFFSET_SET IS_STR_CLASS_NAME_MAP_PTR
+#define IS_STR_OFFSET_SET (1 << 5)
 
 /**
  * !!! Unsafe conversion, discarding const modifier. There are many errors in the php src source code.
@@ -232,6 +232,10 @@ static inline bool zval_is_ref(const zval *v) {
     return Z_TYPE_P(v) == IS_REFERENCE;
 }
 
+static inline bool zval_is_indirect(const zval *v) {
+    return Z_TYPE_P(v) == IS_INDIRECT;
+}
+
 enum class Ctor {
     Copy,
     CopyRef,
@@ -255,9 +259,13 @@ class Variant {
     void delRef() {
         Z_TRY_DELREF_P(&val);
     }
-    static void strOffsetSet(zval *zv, char c);
-    static bool isStrOffsetSet(zval *zv) {
-        return GC_FLAGS(Z_STR_P(zv)) & IS_STR_OFFSET_SET;
+    void setByteOfStr(char c) {
+        SEPARATE_STRING(zv());
+        Z_STRVAL_P(zv())[Z_FE_POS_P(ptr())] = c;
+        zend_string_forget_hash_val(Z_STR_P(zv()));
+    }
+    bool isByteOfStr() {
+        return isIndirect() && isString() && (Z_TYPE_EXTRA_P(ptr()) & IS_STR_OFFSET_SET);
     }
 
   public:
@@ -355,6 +363,13 @@ class Variant {
             addRef();
         }
     }
+    Variant(zval *v, zend_long offset, Ctor method) noexcept {
+        assert(method == Ctor::Indirect);
+        assert(zval_is_string(v));
+        ZVAL_INDIRECT(&val, v);
+        Z_TYPE_EXTRA(val) |= IS_STR_OFFSET_SET;
+        Z_FE_POS(val) = static_cast<uint32_t>(offset);
+    }
     Variant(const Variant &v) : Variant(v.unwrap_ptr()) {}
     Variant(Variant &&v) noexcept {
         if (v.isIndirect()) {
@@ -411,8 +426,8 @@ class Variant {
         return *this;
     }
     Variant &operator=(const std::string &str) {
-        if (isIndirect() && isString() && isStrOffsetSet(zv())) {
-            strOffsetSet(zv(), str.c_str()[0]);
+        if (UNEXPECTED(isByteOfStr())) {
+            setByteOfStr(str.c_str()[0]);
         } else {
             destroy();
             ZVAL_STRINGL(unwrap_ptr(), str.c_str(), str.length());
@@ -420,8 +435,8 @@ class Variant {
         return *this;
     }
     Variant &operator=(const char *str) {
-        if (isIndirect() && isString() && isStrOffsetSet(zv())) {
-            strOffsetSet(zv(), str[0]);
+        if (UNEXPECTED(isByteOfStr())) {
+            setByteOfStr(str[0]);
         } else {
             destroy();
             ZVAL_STRING(unwrap_ptr(), str);

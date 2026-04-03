@@ -34,10 +34,14 @@ Variant::Variant(const Reference *ref) {
 }
 
 void Variant::copyFrom(const zval *src) {
-    zval *zv = unwrap_ptr();
-    if (UNEXPECTED(zval_is_string(zv) && isStrOffsetSet(zv) && zval_is_string(src))) {
-        strOffsetSet(zv, Z_STRVAL_P(src)[0]);
+    if (UNEXPECTED(isByteOfStr())) {
+        if (!zval_is_string(src) || Z_STRLEN_P(src) != 1) {
+            throwError("Can only be assigned a single-byte string to a string offset");
+        } else {
+            setByteOfStr(Z_STRVAL_P(src)[0]);
+        }
     } else {
+        auto zv = unwrap_ptr();
         zval tmp = *zv;
         ZVAL_COPY(zv, src);
         zval_ptr_dtor(&tmp);
@@ -54,15 +58,6 @@ void Variant::copyRef(Variant *v) {
         ZVAL_COPY_VALUE(zv, &val);
         Z_TRY_ADDREF_P(zv);
     }
-}
-
-void Variant::strOffsetSet(zval *zv, char c) {
-    auto str = Z_STR_P(zv);
-    zend_long offset = str->h;
-    SEPARATE_STRING(zv);
-    Z_STRVAL_P(zv)[offset] = c;
-    zend_string_forget_hash_val(Z_STR_P(zv));
-    GC_DEL_FLAGS(str, IS_STR_OFFSET_SET);
 }
 
 Variant &Variant::operator=(const zval *v) {
@@ -718,13 +713,11 @@ Variant Variant::item(zend_long offset, bool update) {
     } else if (zval_is_string(zvar)) {
         if (update) {
             auto str = Z_STR_P(zvar);
-            if (offset >= str->len) {
+            if (offset >= str->len || offset >= UINT_MAX) {
                 throwError("String offset `" ZEND_LONG_FMT "` out of range", offset);
                 return {};
             }
-            str->h = offset;
-            GC_ADD_FLAGS(str, IS_STR_OFFSET_SET);
-            retval = zvar;
+            return Variant{zvar, offset, Ctor::Indirect};
         } else {
             String tmp(zvar, Ctor::Indirect);
             return tmp.offsetGet(offset);

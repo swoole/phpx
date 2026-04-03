@@ -1252,6 +1252,7 @@ TEST(variant, item6) {
     ASSERT_STREQ(s2.toCString(), "hello#world");
 
     try_call([&]() { s2.item(100, true) = "@"; }, "String offset `100` out of range");
+    try_call([&]() { s2.item(5, true) = "-----"; }, "Can only be assigned a single-byte string to a string offset");
 }
 
 TEST(variant, itemRef1) {
