@@ -186,13 +186,17 @@ Object Object::clone() const {
 
 Object newObject(zend_class_entry *ce) {
     Object object;
+
     auto rc = object_init_ex(object.ptr(), ce);
     if (EXPECTED(rc == SUCCESS)) {
-        if (ce->constructor) {
-            zend_call_known_function(ce->constructor, object.object(), object.ce(), nullptr, 0, nullptr, nullptr);
+        auto this_ = object.object();
+        auto ctor = ce->constructor;
+        if (ctor) {
+            zend_call_known_function(ctor, this_, ce, nullptr, 0, nullptr, nullptr);
         }
     }
     throwErrorIfOccurred();
+
     return object;
 }
 
@@ -201,9 +205,10 @@ Object newObject(zend_class_entry *ce, Args &args) {
 
     auto rc = object_init_ex(object.ptr(), ce);
     if (EXPECTED(rc == SUCCESS)) {
-        if (ce->constructor) {
-            zend_call_known_function(
-                ce->constructor, object.object(), object.ce(), nullptr, args.count(), args.ptr(), nullptr);
+        auto this_ = object.object();
+        auto ctor = ce->constructor;
+        if (ctor) {
+            zend_call_known_function(ctor, this_, ce, nullptr, args.count(), args.ptr(), nullptr);
         }
     }
     throwErrorIfOccurred();

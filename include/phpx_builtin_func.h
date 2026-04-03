@@ -21,6 +21,7 @@
 namespace php {
 namespace fn {
 bool function_exists(const String &fname, bool formatted = false);
+Int strlen(const Variant &v);
 Int ord(const Variant &v);
 String chr(Int c);
 }  // namespace fn

@@ -60,6 +60,11 @@ Int ord(const Variant &v) {
     return sv.data()[0];
 }
 
+Int strlen(const Variant &v) {
+    String tmp(v);
+    return v.length();
+}
+
 String chr(Int c) {
     return {zend_one_char_string[c]};
 }
