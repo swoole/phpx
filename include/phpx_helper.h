@@ -167,6 +167,19 @@ static inline bool exists(Bool v) {
     return true;
 }
 
+template <typename T>
+static inline bool notEmpty(T v) {
+    return !empty(v);
+}
+
+static inline bool notEmpty(const Variant &v, const OperationChain &list) {
+    return !empty(v, list);
+}
+
+static inline bool notEmpty(const Variant &v, const OperationChain &list, Variant &result) {
+    return !empty(v, list, result);
+}
+
 static inline Bool exists(const Variant &v) {
     return !(v.isNull() || v.isUndef());
 }

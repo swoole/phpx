@@ -204,6 +204,8 @@ TEST(helper_empty, int_empty) {
     ASSERT_TRUE(php::empty(static_cast<Int>(0)));
     ASSERT_FALSE(php::empty(static_cast<Int>(1)));
     ASSERT_FALSE(php::empty(static_cast<Int>(-1)));
+
+    ASSERT_FALSE(php::notEmpty(static_cast<Int>(0)));
 }
 
 TEST(helper_empty, float_empty) {
