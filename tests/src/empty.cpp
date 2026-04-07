@@ -32,6 +32,9 @@ TEST(empty, array_dim_fetch_basic) {
 
     // Non-existent elements
     ASSERT_TRUE(empty(v, {{ArrayDimFetch, "nonexistent"}}));
+
+    ASSERT_TRUE(notEmpty(v, {{ArrayDimFetch, "key1"}}));
+    ASSERT_FALSE(notEmpty(v, {{ArrayDimFetch, "nonexistent"}}));
 }
 
 TEST(empty, array_dim_fetch_nested) {

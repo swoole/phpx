@@ -58,6 +58,16 @@ TEST(helper, math) {
     var e = 3;
     var d = 4;
     ASSERT_EQ(php::math::pow(e, d).toInt(), std::pow(3, 4));
+
+    ASSERT_EQ(php::math::abs(-100L), 100L);
+    ASSERT_EQ(php::math::abs(100L), 100L);
+
+    ASSERT_EQ(php::math::abs(-100.09), 100.09);
+    ASSERT_EQ(php::math::abs(100.09), 100.09);
+
+    var f = 13;
+    var h = 3;
+    ASSERT_EQ(php::math::mod(f, h).toInt(), 1);
 }
 
 TEST(helper, function_exists) {
@@ -68,7 +78,7 @@ TEST(helper, function_exists) {
     ASSERT_TRUE(php::fn::function_exists("PHP_UNAME"));
 }
 
-TEST(helper, chr) {
+TEST(helper, func) {
     char c1 = 'A';
     auto c2 = php::fn::ord("A");
     ASSERT_EQ(c1, c2);
@@ -76,6 +86,9 @@ TEST(helper, chr) {
     auto s1 = php::fn::chr(c1);
     ASSERT_EQ(s1.length(), 1);
     ASSERT_STREQ(s1.toCString(), "A");
+
+    var d = 10000;
+    ASSERT_EQ(php::fn::strlen(d), 5);
 }
 
 TEST(helper, same) {

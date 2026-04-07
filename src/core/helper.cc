@@ -62,7 +62,7 @@ Int ord(const Variant &v) {
 
 Int strlen(const Variant &v) {
     String tmp(v);
-    return v.length();
+    return tmp.length();
 }
 
 String chr(Int c) {

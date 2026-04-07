@@ -1541,3 +1541,15 @@ TEST(variant, assign_ref2) {
     ASSERT_TRUE(v1.isReference());
     ASSERT_EQ(v1.length(), 5);
 }
+
+TEST(variant, assign_ref3) {
+    Ref a;
+    a = "hello";
+
+    var b;
+    b = 100;
+
+    ASSERT_EQ(b.toInt(), 100);
+    b = &a;
+    ASSERT_STREQ(b.toCString(), "hello");
+}

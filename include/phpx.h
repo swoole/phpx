@@ -248,8 +248,8 @@ static inline Ctor zval_wrap(zval *v) {
 }
 
 #ifndef Z_TYPE_EXTRA_P
-#define Z_TYPE_EXTRA(zval)			(zval).u1.v.u.extra
-#define Z_TYPE_EXTRA_P(zval_p)		Z_TYPE_EXTRA(*(zval_p))
+#define Z_TYPE_EXTRA(zval) (zval).u1.v.u.extra
+#define Z_TYPE_EXTRA_P(zval_p) Z_TYPE_EXTRA(*(zval_p))
 #endif
 
 class Variant {
