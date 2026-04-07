@@ -85,13 +85,16 @@ int main(int argc, char **argv) {
     init_root_path(argv[0]);
     ::testing::InitGoogleTest(&argc, argv);
 
-    try {
-        php::eval("main();");
-    } catch (zend_object *e) {
-        gtest_exit_status = EG(exit_status);
-        CG(unclean_shutdown) = 1;
-        zend_exception_error(e, E_ERROR);
+    zend_first_try {
+        try {
+            php::eval("main();");
+        } catch (zend_object *e) {
+            gtest_exit_status = EG(exit_status);
+            CG(unclean_shutdown) = 1;
+            zend_exception_error(e, E_ERROR);
+        }
     }
+    zend_end_try();
 
     php::request_shutdown();
     php_embed_shutdown();

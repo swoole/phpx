@@ -257,33 +257,11 @@ static void free_fci_cache(zval *el) {
     pefree((zend_fcall_info_cache *) Z_PTR_P(el), 1);
 }
 
-/**
- * @param object/error/fcc optional, nullable
- * @param check_flags IS_CALLABLE_CHECK_SYNTAX_ONLY, IS_CALLABLE_SUPPRESS_DEPRECATIONS
- */
-bool is_callable_ex(zval *callable,
-                    zend_object *object,
-                    uint32_t check_flags,
-                    zend_string **callable_name,
-                    zend_fcall_info_cache *fcc,
-                    char **error) {
-    zend_execute_data *frame = EG(current_execute_data);
-    while (frame && !frame->func) {
-        frame = frame->prev_execute_data;
-    }
-
-    bool ret = zend_is_callable_at_frame(callable, object, frame, check_flags, fcc, error);
-    if (callable_name) {
-        *callable_name = zend_get_callable_name_ex(callable, object);
-    }
-    return ret;
-}
-
 zend_function *getFunction(const String &name) {
     zend_fcall_info_cache fcc;
     zval *fn = NO_CONST_V(name);
 
-    if (!is_callable_ex(fn, nullptr, 0, nullptr, &fcc, nullptr)) {
+    if (!zend_is_callable_ex(fn, nullptr, 0, nullptr, &fcc, nullptr)) {
         auto callable_name = zend_get_callable_name_ex(fn, nullptr);
         zend_throw_error(NULL, "function '%s' is undefined.", ZSTR_VAL(callable_name));
         zend_string_release_ex(callable_name, 0);
@@ -337,7 +315,7 @@ static void call_function_impl(
         }
     }
 
-    if (!is_callable_ex(&fci.function_name, fci.object, 0, NULL, &fcc, &error)) {
+    if (!zend_is_callable_ex(&fci.function_name, fci.object, 0, NULL, &fcc, &error)) {
         ZEND_ASSERT(error && "Should have error if not callable");
         auto callable_name = zend_get_callable_name_ex(&fci.function_name, fci.object);
         zend_throw_error(NULL, "Invalid callback %s, %s", ZSTR_VAL(callable_name), error);
