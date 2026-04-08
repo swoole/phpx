@@ -456,3 +456,14 @@ TEST(base, toReference2) {
     auto v2 = arr.item("object").attr("propInt2");
     ASSERT_EQ(v2.toInt(), 2026);
 }
+
+TEST(base, named_args) {
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
+    Array name_args;
+    name_args.set("vip", true);
+    name_args.set("city", "shanghai");
+
+    auto fn = getFunction("createUser");
+    auto rs = call(fn, {"Charlie", 22}, name_args.array());
+    ASSERT_TRUE(rs.item("vip").toBool());
+}
