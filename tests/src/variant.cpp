@@ -977,6 +977,22 @@ TEST(variant, newReference) {
 
     array arr(*ref);
     ASSERT_STREQ(arr.offsetGet("first").toCString(), "value");
+
+    auto ref2 = newReference("hello world");
+    ASSERT_TRUE(ref2.isString());
+
+    ASSERT_EQ(ref2.getRefCount(), 1);
+    ASSERT_EQ(Z_REFCOUNT_P(ref2.refval()), 1);
+    ASSERT_TRUE(ref2.isReference());
+
+    Reference ref3 = ref2;
+    ref2.unset();
+    ASSERT_TRUE(ref2.isUndef());
+    ASSERT_FALSE(ref2.isReference());
+
+    ASSERT_EQ(ref3.getRefCount(), 1);
+    ASSERT_EQ(Z_REFCOUNT_P(ref3.refval()), 1);
+    ASSERT_TRUE(ref3.isReference());
 }
 
 TEST(variant, unary_operators) {

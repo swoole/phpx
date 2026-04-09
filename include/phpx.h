@@ -1258,6 +1258,12 @@ static inline Reference newReference() {
     return Reference{};
 }
 
+static inline Reference newReference(const Variant &v) {
+    Reference ref;
+    ZVAL_COPY(ref.refval(), v.const_ptr());
+    return ref;
+}
+
 static inline Reference getEmptyArrayRef() {
     Reference ref;
     array_init(ref.refval());
