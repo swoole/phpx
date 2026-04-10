@@ -1569,3 +1569,22 @@ TEST(variant, assign_ref3) {
     b = &a;
     ASSERT_STREQ(b.toCString(), "hello");
 }
+
+TEST(variant, assign_ref4) {
+    auto a = Array({Var(1L), Var(2L), Var(3L)});
+    auto b = Array({Var(4L), Var(5L)});
+
+    Ref ref = b.toReference();
+    ASSERT_TRUE(ref.isReference());
+    ASSERT_TRUE(ref.isArray());
+    ASSERT_EQ(ref.length(), 2);
+
+    a.newItem() = 100;
+    a.newItem() = &ref;
+    ASSERT_EQ(a.count(), 5);
+
+    auto item = a.get(4);
+    ASSERT_TRUE(item.isReference());
+    ASSERT_TRUE(item.isArray());
+    ASSERT_EQ(item.length(), 2);
+}

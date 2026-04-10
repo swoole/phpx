@@ -50,12 +50,13 @@ void Variant::copyFrom(const zval *src) {
 
 void Variant::copyRef(Variant *v) {
     if (v->isReference()) {
-        val = *v->ptr();
-        addRef();
+        auto zv = v->direct_ptr();
+        ZVAL_COPY_VALUE(direct_ptr(), zv);
+        Z_TRY_ADDREF_P(zv);
     } else {
         auto zv = v->unwrap_ptr();
-        ZVAL_NEW_REF(&val, zv);
-        ZVAL_COPY_VALUE(zv, &val);
+        ZVAL_NEW_REF(direct_ptr(), zv);
+        ZVAL_COPY_VALUE(zv, direct_ptr());
         Z_TRY_ADDREF_P(zv);
     }
 }
