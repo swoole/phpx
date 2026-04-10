@@ -49,16 +49,14 @@ void Variant::copyFrom(const zval *src) {
 }
 
 void Variant::copyRef(Variant *v) {
+    auto zv = v->direct_ptr();
     if (v->isReference()) {
-        auto zv = v->direct_ptr();
         ZVAL_COPY_VALUE(direct_ptr(), zv);
-        Z_TRY_ADDREF_P(zv);
     } else {
-        auto zv = v->unwrap_ptr();
         ZVAL_NEW_REF(direct_ptr(), zv);
         ZVAL_COPY_VALUE(zv, direct_ptr());
-        Z_TRY_ADDREF_P(zv);
     }
+    Z_TRY_ADDREF_P(zv);
 }
 
 Variant &Variant::operator=(const zval *v) {
@@ -916,5 +914,27 @@ Variant Variant::call(zend_function *fn, Array &args) {
 Variant Variant::call(zend_function *fn, const ArgList &args) {
     Args _args(args);
     return call(fn, _args);
+}
+
+Reference &Reference::operator=(const Reference &v) {
+    if (&v != this) {
+        zval_ptr_dtor(&val);
+        ZVAL_COPY(&val, v.const_ptr());
+    }
+    return *this;
+}
+
+Reference &Reference::operator=(const Variant &v) {
+    if (&v != this) {
+        destroy();
+        if (v.isReference()) {
+            zval_ptr_dtor(&val);
+            ZVAL_COPY_VALUE(&val, v.direct_ptr());
+            Z_TRY_ADDREF_P(&val);
+        } else {
+            ZVAL_COPY(refval(), v.direct_ptr());
+        }
+    }
+    return *this;
 }
 }  // namespace php

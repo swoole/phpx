@@ -1224,20 +1224,8 @@ class Reference : public Variant {
     Reference(const zval *v, Ctor method = Ctor::CopyRef) : Variant(v, method) {
         checkRef();
     }
-    Reference &operator=(const Reference &v) noexcept {
-        if (&v != this) {
-            zval_ptr_dtor(&val);
-            ZVAL_COPY(&val, v.const_ptr());
-        }
-        return *this;
-    }
-    Reference &operator=(const Variant &v) {
-        if (&v != this) {
-            destroy();
-            ZVAL_COPY(refval(), v.direct_ptr());
-        }
-        return *this;
-    }
+    Reference &operator=(const Reference &v);
+    Reference &operator=(const Variant &v);
 };
 
 class Box {

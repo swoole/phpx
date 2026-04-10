@@ -1588,3 +1588,37 @@ TEST(variant, assign_ref4) {
     ASSERT_TRUE(item.isArray());
     ASSERT_EQ(item.length(), 2);
 }
+
+TEST(variant, assign_ref5) {
+    Array a;
+    Ref b;
+    Ref tmp_var_0;
+
+    a = Array({Var(1L), Var(2L), Var(3L)});
+    ASSERT_EQ(a.count(), 3);
+
+    tmp_var_0 = a.toReference();
+    // ref = ref *
+    b = &tmp_var_0;
+    ASSERT_EQ(b.length(), 3);
+
+    b.append(5L);
+    ASSERT_EQ(b.length(), 4);
+}
+
+TEST(variant, assign_ref6) {
+    Array a;
+    Ref b;
+    Ref tmp_var_0;
+
+    a = Array({Var(1L), Var(2L), Var(3L)});
+    ASSERT_EQ(a.count(), 3);
+
+    tmp_var_0 = a.toReference();
+    // ref = ref
+    b = tmp_var_0;
+    ASSERT_EQ(b.length(), 3);
+
+    b.append(5L);
+    ASSERT_EQ(b.length(), 4);
+}
