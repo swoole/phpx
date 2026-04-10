@@ -1197,6 +1197,8 @@ class Object : public Variant {
 };
 
 class Reference : public Variant {
+    void copyRefZval(const zval *zv);
+
     void checkRef() {
         if (zval_is_null(&val) || zval_is_undef(&val)) {
             ref_init(&val);
@@ -1225,6 +1227,7 @@ class Reference : public Variant {
         checkRef();
     }
     Reference &operator=(const Reference &v);
+    Reference &operator=(Reference *);
     Reference &operator=(const Variant &v);
 };
 

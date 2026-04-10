@@ -916,6 +916,12 @@ Variant Variant::call(zend_function *fn, const ArgList &args) {
     return call(fn, _args);
 }
 
+void Reference::copyRefZval(const zval *zv) {
+    zval_ptr_dtor(&val);
+    ZVAL_COPY_VALUE(&val, zv);
+    Z_TRY_ADDREF_P(&val);
+}
+
 Reference &Reference::operator=(const Reference &v) {
     if (&v != this) {
         zval_ptr_dtor(&val);
@@ -924,13 +930,18 @@ Reference &Reference::operator=(const Reference &v) {
     return *this;
 }
 
+Reference &Reference::operator=(Reference *v) {
+    if (v != this) {
+        copyRefZval(v->const_ptr());
+    }
+    return *this;
+}
+
 Reference &Reference::operator=(const Variant &v) {
     if (&v != this) {
         destroy();
         if (v.isReference()) {
-            zval_ptr_dtor(&val);
-            ZVAL_COPY_VALUE(&val, v.direct_ptr());
-            Z_TRY_ADDREF_P(&val);
+            copyRefZval(v.direct_ptr());
         } else {
             ZVAL_COPY(refval(), v.direct_ptr());
         }
