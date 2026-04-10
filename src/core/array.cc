@@ -163,7 +163,7 @@ void Array::set(const Variant &key, const Variant &v) {
     } else if (key.isInt() || key.isFloat()) {
         set(key.toInt(), v);
     } else {
-        auto zv = NO_CONST_V(v);
+        auto zv = NO_CONST_Z(v.direct_ptr());
         Z_TRY_ADDREF_P(zv);
 
         auto zarr = unwrap_ptr();
@@ -174,7 +174,7 @@ void Array::set(const Variant &key, const Variant &v) {
 }
 
 void Array::set(zend_ulong i, const Variant &v) {
-    auto zv = NO_CONST_V(v);
+    auto zv = NO_CONST_Z(v.direct_ptr());
     Z_TRY_ADDREF_P(zv);
 
     auto zarr = unwrap_ptr();
@@ -183,7 +183,7 @@ void Array::set(zend_ulong i, const Variant &v) {
 }
 
 void Array::append(const Variant &v) {
-    auto zv = NO_CONST_V(v);
+    auto zv = NO_CONST_Z(v.direct_ptr());
     Z_TRY_ADDREF_P(zv);
 
     auto zarr = unwrap_ptr();
