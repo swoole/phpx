@@ -982,17 +982,14 @@ class Array : public Variant {
     Array &operator=(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
     Array &operator=(const std::initializer_list<std::pair<Int, const Variant>> &list);
 
-    zend_array *unwrap_array() {
-        return Z_ARRVAL_P(unwrap_ptr());
-    }
     void set(zend_ulong i, const Variant &v);
     void set(const Variant &key, const Variant &v);
     void append(const Variant &v);
     Variant get(const String &key) const {
-        return {zend_hash_find(Z_ARRVAL_P(const_ptr()), key.str()), Ctor::CopyRef};
+        return {zend_hash_find(array(), key.str()), Ctor::CopyRef};
     }
     Variant get(zend_ulong i) const {
-        return {zend_hash_index_find(Z_ARRVAL_P(const_ptr()), i), Ctor::CopyRef};
+        return {zend_hash_index_find(array(), i), Ctor::CopyRef};
     }
     ArrayItem operator[](zend_ulong i) {
         return {*this, i, String{}};
@@ -1008,26 +1005,26 @@ class Array : public Variant {
         zend_hash_clean(Z_ARRVAL_P(zarr));
     }
     bool exists(zend_ulong index) const {
-        return zend_hash_index_exists(Z_ARRVAL_P(unwrap_ptr()), index);
+        return zend_hash_index_exists(array(), index);
     }
     bool exists(const String &key) const {
-        return zend_hash_exists(Z_ARRVAL_P(unwrap_ptr()), key.str());
+        return zend_hash_exists(array(), key.str());
     }
     ArrayIterator begin() const {
-        return {Z_ARRVAL_P(unwrap_ptr()), 0};
+        return {array(), 0};
     }
     ArrayIterator end() const {
-        const auto ht = Z_ARRVAL_P(unwrap_ptr());
+        const auto ht = array();
         return {ht, ht->nNumUsed};
     }
     size_t count() const {
-        return zend_hash_num_elements(Z_ARRVAL_P(unwrap_ptr()));
+        return zend_hash_num_elements(array());
     }
     bool empty() const {
         return count() == 0;
     }
     bool isList() const {
-        return zend_array_is_list(Z_ARRVAL_P(unwrap_ptr()));
+        return zend_array_is_list(array());
     }
     Variant search(const Variant &_other_var, bool strict = false) const;
     bool contains(const Variant &_other_var, bool strict = false) const;

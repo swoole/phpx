@@ -270,7 +270,7 @@ void ArrayIterator::skipUndefBucket() {
 ArrayItem::ArrayItem(Array &_array, zend_ulong _index, const String &_key)
     : array_(_array), index_(_index), key_(_key) {
     zval *zv;
-    zend_array *ht = array_.unwrap_array();
+    zend_array *ht = array_.array();
 
     if (key_.str() != zend_empty_string) {
         zv = zend_symtable_find(ht, key_.str());
@@ -286,7 +286,7 @@ ArrayItem::ArrayItem(Array &_array, zend_ulong _index, const String &_key)
 
 ArrayItem &ArrayItem::operator=(const Variant &v) {
     const auto zv = NO_CONST_V(v);
-    zend_array *ht = array_.unwrap_array();
+    zend_array *ht = array_.array();
 
     if (isIndirect()) {
         copyFrom(v.unwrap_ptr());
