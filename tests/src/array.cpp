@@ -457,3 +457,22 @@ TEST(array, matrix) {
     ASSERT_EQ(arr.item(0).item(1).toInt(), 0);
     ASSERT_EQ(arr.item(2).item(2).toInt(), 0);
 }
+
+TEST(array, ref_vargs) {
+    php::Ref tmp_var_0;
+
+    auto array = php::Array({php::Var(1L), php::Var(3L), php::Var(5L)});
+    auto push = php::Array({php::Var(12L), php::Var(33L), php::Var(99L)});
+
+    tmp_var_0 = array.toReference();
+
+    php::Array tmp_var_1{&tmp_var_0};
+    tmp_var_1.merge(push);
+
+    auto tmp = tmp_var_1.get(0);
+    ASSERT_TRUE(tmp.isReference());
+
+    auto fn = getFunction("array_push");
+    php::call(fn, tmp_var_1);
+    ASSERT_EQ(array.count(), 6);
+}

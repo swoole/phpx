@@ -920,7 +920,7 @@ class ArrayIterator {
     }
     Variant key() const;
     Variant value() const {
-        return current();
+        return {current(), Ctor::CopyRef};
     }
     Reference valueRef();
     zend_ulong index() const {
@@ -989,10 +989,10 @@ class Array : public Variant {
     void set(const Variant &key, const Variant &v);
     void append(const Variant &v);
     Variant get(const String &key) const {
-        return zend_hash_find(Z_ARRVAL_P(const_ptr()), key.str());
+        return {zend_hash_find(Z_ARRVAL_P(const_ptr()), key.str()), Ctor::CopyRef};
     }
     Variant get(zend_ulong i) const {
-        return zend_hash_index_find(Z_ARRVAL_P(const_ptr()), i);
+        return {zend_hash_index_find(Z_ARRVAL_P(const_ptr()), i), Ctor::CopyRef};
     }
     ArrayItem operator[](zend_ulong i) {
         return {*this, i, String{}};
