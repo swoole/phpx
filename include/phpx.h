@@ -145,6 +145,7 @@ PHPX_API int compare(const Variant &a, const Variant &b);
 PHPX_API Variant getStaticProperty(const Object &object, const String &prop);
 PHPX_API Variant getStaticProperty(const String &class_name, const String &prop);
 PHPX_API Variant getStaticProperty(zend_class_entry *ce, uint32_t offset);
+PHPX_API Variant getStaticProperty(zend_class_entry *ce, const String &prop);
 PHPX_API bool setStaticProperty(const String &class_name, const String &prop, const Variant &value);
 PHPX_API bool hasStaticProperty(const String &class_name, const String &prop);
 PHPX_API uint32_t getPropertyOffset(const String &class_name, const String &prop);
