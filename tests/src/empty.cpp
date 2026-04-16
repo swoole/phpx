@@ -172,9 +172,9 @@ TEST(empty, complex_chains) {
 TEST(empty, numeric_keys) {
     // Numeric key array access test
     Array numeric_arr;
-    numeric_arr.set(0, "first");
+    numeric_arr.set(zero, "first");
     numeric_arr.set(1, "");
-    numeric_arr.set(2, 0);
+    numeric_arr.set(2, zero);
 
     Variant v = numeric_arr;
 
@@ -200,7 +200,7 @@ TEST(empty, mixed_array_object_access) {
     level1_arr.set(1, inner_obj);  // $arr[0][1] = $inner_obj
 
     Array level0_arr;
-    level0_arr.set(0, level1_arr);  // $arr[0] = $level1_arr
+    level0_arr.set(zero, level1_arr);  // $arr[0] = $level1_arr
 
     Variant arr = level0_arr;
 
@@ -220,7 +220,7 @@ TEST(empty, mixed_array_object_access) {
     bad_obj.set("bad_prop", "not_an_object");
 
     Array bad_arr;
-    bad_arr.set(0, bad_obj);
+    bad_arr.set(zero, bad_obj);
     Variant bad_variant = bad_arr;
 
     // Try to call property access on non-object

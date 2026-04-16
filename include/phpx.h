@@ -955,9 +955,10 @@ class ArrayItem : public Variant {
 };
 
 class Array : public Variant {
-    void copyFrom(const ArgList &list);
-    void copyFrom(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
-    void copyFrom(const std::initializer_list<std::pair<Int, const Variant>> &list);
+    void copyFrom(const ArrayList &list);
+    void copyFrom(const StrKeyMap &list);
+    void copyFrom(const StdStrKeyMap &list);
+    void copyFrom(const IntKeyMap &list);
     void checkArray() {
         if (isNull() || isUndef()) {
             array_init(unwrap_ptr());
@@ -974,17 +975,20 @@ class Array : public Variant {
         checkArray();
     }
     Array(const Variant &v) : Array(v.const_ptr()) {}
-    Array(const ArgList &list);
-    Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
-    Array(const std::initializer_list<std::pair<Int, const Variant>> &list);
+    Array(const ArrayList &list);
+    Array(const StrKeyMap &list);
+    Array(const StdStrKeyMap &list);
+    Array(const IntKeyMap &list);
     Array(Variant *v) : Variant(v) {}
 
-    Array &operator=(const ArgList &list);
-    Array &operator=(const std::initializer_list<std::pair<const std::string, const Variant>> &list);
-    Array &operator=(const std::initializer_list<std::pair<Int, const Variant>> &list);
+    Array &operator=(const ArrayList &list);
+    Array &operator=(const StrKeyMap &list);
+    Array &operator=(const StdStrKeyMap &list);
+    Array &operator=(const IntKeyMap &list);
 
     void set(zend_ulong i, const Variant &v);
     void set(const Variant &key, const Variant &v);
+    void set(zend_string *str_key, const Variant &v);
     void append(const Variant &v);
     Variant get(const String &key) const {
         return {zend_hash_find(array(), key.str()), Ctor::CopyRef};

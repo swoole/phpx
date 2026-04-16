@@ -17,6 +17,8 @@
 #pragma once
 
 #include "zend_types.h"
+
+#include <string>
 #include <initializer_list>
 #include <functional>
 #include <vector>
@@ -69,6 +71,12 @@ using Str = String;
 using Ref = Reference;
 using ArgList = std::initializer_list<const Variant>;
 using OperationChain = std::initializer_list<std::pair<Operation, const Variant>>;
+
+using StrKeyMap = std::initializer_list<std::pair<zend_string *, const Variant>>;
+using StdStrKeyMap = std::initializer_list<std::pair<const std::string, const Variant>>;
+using IntKeyMap = std::initializer_list<std::pair<Int, const Variant>>;
+using ArrayList = std::initializer_list<const Variant>;
+
 using ClosureFn = std::function<Variant(INTERNAL_FUNCTION_PARAMETERS, Object &, Args &)>;
 
 typedef void (*resource_dtor)(zend_resource *);

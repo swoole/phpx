@@ -101,7 +101,7 @@ TEST(exists, array_dim_fetch_nested) {
 
 TEST(exists, numeric_keys) {
     Array numeric_arr;
-    numeric_arr.set(0, "first");
+    numeric_arr.set(zero, "first");
     numeric_arr.set(1, "");
     numeric_arr.set(2, 0);
     numeric_arr.set(3, false);
@@ -362,7 +362,7 @@ TEST(exists, float_keys) {
 
 TEST(exists, negative_indices) {
     Array arr;
-    arr.set(0, "zero");
+    arr.set(zero, "zero");
     arr.set(1, "one");
     arr.set(-1, "negative_one");
     arr.set(-5, "negative_five");
@@ -382,7 +382,7 @@ TEST(exists, negative_indices) {
 TEST(exists, boundary_values) {
     Array arr;
 
-    arr.set(0, "zero");
+    arr.set(zero, "zero");
     arr.set(1000000, "million");
     arr.set(LONG_MAX, "max_long");
 
@@ -577,7 +577,7 @@ TEST(exists, empty_containers_nested_access) {
 TEST(exists, numeric_string_vs_int_keys) {
     Array arr;
 
-    arr.set(0, "int_zero");
+    arr.set(zero, "int_zero");
     arr.set(1, "int_one");
     arr.set(42, "int_42");
 

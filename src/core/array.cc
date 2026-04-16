@@ -100,35 +100,46 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
     return Array(&return_value, Ctor::Move);
 }
 
-void Array::copyFrom(const std::initializer_list<const Variant> &list) {
+void Array::copyFrom(const ArrayList &list) {
     for (const auto &val : list) {
         append(val);
     }
 }
 
-void Array::copyFrom(const std::initializer_list<std::pair<const std::string, const Variant>> &list) {
+void Array::copyFrom(const StdStrKeyMap &list) {
     for (const auto &kv : list) {
         set(String(kv.first), kv.second);
     }
 }
 
-void Array::copyFrom(const std::initializer_list<std::pair<Int, const Variant>> &list) {
+void Array::copyFrom(const StrKeyMap &list) {
     for (const auto &kv : list) {
         set(kv.first, kv.second);
     }
 }
 
-Array::Array(const std::initializer_list<const Variant> &list) {
+void Array::copyFrom(const IntKeyMap &list) {
+    for (const auto &kv : list) {
+        set(kv.first, kv.second);
+    }
+}
+
+Array::Array(const ArrayList &list) {
     array_init(&val);
     copyFrom(list);
 }
 
-Array::Array(const std::initializer_list<std::pair<const std::string, const Variant>> &list) {
+Array::Array(const StrKeyMap &list) {
     array_init(&val);
     copyFrom(list);
 }
 
-Array::Array(const std::initializer_list<std::pair<Int, const Variant>> &list) {
+Array::Array(const StdStrKeyMap &list) {
+    array_init(&val);
+    copyFrom(list);
+}
+
+Array::Array(const IntKeyMap &list) {
     array_init(&val);
     copyFrom(list);
 }
@@ -141,7 +152,7 @@ Array &Array::operator=(const std::initializer_list<const Variant> &list) {
     return *this;
 }
 
-Array &Array::operator=(const std::initializer_list<std::pair<const std::string, const Variant>> &list) {
+Array &Array::operator=(const StdStrKeyMap &list) {
     destroy();
     auto zarr = unwrap_ptr();
     array_init(zarr);
@@ -149,7 +160,7 @@ Array &Array::operator=(const std::initializer_list<std::pair<const std::string,
     return *this;
 }
 
-Array &Array::operator=(const std::initializer_list<std::pair<Int, const Variant>> &list) {
+Array &Array::operator=(const IntKeyMap &list) {
     destroy();
     auto zarr = unwrap_ptr();
     array_init(zarr);
@@ -163,14 +174,17 @@ void Array::set(const Variant &key, const Variant &v) {
     } else if (key.isInt() || key.isFloat()) {
         set(key.toInt(), v);
     } else {
-        auto zv = NO_CONST_Z(v.direct_ptr());
-        Z_TRY_ADDREF_P(zv);
-
-        auto zarr = unwrap_ptr();
-        SEPARATE_ARRAY(zarr);
         auto skey = key.toString();
-        zend_symtable_update(Z_ARRVAL_P(zarr), skey.str(), zv);
+        set(skey.str(), v);
     }
+}
+
+void Array::set(zend_string *str_key, const Variant &v) {
+    auto zv = NO_CONST_Z(v.direct_ptr());
+    Z_TRY_ADDREF_P(zv);
+    auto zarr = unwrap_ptr();
+    SEPARATE_ARRAY(zarr);
+    zend_symtable_update(Z_ARRVAL_P(zarr), str_key, zv);
 }
 
 void Array::set(zend_ulong i, const Variant &v) {
