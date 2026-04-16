@@ -73,6 +73,11 @@ using ArgList = std::initializer_list<const Variant>;
 using OperationChain = std::initializer_list<std::pair<Operation, const Variant>>;
 
 using StrKeyMap = std::initializer_list<std::pair<zend_string *, const Variant>>;
+/**
+ * A `String` object cannot be used as an array key, as this may create ambiguity with the definition of `ArrayList`.
+ * Since `String` is a subclass of `Variant`, `{String, Variant}` could be interpreted as an `ArrayList` type. When
+ * using strings as keys in a map, the key may only be `std::string` or `zend_string*`.
+ */
 using StdStrKeyMap = std::initializer_list<std::pair<const std::string, const Variant>>;
 using IntKeyMap = std::initializer_list<std::pair<Int, const Variant>>;
 using ArrayList = std::initializer_list<const Variant>;
