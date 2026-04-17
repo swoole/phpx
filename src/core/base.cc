@@ -89,17 +89,26 @@ Variant global(const String &name) {
     if (!var) {
         return {};
     }
-    return {var, Ctor::Indirect};
+    if (zval_is_ref(var)) {
+        return {var, Ctor::CopyRef};
+    } else {
+        return {var, Ctor::Indirect};
+    }
 }
 
 void initGlobal(const String &name, Variant &var) {
     auto gvar = global(name);
     var.unset();
-    if (gvar.isIndirect()) {
-        *var.ptr() = *gvar.ptr();
+    if (gvar.isNull()) {
+    	auto ref = newReference();
+    	Z_TRY_ADDREF_P(ref.ptr());
+    	zend_hash_add_new(&EG(symbol_table), name.str(), ref.ptr());
+        var.copyRef(&ref);
+    } else if (gvar.isReference()) {
+        var.copyRef(&gvar);
     } else {
-        auto addr = zend_hash_add_new(&EG(symbol_table), name.str(), undef());
-        ZVAL_INDIRECT(var.ptr(), addr);
+        Ref ref = gvar.toReference();
+        var.copyRef(&ref);
     }
 }
 

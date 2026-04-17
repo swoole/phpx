@@ -144,6 +144,7 @@ TEST(base, global2) {
     g.offsetSet("test", 1999);
 
     auto g2 = global("_SERVER");
+    ASSERT_TRUE(g2.isReference());
     ASSERT_EQ(g2.offsetGet("test").toInt(), 1999);
 
     var a;
