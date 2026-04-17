@@ -1,5 +1,6 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
+#include "phpx_helper.h"
 
 using namespace php;
 
@@ -217,4 +218,20 @@ TEST(string, update) {
     String s2("aot");
     s2.offsetSet(0, "d");
     ASSERT_TRUE(newWordList.offsetExists(s2));
+}
+
+TEST(string, assign) {
+    String s;
+    s = php::toInt(100L);
+    ASSERT_STREQ(s.toCString(), "100");
+
+    s = 3.0;
+    ASSERT_STREQ(s.toCString(), "3");
+
+    s = true;
+    ASSERT_STREQ(s.toCString(), "1");
+
+    s = false;
+    ASSERT_STREQ(s.toCString(), "");
+
 }

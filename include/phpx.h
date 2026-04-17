@@ -783,6 +783,15 @@ class String : public Variant {
             ZVAL_STR(zv, new_str);
         }
     }
+    void copyFrom(Int v) {
+        ZVAL_STR(ptr(), zend_long_to_str(v));
+    }
+    void copyFrom(Float v) {
+        ZVAL_STR(ptr(), zend_strpprintf(0, "%.*G", (int) EG(precision), v));
+    }
+    void copyFrom(bool v) {
+        ZVAL_STR(ptr(), zend_string_init(v ? "1" : "", 1, false));
+    }
 
   public:
     String() {
@@ -792,17 +801,41 @@ class String : public Variant {
         checkString();
     }
     String(const Variant &v) : String(v.const_ptr()) {}
-    explicit String(int v) {
-        ZVAL_STR(ptr(), zend_long_to_str(v));
+    template <typename T,
+              typename D = typename std::decay<T>::type,
+              typename std::enable_if<std::is_integral<D>::value && !std::is_same<D, bool>::value, int>::type = 0>
+    explicit String(T v) {
+        copyFrom(static_cast<Int>(v));
     }
-    explicit String(long v) {
-        ZVAL_STR(ptr(), zend_long_to_str(v));
-    }
-    explicit String(double v) {
-        ZVAL_STR(ptr(), zend_strpprintf(0, "%.*G", (int) EG(precision), v));
+    template <typename T,
+              typename D = typename std::decay<T>::type,
+              typename std::enable_if<std::is_floating_point<D>::value, int>::type = 0>
+    explicit String(T v) {
+        copyFrom(static_cast<Float>(v));
     }
     explicit String(bool v) {
-        ZVAL_STR(ptr(), zend_string_init(v ? "1" : "0", 1, false));
+        copyFrom(v);
+    }
+    template <typename T,
+              typename D = typename std::decay<T>::type,
+              typename std::enable_if<std::is_integral<D>::value && !std::is_same<D, bool>::value, int>::type = 0>
+    Variant &operator=(T v) {
+        destroy();
+        copyFrom(static_cast<Int>(v));
+        return *this;
+    }
+    template <typename T,
+              typename D = typename std::decay<T>::type,
+              typename std::enable_if<std::is_floating_point<D>::value, int>::type = 0>
+    Variant &operator=(T v) {
+        destroy();
+        copyFrom(static_cast<Float>(v));
+        return *this;
+    }
+    Variant &operator=(bool v) {
+        destroy();
+        copyFrom(v);
+        return *this;
     }
     String(zend_string *v, Ctor method = Ctor::Copy) {
         if (method == Ctor::Copy) {
