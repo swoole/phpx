@@ -49,7 +49,7 @@ TEST(string, number) {
     ASSERT_TRUE(s3.equals("1"));
 
     String s4(false);
-    ASSERT_TRUE(s4.equals("0"));
+    ASSERT_TRUE(s4.equals(""));
 
     String s5(s1);
     ASSERT_EQ(s5.length(), s1.length());
@@ -233,5 +233,4 @@ TEST(string, assign) {
 
     s = false;
     ASSERT_STREQ(s.toCString(), "");
-
 }

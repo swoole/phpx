@@ -784,13 +784,17 @@ class String : public Variant {
         }
     }
     void copyFrom(Int v) {
-        ZVAL_STR(ptr(), zend_long_to_str(v));
+        ZVAL_STR(unwrap_ptr(), zend_long_to_str(v));
     }
     void copyFrom(Float v) {
-        ZVAL_STR(ptr(), zend_strpprintf(0, "%.*G", (int) EG(precision), v));
+        ZVAL_STR(unwrap_ptr(), zend_strpprintf(0, "%.*G", (int) EG(precision), v));
     }
     void copyFrom(bool v) {
-        ZVAL_STR(ptr(), zend_string_init(v ? "1" : "", 1, false));
+        if (v) {
+            ZVAL_STR(unwrap_ptr(), zend_string_init("1", 1, false));
+        } else {
+            ZVAL_EMPTY_STRING(unwrap_ptr());
+        }
     }
 
   public:
