@@ -203,7 +203,7 @@ static inline void move(Variant &v, zval *retval) {
 static inline void deref(zval *v) {
     if (UNEXPECTED(zval_is_ref(v) && zval_ref_count(v) == 1)) {
         zend_reference *ref = Z_REF_P(v);
-        ZVAL_COPY_VALUE(v, &ref->val);
+        zval_copy_value(v, &ref->val);
         efree_size(ref, sizeof(zend_reference));
     }
 }

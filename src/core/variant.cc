@@ -43,7 +43,7 @@ void Variant::copyFrom(const zval *src) {
     } else {
         auto zv = unwrap_ptr();
         zval tmp = *zv;
-        ZVAL_COPY(zv, src);
+        zval_copy(zv, src);
         zval_ptr_dtor(&tmp);
     }
 }
@@ -51,12 +51,12 @@ void Variant::copyFrom(const zval *src) {
 void Variant::copyRef(Variant *v) {
     auto zv = v->direct_ptr();
     if (v->isReference()) {
-        ZVAL_COPY_VALUE(direct_ptr(), zv);
+        zval_copy_value(direct_ptr(), zv);
     } else {
         ZVAL_NEW_REF(direct_ptr(), zv);
-        ZVAL_COPY_VALUE(zv, direct_ptr());
+        zval_copy_value(zv, direct_ptr());
     }
-    Z_TRY_ADDREF_P(zv);
+    zval_try_add_ref(zv);
 }
 
 Variant &Variant::operator=(const zval *v) {
@@ -201,7 +201,7 @@ Variant Variant::getRefValue() const {
         return *this;
     }
     zval zv;
-    ZVAL_COPY_VALUE(&zv, Z_REFVAL_P(const_ptr()));
+    zval_copy_value(&zv, Z_REFVAL_P(const_ptr()));
     return {&zv};
 }
 
@@ -916,23 +916,23 @@ Variant Variant::call(zend_function *fn, const ArgList &args) {
     return call(fn, _args);
 }
 
-void Reference::copyRefZval(const zval *zv) {
+void Reference::copyRef(const zval *zv) {
     zval_ptr_dtor(&val);
-    ZVAL_COPY_VALUE(&val, zv);
-    Z_TRY_ADDREF_P(&val);
+    zval_copy_value(&val, zv);
+    zval_try_add_ref(&val);
 }
 
 Reference &Reference::operator=(const Reference &v) {
     if (&v != this) {
         zval_ptr_dtor(&val);
-        ZVAL_COPY(&val, v.const_ptr());
+        zval_copy(&val, v.const_ptr());
     }
     return *this;
 }
 
 Reference &Reference::operator=(Reference *v) {
     if (v != this) {
-        copyRefZval(v->const_ptr());
+        copyRef(v->const_ptr());
     }
     return *this;
 }
@@ -941,9 +941,9 @@ Reference &Reference::operator=(const Variant &v) {
     if (&v != this) {
         destroy();
         if (v.isReference()) {
-            copyRefZval(v.direct_ptr());
+            copyRef(v.direct_ptr());
         } else {
-            ZVAL_COPY(refval(), v.direct_ptr());
+            zval_copy(refval(), v.direct_ptr());
         }
     }
     return *this;

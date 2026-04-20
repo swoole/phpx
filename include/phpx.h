@@ -241,6 +241,18 @@ static inline uint32_t zval_ref_count(const zval *v) {
     return Z_REFCOUNT_P(v);
 }
 
+static inline void zval_copy_value(zval *dst, const zval *src) {
+    ZVAL_COPY_VALUE(dst, src);
+}
+
+static inline void zval_copy(zval *dst, const zval *src) {
+    ZVAL_COPY(dst, src);
+}
+
+static inline void zval_try_add_ref(zval *v) {
+    Z_TRY_ADDREF_P(v);
+}
+
 enum class Ctor {
     Copy,
     CopyRef,
@@ -340,10 +352,10 @@ class Variant {
         switch (method) {
         case Ctor::Copy:
             ZVAL_DEREF(v);
-            ZVAL_COPY(&val, v);
+            zval_copy(&val, v);
             break;
         case Ctor::CopyRef:
-            ZVAL_COPY(&val, v);
+            zval_copy(&val, v);
             break;
             /**
              * The value of v must be the address of an array element, or the address of an object property
@@ -622,7 +634,7 @@ class Variant {
     }
 
     void moveTo(zval *dest) {
-        ZVAL_COPY_VALUE(dest, &val);
+        zval_copy_value(dest, &val);
         val = {};
     }
 
@@ -1243,7 +1255,7 @@ class Object : public Variant {
 };
 
 class Reference : public Variant {
-    void copyRefZval(const zval *zv);
+    void copyRef(const zval *zv);
 
     void checkRef() {
         if (zval_is_null(&val) || zval_is_undef(&val)) {
@@ -1266,7 +1278,7 @@ class Reference : public Variant {
         ref_init(&val);
     }
     Reference(const Reference &v) noexcept {
-        ZVAL_COPY(&val, v.const_ptr());
+        zval_copy(&val, v.const_ptr());
     }
     Reference(Reference &&v) noexcept = default;
     Reference(const zval *v, Ctor method = Ctor::CopyRef) : Variant(v, method) {
@@ -1294,7 +1306,7 @@ static inline Reference newReference() {
 
 static inline Reference newReference(const Variant &v) {
     Reference ref;
-    ZVAL_COPY(ref.refval(), v.const_ptr());
+    zval_copy(ref.refval(), v.const_ptr());
     return ref;
 }
 

@@ -301,7 +301,7 @@ static void call_function_impl(
     } else {
         fci.object = nullptr;
     }
-    ZVAL_COPY_VALUE(&fci.function_name, function_name);
+    zval_copy_value(&fci.function_name, function_name);
     fci.retval = retval_ptr;
     fci.param_count = param_count;
     fci.params = params;

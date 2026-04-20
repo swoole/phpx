@@ -67,7 +67,7 @@ bool Class::addConstant(const char *name, const Variant &v) {
     }
     Constant c;
     c.name = name;
-    ZVAL_COPY(&c.value, v.const_ptr());
+    zval_copy(&c.value, v.const_ptr());
     constants.push_back(c);
     return true;
 }
@@ -78,7 +78,7 @@ bool Class::addProperty(const char *name, const Variant &v, int flags) {
     }
     Property p;
     p.name = name;
-    ZVAL_COPY(&p.value, v.const_ptr());
+    zval_copy(&p.value, v.const_ptr());
     p.flags = flags;
     properties.push_back(p);
     return true;
