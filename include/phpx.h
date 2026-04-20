@@ -237,6 +237,10 @@ static inline bool zval_is_indirect(const zval *v) {
     return Z_TYPE_P(v) == IS_INDIRECT;
 }
 
+static inline uint32_t zval_ref_count(const zval *v) {
+    return Z_REFCOUNT_P(v);
+}
+
 enum class Ctor {
     Copy,
     CopyRef,

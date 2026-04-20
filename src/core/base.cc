@@ -100,9 +100,9 @@ void initGlobal(const String &name, Variant &var) {
     auto gvar = global(name);
     var.unset();
     if (gvar.isNull()) {
-    	auto ref = newReference();
-    	Z_TRY_ADDREF_P(ref.ptr());
-    	zend_hash_add_new(&EG(symbol_table), name.str(), ref.ptr());
+        auto ref = newReference();
+        Z_TRY_ADDREF_P(ref.ptr());
+        zend_hash_add_new(&EG(symbol_table), name.str(), ref.ptr());
         var.copyRef(&ref);
     } else if (gvar.isReference()) {
         var.copyRef(&gvar);
