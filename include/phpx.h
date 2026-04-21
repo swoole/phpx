@@ -510,22 +510,22 @@ class Variant {
     const zval *const_ptr() const noexcept {
         return &val;
     }
-    const zval *unwrap_ptr() const {
+    const zval *unwrap_ptr() const noexcept {
         return unwrap_zval(&val);
     }
-    const zval *direct_ptr() const {
+    const zval *direct_ptr() const noexcept {
         return isIndirect() ? zv() : &val;
     }
     zval *unwrap_ptr() noexcept {
         return unwrap_zval(&val);
     }
-    zval *direct_ptr() {
+    zval *direct_ptr() noexcept {
         return isIndirect() ? zv() : &val;
     }
     void debug();
     void print() const;
     int getRefCount() const;
-    int type() const {
+    int type() const noexcept {
         return Z_TYPE_P(unwrap_ptr());
     }
     const char *typeStr() const {
