@@ -655,14 +655,6 @@ class Variant {
         php::deref(direct_ptr());
     }
 
-    void redirect(const Variant &v) {
-        if (v.isIndirect()) {
-            redirect(zv());
-        } else {
-            throwError("Cannot redirect to a non-indirect value.");
-        }
-    }
-
     Variant offsetGet(zend_long offset) const;
     Variant offsetGet(const Variant &key) const;
     bool offsetExists(zend_long offset) const;

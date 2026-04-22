@@ -21,6 +21,8 @@ TEST(array, list) {
         j++;
     }
 
+    ASSERT_TRUE(array.begin() == array.begin());
+
     auto arr2 = array.slice(1, 3);
     ASSERT_EQ(arr2.count(), 3);
     ASSERT_EQ(arr2[0].toInt(), 30);

@@ -584,6 +584,11 @@ TEST(variant, ref6) {
     }
 }
 
+TEST(variant, ref7) {
+    Reference ref(nullptr);
+    ASSERT_TRUE(ref.isNull());
+}
+
 TEST(variant, callable) {
     Variant v1{"phpinfo"};
     ASSERT_TRUE(v1.isCallable());
@@ -1645,4 +1650,13 @@ TEST(variant, deref) {
     zval *zv3 = arr.ptr();
     deref(zv3);
     ASSERT_EQ(Z_TYPE_P(zv3), IS_ARRAY);
+}
+
+TEST(variant, indirect) {
+    auto arr = create_map();
+    var s = "hello";
+
+    var v{arr.ptr(), Ctor::Indirect};
+    ASSERT_TRUE(zval_is_indirect(v.ptr()));
+    ASSERT_TRUE(v.isArray());
 }
