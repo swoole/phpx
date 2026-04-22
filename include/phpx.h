@@ -264,6 +264,19 @@ static inline Ctor zval_wrap(zval *v) {
     return zval_is_ref(v) ? Ctor::CopyRef : Ctor::Indirect;
 }
 
+static inline void deref(zval *v) {
+    if (UNEXPECTED(zval_is_ref(v))) {
+        zend_reference *ref = Z_REF_P(v);
+        if (zval_ref_count(v) == 1) {
+            zval_copy_value(v, &ref->val);
+            efree_size(ref, sizeof(zend_reference));
+        } else {
+            zval_copy(v, &ref->val);
+            GC_DELREF(ref);
+        }
+    }
+}
+
 #ifndef Z_TYPE_EXTRA_P
 #define Z_TYPE_EXTRA(zval) (zval).u1.v.u.extra
 #define Z_TYPE_EXTRA_P(zval_p) Z_TYPE_EXTRA(*(zval_p))
@@ -636,6 +649,10 @@ class Variant {
     void moveTo(zval *dest) {
         zval_copy_value(dest, &val);
         val = {};
+    }
+
+    void deref() {
+        php::deref(direct_ptr());
     }
 
     void redirect(const Variant &v) {

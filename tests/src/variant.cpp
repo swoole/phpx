@@ -1622,3 +1622,27 @@ TEST(variant, assign_ref6) {
     b.append(5L);
     ASSERT_EQ(b.length(), 4);
 }
+
+TEST(variant, deref) {
+    auto arr = create_map();
+    Ref ref1 = arr.toReference();
+    ASSERT_EQ(ref1.length(), 5);
+
+    Ref ref2 = ref1;
+    ASSERT_EQ(ref2.getRefCount(), 3);
+
+    ASSERT_EQ(Z_TYPE_P(arr.ptr()), IS_REFERENCE);
+    ASSERT_EQ(Z_TYPE_P(ref1.ptr()), IS_REFERENCE);
+    ASSERT_EQ(Z_TYPE_P(ref2.ptr()), IS_REFERENCE);
+
+    zval *zv1 = ref2.ptr();
+    deref(zv1);
+    ASSERT_EQ(Z_TYPE_P(zv1), IS_ARRAY);
+
+    ref1.deref();
+    ASSERT_EQ(Z_TYPE_P(ref1.ptr()), IS_ARRAY);
+
+    zval *zv3 = arr.ptr();
+    deref(zv3);
+    ASSERT_EQ(Z_TYPE_P(zv3), IS_ARRAY);
+}

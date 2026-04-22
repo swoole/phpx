@@ -200,19 +200,6 @@ static inline void move(Variant &v, zval *retval) {
     v.moveTo(retval);
 }
 
-static inline void deref(zval *v) {
-    if (UNEXPECTED(zval_is_ref(v))) {
-        zend_reference *ref = Z_REF_P(v);
-        if (zval_ref_count(v) == 1) {
-            zval_copy_value(v, &ref->val);
-            efree_size(ref, sizeof(zend_reference));
-        } else {
-            zval_copy(v, &ref->val);
-            GC_DELREF(ref);
-        }
-    }
-}
-
 static inline bool instanceOf(const Variant &v, const String &cls) {
     if (!v.isObject()) {
         return false;

@@ -114,29 +114,3 @@ TEST(helper, getEmptyArrayRef) {
     ref.newItem() = "java";
     ASSERT_EQ(ref.length(), 2);
 }
-
-TEST(helper, deref) {
-    auto arr = create_map();
-    Ref ref1 = arr.toReference();
-    ASSERT_EQ(ref1.length(), 5);
-
-    Ref ref2 = ref1;
-    ASSERT_EQ(ref2.getRefCount(), 3);
-
-    ASSERT_EQ(Z_TYPE_P(arr.ptr()), IS_REFERENCE);
-    ASSERT_EQ(Z_TYPE_P(ref1.ptr()), IS_REFERENCE);
-    ASSERT_EQ(Z_TYPE_P(ref2.ptr()), IS_REFERENCE);
-
-    zval *zv1 = ref2.ptr();
-    deref(zv1);
-    ASSERT_EQ(Z_TYPE_P(zv1), IS_ARRAY);
-
-    zval *zv2 = ref1.ptr();
-    deref(zv2);
-    ASSERT_EQ(Z_TYPE_P(zv2), IS_ARRAY);
-
-    zval *zv3 = arr.ptr();
-    ASSERT_EQ(Z_TYPE_P(zv3), IS_REFERENCE);
-    deref(zv3);
-    ASSERT_EQ(Z_TYPE_P(zv3), IS_ARRAY);
-}
