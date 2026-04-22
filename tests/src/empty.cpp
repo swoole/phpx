@@ -35,6 +35,10 @@ TEST(empty, array_dim_fetch_basic) {
 
     ASSERT_TRUE(notEmpty(v, {{ArrayDimFetch, "key1"}}));
     ASSERT_FALSE(notEmpty(v, {{ArrayDimFetch, "nonexistent"}}));
+
+    var result;
+    ASSERT_TRUE(notEmpty(v, {{ArrayDimFetch, "key1"}}, result));
+    ASSERT_STREQ(result.toCString(), "value1");
 }
 
 TEST(empty, array_dim_fetch_nested) {
