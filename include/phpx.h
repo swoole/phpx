@@ -694,6 +694,10 @@ class Variant {
      * call object methods
      */
     Variant call(const Variant &fn) {
+        if (UNEXPECTED(!isObject())) {
+            throwError("call method `%s` on %s", fn.toCString(), typeStr());
+            return {};
+        }
         return call_impl(unwrap_ptr(), fn.const_ptr());
     }
     Variant call(const Variant &fn, Args &args) {
