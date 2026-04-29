@@ -222,6 +222,11 @@ if(IS_WINDOWS)
         /wd4996    # 禁用 deprecated 警告
         /wd4267    # 禁用 size_t 转换警告
         /wd4244    # 禁用类型转换警告
+        /wd4146    # 禁用一元负运算符应用于无符号类型的警告
+        /wd4018    # 禁用有符号/无符号不匹配警告
+        /wd4305    # 禁用截断警告
+        /wd4309    # 禁用截断常量值警告
+        /wd4804    # 禁用不安全的使用布尔类型警告
         /MP        # 多处理器编译
     )
 endif()
@@ -270,11 +275,11 @@ if (IS_WINDOWS)
         SUFFIX ".dll"
     )
 
-    # 添加 Windows 特定的编译定义（确保正确加载 zend_config.w32.h）
     target_compile_definitions(phpx PRIVATE
         ZEND_WIN32                          # 标识 Windows 平台
         PHP_WIN32                           # 标识 Windows 平台
-        COMPILE_DL_PHPX                     # 编译为动态库
+        ZEND_DEBUG=0
+        ZTS
         ZEND_ENABLE_STATIC_TSRMLS_CACHE     # 启用静态 TSRM 缓存
     )
 
