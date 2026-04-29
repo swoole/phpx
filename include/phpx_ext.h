@@ -17,6 +17,7 @@
 #pragma once
 
 #include "phpx.h"
+#include "zend_modules.h"
 
 namespace php {
 

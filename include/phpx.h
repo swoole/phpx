@@ -901,7 +901,7 @@ class String : public Variant {
     }
     zend_long offset(zend_long _offset) const {
         size_t len = length();
-        
+
         if (_offset < 0) {
             zend_long positive_offset = -_offset;
             if (UNEXPECTED(static_cast<size_t>(positive_offset) > len)) {
