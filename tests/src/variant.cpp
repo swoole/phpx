@@ -480,20 +480,20 @@ TEST(variant, compare) {
 
 TEST(variant, json) {
     Array arr1 = create_map();
-    auto json = arr1.jsonEncode();
+    auto json = json_encode(arr1);
     ASSERT_TRUE(json.isString());
     ASSERT_GT(json.length(), 10);
 
-    auto v3 = json.jsonDecode();
+    auto v3 = json_decode(json, true);
     ASSERT_TRUE(v3.isArray());
     ASSERT_TRUE(v3.equals(arr1));
 
     Variant v4("");
-    ASSERT_TRUE(v4.jsonDecode().isNull());
-    ASSERT_EQ(JSON_G(error_code), PHP_JSON_ERROR_SYNTAX);
+    ASSERT_TRUE(json_decode(v4).isNull());
+    ASSERT_EQ(json_last_error().toInt(), constant("JSON_ERROR_SYNTAX").toInt());
 
     var v5 = "\xB1\x31";
-    ASSERT_EQ(v5.jsonEncode().toBool(), false);
+    ASSERT_EQ(json_encode(v5).toBool(), false);
 
     var error = json_last_error();
     ASSERT_TRUE(error.equals(JSON_ERROR_UTF8));
