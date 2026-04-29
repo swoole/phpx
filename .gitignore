@@ -69,3 +69,15 @@ bin/phpx
 /examples/embed/CMakeCache.txt
 /test_output.xml
 /test_results.xml
+/phpx.sln
+/phpx.vcxproj
+/phpx.vcxproj.filters
+/ZERO_CHECK.vcxproj
+/ZERO_CHECK.vcxproj.filters
+/INSTALL.vcxproj.filters
+/INSTALL.vcxproj
+/ext.vcxproj.filters
+/ext.vcxproj
+/ALL_BUILD.vcxproj.filters
+/ALL_BUILD.vcxproj
+/ext.dir/

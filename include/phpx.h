@@ -178,7 +178,7 @@ Variant call_impl(const zval *object, const zval *func);
 #define THREAD_LOCAL
 #endif
 
-extern std::function<void(zend_object *)> throw_impl;
+extern PHPX_API std::function<void(zend_object *)> throw_impl;
 extern THREAD_LOCAL int box_res_id;
 extern const char *box_res_name;
 

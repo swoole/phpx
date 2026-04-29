@@ -120,7 +120,9 @@ int main(int cpp_argc, char **cpp_argv) {
     zend_module_entry *module = php_embed_get_module();
     module_init(module);
 
+#ifndef PHP_WIN32
     save_ps_args(cpp_argc, cpp_argv);
+#endif
 
     int rc = 0;
 #if PPROF_ON
