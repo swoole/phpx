@@ -55,6 +55,7 @@ bin/phpx
 /build/
 \.settings/
 /Debug/
+/lib/phpx.exp
 /examples/embed/bin/embed
 /bin/phpx-tests
 /vendor
