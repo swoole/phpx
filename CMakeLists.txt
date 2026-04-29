@@ -45,71 +45,116 @@ endif ()
 
 # ============ PHP 配置 ============
 if(IS_WINDOWS)
-    # Windows 平台：使用指定的目录
-    set(PHP_SOURCE_DIR "D:/workspace/php-8.4.20-src" CACHE PATH "PHP source directory")
-    set(PHP_INSTALL_DIR "D:/workspace/php-8.4.20" CACHE PATH "PHP installation directory")
-    
-    # 验证目录是否存在
-    if(NOT EXISTS ${PHP_SOURCE_DIR})
-        message(FATAL_ERROR "PHP source directory not found: ${PHP_SOURCE_DIR}")
+    # Windows 平台：必须设置 PHP_HOME 环境变量
+
+    # 检查 PHP_HOME 环境变量是否存在
+    if(NOT DEFINED ENV{PHP_HOME})
+        message(FATAL_ERROR "PHP_HOME environment variable is not set.\nPlease set PHP_HOME to your PHP installation directory.\nExample: setx PHP_HOME \"C:\\php\"")
     endif()
-    
+
+    set(PHP_INSTALL_DIR $ENV{PHP_HOME})
+    message(STATUS "Using PHP installation directory from PHP_HOME: ${PHP_INSTALL_DIR}")
+
+    # 验证 PHP 安装目录是否存在
     if(NOT EXISTS ${PHP_INSTALL_DIR})
-        message(FATAL_ERROR "PHP installation directory not found: ${PHP_INSTALL_DIR}")
+        message(FATAL_ERROR "PHP installation directory not found: ${PHP_INSTALL_DIR}\nPlease verify PHP_HOME environment variable is set correctly.")
     endif()
-    
-    # 设置 PHP 头文件路径
+
+    # 设置 SDK 目录（PHP 8.x 标准结构）
+    set(PHP_SDK_DIR ${PHP_INSTALL_DIR}/SDK)
+    set(PHP_DEV_DIR_NAME "SDK")
+
+    # 验证 SDK 目录是否存在
+    if(NOT EXISTS ${PHP_SDK_DIR})
+        message(FATAL_ERROR "PHP SDK directory not found: ${PHP_SDK_DIR}\nExpected structure: \$PHP_HOME/SDK/include\nPlease verify PHP_HOME is set to the correct PHP installation directory.")
+    endif()
+
+    # 设置 PHP 头文件路径（从 SDK 目录）
     set(PHP_INCLUDE_DIRS
-        ${PHP_SOURCE_DIR}
-        ${PHP_SOURCE_DIR}/main
-        ${PHP_SOURCE_DIR}/Zend
-        ${PHP_SOURCE_DIR}/TSRM
-        ${PHP_SOURCE_DIR}/ext
+        ${PHP_SDK_DIR}/include
+        ${PHP_SDK_DIR}/include/main
+        ${PHP_SDK_DIR}/include/Zend
+        ${PHP_SDK_DIR}/include/TSRM
+        ${PHP_SDK_DIR}/include/ext
     )
-    
-    # 检查是否存在 x64/Release 或其他构建目录
-    if(EXISTS ${PHP_SOURCE_DIR}/x64/Release_TS)
-        list(APPEND PHP_INCLUDE_DIRS ${PHP_SOURCE_DIR}/x64/Release_TS)
-    elseif(EXISTS ${PHP_SOURCE_DIR}/x64/Release)
-        list(APPEND PHP_INCLUDE_DIRS ${PHP_SOURCE_DIR}/x64/Release)
-    elseif(EXISTS ${PHP_SOURCE_DIR}/Release_TS)
-        list(APPEND PHP_INCLUDE_DIRS ${PHP_SOURCE_DIR}/Release_TS)
+
+    # 检查构建类型对应的配置目录（用于 zend_config.w32.h）
+    if(EXISTS ${PHP_SDK_DIR}/include/Zend/zend_config.w32.h)
+        message(STATUS "Found zend_config.w32.h in Zend directory")
+    else()
+        message(WARNING "zend_config.w32.h not found in ${PHP_SDK_DIR}/include/Zend")
     endif()
-    
-    # 设置 PHP 库文件
-    set(PHP_LIBRARY_DIR ${PHP_INSTALL_DIR})
-    
+
+    # 验证关键头文件是否存在
+    if(NOT EXISTS ${PHP_SDK_DIR}/include/main/php.h)
+        message(FATAL_ERROR "PHP header file not found: ${PHP_SDK_DIR}/include/main/php.h\nPlease verify PHP SDK directory structure is correct.")
+    endif()
+
+    # 设置 PHP 库文件路径
+    set(PHP_LIBRARY_DIR ${PHP_SDK_DIR}/lib)
+
+    # 验证库目录是否存在
+    if(NOT EXISTS ${PHP_LIBRARY_DIR})
+        message(FATAL_ERROR "PHP library directory not found: ${PHP_LIBRARY_DIR}\nExpected structure: \$PHP_HOME/SDK/lib")
+    endif()
+
     # 查找 php8.lib 或 php8ts.lib
     find_library(PHP_LIBRARY
         NAMES php8ts php8 php
-        PATHS ${PHP_LIBRARY_DIR} ${PHP_LIBRARY_DIR}/dev
+        PATHS ${PHP_LIBRARY_DIR}
         NO_DEFAULT_PATH
     )
-    
+
     if(NOT PHP_LIBRARY)
         message(FATAL_ERROR "PHP library not found in ${PHP_LIBRARY_DIR}")
     endif()
-    
-    # 设置 PHP DLL 路径
+
+    # 查找 embed 库（如果存在）
+    find_library(PHP_EMBED_LIBRARY
+        NAMES php8embed php8embedts
+        PATHS ${PHP_LIBRARY_DIR}
+        NO_DEFAULT_PATH
+    )
+
+    if(PHP_EMBED_LIBRARY)
+        message(STATUS "Found PHP Embed library: ${PHP_EMBED_LIBRARY}")
+        option(USE_PHP_EMBED "Use PHP Embed SAPI" OFF)
+    else()
+        message(STATUS "PHP Embed library not found (optional)")
+        set(USE_PHP_EMBED OFF CACHE BOOL "Use PHP Embed SAPI" FORCE)
+    endif()
+
+    # 设置 PHP DLL 路径（从安装根目录）
     find_file(PHP_DLL
         NAMES php8ts.dll php8.dll
         PATHS ${PHP_INSTALL_DIR}
         NO_DEFAULT_PATH
     )
-    
+
     if(NOT PHP_DLL)
         message(WARNING "PHP DLL not found in ${PHP_INSTALL_DIR}")
     endif()
-    
+
+    # 查找 embed DLL（如果存在）
+    find_file(PHP_EMBED_DLL
+        NAMES php8embed.dll php8embedts.dll
+        PATHS ${PHP_INSTALL_DIR}
+        NO_DEFAULT_PATH
+    )
+
+    if(PHP_EMBED_DLL)
+        message(STATUS "Found PHP Embed DLL: ${PHP_EMBED_DLL}")
+    endif()
+
     set(PHP_EXTENSION_DIR ${PHP_INSTALL_DIR}/ext)
     set(PHP_PREFIX ${PHP_INSTALL_DIR})
-    
-    message(STATUS "PHP_SOURCE_DIR: ${PHP_SOURCE_DIR}")
+
     message(STATUS "PHP_INSTALL_DIR: ${PHP_INSTALL_DIR}")
+    message(STATUS "PHP_SDK_DIR: ${PHP_SDK_DIR}")
+    message(STATUS "PHP_LIBRARY_DIR: ${PHP_LIBRARY_DIR}")
     message(STATUS "PHP_LIBRARY: ${PHP_LIBRARY}")
     message(STATUS "PHP_DLL: ${PHP_DLL}")
-    message(STATUS "PHP_INCLUDE_DIRS: ${PHP_INCLUDE_DIRS}")
-    
+
 else()
     # Unix/Linux/Mac 平台：使用 php-config
     if (DEFINED php_dir)
@@ -118,41 +163,41 @@ else()
         set(PHP_CONFIG "php-config")
     endif()
 
-    execute_process(COMMAND ${PHP_CONFIG} --includes 
-        OUTPUT_VARIABLE PHP_INCLUDES 
-        OUTPUT_STRIP_TRAILING_WHITESPACE  
+    execute_process(COMMAND ${PHP_CONFIG} --includes
+        OUTPUT_VARIABLE PHP_INCLUDES
+        OUTPUT_STRIP_TRAILING_WHITESPACE
         RESULT_VARIABLE PHP_CONFIG_RESULT)
     if (NOT PHP_CONFIG_RESULT EQUAL 0)
         message(FATAL_ERROR "Failed to execute php-config: ${PHP_CONFIG_RESULT}")
     endif()
 
-    execute_process(COMMAND ${PHP_CONFIG} --extension-dir 
-        OUTPUT_VARIABLE PHP_EXTENSION_DIR 
-        OUTPUT_STRIP_TRAILING_WHITESPACE 
+    execute_process(COMMAND ${PHP_CONFIG} --extension-dir
+        OUTPUT_VARIABLE PHP_EXTENSION_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
         RESULT_VARIABLE PHP_CONFIG_RESULT)
     if (NOT PHP_CONFIG_RESULT EQUAL 0)
         message(FATAL_ERROR "Failed to execute php-config: ${PHP_CONFIG_RESULT}")
     endif()
 
-    execute_process(COMMAND ${PHP_CONFIG} --libs 
-        OUTPUT_VARIABLE PHP_LIBS 
-        OUTPUT_STRIP_TRAILING_WHITESPACE 
+    execute_process(COMMAND ${PHP_CONFIG} --libs
+        OUTPUT_VARIABLE PHP_LIBS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
         RESULT_VARIABLE PHP_CONFIG_RESULT)
     if (NOT PHP_CONFIG_RESULT EQUAL 0)
         message(FATAL_ERROR "Failed to execute php-config: ${PHP_CONFIG_RESULT}")
     endif()
 
-    execute_process(COMMAND ${PHP_CONFIG} --ldflags 
-        OUTPUT_VARIABLE PHP_LDFLAGS 
-        OUTPUT_STRIP_TRAILING_WHITESPACE 
+    execute_process(COMMAND ${PHP_CONFIG} --ldflags
+        OUTPUT_VARIABLE PHP_LDFLAGS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
         RESULT_VARIABLE PHP_CONFIG_RESULT)
     if (NOT PHP_CONFIG_RESULT EQUAL 0)
         message(FATAL_ERROR "Failed to execute php-config: ${PHP_CONFIG_RESULT}")
     endif()
 
-    execute_process(COMMAND ${PHP_CONFIG} --prefix 
-        OUTPUT_VARIABLE PHP_PREFIX 
-        OUTPUT_STRIP_TRAILING_WHITESPACE 
+    execute_process(COMMAND ${PHP_CONFIG} --prefix
+        OUTPUT_VARIABLE PHP_PREFIX
+        OUTPUT_STRIP_TRAILING_WHITESPACE
         RESULT_VARIABLE PHP_CONFIG_RESULT)
     if (NOT PHP_CONFIG_RESULT EQUAL 0)
         message(FATAL_ERROR "Failed to execute php-config: ${PHP_CONFIG_RESULT}")
@@ -162,7 +207,7 @@ else()
     message(STATUS "PHP_INCLUDES: ${PHP_INCLUDES}")
     message(STATUS "PHP_LIBS: ${PHP_LIBS}")
     message(STATUS "PHP_LDFLAGS: ${PHP_LDFLAGS}")
-    
+
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PHP_INCLUDES}")
 endif()
 
@@ -171,6 +216,14 @@ include_directories(include tests/include)
 
 if(IS_WINDOWS)
     include_directories(${PHP_INCLUDE_DIRS})
+
+    # Windows 下添加额外的编译选项
+    add_compile_options(
+        /wd4996    # 禁用 deprecated 警告
+        /wd4267    # 禁用 size_t 转换警告
+        /wd4244    # 禁用类型转换警告
+        /MP        # 多处理器编译
+    )
 endif()
 
 # ============ 链接目录 ============
@@ -199,29 +252,32 @@ file(GLOB_RECURSE SRC_FILES src/core/*.cc src/func/*.cc src/class/*.cc src/const
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 
 add_library(phpx SHARED ${SRC_FILES})
-set_target_properties(phpx PROPERTIES 
+set_target_properties(phpx PROPERTIES
     CLEAN_DIRECT_OUTPUT 1
     PREFIX ""  # 去掉 lib 前缀
 )
 
 if (IS_WINDOWS)
-    # Windows 平台链接 PHP 库
-    target_link_libraries(phpx PRIVATE ${PHP_LIBRARY})
+    # Windows 平台链接 PHP 库和必要的系统库
+    target_link_libraries(phpx PRIVATE
+        ${PHP_LIBRARY}
+    )
     target_compile_definitions(phpx PRIVATE PHP_EXPORTS)
-    
+
     # 设置输出名称
     set_target_properties(phpx PROPERTIES
         OUTPUT_NAME "phpx"
         SUFFIX ".dll"
     )
-    
-    # 添加 Windows 特定的编译定义
+
+    # 添加 Windows 特定的编译定义（确保正确加载 zend_config.w32.h）
     target_compile_definitions(phpx PRIVATE
-        ZEND_WIN32
-        PHP_WIN32
-        ZEND_DEBUG=0
+        ZEND_WIN32                          # 标识 Windows 平台
+        PHP_WIN32                           # 标识 Windows 平台
+        COMPILE_DL_PHPX                     # 编译为动态库
+        ZEND_ENABLE_STATIC_TSRMLS_CACHE     # 启用静态 TSRM 缓存
     )
-    
+
     # 复制 PHP DLL 到输出目录（如果需要）
     if(PHP_DLL)
         add_custom_command(TARGET phpx POST_BUILD
@@ -246,19 +302,19 @@ if(BUILD_TESTS)
         set(BUILD_TESTS OFF)
     else()
         message(STATUS "Found GTest: ${GTEST_LIBRARIES}")
-        
+
         file(GLOB_RECURSE TEST_FILES tests/src/*.cpp)
         add_executable(phpx-tests ${TEST_FILES})
         add_dependencies(phpx-tests phpx)
-        
+
         if(IS_WINDOWS)
-            target_link_libraries(phpx-tests 
+            target_link_libraries(phpx-tests
                 PRIVATE
                     ${PHP_LIBRARY}
                     phpx
                     ${GTEST_BOTH_LIBRARIES}
             )
-            
+
             # 复制 DLL 到测试可执行文件目录
             add_custom_command(TARGET phpx-tests POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -266,7 +322,7 @@ if(BUILD_TESTS)
                     $<TARGET_FILE_DIR:phpx-tests>
                 COMMENT "Copying phpx.dll to test directory"
             )
-            
+
             if(PHP_DLL)
                 add_custom_command(TARGET phpx-tests POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -276,12 +332,12 @@ if(BUILD_TESTS)
                 )
             endif()
         else()
-            target_link_libraries(phpx-tests 
+            target_link_libraries(phpx-tests
                 PRIVATE
-                    php 
-                    phpx 
-                    ${PHP_LIBS_NO_PHP} 
-                    ${PHP_LDFLAGS} 
+                    php
+                    phpx
+                    ${PHP_LIBS_NO_PHP}
+                    ${PHP_LDFLAGS}
                     ${GTEST_BOTH_LIBRARIES}
             )
         endif()
@@ -296,14 +352,14 @@ if(BUILD_EXT)
         add_library(ext SHARED ${EXT_FILES})
         add_dependencies(ext phpx)
         target_link_libraries(ext PRIVATE phpx)
-        
-        set_target_properties(ext PROPERTIES 
+
+        set_target_properties(ext PROPERTIES
             PREFIX ""
         )
-        
+
         if(IS_WINDOWS)
             set_target_properties(ext PROPERTIES SUFFIX ".dll")
-            
+
             # 复制依赖的 DLL
             add_custom_command(TARGET ext POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -320,14 +376,15 @@ endif()
 # ============ 安装 ============
 if(IS_WINDOWS)
     # Windows 安装配置
-    install(TARGETS phpx 
+    install(TARGETS phpx
         RUNTIME DESTINATION ${PHP_PREFIX}
         LIBRARY DESTINATION ${PHP_PREFIX}
-        ARCHIVE DESTINATION ${PHP_PREFIX}/dev
+        ARCHIVE DESTINATION ${PHP_PREFIX}/${PHP_DEV_DIR_NAME}
     )
-    install(FILES ${HEADER_FILES} DESTINATION ${PHP_PREFIX}/dev/include/phpx)
-    
+    install(FILES ${HEADER_FILES} DESTINATION ${PHP_PREFIX}/${PHP_DEV_DIR_NAME}/include/phpx)
+
     message(STATUS "Install destination: ${PHP_PREFIX}")
+    message(STATUS "Dev directory name: ${PHP_DEV_DIR_NAME}")
 else()
     # Unix/Linux/Mac 安装配置
     install(CODE "MESSAGE(\"Are you run command using root user?\")")
@@ -343,8 +400,9 @@ message(STATUS "Platform: ${CMAKE_SYSTEM_NAME}")
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "C++ Standard: ${CMAKE_CXX_STANDARD}")
 if(IS_WINDOWS)
-    message(STATUS "PHP Source: ${PHP_SOURCE_DIR}")
     message(STATUS "PHP Install: ${PHP_INSTALL_DIR}")
+    message(STATUS "PHP SDK: ${PHP_SDK_DIR}")
+    message(STATUS "PHP Library: ${PHP_LIBRARY}")
 else()
     message(STATUS "PHP Prefix: ${PHP_PREFIX}")
 endif()
