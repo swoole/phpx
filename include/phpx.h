@@ -28,10 +28,10 @@ extern "C" {
 #include "zend_exceptions.h"
 
 #include <ext/standard/php_standard.h>
-#include <ext/json/php_json.h>
 }
 
 #include "phpx_types.h"
+#include "phpx_compat.h"
 
 #if PHP_VERSION_ID < 80100
 #error "only supports PHP-8.1 or later."
@@ -725,8 +725,6 @@ class Variant {
     bool same(const Variant &v) const {
         return equals(v, true);
     }
-    Variant jsonEncode(zend_long options = 0, zend_long depth = PHP_JSON_PARSER_DEFAULT_DEPTH);
-    Variant jsonDecode(zend_long options = 0, zend_long depth = PHP_JSON_PARSER_DEFAULT_DEPTH);
     Variant serialize();
     Variant unserialize();
     bool isCallable();
@@ -898,10 +896,20 @@ class String : public Variant {
         return zend_string_hash_val(str());
     }
     zend_long offset(zend_long _offset) const {
-        if (UNEXPECTED(length() < ((_offset < 0) ? -(size_t) _offset : ((size_t) _offset + 1)))) {
-            return -1;
+        size_t len = length();
+        
+        if (_offset < 0) {
+            zend_long positive_offset = -_offset;
+            if (UNEXPECTED(static_cast<size_t>(positive_offset) > len)) {
+                return -1;
+            }
+            return static_cast<zend_long>(len) + _offset;
+        } else {
+            if (UNEXPECTED(static_cast<size_t>(_offset) >= len)) {
+                return -1;
+            }
+            return _offset;
         }
-        return _offset < 0 ? (zend_long) length() + _offset : _offset;
     }
     bool equals(const char *s, size_t slen) const {
         return length() == slen && memcmp(data(), s, slen) == 0;
@@ -930,7 +938,7 @@ class String : public Variant {
     zend_string *str() const {
         return Z_STR_P(unwrap_ptr());
     }
-    Array split(const String &delim, long = ZEND_LONG_MAX) const;
+    Array split(const String &delim, zend_long limit = ZEND_LONG_MAX) const;
     String substr(long _offset, long _length = -1) const;
     String stripTags(const String &allow, bool allow_tag_spaces = false) const;
     String addSlashes() const;

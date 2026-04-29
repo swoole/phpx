@@ -648,37 +648,6 @@ Variant Variant::unserialize() {
     }
 }
 
-Variant Variant::jsonEncode(zend_long options, zend_long depth) {
-    smart_str buf = {};
-    JSON_G(error_code) = PHP_JSON_ERROR_NONE;
-    JSON_G(encode_max_depth) = (int) depth;
-    auto zv = unwrap_ptr();
-
-    Variant result;
-    php_json_encode(&buf, zv, (int) options);
-    if (EXPECTED(JSON_G(error_code) == PHP_JSON_ERROR_NONE || (options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR))) {
-        smart_str_0(&buf);
-        result = buf.s;
-    }
-    smart_str_free(&buf);
-    return result;
-}
-
-Variant Variant::jsonDecode(zend_long options, zend_long depth) {
-    JSON_G(error_code) = PHP_JSON_ERROR_NONE;
-    auto zv = unwrap_ptr();
-
-    if (length() == 0) {
-        JSON_G(error_code) = PHP_JSON_ERROR_SYNTAX;
-        return {};
-    }
-
-    options |= PHP_JSON_OBJECT_AS_ARRAY;
-    Variant retval;
-    php_json_decode_ex(retval.ptr(), Z_STRVAL_P(zv), Z_STRLEN_P(zv), options, depth);
-    return retval;
-}
-
 bool Variant::isCallable() {
     return zend_is_callable(unwrap_ptr(), 0, nullptr);
 }

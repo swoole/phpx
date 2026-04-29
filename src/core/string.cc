@@ -135,7 +135,7 @@ String String::substr(long f, long l) const {
     return {data() + f, (size_t) l};
 }
 
-Array String::split(const String &delim, const long limit) const {
+Array String::split(const String &delim, const zend_long limit) const {
     Array retval;
     php_explode(delim.str(), str(), retval.ptr(), limit);
     return retval;

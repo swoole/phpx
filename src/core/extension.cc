@@ -340,7 +340,7 @@ zend_function_entry *copy_function_entries(const zend_function_entry *_functions
     return functions;
 }
 
-void _exec_function(zend_execute_data *data, zval *return_value) {
+void ZEND_FASTCALL _exec_function(zend_execute_data *data, zval *return_value) {
     Function *func = nullptr;
     const auto fn_reserved = data->func->internal_function.reserved;
     const auto fn_name = data->func->common.function_name->val;
@@ -372,7 +372,7 @@ void _exec_function(zend_execute_data *data, zval *return_value) {
     retval.moveTo(return_value);
 }
 
-void _exec_method(zend_execute_data *data, zval *return_value) {
+void ZEND_FASTCALL _exec_method(zend_execute_data *data, zval *return_value) {
     Method *method = nullptr;
     const auto fn_reserved = data->func->internal_function.reserved;
     const auto class_name = data->func->common.scope->name->val;

@@ -85,8 +85,8 @@ class Method {
     PHP_METHOD(class_, method) {}                                                                                      \
     Variant phpx_method_##class_##_##method::impl(Object &_this, Args &args)
 
-extern void _exec_function(zend_execute_data *data, zval *return_value);
-extern void _exec_method(zend_execute_data *data, zval *return_value);
+extern void ZEND_FASTCALL _exec_function(zend_execute_data *data, zval *return_value);
+extern void ZEND_FASTCALL _exec_method(zend_execute_data *data, zval *return_value);
 
 zend_function_entry *copy_function_entries(const zend_function_entry *_functions);
 
