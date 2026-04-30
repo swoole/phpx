@@ -286,12 +286,6 @@ if (IS_WINDOWS)
         $<$<BOOL:${ZTS_ENABLED}>:ZTS>
     )
 
-    add_compile_options(
-        /Zi          # 生成调试信息
-        /Od          # 禁用优化，方便调试
-        /RTC1        # 运行时错误检查
-    )
-
     set_target_properties(phpx PROPERTIES
         OUTPUT_NAME "phpx"
         SUFFIX ".dll"

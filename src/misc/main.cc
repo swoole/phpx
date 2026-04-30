@@ -143,7 +143,7 @@ int main(int cpp_argc, char **cpp_argv) {
         }
     }
     zend_end_try();
-#if PPROF_ON
+#ifdef PPROF_ON
     ProfilerStop();
 #endif
 
