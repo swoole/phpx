@@ -56,11 +56,33 @@ php-config --includes  # 确保包含 GTest 路径
 
 ### 编译测试程序
 
+### 标准编译
+
 ```bash
 cd /home/swoole/workspace/projects/phpx
 cmake .
 make phpx-tests -j 4
 ```
+
+### Debug 模式编译（推荐用于排查问题）
+
+```bash
+# 清理之前的构建
+cmake --build . --target clean
+
+# 配置 Debug 模式
+cmake -DCMAKE_BUILD_TYPE=Debug .
+
+# 编译（包含调试符号和运行时检查）
+make phpx-tests -j 4
+```
+
+**Debug 模式特性：**
+- ✅ 生成完整的调试符号（.pdb 文件在 Windows 上）
+- ✅ 禁用编译器优化，便于单步调试
+- ✅ 启用运行时错误检查（Windows: /RTC1）
+- ✅ 显示详细的头文件包含信息（Windows: /showIncludes）
+- ✅ 更容易定位崩溃和内存问题
 
 ### 执行测试
 

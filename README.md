@@ -20,11 +20,32 @@ C++ wrapper for Zend API
 
 ## Build libphpx.so
 ```shell
+# 标准构建（Release 模式）
 cmake .
 make -j 4
 sudo make install
 sudo ldconfig
 ```
+
+### Debug 模式（用于排查问题）
+```shell
+# 清理之前的构建
+cmake --build . --target clean
+
+# 配置 Debug 模式（包含调试符号和运行时检查）
+cmake -DCMAKE_BUILD_TYPE=Debug .
+
+# 编译
+make -j 4
+sudo make install
+sudo ldconfig
+```
+
+**Debug 模式特性：**
+- ✅ 生成完整的调试符号
+- ✅ 禁用编译器优化，便于单步调试
+- ✅ 启用运行时错误检查
+- ✅ 更详细的编译输出信息
 
 ## Create Project
 ```shell

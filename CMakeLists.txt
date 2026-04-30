@@ -8,6 +8,28 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif ()
 
+# ============ 调试配置 ============
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(STATUS "Building in Debug mode with debug symbols")
+    if(IS_WINDOWS)
+        # Windows Debug 模式：添加调试信息和详细输出
+        add_compile_options(
+            /Zi          # 生成调试信息
+            /Od          # 禁用优化，方便调试
+            /RTC1        # 运行时错误检查
+        )
+        # 设置链接选项以生成完整的调试信息
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEBUG")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /DEBUG")
+    else()
+        # Unix/Linux/Mac Debug 模式
+        add_compile_options(-g -O0)
+        add_definitions(-DDEBUG=1)
+    endif()
+else()
+    message(STATUS "Building in ${CMAKE_BUILD_TYPE} mode")
+endif()
+
 # ============ 平台检测 ============
 if(WIN32)
     message(STATUS "Configuring for Windows platform")
@@ -215,6 +237,12 @@ if(IS_WINDOWS)
         /wd4309    # 禁用截断常量值警告
         /wd4804    # 禁用不安全的使用布尔类型警告
     )
+    
+    # Debug 模式下显示更多编译信息
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message(STATUS "Windows Debug mode: Adding verbose compilation output")
+        add_compile_options(/showIncludes)  # 显示包含的头文件
+    endif()
 endif()
 
 # ============ 链接目录 ============
@@ -382,6 +410,9 @@ message(STATUS "Build Configuration Summary")
 message(STATUS "=================================")
 message(STATUS "Platform: ${CMAKE_SYSTEM_NAME}")
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(STATUS "Debug Mode: Enabled with debug symbols and runtime checks")
+endif()
 message(STATUS "C++ Standard: ${CMAKE_CXX_STANDARD}")
 if(IS_WINDOWS)
     message(STATUS "PHP Install: ${PHP_INSTALL_DIR}")
