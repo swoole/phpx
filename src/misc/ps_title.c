@@ -39,7 +39,9 @@
 extern char** environ;
 #endif
 
+BEGIN_EXTERN_C()
 #include "ps_title.h"
+END_EXTERN_C()
 #include <stdio.h>
 
 #ifdef HAVE_UNISTD_H

@@ -19,8 +19,10 @@
 #endif
 
 #include "php.h"
+BEGIN_EXTERN_C()
 #include "php_cli_process_title.h"
 #include "ps_title.h"
+END_EXTERN_C()
 
 /* {{{ Return a boolean to confirm if the process title was successfully changed or not */
 PHP_FUNCTION(cli_set_process_title)

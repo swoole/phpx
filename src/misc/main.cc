@@ -4,8 +4,10 @@
 
 #include <phpx.h>
 #include <php_aot_helper.h>
+BEGIN_EXTERN_C()
 #include "sapi/embed/php_embed.h"
 #include "ps_title.h"
+END_EXTERN_C()
 
 extern zend_module_entry *php_embed_get_module();
 
