@@ -782,10 +782,6 @@ class Variant {
     Variant operator()(const std::initializer_list<Variant> &args) const;
 };
 
-extern Variant null;
-extern Object null_object;
-extern Int zero;
-
 template <typename T>
 Variant newResource(const char *name, T *v) {
     const auto _c = getResource(name);
@@ -1336,6 +1332,10 @@ static inline Reference getEmptyArrayRef() {
     array_init(ref.refval());
     return ref;
 }
+
+extern PHPX_API Variant null;
+extern PHPX_API Object null_object;
+extern PHPX_API Int zero;
 
 #if PHP_VERSION_ID >= 80200
 extern Object newClosure(const ClosureFn &fn, const ArgList &uses = {}, const Object &_this = {});
