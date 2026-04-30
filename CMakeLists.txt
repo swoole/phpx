@@ -100,7 +100,7 @@ if(IS_WINDOWS)
 
     # 查找 php8.lib 或 php8ts.lib
     find_library(PHP_LIBRARY
-        NAMES php8ts php8 php
+        NAMES php8ts
         PATHS ${PHP_LIBRARY_DIR}
         NO_DEFAULT_PATH
     )
@@ -111,7 +111,7 @@ if(IS_WINDOWS)
 
     # 查找 embed 库（如果存在）
     find_library(PHP_EMBED_LIBRARY
-        NAMES php8embed php8embedts
+        NAMES php8embed
         PATHS ${PHP_LIBRARY_DIR}
         NO_DEFAULT_PATH
     )
@@ -126,7 +126,7 @@ if(IS_WINDOWS)
 
     # 设置 PHP DLL 路径（从安装根目录）
     find_file(PHP_DLL
-        NAMES php8ts.dll php8.dll
+        NAMES php8ts.dll
         PATHS ${PHP_INSTALL_DIR}
         NO_DEFAULT_PATH
     )
@@ -134,13 +134,6 @@ if(IS_WINDOWS)
     if(NOT PHP_DLL)
         message(WARNING "PHP DLL not found in ${PHP_INSTALL_DIR}")
     endif()
-
-    # 查找 embed DLL（如果存在）
-    find_file(PHP_EMBED_DLL
-        NAMES php8embed.dll php8embedts.dll
-        PATHS ${PHP_INSTALL_DIR}
-        NO_DEFAULT_PATH
-    )
 
     if(PHP_EMBED_DLL)
         message(STATUS "Found PHP Embed DLL: ${PHP_EMBED_DLL}")
@@ -227,7 +220,6 @@ if(IS_WINDOWS)
         /wd4305    # 禁用截断警告
         /wd4309    # 禁用截断常量值警告
         /wd4804    # 禁用不安全的使用布尔类型警告
-        /MP        # 多处理器编译
     )
 endif()
 
@@ -238,12 +230,10 @@ else()
     link_directories(${PHP_PREFIX}/lib)
 endif()
 
-# ============ 输出目录 ============
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
-# ============ 平台特定链接标志 ============
 if (APPLE)
     SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
     message(STATUS "macOS linker flags: ${CMAKE_SHARED_LINKER_FLAGS}")
@@ -252,7 +242,6 @@ elseif(IS_WINDOWS)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
-# ============ 主库 phpx ============
 file(GLOB_RECURSE SRC_FILES src/core/*.cc src/func/*.cc src/class/*.cc src/const/*.cc)
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 
@@ -263,27 +252,23 @@ set_target_properties(phpx PROPERTIES
 )
 
 if (IS_WINDOWS)
-    # Windows 平台链接 PHP 库和必要的系统库
     target_link_libraries(phpx PRIVATE
         ${PHP_LIBRARY}
     )
-    target_compile_definitions(phpx PRIVATE PHP_EXPORTS)
 
-    # 设置输出名称
+    target_compile_definitions(phpx PUBLIC
+        PHP_EXPORTS
+        ZTS
+        ZEND_WIN32
+        PHP_WIN32
+        ZEND_DEBUG=0
+    )
+
     set_target_properties(phpx PROPERTIES
         OUTPUT_NAME "phpx"
         SUFFIX ".dll"
     )
 
-    target_compile_definitions(phpx PRIVATE
-        ZEND_WIN32                          # 标识 Windows 平台
-        PHP_WIN32                           # 标识 Windows 平台
-        ZEND_DEBUG=0
-        ZTS
-        ZEND_ENABLE_STATIC_TSRMLS_CACHE     # 启用静态 TSRM 缓存
-    )
-
-    # 复制 PHP DLL 到输出目录（如果需要）
     if(PHP_DLL)
         add_custom_command(TARGET phpx POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
