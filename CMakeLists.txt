@@ -100,7 +100,7 @@ if(IS_WINDOWS)
 
     # 查找 php8.lib 或 php8ts.lib
     find_library(PHP_LIBRARY
-        NAMES php8ts
+        NAMES php8ts php8
         PATHS ${PHP_LIBRARY_DIR}
         NO_DEFAULT_PATH
     )
@@ -109,7 +109,17 @@ if(IS_WINDOWS)
         message(FATAL_ERROR "PHP library not found in ${PHP_LIBRARY_DIR}")
     endif()
 
-    # 查找 embed 库（如果存在）
+    # 根据找到的库文件确定是否启用 ZTS
+    get_filename_component(PHP_LIB_NAME ${PHP_LIBRARY} NAME)
+    if(${PHP_LIB_NAME} STREQUAL "php8ts.lib")
+        set(ZTS_ENABLED TRUE)
+        message(STATUS "Found Thread-Safe PHP library: ${PHP_LIBRARY}")
+    else()
+        set(ZTS_ENABLED FALSE)
+        message(STATUS "Found Non-Thread-Safe PHP library: ${PHP_LIBRARY}")
+    endif()
+
+    # 查找 embed 库（固定使用 php8embed.lib）
     find_library(PHP_EMBED_LIBRARY
         NAMES php8embed
         PATHS ${PHP_LIBRARY_DIR}
@@ -124,21 +134,6 @@ if(IS_WINDOWS)
         set(USE_PHP_EMBED OFF CACHE BOOL "Use PHP Embed SAPI" FORCE)
     endif()
 
-    # 设置 PHP DLL 路径（从安装根目录）
-    find_file(PHP_DLL
-        NAMES php8ts.dll
-        PATHS ${PHP_INSTALL_DIR}
-        NO_DEFAULT_PATH
-    )
-
-    if(NOT PHP_DLL)
-        message(WARNING "PHP DLL not found in ${PHP_INSTALL_DIR}")
-    endif()
-
-    if(PHP_EMBED_DLL)
-        message(STATUS "Found PHP Embed DLL: ${PHP_EMBED_DLL}")
-    endif()
-
     set(PHP_EXTENSION_DIR ${PHP_INSTALL_DIR}/ext)
     set(PHP_PREFIX ${PHP_INSTALL_DIR})
 
@@ -146,7 +141,6 @@ if(IS_WINDOWS)
     message(STATUS "PHP_SDK_DIR: ${PHP_SDK_DIR}")
     message(STATUS "PHP_LIBRARY_DIR: ${PHP_LIBRARY_DIR}")
     message(STATUS "PHP_LIBRARY: ${PHP_LIBRARY}")
-    message(STATUS "PHP_DLL: ${PHP_DLL}")
 
 else()
     # Unix/Linux/Mac 平台：使用 php-config
@@ -258,10 +252,10 @@ if (IS_WINDOWS)
 
     target_compile_definitions(phpx PUBLIC
         PHP_EXPORTS
-        ZTS
         ZEND_WIN32
         PHP_WIN32
         ZEND_DEBUG=0
+        $<$<BOOL:${ZTS_ENABLED}>:ZTS>
     )
 
     set_target_properties(phpx PROPERTIES
@@ -269,12 +263,12 @@ if (IS_WINDOWS)
         SUFFIX ".dll"
     )
 
-    if(PHP_DLL)
+    if(PHP_EMBED_LIBRARY AND USE_PHP_EMBED)
         add_custom_command(TARGET phpx POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                ${PHP_DLL}
+                ${PHP_EMBED_LIBRARY}
                 $<TARGET_FILE_DIR:phpx>
-            COMMENT "Copying PHP DLL to output directory"
+            COMMENT "Copying PHP Embed library to output directory"
         )
     endif()
 endif()
@@ -313,12 +307,12 @@ if(BUILD_TESTS)
                 COMMENT "Copying phpx.dll to test directory"
             )
 
-            if(PHP_DLL)
+            if(PHP_EMBED_LIBRARY AND USE_PHP_EMBED)
                 add_custom_command(TARGET phpx-tests POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                        ${PHP_DLL}
+                        ${PHP_EMBED_LIBRARY}
                         $<TARGET_FILE_DIR:phpx-tests>
-                    COMMENT "Copying PHP DLL to test directory"
+                    COMMENT "Copying PHP Embed library to test directory"
                 )
             endif()
         else()
