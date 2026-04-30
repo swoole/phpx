@@ -1,4 +1,4 @@
-#if PPROF_ON
+#ifdef PPROF_ON
 #include <gperftools/profiler.h>
 #endif
 
@@ -127,7 +127,7 @@ int main(int cpp_argc, char **cpp_argv) {
 #endif
 
     int rc = 0;
-#if PPROF_ON
+#ifdef PPROF_ON
     ProfilerStart("profile.out");
 #endif
     zend_first_try {
