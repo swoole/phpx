@@ -17,6 +17,8 @@
 ### 实践文档
 - [示例指南](./examples-guide.md) - 示例代码使用说明
 - [测试指南](./testing-guide.md) - 测试框架和测试方法
+- [调试指南](./debugging-guide.md) - 调试功能和技巧详解
+- [调试快速参考](./debugging-quick-reference.md) - 常用调试命令速查
 - [最佳实践](./best-practices.md) - 开发最佳实践
 
 ## 项目结构

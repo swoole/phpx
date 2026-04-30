@@ -237,7 +237,7 @@ if(IS_WINDOWS)
         /wd4309    # 禁用截断常量值警告
         /wd4804    # 禁用不安全的使用布尔类型警告
     )
-    
+
     # Debug 模式下显示更多编译信息
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         message(STATUS "Windows Debug mode: Adding verbose compilation output")
@@ -284,6 +284,12 @@ if (IS_WINDOWS)
         PHP_WIN32
         ZEND_DEBUG=0
         $<$<BOOL:${ZTS_ENABLED}>:ZTS>
+    )
+
+    add_compile_options(
+        /Zi          # 生成调试信息
+        /Od          # 禁用优化，方便调试
+        /RTC1        # 运行时错误检查
     )
 
     set_target_properties(phpx PROPERTIES
@@ -412,6 +418,16 @@ message(STATUS "Platform: ${CMAKE_SYSTEM_NAME}")
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "Debug Mode: Enabled with debug symbols and runtime checks")
+    if(IS_WINDOWS)
+        message(STATUS "  - Debug symbols: /Zi (PDB files)")
+        message(STATUS "  - Optimization: /Od (disabled)")
+        message(STATUS "  - Runtime checks: /RTC1")
+        message(STATUS "  - Verbose output: /showIncludes")
+    else()
+        message(STATUS "  - Debug symbols: -g")
+        message(STATUS "  - Optimization: -O0 (disabled)")
+        message(STATUS "  - Debug macro: -DDEBUG=1")
+    endif()
 endif()
 message(STATUS "C++ Standard: ${CMAKE_CXX_STANDARD}")
 if(IS_WINDOWS)
