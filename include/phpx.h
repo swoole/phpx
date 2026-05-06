@@ -629,12 +629,12 @@ class Variant {
     }
     template <class T>
     T *toBox() {
-        if (!isResource()) {
+        if (UNEXPECTED(!isResource())) {
             throwError("This variant is not a resource type.");
             return nullptr;
         }
         auto res = Z_RES(val);
-        if (res->type != box_res_id) {
+        if (UNEXPECTED(res->type != box_res_id)) {
             throwError("This resource is not type of `%s`.", box_res_name);
             return nullptr;
         }
