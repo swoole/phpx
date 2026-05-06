@@ -147,14 +147,12 @@ toVariant(const T &value) {
 }
 
 template <typename T>
-static inline typename std::enable_if<std::is_same<T, bool>::value, Variant>::type
-toVariant(const T &value) {
+static inline typename std::enable_if<std::is_same<T, bool>::value, Variant>::type toVariant(const T &value) {
     return Variant(value);
 }
 
 template <typename T>
-static inline typename std::enable_if<std::is_floating_point<T>::value, Variant>::type
-toVariant(const T &value) {
+static inline typename std::enable_if<std::is_floating_point<T>::value, Variant>::type toVariant(const T &value) {
     return Variant(static_cast<double>(value));
 }
 
@@ -305,6 +303,14 @@ static inline Variant getCallArg(uint32_t i, const Variant &defaultValue) {
     } else {
         return getCallArg(i);
     }
+}
+
+static inline Int safeIndex(Int index, Int size) {
+    if (UNEXPECTED(index < 0 || index >= size)) {
+        throwError("Array index out of bounds: index %ld, size %ld", (long) index, (long) size);
+        return -1;
+    }
+    return index;
 }
 
 static inline Reference getCallArgByRef(uint32_t i, const Reference &defaultValue) {
