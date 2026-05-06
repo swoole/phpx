@@ -698,10 +698,10 @@ class Variant {
             throwError("call method `%s` on %s", fn.toCString(), typeStr());
             return {};
         }
-        return call_impl(unwrap_ptr(), fn.const_ptr());
+        return call_impl(unwrap_ptr(), fn.unwrap_ptr());
     }
     Variant call(const Variant &fn, Args &args) {
-        return call_impl(ptr(), fn.const_ptr(), args);
+        return call_impl(ptr(), fn.unwrap_ptr(), args);
     }
     Variant call(const Variant &fn, Array &args);
     Variant call(const Variant &fn, const ArgList &args);

@@ -853,7 +853,7 @@ Variant Variant::call(const Variant &fn, const ArgList &args) {
         return {};
     }
     Args _args(args);
-    return call_impl(unwrap_ptr(), fn.const_ptr(), _args);
+    return call_impl(unwrap_ptr(), fn.unwrap_ptr(), _args);
 }
 
 Variant Variant::call(const Variant &fn, Array &args) {
