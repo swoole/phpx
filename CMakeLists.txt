@@ -270,7 +270,6 @@ file(GLOB_RECURSE HEADER_FILES include/*.h)
 add_library(phpx SHARED ${SRC_FILES})
 set_target_properties(phpx PROPERTIES
     CLEAN_DIRECT_OUTPUT 1
-    PREFIX ""  # 去掉 lib 前缀
 )
 
 if (IS_WINDOWS)
@@ -299,6 +298,8 @@ if (IS_WINDOWS)
             COMMENT "Copying PHP Embed library to output directory"
         )
     endif()
+else()
+    target_link_libraries(phpx PRIVATE php)
 endif()
 
 if (CODE_COVERAGE AND NOT IS_WINDOWS)
@@ -348,7 +349,7 @@ if(BUILD_TESTS)
                 PRIVATE
                     php
                     phpx
-                    ${PHP_LIBS_NO_PHP}
+                    ${PHP_LIBS}
                     ${PHP_LDFLAGS}
                     ${GTEST_BOTH_LIBRARIES}
             )
