@@ -134,59 +134,6 @@ static inline String toString(const Variant &v) {
     return v.toString();
 }
 
-template <typename T>
-struct is_std_array : std::false_type {};
-
-template <typename T, std::size_t N>
-struct is_std_array<std::array<T, N>> : std::true_type {};
-
-template <typename T>
-static inline typename std::enable_if<std::is_integral<T>::value && !std::is_same<T, bool>::value, Variant>::type
-toVariant(const T &value) {
-    return Variant(static_cast<zend_long>(value));
-}
-
-template <typename T>
-static inline typename std::enable_if<std::is_same<T, bool>::value, Variant>::type toVariant(const T &value) {
-    return Variant(value);
-}
-
-template <typename T>
-static inline typename std::enable_if<std::is_floating_point<T>::value, Variant>::type toVariant(const T &value) {
-    return Variant(static_cast<double>(value));
-}
-
-static inline Variant toVariant(const std::string &value) {
-    return Variant(value.c_str(), value.length());
-}
-
-static inline Variant toVariant(const char *value) {
-    return Variant(value);
-}
-
-static inline Variant toVariant(const Variant &value) {
-    return value;
-}
-
-static inline Variant toVariant(const String &value) {
-    return Variant(value);
-}
-
-template <typename T, std::size_t N>
-static inline Array toArray(const std::array<T, N> &arr) {
-    Array result;
-
-    for (std::size_t i = 0; i < N; ++i) {
-        if constexpr (is_std_array<T>::value) {
-            result.set(i, toArray(arr[i]));
-        } else {
-            result.set(i, toVariant(arr[i]));
-        }
-    }
-
-    return result;
-}
-
 static inline void echo(int val) {
     echo((Int) val);
 }
@@ -303,14 +250,6 @@ static inline Variant getCallArg(uint32_t i, const Variant &defaultValue) {
     } else {
         return getCallArg(i);
     }
-}
-
-static inline Int safeIndex(Int index, Int size) {
-    if (UNEXPECTED(index < 0 || index >= size)) {
-        throwError("Array index out of bounds: index %ld, size %ld", (long) index, (long) size);
-        return -1;
-    }
-    return index;
 }
 
 static inline Reference getCallArgByRef(uint32_t i, const Reference &defaultValue) {

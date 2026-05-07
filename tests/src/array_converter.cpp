@@ -1,10 +1,10 @@
 #include "phpx_test.h"
-#include "phpx_helper.h"
+#include "phpx_std_array.h"
 
 using namespace php;
 
 TEST(array_converter, 1d_int_array) {
-    std::array<Int, 5> arr = {1, 2, 3, 4, 5};
+    StdArray<Int, 5> arr = {1, 2, 3, 4, 5};
     Array parr = toArray(arr);
 
     ASSERT_EQ(parr.count(), 5);
@@ -16,7 +16,7 @@ TEST(array_converter, 1d_int_array) {
 }
 
 TEST(array_converter, 1d_float_array) {
-    std::array<Float, 4> arr = {1.1, 2.2, 3.3, 4.4};
+    StdArray<Float, 4> arr = {1.1, 2.2, 3.3, 4.4};
     Array parr = toArray(arr);
 
     ASSERT_EQ(parr.count(), 4);
@@ -27,7 +27,7 @@ TEST(array_converter, 1d_float_array) {
 }
 
 TEST(array_converter, 1d_bool_array) {
-    std::array<bool, 4> arr = {true, false, true, false};
+    StdArray<bool, 4> arr = {true, false, true, false};
     Array parr = toArray(arr);
 
     ASSERT_EQ(parr.count(), 4);
@@ -38,7 +38,7 @@ TEST(array_converter, 1d_bool_array) {
 }
 
 TEST(array_converter, 1d_string_array) {
-    std::array<std::string, 3> arr = {"hello", "world", "php"};
+    StdArray<std::string, 3> arr = {"hello", "world", "php"};
     Array parr = toArray(arr);
 
     ASSERT_EQ(parr.count(), 3);
@@ -48,7 +48,7 @@ TEST(array_converter, 1d_string_array) {
 }
 
 TEST(array_converter, 2d_int_array) {
-    std::array<std::array<Int, 3>, 2> arr = {{{1, 2, 3}, {4, 5, 6}}};
+    StdArray<StdArray<Int, 3>, 2> arr = {{{1, 2, 3}, {4, 5, 6}}};
     Array parr = toArray(arr);
 
     ASSERT_EQ(parr.count(), 2);
@@ -67,7 +67,7 @@ TEST(array_converter, 2d_int_array) {
 }
 
 TEST(array_converter, 2d_large_array) {
-    std::array<std::array<Int, 10>, 100> arr;
+    StdArray<StdArray<Int, 10>, 100> arr;
 
     for (size_t i = 0; i < 100; ++i) {
         for (size_t j = 0; j < 10; ++j) {
@@ -95,7 +95,7 @@ TEST(array_converter, 2d_large_array) {
 }
 
 TEST(array_converter, 3d_int_array) {
-    std::array<std::array<std::array<Int, 2>, 2>, 2> arr = {{{{{1, 2}, {3, 4}}}, {{{5, 6}, {7, 8}}}}};
+    StdArray<StdArray<StdArray<Int, 2>, 2>, 2> arr = {{{{{1, 2}, {3, 4}}}, {{{5, 6}, {7, 8}}}}};
 
     Array parr = toArray(arr);
     ASSERT_EQ(parr.count(), 2);
@@ -120,7 +120,7 @@ TEST(array_converter, 3d_int_array) {
 }
 
 TEST(array_converter, empty_array) {
-    std::array<Int, 0> arr = {};
+    StdArray<Int, 0> arr = {};
     Array parr = toArray(arr);
 
     ASSERT_EQ(parr.count(), 0);
@@ -128,7 +128,7 @@ TEST(array_converter, empty_array) {
 }
 
 TEST(array_converter, single_element_array) {
-    std::array<Int, 1> arr = {42};
+    StdArray<Int, 1> arr = {42};
     Array parr = toArray(arr);
 
     ASSERT_EQ(parr.count(), 1);
@@ -136,7 +136,7 @@ TEST(array_converter, single_element_array) {
 }
 
 TEST(array_converter, nested_different_sizes) {
-    std::array<std::array<Int, 5>, 3> arr;
+    StdArray<StdArray<Int, 5>, 3> arr;
 
     for (size_t i = 0; i < 3; ++i) {
         for (size_t j = 0; j < 5; ++j) {
