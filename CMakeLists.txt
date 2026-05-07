@@ -299,8 +299,7 @@ if (IS_WINDOWS)
         )
     endif()
 else()
-    # On Linux/Unix, PHP symbols are resolved at runtime when the extension is loaded
-    # No need to link against libphp directly
+    target_link_libraries(phpx PRIVATE php)
 endif()
 
 if (CODE_COVERAGE AND NOT IS_WINDOWS)
