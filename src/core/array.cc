@@ -144,26 +144,26 @@ Array::Array(const IntKeyMap &list) {
     copyFrom(list);
 }
 
-Array &Array::operator=(const std::initializer_list<const Variant> &list) {
-    destroy();
-    auto zarr = unwrap_ptr();
-    array_init(zarr);
+Array &Array::operator=(const ArrayList &list) {
+    rebuild();
+    copyFrom(list);
+    return *this;
+}
+
+Array &Array::operator=(const StrKeyMap &list) {
+    rebuild();
     copyFrom(list);
     return *this;
 }
 
 Array &Array::operator=(const StdStrKeyMap &list) {
-    destroy();
-    auto zarr = unwrap_ptr();
-    array_init(zarr);
+    rebuild();
     copyFrom(list);
     return *this;
 }
 
 Array &Array::operator=(const IntKeyMap &list) {
-    destroy();
-    auto zarr = unwrap_ptr();
-    array_init(zarr);
+    rebuild();
     copyFrom(list);
     return *this;
 }

@@ -43,6 +43,9 @@ extern "C" {
 #include <functional>
 #include <map>
 #include <memory>
+#include <array>
+#include <initializer_list>
+#include <stdexcept>
 #include <type_traits>
 
 /**
@@ -281,6 +284,59 @@ static inline void deref(zval *v) {
 #define Z_TYPE_EXTRA(zval) (zval).u1.v.u.extra
 #define Z_TYPE_EXTRA_P(zval_p) Z_TYPE_EXTRA(*(zval_p))
 #endif
+
+static inline Int safeIndex(Int index, Int size) {
+    if (UNEXPECTED(index < 0 || index >= size)) {
+        throwError("Array index out of bounds: index %ld, size %ld", (long) index, (long) size);
+        return -1;
+    }
+    return index;
+}
+
+template <typename T, std::size_t N>
+class StdArray {
+  private:
+    std::array<T, N> data_;
+
+  public:
+    StdArray() = default;
+    StdArray(std::initializer_list<T> init) {
+        if (UNEXPECTED(init.size() > N)) {
+            throw std::out_of_range("too many initializers");
+        }
+        std::copy(init.begin(), init.end(), data_.begin());
+    }
+    void offsetSet(std::size_t index, const T &value) {
+        data_[safeIndex(index, N)] = value;
+    }
+    const T &offsetGet(std::size_t index) const {
+        return data_[safeIndex(index, N)];
+    }
+    T &offsetGet(std::size_t index) {
+        return data_[safeIndex(index, N)];
+    }
+    constexpr std::size_t size() const noexcept {
+        return N;
+    }
+    T &operator[](std::size_t index) {
+        return data_[index];
+    }
+    const T &operator[](std::size_t index) const {
+        return data_[index];
+    }
+    T &at(std::size_t index) {
+        return offsetGet(index);
+    }
+    const T &at(std::size_t index) const {
+        return offsetGet(index);
+    }
+};
+
+template <typename T>
+struct is_std_array : std::false_type {};
+
+template <typename T, std::size_t N>
+struct is_std_array<StdArray<T, N>> : std::true_type {};
 
 class Variant {
   protected:
@@ -1029,12 +1085,30 @@ class Array : public Variant {
     void copyFrom(const StrKeyMap &list);
     void copyFrom(const StdStrKeyMap &list);
     void copyFrom(const IntKeyMap &list);
+
+    template <typename T, std::size_t N>
+    void copyFrom(const StdArray<T, N> &arr) {
+        for (std::size_t i = 0; i < N; ++i) {
+            if constexpr (is_std_array<T>::value) {
+                set(i, Array(arr[i]));
+            } else {
+                set(i, Variant(arr[i]));
+            }
+        }
+    }
+
     void checkArray() {
         if (isNull() || isUndef()) {
             array_init(unwrap_ptr());
         } else if (!isArray()) {
             throwError("parameter 1 must be `array`, got `%s`", typeStr());
         }
+    }
+
+    void rebuild() {
+        destroy();
+        auto zarr = unwrap_ptr();
+        array_init(zarr);
     }
 
   public:
@@ -1051,10 +1125,23 @@ class Array : public Variant {
     Array(const IntKeyMap &list);
     Array(Variant *v) : Variant(v) {}
 
+    template <typename T, std::size_t N>
+    Array(const StdArray<T, N> &arr) {
+        array_init(&val);
+        copyFrom(arr);
+    }
+
     Array &operator=(const ArrayList &list);
     Array &operator=(const StrKeyMap &list);
     Array &operator=(const StdStrKeyMap &list);
     Array &operator=(const IntKeyMap &list);
+
+    template <typename T, std::size_t N>
+    Array &operator=(const StdArray<T, N> &arr) {
+        rebuild();
+        copyFrom(arr);
+        return *this;
+    }
 
     void set(zend_ulong i, const Variant &v);
     void set(const Variant &key, const Variant &v);
@@ -1331,6 +1418,12 @@ static inline Reference getEmptyArrayRef() {
     Reference ref;
     array_init(ref.refval());
     return ref;
+}
+
+template <typename T, std::size_t N>
+static inline Array toArray(const StdArray<T, N> &arr) {
+    Array result(arr);
+    return result;
 }
 
 extern PHPX_API Variant null;
