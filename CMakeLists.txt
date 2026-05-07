@@ -299,11 +299,12 @@ if (IS_WINDOWS)
         )
     endif()
 else()
-    target_link_libraries(phpx PRIVATE php)
+    # On Linux/Unix, PHP symbols are resolved at runtime when the extension is loaded
+    # No need to link against libphp directly
 endif()
 
 if (CODE_COVERAGE AND NOT IS_WINDOWS)
-    target_link_libraries(phpx coverage_config gcov)
+    target_link_libraries(phpx PRIVATE coverage_config gcov)
 endif()
 
 # ============ 测试 (需要 GTest) ============
@@ -347,7 +348,6 @@ if(BUILD_TESTS)
         else()
             target_link_libraries(phpx-tests
                 PRIVATE
-                    php
                     phpx
                     ${PHP_LIBS}
                     ${PHP_LDFLAGS}
