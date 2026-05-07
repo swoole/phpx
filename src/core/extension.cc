@@ -233,14 +233,14 @@ bool Interface::activate() {
 }
 
 zend_result extension_startup(int type, int module_number) {
-	auto module = EG(current_module);
-	auto extension = _name_to_extension[module->name];
-	extension->started = true;
-	extension->registerIniEntries(module_number);
-	if (extension->onStart) {
-		extension->onStart();
-	}
-	_module_number_to_extension[module_number] = extension;
+    auto module = EG(current_module);
+    auto extension = _name_to_extension[module->name];
+    extension->started = true;
+    extension->registerIniEntries(module_number);
+    if (extension->onStart) {
+        extension->onStart();
+    }
+    _module_number_to_extension[module_number] = extension;
     return SUCCESS;
 }
 
