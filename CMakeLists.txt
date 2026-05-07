@@ -348,6 +348,7 @@ if(BUILD_TESTS)
             target_link_libraries(phpx-tests
                 PRIVATE
                     phpx
+                    php
                     ${PHP_LIBS}
                     ${PHP_LDFLAGS}
                     ${GTEST_BOTH_LIBRARIES}
