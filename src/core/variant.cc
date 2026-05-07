@@ -27,6 +27,8 @@ namespace php {
 Variant null = {};
 Object null_object;
 Int zero = 0L;
+Variant true_ = true;
+Variant false_ = false;
 
 Variant::Variant(const Reference *ref) {
     val = *ref->const_ptr();

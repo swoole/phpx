@@ -1429,6 +1429,8 @@ static inline Array toArray(const StdArray<T, N> &arr) {
 extern PHPX_API Variant null;
 extern PHPX_API Object null_object;
 extern PHPX_API Int zero;
+extern PHPX_API Variant true_;
+extern PHPX_API Variant false_;
 
 #if PHP_VERSION_ID >= 80200
 extern Object newClosure(const ClosureFn &fn, const ArgList &uses = {}, const Object &_this = {});
