@@ -233,21 +233,14 @@ bool Interface::activate() {
 }
 
 zend_result extension_startup(int type, int module_number) {
-    void *ptr;
-    ZEND_HASH_FOREACH_PTR(&module_registry, ptr) {
-        auto *module = static_cast<zend_module_entry *>(ptr);
-        if (module_number == module->module_number) {
-            auto extension = _name_to_extension[module->name];
-            extension->started = true;
-            extension->registerIniEntries(module_number);
-            if (extension->onStart) {
-                extension->onStart();
-            }
-            _module_number_to_extension[module_number] = extension;
-            break;
-        }
-    }
-    ZEND_HASH_FOREACH_END();
+	auto module = EG(current_module);
+	auto extension = _name_to_extension[module->name];
+	extension->started = true;
+	extension->registerIniEntries(module_number);
+	if (extension->onStart) {
+		extension->onStart();
+	}
+	_module_number_to_extension[module_number] = extension;
     return SUCCESS;
 }
 

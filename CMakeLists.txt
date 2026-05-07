@@ -298,8 +298,6 @@ if (IS_WINDOWS)
             COMMENT "Copying PHP Embed library to output directory"
         )
     endif()
-else()
-    target_link_libraries(phpx PRIVATE php)
 endif()
 
 if (CODE_COVERAGE AND NOT IS_WINDOWS)
