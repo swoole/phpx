@@ -4,7 +4,6 @@ ignore:
   - "src/func/*"
   - "src/class/*"
   - "src/const/*"
-  - "src/core/caller.cc"
 
 coverage:
   range: 60..80
