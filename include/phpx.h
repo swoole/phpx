@@ -182,8 +182,11 @@ Variant call_impl(const zval *object, const zval *func);
 #endif
 
 extern PHPX_API std::function<void(zend_object *)> throw_impl;
-extern THREAD_LOCAL int box_res_id;
-extern const char *box_res_name;
+extern PHPX_API const char *box_res_name;
+
+PHPX_API int getBoxResourceId();
+
+PHPX_API Array toArray(const Variant &v);
 
 struct DebugInfo {
     bool enable;
@@ -476,7 +479,7 @@ class Variant {
     }
     Variant(const Reference *ref);
     Variant(Box *v) {
-        zend_resource *res = zend_register_resource(v, box_res_id);
+        zend_resource *res = zend_register_resource(v, getBoxResourceId());
         ZVAL_RES(&val, res);
     }
     /**
@@ -690,7 +693,7 @@ class Variant {
             return nullptr;
         }
         auto res = Z_RES(val);
-        if (UNEXPECTED(res->type != box_res_id)) {
+        if (UNEXPECTED(res->type != getBoxResourceId())) {
             throwError("This resource is not type of `%s`.", box_res_name);
             return nullptr;
         }

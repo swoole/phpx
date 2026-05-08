@@ -192,7 +192,11 @@ static void box_dtor(zend_resource *res) {
 
 THREAD_LOCAL static bool request_init_called = false;
 THREAD_LOCAL static bool request_shutdown_called = false;
-THREAD_LOCAL int box_res_id;
+THREAD_LOCAL static int box_res_id;
+
+int getBoxResourceId() {
+    return box_res_id;
+}
 
 void request_init() {
     if (request_init_called) {
