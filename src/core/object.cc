@@ -200,7 +200,7 @@ Object newObject(zend_class_entry *ce) {
     return object;
 }
 
-Object newObject(zend_class_entry *ce, Args &args) {
+Object newObject(zend_class_entry *ce, Args &args, zend_array *named_args) {
     Object object;
 
     auto rc = object_init_ex(object.ptr(), ce);
@@ -208,7 +208,7 @@ Object newObject(zend_class_entry *ce, Args &args) {
         auto this_ = object.object();
         auto ctor = ce->constructor;
         if (ctor) {
-            zend_call_known_function(ctor, this_, ce, nullptr, args.count(), args.ptr(), nullptr);
+            zend_call_known_function(ctor, this_, ce, nullptr, args.count(), args.ptr(), named_args);
         }
     }
     throwErrorIfOccurred();
@@ -216,17 +216,17 @@ Object newObject(zend_class_entry *ce, Args &args) {
     return object;
 }
 
-Object newObject(zend_class_entry *ce, const ArgList &args) {
+Object newObject(zend_class_entry *ce, const ArgList &args, zend_array *named_args) {
     Args _args(args);
-    return newObject(ce, _args);
+    return newObject(ce, _args, named_args);
 }
 
-Object newObject(zend_class_entry *ce, Array &args) {
+Object newObject(zend_class_entry *ce, Array &args, zend_array *named_args) {
     Args _args(args.count());
     for (size_t i = 0; i < args.count(); i++) {
         _args.append(args[i]);
     }
-    return newObject(ce, _args);
+    return newObject(ce, _args, named_args);
 }
 
 Object toObject(const Variant &v) {
