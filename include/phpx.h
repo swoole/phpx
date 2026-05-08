@@ -634,7 +634,7 @@ class Variant {
         return Z_TYPE_P(unwrap_ptr()) == IS_UNDEF;
     }
     bool isResource() const {
-        return Z_TYPE_P(const_ptr()) == IS_RESOURCE;
+        return Z_TYPE_P(unwrap_ptr()) == IS_RESOURCE;
     }
     bool isReference() const {
         return Z_TYPE_P(direct_ptr()) == IS_REFERENCE;
@@ -692,7 +692,7 @@ class Variant {
             throwError("This variant is not a resource type.");
             return nullptr;
         }
-        auto res = Z_RES(val);
+        auto res = Z_RES_P(unwrap_ptr());
         if (UNEXPECTED(res->type != getBoxResourceId())) {
             throwError("This resource is not type of `%s`.", box_res_name);
             return nullptr;
