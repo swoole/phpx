@@ -935,7 +935,7 @@ class String : public Variant {
     String(const char *str, size_t len) : Variant(str, len) {}
     String(const char *str, size_t len, bool persistent) : Variant(str, len, persistent) {}
     bool isNumeric() const {
-        return is_numeric_string(data(), length(), nullptr, nullptr, false);
+        return is_numeric_string(data(), length(), nullptr, nullptr, false) != 0;
     }
     size_t length() const {
         return Z_STRLEN_P(unwrap_ptr());
@@ -1293,12 +1293,12 @@ class Object : public Variant {
     void updateArrayProperty(const String &name, const Variant &key, const Variant &value);
 
     bool offsetExists(const Variant &offset) const {
-        return object()->handlers->has_dimension(object(), NO_CONST_V(offset), 0);
+        return object()->handlers->has_dimension(object(), NO_CONST_V(offset), 0) != 0;
     }
     bool offsetExists(zend_long offset) {
         zval tmp;
         ZVAL_LONG(&tmp, offset);
-        return object()->handlers->has_dimension(object(), &tmp, 0);
+        return object()->handlers->has_dimension(object(), &tmp, 0) != 0;
     }
     Variant offsetGet(const Variant &offset, int type = BP_VAR_R) {
         zval rv;
