@@ -227,47 +227,252 @@ Hello, World!
 
 ## Advanced Usage
 
-### Creating Classes
+### 1. Variant Type Usage
+
+Variant is a universal type container that can hold any PHP value:
 
 ```cpp
-// Define a class
-Class myClass("MyClass");
-myClass.addMethod("greet", ZEND_FN(greet_method));
-myClass.registerClass();
+#include "phpx.h"
 
-ZEND_METHOD(MyClass, greet_method)
-{
-    RETURN_STRING("Hello from MyClass!");
+using namespace php;
+
+// Create variants of different types
+Variant str_var = "Hello PHPX";
+Variant int_var = 42;
+Variant float_var = 3.14159;
+Variant bool_var = true;
+Variant null_var;
+
+// Type checking
+if (str_var.isString()) {
+    echo("String: ", str_var.toCString());
 }
+
+if (int_var.isInt()) {
+    echo("Integer: ", int_var.toInt());
+}
+
+// Type conversion
+auto str = int_var.toString();      // Convert to string
+auto num = str_var.toInt();         // Convert to integer (0 if not numeric)
+
+// Comparison
+if (str_var.equals("Hello PHPX")) {
+    echo("Match!");
+}
+
+// Serialization
+Variant serialized = str_var.serialize();
+Variant unserialized = serialized.unserialize();
 ```
 
-### Working with Arrays
+### 2. Array Type Usage
+
+Array provides a C++ wrapper for PHP arrays with rich functionality:
 
 ```cpp
-ZEND_FUNCTION(array_example)
-{
-    Array arr;
-    arr.set("key1", "value1");
-    arr.set("key2", 123);
-    arr.set("key3", true);
-    
-    RETURN_ARRAY(arr);
+#include "phpx.h"
+
+using namespace php;
+
+// Create arrays
+Array arr;
+arr.set("name", "PHPX");
+arr.set("version", 8.2);
+arr.set("features", Array{"C++17", "Type-safe", "Modern API"});
+
+// Initialize with list
+Array numbers{1, 2, 3, 4, 5};
+Array map{{"key1", "value1"}, {"key2", "value2"}};
+
+// Access elements
+auto name = arr.get("name");
+auto first = numbers[0];
+
+// Check existence
+if (arr.exists("name")) {
+    echo("Name exists");
 }
+
+// Iterate array
+for (auto &item : arr) {
+    echo(item.key, ": ", item.value, "\n");
+}
+
+// Array operations
+arr.append("new_element");          // Add element
+arr.del("name");                    // Remove element
+auto count = arr.count();           // Get count
+auto keys = arr.keys();             // Get all keys
+
+// Nested arrays
+Array nested;
+nested.set("level1", Array{
+    {"level2", Array{"deep_value"}}
+});
+auto deep = nested.item("level1").item("level2");
+
+// Reference for modification
+Array nums{5, 2, 8, 1, 9};
+Reference ref = nums.toReference();
+php::sort(ref);                     // Sort in place
+php::array_push(ref, 10, 11);       // Push elements
 ```
 
-### Error Handling
+### 3. Object Type Usage
+
+Object wraps PHP objects and provides method calling capabilities:
 
 ```cpp
-ZEND_FUNCTION(error_example)
-{
-    if (some_condition) {
-        zend_throw_error(NULL, "Something went wrong!");
-        RETURN_FALSE;
-    }
-    
-    RETURN_TRUE;
+#include "phpx.h"
+
+using namespace php;
+
+// Create object
+Object datetime = newObject("DateTime");
+
+// Call methods
+auto formatted = datetime.call("format", {"Y-m-d H:i:s"});
+echo("Current time: ", formatted.toCString());
+
+// Set properties
+Object stdclass = newObject("stdClass");
+stdclass.set("name", "test");
+stdclass.set("value", 42);
+
+// Get properties
+auto name = stdclass.get("name");
+auto value = stdclass.get("value");
+
+// Check property existence
+if (stdclass.exists("name")) {
+    echo("Property exists");
 }
+
+// Create object with constructor arguments
+Object arrayObj = newObject("ArrayObject", {
+    Array{1, 2, 3, 4, 5}
+});
+
+// Call method and get result
+auto count = arrayObj.call("count");
+echo("Count: ", count.toInt());
+
+// Static method calls
+auto result = Object::callStatic("DateTime", "createFromFormat", {
+    "Y-m-d", "2024-01-01"
+});
 ```
+
+### 4. Facade Encapsulation API
+
+PHPX provides facade functions in the `php::` namespace for direct PHP function calls:
+
+```cpp
+#include "phpx.h"
+#include "phpx_func.h"
+
+using namespace php;
+
+// Debug and output
+php::var_dump(some_variable);           // Debug output
+php::print_r(some_variable);            // Print readable
+php::echo("Hello", " ", "World");      // Echo strings
+
+// File operations
+auto content = php::file_get_contents("/path/to/file.txt");
+php::file_put_contents("/path/to/file.txt", "content");
+
+// Array manipulation (requires reference)
+Array arr{5, 2, 8, 1, 9};
+Reference ref = arr.toReference();
+
+php::sort(ref);                         // Sort array
+php::rsort(ref);                        // Reverse sort
+php::shuffle(ref);                      // Shuffle
+php::array_push(ref, 10, 11);          // Push elements
+php::array_pop(ref);                    // Pop element
+php::array_shift(ref);                  // Shift element
+php::array_unshift(ref, 0);            // Unshift element
+
+// String operations
+auto upper = php::strtoupper("hello");
+auto lower = php::strtolower("HELLO");
+auto length = php::strlen("hello");
+auto pos = php::strpos("hello world", "world");
+
+// Math operations
+auto max_val = php::max({1, 2, 3, 4, 5});
+auto min_val = php::min({1, 2, 3, 4, 5});
+auto sum = php::array_sum(Array{1, 2, 3, 4, 5});
+auto rand_val = php::rand(1, 100);
+
+// JSON operations
+Array data{{"name", "PHPX"}, {"version", 8.2}};
+auto json_str = php::json_encode(data);
+auto decoded = php::json_decode(json_str, true);
+
+// Other useful functions
+php::sleep(2);                          // Sleep 2 seconds
+auto time = php::time();                // Current timestamp
+auto date = php::date("Y-m-d H:i:s");  // Formatted date
+```
+
+### 5. Built-in Class Facade Encapsulation
+
+PHPX provides facade classes for popular PHP extensions:
+
+```cpp
+#include "phpx.h"
+#include "phpx_class.h"
+
+using namespace php;
+
+// Redis example
+Redis redis{};
+redis.connect("127.0.0.1", 6379);
+
+// String operations
+redis.set("name", "PHPX");
+redis.set("version", "8.2");
+auto name = redis.get("name");
+echo("Name: ", name.toCString());
+
+// Check existence
+if (redis.exists("name")) {
+    echo("Key exists");
+}
+
+// Multiple operations
+redis.mset({
+    {"key1", "value1"},
+    {"key2", "value2"},
+    {"key3", "value3"}
+});
+
+auto values = redis.mget({"key1", "key2", "key3"});
+
+// List operations
+redis.rpush("mylist", "item1");
+redis.rpush("mylist", "item2");
+auto list_len = redis.llen("mylist");
+
+// Hash operations
+redis.hset("user:1", "name", "John");
+redis.hset("user:1", "email", "john@example.com");
+auto user_name = redis.hget("user:1", "name");
+
+// Set expiration
+redis.expire("name", 3600);  // Expire in 1 hour
+
+// Delete keys
+redis.del("key1", "key2");
+
+// Close connection
+redis.close();
+```
+
+**Note:** To use Redis facade, ensure the Redis extension is loaded in your PHP environment.
 
 ## Documentation
 
