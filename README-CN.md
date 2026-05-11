@@ -9,63 +9,63 @@
 [![Latest Release](https://img.shields.io/github/release/swoole/phpx.svg)](https://github.com/swoole/phpx/releases/)
 [![Codecov](https://codecov.io/gh/swoole/phpx/branch/master/graph/badge.svg)](https://codecov.io/gh/swoole/phpx)
 
-C++ wrapper for Zend API
+Zend API 的 C++ 封装库
 
-[简体中文](README-CN.md)
+[English](README.md)
 
-## Requirements
+## 系统要求
 
-- PHP 8.2 or later
+- PHP 8.2 或更高版本
 - Linux/macOS/Windows
-- GCC 9 or later (with C++17 support)
+- GCC 9 或更高版本（支持 C++17）
 - Composer
 
-## Installation
+## 安装
 
-### Build libphpx.so
+### 编译 libphpx.so
 
 ```shell
-# Standard build (Release mode)
+# 标准构建（Release 模式）
 cmake .
 make -j 4
 sudo make install
 sudo ldconfig
 ```
 
-### Debug Mode (for troubleshooting)
+### Debug 模式（用于排查问题）
 
 ```shell
-# Clean previous builds
+# 清理之前的构建
 cmake --build . --target clean
 
-# Configure Debug mode (includes debug symbols and runtime checks)
+# 配置 Debug 模式（包含调试符号和运行时检查）
 cmake -DCMAKE_BUILD_TYPE=Debug .
 
-# Compile
+# 编译
 make -j 4
 sudo make install
 sudo ldconfig
 ```
 
-**Debug Mode Features:**
-- ✅ Generates complete debug symbols
-- ✅ Disables compiler optimizations for easier debugging
-- ✅ Enables runtime error checking
-- ✅ More detailed compilation output
+**Debug 模式特性：**
+- ✅ 生成完整的调试符号
+- ✅ 禁用编译器优化，便于单步调试
+- ✅ 启用运行时错误检查
+- ✅ 更详细的编译输出信息
 
-## Quick Start
+## 快速开始
 
-### Create a New Extension Project
+### 创建新的扩展项目
 
 ```shell
-# Create extension project
+# 创建扩展项目
 composer create-project swoole/phpx-ext test
 cd test
 ```
 
-### Basic Usage Example
+### 基本用法示例
 
-Here's a simple example of creating a PHP extension with PHPX:
+以下是使用 PHPX 创建 PHP 扩展的简单示例：
 
 ```cpp
 #include "phpx.h"
@@ -73,29 +73,29 @@ Here's a simple example of creating a PHP extension with PHPX:
 using namespace std;
 using namespace phpx;
 
-// Define a simple function
+// 定义一个简单的函数
 ZEND_FUNCTION(hello_world)
 {
     RETURN_STRING("Hello, World!");
 }
 
-// Module initialization
+// 模块初始化
 ZEND_MINIT_FUNCTION(test)
 {
-    // Register functions
+    // 注册函数
     REGISTER_FUNCTION(hello_world);
     
     return SUCCESS;
 }
 ```
 
-### Generate ArgInfo & Function Entries
+### 生成 ArgInfo 和函数入口
 
 ```shell
 php vendor/swoole/phpx/bin/gen_stub.php your_stub_dir
 ```
 
-### Build Your Extension
+### 构建你的扩展
 
 ```shell
 cd test
@@ -104,38 +104,38 @@ make -j 4
 make install
 ```
 
-### Load Your Extension
+### 加载你的扩展
 
-Edit `php.ini` and add:
+编辑 `php.ini` 并添加：
 ```ini
 extension=test.so
 ```
 
-### Test Your Extension
+### 测试你的扩展
 
-Create a test file `test.php`:
+创建测试文件 `test.php`：
 ```php
 <?php
 echo hello_world() . "\n";
 ?>
 ```
 
-Run it:
+运行它：
 ```shell
 php test.php
 ```
 
-Expected output:
+预期输出：
 ```
 Hello, World!
 ```
 
-## Advanced Usage
+## 高级用法
 
-### Creating Classes
+### 创建类
 
 ```cpp
-// Define a class
+// 定义一个类
 Class myClass("MyClass");
 myClass.addMethod("greet", ZEND_FN(greet_method));
 myClass.registerClass();
@@ -146,7 +146,7 @@ ZEND_METHOD(MyClass, greet_method)
 }
 ```
 
-### Working with Arrays
+### 数组操作
 
 ```cpp
 ZEND_FUNCTION(array_example)
@@ -160,13 +160,13 @@ ZEND_FUNCTION(array_example)
 }
 ```
 
-### Error Handling
+### 错误处理
 
 ```cpp
 ZEND_FUNCTION(error_example)
 {
     if (some_condition) {
-        zend_throw_error(NULL, "Something went wrong!");
+        zend_throw_error(NULL, "出错了！");
         RETURN_FALSE;
     }
     
@@ -174,29 +174,29 @@ ZEND_FUNCTION(error_example)
 }
 ```
 
-## Documentation
+## 文档
 
-For more detailed documentation, please check:
-- [Architecture Guide](docs/architecture.md)
-- [API Reference](docs/api-reference.md)
-- [Quick Start Guide](docs/quickstart.md)
-- [Testing Guide](docs/testing-guide.md)
-- [Debugging Guide](docs/debugging-guide.md)
+更多详细文档请查看：
+- [架构指南](docs/architecture.md)
+- [API 参考](docs/api-reference.md)
+- [快速入门](docs/quickstart.md)
+- [测试指南](docs/testing-guide.md)
+- [调试指南](docs/debugging-guide.md)
 
-## Examples
+## 示例
 
-Check out the [examples directory](examples/) for more comprehensive examples including:
-- Bloom filter implementation
-- Queue data structure
-- RocksDB integration
-- GTK application
-- And more!
+查看 [examples 目录](examples/) 获取更多综合示例，包括：
+- Bloom filter 实现
+- 队列数据结构
+- RocksDB 集成
+- GTK 应用程序
+- 以及更多！
 
-## Language
+## 语言
 
 - [English](README.md)
 - [中文](README-CN.md)
 
-## License
+## 许可证
 
-PHPX is open-sourced software licensed under the [Apache License 2.0](LICENSE).
+PHPX 是根据 [Apache License 2.0](LICENSE) 许可的开源软件。
