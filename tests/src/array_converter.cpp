@@ -154,3 +154,85 @@ TEST(array_converter, nested_different_sizes) {
         }
     }
 }
+
+TEST(array_converter, std_vector_int) {
+    StdVector<Int> vec;
+    vec.push_back(10);
+    vec.push_back(20);
+    vec.push_back(30);
+    vec.offsetSet(1, 42);
+
+    ASSERT_EQ(vec.size(), 3);
+    ASSERT_EQ(vec.offsetGet(0), 10);
+    ASSERT_EQ(vec.offsetGet(1), 42);
+    ASSERT_EQ(vec[2], 30);
+
+    Array parr = toArray(vec);
+    ASSERT_EQ(parr.count(), 3);
+    ASSERT_EQ(parr.get(0).toInt(), 10);
+    ASSERT_EQ(parr.get(1).toInt(), 42);
+    ASSERT_EQ(parr.get(2).toInt(), 30);
+}
+
+TEST(array_converter, std_vector_float_with_size) {
+    StdVector<Float> vec(3);
+    vec.offsetSet(0, 1.25);
+    vec.offsetSet(2, 3.75);
+
+    Array parr = toArray(vec);
+    ASSERT_EQ(parr.count(), 3);
+    EXPECT_DOUBLE_EQ(parr.get(0).toFloat(), 1.25);
+    EXPECT_DOUBLE_EQ(parr.get(1).toFloat(), 0.0);
+    EXPECT_DOUBLE_EQ(parr.get(2).toFloat(), 3.75);
+}
+
+TEST(array_converter, std_map_int_key) {
+    StdMap<Int> map;
+    map.offsetSet(10, 100);
+    map.offsetSet(20, 200);
+    map.offsetGet(20) += 22;
+
+    ASSERT_EQ(map.size(), 2);
+    ASSERT_EQ(map.offsetGet(10), 100);
+    ASSERT_EQ(map[20], 222);
+
+    Array parr = toArray(map);
+    ASSERT_EQ(parr.count(), 2);
+    ASSERT_EQ(parr.get(10).toInt(), 100);
+    ASSERT_EQ(parr.get(20).toInt(), 222);
+}
+
+TEST(array_converter, std_unordered_map_int_key) {
+    StdUnorderedMap<Float> map;
+    map.offsetSet(7, 1.5);
+    map.offsetSet(9, 2.5);
+    map.offsetGet(9) += 0.25;
+
+    ASSERT_EQ(map.size(), 2);
+    EXPECT_DOUBLE_EQ(map.offsetGet(7), 1.5);
+    EXPECT_DOUBLE_EQ(map[9], 2.75);
+
+    Array parr = toArray(map);
+    ASSERT_EQ(parr.count(), 2);
+    EXPECT_DOUBLE_EQ(parr.get(7).toFloat(), 1.5);
+    EXPECT_DOUBLE_EQ(parr.get(9).toFloat(), 2.75);
+}
+
+TEST(array_converter, nested_std_containers) {
+    StdVector<StdMap<Int>> rows(2);
+    rows.offsetGet(0).offsetSet(10, 100);
+    rows.offsetGet(0).offsetSet(20, 200);
+    rows.offsetGet(1).offsetSet(30, 300);
+
+    Array parr = toArray(rows);
+    ASSERT_EQ(parr.count(), 2);
+
+    Array row0 = toArray(parr.get(0));
+    ASSERT_EQ(row0.count(), 2);
+    ASSERT_EQ(row0.get(10).toInt(), 100);
+    ASSERT_EQ(row0.get(20).toInt(), 200);
+
+    Array row1 = toArray(parr.get(1));
+    ASSERT_EQ(row1.count(), 1);
+    ASSERT_EQ(row1.get(30).toInt(), 300);
+}

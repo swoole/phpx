@@ -336,10 +336,137 @@ class StdArray {
 };
 
 template <typename T>
+class StdVector {
+  private:
+    std::vector<T> data_;
+
+  public:
+    StdVector() = default;
+    explicit StdVector(std::size_t size) : data_(size) {}
+    StdVector(std::initializer_list<T> init) : data_(init) {}
+    void push_back(const T &value) {
+        data_.push_back(value);
+    }
+    void offsetSet(Int index, const T &value) {
+        data_[safeIndex(index, data_.size())] = value;
+    }
+    const T &offsetGet(Int index) const {
+        return data_[safeIndex(index, data_.size())];
+    }
+    T &offsetGet(Int index) {
+        return data_[safeIndex(index, data_.size())];
+    }
+    std::size_t size() const noexcept {
+        return data_.size();
+    }
+    T &operator[](Int index) {
+        return offsetGet(index);
+    }
+    const T &operator[](Int index) const {
+        return offsetGet(index);
+    }
+    auto begin() const noexcept {
+        return data_.begin();
+    }
+    auto end() const noexcept {
+        return data_.end();
+    }
+};
+
+template <typename T>
+class StdMap {
+  private:
+    std::map<Int, T> data_;
+
+  public:
+    StdMap() = default;
+    void offsetSet(Int key, const T &value) {
+        data_[key] = value;
+    }
+    const T &offsetGet(Int key) const {
+        return data_.at(key);
+    }
+    T &offsetGet(Int key) {
+        return data_[key];
+    }
+    std::size_t size() const noexcept {
+        return data_.size();
+    }
+    T &operator[](Int key) {
+        return offsetGet(key);
+    }
+    const T &operator[](Int key) const {
+        return offsetGet(key);
+    }
+    auto begin() const noexcept {
+        return data_.begin();
+    }
+    auto end() const noexcept {
+        return data_.end();
+    }
+};
+
+template <typename T>
+class StdUnorderedMap {
+  private:
+    std::unordered_map<Int, T> data_;
+
+  public:
+    StdUnorderedMap() = default;
+    void offsetSet(Int key, const T &value) {
+        data_[key] = value;
+    }
+    const T &offsetGet(Int key) const {
+        return data_.at(key);
+    }
+    T &offsetGet(Int key) {
+        return data_[key];
+    }
+    std::size_t size() const noexcept {
+        return data_.size();
+    }
+    T &operator[](Int key) {
+        return offsetGet(key);
+    }
+    const T &operator[](Int key) const {
+        return offsetGet(key);
+    }
+    auto begin() const noexcept {
+        return data_.begin();
+    }
+    auto end() const noexcept {
+        return data_.end();
+    }
+};
+
+template <typename T>
 struct is_std_array : std::false_type {};
 
 template <typename T, std::size_t N>
 struct is_std_array<StdArray<T, N>> : std::true_type {};
+
+template <typename T>
+struct is_std_vector : std::false_type {};
+
+template <typename T>
+struct is_std_vector<StdVector<T>> : std::true_type {};
+
+template <typename T>
+struct is_std_map : std::false_type {};
+
+template <typename T>
+struct is_std_map<StdMap<T>> : std::true_type {};
+
+template <typename T>
+struct is_std_unordered_map : std::false_type {};
+
+template <typename T>
+struct is_std_unordered_map<StdUnorderedMap<T>> : std::true_type {};
+
+template <typename T>
+struct is_std_container : std::integral_constant<bool,
+                                                 is_std_array<T>::value || is_std_vector<T>::value ||
+                                                     is_std_map<T>::value || is_std_unordered_map<T>::value> {};
 
 class Variant {
   protected:
@@ -1092,10 +1219,43 @@ class Array : public Variant {
     template <typename T, std::size_t N>
     void copyFrom(const StdArray<T, N> &arr) {
         for (std::size_t i = 0; i < N; ++i) {
-            if constexpr (is_std_array<T>::value) {
+            if constexpr (is_std_container<T>::value) {
                 set(i, Array(arr[i]));
             } else {
                 set(i, Variant(arr[i]));
+            }
+        }
+    }
+
+    template <typename T>
+    void copyFrom(const StdVector<T> &arr) {
+        for (std::size_t i = 0; i < arr.size(); ++i) {
+            if constexpr (is_std_container<T>::value) {
+                set(i, Array(arr[i]));
+            } else {
+                set(i, Variant(arr[i]));
+            }
+        }
+    }
+
+    template <typename T>
+    void copyFrom(const StdMap<T> &map) {
+        for (const auto &item : map) {
+            if constexpr (is_std_container<T>::value) {
+                set(Variant(item.first), Array(item.second));
+            } else {
+                set(Variant(item.first), Variant(item.second));
+            }
+        }
+    }
+
+    template <typename T>
+    void copyFrom(const StdUnorderedMap<T> &map) {
+        for (const auto &item : map) {
+            if constexpr (is_std_container<T>::value) {
+                set(Variant(item.first), Array(item.second));
+            } else {
+                set(Variant(item.first), Variant(item.second));
             }
         }
     }
@@ -1134,6 +1294,24 @@ class Array : public Variant {
         copyFrom(arr);
     }
 
+    template <typename T>
+    Array(const StdVector<T> &arr) {
+        array_init(&val);
+        copyFrom(arr);
+    }
+
+    template <typename T>
+    Array(const StdMap<T> &map) {
+        array_init(&val);
+        copyFrom(map);
+    }
+
+    template <typename T>
+    Array(const StdUnorderedMap<T> &map) {
+        array_init(&val);
+        copyFrom(map);
+    }
+
     Array &operator=(const ArrayList &list);
     Array &operator=(const StrKeyMap &list);
     Array &operator=(const StdStrKeyMap &list);
@@ -1143,6 +1321,27 @@ class Array : public Variant {
     Array &operator=(const StdArray<T, N> &arr) {
         rebuild();
         copyFrom(arr);
+        return *this;
+    }
+
+    template <typename T>
+    Array &operator=(const StdVector<T> &arr) {
+        rebuild();
+        copyFrom(arr);
+        return *this;
+    }
+
+    template <typename T>
+    Array &operator=(const StdMap<T> &map) {
+        rebuild();
+        copyFrom(map);
+        return *this;
+    }
+
+    template <typename T>
+    Array &operator=(const StdUnorderedMap<T> &map) {
+        rebuild();
+        copyFrom(map);
         return *this;
     }
 
@@ -1426,6 +1625,24 @@ static inline Reference getEmptyArrayRef() {
 template <typename T, std::size_t N>
 static inline Array toArray(const StdArray<T, N> &arr) {
     Array result(arr);
+    return result;
+}
+
+template <typename T>
+static inline Array toArray(const StdVector<T> &arr) {
+    Array result(arr);
+    return result;
+}
+
+template <typename T>
+static inline Array toArray(const StdMap<T> &map) {
+    Array result(map);
+    return result;
+}
+
+template <typename T>
+static inline Array toArray(const StdUnorderedMap<T> &map) {
+    Array result(map);
     return result;
 }
 
