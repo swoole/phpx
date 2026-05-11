@@ -23,6 +23,9 @@
 #include <functional>
 #include <vector>
 
+static_assert(sizeof(zend_long) == sizeof(int64_t));
+static_assert(__cplusplus >= 201703L);
+
 namespace php {
 typedef unsigned char uchar;
 typedef zend_long Int;

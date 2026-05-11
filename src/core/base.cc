@@ -253,7 +253,6 @@ Object catchException() {
 }
 
 Int toSize(const String &str) {
-#if PHP_VERSION_ID >= 80200
     zend_string *errstr;
     Int size = zend_ini_parse_quantity(str.str(), &errstr);
     if (errstr) {
@@ -261,9 +260,6 @@ Int toSize(const String &str) {
         zend_string_release(errstr);
     }
     return size;
-#else
-    return zend_atol(str.data(), str.length());
-#endif
 }
 
 static void free_fci_cache(zval *el) {
@@ -458,11 +454,7 @@ static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_
     } break;
     case ZEND_EVAL: {
         char *eval_desc = zend_make_compiled_string_description("eval()");
-#if PHP_VERSION_ID < 80200
-        new_op_array = zend_compile_string(inc_filename, eval_desc);
-#else
         new_op_array = zend_compile_string(inc_filename, eval_desc, ZEND_COMPILE_POSITION_AFTER_OPEN_TAG);
-#endif
         efree(eval_desc);
     } break;
     case ZEND_INCLUDE:
@@ -668,7 +660,7 @@ uint32_t getPropertyOffset(const String &class_name, const String &prop) {
 uint32_t getPropertyOffset(zend_class_entry *ce, const String &prop) {
     auto prev_scope = EG(fake_scope);
     EG(fake_scope) = ce;
-    auto prop_info = zend_get_property_info(ce, prop.str(), 0);
+    auto prop_info = zend_get_property_info(ce, prop.str(), 1);
     if (UNEXPECTED(!prop_info)) {
         throwError("property '%s::%s' is undefined.", ce->name->val, prop.toCString());
         return 0;

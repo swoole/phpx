@@ -16,10 +16,6 @@
 
 #include "phpx.h"
 
-#if PHP_VERSION_ID < 80200
-#define zend_string_toupper php_string_toupper
-#endif
-
 namespace php {
 String String::format(const char *format, ...) {
     va_list args;

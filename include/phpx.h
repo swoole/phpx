@@ -33,8 +33,8 @@ extern "C" {
 #include "phpx_types.h"
 #include "phpx_compat.h"
 
-#if PHP_VERSION_ID < 80100
-#error "only supports PHP-8.1 or later."
+#if PHP_VERSION_ID < 80200
+#error "only supports PHP-8.2 or later."
 #endif
 
 #include <unordered_map>
@@ -1435,9 +1435,7 @@ extern PHPX_API Int zero;
 extern PHPX_API Variant true_;
 extern PHPX_API Variant false_;
 
-#if PHP_VERSION_ID >= 80200
 extern Object newClosure(const ClosureFn &fn, const ArgList &uses = {}, const Object &_this = {});
-#endif
 
 extern Object newObject(zend_class_entry *ce);
 extern Object newObject(zend_class_entry *ce, Args &args, zend_array *named_args = nullptr);
