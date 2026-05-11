@@ -202,6 +202,22 @@ TEST(array_converter, std_map_int_key) {
     ASSERT_EQ(parr.get(20).toInt(), 222);
 }
 
+TEST(array_converter, std_map_string_key) {
+    StdMap<Int, Str> map;
+    map.offsetSet("alpha", 10);
+    map.offsetSet("beta", 20);
+    map.offsetGet("beta") += 22;
+
+    ASSERT_EQ(map.size(), 2);
+    ASSERT_EQ(map.offsetGet("alpha"), 10);
+    ASSERT_EQ(map[String("beta")], 42);
+
+    Array parr = toArray(map);
+    ASSERT_EQ(parr.count(), 2);
+    ASSERT_EQ(parr.get("alpha").toInt(), 10);
+    ASSERT_EQ(parr.get("beta").toInt(), 42);
+}
+
 TEST(array_converter, std_unordered_map_int_key) {
     StdUnorderedMap<Float> map;
     map.offsetSet(7, 1.5);
@@ -216,6 +232,22 @@ TEST(array_converter, std_unordered_map_int_key) {
     ASSERT_EQ(parr.count(), 2);
     EXPECT_DOUBLE_EQ(parr.get(7).toFloat(), 1.5);
     EXPECT_DOUBLE_EQ(parr.get(9).toFloat(), 2.75);
+}
+
+TEST(array_converter, std_unordered_map_string_key) {
+    StdUnorderedMap<Float, Str> map;
+    map.offsetSet("alpha", 1.5);
+    map.offsetSet("beta", 2.5);
+    map.offsetGet("beta") += 0.25;
+
+    ASSERT_EQ(map.size(), 2);
+    EXPECT_DOUBLE_EQ(map.offsetGet("alpha"), 1.5);
+    EXPECT_DOUBLE_EQ(map[String("beta")], 2.75);
+
+    Array parr = toArray(map);
+    ASSERT_EQ(parr.count(), 2);
+    EXPECT_DOUBLE_EQ(parr.get("alpha").toFloat(), 1.5);
+    EXPECT_DOUBLE_EQ(parr.get("beta").toFloat(), 2.75);
 }
 
 TEST(array_converter, nested_std_containers) {

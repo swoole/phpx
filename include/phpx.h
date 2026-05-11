@@ -373,29 +373,42 @@ class StdVector {
     }
 };
 
-template <typename T>
+struct StdStringLess {
+    bool operator()(const String &a, const String &b) const;
+};
+
+struct StdStringHash {
+    std::size_t operator()(const String &key) const;
+};
+
+struct StdStringEqual {
+    bool operator()(const String &a, const String &b) const;
+};
+
+template <typename T, typename K = Int>
 class StdMap {
   private:
-    std::map<Int, T> data_;
+    using Compare = typename std::conditional<std::is_same<K, String>::value, StdStringLess, std::less<K>>::type;
+    std::map<K, T, Compare> data_;
 
   public:
     StdMap() = default;
-    void offsetSet(Int key, const T &value) {
+    void offsetSet(const K &key, const T &value) {
         data_[key] = value;
     }
-    const T &offsetGet(Int key) const {
+    const T &offsetGet(const K &key) const {
         return data_.at(key);
     }
-    T &offsetGet(Int key) {
+    T &offsetGet(const K &key) {
         return data_[key];
     }
     std::size_t size() const noexcept {
         return data_.size();
     }
-    T &operator[](Int key) {
+    T &operator[](const K &key) {
         return offsetGet(key);
     }
-    const T &operator[](Int key) const {
+    const T &operator[](const K &key) const {
         return offsetGet(key);
     }
     auto begin() const noexcept {
@@ -406,29 +419,31 @@ class StdMap {
     }
 };
 
-template <typename T>
+template <typename T, typename K = Int>
 class StdUnorderedMap {
   private:
-    std::unordered_map<Int, T> data_;
+    using Hash = typename std::conditional<std::is_same<K, String>::value, StdStringHash, std::hash<K>>::type;
+    using Equal = typename std::conditional<std::is_same<K, String>::value, StdStringEqual, std::equal_to<K>>::type;
+    std::unordered_map<K, T, Hash, Equal> data_;
 
   public:
     StdUnorderedMap() = default;
-    void offsetSet(Int key, const T &value) {
+    void offsetSet(const K &key, const T &value) {
         data_[key] = value;
     }
-    const T &offsetGet(Int key) const {
+    const T &offsetGet(const K &key) const {
         return data_.at(key);
     }
-    T &offsetGet(Int key) {
+    T &offsetGet(const K &key) {
         return data_[key];
     }
     std::size_t size() const noexcept {
         return data_.size();
     }
-    T &operator[](Int key) {
+    T &operator[](const K &key) {
         return offsetGet(key);
     }
-    const T &operator[](Int key) const {
+    const T &operator[](const K &key) const {
         return offsetGet(key);
     }
     auto begin() const noexcept {
@@ -454,14 +469,14 @@ struct is_std_vector<StdVector<T>> : std::true_type {};
 template <typename T>
 struct is_std_map : std::false_type {};
 
-template <typename T>
-struct is_std_map<StdMap<T>> : std::true_type {};
+template <typename T, typename K>
+struct is_std_map<StdMap<T, K>> : std::true_type {};
 
 template <typename T>
 struct is_std_unordered_map : std::false_type {};
 
-template <typename T>
-struct is_std_unordered_map<StdUnorderedMap<T>> : std::true_type {};
+template <typename T, typename K>
+struct is_std_unordered_map<StdUnorderedMap<T, K>> : std::true_type {};
 
 template <typename T>
 struct is_std_container : std::integral_constant<bool,
@@ -1134,6 +1149,18 @@ class String : public Variant {
     void print() const;
 };
 
+inline bool StdStringLess::operator()(const String &a, const String &b) const {
+    return zend_binary_strcmp(a.data(), a.length(), b.data(), b.length()) < 0;
+}
+
+inline std::size_t StdStringHash::operator()(const String &key) const {
+    return zend_string_hash_val(key.str());
+}
+
+inline bool StdStringEqual::operator()(const String &a, const String &b) const {
+    return zend_string_equals(a.str(), b.str());
+}
+
 class ArrayKeyValue {
   public:
     Variant key;
@@ -1238,8 +1265,8 @@ class Array : public Variant {
         }
     }
 
-    template <typename T>
-    void copyFrom(const StdMap<T> &map) {
+    template <typename T, typename K>
+    void copyFrom(const StdMap<T, K> &map) {
         for (const auto &item : map) {
             if constexpr (is_std_container<T>::value) {
                 set(Variant(item.first), Array(item.second));
@@ -1249,8 +1276,8 @@ class Array : public Variant {
         }
     }
 
-    template <typename T>
-    void copyFrom(const StdUnorderedMap<T> &map) {
+    template <typename T, typename K>
+    void copyFrom(const StdUnorderedMap<T, K> &map) {
         for (const auto &item : map) {
             if constexpr (is_std_container<T>::value) {
                 set(Variant(item.first), Array(item.second));
@@ -1300,14 +1327,14 @@ class Array : public Variant {
         copyFrom(arr);
     }
 
-    template <typename T>
-    Array(const StdMap<T> &map) {
+    template <typename T, typename K>
+    Array(const StdMap<T, K> &map) {
         array_init(&val);
         copyFrom(map);
     }
 
-    template <typename T>
-    Array(const StdUnorderedMap<T> &map) {
+    template <typename T, typename K>
+    Array(const StdUnorderedMap<T, K> &map) {
         array_init(&val);
         copyFrom(map);
     }
@@ -1331,15 +1358,15 @@ class Array : public Variant {
         return *this;
     }
 
-    template <typename T>
-    Array &operator=(const StdMap<T> &map) {
+    template <typename T, typename K>
+    Array &operator=(const StdMap<T, K> &map) {
         rebuild();
         copyFrom(map);
         return *this;
     }
 
-    template <typename T>
-    Array &operator=(const StdUnorderedMap<T> &map) {
+    template <typename T, typename K>
+    Array &operator=(const StdUnorderedMap<T, K> &map) {
         rebuild();
         copyFrom(map);
         return *this;
@@ -1634,14 +1661,14 @@ static inline Array toArray(const StdVector<T> &arr) {
     return result;
 }
 
-template <typename T>
-static inline Array toArray(const StdMap<T> &map) {
+template <typename T, typename K>
+static inline Array toArray(const StdMap<T, K> &map) {
     Array result(map);
     return result;
 }
 
-template <typename T>
-static inline Array toArray(const StdUnorderedMap<T> &map) {
+template <typename T, typename K>
+static inline Array toArray(const StdUnorderedMap<T, K> &map) {
     Array result(map);
     return result;
 }
