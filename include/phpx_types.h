@@ -24,7 +24,12 @@
 #include <vector>
 
 static_assert(sizeof(zend_long) == sizeof(int64_t));
-static_assert(__cplusplus >= 201703L);
+#ifdef _MSVC_LANG
+#define PHPX_CPP_STD _MSVC_LANG
+#else
+#define PHPX_CPP_STD __cplusplus
+#endif
+static_assert(PHPX_CPP_STD >= 201703L);
 
 namespace php {
 typedef unsigned char uchar;
