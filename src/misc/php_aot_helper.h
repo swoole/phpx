@@ -16,7 +16,28 @@ struct Scope {
     zend_class_entry *ce;
     zend_execute_data *frame;
 };
+
+class UnsafePtr : public php::Box {
+  public:
+    void *ptr;
+    uint32_t type_id;
+
+    UnsafePtr(void *ptr, uint32_t type_id) : ptr(ptr), type_id(type_id) {}
+};
 };  // namespace php
+
+static inline php::Var php_create_unsafe_ptr(void *ptr, uint32_t type_id) {
+    return php::Var(new php::UnsafePtr(ptr, type_id));
+}
+
+template <typename T>
+static inline T &php_unsafe_cast(php::Var &unsafePtr, uint32_t type_id) {
+    auto *ptr = unsafePtr.toBox<php::UnsafePtr>();
+    if (UNEXPECTED(ptr->type_id != type_id)) {
+        php::throwException(zend_ce_type_error, "std::unsafe_cast(): UnsafePtr type `%d` mismatch", type_id);
+    }
+    return *reinterpret_cast<T *>(ptr->ptr);
+}
 
 extern const char *php_get_called_class(php::Object &this_);
 extern zend_class_entry *php_get_called_ce(php::Object &this_);

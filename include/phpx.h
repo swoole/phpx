@@ -110,6 +110,7 @@ PHPX_API Variant call(zend_function *func, const ArgList &args, zend_array *name
 PHPX_API Variant call(zend_class_entry *ce, zend_function *func, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_class_entry *ce, zend_function *func, const ArgList &args, zend_array *named_args = nullptr);
 PHPX_API Variant throwException(const String &class_name, const char *message, int code = 0);
+PHPX_API Variant throwException(zend_class_entry *ce, const char *message, int code = 0);
 PHPX_API Variant throwException(const Object &e);
 PHPX_API bool empty(const Variant &v, const OperationChain &list);
 PHPX_API bool empty(const Variant &v, const OperationChain &list, Variant &result);
