@@ -134,7 +134,7 @@ static inline String toString(const Variant &v) {
     return v.toString();
 }
 
-static inline const String &toString(const String &v) {
+static inline String toString(const String &v) {
     return v;
 }
 

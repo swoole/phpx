@@ -337,6 +337,12 @@ class StdArray {
     const T &at(std::size_t index) const {
         return offsetGet(index);
     }
+    auto begin() const noexcept {
+        return data_.begin();
+    }
+    auto end() const noexcept {
+        return data_.end();
+    }
 };
 
 template <typename T>
@@ -392,7 +398,7 @@ struct StdStringEqual {
     bool operator()(const String &a, const String &b) const;
 };
 
-template <typename T, typename K = Int>
+template <typename K, typename T>
 class StdMap {
   private:
     using Compare = typename std::conditional<std::is_same<K, String>::value, StdStringLess, std::less<K>>::type;
@@ -429,7 +435,7 @@ class StdMap {
     }
 };
 
-template <typename T, typename K = Int>
+template <typename K, typename T>
 class StdUnorderedMap {
   private:
     using Hash = typename std::conditional<std::is_same<K, String>::value, StdStringHash, std::hash<K>>::type;

@@ -187,7 +187,7 @@ TEST(array_converter, std_vector_float_with_size) {
 }
 
 TEST(array_converter, std_map_int_key) {
-    StdMap<Int> map;
+    StdMap<Int, Int> map;
     map.offsetSet(10, 100);
     map.offsetSet(20, 200);
     map.offsetGet(20) += 22;
@@ -203,7 +203,7 @@ TEST(array_converter, std_map_int_key) {
 }
 
 TEST(array_converter, std_map_string_key) {
-    StdMap<Int, Str> map;
+    StdMap<Str, Int> map;
     map.offsetSet("alpha", 10);
     map.offsetSet("beta", 20);
     map.offsetGet("beta") += 22;
@@ -219,7 +219,7 @@ TEST(array_converter, std_map_string_key) {
 }
 
 TEST(array_converter, std_unordered_map_int_key) {
-    StdUnorderedMap<Float> map;
+    StdUnorderedMap<Int, Float> map;
     map.offsetSet(7, 1.5);
     map.offsetSet(9, 2.5);
     map.offsetGet(9) += 0.25;
@@ -235,7 +235,7 @@ TEST(array_converter, std_unordered_map_int_key) {
 }
 
 TEST(array_converter, std_unordered_map_string_key) {
-    StdUnorderedMap<Float, Str> map;
+    StdUnorderedMap<Str, Float> map;
     map.offsetSet("alpha", 1.5);
     map.offsetSet("beta", 2.5);
     map.offsetGet("beta") += 0.25;
@@ -251,7 +251,7 @@ TEST(array_converter, std_unordered_map_string_key) {
 }
 
 TEST(array_converter, nested_std_containers) {
-    StdVector<StdMap<Int>> rows(2);
+    StdVector<StdMap<Int, Int>> rows(2);
     rows.offsetGet(0).offsetSet(10, 100);
     rows.offsetGet(0).offsetSet(20, 200);
     rows.offsetGet(1).offsetSet(30, 300);
