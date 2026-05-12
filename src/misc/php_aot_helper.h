@@ -34,7 +34,7 @@ template <typename T>
 static inline T &php_unsafe_cast(php::Var &unsafePtr, uint32_t type_id) {
     auto *ptr = unsafePtr.toBox<php::UnsafePtr>();
     if (UNEXPECTED(ptr->type_id != type_id)) {
-        php::throwException(zend_ce_type_error, "std::unsafe_cast(): UnsafePtr type `%d` mismatch", type_id);
+        php::throwException(zend_ce_type_error, "std::unsafe_cast(): UnsafePtr type mismatch");
     }
     return *reinterpret_cast<T *>(ptr->ptr);
 }
