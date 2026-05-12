@@ -266,11 +266,6 @@ Object toObject(const Variant &v, const String &class_name) {
         throwError("class '%s' is undefined.", class_name.toCString());
         return {};
     }
-    if (UNEXPECTED(!instanceof_function(v.ce(), ce))) {
-        throwError(
-            "must be instance of class `%s`, object of `%s` given", class_name.toCString(), ZSTR_VAL(v.ce()->name));
-        return {};
-    }
-    return Object{v.unwrap_ptr()};
+    return toObject(v, ce);
 }
 }  // namespace php

@@ -1673,6 +1673,21 @@ static inline Array toArray(const StdUnorderedMap<T, K> &map) {
     return result;
 }
 
+static inline Object toObject(const Variant &v, zend_class_entry *ce, bool strict = false) {
+    if (UNEXPECTED(!v.isObject())) {
+        throwError("The parameter `object` must be `object`, got `%s`", v.typeStr());
+        return {};
+    }
+    bool typeof_ce = strict ? v.ce() != ce : !instanceof_function(v.ce(), ce);
+    if (UNEXPECTED(typeof_ce)) {
+        throwError("The parameter `object` must be instance of class `%s`, object of `%s` given",
+                   ZSTR_VAL(ce->name),
+                   ZSTR_VAL(v.ce()->name));
+        return {};
+    }
+    return Object{v.unwrap_ptr()};
+}
+
 extern PHPX_API Variant null;
 extern PHPX_API Object null_object;
 extern PHPX_API Int zero;
