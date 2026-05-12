@@ -133,7 +133,7 @@ TEST(object, mixed) {
     } catch (zend_object *ex) {
         auto e = catchException();
         auto s = e.call("getMessage");
-        ASSERT_TRUE(str_contains(s, "parameter 1 must be `object`").toBool());
+        ASSERT_TRUE(str_contains(s, "The parameter `object` must be `object`").toBool());
     }
 
     try {
@@ -141,7 +141,7 @@ TEST(object, mixed) {
     } catch (zend_object *ex) {
         auto e = catchException();
         auto s = e.call("getMessage");
-        ASSERT_TRUE(str_contains(s, "class 'TestNotExists' is undefined.").toBool());
+        ASSERT_TRUE(str_contains(s, "class 'TestNotExists' is undefined").toBool());
     }
 
     try {
