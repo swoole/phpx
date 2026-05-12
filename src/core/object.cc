@@ -257,13 +257,8 @@ Object toObject(const Variant &v) {
 }
 
 Object toObject(const Variant &v, const String &class_name) {
-    if (UNEXPECTED(!v.isObject())) {
-        throwError("parameter 1 must be `object`, got `%s`", v.typeStr());
-        return {};
-    }
-    auto ce = getClassEntry(class_name);
+    auto ce = getClassEntrySafe(class_name);
     if (UNEXPECTED(ce == nullptr)) {
-        throwError("class '%s' is undefined.", class_name.toCString());
         return {};
     }
     return toObject(v, ce);
