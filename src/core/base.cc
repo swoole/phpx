@@ -221,7 +221,7 @@ void request_shutdown() {
 }
 
 Variant throwException(const String &class_name, const char *message, int code) {
-	return throwException(getClassEntrySafe(class_name), message, code);
+    return throwException(getClassEntrySafe(class_name), message, code);
 }
 
 Variant throwException(zend_class_entry *ce, const char *message, int code) {

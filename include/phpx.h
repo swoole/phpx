@@ -319,6 +319,9 @@ class StdArray {
     T &offsetGet(std::size_t index) {
         return data_[safeIndex(index, N)];
     }
+    void offsetUnset(std::size_t index) {
+        data_[safeIndex(index, N)] = T{};
+    }
     constexpr std::size_t size() const noexcept {
         return N;
     }
@@ -356,6 +359,9 @@ class StdVector {
     }
     T &offsetGet(Int index) {
         return data_[safeIndex(index, data_.size())];
+    }
+    void offsetUnset(std::size_t index) {
+        data_[safeIndex(index, data_.size())] = T{};
     }
     std::size_t size() const noexcept {
         return data_.size();
@@ -403,6 +409,9 @@ class StdMap {
     T &offsetGet(const K &key) {
         return data_[key];
     }
+    void offsetUnset(const K &key) {
+        data_.erase(key);
+    }
     std::size_t size() const noexcept {
         return data_.size();
     }
@@ -437,6 +446,9 @@ class StdUnorderedMap {
     }
     T &offsetGet(const K &key) {
         return data_[key];
+    }
+    void offsetUnset(const K &key) {
+        data_.erase(key);
     }
     std::size_t size() const noexcept {
         return data_.size();
