@@ -797,6 +797,16 @@ class Variant {
     bool isResource() const {
         return Z_TYPE_P(unwrap_ptr()) == IS_RESOURCE;
     }
+    bool isBox() const {
+        if (UNEXPECTED(!isResource())) {
+            return false;
+        }
+        auto res = Z_RES_P(unwrap_ptr());
+        if (UNEXPECTED(res->type != getBoxResourceId())) {
+            return false;
+        }
+        return true;
+    }
     bool isReference() const {
         return Z_TYPE_P(direct_ptr()) == IS_REFERENCE;
     }
@@ -1647,8 +1657,16 @@ class Box {
     void destroy() const {
         delete this;
     }
+    uint32_t getTypeInfo() {
+    	return type_info;
+    }
+    uint32_t getExtraInfo() {
+    	return extra_info;
+    }
 
   protected:
+    uint32_t type_info = 0;
+    uint32_t extra_info = 0;
     virtual ~Box() = default;
 };
 
