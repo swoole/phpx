@@ -20,7 +20,7 @@ namespace php {
 const char *box_res_name = "php::box";
 DebugInfo debug_info{
     false,
-    "",
+    {},
     0,
 };
 
@@ -116,31 +116,83 @@ void unsetGlobal(const String &name) {
     zend_hash_del(&EG(symbol_table), name.str());
 }
 
-void setDebugInfo() {
-    if (debug_info.enable && EG(exception)) {
-        zval tmp;
-        ZVAL_STRING(&tmp, debug_info.file);
+void pushDebugFrame(const char *file, int lineno, const char *function) {
+    if (!debug_info.enable || debug_info.depth >= PHPX_MAX_DEBUG_DEPTH) {
+        return;
+    }
+    auto &frame = debug_info.frames[debug_info.depth++];
+    frame.file = file;
+    frame.line = lineno;
+    frame.function = function;
+}
 
-        auto prev_scope = EG(fake_scope);
-        EG(fake_scope) = EG(exception)->ce;
-
-        zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_FILE), &tmp);
-        zval_ptr_dtor(&tmp);
-
-        ZVAL_LONG(&tmp, debug_info.line);
-        zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_LINE), &tmp);
-
-        EG(fake_scope) = prev_scope;
+void popDebugFrame() {
+    if (debug_info.depth > 0) {
+        debug_info.depth--;
     }
 }
 
 void traceDebugInfo(const char *file, int lineno) {
-    debug_info.file = file;
-    debug_info.line = lineno;
+    if (!debug_info.enable) {
+        return;
+    }
+    if (debug_info.depth == 0) {
+        pushDebugFrame(file, lineno, nullptr);
+    } else {
+        auto &frame = debug_info.frames[debug_info.depth - 1];
+        frame.file = file;
+        frame.line = lineno;
+    }
 }
 
 void enableDebugInfo(bool enable) {
     debug_info.enable = enable;
+}
+
+void setDebugInfo() {
+    if (!debug_info.enable || debug_info.depth == 0 || !EG(exception)) {
+        return;
+    }
+
+    auto prev_scope = EG(fake_scope);
+    EG(fake_scope) = EG(exception)->ce;
+
+    // Set file/line from the top (innermost) frame
+    auto &top = debug_info.frames[debug_info.depth - 1];
+    zval tmp;
+    ZVAL_STRING(&tmp, top.file ? top.file : "");
+    zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_FILE), &tmp);
+    zval_ptr_dtor(&tmp);
+
+    ZVAL_LONG(&tmp, top.line);
+    zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_LINE), &tmp);
+
+    // Build full stack trace string
+    std::string trace;
+    char buf[512];
+    for (int i = 0; i < debug_info.depth; i++) {
+        auto &frame = debug_info.frames[i];
+        int len;
+        if (frame.function && frame.function[0]) {
+            len = snprintf(buf, sizeof(buf), "#%d %s() at %s:%d\n",
+                           i, frame.function,
+                           frame.file ? frame.file : "unknown", frame.line);
+        } else {
+            len = snprintf(buf, sizeof(buf), "#%d %s:%d\n",
+                           i, frame.file ? frame.file : "unknown", frame.line);
+        }
+        if (len > 0 && len < (int) sizeof(buf)) {
+            trace.append(buf, len);
+        }
+    }
+
+    zend_string *key = zend_string_init("debug_trace", sizeof("debug_trace") - 1, 0);
+    ZVAL_STRING(&tmp, trace.c_str());
+    zend_update_property_ex(EG(exception)->ce, EG(exception), key, &tmp);
+    zend_string_release(key);
+    zval_ptr_dtor(&tmp);
+
+    EG(fake_scope) = prev_scope;
 }
 
 Variant constant(const String &name) {

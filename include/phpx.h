@@ -118,9 +118,11 @@ PHPX_API bool exists(const Variant &v, const OperationChain &list);
 PHPX_API bool exists(const Variant &v, const OperationChain &list, Variant &result);
 PHPX_API Reference toReference(const Variant &v, const OperationChain &list);
 
-void setDebugInfo();
+void pushDebugFrame(const char *file, int lineno, const char *function = nullptr);
+void popDebugFrame();
 void traceDebugInfo(const char *file, int lineno);
 void enableDebugInfo(bool enable = true);
+void setDebugInfo();
 
 #define throwError(format, ...)                                                                                        \
     do {                                                                                                               \
@@ -189,10 +191,18 @@ PHPX_API int getBoxResourceId();
 
 PHPX_API Array toArray(const Variant &v);
 
-struct DebugInfo {
-    bool enable;
+#define PHPX_MAX_DEBUG_DEPTH 64
+
+struct DebugFrame {
     const char *file;
     int line;
+    const char *function;
+};
+
+struct DebugInfo {
+    bool enable;
+    DebugFrame frames[PHPX_MAX_DEBUG_DEPTH];
+    int depth;
 };
 
 extern DebugInfo debug_info;
