@@ -33,8 +33,8 @@ TEST(string_extra, offset_valid) {
     String s("hello");
     ASSERT_EQ(s.offset(0), 0);
     ASSERT_EQ(s.offset(4), 4);
-    ASSERT_EQ(s.offset(-1), 4);    // last char
-    ASSERT_EQ(s.offset(-5), 0);    // first char via negative
+    ASSERT_EQ(s.offset(-1), 4);  // last char
+    ASSERT_EQ(s.offset(-5), 0);  // first char via negative
 }
 
 // Test offset() with out-of-range

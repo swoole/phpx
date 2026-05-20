@@ -122,7 +122,7 @@ TEST(array_extra, set) {
     arr.set(key, 999);
     ASSERT_EQ(arr.get("key").toInt(), 999);
 
-    var fkey(2.7); // float key truncates to 2
+    var fkey(2.7);  // float key truncates to 2
     arr.set(fkey, "float_key");
     ASSERT_STREQ(arr.get(2).toCString(), "float_key");
 }

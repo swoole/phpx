@@ -101,9 +101,7 @@ TEST(variant_edge, append_object) {
 TEST(variant_edge, append_null_becomes_array) {
     var v;
     ASSERT_TRUE(v.isNull());
-    try_call(
-        [&]() { v.append("hello"); },
-        "Cannot append element to an `null`");
+    try_call([&]() { v.append("hello"); }, "Cannot append element to an `null`");
 }
 
 // Test newItem on null triggers error
@@ -310,7 +308,7 @@ TEST(variant_edge, is_false_is_true) {
 
     var v3(1);
     ASSERT_FALSE(v3.isFalse());
-    ASSERT_FALSE(v3.isTrue()); // it's IS_LONG, not IS_TRUE/IS_FALSE
+    ASSERT_FALSE(v3.isTrue());  // it's IS_LONG, not IS_TRUE/IS_FALSE
 }
 
 // Test typeStr for various types

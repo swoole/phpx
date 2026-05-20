@@ -9,9 +9,7 @@ TEST(base_extra, include_require) {
     auto rs = include(get_include_dir() + "/../include/return_const.php", REQUIRE);
     ASSERT_STREQ(rs.toCString(), PHP_VERSION);
 
-    try_call(
-        []() { include("/nonexistent/file.php", REQUIRE); },
-        "");
+    try_call([]() { include("/nonexistent/file.php", REQUIRE); }, "");
 }
 
 // Test include with REQUIRE_ONCE (file exists)
@@ -225,9 +223,7 @@ TEST(base_extra, getClassEntrySafe) {
     auto ce1 = getClassEntrySafe("stdClass");
     ASSERT_NE(ce1, nullptr);
 
-    try_call(
-        []() { getClassEntrySafe("ClassDefinitelyNotExists"); },
-        "class 'ClassDefinitelyNotExists' is undefined");
+    try_call([]() { getClassEntrySafe("ClassDefinitelyNotExists"); }, "class 'ClassDefinitelyNotExists' is undefined");
 }
 
 // Test error with different levels
@@ -344,9 +340,7 @@ TEST(base_extra, concat_two_args) {
 TEST(base_extra, newObject_errors) {
     try_call([]() { newObject("NonExistentClass123"); }, "class 'NonExistentClass123' is undefined");
 
-    try_call(
-        []() { newObject("NonExistentClass456", {"arg1", 123}); },
-        "class 'NonExistentClass456' is undefined");
+    try_call([]() { newObject("NonExistentClass456", {"arg1", 123}); }, "class 'NonExistentClass456' is undefined");
 }
 
 // Test exec_function and exec_method indirectly via call
