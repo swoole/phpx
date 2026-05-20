@@ -333,13 +333,13 @@ TEST(debug_info, simulated_call_stack) {
 
     // Simulate: main() calls foo(), foo() calls bar()
     pushDebugFrame("main.php", 1, "main");
-    traceDebugInfo("main.php", 3);    // line inside main
+    traceDebugInfo("main.php", 3);  // line inside main
 
     pushDebugFrame("foo.php", 1, "foo");
-    traceDebugInfo("foo.php", 5);     // line inside foo
+    traceDebugInfo("foo.php", 5);  // line inside foo
 
     pushDebugFrame("bar.php", 1, "bar");
-    traceDebugInfo("bar.php", 3);     // line inside bar - exception thrown here
+    traceDebugInfo("bar.php", 3);  // line inside bar - exception thrown here
 
     try {
         throwError("error in bar");
@@ -359,13 +359,13 @@ TEST(debug_info, simulated_call_stack) {
         ASSERT_TRUE(strstr(traceStr.toCString(), "bar") != nullptr);
     }
 
-    popDebugFrame(); // bar returns
+    popDebugFrame();  // bar returns
     ASSERT_EQ(debug_info.depth, 2);
 
-    popDebugFrame(); // foo returns
+    popDebugFrame();  // foo returns
     ASSERT_EQ(debug_info.depth, 1);
 
-    popDebugFrame(); // main returns
+    popDebugFrame();  // main returns
     ASSERT_EQ(debug_info.depth, 0);
 
     debug_info.depth = 0;
@@ -382,7 +382,7 @@ TEST(debug_info, exception_after_pop) {
 
     pushDebugFrame("inner.php", 1, "inner");
     traceDebugInfo("inner.php", 8);
-    popDebugFrame(); // inner returns successfully
+    popDebugFrame();  // inner returns successfully
 
     // Now at outer level
     traceDebugInfo("outer.php", 12);

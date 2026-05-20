@@ -1662,10 +1662,10 @@ class Box {
         delete this;
     }
     uint32_t getTypeInfo() {
-    	return type_info;
+        return type_info;
     }
     uint32_t getExtraInfo() {
-    	return extra_info;
+        return extra_info;
     }
 
   protected:
