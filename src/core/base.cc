@@ -149,7 +149,7 @@ void enableDebugInfo(bool enable) {
     debug_info.enable = enable;
 }
 
-void setDebugInfo() {
+void augmentException() {
     if (!debug_info.enable || debug_info.depth == 0 || !EG(exception)) {
         return;
     }
@@ -157,7 +157,7 @@ void setDebugInfo() {
     auto prev_scope = EG(fake_scope);
     EG(fake_scope) = EG(exception)->ce;
 
-    // Set file/line from the top (innermost) frame
+    // Set file/line from the innermost frame
     auto &top = debug_info.frames[debug_info.depth - 1];
     zval tmp;
     ZVAL_STRING(&tmp, top.file ? top.file : "");
@@ -167,30 +167,34 @@ void setDebugInfo() {
     ZVAL_LONG(&tmp, top.line);
     zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_LINE), &tmp);
 
-    // Build full stack trace string
-    std::string trace;
-    char buf[512];
-    for (int i = 0; i < debug_info.depth; i++) {
+    // Build backtrace array in zend_fetch_debug_backtrace format
+    // Each frame: {file, line, function, class?, type?, args}
+    Array trace;
+    for (int i = debug_info.depth - 1; i >= 0; i--) {
         auto &frame = debug_info.frames[i];
-        int len;
-        if (frame.function && frame.function[0]) {
-            len = snprintf(buf, sizeof(buf), "#%d %s() at %s:%d\n",
-                           i, frame.function,
-                           frame.file ? frame.file : "unknown", frame.line);
+
+        Array entry;
+        entry.set(ZSTR_KNOWN(ZEND_STR_FILE), String(frame.file ? frame.file : ""));
+        entry.set(ZSTR_KNOWN(ZEND_STR_LINE), frame.line);
+
+        const char *func = frame.function ? frame.function : "";
+        const char *colon = func ? strstr(func, "::") : nullptr;
+
+        if (colon && colon > func) {
+            // ClassName::methodName
+            entry.set(ZSTR_KNOWN(ZEND_STR_CLASS), String(func, colon - func));
+            entry.set(ZSTR_KNOWN(ZEND_STR_TYPE), String("::"));
+            entry.set(ZSTR_KNOWN(ZEND_STR_FUNCTION), String(colon + 2));
         } else {
-            len = snprintf(buf, sizeof(buf), "#%d %s:%d\n",
-                           i, frame.file ? frame.file : "unknown", frame.line);
+            entry.set(ZSTR_KNOWN(ZEND_STR_FUNCTION), String(func));
         }
-        if (len > 0 && len < (int) sizeof(buf)) {
-            trace.append(buf, len);
-        }
+
+        entry.set(ZSTR_KNOWN(ZEND_STR_ARGS), Array());
+
+        trace.append(entry);
     }
 
-    zend_string *key = zend_string_init("debug_trace", sizeof("debug_trace") - 1, 0);
-    ZVAL_STRING(&tmp, trace.c_str());
-    zend_update_property_ex(EG(exception)->ce, EG(exception), key, &tmp);
-    zend_string_release(key);
-    zval_ptr_dtor(&tmp);
+    zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_TRACE), trace.ptr());
 
     EG(fake_scope) = prev_scope;
 }
@@ -278,6 +282,7 @@ Variant throwException(const String &class_name, const char *message, int code) 
 
 Variant throwException(zend_class_entry *ce, const char *message, int code) {
     zend_throw_exception(ce, message, code);
+    augmentException();
     if (throw_impl) {
         throw_impl(EG(exception));
     }
@@ -288,6 +293,7 @@ Variant throwException(const Object &e) {
     auto zv = NO_CONST_V(e);
     zval_add_ref(zv);
     EG(exception) = Z_OBJ_P(zv);
+    augmentException();
     if (throw_impl) {
         throw_impl(EG(exception));
     }

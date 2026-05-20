@@ -161,7 +161,7 @@ TEST(debug_info, max_depth) {
     enableDebugInfo(false);
 }
 
-// Test setDebugInfo on exception with single frame
+// Test augmentException on exception with single frame
 TEST(debug_info, set_debug_info_single_frame) {
     enableDebugInfo(true);
     debug_info.depth = 0;
@@ -179,17 +179,16 @@ TEST(debug_info, set_debug_info_single_frame) {
         ASSERT_STREQ(f.toCString(), "single.php");
         ASSERT_EQ(l.toInt(), 105);
 
-        // Verify debug_trace property exists and has content
-        auto trace = e.attr("debug_trace");
-        ASSERT_TRUE(trace.isString());
-        ASSERT_GT(trace.length(), 0);
+        // Verify trace property is set as array
+        auto trace = e.call("getTrace");
+        ASSERT_TRUE(trace.isArray());
     }
 
     debug_info.depth = 0;
     enableDebugInfo(false);
 }
 
-// Test setDebugInfo on exception with nested frames
+// Test augmentException on exception with nested frames
 TEST(debug_info, set_debug_info_nested_frames) {
     enableDebugInfo(true);
     debug_info.depth = 0;
@@ -210,13 +209,10 @@ TEST(debug_info, set_debug_info_nested_frames) {
         ASSERT_STREQ(f.toCString(), "inner.php");
         ASSERT_EQ(l.toInt(), 25);
 
-        // debug_trace should have both frames
-        auto trace = e.attr("debug_trace");
-        ASSERT_TRUE(trace.isString());
-        String traceStr = trace.toString();
+        // trace should contain both frames in getTraceAsString
+        auto traceStr = e.call("getTraceAsString");
+        ASSERT_TRUE(traceStr.isString());
         ASSERT_GT(traceStr.length(), 0);
-
-        // trace should contain function names from both frames
         ASSERT_TRUE(strstr(traceStr.toCString(), "outer_function") != nullptr);
         ASSERT_TRUE(strstr(traceStr.toCString(), "inner_function") != nullptr);
     }
@@ -225,7 +221,7 @@ TEST(debug_info, set_debug_info_nested_frames) {
     enableDebugInfo(false);
 }
 
-// Test setDebugInfo is no-op when disabled
+// Test augmentException is no-op when disabled
 TEST(debug_info, set_debug_info_disabled) {
     enableDebugInfo(false);
     debug_info.depth = 0;
@@ -244,7 +240,7 @@ TEST(debug_info, set_debug_info_disabled) {
     }
 }
 
-// Test setDebugInfo with empty stack is no-op
+// Test augmentException with empty stack is no-op
 TEST(debug_info, set_debug_info_empty_stack) {
     enableDebugInfo(true);
     debug_info.depth = 0;
@@ -274,9 +270,8 @@ TEST(debug_info, push_empty_function_string) {
         throwError("test empty function");
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto trace = e.attr("debug_trace");
-        ASSERT_TRUE(trace.isString());
-        // Should not crash and should produce valid output
+        auto traceArr = e.call("getTrace");
+        ASSERT_TRUE(traceArr.isArray());
     }
 
     debug_info.depth = 0;
@@ -295,9 +290,8 @@ TEST(debug_info, class_method_name_format) {
         throwError("test class method format");
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto trace = e.attr("debug_trace");
-        ASSERT_TRUE(trace.isString());
-        String traceStr = trace.toString();
+        auto traceStr = e.call("getTraceAsString");
+        ASSERT_TRUE(traceStr.isString());
         ASSERT_TRUE(strstr(traceStr.toCString(), "MyClass::myMethod") != nullptr);
         ASSERT_TRUE(strstr(traceStr.toCString(), "OtherClass::otherMethod") != nullptr);
     }
@@ -318,17 +312,14 @@ TEST(debug_info, trace_format) {
         throwError("test trace format");
     } catch (zend_object *ex) {
         auto e = catchException();
-        auto trace = e.attr("debug_trace");
-        ASSERT_TRUE(trace.isString());
-        String traceStr = trace.toString();
+        auto traceStr = e.call("getTraceAsString");
+        ASSERT_TRUE(traceStr.isString());
 
-        // Should contain frame indices
+        // PHP backtrace format: #N file(line): function()
         ASSERT_TRUE(strstr(traceStr.toCString(), "#0") != nullptr);
         ASSERT_TRUE(strstr(traceStr.toCString(), "#1") != nullptr);
-
-        // Should contain "at file:line" pattern
-        ASSERT_TRUE(strstr(traceStr.toCString(), "main()") != nullptr);
-        ASSERT_TRUE(strstr(traceStr.toCString(), "helper()") != nullptr);
+        ASSERT_TRUE(strstr(traceStr.toCString(), "main") != nullptr);
+        ASSERT_TRUE(strstr(traceStr.toCString(), "helper") != nullptr);
     }
 
     debug_info.depth = 0;
@@ -360,8 +351,8 @@ TEST(debug_info, simulated_call_stack) {
         ASSERT_STREQ(f.toCString(), "bar.php");
         ASSERT_EQ(l.toInt(), 3);
 
-        auto trace = e.attr("debug_trace");
-        String traceStr = trace.toString();
+        auto traceStr = e.call("getTraceAsString");
+        ASSERT_TRUE(traceStr.isString());
         // Should show all 3 levels
         ASSERT_TRUE(strstr(traceStr.toCString(), "main") != nullptr);
         ASSERT_TRUE(strstr(traceStr.toCString(), "foo") != nullptr);

@@ -530,8 +530,8 @@ enableDebugInfo(true);
 // 跟踪调试信息
 traceDebugInfo(__FILE__, __LINE__);
 
-// 设置调试信息
-setDebugInfo();
+// 给当前异常追加调试信息
+augmentException();
 ```
 
 ### 变量调试

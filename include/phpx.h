@@ -118,16 +118,17 @@ PHPX_API bool exists(const Variant &v, const OperationChain &list);
 PHPX_API bool exists(const Variant &v, const OperationChain &list, Variant &result);
 PHPX_API Reference toReference(const Variant &v, const OperationChain &list);
 
-void pushDebugFrame(const char *file, int lineno, const char *function = nullptr);
-void popDebugFrame();
-void traceDebugInfo(const char *file, int lineno);
-void enableDebugInfo(bool enable = true);
-void setDebugInfo();
+PHPX_API void pushDebugFrame(const char *file, int lineno, const char *function = nullptr);
+PHPX_API void popDebugFrame();
+PHPX_API void traceDebugInfo(const char *file, int lineno);
+PHPX_API void enableDebugInfo(bool enable = true);
+
+void augmentException();
 
 #define throwError(format, ...)                                                                                        \
     do {                                                                                                               \
         zend_throw_error(NULL, format, ##__VA_ARGS__);                                                                 \
-        setDebugInfo();                                                                                                \
+        augmentException();                                                                                            \
         if (throw_impl) {                                                                                              \
             throw_impl(EG(exception));                                                                                 \
         }                                                                                                              \
@@ -136,7 +137,7 @@ void setDebugInfo();
 #define throwErrorIfOccurred()                                                                                         \
     do {                                                                                                               \
         if (UNEXPECTED(EG(exception) != nullptr && throw_impl != nullptr)) {                                           \
-            setDebugInfo();                                                                                            \
+            augmentException();                                                                                        \
             throw_impl(EG(exception));                                                                                 \
         }                                                                                                              \
     } while (0)
@@ -166,13 +167,6 @@ Resource *getResource(const std::string &name);
 
 void request_init();
 void request_shutdown();
-
-bool is_callable_ex(zval *callable,
-                    zend_object *object,
-                    uint32_t check_flags,
-                    zend_string **callable_name,
-                    zend_fcall_info_cache *fcc,
-                    char **error);
 int array_data_compare(Bucket *f, Bucket *s);
 bool prepare_slice(long &offset, long &length, size_t total);
 Variant call_impl(const zval *object, const zval *func, Args &args);
