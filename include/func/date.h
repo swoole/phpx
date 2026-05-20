@@ -1,5 +1,8 @@
+#pragma once
+
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant strtotime(const Variant &datetime, const Variant &base_timestamp = {});
@@ -32,37 +35,59 @@ Variant date_parse(const Variant &datetime);
 Variant date_parse_from_format(const Variant &format, const Variant &datetime);
 Variant date_get_last_errors();
 Variant date_format(const Variant &object, const Variant &format);
+Variant date_modify(const DateTime &object, const Variant &modifier);
 Variant date_modify(const Variant &object, const Variant &modifier);
+Variant date_add(const DateTime &object, const DateInterval &interval);
 Variant date_add(const Variant &object, const Variant &interval);
+Variant date_sub(const DateTime &object, const DateInterval &interval);
 Variant date_sub(const Variant &object, const Variant &interval);
 Variant date_timezone_get(const Variant &object);
+Variant date_timezone_set(const DateTime &object, const DateTimeZone &timezone);
 Variant date_timezone_set(const Variant &object, const Variant &timezone);
 Variant date_offset_get(const Variant &object);
 Variant date_diff(const Variant &base_object, const Variant &target_object, const Variant &absolute = false);
+Variant date_time_set(const DateTime &object,
+                      const Variant &hour,
+                      const Variant &minute,
+                      const Variant &second = 0,
+                      const Variant &microsecond = 0);
 Variant date_time_set(const Variant &object,
                       const Variant &hour,
                       const Variant &minute,
                       const Variant &second = 0,
                       const Variant &microsecond = 0);
+Variant date_date_set(const DateTime &object, const Variant &year, const Variant &month, const Variant &day);
 Variant date_date_set(const Variant &object, const Variant &year, const Variant &month, const Variant &day);
+Variant date_isodate_set(const DateTime &object,
+                         const Variant &year,
+                         const Variant &week,
+                         const Variant &day_of_week = 1);
 Variant date_isodate_set(const Variant &object,
                          const Variant &year,
                          const Variant &week,
                          const Variant &day_of_week = 1);
+Variant date_timestamp_set(const DateTime &object, const Variant &timestamp);
 Variant date_timestamp_set(const Variant &object, const Variant &timestamp);
 Variant date_timestamp_get(const Variant &object);
 Variant timezone_open(const Variant &timezone);
+Variant timezone_name_get(const DateTimeZone &object);
 Variant timezone_name_get(const Variant &object);
 Variant timezone_name_from_abbr(const Variant &abbr, const Variant &utc_offset = -1, const Variant &is_d_s_t = -1);
+Variant timezone_offset_get(const DateTimeZone &object, const Variant &datetime);
 Variant timezone_offset_get(const Variant &object, const Variant &datetime);
+Variant timezone_transitions_get(const DateTimeZone &object,
+                                 const Variant &timestamp_begin = LONG_MIN,
+                                 const Variant &timestamp_end = LONG_MAX);
 Variant timezone_transitions_get(const Variant &object,
                                  const Variant &timestamp_begin = LONG_MIN,
                                  const Variant &timestamp_end = LONG_MAX);
+Variant timezone_location_get(const DateTimeZone &object);
 Variant timezone_location_get(const Variant &object);
 Variant timezone_identifiers_list(const Variant &timezone_group = 2047, const Variant &country_code = {});
 Variant timezone_abbreviations_list();
 Variant timezone_version_get();
 Variant date_interval_create_from_date_string(const Variant &datetime);
+Variant date_interval_format(const DateInterval &object, const Variant &format);
 Variant date_interval_format(const Variant &object, const Variant &format);
 Variant date_default_timezone_set(const Variant &timezone_id);
 Variant date_default_timezone_get();

@@ -1,3 +1,6 @@
+#pragma once
+
+#include "phpx_class.h"
 #include "phpx_literal_string.h"
 
 namespace php {
@@ -5,9 +8,10 @@ class XMLReader {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
+    explicit XMLReader(const Object &obj) : this_(obj) {}
     XMLReader();
     Variant close();
     Variant getAttribute(const Variant &name);

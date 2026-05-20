@@ -1,3 +1,6 @@
+#pragma once
+
+#include "phpx_class.h"
 #include "phpx_literal_string.h"
 
 namespace php {
@@ -5,7 +8,7 @@ class PDOException {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     PDOException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -24,7 +27,7 @@ class PDO {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     PDO(const Variant &dsn, const Variant &username = {}, const Variant &password = {}, const Variant &options = {});
@@ -59,9 +62,10 @@ class PDOStatement {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
+    explicit PDOStatement(const Object &obj) : this_(obj) {}
     PDOStatement();
     Variant bindColumn(const Variant &column,
                        const Reference &var,
@@ -111,9 +115,10 @@ class PDORow {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
+    explicit PDORow(const Object &obj) : this_(obj) {}
     PDORow();
 };
 

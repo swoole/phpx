@@ -1,3 +1,6 @@
+#pragma once
+
+#include "phpx_class.h"
 #include "phpx_literal_string.h"
 
 namespace php {
@@ -5,7 +8,7 @@ class SQLite3Exception {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     SQLite3Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -24,7 +27,7 @@ class SQLite3 {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     SQLite3(const Variant &filename, const Variant &flags = 6, const Variant &encryption_key = "");
@@ -38,6 +41,9 @@ class SQLite3 {
     Variant changes();
     Variant busyTimeout(const Variant &milliseconds);
     Variant loadExtension(const Variant &name);
+    Variant backup(const SQLite3 &destination,
+                   const Variant &source_database = "main",
+                   const Variant &destination_database = "main");
     Variant backup(const Variant &destination,
                    const Variant &source_database = "main",
                    const Variant &destination_database = "main");
@@ -69,7 +75,7 @@ class SQLite3Stmt {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Variant bindParam(const Variant &param, const Reference &var, const Variant &type = 3);
@@ -87,7 +93,7 @@ class SQLite3Result {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Variant numColumns();

@@ -1,5 +1,8 @@
+#pragma once
+
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant iconv_strlen(const Variant &string, const Variant &encoding = {});

@@ -1,5 +1,6 @@
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant ctype_alnum(const Variant &text) {

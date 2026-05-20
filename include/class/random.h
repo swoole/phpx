@@ -1,3 +1,6 @@
+#pragma once
+
+#include "phpx_class.h"
 #include "phpx_literal_string.h"
 
 namespace php {
@@ -5,7 +8,7 @@ class Random_RandomError {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Random_RandomError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -24,7 +27,7 @@ class Random_BrokenRandomEngineError {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Random_BrokenRandomEngineError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -43,7 +46,7 @@ class Random_RandomException {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Random_RandomException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -62,7 +65,7 @@ class Random_Engine_Mt19937 {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Random_Engine_Mt19937(const Variant &seed = {}, const Variant &mode = 0);
@@ -76,7 +79,7 @@ class Random_Engine_PcgOneseq128XslRr64 {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Random_Engine_PcgOneseq128XslRr64(const Variant &seed = {});
@@ -91,7 +94,7 @@ class Random_Engine_Xoshiro256StarStar {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Random_Engine_Xoshiro256StarStar(const Variant &seed = {});
@@ -107,18 +110,31 @@ class Random_Engine_Secure {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
+    explicit Random_Engine_Secure(const Object &obj) : this_(obj) {}
     Random_Engine_Secure();
     Variant generate();
+};
+
+class Random_IntervalBoundary {
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    explicit Random_IntervalBoundary(const Object &obj) : this_(obj) {}
+    Random_IntervalBoundary();
+    static Variant cases();
 };
 
 class Random_Randomizer {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Random_Randomizer(const Variant &engine = {});
@@ -133,17 +149,6 @@ class Random_Randomizer {
     Variant pickArrayKeys(const Variant &array, const Variant &num);
     Variant __serialize();
     Variant __unserialize(const Variant &data);
-};
-
-class Random_IntervalBoundary {
-    Object this_;
-
-  public:
-    Object getObject() {
-        return this_;
-    }
-    Random_IntervalBoundary();
-    static Variant cases();
 };
 
 }  // namespace php

@@ -1,5 +1,6 @@
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant set_time_limit(const Variant &seconds) {
@@ -1697,12 +1698,16 @@ Variant opendir(const Variant &directory, const Variant &context) {
     }
     return call(fn, {directory, context});
 }
-Variant dir(const Variant &directory, const Variant &context) {
+Directory dir(const Variant &directory, const Variant &context) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[2173]);
     }
-    return call(fn, {directory, context});
+    auto _rv = call(fn, {directory, context});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "dir() returned false");
+    }
+    return Directory(Object(std::move(_rv)));
 }
 Variant closedir(const Variant &dir_handle) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -3459,12 +3464,19 @@ Variant get_headers(const Variant &url, const Variant &associative, const Varian
     }
     return call(fn, {url, associative, context});
 }
-Variant stream_bucket_make_writeable(const Variant &brigade) {
+StreamBucket stream_bucket_make_writeable(const Variant &brigade) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[2392]);
     }
-    return call(fn, {brigade});
+    return StreamBucket(Object(call(fn, {brigade})));
+}
+Variant stream_bucket_prepend(const Variant &brigade, const StreamBucket &bucket) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2393]);
+    }
+    return call(fn, {brigade, bucket.getObject()});
 }
 Variant stream_bucket_prepend(const Variant &brigade, const Variant &bucket) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -3473,6 +3485,13 @@ Variant stream_bucket_prepend(const Variant &brigade, const Variant &bucket) {
     }
     return call(fn, {brigade, bucket});
 }
+Variant stream_bucket_append(const Variant &brigade, const StreamBucket &bucket) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2394]);
+    }
+    return call(fn, {brigade, bucket.getObject()});
+}
 Variant stream_bucket_append(const Variant &brigade, const Variant &bucket) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
@@ -3480,12 +3499,12 @@ Variant stream_bucket_append(const Variant &brigade, const Variant &bucket) {
     }
     return call(fn, {brigade, bucket});
 }
-Variant stream_bucket_new(const Variant &stream, const Variant &buffer) {
+StreamBucket stream_bucket_new(const Variant &stream, const Variant &buffer) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[2395]);
     }
-    return call(fn, {stream, buffer});
+    return StreamBucket(Object(call(fn, {stream, buffer})));
 }
 Variant stream_get_filters() {
     static THREAD_LOCAL zend_function *fn = nullptr;

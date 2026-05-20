@@ -1,3 +1,6 @@
+#pragma once
+
+#include "phpx_class.h"
 #include "phpx_literal_string.h"
 
 namespace php {
@@ -5,9 +8,10 @@ class SessionHandler {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
+    explicit SessionHandler(const Object &obj) : this_(obj) {}
     SessionHandler();
     Variant open(const Variant &path, const Variant &name);
     Variant close();

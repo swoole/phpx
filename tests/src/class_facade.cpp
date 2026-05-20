@@ -452,7 +452,7 @@ TEST(class_facade, splfixedarray_fromArray) {
     src.append("y");
     src.append("z");
     auto fa = SplFixedArray::fromArray(src);
-    auto obj = SplFixedArray(0);
+    auto obj = SplFixedArray(Variant(0));
     // fromArray is static, result is a new SplFixedArray
     ASSERT_TRUE(fa.isObject());
 }
@@ -1084,7 +1084,7 @@ TEST(class_facade, reflection_reference_fromArrayElement) {
     // $arr['key'] becomes a reference when $ref =& $arr['key']
     auto arr = eval("$arr = ['key' => 42]; $ref =& $arr['key']; return $arr;");
     ASSERT_TRUE(arr.isArray());
-    var ref_var = ReflectionReference::fromArrayElement(arr, "key");
+    auto ref_var = ReflectionReference::fromArrayElement(arr, "key");
     ASSERT_TRUE(ref_var.isObject());
     ASSERT_TRUE(ref_var.call("getId").isString());
 }

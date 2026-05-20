@@ -490,14 +490,22 @@ Variant Redis::serverName() {
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1174]);
     }
-    return this_.call(_method_fn, {});
+    auto _rv = this_.call(_method_fn, {});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "Redis::serverName() returned false");
+    }
+    return Variant(Object(std::move(_rv)));
 }
 Variant Redis::serverVersion() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1175]);
     }
-    return this_.call(_method_fn, {});
+    auto _rv = this_.call(_method_fn, {});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "Redis::serverVersion() returned false");
+    }
+    return Variant(Object(std::move(_rv)));
 }
 Variant Redis::getRange(const Variant &key, const Variant &start, const Variant &end) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -532,7 +540,11 @@ Variant Redis::getTimeout() {
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1180]);
     }
-    return this_.call(_method_fn, {});
+    auto _rv = this_.call(_method_fn, {});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "Redis::getTimeout() returned false");
+    }
+    return Variant(Object(std::move(_rv)));
 }
 Variant Redis::getTransferredBytes() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -1097,7 +1109,11 @@ Variant Redis::scan(const Reference &iterator, const Variant &pattern, const Var
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1269]);
     }
-    return this_.call(_method_fn, {&iterator, pattern, count, type});
+    auto _rv = this_.call(_method_fn, {&iterator, pattern, count, type});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "Redis::scan() returned false");
+    }
+    return Variant(Object(std::move(_rv)));
 }
 Variant Redis::scard(const Variant &key) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -1250,7 +1266,11 @@ Variant Redis::sscan(const Variant &key, const Reference &iterator, const Varian
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1291]);
     }
-    return this_.call(_method_fn, {key, &iterator, pattern, count});
+    auto _rv = this_.call(_method_fn, {key, &iterator, pattern, count});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "Redis::sscan() returned false");
+    }
+    return Variant(Object(std::move(_rv)));
 }
 Variant Redis::ssubscribe(const Variant &channels, const Variant &cb) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -1327,14 +1347,22 @@ Variant Redis::wait(const Variant &numreplicas, const Variant &timeout) {
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1303]);
     }
-    return this_.call(_method_fn, {numreplicas, timeout});
+    auto _rv = this_.call(_method_fn, {numreplicas, timeout});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "Redis::wait() returned false");
+    }
+    return Variant(Object(std::move(_rv)));
 }
 Variant Redis::xack(const Variant &key, const Variant &group, const Variant &ids) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1304]);
     }
-    return this_.call(_method_fn, {key, group, ids});
+    auto _rv = this_.call(_method_fn, {key, group, ids});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "Redis::xack() returned false");
+    }
+    return Variant(Object(std::move(_rv)));
 }
 Variant Redis::xadd(const Variant &key,
                     const Variant &id,
@@ -2131,7 +2159,11 @@ Variant RedisCluster::exec() {
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[866]);
     }
-    return this_.call(_method_fn, {});
+    auto _rv = this_.call(_method_fn, {});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "RedisCluster::exec() returned false");
+    }
+    return Variant(Object(std::move(_rv)));
 }
 Variant RedisCluster::expire(const Variant &key, const Variant &timeout, const Variant &mode) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -2324,7 +2356,11 @@ Variant RedisCluster::gettransferredbytes() {
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1382]);
     }
-    return this_.call(_method_fn, {});
+    auto _rv = this_.call(_method_fn, {});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "RedisCluster::gettransferredbytes() returned false");
+    }
+    return Variant(Object(std::move(_rv)));
 }
 Variant RedisCluster::cleartransferredbytes() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -2875,7 +2911,11 @@ Variant RedisCluster::sscan(const Variant &key,
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1291]);
     }
-    return this_.call(_method_fn, {key, &iterator, pattern, count});
+    auto _rv = this_.call(_method_fn, {key, &iterator, pattern, count});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "RedisCluster::sscan() returned false");
+    }
+    return Variant(Object(std::move(_rv)));
 }
 Variant RedisCluster::strlen(const Variant &key) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;

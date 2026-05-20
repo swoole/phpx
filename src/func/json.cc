@@ -1,5 +1,6 @@
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant json_encode(const Variant &value, const Variant &flags, const Variant &depth) {

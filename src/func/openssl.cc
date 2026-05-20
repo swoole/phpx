@@ -1,5 +1,6 @@
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant openssl_x509_export_to_file(const Variant &certificate,
@@ -56,12 +57,23 @@ Variant openssl_x509_checkpurpose(const Variant &certificate,
     }
     return call(fn, {certificate, purpose, ca_info, untrusted_certificates_file});
 }
-Variant openssl_x509_read(const Variant &certificate) {
+OpenSSLCertificate openssl_x509_read(const Variant &certificate) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[754]);
     }
-    return call(fn, {certificate});
+    auto _rv = call(fn, {certificate});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "openssl_x509_read() returned false");
+    }
+    return OpenSSLCertificate(Object(std::move(_rv)));
+}
+Variant openssl_x509_free(const OpenSSLCertificate &certificate) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[755]);
+    }
+    return call(fn, {certificate.getObject()});
 }
 Variant openssl_x509_free(const Variant &certificate) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -113,18 +125,22 @@ Variant openssl_csr_export(const Variant &csr, const Reference &output, const Va
     }
     return call(fn, {csr, &output, no_text});
 }
-Variant openssl_csr_sign(const Variant &csr,
-                         const Variant &ca_certificate,
-                         const Variant &private_key,
-                         const Variant &days,
-                         const Variant &options,
-                         const Variant &serial,
-                         const Variant &serial_hex) {
+OpenSSLCertificate openssl_csr_sign(const Variant &csr,
+                                    const Variant &ca_certificate,
+                                    const Variant &private_key,
+                                    const Variant &days,
+                                    const Variant &options,
+                                    const Variant &serial,
+                                    const Variant &serial_hex) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[761]);
     }
-    return call(fn, {csr, ca_certificate, private_key, days, options, serial, serial_hex});
+    auto _rv = call(fn, {csr, ca_certificate, private_key, days, options, serial, serial_hex});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "openssl_csr_sign() returned false");
+    }
+    return OpenSSLCertificate(Object(std::move(_rv)));
 }
 Variant openssl_csr_new(const Variant &distinguished_names,
                         const Reference &private_key,
@@ -143,19 +159,27 @@ Variant openssl_csr_get_subject(const Variant &csr, const Variant &short_names) 
     }
     return call(fn, {csr, short_names});
 }
-Variant openssl_csr_get_public_key(const Variant &csr, const Variant &short_names) {
+OpenSSLAsymmetricKey openssl_csr_get_public_key(const Variant &csr, const Variant &short_names) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[764]);
     }
-    return call(fn, {csr, short_names});
+    auto _rv = call(fn, {csr, short_names});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "openssl_csr_get_public_key() returned false");
+    }
+    return OpenSSLAsymmetricKey(Object(std::move(_rv)));
 }
-Variant openssl_pkey_new(const Variant &options) {
+OpenSSLAsymmetricKey openssl_pkey_new(const Variant &options) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[765]);
     }
-    return call(fn, {options});
+    auto _rv = call(fn, {options});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "openssl_pkey_new() returned false");
+    }
+    return OpenSSLAsymmetricKey(Object(std::move(_rv)));
 }
 Variant openssl_pkey_export_to_file(const Variant &key,
                                     const Variant &output_filename,
@@ -177,19 +201,34 @@ Variant openssl_pkey_export(const Variant &key,
     }
     return call(fn, {key, &output, passphrase, options});
 }
-Variant openssl_pkey_get_public(const Variant &public_key) {
+OpenSSLAsymmetricKey openssl_pkey_get_public(const Variant &public_key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[768]);
     }
-    return call(fn, {public_key});
+    auto _rv = call(fn, {public_key});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "openssl_pkey_get_public() returned false");
+    }
+    return OpenSSLAsymmetricKey(Object(std::move(_rv)));
 }
-Variant openssl_get_publickey(const Variant &public_key) {
+OpenSSLAsymmetricKey openssl_get_publickey(const Variant &public_key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[769]);
     }
-    return call(fn, {public_key});
+    auto _rv = call(fn, {public_key});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "openssl_get_publickey() returned false");
+    }
+    return OpenSSLAsymmetricKey(Object(std::move(_rv)));
+}
+Variant openssl_pkey_free(const OpenSSLAsymmetricKey &key) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[770]);
+    }
+    return call(fn, {key.getObject()});
 }
 Variant openssl_pkey_free(const Variant &key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -198,6 +237,13 @@ Variant openssl_pkey_free(const Variant &key) {
     }
     return call(fn, {key});
 }
+Variant openssl_free_key(const OpenSSLAsymmetricKey &key) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[771]);
+    }
+    return call(fn, {key.getObject()});
+}
 Variant openssl_free_key(const Variant &key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
@@ -205,19 +251,34 @@ Variant openssl_free_key(const Variant &key) {
     }
     return call(fn, {key});
 }
-Variant openssl_pkey_get_private(const Variant &private_key, const Variant &passphrase) {
+OpenSSLAsymmetricKey openssl_pkey_get_private(const Variant &private_key, const Variant &passphrase) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[772]);
     }
-    return call(fn, {private_key, passphrase});
+    auto _rv = call(fn, {private_key, passphrase});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "openssl_pkey_get_private() returned false");
+    }
+    return OpenSSLAsymmetricKey(Object(std::move(_rv)));
 }
-Variant openssl_get_privatekey(const Variant &private_key, const Variant &passphrase) {
+OpenSSLAsymmetricKey openssl_get_privatekey(const Variant &private_key, const Variant &passphrase) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[773]);
     }
-    return call(fn, {private_key, passphrase});
+    auto _rv = call(fn, {private_key, passphrase});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "openssl_get_privatekey() returned false");
+    }
+    return OpenSSLAsymmetricKey(Object(std::move(_rv)));
+}
+Variant openssl_pkey_get_details(const OpenSSLAsymmetricKey &key) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[774]);
+    }
+    return call(fn, {key.getObject()});
 }
 Variant openssl_pkey_get_details(const Variant &key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -538,6 +599,13 @@ Variant openssl_cipher_key_length(const Variant &cipher_algo) {
     }
     return call(fn, {cipher_algo});
 }
+Variant openssl_dh_compute_key(const Variant &public_key, const OpenSSLAsymmetricKey &private_key) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[803]);
+    }
+    return call(fn, {public_key, private_key.getObject()});
+}
 Variant openssl_dh_compute_key(const Variant &public_key, const Variant &private_key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
@@ -558,6 +626,15 @@ Variant openssl_random_pseudo_bytes(const Variant &length, const Reference &stro
         fn = getFunction(LITERAL_STRING[805]);
     }
     return call(fn, {length, &strong_result});
+}
+Variant openssl_spki_new(const OpenSSLAsymmetricKey &private_key,
+                         const Variant &challenge,
+                         const Variant &digest_algo) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[806]);
+    }
+    return call(fn, {private_key.getObject(), challenge, digest_algo});
 }
 Variant openssl_spki_new(const Variant &private_key, const Variant &challenge, const Variant &digest_algo) {
     static THREAD_LOCAL zend_function *fn = nullptr;

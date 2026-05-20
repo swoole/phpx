@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Phpx;
 
+use MJS\TopSort\CircularDependencyException;
+use MJS\TopSort\Implementations\ArraySort;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionExtension;
 use ReflectionMethod;
+use ReflectionNamedType;
 use ReflectionParameter;
 use RuntimeException;
 
@@ -21,6 +24,31 @@ class Generator
      */
     static protected array $literalString = [];
     static protected int $literalStringIndex = 0;
+    /**
+     * @var array<string, string> PHP class name => C++ facade class name
+     */
+    static protected array $facadeClassMap = [];
+    /**
+     * @var array<string, string[]> C++ facade class name => list of C++ facade classes it depends on
+     */
+    static protected array $classDependencies = [];
+    /**
+     * @var array<string> Topologically sorted C++ facade class names
+     */
+    static public array $sortedClasses = [];
+    /**
+     * @var array<string, string> C++ facade class name => PHP extension name
+     */
+    static protected array $classToExtension = [];
+    /**
+     * @var array<string, bool> C++ facade class name => has PHP __construct
+     */
+    static protected array $classHasCtor = [];
+
+    const array BUILTIN_TYPES = [
+        'int', 'string', 'float', 'bool', 'array', 'void', 'callable',
+        'mixed', 'iterable', 'object', 'never', 'true', 'false', 'null',
+    ];
 
     const array BUILTIN_FUNCTIONS = [
         'sizeof',
@@ -81,6 +109,284 @@ class Generator
         $code .= "};\n";
 
         file_put_contents(self::getRootDir() . '/src/core/literal_string.cc', $code);
+    }
+
+    /**
+     * Pre-scan all extensions to build a map of PHP class names to C++ facade class names.
+     * Also scans class dependencies for topological sorting.
+     * Must be called before the generation loop.
+     */
+    public static function buildFacadeClassMap(array $extensions): void
+    {
+        // First pass: build class name map (no dependency scanning yet —
+        // we need the full map populated before we can resolve type names)
+        foreach ($extensions as $extension) {
+            if (!extension_loaded($extension)) {
+                continue;
+            }
+            $extRef = new ReflectionExtension($extension);
+            foreach ($extRef->getClasses() as $className => $ref) {
+                if ($ref->isAbstract() || $ref->isInterface() || $ref->isTrait()) {
+                    continue;
+                }
+                $cppName = $className;
+                if (in_array($cppName, self::BUILTIN_CLASSES)) {
+                    $cppName = '_' . $cppName;
+                }
+                $cppName = str_replace('\\', '_', $cppName);
+                self::$facadeClassMap[$className] = $cppName;
+                self::$classToExtension[$cppName] = $extension;
+
+                // Check if class has PHP __construct (no Object constructor)
+                $hasCtor = false;
+                foreach ($ref->getMethods() as $method) {
+                    if ($method->isConstructor()) {
+                        $hasCtor = true;
+                        break;
+                    }
+                }
+                self::$classHasCtor[$cppName] = $hasCtor;
+            }
+        }
+
+        // Second pass: scan dependencies now that the full class map is available
+        foreach ($extensions as $extension) {
+            if (!extension_loaded($extension)) {
+                continue;
+            }
+            $extRef = new ReflectionExtension($extension);
+            foreach ($extRef->getClasses() as $className => $ref) {
+                if ($ref->isAbstract() || $ref->isInterface() || $ref->isTrait()) {
+                    continue;
+                }
+                $cppName = self::$facadeClassMap[$className] ?? null;
+                if ($cppName === null) continue;
+                $deps = self::scanClassDependencies($ref, $cppName);
+                self::$classDependencies[$cppName] = $deps;
+            }
+        }
+
+        // Topological sort classes by dependency order
+        // Uses Kahn's algorithm (BFS) so circular dependencies are handled gracefully:
+        // when cycles prevent progress, the remaining node with fewest deps goes next.
+        self::$sortedClasses = self::topologicalSort(self::$classDependencies);
+    }
+
+    /**
+     * Topological sort with graceful handling of circular dependencies.
+     * When cycles are detected, the remaining node with fewest remaining dependencies
+     * is emitted next, ensuring classes with zero deps always come first.
+     *
+     * @param array<string, string[]> $depsMap class => its dependencies
+     * @return string[] Sorted class names
+     */
+    static protected function topologicalSort(array $depsMap): array
+    {
+        $result = [];
+        $remaining = $depsMap;
+
+        while (!empty($remaining)) {
+            // Find a node with no remaining dependencies
+            $next = null;
+            foreach ($remaining as $class => $deps) {
+                $unresolved = array_filter($deps, fn($d) => isset($remaining[$d]));
+                if (empty($unresolved)) {
+                    $next = $class;
+                    break;
+                }
+            }
+
+            if ($next === null) {
+                // Circular dependency: pick the node with the fewest remaining deps
+                $minCount = PHP_INT_MAX;
+                foreach ($remaining as $class => $deps) {
+                    $unresolved = array_filter($deps, fn($d) => isset($remaining[$d]));
+                    $cnt = count($unresolved);
+                    if ($cnt < $minCount) {
+                        $minCount = $cnt;
+                        $next = $class;
+                    }
+                }
+            }
+
+            $result[] = $next;
+            unset($remaining[$next]);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Scan a class's public methods to find parameter/return type dependencies on other Facade classes.
+     * @return string[] List of C++ Facade class names this class depends on
+     */
+    static protected function scanClassDependencies(ReflectionClass $ref, string $cppName): array
+    {
+        $deps = [];
+        foreach ($ref->getMethods() as $method) {
+            if (!$method->isPublic() || $method->isDestructor()) {
+                continue;
+            }
+
+            // Return type dependency
+            $rt = $method->getReturnType();
+            if ($rt instanceof ReflectionNamedType) {
+                $dep = self::resolveType($rt, $cppName);
+                if ($dep !== 'Variant' && $dep !== $cppName) {
+                    $deps[$dep] = true;
+                }
+            } elseif ($rt instanceof \ReflectionUnionType) {
+                foreach ($rt->getTypes() as $unionType) {
+                    if ($unionType instanceof ReflectionNamedType) {
+                        $dep = self::resolveType($unionType, $cppName);
+                        if ($dep !== 'Variant' && $dep !== $cppName) {
+                            $deps[$dep] = true;
+                        }
+                    }
+                }
+            }
+
+            // Parameter type dependencies
+            foreach ($method->getParameters() as $param) {
+                $pt = $param->getType();
+                if ($pt instanceof ReflectionNamedType) {
+                    $dep = self::resolveType($pt, $cppName);
+                    if ($dep !== 'Variant' && $dep !== $cppName) {
+                        $deps[$dep] = true;
+                    }
+                }
+            }
+        }
+        return array_keys($deps);
+    }
+
+    /**
+     * Check whether $selfClass referencing $depClass is a back-edge in the
+     * topological sort (i.e. $selfClass is defined before $depClass, so the
+     * type won't be visible when the compiler reaches $selfClass).
+     */
+    static protected function isBackEdge(string $selfClass, string $depClass): bool
+    {
+        $selfPos = array_search($selfClass, self::$sortedClasses);
+        $depPos = array_search($depClass, self::$sortedClasses);
+        return $selfPos !== false && $depPos !== false && $selfPos < $depPos;
+    }
+
+    /**
+     * Compute a topologically sorted list of extension names (lowercase).
+     * Extensions whose classes depend on classes from other extensions come later.
+     * @return string[]
+     */
+    public static function getSortedExtensionOrder(): array
+    {
+        $extDeps = [];
+        foreach (self::$classToExtension as $class => $ext) {
+            $extLower = strtolower($ext);
+            if (!isset($extDeps[$extLower])) {
+                $extDeps[$extLower] = [];
+            }
+        }
+
+        foreach (self::$classDependencies as $class => $deps) {
+            $extLower = strtolower(self::$classToExtension[$class] ?? '');
+            if ($extLower === '') continue;
+            foreach ($deps as $dep) {
+                $depExt = strtolower(self::$classToExtension[$dep] ?? '');
+                if ($depExt && $depExt !== $extLower && !in_array($depExt, $extDeps[$extLower])) {
+                    $extDeps[$extLower][] = $depExt;
+                }
+            }
+        }
+
+        $graph = new ArraySort();
+        foreach ($extDeps as $ext => $deps) {
+            $graph->add($ext, $deps);
+        }
+        try {
+            return $graph->sort();
+        } catch (CircularDependencyException $e) {
+            return array_keys($extDeps);
+        }
+    }
+
+    /**
+     * Resolve a PHP type to a C++ type string for code generation.
+     * Returns null when no type info is available (caller falls back to 'Variant').
+     * Returns the Facade class name for classes that have a generated Facade.
+     * Returns 'Variant' for PHP built-in types.
+     */
+    public static function resolveType(?\ReflectionNamedType $type, string $selfClass = ''): string
+    {
+        if ($type === null) {
+            return 'Variant';
+        }
+
+        $typeName = $type->getName();
+
+        // `self` refers to the containing class; `static` is late-bound, can't resolve
+        if ($typeName === 'static') {
+            return 'Variant';
+        }
+        if ($typeName === 'self') {
+            return $selfClass ?: 'Variant';
+        }
+
+        // Built-in PHP types always map to Variant
+        if (in_array($typeName, self::BUILTIN_TYPES)) {
+            return 'Variant';
+        }
+
+        // Check if it's a Facade class
+        if (isset(self::$facadeClassMap[$typeName])) {
+            return self::$facadeClassMap[$typeName];
+        }
+
+        return 'Variant';
+    }
+
+    /**
+     * Resolve a method/function return type for code generation.
+     * Handles `Type | false` union types by returning the Facade type with
+     * a flag indicating the call must be wrapped with a false-check.
+     *
+     * @return array{return_type: string, check_false: bool}
+     */
+    static public function resolveReturnType(?\ReflectionType $type, string $selfClass = ''): array
+    {
+        if ($type === null) {
+            return ['return_type' => 'Variant', 'check_false' => false];
+        }
+
+        if ($type instanceof \ReflectionNamedType) {
+            return ['return_type' => self::resolveType($type, $selfClass), 'check_false' => false];
+        }
+
+        if ($type instanceof \ReflectionUnionType) {
+            $types = $type->getTypes();
+            // Only handle `T | false` (two-type union with exactly one false)
+            if (count($types) === 2) {
+                $hasFalse = false;
+                $otherType = null;
+                $valid = true;
+                foreach ($types as $t) {
+                    if (!$t instanceof \ReflectionNamedType) {
+                        $valid = false;
+                        break;
+                    }
+                    if ($t->getName() === 'false') {
+                        $hasFalse = true;
+                    } else {
+                        $otherType = $t;
+                    }
+                }
+                if ($valid && $hasFalse && $otherType !== null) {
+                    $resolved = self::resolveType($otherType, $selfClass);
+                    return ['return_type' => $resolved, 'check_false' => true];
+                }
+            }
+        }
+
+        return ['return_type' => 'Variant', 'check_false' => false];
     }
 
     public static function render($tplFile, $outFile, $vars, $prefix = ''): void
@@ -232,14 +538,51 @@ class Generator
             }
             self::nameSafety($name);
 
-            [$args, $call, $args_impl, $variadic] = $this->getArgs($function->getParameters());
+            [$args, $call, $args_impl, $variadic, $hasFacade, $args_v, $call_v, $args_impl_v] = $this->getArgs($function->getParameters());
             $symbol = $function->getName();
+
+            $returnInfo = self::resolveReturnType($function->getReturnType());
+            $returnType = $returnInfo['return_type'];
+            // Fall back to Variant if the return-type class has PHP __construct
+            // (no Object constructor exists, so we can't wrap the result)
+            if ($returnType !== 'Variant' && !empty(self::$classHasCtor[$returnType])) {
+                $returnType = 'Variant';
+            }
+            $returnBody = $returnExpr = $returnExprV = '';
+            if ($returnType !== 'Variant') {
+                $callArgs = $call ? '{' . implode(', ', $call) . '}' : '{}';
+                $innerExpr = "call(fn, {$callArgs})";
+                if ($returnInfo['check_false']) {
+                    $funcName = $function->getName();
+                    $returnBody = "auto _rv = {$innerExpr};\n"
+                        . "\tif (!_rv.toBool()) {\n"
+                        . "\t\tthrowException(String(\"RuntimeException\"), \"{$funcName}() returned false\");\n"
+                        . "\t}";
+                    $returnExpr = "{$returnType}(Object(std::move(_rv)))";
+                } else {
+                    $returnExpr = $returnType . '(Object(' . $innerExpr . '))';
+                }
+            }
+            // Variant overload: uses Variant args without unwrapping, always returns Variant
+            if ($hasFacade) {
+                $callArgsV = $call_v ? '{' . implode(', ', $call_v) . '}' : '{}';
+                $returnExprV = "call(fn, {$callArgsV})";
+            }
+
             $functions[$name] = [
                 'args' => $args ? implode(', ', $args) : '',
                 'args_impl' => $args ? implode(', ', $args_impl) : '',
                 'call' => $call ? '{' . implode(', ', $call) . '}' : '{}',
                 'symbol' => self::addLiteralString($symbol),
                 'variadic' => $variadic,
+                'return_type' => $returnType,
+                'return_body' => $returnBody,
+                'return_expr' => $returnExpr,
+                'has_facade_params' => $hasFacade,
+                'args_v' => $args_v ? implode(', ', $args_v) : '',
+                'args_impl_v' => $args_impl_v ? implode(', ', $args_impl_v) : '',
+                'call_v' => $call_v ? '{' . implode(', ', $call_v) . '}' : '{}',
+                'return_expr_v' => $returnExprV,
             ];
         }
         return $functions;
@@ -260,36 +603,72 @@ class Generator
 
     /**
      * @param array<ReflectionParameter> $params
-     * @return array
+     * @return array  [args, call, args_impl, variadic, has_facade, args_v, call_v, args_impl_v]
      */
-    protected function getArgs(array $params): array
+    protected function getArgs(array $params, string $selfClass = ''): array
     {
         $args_impl = $call = $args = [];
+        $args_impl_v = $call_v = $args_v = [];
         $variadic = false;
+        $hasFacade = false;
         foreach ($params as $param) {
             $arg_name = $param->name;
             self::nameSafety($arg_name);
             self::changeCasePascal2Snake($arg_name);
-            $type = 'const ' . ($param->isPassedByReference() ? 'Reference' : 'Variant');
+
+            $paramType = $param->getType();
+            $cppType = 'Variant';
+            $isFacade = false;
+            if ($paramType instanceof \ReflectionNamedType) {
+                $resolved = self::resolveType($paramType, $selfClass);
+                if ($resolved !== 'Variant') {
+                    // Only use Facade type for required params; optional params with scalar
+                    // defaults cannot be implicitly converted from raw int/string literals
+                    if ($param->isOptional()) {
+                        $isFacade = false;
+                    } elseif ($selfClass && self::isBackEdge($selfClass, $resolved)) {
+                        // Circular dependency back-edge: this class is defined before
+                        // the dependency, so the type won't be visible yet — use Variant
+                        $isFacade = false;
+                    } else {
+                        $cppType = $resolved;
+                        $isFacade = true;
+                        $hasFacade = true;
+                    }
+                }
+            }
+
+            $byRef = $param->isPassedByReference();
+            $type = 'const ' . ($byRef ? 'Reference' : $cppType);
+            $typeV = 'const ' . ($byRef ? 'Reference' : 'Variant');
 
             if ($param->isVariadic()) {
                 $variadic = true;
                 $args[] = 'const Args&... ' . $arg_name;
                 $call[] = $arg_name . '...';
                 $args_impl[] = 'const Args&... ' . $arg_name;
+                $args_v[] = 'const Args&... ' . $arg_name;
+                $call_v[] = $arg_name . '...';
+                $args_impl_v[] = 'const Args&... ' . $arg_name;
                 break;
             } elseif ($param->isOptional()) {
                 if ($param->isDefaultValueAvailable()) {
                     $default_value = $param->getDefaultValue();
-                    $args[] = "$type &$arg_name = " . self::valueToCppRepr($default_value, $param->isPassedByReference());
+                    $default_repr = self::valueToCppRepr($default_value, $param->isPassedByReference());
+                    $args[] = "$type &$arg_name = " . $default_repr;
+                    $args_v[] = "$typeV &$arg_name = " . $default_repr;
                 } else {
                     $args[] = "$type &$arg_name = " . '{}';
+                    $args_v[] = "$typeV &$arg_name = " . '{}';
                 }
             } else {
                 $args[] = "$type &$arg_name";
+                $args_v[] = "$typeV &$arg_name";
             }
             $args_impl[] = "$type &$arg_name";
-            $call[] = $param->isPassedByReference() ? '&' . $arg_name : $arg_name;
+            $args_impl_v[] = "$typeV &$arg_name";
+            $call[] = $byRef ? '&' . $arg_name : ($isFacade ? $arg_name . '.getObject()' : $arg_name);
+            $call_v[] = $byRef ? '&' . $arg_name : $arg_name;
         }
 
         return [
@@ -297,6 +676,10 @@ class Generator
             $call,
             $args_impl,
             $variadic,
+            $hasFacade,
+            $args_v,
+            $call_v,
+            $args_impl_v,
         ];
     }
 
@@ -353,8 +736,30 @@ class Generator
                 }
                 self::nameSafety($name);
 
-                [$args, $call, $args_impl, $variadic] = $this->getArgs($params);
+                [$args, $call, $args_impl, $variadic, $hasFacade, $args_v, $call_v, $args_impl_v] = $this->getArgs($params, $className);
                 $symbol = $method->isStatic() ? $className . '::' . $method->getName() : $method->getName();
+
+                // Resolve return type
+                $returnType = 'Variant';
+                $checkFalse = false;
+                $rt = $method->getReturnType();
+                if ($rt !== null) {
+                    $returnInfo = self::resolveReturnType($rt, $className);
+                    $returnType = $returnInfo['return_type'];
+                    $checkFalse = $returnInfo['check_false'];
+                    // Circular dependency back-edge: if the return type is defined
+                    // after this class in sorted order, fall back to Variant.
+                    if ($returnType !== 'Variant' && self::isBackEdge($className, $returnType)) {
+                        $returnType = 'Variant';
+                        $checkFalse = false;
+                    }
+                    // Fall back to Variant if the return-type class has PHP __construct
+                    // (no Object constructor exists, so we can't wrap the result as ClassName(Object(...)))
+                    if ($returnType !== 'Variant' && !empty(self::$classHasCtor[$returnType])) {
+                        $returnType = 'Variant';
+                        $checkFalse = false;
+                    }
+                }
 
                 $info =[
                     'args' => $args ? implode(', ', $args) : '',
@@ -364,11 +769,16 @@ class Generator
                     'ctor' => $method->isConstructor(),
                     'symbol' => self::addLiteralString($symbol),
                     'variadic' => $variadic,
+                    'return_type' => $returnType,
+                    'has_facade_params' => $hasFacade,
+                    'args_v' => $hasFacade ? ($args_v ? implode(', ', $args_v) : '') : '',
+                    'args_impl_v' => $hasFacade ? ($args_impl_v ? implode(', ', $args_impl_v) : '') : '',
+                    'call_v' => $hasFacade ? ($call_v ? '{' . implode(', ', $call_v) . '}' : '{}') : '',
                 ];
 
                 $code = '';
                 if (!$info['ctor']) {
-                    $code .= 'Variant ';
+                    $code .= $returnType . ' ';
                 }
                 $code .= $variadic ? $name : $className . '::' . $name;
                 $code .= "({$info['args_impl']}) {" . "\n";
@@ -382,16 +792,60 @@ class Generator
                      $code .= "\tif (UNEXPECTED(!_method_fn)) {\n";
                      $code .= "\t\t_method_fn = php::getMethod({$classLiteralString}, {$methodLiteralString});\n";
                      $code .= "\t}\n";
-                     $code .= "\treturn php::call(_method_fn, {$info['call']});\n";
+                     if ($checkFalse) {
+                         $callExpr = "php::call(_method_fn, {$info['call']})";
+                         $code .= "\tauto _rv = {$callExpr};\n";
+                         $code .= "\tif (!_rv.toBool()) {\n";
+                         $code .= "\t\tthrowException(String(\"RuntimeException\"), \"{$className}::{$method->getName()}() returned false\");\n";
+                         $code .= "\t}\n";
+                         $code .= "\treturn {$returnType}(Object(std::move(_rv)));\n";
+                     } elseif ($returnType !== 'Variant') {
+                         $code .= "\treturn {$returnType}(Object(php::call(_method_fn, {$info['call']})));\n";
+                     } else {
+                         $code .= "\treturn php::call(_method_fn, {$info['call']});\n";
+                     }
                  } else {
                      $code .= "\tstatic THREAD_LOCAL zend_function *_method_fn = nullptr;\n";
                      $code .= "\tif (UNEXPECTED(!_method_fn)) {\n";
                      $code .= "\t\t_method_fn = php::getMethod(this_.ce(), {$info['symbol']});\n";
                      $code .= "\t}\n";
-                     $code .= "\treturn this_.call(_method_fn, {$info['call']});\n";
+                     if ($checkFalse) {
+                         $callExpr = "this_.call(_method_fn, {$info['call']})";
+                         $code .= "\tauto _rv = {$callExpr};\n";
+                         $code .= "\tif (!_rv.toBool()) {\n";
+                         $code .= "\t\tthrowException(String(\"RuntimeException\"), \"{$className}::{$method->getName()}() returned false\");\n";
+                         $code .= "\t}\n";
+                         $code .= "\treturn {$returnType}(Object(std::move(_rv)));\n";
+                     } elseif ($returnType !== 'Variant') {
+                         $code .= "\treturn {$returnType}(Object(this_.call(_method_fn, {$info['call']})));\n";
+                     } else {
+                         $code .= "\treturn this_.call(_method_fn, {$info['call']});\n";
+                     }
                  }
                 $code .= "}\n";
                 $info['impl_code'] = $code;
+
+                // Generate Variant overload if method has Facade-typed parameters
+                $info['impl_code_v'] = '';
+                if ($hasFacade && !$variadic && !$info['ctor']) {
+                    $codeV = "Variant ";
+                    $codeV .= "{$className}::{$name}({$info['args_impl_v']}) {" . "\n";
+                    if ($info['static']) {
+                        $codeV .= "\tstatic THREAD_LOCAL zend_function *_method_fn = nullptr;\n";
+                        $codeV .= "\tif (UNEXPECTED(!_method_fn)) {\n";
+                        $codeV .= "\t\t_method_fn = php::getMethod({$classLiteralString}, {$methodLiteralString});\n";
+                        $codeV .= "\t}\n";
+                        $codeV .= "\treturn php::call(_method_fn, {$info['call_v']});\n";
+                    } else {
+                        $codeV .= "\tstatic THREAD_LOCAL zend_function *_method_fn = nullptr;\n";
+                        $codeV .= "\tif (UNEXPECTED(!_method_fn)) {\n";
+                        $codeV .= "\t\t_method_fn = php::getMethod(this_.ce(), {$info['symbol']});\n";
+                        $codeV .= "\t}\n";
+                        $codeV .= "\treturn this_.call(_method_fn, {$info['call_v']});\n";
+                    }
+                    $codeV .= "}\n";
+                    $info['impl_code_v'] = $codeV;
+                }
                 $methods[$name] = $info;
             }
 
@@ -402,8 +856,20 @@ class Generator
             $classes[$className] = [
                 'methods' => $methods,
                 'class' => self::addLiteralString($classSymbol),
+                'has_ctor' => $hasCtor,
             ];
         }
+
+        // Sort classes topologically so dependent classes are declared first
+        $sortedList = self::$sortedClasses;
+        uksort($classes, function ($a, $b) use ($sortedList) {
+            $posA = array_search($a, $sortedList);
+            $posB = array_search($b, $sortedList);
+            if ($posA === false) $posA = PHP_INT_MAX;
+            if ($posB === false) $posB = PHP_INT_MAX;
+            return $posA - $posB;
+        });
+
         return $classes;
     }
 
@@ -413,6 +879,8 @@ class Generator
         if ($this->extRef->getConstants()) {
             foreach ($this->extRef->getConstants() as $name => $value) {
                 if (is_array($value) or is_object($value) or is_resource($value)) {
+                    $type = gettype($value);
+                    echo "Skipping constant $name, unsupported type `{$type}`\n";
                     continue;
                 }
                 $ext = strtolower($this->extension);

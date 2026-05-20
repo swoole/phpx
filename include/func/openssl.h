@@ -1,5 +1,8 @@
+#pragma once
+
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant openssl_x509_export_to_file(const Variant &certificate,
@@ -16,7 +19,8 @@ Variant openssl_x509_checkpurpose(const Variant &certificate,
                                   const Variant &purpose,
                                   const Variant &ca_info = Array{},
                                   const Variant &untrusted_certificates_file = {});
-Variant openssl_x509_read(const Variant &certificate);
+OpenSSLCertificate openssl_x509_read(const Variant &certificate);
+Variant openssl_x509_free(const OpenSSLCertificate &certificate);
 Variant openssl_x509_free(const Variant &certificate);
 Variant openssl_pkcs12_export_to_file(const Variant &certificate,
                                       const Variant &output_filename,
@@ -31,20 +35,20 @@ Variant openssl_pkcs12_export(const Variant &certificate,
 Variant openssl_pkcs12_read(const Variant &pkcs12, const Reference &certificates, const Variant &passphrase);
 Variant openssl_csr_export_to_file(const Variant &csr, const Variant &output_filename, const Variant &no_text = true);
 Variant openssl_csr_export(const Variant &csr, const Reference &output, const Variant &no_text = true);
-Variant openssl_csr_sign(const Variant &csr,
-                         const Variant &ca_certificate,
-                         const Variant &private_key,
-                         const Variant &days,
-                         const Variant &options = {},
-                         const Variant &serial = 0,
-                         const Variant &serial_hex = {});
+OpenSSLCertificate openssl_csr_sign(const Variant &csr,
+                                    const Variant &ca_certificate,
+                                    const Variant &private_key,
+                                    const Variant &days,
+                                    const Variant &options = {},
+                                    const Variant &serial = 0,
+                                    const Variant &serial_hex = {});
 Variant openssl_csr_new(const Variant &distinguished_names,
                         const Reference &private_key,
                         const Variant &options = {},
                         const Variant &extra_attributes = {});
 Variant openssl_csr_get_subject(const Variant &csr, const Variant &short_names = true);
-Variant openssl_csr_get_public_key(const Variant &csr, const Variant &short_names = true);
-Variant openssl_pkey_new(const Variant &options = {});
+OpenSSLAsymmetricKey openssl_csr_get_public_key(const Variant &csr, const Variant &short_names = true);
+OpenSSLAsymmetricKey openssl_pkey_new(const Variant &options = {});
 Variant openssl_pkey_export_to_file(const Variant &key,
                                     const Variant &output_filename,
                                     const Variant &passphrase = {},
@@ -53,12 +57,15 @@ Variant openssl_pkey_export(const Variant &key,
                             const Reference &output,
                             const Variant &passphrase = {},
                             const Variant &options = {});
-Variant openssl_pkey_get_public(const Variant &public_key);
-Variant openssl_get_publickey(const Variant &public_key);
+OpenSSLAsymmetricKey openssl_pkey_get_public(const Variant &public_key);
+OpenSSLAsymmetricKey openssl_get_publickey(const Variant &public_key);
+Variant openssl_pkey_free(const OpenSSLAsymmetricKey &key);
 Variant openssl_pkey_free(const Variant &key);
+Variant openssl_free_key(const OpenSSLAsymmetricKey &key);
 Variant openssl_free_key(const Variant &key);
-Variant openssl_pkey_get_private(const Variant &private_key, const Variant &passphrase = {});
-Variant openssl_get_privatekey(const Variant &private_key, const Variant &passphrase = {});
+OpenSSLAsymmetricKey openssl_pkey_get_private(const Variant &private_key, const Variant &passphrase = {});
+OpenSSLAsymmetricKey openssl_get_privatekey(const Variant &private_key, const Variant &passphrase = {});
+Variant openssl_pkey_get_details(const OpenSSLAsymmetricKey &key);
 Variant openssl_pkey_get_details(const Variant &key);
 Variant openssl_pbkdf2(const Variant &password,
                        const Variant &salt,
@@ -178,9 +185,13 @@ Variant openssl_decrypt(const Variant &data,
                         const Variant &aad = "");
 Variant openssl_cipher_iv_length(const Variant &cipher_algo);
 Variant openssl_cipher_key_length(const Variant &cipher_algo);
+Variant openssl_dh_compute_key(const Variant &public_key, const OpenSSLAsymmetricKey &private_key);
 Variant openssl_dh_compute_key(const Variant &public_key, const Variant &private_key);
 Variant openssl_pkey_derive(const Variant &public_key, const Variant &private_key, const Variant &key_length = 0);
 Variant openssl_random_pseudo_bytes(const Variant &length, const Reference &strong_result = {});
+Variant openssl_spki_new(const OpenSSLAsymmetricKey &private_key,
+                         const Variant &challenge,
+                         const Variant &digest_algo = 2);
 Variant openssl_spki_new(const Variant &private_key, const Variant &challenge, const Variant &digest_algo = 2);
 Variant openssl_spki_verify(const Variant &spki);
 Variant openssl_spki_export(const Variant &spki);

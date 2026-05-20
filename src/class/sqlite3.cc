@@ -141,6 +141,15 @@ Variant SQLite3::loadExtension(const Variant &name) {
     }
     return this_.call(_method_fn, {name});
 }
+Variant SQLite3::backup(const SQLite3 &destination,
+                        const Variant &source_database,
+                        const Variant &destination_database) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1899]);
+    }
+    return this_.call(_method_fn, {destination.getObject(), source_database, destination_database});
+}
 Variant SQLite3::backup(const Variant &destination,
                         const Variant &source_database,
                         const Variant &destination_database) {

@@ -1,3 +1,6 @@
+#pragma once
+
+#include "phpx_class.h"
 #include "phpx_literal_string.h"
 
 namespace php {
@@ -5,9 +8,10 @@ class XSLTProcessor {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
+    explicit XSLTProcessor(const Object &obj) : this_(obj) {}
     XSLTProcessor();
     Variant importStylesheet(const Variant &stylesheet);
     Variant transformToDoc(const Variant &document, const Variant &return_class = {});

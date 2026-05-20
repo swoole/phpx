@@ -843,6 +843,13 @@ Variant RequestParseBodyException::__toString() {
     }
     return this_.call(_method_fn, {});
 }
+Variant Closure::bind(const Closure &closure, const Variant &new_this, const Variant &new_scope) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[118], LITERAL_STRING[119]);
+    }
+    return php::call(_method_fn, {closure.getObject(), new_this, new_scope});
+}
 Variant Closure::bind(const Variant &closure, const Variant &new_this, const Variant &new_scope) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {

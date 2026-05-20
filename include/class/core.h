@@ -1,3 +1,6 @@
+#pragma once
+
+#include "phpx_class.h"
 #include "phpx_literal_string.h"
 
 namespace php {
@@ -5,7 +8,7 @@ class InternalIterator {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Variant current();
@@ -19,7 +22,7 @@ class Exception {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -38,7 +41,7 @@ class ErrorException {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ErrorException(const Variant &message = "",
@@ -63,7 +66,7 @@ class Error {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Error(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -82,7 +85,7 @@ class CompileError {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     CompileError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -101,7 +104,7 @@ class ParseError {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ParseError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -120,7 +123,7 @@ class TypeError {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     TypeError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -139,7 +142,7 @@ class ArgumentCountError {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ArgumentCountError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -158,7 +161,7 @@ class ValueError {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ValueError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -177,7 +180,7 @@ class ArithmeticError {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ArithmeticError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -196,7 +199,7 @@ class DivisionByZeroError {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     DivisionByZeroError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -215,7 +218,7 @@ class UnhandledMatchError {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     UnhandledMatchError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -234,7 +237,7 @@ class RequestParseBodyException {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     RequestParseBodyException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -253,10 +256,11 @@ class Closure {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
-    static Variant bind(const Variant &closure, const Variant &new_this, const Variant &new_scope = "static");
+    static Variant bind(const Closure &closure, const Variant &new_this, const Variant &new_scope = "static");
+    Variant bind(const Variant &closure, const Variant &new_this, const Variant &new_scope = "static");
     Variant bindTo(const Variant &new_this, const Variant &new_scope = "static");
     template <typename... Args>
     Variant call(const Variant &new_this, const Args &...args) {
@@ -274,9 +278,10 @@ class Generator {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
+    explicit Generator(const Object &obj) : this_(obj) {}
     Generator();
     Variant rewind();
     Variant valid();
@@ -293,7 +298,7 @@ class ClosedGeneratorException {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ClosedGeneratorException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -312,7 +317,7 @@ class WeakReference {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     WeakReference();
@@ -324,9 +329,10 @@ class WeakMap {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
+    explicit WeakMap(const Object &obj) : this_(obj) {}
     WeakMap();
     Variant offsetGet(const Variant &object);
     Variant offsetSet(const Variant &object, const Variant &value);
@@ -340,7 +346,7 @@ class Attribute {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Attribute(const Variant &flags = 63);
@@ -350,7 +356,7 @@ class ReturnTypeWillChange {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ReturnTypeWillChange();
@@ -360,7 +366,7 @@ class AllowDynamicProperties {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     AllowDynamicProperties();
@@ -370,7 +376,7 @@ class SensitiveParameter {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     SensitiveParameter();
@@ -380,7 +386,7 @@ class SensitiveParameterValue {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     SensitiveParameterValue(const Variant &value);
@@ -392,7 +398,7 @@ class Override {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Override();
@@ -402,7 +408,7 @@ class Deprecated {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Deprecated(const Variant &message = {}, const Variant &since = {});
@@ -412,7 +418,7 @@ class Fiber {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Fiber(const Variant &callback);
@@ -439,7 +445,7 @@ class FiberError {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     FiberError();
@@ -458,9 +464,10 @@ class stdClass {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
+    explicit stdClass(const Object &obj) : this_(obj) {}
     stdClass();
 };
 

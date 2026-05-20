@@ -1,5 +1,8 @@
+#pragma once
+
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant bcadd(const Variant &num1, const Variant &num2, const Variant &scale = {});

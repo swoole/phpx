@@ -1,5 +1,6 @@
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant session_name(const Variant &name) {

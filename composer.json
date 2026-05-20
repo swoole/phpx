@@ -26,6 +26,7 @@
         "phpx": "phpx $1"
     },
     "require": {
-        "league/climate": "^3.10"
+        "league/climate": "^3.10",
+        "marcj/topsort": "^2.0"
     }
 }

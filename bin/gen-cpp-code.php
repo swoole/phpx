@@ -71,15 +71,6 @@ HEADER;
 
 $rootDir = dirname(__DIR__);
 
-$funcHeaderFile = fopen($rootDir . '/include/phpx_func.h', "w");
-fwrite($funcHeaderFile, $header);
-
-$classHeaderFile = fopen($rootDir . '/include/phpx_class.h', "w");
-fwrite($classHeaderFile, $header);
-
-$constHeaderFile = fopen($rootDir . '/include/phpx_const.h', "w");
-fwrite($constHeaderFile, $header);
-
 shell_exec('rm -rf ' . $rootDir . '/include/class/*');
 shell_exec('rm -rf ' . $rootDir . '/include/const/*');
 shell_exec('rm -rf ' . $rootDir . '/include/func/*');
@@ -88,25 +79,75 @@ shell_exec('rm -rf ' . $rootDir . '/src/class/*');
 shell_exec('rm -rf ' . $rootDir . '/src/const/*');
 shell_exec('rm -rf ' . $rootDir . '/src/func/*');
 
+// Pre-scan: build facade class map and dependency graph for type resolution
+Generator::buildFacadeClassMap($extensions);
+
+// Collect generated includes during the extension loop
+$funcIncludes = [];
+$classIncludes = [];
+$constIncludes = [];
+
 foreach ($extensions as $extension) {
     Generator::make($extension);
     $name = strtolower($extension);
     $funcDeclarationFile = $rootDir . "/include/func/{$name}.h";
     if (is_file($funcDeclarationFile)) {
-        fwrite($funcHeaderFile, "#include \"func/{$name}.h\"\n");
+        $funcIncludes[] = $name;
     }
 
     $classDeclarationFile = $rootDir . "/include/class/{$name}.h";
     if (is_file($classDeclarationFile)) {
-        fwrite($classHeaderFile, "#include \"class/{$name}.h\"\n");
+        $classIncludes[] = $name;
     }
 
     $constDeclarationFile = $rootDir . "/include/const/{$name}.h";
     if (is_file($constDeclarationFile)) {
-        fwrite($constHeaderFile, "#include \"const/{$name}.h\"\n");
+        $constIncludes[] = $name;
     }
 
     echo "Generate C++ facade code for ext-{$extension} successfully.\n";
 }
+
+// Sort include entries by extension dependency order
+$extOrder = Generator::getSortedExtensionOrder();
+$byExtOrder = function ($a, $b) use ($extOrder) {
+    $posA = array_search($a, $extOrder);
+    $posB = array_search($b, $extOrder);
+    if ($posA === false) $posA = PHP_INT_MAX;
+    if ($posB === false) $posB = PHP_INT_MAX;
+    return $posA - $posB;
+};
+usort($funcIncludes, $byExtOrder);
+usort($classIncludes, $byExtOrder);
+usort($constIncludes, $byExtOrder);
+
+// Write phpx_func.h
+$funcHeaderFile = fopen($rootDir . '/include/phpx_func.h', "w");
+fwrite($funcHeaderFile, $header);
+foreach ($funcIncludes as $name) {
+    fwrite($funcHeaderFile, "#include \"func/{$name}.h\"\n");
+}
+fclose($funcHeaderFile);
+
+// Write phpx_class.h with forward declarations of all facade classes
+$classHeaderFile = fopen($rootDir . '/include/phpx_class.h', "w");
+fwrite($classHeaderFile, $header);
+fwrite($classHeaderFile, "\nnamespace php {\n");
+foreach (Generator::$sortedClasses as $className) {
+    fwrite($classHeaderFile, "class {$className};\n");
+}
+fwrite($classHeaderFile, "}  // namespace php\n\n");
+foreach ($classIncludes as $name) {
+    fwrite($classHeaderFile, "#include \"class/{$name}.h\"\n");
+}
+fclose($classHeaderFile);
+
+// Write phpx_const.h
+$constHeaderFile = fopen($rootDir . '/include/phpx_const.h', "w");
+fwrite($constHeaderFile, $header);
+foreach ($constIncludes as $name) {
+    fwrite($constHeaderFile, "#include \"const/{$name}.h\"\n");
+}
+fclose($constHeaderFile);
 
 Generator::makeLiteralString();

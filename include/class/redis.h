@@ -1,3 +1,6 @@
+#pragma once
+
+#include "phpx_class.h"
 #include "phpx_literal_string.h"
 
 namespace php {
@@ -5,7 +8,7 @@ class Redis {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Redis(const Variant &options = {});
@@ -689,7 +692,7 @@ class RedisArray {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Variant __call(const Variant &function_name, const Variant &arguments);
@@ -743,7 +746,7 @@ class RedisCluster {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     RedisCluster(const Variant &name,
@@ -1353,7 +1356,7 @@ class RedisClusterException {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     RedisClusterException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -1372,7 +1375,7 @@ class RedisSentinel {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     RedisSentinel(const Variant &options = {});
@@ -1393,7 +1396,7 @@ class RedisException {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     RedisException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});

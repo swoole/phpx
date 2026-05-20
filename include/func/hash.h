@@ -1,5 +1,8 @@
+#pragma once
+
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant hash(const Variant &algo, const Variant &data, const Variant &binary = false, const Variant &options = Array{});
@@ -13,10 +16,15 @@ Variant hash_init(const Variant &algo,
                   const Variant &flags = 0,
                   const Variant &key = "",
                   const Variant &options = Array{});
+Variant hash_update(const HashContext &context, const Variant &data);
 Variant hash_update(const Variant &context, const Variant &data);
+Variant hash_update_stream(const HashContext &context, const Variant &stream, const Variant &length = -1);
 Variant hash_update_stream(const Variant &context, const Variant &stream, const Variant &length = -1);
+Variant hash_update_file(const HashContext &context, const Variant &filename, const Variant &stream_context = {});
 Variant hash_update_file(const Variant &context, const Variant &filename, const Variant &stream_context = {});
+Variant hash_final(const HashContext &context, const Variant &binary = false);
 Variant hash_final(const Variant &context, const Variant &binary = false);
+Variant hash_copy(const HashContext &context);
 Variant hash_copy(const Variant &context);
 Variant hash_algos();
 Variant hash_hmac_algos();

@@ -1,5 +1,6 @@
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant hash(const Variant &algo, const Variant &data, const Variant &binary, const Variant &options) {
@@ -37,12 +38,26 @@ Variant hash_init(const Variant &algo, const Variant &flags, const Variant &key,
     }
     return call(fn, {algo, flags, key, options});
 }
+Variant hash_update(const HashContext &context, const Variant &data) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[646]);
+    }
+    return call(fn, {context.getObject(), data});
+}
 Variant hash_update(const Variant &context, const Variant &data) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[646]);
     }
     return call(fn, {context, data});
+}
+Variant hash_update_stream(const HashContext &context, const Variant &stream, const Variant &length) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[647]);
+    }
+    return call(fn, {context.getObject(), stream, length});
 }
 Variant hash_update_stream(const Variant &context, const Variant &stream, const Variant &length) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -51,6 +66,13 @@ Variant hash_update_stream(const Variant &context, const Variant &stream, const 
     }
     return call(fn, {context, stream, length});
 }
+Variant hash_update_file(const HashContext &context, const Variant &filename, const Variant &stream_context) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[648]);
+    }
+    return call(fn, {context.getObject(), filename, stream_context});
+}
 Variant hash_update_file(const Variant &context, const Variant &filename, const Variant &stream_context) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
@@ -58,12 +80,26 @@ Variant hash_update_file(const Variant &context, const Variant &filename, const 
     }
     return call(fn, {context, filename, stream_context});
 }
+Variant hash_final(const HashContext &context, const Variant &binary) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[649]);
+    }
+    return call(fn, {context.getObject(), binary});
+}
 Variant hash_final(const Variant &context, const Variant &binary) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[649]);
     }
     return call(fn, {context, binary});
+}
+Variant hash_copy(const HashContext &context) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[650]);
+    }
+    return call(fn, {context.getObject()});
 }
 Variant hash_copy(const Variant &context) {
     static THREAD_LOCAL zend_function *fn = nullptr;

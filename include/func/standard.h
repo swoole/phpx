@@ -1,5 +1,8 @@
+#pragma once
+
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant set_time_limit(const Variant &seconds);
@@ -566,7 +569,7 @@ Variant substr_compare(const Variant &haystack,
 Variant utf8_encode(const Variant &string);
 Variant utf8_decode(const Variant &string);
 Variant opendir(const Variant &directory, const Variant &context = {});
-Variant dir(const Variant &directory, const Variant &context = {});
+Directory dir(const Variant &directory, const Variant &context = {});
 Variant closedir(const Variant &dir_handle = {});
 Variant chdir(const Variant &directory);
 Variant getcwd();
@@ -931,10 +934,12 @@ Variant urldecode(const Variant &string);
 Variant rawurlencode(const Variant &string);
 Variant rawurldecode(const Variant &string);
 Variant get_headers(const Variant &url, const Variant &associative = false, const Variant &context = {});
-Variant stream_bucket_make_writeable(const Variant &brigade);
+StreamBucket stream_bucket_make_writeable(const Variant &brigade);
+Variant stream_bucket_prepend(const Variant &brigade, const StreamBucket &bucket);
 Variant stream_bucket_prepend(const Variant &brigade, const Variant &bucket);
+Variant stream_bucket_append(const Variant &brigade, const StreamBucket &bucket);
 Variant stream_bucket_append(const Variant &brigade, const Variant &bucket);
-Variant stream_bucket_new(const Variant &stream, const Variant &buffer);
+StreamBucket stream_bucket_new(const Variant &stream, const Variant &buffer);
 Variant stream_get_filters();
 Variant stream_filter_register(const Variant &filter_name, const Variant &_class);
 Variant convert_uuencode(const Variant &string);

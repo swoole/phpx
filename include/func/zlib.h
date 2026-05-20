@@ -1,5 +1,8 @@
+#pragma once
+
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant ob_gzhandler(const Variant &data, const Variant &flags);
@@ -26,10 +29,14 @@ Variant gzseek(const Variant &stream, const Variant &offset, const Variant &when
 Variant gztell(const Variant &stream);
 Variant gzread(const Variant &stream, const Variant &length);
 Variant gzgets(const Variant &stream, const Variant &length = {});
-Variant deflate_init(const Variant &encoding, const Variant &options = Array{});
+DeflateContext deflate_init(const Variant &encoding, const Variant &options = Array{});
+Variant deflate_add(const DeflateContext &context, const Variant &data, const Variant &flush_mode = 2);
 Variant deflate_add(const Variant &context, const Variant &data, const Variant &flush_mode = 2);
-Variant inflate_init(const Variant &encoding, const Variant &options = Array{});
+InflateContext inflate_init(const Variant &encoding, const Variant &options = Array{});
+Variant inflate_add(const InflateContext &context, const Variant &data, const Variant &flush_mode = 2);
 Variant inflate_add(const Variant &context, const Variant &data, const Variant &flush_mode = 2);
+Variant inflate_get_status(const InflateContext &context);
 Variant inflate_get_status(const Variant &context);
+Variant inflate_get_read_len(const InflateContext &context);
 Variant inflate_get_read_len(const Variant &context);
 }  // namespace php

@@ -1,3 +1,6 @@
+#pragma once
+
+#include "phpx_class.h"
 #include "phpx_literal_string.h"
 
 namespace php {
@@ -5,7 +8,7 @@ class PharException {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     PharException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -24,7 +27,7 @@ class Phar {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     Phar(const Variant &filename, const Variant &flags = 12288, const Variant &alias = {});
@@ -135,7 +138,7 @@ class PharData {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     PharData(const Variant &filename,
@@ -249,7 +252,7 @@ class PharFileInfo {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     PharFileInfo(const Variant &filename);

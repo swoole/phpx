@@ -1,3 +1,6 @@
+#pragma once
+
+#include "phpx_class.h"
 #include "phpx_literal_string.h"
 
 namespace php {
@@ -5,7 +8,7 @@ class ReflectionException {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ReflectionException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
@@ -24,9 +27,10 @@ class Reflection {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
+    explicit Reflection(const Object &obj) : this_(obj) {}
     Reflection();
     static Variant getModifierNames(const Variant &modifiers);
 };
@@ -35,7 +39,7 @@ class ReflectionFunction {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ReflectionFunction(const Variant &function);
@@ -89,10 +93,10 @@ class ReflectionGenerator {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
-    ReflectionGenerator(const Variant &generator);
+    ReflectionGenerator(const Generator &generator);
     Variant getExecutingLine();
     Variant getExecutingFile();
     Variant getTrace(const Variant &options = 1);
@@ -106,7 +110,7 @@ class ReflectionParameter {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ReflectionParameter(const Variant &function, const Variant &param);
@@ -137,9 +141,10 @@ class ReflectionNamedType {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
+    explicit ReflectionNamedType(const Object &obj) : this_(obj) {}
     ReflectionNamedType();
     Variant getName();
     Variant isBuiltin();
@@ -151,9 +156,10 @@ class ReflectionUnionType {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
+    explicit ReflectionUnionType(const Object &obj) : this_(obj) {}
     ReflectionUnionType();
     Variant getTypes();
     Variant allowsNull();
@@ -164,9 +170,10 @@ class ReflectionIntersectionType {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
+    explicit ReflectionIntersectionType(const Object &obj) : this_(obj) {}
     ReflectionIntersectionType();
     Variant getTypes();
     Variant allowsNull();
@@ -177,7 +184,7 @@ class ReflectionMethod {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ReflectionMethod(const Variant &object_or_method, const Variant &method = {});
@@ -242,7 +249,7 @@ class ReflectionClass {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ReflectionClass(const Variant &object_or_class);
@@ -321,7 +328,7 @@ class ReflectionObject {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ReflectionObject(const Variant &object);
@@ -396,11 +403,145 @@ class ReflectionObject {
     Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
 };
 
+class ReflectionClassConstant {
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    ReflectionClassConstant(const Variant &_class, const Variant &constant);
+    Variant __toString();
+    Variant getName();
+    Variant getValue();
+    Variant isPublic();
+    Variant isPrivate();
+    Variant isProtected();
+    Variant isFinal();
+    Variant getModifiers();
+    Variant getDeclaringClass();
+    Variant getDocComment();
+    Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
+    Variant isEnumCase();
+    Variant isDeprecated();
+    Variant hasType();
+    Variant getType();
+};
+
+class ReflectionExtension {
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    ReflectionExtension(const Variant &name);
+    Variant __toString();
+    Variant getName();
+    Variant getVersion();
+    Variant getFunctions();
+    Variant getConstants();
+    Variant getINIEntries();
+    Variant getClasses();
+    Variant getClassNames();
+    Variant getDependencies();
+    Variant info();
+    Variant isPersistent();
+    Variant isTemporary();
+};
+
+class ReflectionZendExtension {
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    ReflectionZendExtension(const Variant &name);
+    Variant __toString();
+    Variant getName();
+    Variant getVersion();
+    Variant getAuthor();
+    Variant getURL();
+    Variant getCopyright();
+};
+
+class ReflectionReference {
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    static Variant fromArrayElement(const Variant &array, const Variant &key);
+    Variant getId();
+};
+
+class ReflectionAttribute {
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    Variant getName();
+    Variant getTarget();
+    Variant isRepeated();
+    Variant getArguments();
+    Variant newInstance();
+    Variant __toString();
+};
+
+class ReflectionFiber {
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    ReflectionFiber(const Fiber &fiber);
+    Variant getFiber();
+    Variant getExecutingFile();
+    Variant getExecutingLine();
+    Variant getCallable();
+    Variant getTrace(const Variant &options = 1);
+};
+
+class ReflectionConstant {
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    ReflectionConstant(const Variant &name);
+    Variant getName();
+    Variant getNamespaceName();
+    Variant getShortName();
+    Variant getValue();
+    Variant isDeprecated();
+    Variant __toString();
+};
+
+class PropertyHookType {
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    explicit PropertyHookType(const Object &obj) : this_(obj) {}
+    PropertyHookType();
+    static Variant cases();
+    static Variant from(const Variant &value);
+    static Variant tryFrom(const Variant &value);
+};
+
 class ReflectionProperty {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ReflectionProperty(const Variant &_class, const Variant &property);
@@ -438,105 +579,18 @@ class ReflectionProperty {
     Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
     Variant hasHooks();
     Variant getHooks();
+    Variant hasHook(const PropertyHookType &type);
     Variant hasHook(const Variant &type);
+    Variant getHook(const PropertyHookType &type);
     Variant getHook(const Variant &type);
     Variant isFinal();
-};
-
-class ReflectionClassConstant {
-    Object this_;
-
-  public:
-    Object getObject() {
-        return this_;
-    }
-    ReflectionClassConstant(const Variant &_class, const Variant &constant);
-    Variant __toString();
-    Variant getName();
-    Variant getValue();
-    Variant isPublic();
-    Variant isPrivate();
-    Variant isProtected();
-    Variant isFinal();
-    Variant getModifiers();
-    Variant getDeclaringClass();
-    Variant getDocComment();
-    Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
-    Variant isEnumCase();
-    Variant isDeprecated();
-    Variant hasType();
-    Variant getType();
-};
-
-class ReflectionExtension {
-    Object this_;
-
-  public:
-    Object getObject() {
-        return this_;
-    }
-    ReflectionExtension(const Variant &name);
-    Variant __toString();
-    Variant getName();
-    Variant getVersion();
-    Variant getFunctions();
-    Variant getConstants();
-    Variant getINIEntries();
-    Variant getClasses();
-    Variant getClassNames();
-    Variant getDependencies();
-    Variant info();
-    Variant isPersistent();
-    Variant isTemporary();
-};
-
-class ReflectionZendExtension {
-    Object this_;
-
-  public:
-    Object getObject() {
-        return this_;
-    }
-    ReflectionZendExtension(const Variant &name);
-    Variant __toString();
-    Variant getName();
-    Variant getVersion();
-    Variant getAuthor();
-    Variant getURL();
-    Variant getCopyright();
-};
-
-class ReflectionReference {
-    Object this_;
-
-  public:
-    Object getObject() {
-        return this_;
-    }
-    static Variant fromArrayElement(const Variant &array, const Variant &key);
-    Variant getId();
-};
-
-class ReflectionAttribute {
-    Object this_;
-
-  public:
-    Object getObject() {
-        return this_;
-    }
-    Variant getName();
-    Variant getTarget();
-    Variant isRepeated();
-    Variant getArguments();
-    Variant newInstance();
-    Variant __toString();
 };
 
 class ReflectionEnum {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ReflectionEnum(const Variant &object_or_class);
@@ -544,7 +598,7 @@ class ReflectionEnum {
     Variant getCase(const Variant &name);
     Variant getCases();
     Variant isBacked();
-    Variant getBackingType();
+    ReflectionNamedType getBackingType();
     Variant __toString();
     Variant getName();
     Variant isInternal();
@@ -620,7 +674,7 @@ class ReflectionEnumUnitCase {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ReflectionEnumUnitCase(const Variant &_class, const Variant &constant);
@@ -646,7 +700,7 @@ class ReflectionEnumBackedCase {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
     ReflectionEnumBackedCase(const Variant &_class, const Variant &constant);
@@ -667,50 +721,6 @@ class ReflectionEnumBackedCase {
     Variant isDeprecated();
     Variant hasType();
     Variant getType();
-};
-
-class ReflectionFiber {
-    Object this_;
-
-  public:
-    Object getObject() {
-        return this_;
-    }
-    ReflectionFiber(const Variant &fiber);
-    Variant getFiber();
-    Variant getExecutingFile();
-    Variant getExecutingLine();
-    Variant getCallable();
-    Variant getTrace(const Variant &options = 1);
-};
-
-class ReflectionConstant {
-    Object this_;
-
-  public:
-    Object getObject() {
-        return this_;
-    }
-    ReflectionConstant(const Variant &name);
-    Variant getName();
-    Variant getNamespaceName();
-    Variant getShortName();
-    Variant getValue();
-    Variant isDeprecated();
-    Variant __toString();
-};
-
-class PropertyHookType {
-    Object this_;
-
-  public:
-    Object getObject() {
-        return this_;
-    }
-    PropertyHookType();
-    static Variant cases();
-    static Variant from(const Variant &value);
-    static Variant tryFrom(const Variant &value);
 };
 
 }  // namespace php

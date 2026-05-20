@@ -1,3 +1,6 @@
+#pragma once
+
+#include "phpx_class.h"
 #include "phpx_literal_string.h"
 
 namespace php {
@@ -5,9 +8,10 @@ class Pcntl_QosClass {
     Object this_;
 
   public:
-    Object getObject() {
+    Object getObject() const {
         return this_;
     }
+    explicit Pcntl_QosClass(const Object &obj) : this_(obj) {}
     Pcntl_QosClass();
     static Variant cases();
 };

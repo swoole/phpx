@@ -1,5 +1,6 @@
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant strtotime(const Variant &datetime, const Variant &base_timestamp) {
@@ -152,6 +153,13 @@ Variant date_format(const Variant &object, const Variant &format) {
     }
     return call(fn, {object, format});
 }
+Variant date_modify(const DateTime &object, const Variant &modifier) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[237]);
+    }
+    return call(fn, {object.getObject(), modifier});
+}
 Variant date_modify(const Variant &object, const Variant &modifier) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
@@ -159,12 +167,26 @@ Variant date_modify(const Variant &object, const Variant &modifier) {
     }
     return call(fn, {object, modifier});
 }
+Variant date_add(const DateTime &object, const DateInterval &interval) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[238]);
+    }
+    return call(fn, {object.getObject(), interval.getObject()});
+}
 Variant date_add(const Variant &object, const Variant &interval) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[238]);
     }
     return call(fn, {object, interval});
+}
+Variant date_sub(const DateTime &object, const DateInterval &interval) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[239]);
+    }
+    return call(fn, {object.getObject(), interval.getObject()});
 }
 Variant date_sub(const Variant &object, const Variant &interval) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -179,6 +201,13 @@ Variant date_timezone_get(const Variant &object) {
         fn = getFunction(LITERAL_STRING[240]);
     }
     return call(fn, {object});
+}
+Variant date_timezone_set(const DateTime &object, const DateTimeZone &timezone) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[241]);
+    }
+    return call(fn, {object.getObject(), timezone.getObject()});
 }
 Variant date_timezone_set(const Variant &object, const Variant &timezone) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -201,6 +230,17 @@ Variant date_diff(const Variant &base_object, const Variant &target_object, cons
     }
     return call(fn, {base_object, target_object, absolute});
 }
+Variant date_time_set(const DateTime &object,
+                      const Variant &hour,
+                      const Variant &minute,
+                      const Variant &second,
+                      const Variant &microsecond) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[244]);
+    }
+    return call(fn, {object.getObject(), hour, minute, second, microsecond});
+}
 Variant date_time_set(const Variant &object,
                       const Variant &hour,
                       const Variant &minute,
@@ -212,6 +252,13 @@ Variant date_time_set(const Variant &object,
     }
     return call(fn, {object, hour, minute, second, microsecond});
 }
+Variant date_date_set(const DateTime &object, const Variant &year, const Variant &month, const Variant &day) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[245]);
+    }
+    return call(fn, {object.getObject(), year, month, day});
+}
 Variant date_date_set(const Variant &object, const Variant &year, const Variant &month, const Variant &day) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
@@ -219,12 +266,26 @@ Variant date_date_set(const Variant &object, const Variant &year, const Variant 
     }
     return call(fn, {object, year, month, day});
 }
+Variant date_isodate_set(const DateTime &object, const Variant &year, const Variant &week, const Variant &day_of_week) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[246]);
+    }
+    return call(fn, {object.getObject(), year, week, day_of_week});
+}
 Variant date_isodate_set(const Variant &object, const Variant &year, const Variant &week, const Variant &day_of_week) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[246]);
     }
     return call(fn, {object, year, week, day_of_week});
+}
+Variant date_timestamp_set(const DateTime &object, const Variant &timestamp) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[247]);
+    }
+    return call(fn, {object.getObject(), timestamp});
 }
 Variant date_timestamp_set(const Variant &object, const Variant &timestamp) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -247,6 +308,13 @@ Variant timezone_open(const Variant &timezone) {
     }
     return call(fn, {timezone});
 }
+Variant timezone_name_get(const DateTimeZone &object) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[250]);
+    }
+    return call(fn, {object.getObject()});
+}
 Variant timezone_name_get(const Variant &object) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
@@ -261,6 +329,13 @@ Variant timezone_name_from_abbr(const Variant &abbr, const Variant &utc_offset, 
     }
     return call(fn, {abbr, utc_offset, is_d_s_t});
 }
+Variant timezone_offset_get(const DateTimeZone &object, const Variant &datetime) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[252]);
+    }
+    return call(fn, {object.getObject(), datetime});
+}
 Variant timezone_offset_get(const Variant &object, const Variant &datetime) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
@@ -268,12 +343,28 @@ Variant timezone_offset_get(const Variant &object, const Variant &datetime) {
     }
     return call(fn, {object, datetime});
 }
+Variant timezone_transitions_get(const DateTimeZone &object,
+                                 const Variant &timestamp_begin,
+                                 const Variant &timestamp_end) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[253]);
+    }
+    return call(fn, {object.getObject(), timestamp_begin, timestamp_end});
+}
 Variant timezone_transitions_get(const Variant &object, const Variant &timestamp_begin, const Variant &timestamp_end) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[253]);
     }
     return call(fn, {object, timestamp_begin, timestamp_end});
+}
+Variant timezone_location_get(const DateTimeZone &object) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[254]);
+    }
+    return call(fn, {object.getObject()});
 }
 Variant timezone_location_get(const Variant &object) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -309,6 +400,13 @@ Variant date_interval_create_from_date_string(const Variant &datetime) {
         fn = getFunction(LITERAL_STRING[258]);
     }
     return call(fn, {datetime});
+}
+Variant date_interval_format(const DateInterval &object, const Variant &format) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[259]);
+    }
+    return call(fn, {object.getObject(), format});
 }
 Variant date_interval_format(const Variant &object, const Variant &format) {
     static THREAD_LOCAL zend_function *fn = nullptr;

@@ -326,6 +326,16 @@ Variant Random_Engine_Secure::generate() {
     }
     return this_.call(_method_fn, {});
 }
+Random_IntervalBoundary::Random_IntervalBoundary() {
+    this_ = newObject(LITERAL_STRING[1096]);
+}
+Variant Random_IntervalBoundary::cases() {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[1098], LITERAL_STRING[334]);
+    }
+    return php::call(_method_fn, {});
+}
 Random_Randomizer::Random_Randomizer(const Variant &engine) {
     this_ = newObject(LITERAL_STRING[1086], {engine});
 }
@@ -405,15 +415,5 @@ Variant Random_Randomizer::__unserialize(const Variant &data) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[31]);
     }
     return this_.call(_method_fn, {data});
-}
-Random_IntervalBoundary::Random_IntervalBoundary() {
-    this_ = newObject(LITERAL_STRING[1096]);
-}
-Variant Random_IntervalBoundary::cases() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(LITERAL_STRING[1098], LITERAL_STRING[334]);
-    }
-    return php::call(_method_fn, {});
 }
 }  // namespace php

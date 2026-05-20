@@ -1,5 +1,6 @@
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant ob_gzhandler(const Variant &data, const Variant &flags) {
@@ -170,12 +171,23 @@ Variant gzgets(const Variant &stream, const Variant &length) {
     }
     return call(fn, {stream, length});
 }
-Variant deflate_init(const Variant &encoding, const Variant &options) {
+DeflateContext deflate_init(const Variant &encoding, const Variant &options) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[2608]);
     }
-    return call(fn, {encoding, options});
+    auto _rv = call(fn, {encoding, options});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "deflate_init() returned false");
+    }
+    return DeflateContext(Object(std::move(_rv)));
+}
+Variant deflate_add(const DeflateContext &context, const Variant &data, const Variant &flush_mode) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2609]);
+    }
+    return call(fn, {context.getObject(), data, flush_mode});
 }
 Variant deflate_add(const Variant &context, const Variant &data, const Variant &flush_mode) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -184,12 +196,23 @@ Variant deflate_add(const Variant &context, const Variant &data, const Variant &
     }
     return call(fn, {context, data, flush_mode});
 }
-Variant inflate_init(const Variant &encoding, const Variant &options) {
+InflateContext inflate_init(const Variant &encoding, const Variant &options) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[2610]);
     }
-    return call(fn, {encoding, options});
+    auto _rv = call(fn, {encoding, options});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "inflate_init() returned false");
+    }
+    return InflateContext(Object(std::move(_rv)));
+}
+Variant inflate_add(const InflateContext &context, const Variant &data, const Variant &flush_mode) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2611]);
+    }
+    return call(fn, {context.getObject(), data, flush_mode});
 }
 Variant inflate_add(const Variant &context, const Variant &data, const Variant &flush_mode) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -198,12 +221,26 @@ Variant inflate_add(const Variant &context, const Variant &data, const Variant &
     }
     return call(fn, {context, data, flush_mode});
 }
+Variant inflate_get_status(const InflateContext &context) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2612]);
+    }
+    return call(fn, {context.getObject()});
+}
 Variant inflate_get_status(const Variant &context) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[2612]);
     }
     return call(fn, {context});
+}
+Variant inflate_get_read_len(const InflateContext &context) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2613]);
+    }
+    return call(fn, {context.getObject()});
 }
 Variant inflate_get_read_len(const Variant &context) {
     static THREAD_LOCAL zend_function *fn = nullptr;

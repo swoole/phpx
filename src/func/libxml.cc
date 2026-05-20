@@ -1,5 +1,6 @@
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant libxml_set_streams_context(const Variant &context) {
@@ -16,12 +17,16 @@ Variant libxml_use_internal_errors(const Variant &use_errors) {
     }
     return call(fn, {use_errors});
 }
-Variant libxml_get_last_error() {
+LibXMLError libxml_get_last_error() {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[675]);
     }
-    return call(fn, {});
+    auto _rv = call(fn, {});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "libxml_get_last_error() returned false");
+    }
+    return LibXMLError(Object(std::move(_rv)));
 }
 Variant libxml_get_errors() {
     static THREAD_LOCAL zend_function *fn = nullptr;

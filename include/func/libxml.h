@@ -1,10 +1,13 @@
+#pragma once
+
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant libxml_set_streams_context(const Variant &context);
 Variant libxml_use_internal_errors(const Variant &use_errors = {});
-Variant libxml_get_last_error();
+LibXMLError libxml_get_last_error();
 Variant libxml_get_errors();
 Variant libxml_clear_errors();
 Variant libxml_disable_entity_loader(const Variant &disable = true);

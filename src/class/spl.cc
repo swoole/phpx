@@ -5835,6 +5835,13 @@ Variant SplObjectStorage::contains(const Variant &object) {
     }
     return this_.call(_method_fn, {object});
 }
+Variant SplObjectStorage::addAll(const SplObjectStorage &storage) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1878]);
+    }
+    return this_.call(_method_fn, {storage.getObject()});
+}
 Variant SplObjectStorage::addAll(const Variant &storage) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
@@ -5842,12 +5849,26 @@ Variant SplObjectStorage::addAll(const Variant &storage) {
     }
     return this_.call(_method_fn, {storage});
 }
+Variant SplObjectStorage::removeAll(const SplObjectStorage &storage) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1879]);
+    }
+    return this_.call(_method_fn, {storage.getObject()});
+}
 Variant SplObjectStorage::removeAll(const Variant &storage) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1879]);
     }
     return this_.call(_method_fn, {storage});
+}
+Variant SplObjectStorage::removeAllExcept(const SplObjectStorage &storage) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1880]);
+    }
+    return this_.call(_method_fn, {storage.getObject()});
 }
 Variant SplObjectStorage::removeAllExcept(const Variant &storage) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;

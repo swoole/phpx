@@ -1,5 +1,6 @@
 #include "phpx.h"
 #include "phpx_literal_string.h"
+#include "phpx_class.h"
 
 namespace php {
 Variant finfo_open(const Variant &flags, const Variant &magic_database) {
@@ -9,12 +10,26 @@ Variant finfo_open(const Variant &flags, const Variant &magic_database) {
     }
     return call(fn, {flags, magic_database});
 }
+Variant finfo_close(const finfo &finfo) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[524]);
+    }
+    return call(fn, {finfo.getObject()});
+}
 Variant finfo_close(const Variant &finfo) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[524]);
     }
     return call(fn, {finfo});
+}
+Variant finfo_set_flags(const finfo &finfo, const Variant &flags) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[525]);
+    }
+    return call(fn, {finfo.getObject(), flags});
 }
 Variant finfo_set_flags(const Variant &finfo, const Variant &flags) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -23,12 +38,26 @@ Variant finfo_set_flags(const Variant &finfo, const Variant &flags) {
     }
     return call(fn, {finfo, flags});
 }
+Variant finfo_file(const finfo &finfo, const Variant &filename, const Variant &flags, const Variant &context) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[526]);
+    }
+    return call(fn, {finfo.getObject(), filename, flags, context});
+}
 Variant finfo_file(const Variant &finfo, const Variant &filename, const Variant &flags, const Variant &context) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[526]);
     }
     return call(fn, {finfo, filename, flags, context});
+}
+Variant finfo_buffer(const finfo &finfo, const Variant &string, const Variant &flags, const Variant &context) {
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[527]);
+    }
+    return call(fn, {finfo.getObject(), string, flags, context});
 }
 Variant finfo_buffer(const Variant &finfo, const Variant &string, const Variant &flags, const Variant &context) {
     static THREAD_LOCAL zend_function *fn = nullptr;
