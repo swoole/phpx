@@ -47,6 +47,7 @@ TEST(func_facade, json_decode_flags) {
     ASSERT_STREQ(arr.get("key").toCString(), "12345678901234567890");
 }
 
+#if PHP_VERSION_ID >= 80300
 TEST(func_facade, json_validate) {
     ASSERT_TRUE(json_validate("{\"valid\": true}").toBool());
     ASSERT_FALSE(json_validate("{invalid json").toBool());
@@ -54,6 +55,7 @@ TEST(func_facade, json_validate) {
     ASSERT_TRUE(json_validate("42").toBool());
     ASSERT_TRUE(json_validate("\"string\"").toBool());
 }
+#endif
 
 TEST(func_facade, json_last_error) {
     json_decode("invalid");
@@ -118,10 +120,11 @@ TEST(func_facade, preg_replace_limit) {
 }
 
 TEST(func_facade, preg_replace_count) {
-    // Testing preg_replace with count reference
-    Array count;
-    auto rs = preg_replace("/\\d+/", "#", "a1b2");
+    var count(0);
+    auto ref = count.toReference();
+    auto rs = preg_replace("/\\d+/", "#", "a1b2", -1, ref);
     ASSERT_STREQ(rs.toCString(), "a#b#");
+    ASSERT_EQ(count.toInt(), 2);
 }
 
 TEST(func_facade, preg_filter) {
@@ -512,9 +515,11 @@ TEST(func_facade, str_replace_array) {
 }
 
 TEST(func_facade, str_replace_count) {
-    // Simple replacement test (count reference can't be tested easily via Embed SAPI)
-    auto rs = str_replace("o", "O", "hello world");
+    var count(0);
+    auto ref = count.toReference();
+    auto rs = str_replace("o", "O", "hello world", ref);
     ASSERT_STREQ(rs.toCString(), "hellO wOrld");
+    ASSERT_EQ(count.toInt(), 2);
 }
 
 TEST(func_facade, str_ireplace) {
@@ -537,9 +542,11 @@ TEST(func_facade, substr) {
 }
 
 TEST(func_facade, str_replace_count_ref) {
-    // Replace with array-based search/replace
-    auto rs = str_replace("l", "L", "hello world");
+    var count(0);
+    auto ref = count.toReference();
+    auto rs = str_replace("l", "L", "hello world", ref);
     ASSERT_STREQ(rs.toCString(), "heLLo worLd");
+    ASSERT_EQ(count.toInt(), 3);
 }
 
 TEST(func_facade, strpos_stripos_strrpos_strripos) {
