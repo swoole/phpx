@@ -84,7 +84,11 @@ Variant mb_convert_variables(const Variant &to_encoding,
                              const Variant &from_encoding,
                              const Reference &var,
                              const Args &...vars) {
-    return call(LITERAL_STRING[687], {to_encoding, from_encoding, &var, vars...});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[721]);
+    }
+    return call(fn, {to_encoding, from_encoding, &var, vars...});
 }
 Variant mb_encode_numericentity(const Variant &string,
                                 const Variant &map,

@@ -5,6 +5,9 @@ class JsonException {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     JsonException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();

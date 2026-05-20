@@ -3,18 +3,38 @@
 
 namespace php {
 Variant json_encode(const Variant &value, const Variant &flags, const Variant &depth) {
-    return call(LITERAL_STRING[634], {value, flags, depth});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[667]);
+    }
+    return call(fn, {value, flags, depth});
 }
 Variant json_decode(const Variant &json, const Variant &associative, const Variant &depth, const Variant &flags) {
-    return call(LITERAL_STRING[635], {json, associative, depth, flags});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[668]);
+    }
+    return call(fn, {json, associative, depth, flags});
 }
 Variant json_validate(const Variant &json, const Variant &depth, const Variant &flags) {
-    return call(LITERAL_STRING[636], {json, depth, flags});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[669]);
+    }
+    return call(fn, {json, depth, flags});
 }
 Variant json_last_error() {
-    return call(LITERAL_STRING[637], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[670]);
+    }
+    return call(fn, {});
 }
 Variant json_last_error_msg() {
-    return call(LITERAL_STRING[638], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[671]);
+    }
+    return call(fn, {});
 }
 }  // namespace php

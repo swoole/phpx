@@ -3,9 +3,17 @@
 
 namespace php {
 Variant token_get_all(const Variant &code, const Variant &flags) {
-    return call(LITERAL_STRING[2353], {code, flags});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2420]);
+    }
+    return call(fn, {code, flags});
 }
 Variant token_name(const Variant &id) {
-    return call(LITERAL_STRING[2354], {id});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2421]);
+    }
+    return call(fn, {id});
 }
 }  // namespace php

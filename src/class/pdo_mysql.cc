@@ -3,54 +3,114 @@
 
 namespace php {
 Variant Pdo_Mysql::getWarningCount() {
-    return this_.call(LITERAL_STRING[850], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[890]);
+    }
+    return this_.call(_method_fn, {});
 }
 Pdo_Mysql::Pdo_Mysql(const Variant &dsn, const Variant &username, const Variant &password, const Variant &options) {
-    this_ = newObject(LITERAL_STRING[851], {dsn, username, password, options});
+    this_ = newObject(LITERAL_STRING[891], {dsn, username, password, options});
 }
 Variant Pdo_Mysql::connect(const Variant &dsn,
                            const Variant &username,
                            const Variant &password,
                            const Variant &options) {
-    return php::call(LITERAL_STRING[852], {dsn, username, password, options});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[893], LITERAL_STRING[861]);
+    }
+    return php::call(_method_fn, {dsn, username, password, options});
 }
 Variant Pdo_Mysql::beginTransaction() {
-    return this_.call(LITERAL_STRING[823], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[862]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Pdo_Mysql::commit() {
-    return this_.call(LITERAL_STRING[824], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[863]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Pdo_Mysql::errorCode() {
-    return this_.call(LITERAL_STRING[825], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[864]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Pdo_Mysql::errorInfo() {
-    return this_.call(LITERAL_STRING[826], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[865]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Pdo_Mysql::exec(const Variant &statement) {
-    return this_.call(LITERAL_STRING[827], {statement});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[866]);
+    }
+    return this_.call(_method_fn, {statement});
 }
 Variant Pdo_Mysql::getAttribute(const Variant &attribute) {
-    return this_.call(LITERAL_STRING[430], {attribute});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[459]);
+    }
+    return this_.call(_method_fn, {attribute});
 }
 Variant Pdo_Mysql::getAvailableDrivers() {
-    return php::call(LITERAL_STRING[853], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[893], LITERAL_STRING[868]);
+    }
+    return php::call(_method_fn, {});
 }
 Variant Pdo_Mysql::inTransaction() {
-    return this_.call(LITERAL_STRING[829], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[869]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Pdo_Mysql::lastInsertId(const Variant &name) {
-    return this_.call(LITERAL_STRING[830], {name});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[870]);
+    }
+    return this_.call(_method_fn, {name});
 }
 Variant Pdo_Mysql::prepare(const Variant &query, const Variant &options) {
-    return this_.call(LITERAL_STRING[831], {query, options});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[871]);
+    }
+    return this_.call(_method_fn, {query, options});
 }
 Variant Pdo_Mysql::quote(const Variant &string, const Variant &type) {
-    return this_.call(LITERAL_STRING[832], {string, type});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[511]);
+    }
+    return this_.call(_method_fn, {string, type});
 }
 Variant Pdo_Mysql::rollBack() {
-    return this_.call(LITERAL_STRING[833], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[872]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Pdo_Mysql::setAttribute(const Variant &attribute, const Variant &value) {
-    return this_.call(LITERAL_STRING[440], {attribute, value});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[469]);
+    }
+    return this_.call(_method_fn, {attribute, value});
 }
 }  // namespace php

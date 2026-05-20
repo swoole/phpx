@@ -5,6 +5,10 @@ class XMLWriter {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    XMLWriter();
     Variant openUri(const Variant &uri);
     static Variant toUri(const Variant &uri);
     Variant openMemory();

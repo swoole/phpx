@@ -5,6 +5,9 @@ class SQLite3Exception {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     SQLite3Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -21,6 +24,9 @@ class SQLite3 {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     SQLite3(const Variant &filename, const Variant &flags = 6, const Variant &encryption_key = "");
     Variant open(const Variant &filename, const Variant &flags = 6, const Variant &encryption_key = "");
     Variant close();
@@ -63,6 +69,9 @@ class SQLite3Stmt {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Variant bindParam(const Variant &param, const Reference &var, const Variant &type = 3);
     Variant bindValue(const Variant &param, const Variant &value, const Variant &type = 3);
     Variant clear();
@@ -78,6 +87,9 @@ class SQLite3Result {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Variant numColumns();
     Variant columnName(const Variant &column);
     Variant columnType(const Variant &column);

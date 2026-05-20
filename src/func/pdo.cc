@@ -3,6 +3,10 @@
 
 namespace php {
 Variant pdo_drivers() {
-    return call(LITERAL_STRING[819], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[857]);
+    }
+    return call(fn, {});
 }
 }  // namespace php

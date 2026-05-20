@@ -5,6 +5,9 @@ class PDOException {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     PDOException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -21,6 +24,9 @@ class PDO {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     PDO(const Variant &dsn, const Variant &username = {}, const Variant &password = {}, const Variant &options = {});
     static Variant connect(const Variant &dsn,
                            const Variant &username = {},
@@ -38,7 +44,11 @@ class PDO {
     Variant prepare(const Variant &query, const Variant &options = Array{});
     template <typename... Args>
     Variant query(const Variant &query, const Variant &fetch_mode, const Args &...fetch_mode_args) {
-        return this_.call(LITERAL_STRING[477], {query, fetch_mode, fetch_mode_args...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[506]);
+        }
+        return this_.call(_method_fn, {query, fetch_mode, fetch_mode_args...});
     }
     Variant quote(const Variant &string, const Variant &type = 2);
     Variant rollBack();
@@ -49,6 +59,10 @@ class PDOStatement {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    PDOStatement();
     Variant bindColumn(const Variant &column,
                        const Reference &var,
                        const Variant &type = 2,
@@ -69,7 +83,11 @@ class PDOStatement {
     Variant fetch(const Variant &mode = 0, const Variant &cursor_orientation = 0, const Variant &cursor_offset = 0);
     template <typename... Args>
     Variant fetchAll(const Variant &mode, const Args &...args) {
-        return this_.call(LITERAL_STRING[842], {mode, args...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[882]);
+        }
+        return this_.call(_method_fn, {mode, args...});
     }
     Variant fetchColumn(const Variant &column = 0);
     Variant fetchObject(const Variant &_class = "stdClass", const Variant &constructor_args = Array{});
@@ -80,9 +98,23 @@ class PDOStatement {
     Variant setAttribute(const Variant &attribute, const Variant &value);
     template <typename... Args>
     Variant setFetchMode(const Variant &mode, const Args &...args) {
-        return this_.call(LITERAL_STRING[848], {mode, args...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[888]);
+        }
+        return this_.call(_method_fn, {mode, args...});
     }
     Variant getIterator();
+};
+
+class PDORow {
+    Object this_;
+
+  public:
+    Object getObject() {
+        return this_;
+    }
+    PDORow();
 };
 
 }  // namespace php

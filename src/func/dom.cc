@@ -3,9 +3,17 @@
 
 namespace php {
 Variant dom_import_simplexml(const Variant &node) {
-    return call(LITERAL_STRING[309], {node});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[329]);
+    }
+    return call(fn, {node});
 }
 Variant Dom_import_simplexml(const Variant &node) {
-    return call(LITERAL_STRING[310], {node});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[330]);
+    }
+    return call(fn, {node});
 }
 }  // namespace php

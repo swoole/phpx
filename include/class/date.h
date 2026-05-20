@@ -5,6 +5,9 @@ class DateTime {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DateTime(const Variant &datetime = "now", const Variant &timezone = {});
     Variant __serialize();
     Variant __unserialize(const Variant &data);
@@ -39,6 +42,9 @@ class DateTimeImmutable {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DateTimeImmutable(const Variant &datetime = "now", const Variant &timezone = {});
     Variant __serialize();
     Variant __unserialize(const Variant &data);
@@ -73,6 +79,9 @@ class DateTimeZone {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DateTimeZone(const Variant &timezone);
     Variant getName();
     Variant getOffset(const Variant &datetime);
@@ -90,6 +99,9 @@ class DateInterval {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DateInterval(const Variant &duration);
     static Variant createFromDateString(const Variant &datetime);
     Variant format(const Variant &format);
@@ -103,6 +115,9 @@ class DatePeriod {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     static Variant createFromISO8601String(const Variant &specification, const Variant &options = 0);
     DatePeriod(const Variant &start,
                const Variant &interval = {},
@@ -123,6 +138,9 @@ class DateError {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DateError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -139,6 +157,9 @@ class DateObjectError {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DateObjectError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -155,6 +176,9 @@ class DateRangeError {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DateRangeError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -171,6 +195,9 @@ class DateException {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DateException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -187,6 +214,9 @@ class DateInvalidTimeZoneException {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DateInvalidTimeZoneException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -203,6 +233,9 @@ class DateInvalidOperationException {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DateInvalidOperationException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -219,6 +252,9 @@ class DateMalformedStringException {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DateMalformedStringException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -235,6 +271,9 @@ class DateMalformedIntervalStringException {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DateMalformedIntervalStringException(const Variant &message = "",
                                          const Variant &code = 0,
                                          const Variant &previous = {});
@@ -253,6 +292,9 @@ class DateMalformedPeriodStringException {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DateMalformedPeriodStringException(const Variant &message = "",
                                        const Variant &code = 0,
                                        const Variant &previous = {});

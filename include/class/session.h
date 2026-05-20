@@ -5,6 +5,10 @@ class SessionHandler {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    SessionHandler();
     Variant open(const Variant &path, const Variant &name);
     Variant close();
     Variant read(const Variant &id);

@@ -5,6 +5,10 @@ class XMLReader {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    XMLReader();
     Variant close();
     Variant getAttribute(const Variant &name);
     Variant getAttributeNo(const Variant &index);

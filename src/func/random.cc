@@ -3,30 +3,66 @@
 
 namespace php {
 Variant lcg_value() {
-    return call(LITERAL_STRING[1010], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[1067]);
+    }
+    return call(fn, {});
 }
 Variant mt_srand(const Variant &seed, const Variant &mode) {
-    return call(LITERAL_STRING[1011], {seed, mode});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[1068]);
+    }
+    return call(fn, {seed, mode});
 }
 Variant srand(const Variant &seed, const Variant &mode) {
-    return call(LITERAL_STRING[1012], {seed, mode});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[1069]);
+    }
+    return call(fn, {seed, mode});
 }
 Variant rand(const Variant &min, const Variant &max) {
-    return call(LITERAL_STRING[1013], {min, max});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[1070]);
+    }
+    return call(fn, {min, max});
 }
 Variant mt_rand(const Variant &min, const Variant &max) {
-    return call(LITERAL_STRING[1014], {min, max});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[1071]);
+    }
+    return call(fn, {min, max});
 }
 Variant mt_getrandmax() {
-    return call(LITERAL_STRING[1015], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[1072]);
+    }
+    return call(fn, {});
 }
 Variant getrandmax() {
-    return call(LITERAL_STRING[1016], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[1073]);
+    }
+    return call(fn, {});
 }
 Variant random_bytes(const Variant &length) {
-    return call(LITERAL_STRING[1017], {length});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[1074]);
+    }
+    return call(fn, {length});
 }
 Variant random_int(const Variant &min, const Variant &max) {
-    return call(LITERAL_STRING[1018], {min, max});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[1075]);
+    }
+    return call(fn, {min, max});
 }
 }  // namespace php

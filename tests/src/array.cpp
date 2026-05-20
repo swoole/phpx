@@ -478,4 +478,3 @@ TEST(array, ref_vargs) {
     php::call(fn, tmp_var_1);
     ASSERT_EQ(array.count(), 6);
 }
-

@@ -2,140 +2,311 @@
 #include "class/xmlwriter.h"
 
 namespace php {
+XMLWriter::XMLWriter() {
+    this_ = newObject(LITERAL_STRING[2522]);
+}
 Variant XMLWriter::openUri(const Variant &uri) {
-    return this_.call(LITERAL_STRING[2449], {uri});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2523]);
+    }
+    return this_.call(_method_fn, {uri});
 }
 Variant XMLWriter::toUri(const Variant &uri) {
-    return php::call(LITERAL_STRING[2450], {uri});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[2522], LITERAL_STRING[2525]);
+    }
+    return php::call(_method_fn, {uri});
 }
 Variant XMLWriter::openMemory() {
-    return this_.call(LITERAL_STRING[2451], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2526]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLWriter::toMemory() {
-    return php::call(LITERAL_STRING[2452], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[2522], LITERAL_STRING[2528]);
+    }
+    return php::call(_method_fn, {});
 }
 Variant XMLWriter::toStream(const Variant &stream) {
-    return php::call(LITERAL_STRING[2453], {stream});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[2522], LITERAL_STRING[2530]);
+    }
+    return php::call(_method_fn, {stream});
 }
 Variant XMLWriter::setIndent(const Variant &enable) {
-    return this_.call(LITERAL_STRING[2454], {enable});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2531]);
+    }
+    return this_.call(_method_fn, {enable});
 }
 Variant XMLWriter::setIndentString(const Variant &indentation) {
-    return this_.call(LITERAL_STRING[2455], {indentation});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2532]);
+    }
+    return this_.call(_method_fn, {indentation});
 }
 Variant XMLWriter::startComment() {
-    return this_.call(LITERAL_STRING[2456], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2533]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLWriter::endComment() {
-    return this_.call(LITERAL_STRING[2457], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2534]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLWriter::startAttribute(const Variant &name) {
-    return this_.call(LITERAL_STRING[2458], {name});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2535]);
+    }
+    return this_.call(_method_fn, {name});
 }
 Variant XMLWriter::endAttribute() {
-    return this_.call(LITERAL_STRING[2459], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2536]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLWriter::writeAttribute(const Variant &name, const Variant &value) {
-    return this_.call(LITERAL_STRING[2460], {name, value});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2537]);
+    }
+    return this_.call(_method_fn, {name, value});
 }
 Variant XMLWriter::startAttributeNs(const Variant &prefix, const Variant &name, const Variant &_namespace) {
-    return this_.call(LITERAL_STRING[2461], {prefix, name, _namespace});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2538]);
+    }
+    return this_.call(_method_fn, {prefix, name, _namespace});
 }
 Variant XMLWriter::writeAttributeNs(const Variant &prefix,
                                     const Variant &name,
                                     const Variant &_namespace,
                                     const Variant &value) {
-    return this_.call(LITERAL_STRING[2462], {prefix, name, _namespace, value});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2539]);
+    }
+    return this_.call(_method_fn, {prefix, name, _namespace, value});
 }
 Variant XMLWriter::startElement(const Variant &name) {
-    return this_.call(LITERAL_STRING[2463], {name});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2540]);
+    }
+    return this_.call(_method_fn, {name});
 }
 Variant XMLWriter::endElement() {
-    return this_.call(LITERAL_STRING[2464], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2541]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLWriter::fullEndElement() {
-    return this_.call(LITERAL_STRING[2465], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2542]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLWriter::startElementNs(const Variant &prefix, const Variant &name, const Variant &_namespace) {
-    return this_.call(LITERAL_STRING[2466], {prefix, name, _namespace});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2543]);
+    }
+    return this_.call(_method_fn, {prefix, name, _namespace});
 }
 Variant XMLWriter::writeElement(const Variant &name, const Variant &content) {
-    return this_.call(LITERAL_STRING[2467], {name, content});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2544]);
+    }
+    return this_.call(_method_fn, {name, content});
 }
 Variant XMLWriter::writeElementNs(const Variant &prefix,
                                   const Variant &name,
                                   const Variant &_namespace,
                                   const Variant &content) {
-    return this_.call(LITERAL_STRING[2468], {prefix, name, _namespace, content});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2545]);
+    }
+    return this_.call(_method_fn, {prefix, name, _namespace, content});
 }
 Variant XMLWriter::startPi(const Variant &target) {
-    return this_.call(LITERAL_STRING[2469], {target});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2546]);
+    }
+    return this_.call(_method_fn, {target});
 }
 Variant XMLWriter::endPi() {
-    return this_.call(LITERAL_STRING[2470], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2547]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLWriter::writePi(const Variant &target, const Variant &content) {
-    return this_.call(LITERAL_STRING[2471], {target, content});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2548]);
+    }
+    return this_.call(_method_fn, {target, content});
 }
 Variant XMLWriter::startCdata() {
-    return this_.call(LITERAL_STRING[2472], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2549]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLWriter::endCdata() {
-    return this_.call(LITERAL_STRING[2473], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2550]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLWriter::writeCdata(const Variant &content) {
-    return this_.call(LITERAL_STRING[2474], {content});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2551]);
+    }
+    return this_.call(_method_fn, {content});
 }
 Variant XMLWriter::text(const Variant &content) {
-    return this_.call(LITERAL_STRING[2475], {content});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2552]);
+    }
+    return this_.call(_method_fn, {content});
 }
 Variant XMLWriter::writeRaw(const Variant &content) {
-    return this_.call(LITERAL_STRING[2476], {content});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2553]);
+    }
+    return this_.call(_method_fn, {content});
 }
 Variant XMLWriter::startDocument(const Variant &version, const Variant &encoding, const Variant &standalone) {
-    return this_.call(LITERAL_STRING[2477], {version, encoding, standalone});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2554]);
+    }
+    return this_.call(_method_fn, {version, encoding, standalone});
 }
 Variant XMLWriter::endDocument() {
-    return this_.call(LITERAL_STRING[2478], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2555]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLWriter::writeComment(const Variant &content) {
-    return this_.call(LITERAL_STRING[2479], {content});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2556]);
+    }
+    return this_.call(_method_fn, {content});
 }
 Variant XMLWriter::startDtd(const Variant &qualified_name, const Variant &public_id, const Variant &system_id) {
-    return this_.call(LITERAL_STRING[2480], {qualified_name, public_id, system_id});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2557]);
+    }
+    return this_.call(_method_fn, {qualified_name, public_id, system_id});
 }
 Variant XMLWriter::endDtd() {
-    return this_.call(LITERAL_STRING[2481], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2558]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLWriter::writeDtd(const Variant &name,
                             const Variant &public_id,
                             const Variant &system_id,
                             const Variant &content) {
-    return this_.call(LITERAL_STRING[2482], {name, public_id, system_id, content});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2559]);
+    }
+    return this_.call(_method_fn, {name, public_id, system_id, content});
 }
 Variant XMLWriter::startDtdElement(const Variant &qualified_name) {
-    return this_.call(LITERAL_STRING[2483], {qualified_name});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2560]);
+    }
+    return this_.call(_method_fn, {qualified_name});
 }
 Variant XMLWriter::endDtdElement() {
-    return this_.call(LITERAL_STRING[2484], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2561]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLWriter::writeDtdElement(const Variant &name, const Variant &content) {
-    return this_.call(LITERAL_STRING[2485], {name, content});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2562]);
+    }
+    return this_.call(_method_fn, {name, content});
 }
 Variant XMLWriter::startDtdAttlist(const Variant &name) {
-    return this_.call(LITERAL_STRING[2486], {name});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2563]);
+    }
+    return this_.call(_method_fn, {name});
 }
 Variant XMLWriter::endDtdAttlist() {
-    return this_.call(LITERAL_STRING[2487], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2564]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLWriter::writeDtdAttlist(const Variant &name, const Variant &content) {
-    return this_.call(LITERAL_STRING[2488], {name, content});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2565]);
+    }
+    return this_.call(_method_fn, {name, content});
 }
 Variant XMLWriter::startDtdEntity(const Variant &name, const Variant &is_param) {
-    return this_.call(LITERAL_STRING[2489], {name, is_param});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2566]);
+    }
+    return this_.call(_method_fn, {name, is_param});
 }
 Variant XMLWriter::endDtdEntity() {
-    return this_.call(LITERAL_STRING[2490], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2567]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLWriter::writeDtdEntity(const Variant &name,
                                   const Variant &content,
@@ -143,12 +314,24 @@ Variant XMLWriter::writeDtdEntity(const Variant &name,
                                   const Variant &public_id,
                                   const Variant &system_id,
                                   const Variant &notation_data) {
-    return this_.call(LITERAL_STRING[2491], {name, content, is_param, public_id, system_id, notation_data});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2568]);
+    }
+    return this_.call(_method_fn, {name, content, is_param, public_id, system_id, notation_data});
 }
 Variant XMLWriter::outputMemory(const Variant &flush) {
-    return this_.call(LITERAL_STRING[2492], {flush});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2569]);
+    }
+    return this_.call(_method_fn, {flush});
 }
 Variant XMLWriter::flush(const Variant &empty) {
-    return this_.call(LITERAL_STRING[1950], {empty});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2015]);
+    }
+    return this_.call(_method_fn, {empty});
 }
 }  // namespace php

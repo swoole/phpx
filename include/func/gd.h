@@ -222,7 +222,11 @@ Variant imagesetclip(const Variant &image, const Variant &x1, const Variant &y1,
 Variant imagegetclip(const Variant &image);
 template <typename... Args>
 Variant imagefilter(const Variant &image, const Variant &filter, const Args &...args) {
-    return call(LITERAL_STRING[595], {image, filter, args...});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[626]);
+    }
+    return call(fn, {image, filter, args...});
 }
 Variant imageconvolution(const Variant &image, const Variant &matrix, const Variant &divisor, const Variant &offset);
 Variant imageflip(const Variant &image, const Variant &mode);

@@ -5,6 +5,10 @@ class Dom_AdjacentPosition {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_AdjacentPosition();
     static Variant cases();
     static Variant from(const Variant &value);
     static Variant tryFrom(const Variant &value);
@@ -14,6 +18,9 @@ class DOMException {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DOMException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -30,6 +37,9 @@ class dom_domexception {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     dom_domexception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -46,6 +56,10 @@ class DOMImplementation {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    DOMImplementation();
     Variant hasFeature(const Variant &feature, const Variant &version);
     Variant createDocumentType(const Variant &qualified_name,
                                const Variant &public_id = "",
@@ -59,6 +73,10 @@ class Dom_Implementation {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_Implementation();
     Variant createDocumentType(const Variant &qualified_name, const Variant &public_id, const Variant &system_id);
     Variant createDocument(const Variant &_namespace, const Variant &qualified_name, const Variant &doctype = {});
     Variant createHTMLDocument(const Variant &title = {});
@@ -68,6 +86,10 @@ class DOMNode {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    DOMNode();
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
                  const Variant &with_comments = false,
@@ -104,6 +126,9 @@ class Dom_Node {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
     Variant normalize();
@@ -138,6 +163,10 @@ class DOMNameSpaceNode {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    DOMNameSpaceNode();
     Variant __sleep();
     Variant __wakeup();
 };
@@ -146,19 +175,34 @@ class DOMDocumentFragment {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DOMDocumentFragment();
     Variant appendXML(const Variant &data);
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[349], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[373]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[350], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[374]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[351], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[375]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
@@ -196,18 +240,34 @@ class Dom_DocumentFragment {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_DocumentFragment();
     Variant appendXml(const Variant &data);
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[349], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[373]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[350], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[374]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[351], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[375]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant querySelector(const Variant &selectors);
     Variant querySelectorAll(const Variant &selectors);
@@ -245,6 +305,9 @@ class DOMDocument {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DOMDocument(const Variant &version = "1.0", const Variant &encoding = "");
     Variant createAttribute(const Variant &local_name);
     Variant createAttributeNS(const Variant &_namespace, const Variant &qualified_name);
@@ -279,15 +342,27 @@ class DOMDocument {
     Variant adoptNode(const Variant &node);
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[349], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[373]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[350], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[374]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[351], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[375]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
@@ -325,6 +400,10 @@ class Dom_HTMLDocument {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_HTMLDocument();
     static Variant createEmpty(const Variant &encoding = "UTF-8");
     static Variant createFromFile(const Variant &path,
                                   const Variant &options = 0,
@@ -358,15 +437,27 @@ class Dom_HTMLDocument {
     Variant relaxNgValidateSource(const Variant &source);
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[349], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[373]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[350], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[374]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[351], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[375]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant importLegacyNode(const Variant &node, const Variant &deep = false);
     Variant querySelector(const Variant &selectors);
@@ -405,6 +496,10 @@ class Dom_XMLDocument {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_XMLDocument();
     static Variant createEmpty(const Variant &version = "1.0", const Variant &encoding = "UTF-8");
     static Variant createFromFile(const Variant &path,
                                   const Variant &options = 0,
@@ -438,15 +533,27 @@ class Dom_XMLDocument {
     Variant relaxNgValidateSource(const Variant &source);
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[349], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[373]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[350], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[374]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[351], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[375]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant importLegacyNode(const Variant &node, const Variant &deep = false);
     Variant querySelector(const Variant &selectors);
@@ -485,6 +592,10 @@ class DOMNodeList {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    DOMNodeList();
     Variant count();
     Variant getIterator();
     Variant item(const Variant &index);
@@ -494,6 +605,10 @@ class Dom_NodeList {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_NodeList();
     Variant count();
     Variant getIterator();
     Variant item(const Variant &index);
@@ -503,6 +618,10 @@ class DOMNamedNodeMap {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    DOMNamedNodeMap();
     Variant getNamedItem(const Variant &qualified_name);
     Variant getNamedItemNS(const Variant &_namespace, const Variant &local_name);
     Variant item(const Variant &index);
@@ -514,6 +633,10 @@ class Dom_NamedNodeMap {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_NamedNodeMap();
     Variant item(const Variant &index);
     Variant getNamedItem(const Variant &qualified_name);
     Variant getNamedItemNS(const Variant &_namespace, const Variant &local_name);
@@ -525,6 +648,10 @@ class Dom_DtdNamedNodeMap {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_DtdNamedNodeMap();
     Variant item(const Variant &index);
     Variant getNamedItem(const Variant &qualified_name);
     Variant getNamedItemNS(const Variant &_namespace, const Variant &local_name);
@@ -536,6 +663,10 @@ class Dom_HTMLCollection {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_HTMLCollection();
     Variant item(const Variant &index);
     Variant namedItem(const Variant &key);
     Variant count();
@@ -546,6 +677,10 @@ class DOMCharacterData {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    DOMCharacterData();
     Variant appendData(const Variant &data);
     Variant substringData(const Variant &offset, const Variant &count);
     Variant insertData(const Variant &offset, const Variant &data);
@@ -553,16 +688,28 @@ class DOMCharacterData {
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[419], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[421], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[451]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[422], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[452]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
@@ -600,6 +747,10 @@ class Dom_CharacterData {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_CharacterData();
     Variant substringData(const Variant &offset, const Variant &count);
     Variant appendData(const Variant &data);
     Variant insertData(const Variant &offset, const Variant &data);
@@ -608,15 +759,27 @@ class Dom_CharacterData {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[421], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[451]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[422], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[452]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[419], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -652,6 +815,9 @@ class DOMAttr {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DOMAttr(const Variant &name, const Variant &value = "");
     Variant isId();
     Variant appendChild(const Variant &node);
@@ -690,6 +856,10 @@ class Dom_Attr {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_Attr();
     Variant isId();
     Variant rename(const Variant &namespace_u_r_i, const Variant &qualified_name);
     Variant getRootNode(const Variant &options = Array{});
@@ -726,6 +896,9 @@ class DOMElement {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DOMElement(const Variant &qualified_name, const Variant &value = {}, const Variant &_namespace = "");
     Variant getAttribute(const Variant &qualified_name);
     Variant getAttributeNames();
@@ -750,27 +923,51 @@ class DOMElement {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[421], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[451]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[422], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[452]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[419], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[349], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[373]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[350], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[374]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[351], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[375]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant insertAdjacentElement(const Variant &where, const Variant &element);
     Variant insertAdjacentText(const Variant &where, const Variant &data);
@@ -810,6 +1007,10 @@ class Dom_Element {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_Element();
     Variant hasAttributes();
     Variant getAttributeNames();
     Variant getAttribute(const Variant &qualified_name);
@@ -836,27 +1037,51 @@ class Dom_Element {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[421], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[451]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[422], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[452]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[419], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[349], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[373]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[350], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[374]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[351], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[375]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant querySelector(const Variant &selectors);
     Variant querySelectorAll(const Variant &selectors);
@@ -899,6 +1124,10 @@ class Dom_HTMLElement {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_HTMLElement();
     Variant hasAttributes();
     Variant getAttributeNames();
     Variant getAttribute(const Variant &qualified_name);
@@ -925,27 +1154,51 @@ class Dom_HTMLElement {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[421], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[451]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[422], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[452]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[419], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant append(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[349], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[373]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant prepend(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[350], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[374]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceChildren(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[351], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[375]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant querySelector(const Variant &selectors);
     Variant querySelectorAll(const Variant &selectors);
@@ -988,6 +1241,9 @@ class DOMText {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DOMText(const Variant &data = "");
     Variant isWhitespaceInElementContent();
     Variant isElementContentWhitespace();
@@ -999,16 +1255,28 @@ class DOMText {
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[419], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[421], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[451]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[422], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[452]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
@@ -1046,6 +1314,10 @@ class Dom_Text {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_Text();
     Variant splitText(const Variant &offset);
     Variant substringData(const Variant &offset, const Variant &count);
     Variant appendData(const Variant &data);
@@ -1055,15 +1327,27 @@ class Dom_Text {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[421], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[451]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[422], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[452]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[419], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1099,6 +1383,9 @@ class DOMComment {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DOMComment(const Variant &data = "");
     Variant appendData(const Variant &data);
     Variant substringData(const Variant &offset, const Variant &count);
@@ -1107,16 +1394,28 @@ class DOMComment {
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[419], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[421], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[451]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[422], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[452]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
@@ -1154,6 +1453,10 @@ class Dom_Comment {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_Comment();
     Variant substringData(const Variant &offset, const Variant &count);
     Variant appendData(const Variant &data);
     Variant insertData(const Variant &offset, const Variant &data);
@@ -1162,15 +1465,27 @@ class Dom_Comment {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[421], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[451]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[422], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[452]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[419], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1206,6 +1521,9 @@ class DOMCdataSection {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DOMCdataSection(const Variant &data);
     Variant isWhitespaceInElementContent();
     Variant isElementContentWhitespace();
@@ -1217,16 +1535,28 @@ class DOMCdataSection {
     Variant replaceData(const Variant &offset, const Variant &count, const Variant &data);
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[419], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[421], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[451]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[422], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[452]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
@@ -1264,6 +1594,10 @@ class Dom_CDATASection {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_CDATASection();
     Variant splitText(const Variant &offset);
     Variant substringData(const Variant &offset, const Variant &count);
     Variant appendData(const Variant &data);
@@ -1273,15 +1607,27 @@ class Dom_CDATASection {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[421], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[451]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[422], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[452]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[419], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1317,6 +1663,10 @@ class DOMDocumentType {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    DOMDocumentType();
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
                  const Variant &with_comments = false,
@@ -1353,18 +1703,34 @@ class Dom_DocumentType {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_DocumentType();
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[421], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[451]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[422], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[452]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[419], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1400,6 +1766,10 @@ class DOMNotation {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    DOMNotation();
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
                  const Variant &with_comments = false,
@@ -1436,6 +1806,10 @@ class Dom_Notation {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_Notation();
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
     Variant normalize();
@@ -1470,6 +1844,10 @@ class DOMEntity {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    DOMEntity();
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
                  const Variant &with_comments = false,
@@ -1506,6 +1884,10 @@ class Dom_Entity {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_Entity();
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
     Variant normalize();
@@ -1540,6 +1922,9 @@ class DOMEntityReference {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DOMEntityReference(const Variant &name);
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
@@ -1577,6 +1962,10 @@ class Dom_EntityReference {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_EntityReference();
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
     Variant normalize();
@@ -1611,6 +2000,9 @@ class DOMProcessingInstruction {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DOMProcessingInstruction(const Variant &name, const Variant &value = "");
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
@@ -1648,6 +2040,10 @@ class Dom_ProcessingInstruction {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Dom_ProcessingInstruction();
     Variant substringData(const Variant &offset, const Variant &count);
     Variant appendData(const Variant &data);
     Variant insertData(const Variant &offset, const Variant &data);
@@ -1656,15 +2052,27 @@ class Dom_ProcessingInstruction {
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[421], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[451]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant after(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[422], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[452]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     template <typename... Args>
     Variant replaceWith(const Args &...nodes) {
-        return this_.call(LITERAL_STRING[419], {nodes...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+        }
+        return this_.call(_method_fn, {nodes...});
     }
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -1700,6 +2108,9 @@ class DOMXPath {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     DOMXPath(const Variant &document, const Variant &register_node_n_s = true);
     Variant evaluate(const Variant &expression,
                      const Variant &context_node = {},
@@ -1715,6 +2126,9 @@ class Dom_XPath {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Dom_XPath(const Variant &document, const Variant &register_node_n_s = true);
     Variant evaluate(const Variant &expression,
                      const Variant &context_node = {},
@@ -1730,15 +2144,26 @@ class Dom_TokenList {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Variant item(const Variant &index);
     Variant contains(const Variant &token);
     template <typename... Args>
     Variant add(const Args &...tokens) {
-        return this_.call(LITERAL_STRING[16], {tokens...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[16]);
+        }
+        return this_.call(_method_fn, {tokens...});
     }
     template <typename... Args>
     Variant remove(const Args &...tokens) {
-        return this_.call(LITERAL_STRING[420], {tokens...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[450]);
+        }
+        return this_.call(_method_fn, {tokens...});
     }
     Variant toggle(const Variant &token, const Variant &force = {});
     Variant replace(const Variant &token, const Variant &new_token);

@@ -5,6 +5,9 @@ namespace php {
 class <?=$className?> {
     Object this_;
   public:
+    Object getObject() {
+        return this_;
+    }
 <?php foreach ($info['methods'] as $name => $minfo): ?>
 <?php if ($minfo['variadic']): ?>
     template <typename... Args>

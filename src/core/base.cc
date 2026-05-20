@@ -339,6 +339,14 @@ zend_function *getFunction(const String &name) {
     return fcc.function_handler;
 }
 
+zend_function *getMethod(const String &class_name, const String &name) {
+    const auto ce = getClassEntrySafe(class_name);
+    if (UNEXPECTED(!ce)) {
+        return nullptr;
+    }
+    return getMethod(ce, name);
+}
+
 zend_function *getMethod(zend_class_entry *ce, const String &name) {
     auto lmname = zend_string_tolower(name.str());
     auto zv = zend_hash_find(&ce->function_table, lmname);

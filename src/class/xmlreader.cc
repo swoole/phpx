@@ -2,91 +2,206 @@
 #include "class/xmlreader.h"
 
 namespace php {
+XMLReader::XMLReader() {
+    this_ = newObject(LITERAL_STRING[2451]);
+}
 Variant XMLReader::close() {
-    return this_.call(LITERAL_STRING[1068], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1126]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLReader::getAttribute(const Variant &name) {
-    return this_.call(LITERAL_STRING[430], {name});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[459]);
+    }
+    return this_.call(_method_fn, {name});
 }
 Variant XMLReader::getAttributeNo(const Variant &index) {
-    return this_.call(LITERAL_STRING[2382], {index});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2452]);
+    }
+    return this_.call(_method_fn, {index});
 }
 Variant XMLReader::getAttributeNs(const Variant &name, const Variant &_namespace) {
-    return this_.call(LITERAL_STRING[2383], {name, _namespace});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2453]);
+    }
+    return this_.call(_method_fn, {name, _namespace});
 }
 Variant XMLReader::getParserProperty(const Variant &property) {
-    return this_.call(LITERAL_STRING[2384], {property});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2454]);
+    }
+    return this_.call(_method_fn, {property});
 }
 Variant XMLReader::isValid() {
-    return this_.call(LITERAL_STRING[2385], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2455]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLReader::lookupNamespace(const Variant &prefix) {
-    return this_.call(LITERAL_STRING[2386], {prefix});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2456]);
+    }
+    return this_.call(_method_fn, {prefix});
 }
 Variant XMLReader::moveToAttribute(const Variant &name) {
-    return this_.call(LITERAL_STRING[2387], {name});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2457]);
+    }
+    return this_.call(_method_fn, {name});
 }
 Variant XMLReader::moveToAttributeNo(const Variant &index) {
-    return this_.call(LITERAL_STRING[2388], {index});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2458]);
+    }
+    return this_.call(_method_fn, {index});
 }
 Variant XMLReader::moveToAttributeNs(const Variant &name, const Variant &_namespace) {
-    return this_.call(LITERAL_STRING[2389], {name, _namespace});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2459]);
+    }
+    return this_.call(_method_fn, {name, _namespace});
 }
 Variant XMLReader::moveToElement() {
-    return this_.call(LITERAL_STRING[2390], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2460]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLReader::moveToFirstAttribute() {
-    return this_.call(LITERAL_STRING[2391], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2461]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLReader::moveToNextAttribute() {
-    return this_.call(LITERAL_STRING[2392], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2462]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLReader::read() {
-    return this_.call(LITERAL_STRING[1615], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1676]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLReader::next(const Variant &name) {
-    return this_.call(LITERAL_STRING[92], {name});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[92]);
+    }
+    return this_.call(_method_fn, {name});
 }
 Variant XMLReader::open(const Variant &uri, const Variant &encoding, const Variant &flags) {
-    return php::call(LITERAL_STRING[2393], {uri, encoding, flags});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[2451], LITERAL_STRING[1230]);
+    }
+    return php::call(_method_fn, {uri, encoding, flags});
 }
 Variant XMLReader::fromUri(const Variant &uri, const Variant &encoding, const Variant &flags) {
-    return php::call(LITERAL_STRING[2394], {uri, encoding, flags});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[2451], LITERAL_STRING[2465]);
+    }
+    return php::call(_method_fn, {uri, encoding, flags});
 }
 Variant XMLReader::fromStream(const Variant &stream,
                               const Variant &encoding,
                               const Variant &flags,
                               const Variant &document_uri) {
-    return php::call(LITERAL_STRING[2395], {stream, encoding, flags, document_uri});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[2451], LITERAL_STRING[2467]);
+    }
+    return php::call(_method_fn, {stream, encoding, flags, document_uri});
 }
 Variant XMLReader::readInnerXml() {
-    return this_.call(LITERAL_STRING[2396], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2468]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLReader::readOuterXml() {
-    return this_.call(LITERAL_STRING[2397], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2469]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLReader::readString() {
-    return this_.call(LITERAL_STRING[2398], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2470]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XMLReader::setSchema(const Variant &filename) {
-    return this_.call(LITERAL_STRING[2399], {filename});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2471]);
+    }
+    return this_.call(_method_fn, {filename});
 }
 Variant XMLReader::setParserProperty(const Variant &property, const Variant &value) {
-    return this_.call(LITERAL_STRING[2400], {property, value});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2472]);
+    }
+    return this_.call(_method_fn, {property, value});
 }
 Variant XMLReader::setRelaxNGSchema(const Variant &filename) {
-    return this_.call(LITERAL_STRING[2401], {filename});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2473]);
+    }
+    return this_.call(_method_fn, {filename});
 }
 Variant XMLReader::setRelaxNGSchemaSource(const Variant &source) {
-    return this_.call(LITERAL_STRING[2402], {source});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2474]);
+    }
+    return this_.call(_method_fn, {source});
 }
 Variant XMLReader::XML(const Variant &source, const Variant &encoding, const Variant &flags) {
-    return php::call(LITERAL_STRING[2403], {source, encoding, flags});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[2451], LITERAL_STRING[2476]);
+    }
+    return php::call(_method_fn, {source, encoding, flags});
 }
 Variant XMLReader::fromString(const Variant &source, const Variant &encoding, const Variant &flags) {
-    return php::call(LITERAL_STRING[2404], {source, encoding, flags});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[2451], LITERAL_STRING[2478]);
+    }
+    return php::call(_method_fn, {source, encoding, flags});
 }
 Variant XMLReader::expand(const Variant &base_node) {
-    return this_.call(LITERAL_STRING[2405], {base_node});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2479]);
+    }
+    return this_.call(_method_fn, {base_node});
 }
 }  // namespace php

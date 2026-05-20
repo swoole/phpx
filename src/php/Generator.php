@@ -316,6 +316,31 @@ class Generator
                 continue;
             }
 
+            $hasCtor = false;
+            foreach ($ref->getMethods() as $method) {
+                if ($method->isConstructor()) {
+                    $hasCtor = true;
+                }
+            }
+
+            if (!$hasCtor) {
+                $classSymbolLiteralString = self::addLiteralString($classSymbol);
+                $code = "{$className}::{$className}() {\n";
+                $code .= "\tthis_ = newObject({$classSymbolLiteralString});\n";
+                $code .= "}\n";
+                $methods[$className] = [
+                    'args' => '',
+                    'args_impl' => '',
+                    'call' => '{}',
+                    'variadic' => false,
+                    'static' => false,
+                    'ctor' => true,
+                    'name' => $className,
+                    'symbol' => self::addLiteralString($classSymbol),
+                    'impl_code' => $code,
+                ];
+            }
+
             foreach ($ref->getMethods() as $method) {
                 if (!$method->isPublic() || $method->isDestructor()) {
                     continue;
@@ -348,12 +373,22 @@ class Generator
                 $code .= $variadic ? $name : $className . '::' . $name;
                 $code .= "({$info['args_impl']}) {" . "\n";
                  if ($info['ctor']) {
-                    $classSymbolLiteralString = self::addLiteralString($classSymbol);
+                     $classSymbolLiteralString = self::addLiteralString($classSymbol);
                      $code .= "\tthis_ = newObject({$classSymbolLiteralString}, {$info['call']});\n";
                  } elseif ($info['static']) {
-                     $code .= "\treturn php::call({$info['symbol']}, {$info['call']});\n";
+                     $classLiteralString = self::addLiteralString($className);
+                     $methodLiteralString = self::addLiteralString($method->getName());
+                     $code .= "\tstatic THREAD_LOCAL zend_function *_method_fn = nullptr;\n";
+                     $code .= "\tif (UNEXPECTED(!_method_fn)) {\n";
+                     $code .= "\t\t_method_fn = php::getMethod({$classLiteralString}, {$methodLiteralString});\n";
+                     $code .= "\t}\n";
+                     $code .= "\treturn php::call(_method_fn, {$info['call']});\n";
                  } else {
-                     $code .= "\treturn this_.call({$info['symbol']}, {$info['call']});\n";
+                     $code .= "\tstatic THREAD_LOCAL zend_function *_method_fn = nullptr;\n";
+                     $code .= "\tif (UNEXPECTED(!_method_fn)) {\n";
+                     $code .= "\t\t_method_fn = php::getMethod(this_.ce(), {$info['symbol']});\n";
+                     $code .= "\t}\n";
+                     $code .= "\treturn this_.call(_method_fn, {$info['call']});\n";
                  }
                 $code .= "}\n";
                 $info['impl_code'] = $code;

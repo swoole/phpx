@@ -3,21 +3,41 @@
 
 namespace php {
 Variant PhpToken::tokenize(const Variant &code, const Variant &flags) {
-    return php::call(LITERAL_STRING[2355], {code, flags});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[2423], LITERAL_STRING[2424]);
+    }
+    return php::call(_method_fn, {code, flags});
 }
 PhpToken::PhpToken(const Variant &id, const Variant &text, const Variant &line, const Variant &pos) {
-    this_ = newObject(LITERAL_STRING[2356], {id, text, line, pos});
+    this_ = newObject(LITERAL_STRING[2423], {id, text, line, pos});
 }
 Variant PhpToken::is(const Variant &kind) {
-    return this_.call(LITERAL_STRING[2357], {kind});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2425]);
+    }
+    return this_.call(_method_fn, {kind});
 }
 Variant PhpToken::isIgnorable() {
-    return this_.call(LITERAL_STRING[2358], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2426]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant PhpToken::getTokenName() {
-    return this_.call(LITERAL_STRING[2359], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2427]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant PhpToken::__toString() {
-    return this_.call(LITERAL_STRING[29], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
+    }
+    return this_.call(_method_fn, {});
 }
 }  // namespace php

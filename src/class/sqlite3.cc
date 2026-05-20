@@ -3,159 +3,347 @@
 
 namespace php {
 SQLite3Exception::SQLite3Exception(const Variant &message, const Variant &code, const Variant &previous) {
-    this_ = newObject(LITERAL_STRING[1826], {message, code, previous});
+    this_ = newObject(LITERAL_STRING[1889], {message, code, previous});
 }
 Variant SQLite3Exception::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Exception::getMessage() {
-    return this_.call(LITERAL_STRING[98], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Exception::getCode() {
-    return this_.call(LITERAL_STRING[99], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Exception::getFile() {
-    return this_.call(LITERAL_STRING[100], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Exception::getLine() {
-    return this_.call(LITERAL_STRING[101], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Exception::getTrace() {
-    return this_.call(LITERAL_STRING[102], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Exception::getPrevious() {
-    return this_.call(LITERAL_STRING[103], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Exception::getTraceAsString() {
-    return this_.call(LITERAL_STRING[104], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Exception::__toString() {
-    return this_.call(LITERAL_STRING[29], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
+    }
+    return this_.call(_method_fn, {});
 }
 SQLite3::SQLite3(const Variant &filename, const Variant &flags, const Variant &encryption_key) {
-    this_ = newObject(LITERAL_STRING[1827], {filename, flags, encryption_key});
+    this_ = newObject(LITERAL_STRING[1890], {filename, flags, encryption_key});
 }
 Variant SQLite3::open(const Variant &filename, const Variant &flags, const Variant &encryption_key) {
-    return this_.call(LITERAL_STRING[1173], {filename, flags, encryption_key});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1230]);
+    }
+    return this_.call(_method_fn, {filename, flags, encryption_key});
 }
 Variant SQLite3::close() {
-    return this_.call(LITERAL_STRING[1068], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1126]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3::version() {
-    return php::call(LITERAL_STRING[1828], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[1890], LITERAL_STRING[1892]);
+    }
+    return php::call(_method_fn, {});
 }
 Variant SQLite3::lastInsertRowID() {
-    return this_.call(LITERAL_STRING[1829], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1893]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3::lastErrorCode() {
-    return this_.call(LITERAL_STRING[1830], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1894]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3::lastExtendedErrorCode() {
-    return this_.call(LITERAL_STRING[1831], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1895]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3::lastErrorMsg() {
-    return this_.call(LITERAL_STRING[1832], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1896]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3::changes() {
-    return this_.call(LITERAL_STRING[1833], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1897]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3::busyTimeout(const Variant &milliseconds) {
-    return this_.call(LITERAL_STRING[1834], {milliseconds});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1898]);
+    }
+    return this_.call(_method_fn, {milliseconds});
 }
 Variant SQLite3::loadExtension(const Variant &name) {
-    return this_.call(LITERAL_STRING[857], {name});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[898]);
+    }
+    return this_.call(_method_fn, {name});
 }
 Variant SQLite3::backup(const Variant &destination,
                         const Variant &source_database,
                         const Variant &destination_database) {
-    return this_.call(LITERAL_STRING[1835], {destination, source_database, destination_database});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1899]);
+    }
+    return this_.call(_method_fn, {destination, source_database, destination_database});
 }
 Variant SQLite3::escapeString(const Variant &string) {
-    return php::call(LITERAL_STRING[1836], {string});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[1890], LITERAL_STRING[1901]);
+    }
+    return php::call(_method_fn, {string});
 }
 Variant SQLite3::prepare(const Variant &query) {
-    return this_.call(LITERAL_STRING[831], {query});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[871]);
+    }
+    return this_.call(_method_fn, {query});
 }
 Variant SQLite3::exec(const Variant &query) {
-    return this_.call(LITERAL_STRING[827], {query});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[866]);
+    }
+    return this_.call(_method_fn, {query});
 }
 Variant SQLite3::query(const Variant &query) {
-    return this_.call(LITERAL_STRING[477], {query});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[506]);
+    }
+    return this_.call(_method_fn, {query});
 }
 Variant SQLite3::querySingle(const Variant &query, const Variant &entire_row) {
-    return this_.call(LITERAL_STRING[1837], {query, entire_row});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1902]);
+    }
+    return this_.call(_method_fn, {query, entire_row});
 }
 Variant SQLite3::createFunction(const Variant &name,
                                 const Variant &callback,
                                 const Variant &arg_count,
                                 const Variant &flags) {
-    return this_.call(LITERAL_STRING[856], {name, callback, arg_count, flags});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[897]);
+    }
+    return this_.call(_method_fn, {name, callback, arg_count, flags});
 }
 Variant SQLite3::createAggregate(const Variant &name,
                                  const Variant &step_callback,
                                  const Variant &final_callback,
                                  const Variant &arg_count) {
-    return this_.call(LITERAL_STRING[854], {name, step_callback, final_callback, arg_count});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[895]);
+    }
+    return this_.call(_method_fn, {name, step_callback, final_callback, arg_count});
 }
 Variant SQLite3::createCollation(const Variant &name, const Variant &callback) {
-    return this_.call(LITERAL_STRING[855], {name, callback});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[896]);
+    }
+    return this_.call(_method_fn, {name, callback});
 }
 Variant SQLite3::openBlob(
     const Variant &table, const Variant &column, const Variant &rowid, const Variant &database, const Variant &flags) {
-    return this_.call(LITERAL_STRING[858], {table, column, rowid, database, flags});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[899]);
+    }
+    return this_.call(_method_fn, {table, column, rowid, database, flags});
 }
 Variant SQLite3::enableExceptions(const Variant &enable) {
-    return this_.call(LITERAL_STRING[1838], {enable});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1903]);
+    }
+    return this_.call(_method_fn, {enable});
 }
 Variant SQLite3::enableExtendedResultCodes(const Variant &enable) {
-    return this_.call(LITERAL_STRING[1839], {enable});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1904]);
+    }
+    return this_.call(_method_fn, {enable});
 }
 Variant SQLite3::setAuthorizer(const Variant &callback) {
-    return this_.call(LITERAL_STRING[1840], {callback});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1905]);
+    }
+    return this_.call(_method_fn, {callback});
 }
 Variant SQLite3Stmt::bindParam(const Variant &param, const Reference &var, const Variant &type) {
-    return this_.call(LITERAL_STRING[835], {param, &var, type});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[875]);
+    }
+    return this_.call(_method_fn, {param, &var, type});
 }
 Variant SQLite3Stmt::bindValue(const Variant &param, const Variant &value, const Variant &type) {
-    return this_.call(LITERAL_STRING[836], {param, value, type});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[876]);
+    }
+    return this_.call(_method_fn, {param, value, type});
 }
 Variant SQLite3Stmt::clear() {
-    return this_.call(LITERAL_STRING[1841], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1906]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Stmt::close() {
-    return this_.call(LITERAL_STRING[1068], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1126]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Stmt::execute() {
-    return this_.call(LITERAL_STRING[840], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[880]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Stmt::getSQL(const Variant &expand) {
-    return this_.call(LITERAL_STRING[1842], {expand});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1907]);
+    }
+    return this_.call(_method_fn, {expand});
 }
 Variant SQLite3Stmt::paramCount() {
-    return this_.call(LITERAL_STRING[1843], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1908]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Stmt::readOnly() {
-    return this_.call(LITERAL_STRING[1844], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1909]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Stmt::reset() {
-    return this_.call(LITERAL_STRING[1194], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1251]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Result::numColumns() {
-    return this_.call(LITERAL_STRING[1846], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1911]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Result::columnName(const Variant &column) {
-    return this_.call(LITERAL_STRING[1847], {column});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1912]);
+    }
+    return this_.call(_method_fn, {column});
 }
 Variant SQLite3Result::columnType(const Variant &column) {
-    return this_.call(LITERAL_STRING[1848], {column});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1913]);
+    }
+    return this_.call(_method_fn, {column});
 }
 Variant SQLite3Result::fetchArray(const Variant &mode) {
-    return this_.call(LITERAL_STRING[1849], {mode});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1914]);
+    }
+    return this_.call(_method_fn, {mode});
 }
 Variant SQLite3Result::reset() {
-    return this_.call(LITERAL_STRING[1194], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1251]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant SQLite3Result::finalize() {
-    return this_.call(LITERAL_STRING[1850], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1915]);
+    }
+    return this_.call(_method_fn, {});
 }
 }  // namespace php

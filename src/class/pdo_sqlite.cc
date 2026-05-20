@@ -6,70 +6,146 @@ Variant Pdo_Sqlite::createAggregate(const Variant &name,
                                     const Variant &step,
                                     const Variant &finalize,
                                     const Variant &num_args) {
-    return this_.call(LITERAL_STRING[854], {name, step, finalize, num_args});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[895]);
+    }
+    return this_.call(_method_fn, {name, step, finalize, num_args});
 }
 Variant Pdo_Sqlite::createCollation(const Variant &name, const Variant &callback) {
-    return this_.call(LITERAL_STRING[855], {name, callback});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[896]);
+    }
+    return this_.call(_method_fn, {name, callback});
 }
 Variant Pdo_Sqlite::createFunction(const Variant &function_name,
                                    const Variant &callback,
                                    const Variant &num_args,
                                    const Variant &flags) {
-    return this_.call(LITERAL_STRING[856], {function_name, callback, num_args, flags});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[897]);
+    }
+    return this_.call(_method_fn, {function_name, callback, num_args, flags});
 }
 Variant Pdo_Sqlite::loadExtension(const Variant &name) {
-    return this_.call(LITERAL_STRING[857], {name});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[898]);
+    }
+    return this_.call(_method_fn, {name});
 }
 Variant Pdo_Sqlite::openBlob(
     const Variant &table, const Variant &column, const Variant &rowid, const Variant &dbname, const Variant &flags) {
-    return this_.call(LITERAL_STRING[858], {table, column, rowid, dbname, flags});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[899]);
+    }
+    return this_.call(_method_fn, {table, column, rowid, dbname, flags});
 }
 Pdo_Sqlite::Pdo_Sqlite(const Variant &dsn, const Variant &username, const Variant &password, const Variant &options) {
-    this_ = newObject(LITERAL_STRING[859], {dsn, username, password, options});
+    this_ = newObject(LITERAL_STRING[900], {dsn, username, password, options});
 }
 Variant Pdo_Sqlite::connect(const Variant &dsn,
                             const Variant &username,
                             const Variant &password,
                             const Variant &options) {
-    return php::call(LITERAL_STRING[860], {dsn, username, password, options});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[902], LITERAL_STRING[861]);
+    }
+    return php::call(_method_fn, {dsn, username, password, options});
 }
 Variant Pdo_Sqlite::beginTransaction() {
-    return this_.call(LITERAL_STRING[823], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[862]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Pdo_Sqlite::commit() {
-    return this_.call(LITERAL_STRING[824], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[863]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Pdo_Sqlite::errorCode() {
-    return this_.call(LITERAL_STRING[825], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[864]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Pdo_Sqlite::errorInfo() {
-    return this_.call(LITERAL_STRING[826], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[865]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Pdo_Sqlite::exec(const Variant &statement) {
-    return this_.call(LITERAL_STRING[827], {statement});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[866]);
+    }
+    return this_.call(_method_fn, {statement});
 }
 Variant Pdo_Sqlite::getAttribute(const Variant &attribute) {
-    return this_.call(LITERAL_STRING[430], {attribute});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[459]);
+    }
+    return this_.call(_method_fn, {attribute});
 }
 Variant Pdo_Sqlite::getAvailableDrivers() {
-    return php::call(LITERAL_STRING[861], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[902], LITERAL_STRING[868]);
+    }
+    return php::call(_method_fn, {});
 }
 Variant Pdo_Sqlite::inTransaction() {
-    return this_.call(LITERAL_STRING[829], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[869]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Pdo_Sqlite::lastInsertId(const Variant &name) {
-    return this_.call(LITERAL_STRING[830], {name});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[870]);
+    }
+    return this_.call(_method_fn, {name});
 }
 Variant Pdo_Sqlite::prepare(const Variant &query, const Variant &options) {
-    return this_.call(LITERAL_STRING[831], {query, options});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[871]);
+    }
+    return this_.call(_method_fn, {query, options});
 }
 Variant Pdo_Sqlite::quote(const Variant &string, const Variant &type) {
-    return this_.call(LITERAL_STRING[832], {string, type});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[511]);
+    }
+    return this_.call(_method_fn, {string, type});
 }
 Variant Pdo_Sqlite::rollBack() {
-    return this_.call(LITERAL_STRING[833], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[872]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Pdo_Sqlite::setAttribute(const Variant &attribute, const Variant &value) {
-    return this_.call(LITERAL_STRING[440], {attribute, value});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[469]);
+    }
+    return this_.call(_method_fn, {attribute, value});
 }
 }  // namespace php

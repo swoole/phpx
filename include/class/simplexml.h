@@ -5,6 +5,9 @@ class SimpleXMLElement {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Variant xpath(const Variant &expression);
     Variant registerXPathNamespace(const Variant &prefix, const Variant &_namespace);
     Variant asXML(const Variant &filename = {});
@@ -36,6 +39,9 @@ class SimpleXMLIterator {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Variant xpath(const Variant &expression);
     Variant registerXPathNamespace(const Variant &prefix, const Variant &_namespace);
     Variant asXML(const Variant &filename = {});

@@ -3,33 +3,69 @@
 
 namespace php {
 JsonException::JsonException(const Variant &message, const Variant &code, const Variant &previous) {
-    this_ = newObject(LITERAL_STRING[639], {message, code, previous});
+    this_ = newObject(LITERAL_STRING[672], {message, code, previous});
 }
 Variant JsonException::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant JsonException::getMessage() {
-    return this_.call(LITERAL_STRING[98], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant JsonException::getCode() {
-    return this_.call(LITERAL_STRING[99], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant JsonException::getFile() {
-    return this_.call(LITERAL_STRING[100], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant JsonException::getLine() {
-    return this_.call(LITERAL_STRING[101], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant JsonException::getTrace() {
-    return this_.call(LITERAL_STRING[102], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant JsonException::getPrevious() {
-    return this_.call(LITERAL_STRING[103], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant JsonException::getTraceAsString() {
-    return this_.call(LITERAL_STRING[104], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant JsonException::__toString() {
-    return this_.call(LITERAL_STRING[29], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
+    }
+    return this_.call(_method_fn, {});
 }
 }  // namespace php

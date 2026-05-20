@@ -3,177 +3,409 @@
 
 namespace php {
 Variant die(const Variant &status) {
-    return call(LITERAL_STRING[32], {status});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[32]);
+    }
+    return call(fn, {status});
 }
 Variant zend_version() {
-    return call(LITERAL_STRING[33], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[33]);
+    }
+    return call(fn, {});
 }
 Variant func_num_args() {
-    return call(LITERAL_STRING[34], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[34]);
+    }
+    return call(fn, {});
 }
 Variant func_get_arg(const Variant &position) {
-    return call(LITERAL_STRING[35], {position});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[35]);
+    }
+    return call(fn, {position});
 }
 Variant func_get_args() {
-    return call(LITERAL_STRING[36], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[36]);
+    }
+    return call(fn, {});
 }
 Variant strcmp(const Variant &string1, const Variant &string2) {
-    return call(LITERAL_STRING[37], {string1, string2});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[37]);
+    }
+    return call(fn, {string1, string2});
 }
 Variant strncmp(const Variant &string1, const Variant &string2, const Variant &length) {
-    return call(LITERAL_STRING[38], {string1, string2, length});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[38]);
+    }
+    return call(fn, {string1, string2, length});
 }
 Variant strcasecmp(const Variant &string1, const Variant &string2) {
-    return call(LITERAL_STRING[39], {string1, string2});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[39]);
+    }
+    return call(fn, {string1, string2});
 }
 Variant strncasecmp(const Variant &string1, const Variant &string2, const Variant &length) {
-    return call(LITERAL_STRING[40], {string1, string2, length});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[40]);
+    }
+    return call(fn, {string1, string2, length});
 }
 Variant error_reporting(const Variant &error_level) {
-    return call(LITERAL_STRING[41], {error_level});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[41]);
+    }
+    return call(fn, {error_level});
 }
 Variant define(const Variant &constant_name, const Variant &value, const Variant &case_insensitive) {
-    return call(LITERAL_STRING[42], {constant_name, value, case_insensitive});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[42]);
+    }
+    return call(fn, {constant_name, value, case_insensitive});
 }
 Variant defined(const Variant &constant_name) {
-    return call(LITERAL_STRING[43], {constant_name});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[43]);
+    }
+    return call(fn, {constant_name});
 }
 Variant get_class(const Variant &object) {
-    return call(LITERAL_STRING[44], {object});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[44]);
+    }
+    return call(fn, {object});
 }
 Variant get_called_class() {
-    return call(LITERAL_STRING[45], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[45]);
+    }
+    return call(fn, {});
 }
 Variant get_parent_class(const Variant &object_or_class) {
-    return call(LITERAL_STRING[46], {object_or_class});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[46]);
+    }
+    return call(fn, {object_or_class});
 }
 Variant is_subclass_of(const Variant &object_or_class, const Variant &_class, const Variant &allow_string) {
-    return call(LITERAL_STRING[47], {object_or_class, _class, allow_string});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[47]);
+    }
+    return call(fn, {object_or_class, _class, allow_string});
 }
 Variant is_a(const Variant &object_or_class, const Variant &_class, const Variant &allow_string) {
-    return call(LITERAL_STRING[48], {object_or_class, _class, allow_string});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[48]);
+    }
+    return call(fn, {object_or_class, _class, allow_string});
 }
 Variant get_class_vars(const Variant &_class) {
-    return call(LITERAL_STRING[49], {_class});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[49]);
+    }
+    return call(fn, {_class});
 }
 Variant get_object_vars(const Variant &object) {
-    return call(LITERAL_STRING[50], {object});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[50]);
+    }
+    return call(fn, {object});
 }
 Variant get_mangled_object_vars(const Variant &object) {
-    return call(LITERAL_STRING[51], {object});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[51]);
+    }
+    return call(fn, {object});
 }
 Variant get_class_methods(const Variant &object_or_class) {
-    return call(LITERAL_STRING[52], {object_or_class});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[52]);
+    }
+    return call(fn, {object_or_class});
 }
 Variant method_exists(const Variant &object_or_class, const Variant &method) {
-    return call(LITERAL_STRING[53], {object_or_class, method});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[53]);
+    }
+    return call(fn, {object_or_class, method});
 }
 Variant property_exists(const Variant &object_or_class, const Variant &property) {
-    return call(LITERAL_STRING[54], {object_or_class, property});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[54]);
+    }
+    return call(fn, {object_or_class, property});
 }
 Variant class_exists(const Variant &_class, const Variant &autoload) {
-    return call(LITERAL_STRING[55], {_class, autoload});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[55]);
+    }
+    return call(fn, {_class, autoload});
 }
 Variant interface_exists(const Variant &interface, const Variant &autoload) {
-    return call(LITERAL_STRING[56], {interface, autoload});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[56]);
+    }
+    return call(fn, {interface, autoload});
 }
 Variant trait_exists(const Variant &trait, const Variant &autoload) {
-    return call(LITERAL_STRING[57], {trait, autoload});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[57]);
+    }
+    return call(fn, {trait, autoload});
 }
 Variant enum_exists(const Variant &_enum, const Variant &autoload) {
-    return call(LITERAL_STRING[58], {_enum, autoload});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[58]);
+    }
+    return call(fn, {_enum, autoload});
 }
 Variant function_exists(const Variant &function) {
-    return call(LITERAL_STRING[59], {function});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[59]);
+    }
+    return call(fn, {function});
 }
 Variant class_alias(const Variant &_class, const Variant &alias, const Variant &autoload) {
-    return call(LITERAL_STRING[60], {_class, alias, autoload});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[60]);
+    }
+    return call(fn, {_class, alias, autoload});
 }
 Variant get_included_files() {
-    return call(LITERAL_STRING[61], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[61]);
+    }
+    return call(fn, {});
 }
 Variant get_required_files() {
-    return call(LITERAL_STRING[62], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[62]);
+    }
+    return call(fn, {});
 }
 Variant trigger_error(const Variant &message, const Variant &error_level) {
-    return call(LITERAL_STRING[63], {message, error_level});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[63]);
+    }
+    return call(fn, {message, error_level});
 }
 Variant user_error(const Variant &message, const Variant &error_level) {
-    return call(LITERAL_STRING[64], {message, error_level});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[64]);
+    }
+    return call(fn, {message, error_level});
 }
 Variant set_error_handler(const Variant &callback, const Variant &error_levels) {
-    return call(LITERAL_STRING[65], {callback, error_levels});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[65]);
+    }
+    return call(fn, {callback, error_levels});
 }
 Variant restore_error_handler() {
-    return call(LITERAL_STRING[66], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[66]);
+    }
+    return call(fn, {});
 }
 Variant set_exception_handler(const Variant &callback) {
-    return call(LITERAL_STRING[67], {callback});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[67]);
+    }
+    return call(fn, {callback});
 }
 Variant restore_exception_handler() {
-    return call(LITERAL_STRING[68], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[68]);
+    }
+    return call(fn, {});
 }
 Variant get_declared_classes() {
-    return call(LITERAL_STRING[69], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[69]);
+    }
+    return call(fn, {});
 }
 Variant get_declared_traits() {
-    return call(LITERAL_STRING[70], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[70]);
+    }
+    return call(fn, {});
 }
 Variant get_declared_interfaces() {
-    return call(LITERAL_STRING[71], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[71]);
+    }
+    return call(fn, {});
 }
 Variant get_defined_functions(const Variant &exclude_disabled) {
-    return call(LITERAL_STRING[72], {exclude_disabled});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[72]);
+    }
+    return call(fn, {exclude_disabled});
 }
 Variant get_defined_vars() {
-    return call(LITERAL_STRING[73], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[73]);
+    }
+    return call(fn, {});
 }
 Variant get_resource_type(const Variant &resource) {
-    return call(LITERAL_STRING[74], {resource});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[74]);
+    }
+    return call(fn, {resource});
 }
 Variant get_resource_id(const Variant &resource) {
-    return call(LITERAL_STRING[75], {resource});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[75]);
+    }
+    return call(fn, {resource});
 }
 Variant get_resources(const Variant &type) {
-    return call(LITERAL_STRING[76], {type});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[76]);
+    }
+    return call(fn, {type});
 }
 Variant get_loaded_extensions(const Variant &zend_extensions) {
-    return call(LITERAL_STRING[77], {zend_extensions});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[77]);
+    }
+    return call(fn, {zend_extensions});
 }
 Variant get_defined_constants(const Variant &categorize) {
-    return call(LITERAL_STRING[78], {categorize});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[78]);
+    }
+    return call(fn, {categorize});
 }
 Variant debug_backtrace(const Variant &options, const Variant &limit) {
-    return call(LITERAL_STRING[79], {options, limit});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[79]);
+    }
+    return call(fn, {options, limit});
 }
 Variant debug_print_backtrace(const Variant &options, const Variant &limit) {
-    return call(LITERAL_STRING[80], {options, limit});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[80]);
+    }
+    return call(fn, {options, limit});
 }
 Variant extension_loaded(const Variant &extension) {
-    return call(LITERAL_STRING[81], {extension});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[81]);
+    }
+    return call(fn, {extension});
 }
 Variant get_extension_funcs(const Variant &extension) {
-    return call(LITERAL_STRING[82], {extension});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[82]);
+    }
+    return call(fn, {extension});
 }
 Variant zend_thread_id() {
-    return call(LITERAL_STRING[83], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[83]);
+    }
+    return call(fn, {});
 }
 Variant gc_mem_caches() {
-    return call(LITERAL_STRING[84], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[84]);
+    }
+    return call(fn, {});
 }
 Variant gc_collect_cycles() {
-    return call(LITERAL_STRING[85], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[85]);
+    }
+    return call(fn, {});
 }
 Variant gc_enabled() {
-    return call(LITERAL_STRING[86], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[86]);
+    }
+    return call(fn, {});
 }
 Variant gc_enable() {
-    return call(LITERAL_STRING[87], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[87]);
+    }
+    return call(fn, {});
 }
 Variant gc_disable() {
-    return call(LITERAL_STRING[88], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[88]);
+    }
+    return call(fn, {});
 }
 Variant gc_status() {
-    return call(LITERAL_STRING[89], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[89]);
+    }
+    return call(fn, {});
 }
 }  // namespace php

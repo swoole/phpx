@@ -5,6 +5,9 @@ class BcMath_Number {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     BcMath_Number(const Variant &num);
     Variant add(const Variant &num, const Variant &scale = {});
     Variant sub(const Variant &num, const Variant &scale = {});

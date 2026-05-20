@@ -5,6 +5,9 @@ class Random_RandomError {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Random_RandomError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -21,6 +24,9 @@ class Random_BrokenRandomEngineError {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Random_BrokenRandomEngineError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -37,6 +43,9 @@ class Random_RandomException {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Random_RandomException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -53,6 +62,9 @@ class Random_Engine_Mt19937 {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Random_Engine_Mt19937(const Variant &seed = {}, const Variant &mode = 0);
     Variant generate();
     Variant __serialize();
@@ -64,6 +76,9 @@ class Random_Engine_PcgOneseq128XslRr64 {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Random_Engine_PcgOneseq128XslRr64(const Variant &seed = {});
     Variant generate();
     Variant jump(const Variant &advance);
@@ -76,6 +91,9 @@ class Random_Engine_Xoshiro256StarStar {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Random_Engine_Xoshiro256StarStar(const Variant &seed = {});
     Variant generate();
     Variant jump();
@@ -89,6 +107,10 @@ class Random_Engine_Secure {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Random_Engine_Secure();
     Variant generate();
 };
 
@@ -96,6 +118,9 @@ class Random_Randomizer {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Random_Randomizer(const Variant &engine = {});
     Variant nextInt();
     Variant nextFloat();
@@ -114,6 +139,10 @@ class Random_IntervalBoundary {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Random_IntervalBoundary();
     static Variant cases();
 };
 

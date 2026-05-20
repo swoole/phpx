@@ -3,27 +3,59 @@
 
 namespace php {
 Variant libxml_set_streams_context(const Variant &context) {
-    return call(LITERAL_STRING[640], {context});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[673]);
+    }
+    return call(fn, {context});
 }
 Variant libxml_use_internal_errors(const Variant &use_errors) {
-    return call(LITERAL_STRING[641], {use_errors});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[674]);
+    }
+    return call(fn, {use_errors});
 }
 Variant libxml_get_last_error() {
-    return call(LITERAL_STRING[642], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[675]);
+    }
+    return call(fn, {});
 }
 Variant libxml_get_errors() {
-    return call(LITERAL_STRING[643], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[676]);
+    }
+    return call(fn, {});
 }
 Variant libxml_clear_errors() {
-    return call(LITERAL_STRING[644], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[677]);
+    }
+    return call(fn, {});
 }
 Variant libxml_disable_entity_loader(const Variant &disable) {
-    return call(LITERAL_STRING[645], {disable});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[678]);
+    }
+    return call(fn, {disable});
 }
 Variant libxml_set_external_entity_loader(const Variant &resolver_function) {
-    return call(LITERAL_STRING[646], {resolver_function});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[679]);
+    }
+    return call(fn, {resolver_function});
 }
 Variant libxml_get_external_entity_loader() {
-    return call(LITERAL_STRING[647], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[680]);
+    }
+    return call(fn, {});
 }
 }  // namespace php

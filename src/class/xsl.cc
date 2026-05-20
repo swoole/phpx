@@ -2,45 +2,100 @@
 #include "class/xsl.h"
 
 namespace php {
+XSLTProcessor::XSLTProcessor() {
+    this_ = newObject(LITERAL_STRING[2570]);
+}
 Variant XSLTProcessor::importStylesheet(const Variant &stylesheet) {
-    return this_.call(LITERAL_STRING[2494], {stylesheet});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2571]);
+    }
+    return this_.call(_method_fn, {stylesheet});
 }
 Variant XSLTProcessor::transformToDoc(const Variant &document, const Variant &return_class) {
-    return this_.call(LITERAL_STRING[2495], {document, return_class});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2572]);
+    }
+    return this_.call(_method_fn, {document, return_class});
 }
 Variant XSLTProcessor::transformToUri(const Variant &document, const Variant &uri) {
-    return this_.call(LITERAL_STRING[2496], {document, uri});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2573]);
+    }
+    return this_.call(_method_fn, {document, uri});
 }
 Variant XSLTProcessor::transformToXml(const Variant &document) {
-    return this_.call(LITERAL_STRING[2497], {document});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2574]);
+    }
+    return this_.call(_method_fn, {document});
 }
 Variant XSLTProcessor::setParameter(const Variant &_namespace, const Variant &name, const Variant &value) {
-    return this_.call(LITERAL_STRING[2498], {_namespace, name, value});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2575]);
+    }
+    return this_.call(_method_fn, {_namespace, name, value});
 }
 Variant XSLTProcessor::getParameter(const Variant &_namespace, const Variant &name) {
-    return this_.call(LITERAL_STRING[2499], {_namespace, name});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2576]);
+    }
+    return this_.call(_method_fn, {_namespace, name});
 }
 Variant XSLTProcessor::removeParameter(const Variant &_namespace, const Variant &name) {
-    return this_.call(LITERAL_STRING[2500], {_namespace, name});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2577]);
+    }
+    return this_.call(_method_fn, {_namespace, name});
 }
 Variant XSLTProcessor::hasExsltSupport() {
-    return this_.call(LITERAL_STRING[2501], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2578]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant XSLTProcessor::registerPHPFunctions(const Variant &functions) {
-    return this_.call(LITERAL_STRING[2502], {functions});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2579]);
+    }
+    return this_.call(_method_fn, {functions});
 }
 Variant XSLTProcessor::registerPHPFunctionNS(const Variant &namespace_u_r_i,
                                              const Variant &name,
                                              const Variant &callable) {
-    return this_.call(LITERAL_STRING[2503], {namespace_u_r_i, name, callable});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2580]);
+    }
+    return this_.call(_method_fn, {namespace_u_r_i, name, callable});
 }
 Variant XSLTProcessor::setProfiling(const Variant &filename) {
-    return this_.call(LITERAL_STRING[2504], {filename});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2581]);
+    }
+    return this_.call(_method_fn, {filename});
 }
 Variant XSLTProcessor::setSecurityPrefs(const Variant &preferences) {
-    return this_.call(LITERAL_STRING[2505], {preferences});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2582]);
+    }
+    return this_.call(_method_fn, {preferences});
 }
 Variant XSLTProcessor::getSecurityPrefs() {
-    return this_.call(LITERAL_STRING[2506], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2583]);
+    }
+    return this_.call(_method_fn, {});
 }
 }  // namespace php

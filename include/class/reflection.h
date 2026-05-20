@@ -5,6 +5,9 @@ class ReflectionException {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -21,6 +24,10 @@ class Reflection {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    Reflection();
     static Variant getModifierNames(const Variant &modifiers);
 };
 
@@ -28,13 +35,20 @@ class ReflectionFunction {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionFunction(const Variant &function);
     Variant __toString();
     Variant isAnonymous();
     Variant isDisabled();
     template <typename... Args>
     Variant invoke(const Args &...args) {
-        return this_.call(LITERAL_STRING[1414], {args...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1472]);
+        }
+        return this_.call(_method_fn, {args...});
     }
     Variant invokeArgs(const Variant &args);
     Variant getClosure();
@@ -75,6 +89,9 @@ class ReflectionGenerator {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionGenerator(const Variant &generator);
     Variant getExecutingLine();
     Variant getExecutingFile();
@@ -89,6 +106,9 @@ class ReflectionParameter {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionParameter(const Variant &function, const Variant &param);
     Variant __toString();
     Variant getName();
@@ -117,6 +137,10 @@ class ReflectionNamedType {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    ReflectionNamedType();
     Variant getName();
     Variant isBuiltin();
     Variant allowsNull();
@@ -127,6 +151,10 @@ class ReflectionUnionType {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    ReflectionUnionType();
     Variant getTypes();
     Variant allowsNull();
     Variant __toString();
@@ -136,6 +164,10 @@ class ReflectionIntersectionType {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    ReflectionIntersectionType();
     Variant getTypes();
     Variant allowsNull();
     Variant __toString();
@@ -145,6 +177,9 @@ class ReflectionMethod {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionMethod(const Variant &object_or_method, const Variant &method = {});
     static Variant createFromMethodName(const Variant &method);
     Variant __toString();
@@ -159,7 +194,11 @@ class ReflectionMethod {
     Variant getModifiers();
     template <typename... Args>
     Variant invoke(const Variant &object, const Args &...args) {
-        return this_.call(LITERAL_STRING[1414], {object, args...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1472]);
+        }
+        return this_.call(_method_fn, {object, args...});
     }
     Variant invokeArgs(const Variant &object, const Variant &args);
     Variant getDeclaringClass();
@@ -203,6 +242,9 @@ class ReflectionClass {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionClass(const Variant &object_or_class);
     Variant __toString();
     Variant getName();
@@ -242,7 +284,11 @@ class ReflectionClass {
     Variant isInstance(const Variant &object);
     template <typename... Args>
     Variant newInstance(const Args &...args) {
-        return this_.call(LITERAL_STRING[1513], {args...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1572]);
+        }
+        return this_.call(_method_fn, {args...});
     }
     Variant newInstanceWithoutConstructor();
     Variant newInstanceArgs(const Variant &args = Array{});
@@ -275,6 +321,9 @@ class ReflectionObject {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionObject(const Variant &object);
     Variant __toString();
     Variant getName();
@@ -314,7 +363,11 @@ class ReflectionObject {
     Variant isInstance(const Variant &object);
     template <typename... Args>
     Variant newInstance(const Args &...args) {
-        return this_.call(LITERAL_STRING[1513], {args...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1572]);
+        }
+        return this_.call(_method_fn, {args...});
     }
     Variant newInstanceWithoutConstructor();
     Variant newInstanceArgs(const Variant &args = Array{});
@@ -347,6 +400,9 @@ class ReflectionProperty {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionProperty(const Variant &_class, const Variant &property);
     Variant __toString();
     Variant getName();
@@ -391,6 +447,9 @@ class ReflectionClassConstant {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionClassConstant(const Variant &_class, const Variant &constant);
     Variant __toString();
     Variant getName();
@@ -413,6 +472,9 @@ class ReflectionExtension {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionExtension(const Variant &name);
     Variant __toString();
     Variant getName();
@@ -432,6 +494,9 @@ class ReflectionZendExtension {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionZendExtension(const Variant &name);
     Variant __toString();
     Variant getName();
@@ -445,6 +510,9 @@ class ReflectionReference {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     static Variant fromArrayElement(const Variant &array, const Variant &key);
     Variant getId();
 };
@@ -453,6 +521,9 @@ class ReflectionAttribute {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Variant getName();
     Variant getTarget();
     Variant isRepeated();
@@ -465,6 +536,9 @@ class ReflectionEnum {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionEnum(const Variant &object_or_class);
     Variant hasCase(const Variant &name);
     Variant getCase(const Variant &name);
@@ -509,7 +583,11 @@ class ReflectionEnum {
     Variant isInstance(const Variant &object);
     template <typename... Args>
     Variant newInstance(const Args &...args) {
-        return this_.call(LITERAL_STRING[1513], {args...});
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1572]);
+        }
+        return this_.call(_method_fn, {args...});
     }
     Variant newInstanceWithoutConstructor();
     Variant newInstanceArgs(const Variant &args = Array{});
@@ -542,6 +620,9 @@ class ReflectionEnumUnitCase {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionEnumUnitCase(const Variant &_class, const Variant &constant);
     Variant getEnum();
     Variant getValue();
@@ -565,6 +646,9 @@ class ReflectionEnumBackedCase {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionEnumBackedCase(const Variant &_class, const Variant &constant);
     Variant getBackingValue();
     Variant getEnum();
@@ -589,6 +673,9 @@ class ReflectionFiber {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionFiber(const Variant &fiber);
     Variant getFiber();
     Variant getExecutingFile();
@@ -601,6 +688,9 @@ class ReflectionConstant {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     ReflectionConstant(const Variant &name);
     Variant getName();
     Variant getNamespaceName();
@@ -614,6 +704,10 @@ class PropertyHookType {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    PropertyHookType();
     static Variant cases();
     static Variant from(const Variant &value);
     static Variant tryFrom(const Variant &value);

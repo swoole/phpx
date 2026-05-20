@@ -1502,6 +1502,7 @@ class Args {
 };
 
 PHPX_API extern zend_function *getFunction(const String &name);
+PHPX_API extern zend_function *getMethod(const String &class_name, const String &name);
 PHPX_API extern zend_function *getMethod(zend_class_entry *ce, const String &name);
 
 static inline Variant call(const Variant &func) {

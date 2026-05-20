@@ -3,526 +3,1146 @@
 
 namespace php {
 DateTime::DateTime(const Variant &datetime, const Variant &timezone) {
-    this_ = newObject(LITERAL_STRING[256], {datetime, timezone});
+    this_ = newObject(LITERAL_STRING[265], {datetime, timezone});
 }
 Variant DateTime::__serialize() {
-    return this_.call(LITERAL_STRING[30], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[30]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTime::__unserialize(const Variant &data) {
-    return this_.call(LITERAL_STRING[31], {data});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[31]);
+    }
+    return this_.call(_method_fn, {data});
 }
 Variant DateTime::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTime::__set_state(const Variant &array) {
-    return php::call(LITERAL_STRING[257], {array});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[265], LITERAL_STRING[267]);
+    }
+    return php::call(_method_fn, {array});
 }
 Variant DateTime::createFromImmutable(const Variant &object) {
-    return php::call(LITERAL_STRING[258], {object});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[265], LITERAL_STRING[269]);
+    }
+    return php::call(_method_fn, {object});
 }
 Variant DateTime::createFromInterface(const Variant &object) {
-    return php::call(LITERAL_STRING[259], {object});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[265], LITERAL_STRING[271]);
+    }
+    return php::call(_method_fn, {object});
 }
 Variant DateTime::createFromFormat(const Variant &format, const Variant &datetime, const Variant &timezone) {
-    return php::call(LITERAL_STRING[260], {format, datetime, timezone});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[265], LITERAL_STRING[273]);
+    }
+    return php::call(_method_fn, {format, datetime, timezone});
 }
 Variant DateTime::createFromTimestamp(const Variant &timestamp) {
-    return php::call(LITERAL_STRING[261], {timestamp});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[265], LITERAL_STRING[275]);
+    }
+    return php::call(_method_fn, {timestamp});
 }
 Variant DateTime::getLastErrors() {
-    return php::call(LITERAL_STRING[262], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[265], LITERAL_STRING[277]);
+    }
+    return php::call(_method_fn, {});
 }
 Variant DateTime::format(const Variant &format) {
-    return this_.call(LITERAL_STRING[263], {format});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[278]);
+    }
+    return this_.call(_method_fn, {format});
 }
 Variant DateTime::modify(const Variant &modifier) {
-    return this_.call(LITERAL_STRING[264], {modifier});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[279]);
+    }
+    return this_.call(_method_fn, {modifier});
 }
 Variant DateTime::add(const Variant &interval) {
-    return this_.call(LITERAL_STRING[16], {interval});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[16]);
+    }
+    return this_.call(_method_fn, {interval});
 }
 Variant DateTime::sub(const Variant &interval) {
-    return this_.call(LITERAL_STRING[17], {interval});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[17]);
+    }
+    return this_.call(_method_fn, {interval});
 }
 Variant DateTime::getTimezone() {
-    return this_.call(LITERAL_STRING[265], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[280]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTime::setTimezone(const Variant &timezone) {
-    return this_.call(LITERAL_STRING[266], {timezone});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[281]);
+    }
+    return this_.call(_method_fn, {timezone});
 }
 Variant DateTime::getOffset() {
-    return this_.call(LITERAL_STRING[267], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[282]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTime::getMicrosecond() {
-    return this_.call(LITERAL_STRING[268], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[283]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTime::setTime(const Variant &hour,
                           const Variant &minute,
                           const Variant &second,
                           const Variant &microsecond) {
-    return this_.call(LITERAL_STRING[269], {hour, minute, second, microsecond});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[284]);
+    }
+    return this_.call(_method_fn, {hour, minute, second, microsecond});
 }
 Variant DateTime::setDate(const Variant &year, const Variant &month, const Variant &day) {
-    return this_.call(LITERAL_STRING[270], {year, month, day});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[285]);
+    }
+    return this_.call(_method_fn, {year, month, day});
 }
 Variant DateTime::setISODate(const Variant &year, const Variant &week, const Variant &day_of_week) {
-    return this_.call(LITERAL_STRING[271], {year, week, day_of_week});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[286]);
+    }
+    return this_.call(_method_fn, {year, week, day_of_week});
 }
 Variant DateTime::setTimestamp(const Variant &timestamp) {
-    return this_.call(LITERAL_STRING[272], {timestamp});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[287]);
+    }
+    return this_.call(_method_fn, {timestamp});
 }
 Variant DateTime::setMicrosecond(const Variant &microsecond) {
-    return this_.call(LITERAL_STRING[273], {microsecond});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[288]);
+    }
+    return this_.call(_method_fn, {microsecond});
 }
 Variant DateTime::getTimestamp() {
-    return this_.call(LITERAL_STRING[274], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[289]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTime::diff(const Variant &target_object, const Variant &absolute) {
-    return this_.call(LITERAL_STRING[275], {target_object, absolute});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[290]);
+    }
+    return this_.call(_method_fn, {target_object, absolute});
 }
 DateTimeImmutable::DateTimeImmutable(const Variant &datetime, const Variant &timezone) {
-    this_ = newObject(LITERAL_STRING[276], {datetime, timezone});
+    this_ = newObject(LITERAL_STRING[291], {datetime, timezone});
 }
 Variant DateTimeImmutable::__serialize() {
-    return this_.call(LITERAL_STRING[30], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[30]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTimeImmutable::__unserialize(const Variant &data) {
-    return this_.call(LITERAL_STRING[31], {data});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[31]);
+    }
+    return this_.call(_method_fn, {data});
 }
 Variant DateTimeImmutable::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTimeImmutable::__set_state(const Variant &array) {
-    return php::call(LITERAL_STRING[277], {array});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[291], LITERAL_STRING[267]);
+    }
+    return php::call(_method_fn, {array});
 }
 Variant DateTimeImmutable::createFromFormat(const Variant &format, const Variant &datetime, const Variant &timezone) {
-    return php::call(LITERAL_STRING[278], {format, datetime, timezone});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[291], LITERAL_STRING[273]);
+    }
+    return php::call(_method_fn, {format, datetime, timezone});
 }
 Variant DateTimeImmutable::createFromTimestamp(const Variant &timestamp) {
-    return php::call(LITERAL_STRING[279], {timestamp});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[291], LITERAL_STRING[275]);
+    }
+    return php::call(_method_fn, {timestamp});
 }
 Variant DateTimeImmutable::getLastErrors() {
-    return php::call(LITERAL_STRING[280], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[291], LITERAL_STRING[277]);
+    }
+    return php::call(_method_fn, {});
 }
 Variant DateTimeImmutable::format(const Variant &format) {
-    return this_.call(LITERAL_STRING[263], {format});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[278]);
+    }
+    return this_.call(_method_fn, {format});
 }
 Variant DateTimeImmutable::getTimezone() {
-    return this_.call(LITERAL_STRING[265], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[280]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTimeImmutable::getOffset() {
-    return this_.call(LITERAL_STRING[267], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[282]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTimeImmutable::getTimestamp() {
-    return this_.call(LITERAL_STRING[274], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[289]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTimeImmutable::getMicrosecond() {
-    return this_.call(LITERAL_STRING[268], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[283]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTimeImmutable::diff(const Variant &target_object, const Variant &absolute) {
-    return this_.call(LITERAL_STRING[275], {target_object, absolute});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[290]);
+    }
+    return this_.call(_method_fn, {target_object, absolute});
 }
 Variant DateTimeImmutable::modify(const Variant &modifier) {
-    return this_.call(LITERAL_STRING[264], {modifier});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[279]);
+    }
+    return this_.call(_method_fn, {modifier});
 }
 Variant DateTimeImmutable::add(const Variant &interval) {
-    return this_.call(LITERAL_STRING[16], {interval});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[16]);
+    }
+    return this_.call(_method_fn, {interval});
 }
 Variant DateTimeImmutable::sub(const Variant &interval) {
-    return this_.call(LITERAL_STRING[17], {interval});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[17]);
+    }
+    return this_.call(_method_fn, {interval});
 }
 Variant DateTimeImmutable::setTimezone(const Variant &timezone) {
-    return this_.call(LITERAL_STRING[266], {timezone});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[281]);
+    }
+    return this_.call(_method_fn, {timezone});
 }
 Variant DateTimeImmutable::setTime(const Variant &hour,
                                    const Variant &minute,
                                    const Variant &second,
                                    const Variant &microsecond) {
-    return this_.call(LITERAL_STRING[269], {hour, minute, second, microsecond});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[284]);
+    }
+    return this_.call(_method_fn, {hour, minute, second, microsecond});
 }
 Variant DateTimeImmutable::setDate(const Variant &year, const Variant &month, const Variant &day) {
-    return this_.call(LITERAL_STRING[270], {year, month, day});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[285]);
+    }
+    return this_.call(_method_fn, {year, month, day});
 }
 Variant DateTimeImmutable::setISODate(const Variant &year, const Variant &week, const Variant &day_of_week) {
-    return this_.call(LITERAL_STRING[271], {year, week, day_of_week});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[286]);
+    }
+    return this_.call(_method_fn, {year, week, day_of_week});
 }
 Variant DateTimeImmutable::setTimestamp(const Variant &timestamp) {
-    return this_.call(LITERAL_STRING[272], {timestamp});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[287]);
+    }
+    return this_.call(_method_fn, {timestamp});
 }
 Variant DateTimeImmutable::setMicrosecond(const Variant &microsecond) {
-    return this_.call(LITERAL_STRING[273], {microsecond});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[288]);
+    }
+    return this_.call(_method_fn, {microsecond});
 }
 Variant DateTimeImmutable::createFromMutable(const Variant &object) {
-    return php::call(LITERAL_STRING[281], {object});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[291], LITERAL_STRING[297]);
+    }
+    return php::call(_method_fn, {object});
 }
 Variant DateTimeImmutable::createFromInterface(const Variant &object) {
-    return php::call(LITERAL_STRING[282], {object});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[291], LITERAL_STRING[271]);
+    }
+    return php::call(_method_fn, {object});
 }
 DateTimeZone::DateTimeZone(const Variant &timezone) {
-    this_ = newObject(LITERAL_STRING[283], {timezone});
+    this_ = newObject(LITERAL_STRING[299], {timezone});
 }
 Variant DateTimeZone::getName() {
-    return this_.call(LITERAL_STRING[284], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[300]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTimeZone::getOffset(const Variant &datetime) {
-    return this_.call(LITERAL_STRING[267], {datetime});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[282]);
+    }
+    return this_.call(_method_fn, {datetime});
 }
 Variant DateTimeZone::getTransitions(const Variant &timestamp_begin, const Variant &timestamp_end) {
-    return this_.call(LITERAL_STRING[285], {timestamp_begin, timestamp_end});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[301]);
+    }
+    return this_.call(_method_fn, {timestamp_begin, timestamp_end});
 }
 Variant DateTimeZone::getLocation() {
-    return this_.call(LITERAL_STRING[286], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[302]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTimeZone::listAbbreviations() {
-    return php::call(LITERAL_STRING[287], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[299], LITERAL_STRING[304]);
+    }
+    return php::call(_method_fn, {});
 }
 Variant DateTimeZone::listIdentifiers(const Variant &timezone_group, const Variant &country_code) {
-    return php::call(LITERAL_STRING[288], {timezone_group, country_code});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[299], LITERAL_STRING[306]);
+    }
+    return php::call(_method_fn, {timezone_group, country_code});
 }
 Variant DateTimeZone::__serialize() {
-    return this_.call(LITERAL_STRING[30], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[30]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTimeZone::__unserialize(const Variant &data) {
-    return this_.call(LITERAL_STRING[31], {data});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[31]);
+    }
+    return this_.call(_method_fn, {data});
 }
 Variant DateTimeZone::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateTimeZone::__set_state(const Variant &array) {
-    return php::call(LITERAL_STRING[289], {array});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[299], LITERAL_STRING[267]);
+    }
+    return php::call(_method_fn, {array});
 }
 DateInterval::DateInterval(const Variant &duration) {
-    this_ = newObject(LITERAL_STRING[290], {duration});
+    this_ = newObject(LITERAL_STRING[308], {duration});
 }
 Variant DateInterval::createFromDateString(const Variant &datetime) {
-    return php::call(LITERAL_STRING[291], {datetime});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[308], LITERAL_STRING[310]);
+    }
+    return php::call(_method_fn, {datetime});
 }
 Variant DateInterval::format(const Variant &format) {
-    return this_.call(LITERAL_STRING[263], {format});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[278]);
+    }
+    return this_.call(_method_fn, {format});
 }
 Variant DateInterval::__serialize() {
-    return this_.call(LITERAL_STRING[30], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[30]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInterval::__unserialize(const Variant &data) {
-    return this_.call(LITERAL_STRING[31], {data});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[31]);
+    }
+    return this_.call(_method_fn, {data});
 }
 Variant DateInterval::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInterval::__set_state(const Variant &array) {
-    return php::call(LITERAL_STRING[292], {array});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[308], LITERAL_STRING[267]);
+    }
+    return php::call(_method_fn, {array});
 }
 Variant DatePeriod::createFromISO8601String(const Variant &specification, const Variant &options) {
-    return php::call(LITERAL_STRING[293], {specification, options});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[313], LITERAL_STRING[314]);
+    }
+    return php::call(_method_fn, {specification, options});
 }
 DatePeriod::DatePeriod(const Variant &start, const Variant &interval, const Variant &end, const Variant &options) {
-    this_ = newObject(LITERAL_STRING[294], {start, interval, end, options});
+    this_ = newObject(LITERAL_STRING[313], {start, interval, end, options});
 }
 Variant DatePeriod::getStartDate() {
-    return this_.call(LITERAL_STRING[295], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[315]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DatePeriod::getEndDate() {
-    return this_.call(LITERAL_STRING[296], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[316]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DatePeriod::getDateInterval() {
-    return this_.call(LITERAL_STRING[297], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[317]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DatePeriod::getRecurrences() {
-    return this_.call(LITERAL_STRING[298], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[318]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DatePeriod::__serialize() {
-    return this_.call(LITERAL_STRING[30], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[30]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DatePeriod::__unserialize(const Variant &data) {
-    return this_.call(LITERAL_STRING[31], {data});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[31]);
+    }
+    return this_.call(_method_fn, {data});
 }
 Variant DatePeriod::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DatePeriod::__set_state(const Variant &array) {
-    return php::call(LITERAL_STRING[299], {array});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[313], LITERAL_STRING[267]);
+    }
+    return php::call(_method_fn, {array});
 }
 Variant DatePeriod::getIterator() {
-    return this_.call(LITERAL_STRING[137], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[141]);
+    }
+    return this_.call(_method_fn, {});
 }
 DateError::DateError(const Variant &message, const Variant &code, const Variant &previous) {
-    this_ = newObject(LITERAL_STRING[300], {message, code, previous});
+    this_ = newObject(LITERAL_STRING[320], {message, code, previous});
 }
 Variant DateError::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateError::getMessage() {
-    return this_.call(LITERAL_STRING[98], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateError::getCode() {
-    return this_.call(LITERAL_STRING[99], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateError::getFile() {
-    return this_.call(LITERAL_STRING[100], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateError::getLine() {
-    return this_.call(LITERAL_STRING[101], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateError::getTrace() {
-    return this_.call(LITERAL_STRING[102], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateError::getPrevious() {
-    return this_.call(LITERAL_STRING[103], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateError::getTraceAsString() {
-    return this_.call(LITERAL_STRING[104], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateError::__toString() {
-    return this_.call(LITERAL_STRING[29], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
+    }
+    return this_.call(_method_fn, {});
 }
 DateObjectError::DateObjectError(const Variant &message, const Variant &code, const Variant &previous) {
-    this_ = newObject(LITERAL_STRING[301], {message, code, previous});
+    this_ = newObject(LITERAL_STRING[321], {message, code, previous});
 }
 Variant DateObjectError::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateObjectError::getMessage() {
-    return this_.call(LITERAL_STRING[98], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateObjectError::getCode() {
-    return this_.call(LITERAL_STRING[99], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateObjectError::getFile() {
-    return this_.call(LITERAL_STRING[100], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateObjectError::getLine() {
-    return this_.call(LITERAL_STRING[101], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateObjectError::getTrace() {
-    return this_.call(LITERAL_STRING[102], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateObjectError::getPrevious() {
-    return this_.call(LITERAL_STRING[103], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateObjectError::getTraceAsString() {
-    return this_.call(LITERAL_STRING[104], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateObjectError::__toString() {
-    return this_.call(LITERAL_STRING[29], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
+    }
+    return this_.call(_method_fn, {});
 }
 DateRangeError::DateRangeError(const Variant &message, const Variant &code, const Variant &previous) {
-    this_ = newObject(LITERAL_STRING[302], {message, code, previous});
+    this_ = newObject(LITERAL_STRING[322], {message, code, previous});
 }
 Variant DateRangeError::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateRangeError::getMessage() {
-    return this_.call(LITERAL_STRING[98], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateRangeError::getCode() {
-    return this_.call(LITERAL_STRING[99], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateRangeError::getFile() {
-    return this_.call(LITERAL_STRING[100], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateRangeError::getLine() {
-    return this_.call(LITERAL_STRING[101], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateRangeError::getTrace() {
-    return this_.call(LITERAL_STRING[102], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateRangeError::getPrevious() {
-    return this_.call(LITERAL_STRING[103], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateRangeError::getTraceAsString() {
-    return this_.call(LITERAL_STRING[104], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateRangeError::__toString() {
-    return this_.call(LITERAL_STRING[29], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
+    }
+    return this_.call(_method_fn, {});
 }
 DateException::DateException(const Variant &message, const Variant &code, const Variant &previous) {
-    this_ = newObject(LITERAL_STRING[303], {message, code, previous});
+    this_ = newObject(LITERAL_STRING[323], {message, code, previous});
 }
 Variant DateException::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateException::getMessage() {
-    return this_.call(LITERAL_STRING[98], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateException::getCode() {
-    return this_.call(LITERAL_STRING[99], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateException::getFile() {
-    return this_.call(LITERAL_STRING[100], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateException::getLine() {
-    return this_.call(LITERAL_STRING[101], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateException::getTrace() {
-    return this_.call(LITERAL_STRING[102], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateException::getPrevious() {
-    return this_.call(LITERAL_STRING[103], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateException::getTraceAsString() {
-    return this_.call(LITERAL_STRING[104], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateException::__toString() {
-    return this_.call(LITERAL_STRING[29], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
+    }
+    return this_.call(_method_fn, {});
 }
 DateInvalidTimeZoneException::DateInvalidTimeZoneException(const Variant &message,
                                                            const Variant &code,
                                                            const Variant &previous) {
-    this_ = newObject(LITERAL_STRING[304], {message, code, previous});
+    this_ = newObject(LITERAL_STRING[324], {message, code, previous});
 }
 Variant DateInvalidTimeZoneException::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidTimeZoneException::getMessage() {
-    return this_.call(LITERAL_STRING[98], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidTimeZoneException::getCode() {
-    return this_.call(LITERAL_STRING[99], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidTimeZoneException::getFile() {
-    return this_.call(LITERAL_STRING[100], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidTimeZoneException::getLine() {
-    return this_.call(LITERAL_STRING[101], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidTimeZoneException::getTrace() {
-    return this_.call(LITERAL_STRING[102], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidTimeZoneException::getPrevious() {
-    return this_.call(LITERAL_STRING[103], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidTimeZoneException::getTraceAsString() {
-    return this_.call(LITERAL_STRING[104], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidTimeZoneException::__toString() {
-    return this_.call(LITERAL_STRING[29], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
+    }
+    return this_.call(_method_fn, {});
 }
 DateInvalidOperationException::DateInvalidOperationException(const Variant &message,
                                                              const Variant &code,
                                                              const Variant &previous) {
-    this_ = newObject(LITERAL_STRING[305], {message, code, previous});
+    this_ = newObject(LITERAL_STRING[325], {message, code, previous});
 }
 Variant DateInvalidOperationException::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidOperationException::getMessage() {
-    return this_.call(LITERAL_STRING[98], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidOperationException::getCode() {
-    return this_.call(LITERAL_STRING[99], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidOperationException::getFile() {
-    return this_.call(LITERAL_STRING[100], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidOperationException::getLine() {
-    return this_.call(LITERAL_STRING[101], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidOperationException::getTrace() {
-    return this_.call(LITERAL_STRING[102], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidOperationException::getPrevious() {
-    return this_.call(LITERAL_STRING[103], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidOperationException::getTraceAsString() {
-    return this_.call(LITERAL_STRING[104], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateInvalidOperationException::__toString() {
-    return this_.call(LITERAL_STRING[29], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
+    }
+    return this_.call(_method_fn, {});
 }
 DateMalformedStringException::DateMalformedStringException(const Variant &message,
                                                            const Variant &code,
                                                            const Variant &previous) {
-    this_ = newObject(LITERAL_STRING[306], {message, code, previous});
+    this_ = newObject(LITERAL_STRING[326], {message, code, previous});
 }
 Variant DateMalformedStringException::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedStringException::getMessage() {
-    return this_.call(LITERAL_STRING[98], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedStringException::getCode() {
-    return this_.call(LITERAL_STRING[99], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedStringException::getFile() {
-    return this_.call(LITERAL_STRING[100], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedStringException::getLine() {
-    return this_.call(LITERAL_STRING[101], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedStringException::getTrace() {
-    return this_.call(LITERAL_STRING[102], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedStringException::getPrevious() {
-    return this_.call(LITERAL_STRING[103], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedStringException::getTraceAsString() {
-    return this_.call(LITERAL_STRING[104], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedStringException::__toString() {
-    return this_.call(LITERAL_STRING[29], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
+    }
+    return this_.call(_method_fn, {});
 }
 DateMalformedIntervalStringException::DateMalformedIntervalStringException(const Variant &message,
                                                                            const Variant &code,
                                                                            const Variant &previous) {
-    this_ = newObject(LITERAL_STRING[307], {message, code, previous});
+    this_ = newObject(LITERAL_STRING[327], {message, code, previous});
 }
 Variant DateMalformedIntervalStringException::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedIntervalStringException::getMessage() {
-    return this_.call(LITERAL_STRING[98], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedIntervalStringException::getCode() {
-    return this_.call(LITERAL_STRING[99], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedIntervalStringException::getFile() {
-    return this_.call(LITERAL_STRING[100], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedIntervalStringException::getLine() {
-    return this_.call(LITERAL_STRING[101], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedIntervalStringException::getTrace() {
-    return this_.call(LITERAL_STRING[102], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedIntervalStringException::getPrevious() {
-    return this_.call(LITERAL_STRING[103], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedIntervalStringException::getTraceAsString() {
-    return this_.call(LITERAL_STRING[104], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedIntervalStringException::__toString() {
-    return this_.call(LITERAL_STRING[29], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
+    }
+    return this_.call(_method_fn, {});
 }
 DateMalformedPeriodStringException::DateMalformedPeriodStringException(const Variant &message,
                                                                        const Variant &code,
                                                                        const Variant &previous) {
-    this_ = newObject(LITERAL_STRING[308], {message, code, previous});
+    this_ = newObject(LITERAL_STRING[328], {message, code, previous});
 }
 Variant DateMalformedPeriodStringException::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedPeriodStringException::getMessage() {
-    return this_.call(LITERAL_STRING[98], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedPeriodStringException::getCode() {
-    return this_.call(LITERAL_STRING[99], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedPeriodStringException::getFile() {
-    return this_.call(LITERAL_STRING[100], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedPeriodStringException::getLine() {
-    return this_.call(LITERAL_STRING[101], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedPeriodStringException::getTrace() {
-    return this_.call(LITERAL_STRING[102], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedPeriodStringException::getPrevious() {
-    return this_.call(LITERAL_STRING[103], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedPeriodStringException::getTraceAsString() {
-    return this_.call(LITERAL_STRING[104], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant DateMalformedPeriodStringException::__toString() {
-    return this_.call(LITERAL_STRING[29], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
+    }
+    return this_.call(_method_fn, {});
 }
 }  // namespace php

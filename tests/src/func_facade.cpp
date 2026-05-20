@@ -743,6 +743,7 @@ TEST(func_facade, strcasecmp_strncasecmp) {
     ASSERT_EQ(php::strncasecmp("ABCDE", "abcxy", 3).toInt(), 0);
 }
 
+#if PHP_VERSION_ID >= 80300
 TEST(func_facade, str_increment_decrement) {
     auto rs = str_increment("a");
     ASSERT_STREQ(rs.toCString(), "b");
@@ -750,6 +751,7 @@ TEST(func_facade, str_increment_decrement) {
     auto rs2 = str_decrement("b");
     ASSERT_STREQ(rs2.toCString(), "a");
 }
+#endif
 
 TEST(func_facade, quotemeta) {
     auto rs = quotemeta(".+*?[^]$()");

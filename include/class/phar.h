@@ -5,6 +5,9 @@ class PharException {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     PharException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
     Variant __wakeup();
     Variant getMessage();
@@ -21,6 +24,9 @@ class Phar {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     Phar(const Variant &filename, const Variant &flags = 12288, const Variant &alias = {});
     Variant addEmptyDir(const Variant &directory);
     Variant addFile(const Variant &filename, const Variant &local_name = {});
@@ -129,6 +135,9 @@ class PharData {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     PharData(const Variant &filename,
              const Variant &flags = 12288,
              const Variant &alias = {},
@@ -240,6 +249,9 @@ class PharFileInfo {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
     PharFileInfo(const Variant &filename);
     Variant chmod(const Variant &perms);
     Variant compress(const Variant &compression);

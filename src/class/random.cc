@@ -3,191 +3,417 @@
 
 namespace php {
 Random_RandomError::Random_RandomError(const Variant &message, const Variant &code, const Variant &previous) {
-    this_ = newObject(LITERAL_STRING[1019], {message, code, previous});
+    this_ = newObject(LITERAL_STRING[1076], {message, code, previous});
 }
 Variant Random_RandomError::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomError::getMessage() {
-    return this_.call(LITERAL_STRING[98], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomError::getCode() {
-    return this_.call(LITERAL_STRING[99], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomError::getFile() {
-    return this_.call(LITERAL_STRING[100], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomError::getLine() {
-    return this_.call(LITERAL_STRING[101], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomError::getTrace() {
-    return this_.call(LITERAL_STRING[102], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomError::getPrevious() {
-    return this_.call(LITERAL_STRING[103], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomError::getTraceAsString() {
-    return this_.call(LITERAL_STRING[104], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomError::__toString() {
-    return this_.call(LITERAL_STRING[29], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
+    }
+    return this_.call(_method_fn, {});
 }
 Random_BrokenRandomEngineError::Random_BrokenRandomEngineError(const Variant &message,
                                                                const Variant &code,
                                                                const Variant &previous) {
-    this_ = newObject(LITERAL_STRING[1020], {message, code, previous});
+    this_ = newObject(LITERAL_STRING[1077], {message, code, previous});
 }
 Variant Random_BrokenRandomEngineError::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_BrokenRandomEngineError::getMessage() {
-    return this_.call(LITERAL_STRING[98], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_BrokenRandomEngineError::getCode() {
-    return this_.call(LITERAL_STRING[99], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_BrokenRandomEngineError::getFile() {
-    return this_.call(LITERAL_STRING[100], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_BrokenRandomEngineError::getLine() {
-    return this_.call(LITERAL_STRING[101], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_BrokenRandomEngineError::getTrace() {
-    return this_.call(LITERAL_STRING[102], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_BrokenRandomEngineError::getPrevious() {
-    return this_.call(LITERAL_STRING[103], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_BrokenRandomEngineError::getTraceAsString() {
-    return this_.call(LITERAL_STRING[104], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_BrokenRandomEngineError::__toString() {
-    return this_.call(LITERAL_STRING[29], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
+    }
+    return this_.call(_method_fn, {});
 }
 Random_RandomException::Random_RandomException(const Variant &message, const Variant &code, const Variant &previous) {
-    this_ = newObject(LITERAL_STRING[1021], {message, code, previous});
+    this_ = newObject(LITERAL_STRING[1078], {message, code, previous});
 }
 Variant Random_RandomException::__wakeup() {
-    return this_.call(LITERAL_STRING[97], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomException::getMessage() {
-    return this_.call(LITERAL_STRING[98], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomException::getCode() {
-    return this_.call(LITERAL_STRING[99], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomException::getFile() {
-    return this_.call(LITERAL_STRING[100], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomException::getLine() {
-    return this_.call(LITERAL_STRING[101], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomException::getTrace() {
-    return this_.call(LITERAL_STRING[102], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomException::getPrevious() {
-    return this_.call(LITERAL_STRING[103], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomException::getTraceAsString() {
-    return this_.call(LITERAL_STRING[104], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_RandomException::__toString() {
-    return this_.call(LITERAL_STRING[29], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
+    }
+    return this_.call(_method_fn, {});
 }
 Random_Engine_Mt19937::Random_Engine_Mt19937(const Variant &seed, const Variant &mode) {
-    this_ = newObject(LITERAL_STRING[1022], {seed, mode});
+    this_ = newObject(LITERAL_STRING[1079], {seed, mode});
 }
 Variant Random_Engine_Mt19937::generate() {
-    return this_.call(LITERAL_STRING[1023], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1080]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_Engine_Mt19937::__serialize() {
-    return this_.call(LITERAL_STRING[30], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[30]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_Engine_Mt19937::__unserialize(const Variant &data) {
-    return this_.call(LITERAL_STRING[31], {data});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[31]);
+    }
+    return this_.call(_method_fn, {data});
 }
 Variant Random_Engine_Mt19937::__debugInfo() {
-    return this_.call(LITERAL_STRING[126], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[129]);
+    }
+    return this_.call(_method_fn, {});
 }
 Random_Engine_PcgOneseq128XslRr64::Random_Engine_PcgOneseq128XslRr64(const Variant &seed) {
-    this_ = newObject(LITERAL_STRING[1024], {seed});
+    this_ = newObject(LITERAL_STRING[1081], {seed});
 }
 Variant Random_Engine_PcgOneseq128XslRr64::generate() {
-    return this_.call(LITERAL_STRING[1023], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1080]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_Engine_PcgOneseq128XslRr64::jump(const Variant &advance) {
-    return this_.call(LITERAL_STRING[1025], {advance});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1082]);
+    }
+    return this_.call(_method_fn, {advance});
 }
 Variant Random_Engine_PcgOneseq128XslRr64::__serialize() {
-    return this_.call(LITERAL_STRING[30], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[30]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_Engine_PcgOneseq128XslRr64::__unserialize(const Variant &data) {
-    return this_.call(LITERAL_STRING[31], {data});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[31]);
+    }
+    return this_.call(_method_fn, {data});
 }
 Variant Random_Engine_PcgOneseq128XslRr64::__debugInfo() {
-    return this_.call(LITERAL_STRING[126], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[129]);
+    }
+    return this_.call(_method_fn, {});
 }
 Random_Engine_Xoshiro256StarStar::Random_Engine_Xoshiro256StarStar(const Variant &seed) {
-    this_ = newObject(LITERAL_STRING[1026], {seed});
+    this_ = newObject(LITERAL_STRING[1083], {seed});
 }
 Variant Random_Engine_Xoshiro256StarStar::generate() {
-    return this_.call(LITERAL_STRING[1023], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1080]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_Engine_Xoshiro256StarStar::jump() {
-    return this_.call(LITERAL_STRING[1025], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1082]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_Engine_Xoshiro256StarStar::jumpLong() {
-    return this_.call(LITERAL_STRING[1027], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1084]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_Engine_Xoshiro256StarStar::__serialize() {
-    return this_.call(LITERAL_STRING[30], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[30]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_Engine_Xoshiro256StarStar::__unserialize(const Variant &data) {
-    return this_.call(LITERAL_STRING[31], {data});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[31]);
+    }
+    return this_.call(_method_fn, {data});
 }
 Variant Random_Engine_Xoshiro256StarStar::__debugInfo() {
-    return this_.call(LITERAL_STRING[126], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[129]);
+    }
+    return this_.call(_method_fn, {});
+}
+Random_Engine_Secure::Random_Engine_Secure() {
+    this_ = newObject(LITERAL_STRING[1085]);
 }
 Variant Random_Engine_Secure::generate() {
-    return this_.call(LITERAL_STRING[1023], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1080]);
+    }
+    return this_.call(_method_fn, {});
 }
 Random_Randomizer::Random_Randomizer(const Variant &engine) {
-    this_ = newObject(LITERAL_STRING[1029], {engine});
+    this_ = newObject(LITERAL_STRING[1086], {engine});
 }
 Variant Random_Randomizer::nextInt() {
-    return this_.call(LITERAL_STRING[1030], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1087]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_Randomizer::nextFloat() {
-    return this_.call(LITERAL_STRING[1031], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1088]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_Randomizer::getFloat(const Variant &min, const Variant &max, const Variant &boundary) {
-    return this_.call(LITERAL_STRING[1032], {min, max, boundary});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1089]);
+    }
+    return this_.call(_method_fn, {min, max, boundary});
 }
 Variant Random_Randomizer::getInt(const Variant &min, const Variant &max) {
-    return this_.call(LITERAL_STRING[1033], {min, max});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1090]);
+    }
+    return this_.call(_method_fn, {min, max});
 }
 Variant Random_Randomizer::getBytes(const Variant &length) {
-    return this_.call(LITERAL_STRING[1034], {length});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1091]);
+    }
+    return this_.call(_method_fn, {length});
 }
 Variant Random_Randomizer::getBytesFromString(const Variant &string, const Variant &length) {
-    return this_.call(LITERAL_STRING[1035], {string, length});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1092]);
+    }
+    return this_.call(_method_fn, {string, length});
 }
 Variant Random_Randomizer::shuffleArray(const Variant &array) {
-    return this_.call(LITERAL_STRING[1036], {array});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1093]);
+    }
+    return this_.call(_method_fn, {array});
 }
 Variant Random_Randomizer::shuffleBytes(const Variant &bytes) {
-    return this_.call(LITERAL_STRING[1037], {bytes});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1094]);
+    }
+    return this_.call(_method_fn, {bytes});
 }
 Variant Random_Randomizer::pickArrayKeys(const Variant &array, const Variant &num) {
-    return this_.call(LITERAL_STRING[1038], {array, num});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1095]);
+    }
+    return this_.call(_method_fn, {array, num});
 }
 Variant Random_Randomizer::__serialize() {
-    return this_.call(LITERAL_STRING[30], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[30]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant Random_Randomizer::__unserialize(const Variant &data) {
-    return this_.call(LITERAL_STRING[31], {data});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[31]);
+    }
+    return this_.call(_method_fn, {data});
+}
+Random_IntervalBoundary::Random_IntervalBoundary() {
+    this_ = newObject(LITERAL_STRING[1096]);
 }
 Variant Random_IntervalBoundary::cases() {
-    return php::call(LITERAL_STRING[1039], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(LITERAL_STRING[1098], LITERAL_STRING[334]);
+    }
+    return php::call(_method_fn, {});
 }
 }  // namespace php

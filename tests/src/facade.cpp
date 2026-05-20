@@ -22,3 +22,8 @@ TEST(facade, redis) {
     ASSERT_FALSE(redis.exists("key2"));
     ASSERT_FALSE(redis.exists("key3"));
 }
+
+TEST(facade, uname) {
+    auto m = php_uname("m");
+    ASSERT_STREQ(m.toCString(), "x86_64");
+}

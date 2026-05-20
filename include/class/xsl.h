@@ -5,6 +5,10 @@ class XSLTProcessor {
     Object this_;
 
   public:
+    Object getObject() {
+        return this_;
+    }
+    XSLTProcessor();
     Variant importStylesheet(const Variant &stylesheet);
     Variant transformToDoc(const Variant &document, const Variant &return_class = {});
     Variant transformToUri(const Variant &document, const Variant &uri);

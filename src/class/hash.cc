@@ -3,12 +3,24 @@
 
 namespace php {
 Variant HashContext::__serialize() {
-    return this_.call(LITERAL_STRING[30], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[30]);
+    }
+    return this_.call(_method_fn, {});
 }
 Variant HashContext::__unserialize(const Variant &data) {
-    return this_.call(LITERAL_STRING[31], {data});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[31]);
+    }
+    return this_.call(_method_fn, {data});
 }
 Variant HashContext::__debugInfo() {
-    return this_.call(LITERAL_STRING[126], {});
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[129]);
+    }
+    return this_.call(_method_fn, {});
 }
 }  // namespace php

@@ -3,145 +3,301 @@
 
 namespace php {
 Variant xmlwriter_open_uri(const Variant &uri) {
-    return call(LITERAL_STRING[2407], {uri});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2480]);
+    }
+    return call(fn, {uri});
 }
 Variant xmlwriter_open_memory() {
-    return call(LITERAL_STRING[2408], {});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2481]);
+    }
+    return call(fn, {});
 }
 Variant xmlwriter_set_indent(const Variant &writer, const Variant &enable) {
-    return call(LITERAL_STRING[2409], {writer, enable});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2482]);
+    }
+    return call(fn, {writer, enable});
 }
 Variant xmlwriter_set_indent_string(const Variant &writer, const Variant &indentation) {
-    return call(LITERAL_STRING[2410], {writer, indentation});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2483]);
+    }
+    return call(fn, {writer, indentation});
 }
 Variant xmlwriter_start_comment(const Variant &writer) {
-    return call(LITERAL_STRING[2411], {writer});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2484]);
+    }
+    return call(fn, {writer});
 }
 Variant xmlwriter_end_comment(const Variant &writer) {
-    return call(LITERAL_STRING[2412], {writer});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2485]);
+    }
+    return call(fn, {writer});
 }
 Variant xmlwriter_start_attribute(const Variant &writer, const Variant &name) {
-    return call(LITERAL_STRING[2413], {writer, name});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2486]);
+    }
+    return call(fn, {writer, name});
 }
 Variant xmlwriter_end_attribute(const Variant &writer) {
-    return call(LITERAL_STRING[2414], {writer});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2487]);
+    }
+    return call(fn, {writer});
 }
 Variant xmlwriter_write_attribute(const Variant &writer, const Variant &name, const Variant &value) {
-    return call(LITERAL_STRING[2415], {writer, name, value});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2488]);
+    }
+    return call(fn, {writer, name, value});
 }
 Variant xmlwriter_start_attribute_ns(const Variant &writer,
                                      const Variant &prefix,
                                      const Variant &name,
                                      const Variant &_namespace) {
-    return call(LITERAL_STRING[2416], {writer, prefix, name, _namespace});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2489]);
+    }
+    return call(fn, {writer, prefix, name, _namespace});
 }
 Variant xmlwriter_write_attribute_ns(const Variant &writer,
                                      const Variant &prefix,
                                      const Variant &name,
                                      const Variant &_namespace,
                                      const Variant &value) {
-    return call(LITERAL_STRING[2417], {writer, prefix, name, _namespace, value});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2490]);
+    }
+    return call(fn, {writer, prefix, name, _namespace, value});
 }
 Variant xmlwriter_start_element(const Variant &writer, const Variant &name) {
-    return call(LITERAL_STRING[2418], {writer, name});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2491]);
+    }
+    return call(fn, {writer, name});
 }
 Variant xmlwriter_end_element(const Variant &writer) {
-    return call(LITERAL_STRING[2419], {writer});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2492]);
+    }
+    return call(fn, {writer});
 }
 Variant xmlwriter_full_end_element(const Variant &writer) {
-    return call(LITERAL_STRING[2420], {writer});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2493]);
+    }
+    return call(fn, {writer});
 }
 Variant xmlwriter_start_element_ns(const Variant &writer,
                                    const Variant &prefix,
                                    const Variant &name,
                                    const Variant &_namespace) {
-    return call(LITERAL_STRING[2421], {writer, prefix, name, _namespace});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2494]);
+    }
+    return call(fn, {writer, prefix, name, _namespace});
 }
 Variant xmlwriter_write_element(const Variant &writer, const Variant &name, const Variant &content) {
-    return call(LITERAL_STRING[2422], {writer, name, content});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2495]);
+    }
+    return call(fn, {writer, name, content});
 }
 Variant xmlwriter_write_element_ns(const Variant &writer,
                                    const Variant &prefix,
                                    const Variant &name,
                                    const Variant &_namespace,
                                    const Variant &content) {
-    return call(LITERAL_STRING[2423], {writer, prefix, name, _namespace, content});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2496]);
+    }
+    return call(fn, {writer, prefix, name, _namespace, content});
 }
 Variant xmlwriter_start_pi(const Variant &writer, const Variant &target) {
-    return call(LITERAL_STRING[2424], {writer, target});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2497]);
+    }
+    return call(fn, {writer, target});
 }
 Variant xmlwriter_end_pi(const Variant &writer) {
-    return call(LITERAL_STRING[2425], {writer});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2498]);
+    }
+    return call(fn, {writer});
 }
 Variant xmlwriter_write_pi(const Variant &writer, const Variant &target, const Variant &content) {
-    return call(LITERAL_STRING[2426], {writer, target, content});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2499]);
+    }
+    return call(fn, {writer, target, content});
 }
 Variant xmlwriter_start_cdata(const Variant &writer) {
-    return call(LITERAL_STRING[2427], {writer});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2500]);
+    }
+    return call(fn, {writer});
 }
 Variant xmlwriter_end_cdata(const Variant &writer) {
-    return call(LITERAL_STRING[2428], {writer});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2501]);
+    }
+    return call(fn, {writer});
 }
 Variant xmlwriter_write_cdata(const Variant &writer, const Variant &content) {
-    return call(LITERAL_STRING[2429], {writer, content});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2502]);
+    }
+    return call(fn, {writer, content});
 }
 Variant xmlwriter_text(const Variant &writer, const Variant &content) {
-    return call(LITERAL_STRING[2430], {writer, content});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2503]);
+    }
+    return call(fn, {writer, content});
 }
 Variant xmlwriter_write_raw(const Variant &writer, const Variant &content) {
-    return call(LITERAL_STRING[2431], {writer, content});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2504]);
+    }
+    return call(fn, {writer, content});
 }
 Variant xmlwriter_start_document(const Variant &writer,
                                  const Variant &version,
                                  const Variant &encoding,
                                  const Variant &standalone) {
-    return call(LITERAL_STRING[2432], {writer, version, encoding, standalone});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2505]);
+    }
+    return call(fn, {writer, version, encoding, standalone});
 }
 Variant xmlwriter_end_document(const Variant &writer) {
-    return call(LITERAL_STRING[2433], {writer});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2506]);
+    }
+    return call(fn, {writer});
 }
 Variant xmlwriter_write_comment(const Variant &writer, const Variant &content) {
-    return call(LITERAL_STRING[2434], {writer, content});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2507]);
+    }
+    return call(fn, {writer, content});
 }
 Variant xmlwriter_start_dtd(const Variant &writer,
                             const Variant &qualified_name,
                             const Variant &public_id,
                             const Variant &system_id) {
-    return call(LITERAL_STRING[2435], {writer, qualified_name, public_id, system_id});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2508]);
+    }
+    return call(fn, {writer, qualified_name, public_id, system_id});
 }
 Variant xmlwriter_end_dtd(const Variant &writer) {
-    return call(LITERAL_STRING[2436], {writer});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2509]);
+    }
+    return call(fn, {writer});
 }
 Variant xmlwriter_write_dtd(const Variant &writer,
                             const Variant &name,
                             const Variant &public_id,
                             const Variant &system_id,
                             const Variant &content) {
-    return call(LITERAL_STRING[2437], {writer, name, public_id, system_id, content});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2510]);
+    }
+    return call(fn, {writer, name, public_id, system_id, content});
 }
 Variant xmlwriter_start_dtd_element(const Variant &writer, const Variant &qualified_name) {
-    return call(LITERAL_STRING[2438], {writer, qualified_name});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2511]);
+    }
+    return call(fn, {writer, qualified_name});
 }
 Variant xmlwriter_end_dtd_element(const Variant &writer) {
-    return call(LITERAL_STRING[2439], {writer});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2512]);
+    }
+    return call(fn, {writer});
 }
 Variant xmlwriter_write_dtd_element(const Variant &writer, const Variant &name, const Variant &content) {
-    return call(LITERAL_STRING[2440], {writer, name, content});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2513]);
+    }
+    return call(fn, {writer, name, content});
 }
 Variant xmlwriter_start_dtd_attlist(const Variant &writer, const Variant &name) {
-    return call(LITERAL_STRING[2441], {writer, name});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2514]);
+    }
+    return call(fn, {writer, name});
 }
 Variant xmlwriter_end_dtd_attlist(const Variant &writer) {
-    return call(LITERAL_STRING[2442], {writer});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2515]);
+    }
+    return call(fn, {writer});
 }
 Variant xmlwriter_write_dtd_attlist(const Variant &writer, const Variant &name, const Variant &content) {
-    return call(LITERAL_STRING[2443], {writer, name, content});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2516]);
+    }
+    return call(fn, {writer, name, content});
 }
 Variant xmlwriter_start_dtd_entity(const Variant &writer, const Variant &name, const Variant &is_param) {
-    return call(LITERAL_STRING[2444], {writer, name, is_param});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2517]);
+    }
+    return call(fn, {writer, name, is_param});
 }
 Variant xmlwriter_end_dtd_entity(const Variant &writer) {
-    return call(LITERAL_STRING[2445], {writer});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2518]);
+    }
+    return call(fn, {writer});
 }
 Variant xmlwriter_write_dtd_entity(const Variant &writer,
                                    const Variant &name,
@@ -150,12 +306,24 @@ Variant xmlwriter_write_dtd_entity(const Variant &writer,
                                    const Variant &public_id,
                                    const Variant &system_id,
                                    const Variant &notation_data) {
-    return call(LITERAL_STRING[2446], {writer, name, content, is_param, public_id, system_id, notation_data});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2519]);
+    }
+    return call(fn, {writer, name, content, is_param, public_id, system_id, notation_data});
 }
 Variant xmlwriter_output_memory(const Variant &writer, const Variant &flush) {
-    return call(LITERAL_STRING[2447], {writer, flush});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2520]);
+    }
+    return call(fn, {writer, flush});
 }
 Variant xmlwriter_flush(const Variant &writer, const Variant &empty) {
-    return call(LITERAL_STRING[2448], {writer, empty});
+    static THREAD_LOCAL zend_function *fn = nullptr;
+    if (UNEXPECTED(!fn)) {
+        fn = getFunction(LITERAL_STRING[2521]);
+    }
+    return call(fn, {writer, empty});
 }
 }  // namespace php
