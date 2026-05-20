@@ -442,14 +442,14 @@ Variant call(const Variant &func, const ArgList &args) {
 
 Variant call(zend_function *func, zend_array *named_args) {
     Variant retval{};
-    zend_call_known_function(func, nullptr, nullptr, retval.ptr(), 0, nullptr, named_args);
+    zend_call_known_function(func, nullptr, func->common.scope, retval.ptr(), 0, nullptr, named_args);
     throwErrorIfOccurred();
     return retval;
 }
 
 Variant call(zend_function *func, Args &_args, zend_array *named_args) {
     Variant retval{};
-    zend_call_known_function(func, nullptr, nullptr, retval.ptr(), _args.count(), _args.ptr(), named_args);
+    zend_call_known_function(func, nullptr, func->common.scope, retval.ptr(), _args.count(), _args.ptr(), named_args);
     throwErrorIfOccurred();
     return retval;
 }
