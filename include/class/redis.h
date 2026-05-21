@@ -1,16 +1,69 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
+#include "class/spl.h"
 
 namespace php {
+class Redis;
+class RedisArray;
+class RedisCluster;
+class RedisClusterException;
+class RedisSentinel;
+class RedisException;
+
 class Redis {
+  protected:
     Object this_;
 
   public:
     Object getObject() const {
         return this_;
     }
+    static constexpr int REDIS_NOT_FOUND = 0;
+    static constexpr int REDIS_STRING = 1;
+    static constexpr int REDIS_SET = 2;
+    static constexpr int REDIS_LIST = 3;
+    static constexpr int REDIS_ZSET = 4;
+    static constexpr int REDIS_HASH = 5;
+    static constexpr int REDIS_STREAM = 6;
+    static constexpr int ATOMIC = 0;
+    static constexpr int MULTI = 1;
+    static constexpr int PIPELINE = 2;
+    static constexpr int OPT_SERIALIZER = 1;
+    static constexpr int OPT_PREFIX = 2;
+    static constexpr int OPT_READ_TIMEOUT = 3;
+    static constexpr int OPT_TCP_KEEPALIVE = 6;
+    static constexpr int OPT_COMPRESSION = 7;
+    static constexpr int OPT_REPLY_LITERAL = 8;
+    static constexpr int OPT_COMPRESSION_LEVEL = 9;
+    static constexpr int OPT_NULL_MULTIBULK_AS_NULL = 10;
+    static constexpr int OPT_PACK_IGNORE_NUMBERS = 15;
+    static constexpr int SERIALIZER_NONE = 0;
+    static constexpr int SERIALIZER_PHP = 1;
+    static constexpr int SERIALIZER_JSON = 4;
+    static constexpr int COMPRESSION_NONE = 0;
+    static constexpr int OPT_SCAN = 4;
+    static constexpr int SCAN_RETRY = 1;
+    static constexpr int SCAN_NORETRY = 0;
+    static constexpr int SCAN_PREFIX = 2;
+    static constexpr int SCAN_NOPREFIX = 3;
+    static inline const Variant BEFORE{ZEND_STRL("before"), true};
+    static inline const Variant AFTER{ZEND_STRL("after"), true};
+    static inline const Variant LEFT{ZEND_STRL("left"), true};
+    static inline const Variant RIGHT{ZEND_STRL("right"), true};
+    static constexpr int OPT_MAX_RETRIES = 11;
+    static constexpr int OPT_BACKOFF_ALGORITHM = 12;
+    static constexpr int BACKOFF_ALGORITHM_DEFAULT = 0;
+    static constexpr int BACKOFF_ALGORITHM_CONSTANT = 6;
+    static constexpr int BACKOFF_ALGORITHM_UNIFORM = 5;
+    static constexpr int BACKOFF_ALGORITHM_EXPONENTIAL = 4;
+    static constexpr int BACKOFF_ALGORITHM_FULL_JITTER = 2;
+    static constexpr int BACKOFF_ALGORITHM_EQUAL_JITTER = 3;
+    static constexpr int BACKOFF_ALGORITHM_DECORRELATED_JITTER = 1;
+    static constexpr int OPT_BACKOFF_BASE = 13;
+    static constexpr int OPT_BACKOFF_CAP = 14;
+
     Redis(const Variant &options = {});
     Variant _compress(const Variant &value);
     Variant _uncompress(const Variant &value);
@@ -23,7 +76,7 @@ class Redis {
     Variant acl(const Variant &subcmd, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1107]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1243]);
         }
         return this_.call(_method_fn, {subcmd, args...});
     }
@@ -40,7 +93,7 @@ class Redis {
     Variant bitop(const Variant &operation, const Variant &deskey, const Variant &srckey, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1113]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1249]);
         }
         return this_.call(_method_fn, {operation, deskey, srckey, other_keys...});
     }
@@ -53,7 +106,7 @@ class Redis {
     Variant blPop(const Variant &key_or_keys, const Variant &timeout_or_key, const Args &...extra_args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1115]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1251]);
         }
         return this_.call(_method_fn, {key_or_keys, timeout_or_key, extra_args...});
     }
@@ -61,7 +114,7 @@ class Redis {
     Variant brPop(const Variant &key_or_keys, const Variant &timeout_or_key, const Args &...extra_args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1116]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1252]);
         }
         return this_.call(_method_fn, {key_or_keys, timeout_or_key, extra_args...});
     }
@@ -70,7 +123,7 @@ class Redis {
     Variant bzPopMax(const Variant &key, const Variant &timeout_or_key, const Args &...extra_args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1118]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1254]);
         }
         return this_.call(_method_fn, {key, timeout_or_key, extra_args...});
     }
@@ -78,7 +131,7 @@ class Redis {
     Variant bzPopMin(const Variant &key, const Variant &timeout_or_key, const Args &...extra_args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1119]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1255]);
         }
         return this_.call(_method_fn, {key, timeout_or_key, extra_args...});
     }
@@ -91,7 +144,7 @@ class Redis {
     Variant client(const Variant &opt, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1125]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1261]);
         }
         return this_.call(_method_fn, {opt, args...});
     }
@@ -100,7 +153,7 @@ class Redis {
     Variant command(const Variant &opt, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1127]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1262]);
         }
         return this_.call(_method_fn, {opt, args...});
     }
@@ -121,15 +174,15 @@ class Redis {
     Variant del(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1133]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1267]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
     template <typename... Args>
-    Variant _delete(const Variant &key, const Args &...other_keys) {
+    Variant delete_(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[918]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1087]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -145,7 +198,7 @@ class Redis {
     Variant exists(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1141]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1275]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -162,7 +215,7 @@ class Redis {
     Variant function(const Variant &operation, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1151]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1285]);
         }
         return this_.call(_method_fn, {operation, args...});
     }
@@ -174,7 +227,7 @@ class Redis {
                    const Args &...other_triples_and_options) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1152]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1286]);
         }
         return this_.call(_method_fn, {key, lng, lat, member, other_triples_and_options...});
     }
@@ -183,7 +236,7 @@ class Redis {
     Variant geohash(const Variant &key, const Variant &member, const Args &...other_members) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1154]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1288]);
         }
         return this_.call(_method_fn, {key, member, other_members...});
     }
@@ -191,7 +244,7 @@ class Redis {
     Variant geopos(const Variant &key, const Variant &member, const Args &...other_members) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1155]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1289]);
         }
         return this_.call(_method_fn, {key, member, other_members...});
     }
@@ -254,7 +307,7 @@ class Redis {
     Variant hDel(const Variant &key, const Variant &field, const Args &...other_fields) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1183]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1317]);
         }
         return this_.call(_method_fn, {key, field, other_fields...});
     }
@@ -272,7 +325,7 @@ class Redis {
     Variant hSet(const Variant &key, const Args &...fields_and_vals) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1194]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1328]);
         }
         return this_.call(_method_fn, {key, fields_and_vals...});
     }
@@ -289,7 +342,7 @@ class Redis {
     Variant info(const Args &...sections) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1204]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1338]);
         }
         return this_.call(_method_fn, {sections...});
     }
@@ -309,7 +362,7 @@ class Redis {
     Variant lPush(const Variant &key, const Args &...elements) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1213]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1347]);
         }
         return this_.call(_method_fn, {key, elements...});
     }
@@ -317,7 +370,7 @@ class Redis {
     Variant rPush(const Variant &key, const Args &...elements) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1214]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1348]);
         }
         return this_.call(_method_fn, {key, elements...});
     }
@@ -384,7 +437,7 @@ class Redis {
     Variant rawcommand(const Variant &command, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1249]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1382]);
         }
         return this_.call(_method_fn, {command, args...});
     }
@@ -398,7 +451,7 @@ class Redis {
     Variant sAdd(const Variant &key, const Variant &value, const Args &...other_values) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1255]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1387]);
         }
         return this_.call(_method_fn, {key, value, other_values...});
     }
@@ -407,7 +460,7 @@ class Redis {
     Variant sDiff(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1257]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1389]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -415,7 +468,7 @@ class Redis {
     Variant sDiffStore(const Variant &dst, const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1258]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1390]);
         }
         return this_.call(_method_fn, {dst, key, other_keys...});
     }
@@ -423,7 +476,7 @@ class Redis {
     Variant sInter(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1259]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1391]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -432,7 +485,7 @@ class Redis {
     Variant sInterStore(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1261]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1393]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -441,7 +494,7 @@ class Redis {
     Variant sMisMember(const Variant &key, const Variant &member, const Args &...other_members) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1263]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1395]);
         }
         return this_.call(_method_fn, {key, member, other_members...});
     }
@@ -452,7 +505,7 @@ class Redis {
     Variant sUnion(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1267]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1399]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -460,7 +513,7 @@ class Redis {
     Variant sUnionStore(const Variant &dst, const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1268]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1400]);
         }
         return this_.call(_method_fn, {dst, key, other_keys...});
     }
@@ -474,7 +527,7 @@ class Redis {
     Variant script(const Variant &command, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1271]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1403]);
         }
         return this_.call(_method_fn, {command, args...});
     }
@@ -492,7 +545,7 @@ class Redis {
     Variant touch(const Variant &key_or_array, const Args &...more_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1282]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1414]);
         }
         return this_.call(_method_fn, {key_or_array, more_keys...});
     }
@@ -527,7 +580,7 @@ class Redis {
     Variant srem(const Variant &key, const Variant &value, const Args &...other_values) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1290]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1422]);
         }
         return this_.call(_method_fn, {key, value, other_values...});
     }
@@ -544,7 +597,7 @@ class Redis {
     Variant unlink(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1299]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1431]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -554,7 +607,7 @@ class Redis {
     Variant watch(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1302]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1434]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -614,7 +667,7 @@ class Redis {
     Variant zAdd(const Variant &key, const Variant &score_or_options, const Args &...more_scores_and_mems) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1318]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1450]);
         }
         return this_.call(_method_fn, {key, score_or_options, more_scores_and_mems...});
     }
@@ -626,7 +679,7 @@ class Redis {
     Variant zMscore(const Variant &key, const Variant &member, const Args &...other_members) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1323]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1455]);
         }
         return this_.call(_method_fn, {key, member, other_members...});
     }
@@ -653,7 +706,7 @@ class Redis {
     Variant zRem(const Variant &key, const Variant &member, const Args &...other_members) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1332]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1464]);
         }
         return this_.call(_method_fn, {key, member, other_members...});
     }
@@ -689,7 +742,9 @@ class Redis {
 };
 
 class RedisArray {
+  protected:
     Object this_;
+    RedisArray() = default;
 
   public:
     Object getObject() const {
@@ -709,7 +764,7 @@ class RedisArray {
     Variant del(const Variant &key, const Args &...otherkeys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1133]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1267]);
         }
         return this_.call(_method_fn, {key, otherkeys...});
     }
@@ -734,7 +789,7 @@ class RedisArray {
     Variant unlink(const Variant &key, const Args &...otherkeys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1299]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1431]);
         }
         return this_.call(_method_fn, {key, otherkeys...});
     }
@@ -743,12 +798,20 @@ class RedisArray {
 };
 
 class RedisCluster {
+  protected:
     Object this_;
+    RedisCluster() = default;
 
   public:
     Object getObject() const {
         return this_;
     }
+    static constexpr int OPT_SLAVE_FAILOVER = 5;
+    static constexpr int FAILOVER_NONE = 0;
+    static constexpr int FAILOVER_ERROR = 1;
+    static constexpr int FAILOVER_DISTRIBUTE = 2;
+    static constexpr int FAILOVER_DISTRIBUTE_SLAVES = 3;
+
     RedisCluster(const Variant &name,
                  const Variant &seeds = {},
                  const Variant &timeout = 0,
@@ -769,7 +832,7 @@ class RedisCluster {
     Variant acl(const Variant &key_or_address, const Variant &subcmd, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1107]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1243]);
         }
         return this_.call(_method_fn, {key_or_address, subcmd, args...});
     }
@@ -788,7 +851,7 @@ class RedisCluster {
     Variant bitop(const Variant &operation, const Variant &deskey, const Variant &srckey, const Args &...otherkeys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1113]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1249]);
         }
         return this_.call(_method_fn, {operation, deskey, srckey, otherkeys...});
     }
@@ -801,7 +864,7 @@ class RedisCluster {
     Variant blpop(const Variant &key, const Variant &timeout_or_key, const Args &...extra_args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1364]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1496]);
         }
         return this_.call(_method_fn, {key, timeout_or_key, extra_args...});
     }
@@ -809,7 +872,7 @@ class RedisCluster {
     Variant brpop(const Variant &key, const Variant &timeout_or_key, const Args &...extra_args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1365]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1497]);
         }
         return this_.call(_method_fn, {key, timeout_or_key, extra_args...});
     }
@@ -824,7 +887,7 @@ class RedisCluster {
     Variant bzpopmax(const Variant &key, const Variant &timeout_or_key, const Args &...extra_args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1367]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1499]);
         }
         return this_.call(_method_fn, {key, timeout_or_key, extra_args...});
     }
@@ -832,7 +895,7 @@ class RedisCluster {
     Variant bzpopmin(const Variant &key, const Variant &timeout_or_key, const Args &...extra_args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1368]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1500]);
         }
         return this_.call(_method_fn, {key, timeout_or_key, extra_args...});
     }
@@ -847,7 +910,7 @@ class RedisCluster {
     Variant cluster(const Variant &key_or_address, const Variant &command, const Args &...extra_args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1370]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1502]);
         }
         return this_.call(_method_fn, {key_or_address, command, extra_args...});
     }
@@ -855,7 +918,7 @@ class RedisCluster {
     Variant command(const Args &...extra_args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1127]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1262]);
         }
         return this_.call(_method_fn, {extra_args...});
     }
@@ -863,7 +926,7 @@ class RedisCluster {
     Variant config(const Variant &key_or_address, const Variant &subcommand, const Args &...extra_args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1128]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1263]);
         }
         return this_.call(_method_fn, {key_or_address, subcommand, extra_args...});
     }
@@ -876,7 +939,7 @@ class RedisCluster {
     Variant del(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1133]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1267]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -892,7 +955,7 @@ class RedisCluster {
     Variant exists(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1141]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1275]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -900,7 +963,7 @@ class RedisCluster {
     Variant touch(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1282]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1414]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -918,7 +981,7 @@ class RedisCluster {
                    const Args &...other_triples_and_options) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1152]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1286]);
         }
         return this_.call(_method_fn, {key, lng, lat, member, other_triples_and_options...});
     }
@@ -927,7 +990,7 @@ class RedisCluster {
     Variant geohash(const Variant &key, const Variant &member, const Args &...other_members) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1154]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1288]);
         }
         return this_.call(_method_fn, {key, member, other_members...});
     }
@@ -935,7 +998,7 @@ class RedisCluster {
     Variant geopos(const Variant &key, const Variant &member, const Args &...other_members) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1155]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1289]);
         }
         return this_.call(_method_fn, {key, member, other_members...});
     }
@@ -989,7 +1052,7 @@ class RedisCluster {
     Variant hdel(const Variant &key, const Variant &member, const Args &...other_members) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1384]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1516]);
         }
         return this_.call(_method_fn, {key, member, other_members...});
     }
@@ -1017,7 +1080,7 @@ class RedisCluster {
     Variant info(const Variant &key_or_address, const Args &...sections) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1204]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1338]);
         }
         return this_.call(_method_fn, {key_or_address, sections...});
     }
@@ -1033,7 +1096,7 @@ class RedisCluster {
     Variant lpush(const Variant &key, const Variant &value, const Args &...other_values) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1407]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1539]);
         }
         return this_.call(_method_fn, {key, value, other_values...});
     }
@@ -1062,7 +1125,7 @@ class RedisCluster {
     Variant pubsub(const Variant &key_or_address, const Args &...values) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1245]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1378]);
         }
         return this_.call(_method_fn, {key_or_address, values...});
     }
@@ -1070,7 +1133,7 @@ class RedisCluster {
     Variant punsubscribe(const Variant &pattern, const Args &...other_patterns) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1246]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1379]);
         }
         return this_.call(_method_fn, {pattern, other_patterns...});
     }
@@ -1079,7 +1142,7 @@ class RedisCluster {
     Variant rawcommand(const Variant &key_or_address, const Variant &command, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1249]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1382]);
         }
         return this_.call(_method_fn, {key_or_address, command, args...});
     }
@@ -1093,7 +1156,7 @@ class RedisCluster {
     Variant rpush(const Variant &key, const Args &...elements) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1414]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1546]);
         }
         return this_.call(_method_fn, {key, elements...});
     }
@@ -1102,7 +1165,7 @@ class RedisCluster {
     Variant sadd(const Variant &key, const Variant &value, const Args &...other_values) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1416]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1548]);
         }
         return this_.call(_method_fn, {key, value, other_values...});
     }
@@ -1117,7 +1180,7 @@ class RedisCluster {
     Variant script(const Variant &key_or_address, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1271]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1403]);
         }
         return this_.call(_method_fn, {key_or_address, args...});
     }
@@ -1125,7 +1188,7 @@ class RedisCluster {
     Variant sdiff(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1418]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1550]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -1133,12 +1196,12 @@ class RedisCluster {
     Variant sdiffstore(const Variant &dst, const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1419]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1551]);
         }
         return this_.call(_method_fn, {dst, key, other_keys...});
     }
     Variant set(const Variant &key, const Variant &value, const Variant &options = {});
-    Variant _setbit(const Variant &key, const Variant &offset, const Variant &onoff);
+    Variant setbit_(const Variant &key, const Variant &offset, const Variant &onoff);
     Variant setex(const Variant &key, const Variant &expire, const Variant &value);
     Variant setnx(const Variant &key, const Variant &value);
     Variant setoption(const Variant &option, const Variant &value);
@@ -1147,7 +1210,7 @@ class RedisCluster {
     Variant sinter(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1423]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1555]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -1156,7 +1219,7 @@ class RedisCluster {
     Variant sinterstore(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1424]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1556]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -1165,7 +1228,7 @@ class RedisCluster {
     Variant smismember(const Variant &key, const Variant &member, const Args &...other_members) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1425]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1557]);
         }
         return this_.call(_method_fn, {key, member, other_members...});
     }
@@ -1173,7 +1236,7 @@ class RedisCluster {
     Variant slowlog(const Variant &key_or_address, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1283]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1415]);
         }
         return this_.call(_method_fn, {key_or_address, args...});
     }
@@ -1187,7 +1250,7 @@ class RedisCluster {
     Variant srem(const Variant &key, const Variant &value, const Args &...other_values) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1290]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1422]);
         }
         return this_.call(_method_fn, {key, value, other_values...});
     }
@@ -1198,7 +1261,7 @@ class RedisCluster {
     Variant sunion(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1430]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1562]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -1206,7 +1269,7 @@ class RedisCluster {
     Variant sunionstore(const Variant &dst, const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1431]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1563]);
         }
         return this_.call(_method_fn, {dst, key, other_keys...});
     }
@@ -1218,7 +1281,7 @@ class RedisCluster {
     Variant unlink(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1299]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1431]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -1227,7 +1290,7 @@ class RedisCluster {
     Variant watch(const Variant &key, const Args &...other_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1302]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1434]);
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
@@ -1285,7 +1348,7 @@ class RedisCluster {
     Variant zadd(const Variant &key, const Variant &score_or_options, const Args &...more_scores_and_mems) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1432]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1564]);
         }
         return this_.call(_method_fn, {key, score_or_options, more_scores_and_mems...});
     }
@@ -1321,7 +1384,7 @@ class RedisCluster {
     Variant zrem(const Variant &key, const Variant &value, const Args &...other_values) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1444]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1576]);
         }
         return this_.call(_method_fn, {key, value, other_values...});
     }
@@ -1338,7 +1401,7 @@ class RedisCluster {
     Variant zmscore(const Variant &key, const Variant &member, const Args &...other_members) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1453]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1585]);
         }
         return this_.call(_method_fn, {key, member, other_members...});
     }
@@ -1352,26 +1415,13 @@ class RedisCluster {
     Variant zdiff(const Variant &keys, const Variant &options = {});
 };
 
-class RedisClusterException {
-    Object this_;
-
+class RedisClusterException : public RuntimeException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     RedisClusterException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
 class RedisSentinel {
+  protected:
     Object this_;
 
   public:
@@ -1392,23 +1442,9 @@ class RedisSentinel {
     Variant slaves(const Variant &master);
 };
 
-class RedisException {
-    Object this_;
-
+class RedisException : public RuntimeException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     RedisException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
 }  // namespace php

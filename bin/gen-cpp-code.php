@@ -21,6 +21,7 @@ $extensions = [
     'libxml',
     'mbstring',
     'mysqlnd',
+    'mysqli',
     'openssl',
     'pcntl',
     'pcre',

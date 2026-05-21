@@ -1405,7 +1405,7 @@ TEST(class_facade, bad_method_call_exception) {
 
 TEST(class_facade, array_iterator_construct) {
     Array arr{1, 2, 3};
-    _ArrayIterator ai(arr);
+    ArrayIterator_ ai(arr);
     ai.rewind();
     ASSERT_TRUE(ai.valid().toBool());
     ASSERT_EQ(ai.current().toInt(), 1);
@@ -1413,7 +1413,7 @@ TEST(class_facade, array_iterator_construct) {
 
 TEST(class_facade, array_iterator_traversal) {
     Array arr{10, 20, 30, 40, 50};
-    _ArrayIterator ai(arr);
+    ArrayIterator_ ai(arr);
     int sum = 0;
     for (ai.rewind(); ai.valid().toBool(); ai.next()) {
         sum += ai.current().toInt();
@@ -1423,7 +1423,7 @@ TEST(class_facade, array_iterator_traversal) {
 
 TEST(class_facade, array_iterator_key) {
     Array arr{"a", "b", "c"};
-    _ArrayIterator ai(arr);
+    ArrayIterator_ ai(arr);
     ai.rewind();
     ASSERT_EQ(ai.key().toInt(), 0);
     ai.next();
@@ -1432,20 +1432,20 @@ TEST(class_facade, array_iterator_key) {
 
 TEST(class_facade, array_iterator_seek) {
     Array arr{1, 2, 3, 4, 5};
-    _ArrayIterator ai(arr);
+    ArrayIterator_ ai(arr);
     ai.seek(3);
     ASSERT_EQ(ai.current().toInt(), 4);
 }
 
 TEST(class_facade, array_iterator_count) {
     Array arr{1, 2, 3};
-    _ArrayIterator ai(arr);
+    ArrayIterator_ ai(arr);
     ASSERT_EQ(ai.count().toInt(), 3);
 }
 
 TEST(class_facade, array_iterator_getArrayCopy) {
     Array arr{1, 2, 3};
-    _ArrayIterator ai(arr);
+    ArrayIterator_ ai(arr);
     auto copy = ai.getArrayCopy();
     ASSERT_TRUE(copy.isArray());
 }
@@ -1458,8 +1458,8 @@ TEST(class_facade, append_iterator) {
     Array arr1{1, 2};
     Array arr2{3, 4};
     AppendIterator ap;
-    ap.append(_ArrayIterator(arr1).getObject());
-    ap.append(_ArrayIterator(arr2).getObject());
+    ap.append(ArrayIterator_(arr1).getObject());
+    ap.append(ArrayIterator_(arr2).getObject());
     ap.rewind();
     ASSERT_TRUE(ap.valid().toBool());
     ASSERT_EQ(ap.current().toInt(), 1);
@@ -1471,7 +1471,7 @@ TEST(class_facade, append_iterator) {
 
 TEST(class_facade, callback_filter_iterator) {
     Array arr{1, 2, 3, 4, 5, 6};
-    _ArrayIterator base(arr);
+    ArrayIterator_ base(arr);
     auto callback = eval("return function($v) { return $v % 2 == 0; };");
     CallbackFilterIterator cfi(base.getObject(), callback);
     int count = 0;
@@ -1492,7 +1492,7 @@ TEST(class_facade, regex_iterator) {
     arr.append("banana");
     arr.append("apricot");
     arr.append("cherry");
-    _ArrayIterator base(arr);
+    ArrayIterator_ base(arr);
     RegexIterator ri(base.getObject(), "/^ap/");
     int count = 0;
     for (ri.rewind(); ri.valid().toBool(); ri.next()) {
@@ -1508,7 +1508,7 @@ TEST(class_facade, regex_iterator) {
 
 TEST(class_facade, limit_iterator) {
     Array arr{1, 2, 3, 4, 5, 6, 7, 8};
-    var base = _ArrayIterator(arr).getObject();
+    var base = ArrayIterator_(arr).getObject();
     LimitIterator li(base, 2, 3);  // offset=2, limit=3 -> items 3,4,5
     int count = 0;
     auto sum = 0;
@@ -1522,7 +1522,7 @@ TEST(class_facade, limit_iterator) {
 
 TEST(class_facade, limit_iterator_getPosition) {
     Array arr{10, 20, 30, 40, 50};
-    var base = _ArrayIterator(arr).getObject();
+    var base = ArrayIterator_(arr).getObject();
     LimitIterator li(base, 1, 2);  // offset=1, limit=2 -> items 20, 30
     li.rewind();
     ASSERT_EQ(li.current().toInt(), 20);  // first element in window
@@ -1536,7 +1536,7 @@ TEST(class_facade, limit_iterator_getPosition) {
 
 TEST(class_facade, infinite_iterator) {
     Array arr{1, 2};
-    var base = _ArrayIterator(arr).getObject();
+    var base = ArrayIterator_(arr).getObject();
     InfiniteIterator ii(base);
     ii.rewind();
     ASSERT_TRUE(ii.valid().toBool());
@@ -1553,8 +1553,8 @@ TEST(class_facade, multiple_iterator_basic) {
     MultipleIterator mi;
     Array a1{1, 2};
     Array a2{"a", "b"};
-    mi.attachIterator(_ArrayIterator(a1).getObject());
-    mi.attachIterator(_ArrayIterator(a2).getObject());
+    mi.attachIterator(ArrayIterator_(a1).getObject());
+    mi.attachIterator(ArrayIterator_(a2).getObject());
     mi.rewind();
     ASSERT_TRUE(mi.valid().toBool());
     auto cur = mi.current();

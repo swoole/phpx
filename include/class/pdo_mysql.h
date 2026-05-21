@@ -1,46 +1,39 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
+#include "class/pdo.h"
 
 namespace php {
-class Pdo_Mysql {
-    Object this_;
+class Pdo_Mysql;
+
+class Pdo_Mysql : public PDO {
+  protected:
+    Pdo_Mysql() = default;
 
   public:
-    Object getObject() const {
-        return this_;
-    }
+    static constexpr int ATTR_USE_BUFFERED_QUERY = 1000;
+    static constexpr int ATTR_LOCAL_INFILE = 1001;
+    static constexpr int ATTR_INIT_COMMAND = 1002;
+    static constexpr int ATTR_COMPRESS = 1003;
+    static constexpr int ATTR_DIRECT_QUERY = 1004;
+    static constexpr int ATTR_FOUND_ROWS = 1005;
+    static constexpr int ATTR_IGNORE_SPACE = 1006;
+    static constexpr int ATTR_SSL_KEY = 1007;
+    static constexpr int ATTR_SSL_CERT = 1008;
+    static constexpr int ATTR_SSL_CA = 1009;
+    static constexpr int ATTR_SSL_CAPATH = 1010;
+    static constexpr int ATTR_SSL_CIPHER = 1011;
+    static constexpr int ATTR_SERVER_PUBLIC_KEY = 1012;
+    static constexpr int ATTR_MULTI_STATEMENTS = 1013;
+    static constexpr int ATTR_SSL_VERIFY_SERVER_CERT = 1014;
+    static constexpr int ATTR_LOCAL_INFILE_DIRECTORY = 1015;
+
     Variant getWarningCount();
     Pdo_Mysql(const Variant &dsn,
               const Variant &username = {},
               const Variant &password = {},
               const Variant &options = {});
-    static Variant connect(const Variant &dsn,
-                           const Variant &username = {},
-                           const Variant &password = {},
-                           const Variant &options = {});
-    Variant beginTransaction();
-    Variant commit();
-    Variant errorCode();
-    Variant errorInfo();
-    Variant exec(const Variant &statement);
-    Variant getAttribute(const Variant &attribute);
-    static Variant getAvailableDrivers();
-    Variant inTransaction();
-    Variant lastInsertId(const Variant &name = {});
-    Variant prepare(const Variant &query, const Variant &options = Array{});
-    template <typename... Args>
-    Variant query(const Variant &query, const Variant &fetch_mode, const Args &...fetch_mode_args) {
-        static THREAD_LOCAL zend_function *_method_fn = nullptr;
-        if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[506]);
-        }
-        return this_.call(_method_fn, {query, fetch_mode, fetch_mode_args...});
-    }
-    Variant quote(const Variant &string, const Variant &type = 2);
-    Variant rollBack();
-    Variant setAttribute(const Variant &attribute, const Variant &value);
 };
 
 }  // namespace php

@@ -1,16 +1,25 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
+#include "class/pdo.h"
 
 namespace php {
-class Pdo_Sqlite {
-    Object this_;
+class Pdo_Sqlite;
+
+class Pdo_Sqlite : public PDO {
+  protected:
+    Pdo_Sqlite() = default;
 
   public:
-    Object getObject() const {
-        return this_;
-    }
+    static constexpr int DETERMINISTIC = 2048;
+    static constexpr int OPEN_READONLY = 1;
+    static constexpr int OPEN_READWRITE = 2;
+    static constexpr int OPEN_CREATE = 4;
+    static constexpr int ATTR_OPEN_FLAGS = 1000;
+    static constexpr int ATTR_READONLY_STATEMENT = 1001;
+    static constexpr int ATTR_EXTENDED_RESULT_CODES = 1002;
+
     Variant createAggregate(const Variant &name,
                             const Variant &step,
                             const Variant &finalize,
@@ -30,31 +39,6 @@ class Pdo_Sqlite {
                const Variant &username = {},
                const Variant &password = {},
                const Variant &options = {});
-    static Variant connect(const Variant &dsn,
-                           const Variant &username = {},
-                           const Variant &password = {},
-                           const Variant &options = {});
-    Variant beginTransaction();
-    Variant commit();
-    Variant errorCode();
-    Variant errorInfo();
-    Variant exec(const Variant &statement);
-    Variant getAttribute(const Variant &attribute);
-    static Variant getAvailableDrivers();
-    Variant inTransaction();
-    Variant lastInsertId(const Variant &name = {});
-    Variant prepare(const Variant &query, const Variant &options = Array{});
-    template <typename... Args>
-    Variant query(const Variant &query, const Variant &fetch_mode, const Args &...fetch_mode_args) {
-        static THREAD_LOCAL zend_function *_method_fn = nullptr;
-        if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[506]);
-        }
-        return this_.call(_method_fn, {query, fetch_mode, fetch_mode_args...});
-    }
-    Variant quote(const Variant &string, const Variant &type = 2);
-    Variant rollBack();
-    Variant setAttribute(const Variant &attribute, const Variant &value);
 };
 
 }  // namespace php

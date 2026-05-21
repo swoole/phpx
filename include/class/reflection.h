@@ -1,29 +1,41 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
+#include "class/core.h"
 
 namespace php {
-class ReflectionException {
-    Object this_;
+class ReflectionException;
+class Reflection;
+class ReflectionGenerator;
+class ReflectionNamedType;
+class ReflectionUnionType;
+class ReflectionIntersectionType;
+class ReflectionExtension;
+class ReflectionZendExtension;
+class ReflectionReference;
+class ReflectionAttribute;
+class ReflectionFiber;
+class ReflectionConstant;
+class PropertyHookType;
+class ReflectionFunction;
+class ReflectionParameter;
+class ReflectionMethod;
+class ReflectionProperty;
+class ReflectionClass;
+class ReflectionClassConstant;
+class ReflectionObject;
+class ReflectionEnum;
+class ReflectionEnumUnitCase;
+class ReflectionEnumBackedCase;
 
+class ReflectionException : public Exception {
   public:
-    Object getObject() const {
-        return this_;
-    }
     ReflectionException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
 class Reflection {
+  protected:
     Object this_;
 
   public:
@@ -35,13 +47,204 @@ class Reflection {
     static Variant getModifierNames(const Variant &modifiers);
 };
 
-class ReflectionFunction {
+class ReflectionGenerator {
+  protected:
+    Object this_;
+    ReflectionGenerator() = default;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    ReflectionGenerator(const Generator &generator);
+    Variant getExecutingLine();
+    Variant getExecutingFile();
+    Variant getTrace(const Variant &options = 1);
+    Variant getFunction();
+    Variant getThis_();
+    Generator getExecutingGenerator();
+    Variant isClosed();
+};
+
+class ReflectionNamedType {
+  protected:
     Object this_;
 
   public:
     Object getObject() const {
         return this_;
     }
+    explicit ReflectionNamedType(const Object &obj) : this_(obj) {}
+    ReflectionNamedType();
+    Variant getName();
+    Variant isBuiltin();
+    Variant allowsNull();
+    Variant __toString();
+};
+
+class ReflectionUnionType {
+  protected:
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    explicit ReflectionUnionType(const Object &obj) : this_(obj) {}
+    ReflectionUnionType();
+    Variant getTypes();
+    Variant allowsNull();
+    Variant __toString();
+};
+
+class ReflectionIntersectionType {
+  protected:
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    explicit ReflectionIntersectionType(const Object &obj) : this_(obj) {}
+    ReflectionIntersectionType();
+    Variant getTypes();
+    Variant allowsNull();
+    Variant __toString();
+};
+
+class ReflectionExtension {
+  protected:
+    Object this_;
+    ReflectionExtension() = default;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    ReflectionExtension(const Variant &name);
+    Variant __toString();
+    Variant getName();
+    Variant getVersion();
+    Variant getFunctions();
+    Variant getConstants();
+    Variant getINIEntries();
+    Variant getClasses();
+    Variant getClassNames();
+    Variant getDependencies();
+    Variant info();
+    Variant isPersistent();
+    Variant isTemporary();
+};
+
+class ReflectionZendExtension {
+  protected:
+    Object this_;
+    ReflectionZendExtension() = default;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    ReflectionZendExtension(const Variant &name);
+    Variant __toString();
+    Variant getName();
+    Variant getVersion();
+    Variant getAuthor();
+    Variant getURL();
+    Variant getCopyright();
+};
+
+class ReflectionReference {
+  protected:
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    static Variant fromArrayElement(const Variant &array, const Variant &key);
+    Variant getId();
+};
+
+class ReflectionAttribute {
+  protected:
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    static constexpr int IS_INSTANCEOF = 2;
+
+    Variant getName();
+    Variant getTarget();
+    Variant isRepeated();
+    Variant getArguments();
+    Variant newInstance();
+    Variant __toString();
+};
+
+class ReflectionFiber {
+  protected:
+    Object this_;
+    ReflectionFiber() = default;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    ReflectionFiber(const Fiber &fiber);
+    Variant getFiber();
+    Variant getExecutingFile();
+    Variant getExecutingLine();
+    Variant getCallable();
+    Variant getTrace(const Variant &options = 1);
+};
+
+class ReflectionConstant {
+  protected:
+    Object this_;
+    ReflectionConstant() = default;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    ReflectionConstant(const Variant &name);
+    Variant getName();
+    Variant getNamespaceName();
+    Variant getShortName();
+    Variant getValue();
+    Variant isDeprecated();
+    Variant __toString();
+};
+
+class PropertyHookType {
+  protected:
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    explicit PropertyHookType(const Object &obj) : this_(obj) {}
+    PropertyHookType();
+    static Variant cases();
+    static Variant from(const Variant &value);
+    static Variant tryFrom(const Variant &value);
+};
+
+class ReflectionFunction {
+  protected:
+    Object this_;
+    ReflectionFunction() = default;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    static constexpr int IS_DEPRECATED = 2048;
+
     ReflectionFunction(const Variant &function);
     Variant __toString();
     Variant isAnonymous();
@@ -50,7 +253,7 @@ class ReflectionFunction {
     Variant invoke(const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1472]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1604]);
         }
         return this_.call(_method_fn, {args...});
     }
@@ -89,25 +292,10 @@ class ReflectionFunction {
     Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
 };
 
-class ReflectionGenerator {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    ReflectionGenerator(const Generator &generator);
-    Variant getExecutingLine();
-    Variant getExecutingFile();
-    Variant getTrace(const Variant &options = 1);
-    Variant getFunction();
-    Variant _getThis();
-    Variant getExecutingGenerator();
-    Variant isClosed();
-};
-
 class ReflectionParameter {
+  protected:
     Object this_;
+    ReflectionParameter() = default;
 
   public:
     Object getObject() const {
@@ -137,56 +325,22 @@ class ReflectionParameter {
     Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
 };
 
-class ReflectionNamedType {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    explicit ReflectionNamedType(const Object &obj) : this_(obj) {}
-    ReflectionNamedType();
-    Variant getName();
-    Variant isBuiltin();
-    Variant allowsNull();
-    Variant __toString();
-};
-
-class ReflectionUnionType {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    explicit ReflectionUnionType(const Object &obj) : this_(obj) {}
-    ReflectionUnionType();
-    Variant getTypes();
-    Variant allowsNull();
-    Variant __toString();
-};
-
-class ReflectionIntersectionType {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    explicit ReflectionIntersectionType(const Object &obj) : this_(obj) {}
-    ReflectionIntersectionType();
-    Variant getTypes();
-    Variant allowsNull();
-    Variant __toString();
-};
-
 class ReflectionMethod {
+  protected:
     Object this_;
+    ReflectionMethod() = default;
 
   public:
     Object getObject() const {
         return this_;
     }
+    static constexpr int IS_STATIC_ = 16;
+    static constexpr int IS_PUBLIC = 1;
+    static constexpr int IS_PROTECTED = 2;
+    static constexpr int IS_PRIVATE = 4;
+    static constexpr int IS_ABSTRACT = 64;
+    static constexpr int IS_FINAL = 32;
+
     ReflectionMethod(const Variant &object_or_method, const Variant &method = {});
     static Variant createFromMethodName(const Variant &method);
     Variant __toString();
@@ -203,7 +357,7 @@ class ReflectionMethod {
     Variant invoke(const Variant &object, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1472]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1604]);
         }
         return this_.call(_method_fn, {object, args...});
     }
@@ -245,306 +399,27 @@ class ReflectionMethod {
     Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
 };
 
-class ReflectionClass {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    ReflectionClass(const Variant &object_or_class);
-    Variant __toString();
-    Variant getName();
-    Variant isInternal();
-    Variant isUserDefined();
-    Variant isAnonymous();
-    Variant isInstantiable();
-    Variant isCloneable();
-    Variant getFileName();
-    Variant getStartLine();
-    Variant getEndLine();
-    Variant getDocComment();
-    Variant getConstructor();
-    Variant hasMethod(const Variant &name);
-    Variant getMethod(const Variant &name);
-    Variant getMethods(const Variant &filter = {});
-    Variant hasProperty(const Variant &name);
-    Variant getProperty(const Variant &name);
-    Variant getProperties(const Variant &filter = {});
-    Variant hasConstant(const Variant &name);
-    Variant getConstants(const Variant &filter = {});
-    Variant getReflectionConstants(const Variant &filter = {});
-    Variant getConstant(const Variant &name);
-    Variant getReflectionConstant(const Variant &name);
-    Variant getInterfaces();
-    Variant getInterfaceNames();
-    Variant isInterface();
-    Variant getTraits();
-    Variant getTraitNames();
-    Variant getTraitAliases();
-    Variant isTrait();
-    Variant isEnum();
-    Variant isAbstract();
-    Variant isFinal();
-    Variant isReadOnly();
-    Variant getModifiers();
-    Variant isInstance(const Variant &object);
-    template <typename... Args>
-    Variant newInstance(const Args &...args) {
-        static THREAD_LOCAL zend_function *_method_fn = nullptr;
-        if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1572]);
-        }
-        return this_.call(_method_fn, {args...});
-    }
-    Variant newInstanceWithoutConstructor();
-    Variant newInstanceArgs(const Variant &args = Array{});
-    Variant newLazyGhost(const Variant &initializer, const Variant &options = 0);
-    Variant newLazyProxy(const Variant &factory, const Variant &options = 0);
-    Variant resetAsLazyGhost(const Variant &object, const Variant &initializer, const Variant &options = 0);
-    Variant resetAsLazyProxy(const Variant &object, const Variant &factory, const Variant &options = 0);
-    Variant initializeLazyObject(const Variant &object);
-    Variant isUninitializedLazyObject(const Variant &object);
-    Variant markLazyObjectAsInitialized(const Variant &object);
-    Variant getLazyInitializer(const Variant &object);
-    Variant getParentClass();
-    Variant isSubclassOf(const Variant &_class);
-    Variant getStaticProperties();
-    Variant getStaticPropertyValue(const Variant &name, const Variant &_default = {});
-    Variant setStaticPropertyValue(const Variant &name, const Variant &value);
-    Variant getDefaultProperties();
-    Variant isIterable();
-    Variant isIterateable();
-    Variant implementsInterface(const Variant &interface);
-    Variant getExtension();
-    Variant getExtensionName();
-    Variant inNamespace();
-    Variant getNamespaceName();
-    Variant getShortName();
-    Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
-};
-
-class ReflectionObject {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    ReflectionObject(const Variant &object);
-    Variant __toString();
-    Variant getName();
-    Variant isInternal();
-    Variant isUserDefined();
-    Variant isAnonymous();
-    Variant isInstantiable();
-    Variant isCloneable();
-    Variant getFileName();
-    Variant getStartLine();
-    Variant getEndLine();
-    Variant getDocComment();
-    Variant getConstructor();
-    Variant hasMethod(const Variant &name);
-    Variant getMethod(const Variant &name);
-    Variant getMethods(const Variant &filter = {});
-    Variant hasProperty(const Variant &name);
-    Variant getProperty(const Variant &name);
-    Variant getProperties(const Variant &filter = {});
-    Variant hasConstant(const Variant &name);
-    Variant getConstants(const Variant &filter = {});
-    Variant getReflectionConstants(const Variant &filter = {});
-    Variant getConstant(const Variant &name);
-    Variant getReflectionConstant(const Variant &name);
-    Variant getInterfaces();
-    Variant getInterfaceNames();
-    Variant isInterface();
-    Variant getTraits();
-    Variant getTraitNames();
-    Variant getTraitAliases();
-    Variant isTrait();
-    Variant isEnum();
-    Variant isAbstract();
-    Variant isFinal();
-    Variant isReadOnly();
-    Variant getModifiers();
-    Variant isInstance(const Variant &object);
-    template <typename... Args>
-    Variant newInstance(const Args &...args) {
-        static THREAD_LOCAL zend_function *_method_fn = nullptr;
-        if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1572]);
-        }
-        return this_.call(_method_fn, {args...});
-    }
-    Variant newInstanceWithoutConstructor();
-    Variant newInstanceArgs(const Variant &args = Array{});
-    Variant newLazyGhost(const Variant &initializer, const Variant &options = 0);
-    Variant newLazyProxy(const Variant &factory, const Variant &options = 0);
-    Variant resetAsLazyGhost(const Variant &object, const Variant &initializer, const Variant &options = 0);
-    Variant resetAsLazyProxy(const Variant &object, const Variant &factory, const Variant &options = 0);
-    Variant initializeLazyObject(const Variant &object);
-    Variant isUninitializedLazyObject(const Variant &object);
-    Variant markLazyObjectAsInitialized(const Variant &object);
-    Variant getLazyInitializer(const Variant &object);
-    Variant getParentClass();
-    Variant isSubclassOf(const Variant &_class);
-    Variant getStaticProperties();
-    Variant getStaticPropertyValue(const Variant &name, const Variant &_default = {});
-    Variant setStaticPropertyValue(const Variant &name, const Variant &value);
-    Variant getDefaultProperties();
-    Variant isIterable();
-    Variant isIterateable();
-    Variant implementsInterface(const Variant &interface);
-    Variant getExtension();
-    Variant getExtensionName();
-    Variant inNamespace();
-    Variant getNamespaceName();
-    Variant getShortName();
-    Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
-};
-
-class ReflectionClassConstant {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    ReflectionClassConstant(const Variant &_class, const Variant &constant);
-    Variant __toString();
-    Variant getName();
-    Variant getValue();
-    Variant isPublic();
-    Variant isPrivate();
-    Variant isProtected();
-    Variant isFinal();
-    Variant getModifiers();
-    Variant getDeclaringClass();
-    Variant getDocComment();
-    Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
-    Variant isEnumCase();
-    Variant isDeprecated();
-    Variant hasType();
-    Variant getType();
-};
-
-class ReflectionExtension {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    ReflectionExtension(const Variant &name);
-    Variant __toString();
-    Variant getName();
-    Variant getVersion();
-    Variant getFunctions();
-    Variant getConstants();
-    Variant getINIEntries();
-    Variant getClasses();
-    Variant getClassNames();
-    Variant getDependencies();
-    Variant info();
-    Variant isPersistent();
-    Variant isTemporary();
-};
-
-class ReflectionZendExtension {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    ReflectionZendExtension(const Variant &name);
-    Variant __toString();
-    Variant getName();
-    Variant getVersion();
-    Variant getAuthor();
-    Variant getURL();
-    Variant getCopyright();
-};
-
-class ReflectionReference {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    static Variant fromArrayElement(const Variant &array, const Variant &key);
-    Variant getId();
-};
-
-class ReflectionAttribute {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    Variant getName();
-    Variant getTarget();
-    Variant isRepeated();
-    Variant getArguments();
-    Variant newInstance();
-    Variant __toString();
-};
-
-class ReflectionFiber {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    ReflectionFiber(const Fiber &fiber);
-    Variant getFiber();
-    Variant getExecutingFile();
-    Variant getExecutingLine();
-    Variant getCallable();
-    Variant getTrace(const Variant &options = 1);
-};
-
-class ReflectionConstant {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    ReflectionConstant(const Variant &name);
-    Variant getName();
-    Variant getNamespaceName();
-    Variant getShortName();
-    Variant getValue();
-    Variant isDeprecated();
-    Variant __toString();
-};
-
-class PropertyHookType {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    explicit PropertyHookType(const Object &obj) : this_(obj) {}
-    PropertyHookType();
-    static Variant cases();
-    static Variant from(const Variant &value);
-    static Variant tryFrom(const Variant &value);
-};
-
 class ReflectionProperty {
+  protected:
     Object this_;
+    ReflectionProperty() = default;
 
   public:
     Object getObject() const {
         return this_;
     }
-    ReflectionProperty(const Variant &_class, const Variant &property);
+    static constexpr int IS_STATIC_ = 16;
+    static constexpr int IS_READONLY = 128;
+    static constexpr int IS_PUBLIC = 1;
+    static constexpr int IS_PROTECTED = 2;
+    static constexpr int IS_PRIVATE = 4;
+    static constexpr int IS_ABSTRACT = 64;
+    static constexpr int IS_PROTECTED_SET = 2048;
+    static constexpr int IS_PRIVATE_SET = 4096;
+    static constexpr int IS_VIRTUAL = 512;
+    static constexpr int IS_FINAL = 32;
+
+    ReflectionProperty(const Variant &class_, const Variant &property);
     Variant __toString();
     Variant getName();
     Variant getValue(const Variant &object = {});
@@ -586,19 +461,23 @@ class ReflectionProperty {
     Variant isFinal();
 };
 
-class ReflectionEnum {
+class ReflectionClass {
+  protected:
     Object this_;
+    ReflectionClass() = default;
 
   public:
     Object getObject() const {
         return this_;
     }
-    ReflectionEnum(const Variant &object_or_class);
-    Variant hasCase(const Variant &name);
-    Variant getCase(const Variant &name);
-    Variant getCases();
-    Variant isBacked();
-    ReflectionNamedType getBackingType();
+    static constexpr int IS_IMPLICIT_ABSTRACT = 16;
+    static constexpr int IS_EXPLICIT_ABSTRACT = 64;
+    static constexpr int IS_FINAL = 32;
+    static constexpr int IS_READONLY = 65536;
+    static constexpr int SKIP_INITIALIZATION_ON_SERIALIZE = 8;
+    static constexpr int SKIP_DESTRUCTOR = 16;
+
+    ReflectionClass(const Variant &object_or_class);
     Variant __toString();
     Variant getName();
     Variant isInternal();
@@ -639,7 +518,7 @@ class ReflectionEnum {
     Variant newInstance(const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1572]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1706]);
         }
         return this_.call(_method_fn, {args...});
     }
@@ -654,9 +533,9 @@ class ReflectionEnum {
     Variant markLazyObjectAsInitialized(const Variant &object);
     Variant getLazyInitializer(const Variant &object);
     Variant getParentClass();
-    Variant isSubclassOf(const Variant &_class);
+    Variant isSubclassOf(const Variant &class_);
     Variant getStaticProperties();
-    Variant getStaticPropertyValue(const Variant &name, const Variant &_default = {});
+    Variant getStaticPropertyValue(const Variant &name, const Variant &default_ = {});
     Variant setStaticPropertyValue(const Variant &name, const Variant &value);
     Variant getDefaultProperties();
     Variant isIterable();
@@ -670,18 +549,24 @@ class ReflectionEnum {
     Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
 };
 
-class ReflectionEnumUnitCase {
+class ReflectionClassConstant {
+  protected:
     Object this_;
+    ReflectionClassConstant() = default;
 
   public:
     Object getObject() const {
         return this_;
     }
-    ReflectionEnumUnitCase(const Variant &_class, const Variant &constant);
-    Variant getEnum();
-    Variant getValue();
+    static constexpr int IS_PUBLIC = 1;
+    static constexpr int IS_PROTECTED = 2;
+    static constexpr int IS_PRIVATE = 4;
+    static constexpr int IS_FINAL = 32;
+
+    ReflectionClassConstant(const Variant &class_, const Variant &constant);
     Variant __toString();
     Variant getName();
+    Variant getValue();
     Variant isPublic();
     Variant isPrivate();
     Variant isProtected();
@@ -696,31 +581,44 @@ class ReflectionEnumUnitCase {
     Variant getType();
 };
 
-class ReflectionEnumBackedCase {
-    Object this_;
+class ReflectionObject : public ReflectionClass {
+  protected:
+    ReflectionObject() = default;
 
   public:
-    Object getObject() const {
-        return this_;
-    }
-    ReflectionEnumBackedCase(const Variant &_class, const Variant &constant);
-    Variant getBackingValue();
+    ReflectionObject(const Variant &object);
+};
+
+class ReflectionEnum : public ReflectionClass {
+  protected:
+    ReflectionEnum() = default;
+
+  public:
+    ReflectionEnum(const Variant &object_or_class);
+    Variant hasCase(const Variant &name);
+    Variant getCase(const Variant &name);
+    Variant getCases();
+    Variant isBacked();
+    ReflectionNamedType getBackingType();
+};
+
+class ReflectionEnumUnitCase : public ReflectionClassConstant {
+  protected:
+    ReflectionEnumUnitCase() = default;
+
+  public:
+    ReflectionEnumUnitCase(const Variant &class_, const Variant &constant);
     Variant getEnum();
     Variant getValue();
-    Variant __toString();
-    Variant getName();
-    Variant isPublic();
-    Variant isPrivate();
-    Variant isProtected();
-    Variant isFinal();
-    Variant getModifiers();
-    Variant getDeclaringClass();
-    Variant getDocComment();
-    Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
-    Variant isEnumCase();
-    Variant isDeprecated();
-    Variant hasType();
-    Variant getType();
+};
+
+class ReflectionEnumBackedCase : public ReflectionEnumUnitCase {
+  protected:
+    ReflectionEnumBackedCase() = default;
+
+  public:
+    ReflectionEnumBackedCase(const Variant &class_, const Variant &constant);
+    Variant getBackingValue();
 };
 
 }  // namespace php

@@ -1,10 +1,13 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
 
 namespace php {
+class XSLTProcessor;
+
 class XSLTProcessor {
+  protected:
     Object this_;
 
   public:
@@ -17,9 +20,9 @@ class XSLTProcessor {
     Variant transformToDoc(const Variant &document, const Variant &return_class = {});
     Variant transformToUri(const Variant &document, const Variant &uri);
     Variant transformToXml(const Variant &document);
-    Variant setParameter(const Variant &_namespace, const Variant &name, const Variant &value = {});
-    Variant getParameter(const Variant &_namespace, const Variant &name);
-    Variant removeParameter(const Variant &_namespace, const Variant &name);
+    Variant setParameter(const Variant &namespace_, const Variant &name, const Variant &value = {});
+    Variant getParameter(const Variant &namespace_, const Variant &name);
+    Variant removeParameter(const Variant &namespace_, const Variant &name);
     Variant hasExsltSupport();
     Variant registerPHPFunctions(const Variant &functions = {});
     Variant registerPHPFunctionNS(const Variant &namespace_u_r_i, const Variant &name, const Variant &callable);

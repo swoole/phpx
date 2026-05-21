@@ -1,11 +1,15 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
 
 namespace php {
+class PhpToken;
+
 class PhpToken {
+  protected:
     Object this_;
+    PhpToken() = default;
 
   public:
     Object getObject() const {

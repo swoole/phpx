@@ -1,10 +1,14 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
 
 namespace php {
+class InflateContext;
+class DeflateContext;
+
 class InflateContext {
+  protected:
     Object this_;
 
   public:
@@ -16,6 +20,7 @@ class InflateContext {
 };
 
 class DeflateContext {
+  protected:
     Object this_;
 
   public:

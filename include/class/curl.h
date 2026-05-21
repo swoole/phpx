@@ -1,10 +1,17 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
 
 namespace php {
+class CurlHandle;
+class CurlMultiHandle;
+class CurlShareHandle;
+class CURLFile;
+class CURLStringFile;
+
 class CurlHandle {
+  protected:
     Object this_;
 
   public:
@@ -16,6 +23,7 @@ class CurlHandle {
 };
 
 class CurlMultiHandle {
+  protected:
     Object this_;
 
   public:
@@ -27,6 +35,7 @@ class CurlMultiHandle {
 };
 
 class CurlShareHandle {
+  protected:
     Object this_;
 
   public:
@@ -38,7 +47,9 @@ class CurlShareHandle {
 };
 
 class CURLFile {
+  protected:
     Object this_;
+    CURLFile() = default;
 
   public:
     Object getObject() const {
@@ -53,7 +64,9 @@ class CURLFile {
 };
 
 class CURLStringFile {
+  protected:
     Object this_;
+    CURLStringFile() = default;
 
   public:
     Object getObject() const {

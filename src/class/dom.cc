@@ -1,4 +1,5 @@
 #include "phpx.h"
+#include "phpx_class.h"
 #include "class/dom.h"
 
 namespace php {
@@ -29,134 +30,8 @@ Variant Dom_AdjacentPosition::tryFrom(const Variant &value) {
 DOMException::DOMException(const Variant &message, const Variant &code, const Variant &previous) {
     this_ = newObject(LITERAL_STRING[339], {message, code, previous});
 }
-Variant DOMException::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMException::getMessage() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMException::getCode() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMException::getFile() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMException::getLine() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMException::getTrace() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMException::getPrevious() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMException::getTraceAsString() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMException::__toString() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
-    }
-    return this_.call(_method_fn, {});
-}
 dom_domexception::dom_domexception(const Variant &message, const Variant &code, const Variant &previous) {
     this_ = newObject(LITERAL_STRING[339], {message, code, previous});
-}
-Variant dom_domexception::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant dom_domexception::getMessage() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[98]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant dom_domexception::getCode() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[99]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant dom_domexception::getFile() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[100]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant dom_domexception::getLine() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[101]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant dom_domexception::getTrace() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[102]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant dom_domexception::getPrevious() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[103]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant dom_domexception::getTraceAsString() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[104]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant dom_domexception::__toString() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[29]);
-    }
-    return this_.call(_method_fn, {});
 }
 DOMNode::DOMNode() {
     this_ = newObject(LITERAL_STRING[346]);
@@ -245,12 +120,12 @@ Variant DOMNode::insertBefore(const Variant &node, const Variant &child) {
     }
     return this_.call(_method_fn, {node, child});
 }
-Variant DOMNode::isDefaultNamespace(const Variant &_namespace) {
+Variant DOMNode::isDefaultNamespace(const Variant &namespace_) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
     }
-    return this_.call(_method_fn, {_namespace});
+    return this_.call(_method_fn, {namespace_});
 }
 Variant DOMNode::isSameNode(const DOMNode &other_node) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -294,12 +169,12 @@ Variant DOMNode::lookupNamespaceURI(const Variant &prefix) {
     }
     return this_.call(_method_fn, {prefix});
 }
-Variant DOMNode::lookupPrefix(const Variant &_namespace) {
+Variant DOMNode::lookupPrefix(const Variant &namespace_) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
     }
-    return this_.call(_method_fn, {_namespace});
+    return this_.call(_method_fn, {namespace_});
 }
 Variant DOMNode::normalize() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -462,12 +337,12 @@ Variant Dom_Node::contains(const Variant &other) {
     }
     return this_.call(_method_fn, {other});
 }
-Variant Dom_Node::lookupPrefix(const Variant &_namespace) {
+Variant Dom_Node::lookupPrefix(const Variant &namespace_) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
     }
-    return this_.call(_method_fn, {_namespace});
+    return this_.call(_method_fn, {namespace_});
 }
 Variant Dom_Node::lookupNamespaceURI(const Variant &prefix) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -476,12 +351,12 @@ Variant Dom_Node::lookupNamespaceURI(const Variant &prefix) {
     }
     return this_.call(_method_fn, {prefix});
 }
-Variant Dom_Node::isDefaultNamespace(const Variant &_namespace) {
+Variant Dom_Node::isDefaultNamespace(const Variant &namespace_) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
     }
-    return this_.call(_method_fn, {_namespace});
+    return this_.call(_method_fn, {namespace_});
 }
 Variant Dom_Node::insertBefore(const Dom_Node &node, const Dom_Node &child) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -561,11 +436,7 @@ Variant Dom_Node::C14N(const Variant &exclusive,
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
     }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_Node::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
+    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
 }
 Variant Dom_Node::C14NFile(const Variant &uri,
                            const Variant &exclusive,
@@ -576,11 +447,7 @@ Variant Dom_Node::C14NFile(const Variant &uri,
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
     }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_Node::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
+    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
 }
 Variant Dom_Node::__sleep() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -623,222 +490,482 @@ Variant DOMDocumentFragment::appendXML(const Variant &data) {
     }
     return this_.call(_method_fn, {data});
 }
-Variant DOMDocumentFragment::appendChild(const DOMNode &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
+DOMNodeList::DOMNodeList() {
+    this_ = newObject(LITERAL_STRING[433]);
 }
-Variant DOMDocumentFragment::appendChild(const Variant &node) {
+Variant DOMNodeList::count() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant DOMDocumentFragment::C14N(const Variant &exclusive,
-                                  const Variant &with_comments,
-                                  const Variant &xpath,
-                                  const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMDocumentFragment::C14NFile(const Variant &uri,
-                                      const Variant &exclusive,
-                                      const Variant &with_comments,
-                                      const Variant &xpath,
-                                      const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMDocumentFragment::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant DOMDocumentFragment::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[140]);
     }
     return this_.call(_method_fn, {});
 }
-Variant DOMDocumentFragment::getNodePath() {
+Variant DOMNodeList::getIterator() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[141]);
     }
     return this_.call(_method_fn, {});
 }
-Variant DOMDocumentFragment::hasAttributes() {
+Variant DOMNodeList::item(const Variant &index) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[353]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[434]);
+    }
+    return this_.call(_method_fn, {index});
+}
+Dom_NodeList::Dom_NodeList() {
+    this_ = newObject(LITERAL_STRING[435]);
+}
+Variant Dom_NodeList::count() {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[140]);
     }
     return this_.call(_method_fn, {});
 }
-Variant DOMDocumentFragment::hasChildNodes() {
+Variant Dom_NodeList::getIterator() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[141]);
     }
     return this_.call(_method_fn, {});
 }
-Variant DOMDocumentFragment::insertBefore(const DOMNode &node, const Variant &child) {
+Variant Dom_NodeList::item(const Variant &index) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[434]);
     }
-    return this_.call(_method_fn, {node.getObject(), child});
+    return this_.call(_method_fn, {index});
 }
-Variant DOMDocumentFragment::insertBefore(const Variant &node, const Variant &child) {
+DOMNamedNodeMap::DOMNamedNodeMap() {
+    this_ = newObject(LITERAL_STRING[436]);
+}
+DOMNode DOMNamedNodeMap::getNamedItem(const Variant &qualified_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[437]);
     }
-    return this_.call(_method_fn, {node, child});
+    return DOMNode(Object(this_.call(_method_fn, {qualified_name})));
 }
-Variant DOMDocumentFragment::isDefaultNamespace(const Variant &_namespace) {
+DOMNode DOMNamedNodeMap::getNamedItemNS(const Variant &namespace_, const Variant &local_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[438]);
     }
-    return this_.call(_method_fn, {_namespace});
+    return DOMNode(Object(this_.call(_method_fn, {namespace_, local_name})));
 }
-Variant DOMDocumentFragment::isSameNode(const DOMNode &other_node) {
+DOMNode DOMNamedNodeMap::item(const Variant &index) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[434]);
     }
-    return this_.call(_method_fn, {other_node.getObject()});
+    return DOMNode(Object(this_.call(_method_fn, {index})));
 }
-Variant DOMDocumentFragment::isSameNode(const Variant &other_node) {
+Variant DOMNamedNodeMap::count() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMDocumentFragment::isEqualNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMDocumentFragment::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMDocumentFragment::isSupported(const Variant &feature, const Variant &version) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[359]);
-    }
-    return this_.call(_method_fn, {feature, version});
-}
-Variant DOMDocumentFragment::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant DOMDocumentFragment::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMDocumentFragment::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[140]);
     }
     return this_.call(_method_fn, {});
 }
-Variant DOMDocumentFragment::removeChild(const DOMNode &child) {
+Variant DOMNamedNodeMap::getIterator() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant DOMDocumentFragment::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant DOMDocumentFragment::replaceChild(const DOMNode &node, const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant DOMDocumentFragment::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMDocumentFragment::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-DOMNode DOMDocumentFragment::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return DOMNode(Object(this_.call(_method_fn, {options})));
-}
-Variant DOMDocumentFragment::compareDocumentPosition(const DOMNode &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant DOMDocumentFragment::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant DOMDocumentFragment::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[141]);
     }
     return this_.call(_method_fn, {});
 }
-Variant DOMDocumentFragment::__wakeup() {
+DOMCharacterData::DOMCharacterData() {
+    this_ = newObject(LITERAL_STRING[443]);
+}
+Variant DOMCharacterData::appendData(const Variant &data) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[444]);
+    }
+    return this_.call(_method_fn, {data});
+}
+Variant DOMCharacterData::substringData(const Variant &offset, const Variant &count) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[445]);
+    }
+    return this_.call(_method_fn, {offset, count});
+}
+Variant DOMCharacterData::insertData(const Variant &offset, const Variant &data) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
+    }
+    return this_.call(_method_fn, {offset, data});
+}
+Variant DOMCharacterData::deleteData(const Variant &offset, const Variant &count) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[447]);
+    }
+    return this_.call(_method_fn, {offset, count});
+}
+Variant DOMCharacterData::replaceData(const Variant &offset, const Variant &count, const Variant &data) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
+    }
+    return this_.call(_method_fn, {offset, count, data});
+}
+Variant DOMCharacterData::remove() {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[450]);
     }
     return this_.call(_method_fn, {});
+}
+Dom_CharacterData::Dom_CharacterData() {
+    this_ = newObject(LITERAL_STRING[453]);
+}
+Variant Dom_CharacterData::substringData(const Variant &offset, const Variant &count) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[445]);
+    }
+    return this_.call(_method_fn, {offset, count});
+}
+Variant Dom_CharacterData::appendData(const Variant &data) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[444]);
+    }
+    return this_.call(_method_fn, {data});
+}
+Variant Dom_CharacterData::insertData(const Variant &offset, const Variant &data) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
+    }
+    return this_.call(_method_fn, {offset, data});
+}
+Variant Dom_CharacterData::deleteData(const Variant &offset, const Variant &count) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[447]);
+    }
+    return this_.call(_method_fn, {offset, count});
+}
+Variant Dom_CharacterData::replaceData(const Variant &offset, const Variant &count, const Variant &data) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
+    }
+    return this_.call(_method_fn, {offset, count, data});
+}
+Variant Dom_CharacterData::remove() {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[450]);
+    }
+    return this_.call(_method_fn, {});
+}
+DOMAttr::DOMAttr(const Variant &name, const Variant &value) {
+    this_ = newObject(LITERAL_STRING[454], {name, value});
+}
+Variant DOMAttr::isId() {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[455]);
+    }
+    return this_.call(_method_fn, {});
+}
+Dom_Attr::Dom_Attr() {
+    this_ = newObject(LITERAL_STRING[456]);
+}
+Variant Dom_Attr::isId() {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[455]);
+    }
+    return this_.call(_method_fn, {});
+}
+Variant Dom_Attr::rename(const Variant &namespace_u_r_i, const Variant &qualified_name) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[457]);
+    }
+    return this_.call(_method_fn, {namespace_u_r_i, qualified_name});
+}
+Dom_NamedNodeMap::Dom_NamedNodeMap() {
+    this_ = newObject(LITERAL_STRING[439]);
+}
+Dom_Attr Dom_NamedNodeMap::item(const Variant &index) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[434]);
+    }
+    return Dom_Attr(Object(this_.call(_method_fn, {index})));
+}
+Dom_Attr Dom_NamedNodeMap::getNamedItem(const Variant &qualified_name) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[437]);
+    }
+    return Dom_Attr(Object(this_.call(_method_fn, {qualified_name})));
+}
+Dom_Attr Dom_NamedNodeMap::getNamedItemNS(const Variant &namespace_, const Variant &local_name) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[438]);
+    }
+    return Dom_Attr(Object(this_.call(_method_fn, {namespace_, local_name})));
+}
+Variant Dom_NamedNodeMap::count() {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[140]);
+    }
+    return this_.call(_method_fn, {});
+}
+Variant Dom_NamedNodeMap::getIterator() {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[141]);
+    }
+    return this_.call(_method_fn, {});
+}
+DOMElement::DOMElement(const Variant &qualified_name, const Variant &value, const Variant &namespace_) {
+    this_ = newObject(LITERAL_STRING[458], {qualified_name, value, namespace_});
+}
+Variant DOMElement::getAttribute(const Variant &qualified_name) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[459]);
+    }
+    return this_.call(_method_fn, {qualified_name});
+}
+Variant DOMElement::getAttributeNames() {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[460]);
+    }
+    return this_.call(_method_fn, {});
+}
+Variant DOMElement::getAttributeNS(const Variant &namespace_, const Variant &local_name) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[461]);
+    }
+    return this_.call(_method_fn, {namespace_, local_name});
+}
+Variant DOMElement::getAttributeNode(const Variant &qualified_name) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[462]);
+    }
+    return this_.call(_method_fn, {qualified_name});
+}
+Variant DOMElement::getAttributeNodeNS(const Variant &namespace_, const Variant &local_name) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[463]);
+    }
+    return this_.call(_method_fn, {namespace_, local_name});
+}
+DOMNodeList DOMElement::getElementsByTagName(const Variant &qualified_name) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[392]);
+    }
+    return DOMNodeList(Object(this_.call(_method_fn, {qualified_name})));
+}
+DOMNodeList DOMElement::getElementsByTagNameNS(const Variant &namespace_, const Variant &local_name) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[393]);
+    }
+    return DOMNodeList(Object(this_.call(_method_fn, {namespace_, local_name})));
+}
+Variant DOMElement::hasAttribute(const Variant &qualified_name) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[464]);
+    }
+    return this_.call(_method_fn, {qualified_name});
+}
+Variant DOMElement::hasAttributeNS(const Variant &namespace_, const Variant &local_name) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[465]);
+    }
+    return this_.call(_method_fn, {namespace_, local_name});
+}
+Variant DOMElement::removeAttribute(const Variant &qualified_name) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[466]);
+    }
+    return this_.call(_method_fn, {qualified_name});
+}
+Variant DOMElement::removeAttributeNS(const Variant &namespace_, const Variant &local_name) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[467]);
+    }
+    return this_.call(_method_fn, {namespace_, local_name});
+}
+Variant DOMElement::removeAttributeNode(const DOMAttr &attr) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[468]);
+    }
+    return this_.call(_method_fn, {attr.getObject()});
+}
+Variant DOMElement::removeAttributeNode(const Variant &attr) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[468]);
+    }
+    return this_.call(_method_fn, {attr});
+}
+Variant DOMElement::setAttribute(const Variant &qualified_name, const Variant &value) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[469]);
+    }
+    return this_.call(_method_fn, {qualified_name, value});
+}
+Variant DOMElement::setAttributeNS(const Variant &namespace_, const Variant &qualified_name, const Variant &value) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[470]);
+    }
+    return this_.call(_method_fn, {namespace_, qualified_name, value});
+}
+Variant DOMElement::setAttributeNode(const DOMAttr &attr) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[471]);
+    }
+    return this_.call(_method_fn, {attr.getObject()});
+}
+Variant DOMElement::setAttributeNode(const Variant &attr) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[471]);
+    }
+    return this_.call(_method_fn, {attr});
+}
+Variant DOMElement::setAttributeNodeNS(const DOMAttr &attr) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[472]);
+    }
+    return this_.call(_method_fn, {attr.getObject()});
+}
+Variant DOMElement::setAttributeNodeNS(const Variant &attr) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[472]);
+    }
+    return this_.call(_method_fn, {attr});
+}
+Variant DOMElement::setIdAttribute(const Variant &qualified_name, const Variant &is_id) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[473]);
+    }
+    return this_.call(_method_fn, {qualified_name, is_id});
+}
+Variant DOMElement::setIdAttributeNS(const Variant &namespace_, const Variant &qualified_name, const Variant &is_id) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[474]);
+    }
+    return this_.call(_method_fn, {namespace_, qualified_name, is_id});
+}
+Variant DOMElement::setIdAttributeNode(const DOMAttr &attr, const Variant &is_id) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[475]);
+    }
+    return this_.call(_method_fn, {attr.getObject(), is_id});
+}
+Variant DOMElement::setIdAttributeNode(const Variant &attr, const Variant &is_id) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[475]);
+    }
+    return this_.call(_method_fn, {attr, is_id});
+}
+Variant DOMElement::toggleAttribute(const Variant &qualified_name, const Variant &force) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[476]);
+    }
+    return this_.call(_method_fn, {qualified_name, force});
+}
+Variant DOMElement::remove() {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[450]);
+    }
+    return this_.call(_method_fn, {});
+}
+Variant DOMElement::insertAdjacentElement(const Variant &where, const DOMElement &element) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[477]);
+    }
+    return this_.call(_method_fn, {where, element.getObject()});
+}
+Variant DOMElement::insertAdjacentElement(const Variant &where, const Variant &element) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[477]);
+    }
+    return this_.call(_method_fn, {where, element});
+}
+Variant DOMElement::insertAdjacentText(const Variant &where, const Variant &data) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[478]);
+    }
+    return this_.call(_method_fn, {where, data});
+}
+DOMText::DOMText(const Variant &data) {
+    this_ = newObject(LITERAL_STRING[485], {data});
+}
+Variant DOMText::isWhitespaceInElementContent() {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[486]);
+    }
+    return this_.call(_method_fn, {});
+}
+Variant DOMText::isElementContentWhitespace() {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[487]);
+    }
+    return this_.call(_method_fn, {});
+}
+Variant DOMText::splitText(const Variant &offset) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[488]);
+    }
+    return this_.call(_method_fn, {offset});
+}
+Dom_Text::Dom_Text() {
+    this_ = newObject(LITERAL_STRING[489]);
+}
+Dom_Text Dom_Text::splitText(const Variant &offset) {
+    static THREAD_LOCAL zend_function *_method_fn = nullptr;
+    if (UNEXPECTED(!_method_fn)) {
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[488]);
+    }
+    return Dom_Text(Object(this_.call(_method_fn, {offset})));
+}
+DOMComment::DOMComment(const Variant &data) {
+    this_ = newObject(LITERAL_STRING[490], {data});
 }
 DOMDocument::DOMDocument(const Variant &version, const Variant &encoding) {
     this_ = newObject(LITERAL_STRING[380], {version, encoding});
@@ -850,12 +977,12 @@ Variant DOMDocument::createAttribute(const Variant &local_name) {
     }
     return this_.call(_method_fn, {local_name});
 }
-Variant DOMDocument::createAttributeNS(const Variant &_namespace, const Variant &qualified_name) {
+Variant DOMDocument::createAttributeNS(const Variant &namespace_, const Variant &qualified_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[382]);
     }
-    return this_.call(_method_fn, {_namespace, qualified_name});
+    return this_.call(_method_fn, {namespace_, qualified_name});
 }
 Variant DOMDocument::createCDATASection(const Variant &data) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -885,12 +1012,12 @@ Variant DOMDocument::createElement(const Variant &local_name, const Variant &val
     }
     return this_.call(_method_fn, {local_name, value});
 }
-Variant DOMDocument::createElementNS(const Variant &_namespace, const Variant &qualified_name, const Variant &value) {
+Variant DOMDocument::createElementNS(const Variant &namespace_, const Variant &qualified_name, const Variant &value) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[387]);
     }
-    return this_.call(_method_fn, {_namespace, qualified_name, value});
+    return this_.call(_method_fn, {namespace_, qualified_name, value});
 }
 Variant DOMDocument::createEntityReference(const Variant &name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -920,19 +1047,19 @@ Variant DOMDocument::getElementById(const Variant &element_id) {
     }
     return this_.call(_method_fn, {element_id});
 }
-Variant DOMDocument::getElementsByTagName(const Variant &qualified_name) {
+DOMNodeList DOMDocument::getElementsByTagName(const Variant &qualified_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[392]);
     }
-    return this_.call(_method_fn, {qualified_name});
+    return DOMNodeList(Object(this_.call(_method_fn, {qualified_name})));
 }
-Variant DOMDocument::getElementsByTagNameNS(const Variant &_namespace, const Variant &local_name) {
+DOMNodeList DOMDocument::getElementsByTagNameNS(const Variant &namespace_, const Variant &local_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[393]);
     }
-    return this_.call(_method_fn, {_namespace, local_name});
+    return DOMNodeList(Object(this_.call(_method_fn, {namespace_, local_name})));
 }
 Variant DOMDocument::importNode(const DOMNode &node, const Variant &deep) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -1060,12 +1187,16 @@ Variant DOMDocument::xinclude(const Variant &options) {
     }
     return this_.call(_method_fn, {options});
 }
-Variant DOMDocument::adoptNode(const DOMNode &node) {
+DOMNode DOMDocument::adoptNode(const DOMNode &node) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[411]);
     }
-    return this_.call(_method_fn, {node.getObject()});
+    auto _rv = this_.call(_method_fn, {node.getObject()});
+    if (!_rv.toBool()) {
+        throwException(String("RuntimeException"), "DOMDocument::adoptNode() returned false");
+    }
+    return DOMNode(Object(std::move(_rv)));
 }
 Variant DOMDocument::adoptNode(const Variant &node) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -1074,3600 +1205,17 @@ Variant DOMDocument::adoptNode(const Variant &node) {
     }
     return this_.call(_method_fn, {node});
 }
-Variant DOMDocument::appendChild(const DOMNode &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant DOMDocument::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant DOMDocument::C14N(const Variant &exclusive,
-                          const Variant &with_comments,
-                          const Variant &xpath,
-                          const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMDocument::C14NFile(const Variant &uri,
-                              const Variant &exclusive,
-                              const Variant &with_comments,
-                              const Variant &xpath,
-                              const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMDocument::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant DOMDocument::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMDocument::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMDocument::hasAttributes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[353]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMDocument::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMDocument::insertBefore(const DOMNode &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child});
-}
-Variant DOMDocument::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMDocument::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMDocument::isSameNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMDocument::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMDocument::isEqualNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMDocument::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMDocument::isSupported(const Variant &feature, const Variant &version) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[359]);
-    }
-    return this_.call(_method_fn, {feature, version});
-}
-Variant DOMDocument::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant DOMDocument::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMDocument::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMDocument::removeChild(const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant DOMDocument::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant DOMDocument::replaceChild(const DOMNode &node, const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant DOMDocument::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMDocument::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-DOMNode DOMDocument::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return DOMNode(Object(this_.call(_method_fn, {options})));
-}
-Variant DOMDocument::compareDocumentPosition(const DOMNode &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant DOMDocument::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant DOMDocument::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMDocument::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
-DOMNodeList::DOMNodeList() {
-    this_ = newObject(LITERAL_STRING[433]);
-}
-Variant DOMNodeList::count() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[140]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMNodeList::getIterator() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[141]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMNodeList::item(const Variant &index) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[434]);
-    }
-    return this_.call(_method_fn, {index});
-}
-Dom_NodeList::Dom_NodeList() {
-    this_ = newObject(LITERAL_STRING[435]);
-}
-Variant Dom_NodeList::count() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[140]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_NodeList::getIterator() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[141]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_NodeList::item(const Variant &index) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[434]);
-    }
-    return this_.call(_method_fn, {index});
-}
-DOMNamedNodeMap::DOMNamedNodeMap() {
-    this_ = newObject(LITERAL_STRING[436]);
-}
-Variant DOMNamedNodeMap::getNamedItem(const Variant &qualified_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[437]);
-    }
-    return this_.call(_method_fn, {qualified_name});
-}
-Variant DOMNamedNodeMap::getNamedItemNS(const Variant &_namespace, const Variant &local_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[438]);
-    }
-    return this_.call(_method_fn, {_namespace, local_name});
-}
-Variant DOMNamedNodeMap::item(const Variant &index) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[434]);
-    }
-    return this_.call(_method_fn, {index});
-}
-Variant DOMNamedNodeMap::count() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[140]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMNamedNodeMap::getIterator() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[141]);
-    }
-    return this_.call(_method_fn, {});
-}
-DOMCharacterData::DOMCharacterData() {
-    this_ = newObject(LITERAL_STRING[443]);
-}
-Variant DOMCharacterData::appendData(const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[444]);
-    }
-    return this_.call(_method_fn, {data});
-}
-Variant DOMCharacterData::substringData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[445]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant DOMCharacterData::insertData(const Variant &offset, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
-    }
-    return this_.call(_method_fn, {offset, data});
-}
-Variant DOMCharacterData::deleteData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[447]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant DOMCharacterData::replaceData(const Variant &offset, const Variant &count, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
-    }
-    return this_.call(_method_fn, {offset, count, data});
-}
-Variant DOMCharacterData::remove() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[450]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCharacterData::appendChild(const DOMNode &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant DOMCharacterData::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant DOMCharacterData::C14N(const Variant &exclusive,
-                               const Variant &with_comments,
-                               const Variant &xpath,
-                               const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMCharacterData::C14NFile(const Variant &uri,
-                                   const Variant &exclusive,
-                                   const Variant &with_comments,
-                                   const Variant &xpath,
-                                   const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMCharacterData::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant DOMCharacterData::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCharacterData::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCharacterData::hasAttributes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[353]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCharacterData::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCharacterData::insertBefore(const DOMNode &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child});
-}
-Variant DOMCharacterData::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMCharacterData::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMCharacterData::isSameNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMCharacterData::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMCharacterData::isEqualNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMCharacterData::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMCharacterData::isSupported(const Variant &feature, const Variant &version) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[359]);
-    }
-    return this_.call(_method_fn, {feature, version});
-}
-Variant DOMCharacterData::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant DOMCharacterData::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMCharacterData::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCharacterData::removeChild(const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant DOMCharacterData::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant DOMCharacterData::replaceChild(const DOMNode &node, const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant DOMCharacterData::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMCharacterData::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-DOMNode DOMCharacterData::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return DOMNode(Object(this_.call(_method_fn, {options})));
-}
-Variant DOMCharacterData::compareDocumentPosition(const DOMNode &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant DOMCharacterData::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant DOMCharacterData::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCharacterData::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
-Dom_CharacterData::Dom_CharacterData() {
-    this_ = newObject(LITERAL_STRING[453]);
-}
-Variant Dom_CharacterData::substringData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[445]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant Dom_CharacterData::appendData(const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[444]);
-    }
-    return this_.call(_method_fn, {data});
-}
-Variant Dom_CharacterData::insertData(const Variant &offset, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
-    }
-    return this_.call(_method_fn, {offset, data});
-}
-Variant Dom_CharacterData::deleteData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[447]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant Dom_CharacterData::replaceData(const Variant &offset, const Variant &count, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
-    }
-    return this_.call(_method_fn, {offset, count, data});
-}
-Variant Dom_CharacterData::remove() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[450]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_CharacterData::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return this_.call(_method_fn, {options});
-}
-Variant Dom_CharacterData::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_CharacterData::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_CharacterData::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant Dom_CharacterData::isEqualNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_CharacterData::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_CharacterData::isSameNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_CharacterData::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_CharacterData::compareDocumentPosition(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_CharacterData::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_CharacterData::contains(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_CharacterData::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_CharacterData::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_CharacterData::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant Dom_CharacterData::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_CharacterData::insertBefore(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_CharacterData::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_CharacterData::appendChild(const Dom_Node &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant Dom_CharacterData::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant Dom_CharacterData::replaceChild(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_CharacterData::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_CharacterData::removeChild(const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant Dom_CharacterData::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant Dom_CharacterData::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_CharacterData::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_CharacterData::C14N(const Variant &exclusive,
-                                const Variant &with_comments,
-                                const Variant &xpath,
-                                const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_CharacterData::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_CharacterData::C14NFile(const Variant &uri,
-                                    const Variant &exclusive,
-                                    const Variant &with_comments,
-                                    const Variant &xpath,
-                                    const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_CharacterData::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_CharacterData::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_CharacterData::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
-DOMAttr::DOMAttr(const Variant &name, const Variant &value) {
-    this_ = newObject(LITERAL_STRING[454], {name, value});
-}
-Variant DOMAttr::isId() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[455]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMAttr::appendChild(const DOMNode &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant DOMAttr::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant DOMAttr::C14N(const Variant &exclusive,
-                      const Variant &with_comments,
-                      const Variant &xpath,
-                      const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMAttr::C14NFile(const Variant &uri,
-                          const Variant &exclusive,
-                          const Variant &with_comments,
-                          const Variant &xpath,
-                          const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMAttr::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant DOMAttr::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMAttr::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMAttr::hasAttributes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[353]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMAttr::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMAttr::insertBefore(const DOMNode &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child});
-}
-Variant DOMAttr::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMAttr::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMAttr::isSameNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMAttr::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMAttr::isEqualNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMAttr::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMAttr::isSupported(const Variant &feature, const Variant &version) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[359]);
-    }
-    return this_.call(_method_fn, {feature, version});
-}
-Variant DOMAttr::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant DOMAttr::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMAttr::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMAttr::removeChild(const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant DOMAttr::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant DOMAttr::replaceChild(const DOMNode &node, const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant DOMAttr::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMAttr::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-DOMNode DOMAttr::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return DOMNode(Object(this_.call(_method_fn, {options})));
-}
-Variant DOMAttr::compareDocumentPosition(const DOMNode &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant DOMAttr::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant DOMAttr::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMAttr::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
-Dom_Attr::Dom_Attr() {
-    this_ = newObject(LITERAL_STRING[456]);
-}
-Variant Dom_Attr::isId() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[455]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Attr::rename(const Variant &namespace_u_r_i, const Variant &qualified_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[457]);
-    }
-    return this_.call(_method_fn, {namespace_u_r_i, qualified_name});
-}
-Variant Dom_Attr::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return this_.call(_method_fn, {options});
-}
-Variant Dom_Attr::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Attr::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Attr::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant Dom_Attr::isEqualNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_Attr::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_Attr::isSameNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_Attr::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_Attr::compareDocumentPosition(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_Attr::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_Attr::contains(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_Attr::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_Attr::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_Attr::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant Dom_Attr::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_Attr::insertBefore(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_Attr::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_Attr::appendChild(const Dom_Node &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant Dom_Attr::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant Dom_Attr::replaceChild(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_Attr::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_Attr::removeChild(const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant Dom_Attr::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant Dom_Attr::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Attr::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Attr::C14N(const Variant &exclusive,
-                       const Variant &with_comments,
-                       const Variant &xpath,
-                       const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_Attr::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_Attr::C14NFile(const Variant &uri,
-                           const Variant &exclusive,
-                           const Variant &with_comments,
-                           const Variant &xpath,
-                           const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_Attr::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_Attr::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Attr::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
-Dom_NamedNodeMap::Dom_NamedNodeMap() {
-    this_ = newObject(LITERAL_STRING[439]);
-}
-Dom_Attr Dom_NamedNodeMap::item(const Variant &index) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[434]);
-    }
-    return Dom_Attr(Object(this_.call(_method_fn, {index})));
-}
-Dom_Attr Dom_NamedNodeMap::getNamedItem(const Variant &qualified_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[437]);
-    }
-    return Dom_Attr(Object(this_.call(_method_fn, {qualified_name})));
-}
-Dom_Attr Dom_NamedNodeMap::getNamedItemNS(const Variant &_namespace, const Variant &local_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[438]);
-    }
-    return Dom_Attr(Object(this_.call(_method_fn, {_namespace, local_name})));
-}
-Variant Dom_NamedNodeMap::count() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[140]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_NamedNodeMap::getIterator() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[141]);
-    }
-    return this_.call(_method_fn, {});
-}
-DOMElement::DOMElement(const Variant &qualified_name, const Variant &value, const Variant &_namespace) {
-    this_ = newObject(LITERAL_STRING[458], {qualified_name, value, _namespace});
-}
-Variant DOMElement::getAttribute(const Variant &qualified_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[459]);
-    }
-    return this_.call(_method_fn, {qualified_name});
-}
-Variant DOMElement::getAttributeNames() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[460]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMElement::getAttributeNS(const Variant &_namespace, const Variant &local_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[461]);
-    }
-    return this_.call(_method_fn, {_namespace, local_name});
-}
-Variant DOMElement::getAttributeNode(const Variant &qualified_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[462]);
-    }
-    return this_.call(_method_fn, {qualified_name});
-}
-Variant DOMElement::getAttributeNodeNS(const Variant &_namespace, const Variant &local_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[463]);
-    }
-    return this_.call(_method_fn, {_namespace, local_name});
-}
-Variant DOMElement::getElementsByTagName(const Variant &qualified_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[392]);
-    }
-    return this_.call(_method_fn, {qualified_name});
-}
-Variant DOMElement::getElementsByTagNameNS(const Variant &_namespace, const Variant &local_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[393]);
-    }
-    return this_.call(_method_fn, {_namespace, local_name});
-}
-Variant DOMElement::hasAttribute(const Variant &qualified_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[464]);
-    }
-    return this_.call(_method_fn, {qualified_name});
-}
-Variant DOMElement::hasAttributeNS(const Variant &_namespace, const Variant &local_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[465]);
-    }
-    return this_.call(_method_fn, {_namespace, local_name});
-}
-Variant DOMElement::removeAttribute(const Variant &qualified_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[466]);
-    }
-    return this_.call(_method_fn, {qualified_name});
-}
-Variant DOMElement::removeAttributeNS(const Variant &_namespace, const Variant &local_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[467]);
-    }
-    return this_.call(_method_fn, {_namespace, local_name});
-}
-Variant DOMElement::removeAttributeNode(const DOMAttr &attr) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[468]);
-    }
-    return this_.call(_method_fn, {attr.getObject()});
-}
-Variant DOMElement::removeAttributeNode(const Variant &attr) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[468]);
-    }
-    return this_.call(_method_fn, {attr});
-}
-Variant DOMElement::setAttribute(const Variant &qualified_name, const Variant &value) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[469]);
-    }
-    return this_.call(_method_fn, {qualified_name, value});
-}
-Variant DOMElement::setAttributeNS(const Variant &_namespace, const Variant &qualified_name, const Variant &value) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[470]);
-    }
-    return this_.call(_method_fn, {_namespace, qualified_name, value});
-}
-Variant DOMElement::setAttributeNode(const DOMAttr &attr) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[471]);
-    }
-    return this_.call(_method_fn, {attr.getObject()});
-}
-Variant DOMElement::setAttributeNode(const Variant &attr) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[471]);
-    }
-    return this_.call(_method_fn, {attr});
-}
-Variant DOMElement::setAttributeNodeNS(const DOMAttr &attr) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[472]);
-    }
-    return this_.call(_method_fn, {attr.getObject()});
-}
-Variant DOMElement::setAttributeNodeNS(const Variant &attr) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[472]);
-    }
-    return this_.call(_method_fn, {attr});
-}
-Variant DOMElement::setIdAttribute(const Variant &qualified_name, const Variant &is_id) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[473]);
-    }
-    return this_.call(_method_fn, {qualified_name, is_id});
-}
-Variant DOMElement::setIdAttributeNS(const Variant &_namespace, const Variant &qualified_name, const Variant &is_id) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[474]);
-    }
-    return this_.call(_method_fn, {_namespace, qualified_name, is_id});
-}
-Variant DOMElement::setIdAttributeNode(const DOMAttr &attr, const Variant &is_id) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[475]);
-    }
-    return this_.call(_method_fn, {attr.getObject(), is_id});
-}
-Variant DOMElement::setIdAttributeNode(const Variant &attr, const Variant &is_id) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[475]);
-    }
-    return this_.call(_method_fn, {attr, is_id});
-}
-Variant DOMElement::toggleAttribute(const Variant &qualified_name, const Variant &force) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[476]);
-    }
-    return this_.call(_method_fn, {qualified_name, force});
-}
-Variant DOMElement::remove() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[450]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMElement::insertAdjacentElement(const Variant &where, const DOMElement &element) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[477]);
-    }
-    return this_.call(_method_fn, {where, element.getObject()});
-}
-Variant DOMElement::insertAdjacentElement(const Variant &where, const Variant &element) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[477]);
-    }
-    return this_.call(_method_fn, {where, element});
-}
-Variant DOMElement::insertAdjacentText(const Variant &where, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[478]);
-    }
-    return this_.call(_method_fn, {where, data});
-}
-Variant DOMElement::appendChild(const DOMNode &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant DOMElement::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant DOMElement::C14N(const Variant &exclusive,
-                         const Variant &with_comments,
-                         const Variant &xpath,
-                         const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMElement::C14NFile(const Variant &uri,
-                             const Variant &exclusive,
-                             const Variant &with_comments,
-                             const Variant &xpath,
-                             const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMElement::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant DOMElement::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMElement::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMElement::hasAttributes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[353]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMElement::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMElement::insertBefore(const DOMNode &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child});
-}
-Variant DOMElement::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMElement::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMElement::isSameNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMElement::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMElement::isEqualNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMElement::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMElement::isSupported(const Variant &feature, const Variant &version) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[359]);
-    }
-    return this_.call(_method_fn, {feature, version});
-}
-Variant DOMElement::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant DOMElement::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMElement::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMElement::removeChild(const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant DOMElement::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant DOMElement::replaceChild(const DOMNode &node, const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant DOMElement::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMElement::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-DOMNode DOMElement::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return DOMNode(Object(this_.call(_method_fn, {options})));
-}
-Variant DOMElement::compareDocumentPosition(const DOMNode &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant DOMElement::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant DOMElement::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMElement::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
-DOMText::DOMText(const Variant &data) {
-    this_ = newObject(LITERAL_STRING[485], {data});
-}
-Variant DOMText::isWhitespaceInElementContent() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[486]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMText::isElementContentWhitespace() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[487]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMText::splitText(const Variant &offset) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[488]);
-    }
-    return this_.call(_method_fn, {offset});
-}
-Variant DOMText::appendData(const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[444]);
-    }
-    return this_.call(_method_fn, {data});
-}
-Variant DOMText::substringData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[445]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant DOMText::insertData(const Variant &offset, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
-    }
-    return this_.call(_method_fn, {offset, data});
-}
-Variant DOMText::deleteData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[447]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant DOMText::replaceData(const Variant &offset, const Variant &count, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
-    }
-    return this_.call(_method_fn, {offset, count, data});
-}
-Variant DOMText::remove() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[450]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMText::appendChild(const DOMNode &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant DOMText::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant DOMText::C14N(const Variant &exclusive,
-                      const Variant &with_comments,
-                      const Variant &xpath,
-                      const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMText::C14NFile(const Variant &uri,
-                          const Variant &exclusive,
-                          const Variant &with_comments,
-                          const Variant &xpath,
-                          const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMText::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant DOMText::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMText::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMText::hasAttributes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[353]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMText::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMText::insertBefore(const DOMNode &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child});
-}
-Variant DOMText::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMText::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMText::isSameNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMText::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMText::isEqualNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMText::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMText::isSupported(const Variant &feature, const Variant &version) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[359]);
-    }
-    return this_.call(_method_fn, {feature, version});
-}
-Variant DOMText::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant DOMText::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMText::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMText::removeChild(const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant DOMText::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant DOMText::replaceChild(const DOMNode &node, const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant DOMText::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMText::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-DOMNode DOMText::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return DOMNode(Object(this_.call(_method_fn, {options})));
-}
-Variant DOMText::compareDocumentPosition(const DOMNode &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant DOMText::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant DOMText::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMText::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
-Dom_Text::Dom_Text() {
-    this_ = newObject(LITERAL_STRING[489]);
-}
-Dom_Text Dom_Text::splitText(const Variant &offset) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[488]);
-    }
-    return Dom_Text(Object(this_.call(_method_fn, {offset})));
-}
-Variant Dom_Text::substringData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[445]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant Dom_Text::appendData(const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[444]);
-    }
-    return this_.call(_method_fn, {data});
-}
-Variant Dom_Text::insertData(const Variant &offset, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
-    }
-    return this_.call(_method_fn, {offset, data});
-}
-Variant Dom_Text::deleteData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[447]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant Dom_Text::replaceData(const Variant &offset, const Variant &count, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
-    }
-    return this_.call(_method_fn, {offset, count, data});
-}
-Variant Dom_Text::remove() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[450]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Text::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return this_.call(_method_fn, {options});
-}
-Variant Dom_Text::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Text::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Text::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant Dom_Text::isEqualNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_Text::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_Text::isSameNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_Text::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_Text::compareDocumentPosition(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_Text::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_Text::contains(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_Text::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_Text::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_Text::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant Dom_Text::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_Text::insertBefore(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_Text::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_Text::appendChild(const Dom_Node &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant Dom_Text::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant Dom_Text::replaceChild(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_Text::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_Text::removeChild(const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant Dom_Text::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant Dom_Text::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Text::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Text::C14N(const Variant &exclusive,
-                       const Variant &with_comments,
-                       const Variant &xpath,
-                       const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_Text::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_Text::C14NFile(const Variant &uri,
-                           const Variant &exclusive,
-                           const Variant &with_comments,
-                           const Variant &xpath,
-                           const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_Text::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_Text::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Text::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
-DOMComment::DOMComment(const Variant &data) {
-    this_ = newObject(LITERAL_STRING[490], {data});
-}
-Variant DOMComment::appendData(const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[444]);
-    }
-    return this_.call(_method_fn, {data});
-}
-Variant DOMComment::substringData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[445]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant DOMComment::insertData(const Variant &offset, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
-    }
-    return this_.call(_method_fn, {offset, data});
-}
-Variant DOMComment::deleteData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[447]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant DOMComment::replaceData(const Variant &offset, const Variant &count, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
-    }
-    return this_.call(_method_fn, {offset, count, data});
-}
-Variant DOMComment::remove() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[450]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMComment::appendChild(const DOMNode &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant DOMComment::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant DOMComment::C14N(const Variant &exclusive,
-                         const Variant &with_comments,
-                         const Variant &xpath,
-                         const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMComment::C14NFile(const Variant &uri,
-                             const Variant &exclusive,
-                             const Variant &with_comments,
-                             const Variant &xpath,
-                             const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMComment::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant DOMComment::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMComment::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMComment::hasAttributes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[353]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMComment::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMComment::insertBefore(const DOMNode &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child});
-}
-Variant DOMComment::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMComment::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMComment::isSameNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMComment::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMComment::isEqualNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMComment::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMComment::isSupported(const Variant &feature, const Variant &version) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[359]);
-    }
-    return this_.call(_method_fn, {feature, version});
-}
-Variant DOMComment::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant DOMComment::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMComment::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMComment::removeChild(const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant DOMComment::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant DOMComment::replaceChild(const DOMNode &node, const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant DOMComment::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMComment::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-DOMNode DOMComment::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return DOMNode(Object(this_.call(_method_fn, {options})));
-}
-Variant DOMComment::compareDocumentPosition(const DOMNode &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant DOMComment::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant DOMComment::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMComment::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
 Dom_Comment::Dom_Comment() {
     this_ = newObject(LITERAL_STRING[491]);
-}
-Variant Dom_Comment::substringData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[445]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant Dom_Comment::appendData(const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[444]);
-    }
-    return this_.call(_method_fn, {data});
-}
-Variant Dom_Comment::insertData(const Variant &offset, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
-    }
-    return this_.call(_method_fn, {offset, data});
-}
-Variant Dom_Comment::deleteData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[447]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant Dom_Comment::replaceData(const Variant &offset, const Variant &count, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
-    }
-    return this_.call(_method_fn, {offset, count, data});
-}
-Variant Dom_Comment::remove() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[450]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Comment::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return this_.call(_method_fn, {options});
-}
-Variant Dom_Comment::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Comment::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Comment::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant Dom_Comment::isEqualNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_Comment::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_Comment::isSameNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_Comment::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_Comment::compareDocumentPosition(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_Comment::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_Comment::contains(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_Comment::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_Comment::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_Comment::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant Dom_Comment::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_Comment::insertBefore(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_Comment::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_Comment::appendChild(const Dom_Node &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant Dom_Comment::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant Dom_Comment::replaceChild(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_Comment::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_Comment::removeChild(const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant Dom_Comment::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant Dom_Comment::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Comment::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Comment::C14N(const Variant &exclusive,
-                          const Variant &with_comments,
-                          const Variant &xpath,
-                          const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_Comment::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_Comment::C14NFile(const Variant &uri,
-                              const Variant &exclusive,
-                              const Variant &with_comments,
-                              const Variant &xpath,
-                              const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_Comment::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_Comment::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Comment::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
 }
 DOMCdataSection::DOMCdataSection(const Variant &data) {
     this_ = newObject(LITERAL_STRING[492], {data});
 }
-Variant DOMCdataSection::isWhitespaceInElementContent() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[486]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCdataSection::isElementContentWhitespace() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[487]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCdataSection::splitText(const Variant &offset) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[488]);
-    }
-    return this_.call(_method_fn, {offset});
-}
-Variant DOMCdataSection::appendData(const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[444]);
-    }
-    return this_.call(_method_fn, {data});
-}
-Variant DOMCdataSection::substringData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[445]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant DOMCdataSection::insertData(const Variant &offset, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
-    }
-    return this_.call(_method_fn, {offset, data});
-}
-Variant DOMCdataSection::deleteData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[447]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant DOMCdataSection::replaceData(const Variant &offset, const Variant &count, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
-    }
-    return this_.call(_method_fn, {offset, count, data});
-}
-Variant DOMCdataSection::remove() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[450]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCdataSection::appendChild(const DOMNode &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant DOMCdataSection::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant DOMCdataSection::C14N(const Variant &exclusive,
-                              const Variant &with_comments,
-                              const Variant &xpath,
-                              const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMCdataSection::C14NFile(const Variant &uri,
-                                  const Variant &exclusive,
-                                  const Variant &with_comments,
-                                  const Variant &xpath,
-                                  const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMCdataSection::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant DOMCdataSection::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCdataSection::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCdataSection::hasAttributes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[353]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCdataSection::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCdataSection::insertBefore(const DOMNode &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child});
-}
-Variant DOMCdataSection::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMCdataSection::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMCdataSection::isSameNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMCdataSection::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMCdataSection::isEqualNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMCdataSection::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMCdataSection::isSupported(const Variant &feature, const Variant &version) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[359]);
-    }
-    return this_.call(_method_fn, {feature, version});
-}
-Variant DOMCdataSection::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant DOMCdataSection::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMCdataSection::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCdataSection::removeChild(const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant DOMCdataSection::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant DOMCdataSection::replaceChild(const DOMNode &node, const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant DOMCdataSection::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMCdataSection::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-DOMNode DOMCdataSection::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return DOMNode(Object(this_.call(_method_fn, {options})));
-}
-Variant DOMCdataSection::compareDocumentPosition(const DOMNode &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant DOMCdataSection::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant DOMCdataSection::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMCdataSection::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
 Dom_CDATASection::Dom_CDATASection() {
     this_ = newObject(LITERAL_STRING[493]);
 }
-Dom_Text Dom_CDATASection::splitText(const Variant &offset) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[488]);
-    }
-    return Dom_Text(Object(this_.call(_method_fn, {offset})));
-}
-Variant Dom_CDATASection::substringData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[445]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant Dom_CDATASection::appendData(const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[444]);
-    }
-    return this_.call(_method_fn, {data});
-}
-Variant Dom_CDATASection::insertData(const Variant &offset, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
-    }
-    return this_.call(_method_fn, {offset, data});
-}
-Variant Dom_CDATASection::deleteData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[447]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant Dom_CDATASection::replaceData(const Variant &offset, const Variant &count, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
-    }
-    return this_.call(_method_fn, {offset, count, data});
-}
-Variant Dom_CDATASection::remove() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[450]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_CDATASection::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return this_.call(_method_fn, {options});
-}
-Variant Dom_CDATASection::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_CDATASection::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_CDATASection::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant Dom_CDATASection::isEqualNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_CDATASection::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_CDATASection::isSameNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_CDATASection::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_CDATASection::compareDocumentPosition(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_CDATASection::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_CDATASection::contains(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_CDATASection::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_CDATASection::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_CDATASection::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant Dom_CDATASection::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_CDATASection::insertBefore(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_CDATASection::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_CDATASection::appendChild(const Dom_Node &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant Dom_CDATASection::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant Dom_CDATASection::replaceChild(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_CDATASection::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_CDATASection::removeChild(const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant Dom_CDATASection::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant Dom_CDATASection::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_CDATASection::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_CDATASection::C14N(const Variant &exclusive,
-                               const Variant &with_comments,
-                               const Variant &xpath,
-                               const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_CDATASection::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_CDATASection::C14NFile(const Variant &uri,
-                                   const Variant &exclusive,
-                                   const Variant &with_comments,
-                                   const Variant &xpath,
-                                   const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_CDATASection::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_CDATASection::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_CDATASection::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
 DOMDocumentType::DOMDocumentType() {
     this_ = newObject(LITERAL_STRING[494]);
-}
-Variant DOMDocumentType::appendChild(const DOMNode &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant DOMDocumentType::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant DOMDocumentType::C14N(const Variant &exclusive,
-                              const Variant &with_comments,
-                              const Variant &xpath,
-                              const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMDocumentType::C14NFile(const Variant &uri,
-                                  const Variant &exclusive,
-                                  const Variant &with_comments,
-                                  const Variant &xpath,
-                                  const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMDocumentType::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant DOMDocumentType::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMDocumentType::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMDocumentType::hasAttributes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[353]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMDocumentType::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMDocumentType::insertBefore(const DOMNode &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child});
-}
-Variant DOMDocumentType::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMDocumentType::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMDocumentType::isSameNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMDocumentType::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMDocumentType::isEqualNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMDocumentType::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMDocumentType::isSupported(const Variant &feature, const Variant &version) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[359]);
-    }
-    return this_.call(_method_fn, {feature, version});
-}
-Variant DOMDocumentType::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant DOMDocumentType::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMDocumentType::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMDocumentType::removeChild(const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant DOMDocumentType::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant DOMDocumentType::replaceChild(const DOMNode &node, const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant DOMDocumentType::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMDocumentType::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-DOMNode DOMDocumentType::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return DOMNode(Object(this_.call(_method_fn, {options})));
-}
-Variant DOMDocumentType::compareDocumentPosition(const DOMNode &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant DOMDocumentType::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant DOMDocumentType::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMDocumentType::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
 }
 DOMImplementation::DOMImplementation() {
     this_ = newObject(LITERAL_STRING[340]);
@@ -4688,14 +1236,14 @@ Variant DOMImplementation::createDocumentType(const Variant &qualified_name,
     }
     return this_.call(_method_fn, {qualified_name, public_id, system_id});
 }
-Variant DOMImplementation::createDocument(const Variant &_namespace,
+Variant DOMImplementation::createDocument(const Variant &namespace_,
                                           const Variant &qualified_name,
                                           const Variant &doctype) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[343]);
     }
-    return this_.call(_method_fn, {_namespace, qualified_name, doctype});
+    return this_.call(_method_fn, {namespace_, qualified_name, doctype});
 }
 Dom_DocumentType::Dom_DocumentType() {
     this_ = newObject(LITERAL_STRING[495]);
@@ -4707,1105 +1255,17 @@ Variant Dom_DocumentType::remove() {
     }
     return this_.call(_method_fn, {});
 }
-Variant Dom_DocumentType::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return this_.call(_method_fn, {options});
-}
-Variant Dom_DocumentType::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_DocumentType::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_DocumentType::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant Dom_DocumentType::isEqualNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_DocumentType::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_DocumentType::isSameNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_DocumentType::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_DocumentType::compareDocumentPosition(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_DocumentType::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_DocumentType::contains(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_DocumentType::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_DocumentType::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_DocumentType::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant Dom_DocumentType::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_DocumentType::insertBefore(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_DocumentType::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_DocumentType::appendChild(const Dom_Node &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant Dom_DocumentType::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant Dom_DocumentType::replaceChild(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_DocumentType::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_DocumentType::removeChild(const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant Dom_DocumentType::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant Dom_DocumentType::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_DocumentType::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_DocumentType::C14N(const Variant &exclusive,
-                               const Variant &with_comments,
-                               const Variant &xpath,
-                               const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_DocumentType::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_DocumentType::C14NFile(const Variant &uri,
-                                   const Variant &exclusive,
-                                   const Variant &with_comments,
-                                   const Variant &xpath,
-                                   const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_DocumentType::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_DocumentType::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_DocumentType::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
 DOMNotation::DOMNotation() {
     this_ = newObject(LITERAL_STRING[496]);
-}
-Variant DOMNotation::appendChild(const DOMNode &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant DOMNotation::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant DOMNotation::C14N(const Variant &exclusive,
-                          const Variant &with_comments,
-                          const Variant &xpath,
-                          const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMNotation::C14NFile(const Variant &uri,
-                              const Variant &exclusive,
-                              const Variant &with_comments,
-                              const Variant &xpath,
-                              const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMNotation::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant DOMNotation::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMNotation::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMNotation::hasAttributes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[353]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMNotation::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMNotation::insertBefore(const DOMNode &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child});
-}
-Variant DOMNotation::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMNotation::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMNotation::isSameNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMNotation::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMNotation::isEqualNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMNotation::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMNotation::isSupported(const Variant &feature, const Variant &version) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[359]);
-    }
-    return this_.call(_method_fn, {feature, version});
-}
-Variant DOMNotation::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant DOMNotation::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMNotation::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMNotation::removeChild(const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant DOMNotation::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant DOMNotation::replaceChild(const DOMNode &node, const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant DOMNotation::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMNotation::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-DOMNode DOMNotation::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return DOMNode(Object(this_.call(_method_fn, {options})));
-}
-Variant DOMNotation::compareDocumentPosition(const DOMNode &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant DOMNotation::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant DOMNotation::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMNotation::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
 }
 Dom_Notation::Dom_Notation() {
     this_ = newObject(LITERAL_STRING[497]);
 }
-Variant Dom_Notation::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return this_.call(_method_fn, {options});
-}
-Variant Dom_Notation::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Notation::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Notation::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant Dom_Notation::isEqualNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_Notation::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_Notation::isSameNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_Notation::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_Notation::compareDocumentPosition(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_Notation::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_Notation::contains(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_Notation::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_Notation::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_Notation::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant Dom_Notation::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_Notation::insertBefore(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_Notation::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_Notation::appendChild(const Dom_Node &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant Dom_Notation::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant Dom_Notation::replaceChild(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_Notation::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_Notation::removeChild(const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant Dom_Notation::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant Dom_Notation::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Notation::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Notation::C14N(const Variant &exclusive,
-                           const Variant &with_comments,
-                           const Variant &xpath,
-                           const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_Notation::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_Notation::C14NFile(const Variant &uri,
-                               const Variant &exclusive,
-                               const Variant &with_comments,
-                               const Variant &xpath,
-                               const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_Notation::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_Notation::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Notation::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
 DOMEntity::DOMEntity() {
     this_ = newObject(LITERAL_STRING[498]);
 }
-Variant DOMEntity::appendChild(const DOMNode &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant DOMEntity::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant DOMEntity::C14N(const Variant &exclusive,
-                        const Variant &with_comments,
-                        const Variant &xpath,
-                        const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMEntity::C14NFile(const Variant &uri,
-                            const Variant &exclusive,
-                            const Variant &with_comments,
-                            const Variant &xpath,
-                            const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMEntity::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant DOMEntity::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMEntity::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMEntity::hasAttributes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[353]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMEntity::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMEntity::insertBefore(const DOMNode &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child});
-}
-Variant DOMEntity::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMEntity::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMEntity::isSameNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMEntity::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMEntity::isEqualNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMEntity::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMEntity::isSupported(const Variant &feature, const Variant &version) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[359]);
-    }
-    return this_.call(_method_fn, {feature, version});
-}
-Variant DOMEntity::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant DOMEntity::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMEntity::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMEntity::removeChild(const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant DOMEntity::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant DOMEntity::replaceChild(const DOMNode &node, const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant DOMEntity::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMEntity::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-DOMNode DOMEntity::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return DOMNode(Object(this_.call(_method_fn, {options})));
-}
-Variant DOMEntity::compareDocumentPosition(const DOMNode &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant DOMEntity::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant DOMEntity::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMEntity::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
 Dom_Entity::Dom_Entity() {
     this_ = newObject(LITERAL_STRING[499]);
-}
-Variant Dom_Entity::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return this_.call(_method_fn, {options});
-}
-Variant Dom_Entity::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Entity::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Entity::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant Dom_Entity::isEqualNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_Entity::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_Entity::isSameNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_Entity::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_Entity::compareDocumentPosition(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_Entity::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_Entity::contains(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_Entity::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_Entity::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_Entity::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant Dom_Entity::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_Entity::insertBefore(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_Entity::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_Entity::appendChild(const Dom_Node &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant Dom_Entity::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant Dom_Entity::replaceChild(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_Entity::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_Entity::removeChild(const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant Dom_Entity::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant Dom_Entity::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Entity::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Entity::C14N(const Variant &exclusive,
-                         const Variant &with_comments,
-                         const Variant &xpath,
-                         const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_Entity::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_Entity::C14NFile(const Variant &uri,
-                             const Variant &exclusive,
-                             const Variant &with_comments,
-                             const Variant &xpath,
-                             const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_Entity::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_Entity::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Entity::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
 }
 Dom_DtdNamedNodeMap::Dom_DtdNamedNodeMap() {
     this_ = newObject(LITERAL_STRING[440]);
@@ -5824,12 +1284,12 @@ Variant Dom_DtdNamedNodeMap::getNamedItem(const Variant &qualified_name) {
     }
     return this_.call(_method_fn, {qualified_name});
 }
-Variant Dom_DtdNamedNodeMap::getNamedItemNS(const Variant &_namespace, const Variant &local_name) {
+Variant Dom_DtdNamedNodeMap::getNamedItemNS(const Variant &namespace_, const Variant &local_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[438]);
     }
-    return this_.call(_method_fn, {_namespace, local_name});
+    return this_.call(_method_fn, {namespace_, local_name});
 }
 Variant Dom_DtdNamedNodeMap::count() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -5848,926 +1308,14 @@ Variant Dom_DtdNamedNodeMap::getIterator() {
 DOMEntityReference::DOMEntityReference(const Variant &name) {
     this_ = newObject(LITERAL_STRING[500], {name});
 }
-Variant DOMEntityReference::appendChild(const DOMNode &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant DOMEntityReference::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant DOMEntityReference::C14N(const Variant &exclusive,
-                                 const Variant &with_comments,
-                                 const Variant &xpath,
-                                 const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMEntityReference::C14NFile(const Variant &uri,
-                                     const Variant &exclusive,
-                                     const Variant &with_comments,
-                                     const Variant &xpath,
-                                     const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMEntityReference::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant DOMEntityReference::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMEntityReference::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMEntityReference::hasAttributes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[353]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMEntityReference::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMEntityReference::insertBefore(const DOMNode &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child});
-}
-Variant DOMEntityReference::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMEntityReference::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMEntityReference::isSameNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMEntityReference::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMEntityReference::isEqualNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMEntityReference::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMEntityReference::isSupported(const Variant &feature, const Variant &version) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[359]);
-    }
-    return this_.call(_method_fn, {feature, version});
-}
-Variant DOMEntityReference::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant DOMEntityReference::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMEntityReference::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMEntityReference::removeChild(const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant DOMEntityReference::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant DOMEntityReference::replaceChild(const DOMNode &node, const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant DOMEntityReference::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMEntityReference::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-DOMNode DOMEntityReference::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return DOMNode(Object(this_.call(_method_fn, {options})));
-}
-Variant DOMEntityReference::compareDocumentPosition(const DOMNode &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant DOMEntityReference::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant DOMEntityReference::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMEntityReference::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
 Dom_EntityReference::Dom_EntityReference() {
     this_ = newObject(LITERAL_STRING[501]);
-}
-Variant Dom_EntityReference::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return this_.call(_method_fn, {options});
-}
-Variant Dom_EntityReference::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_EntityReference::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_EntityReference::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant Dom_EntityReference::isEqualNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_EntityReference::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_EntityReference::isSameNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_EntityReference::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_EntityReference::compareDocumentPosition(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_EntityReference::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_EntityReference::contains(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_EntityReference::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_EntityReference::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_EntityReference::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant Dom_EntityReference::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_EntityReference::insertBefore(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_EntityReference::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_EntityReference::appendChild(const Dom_Node &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant Dom_EntityReference::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant Dom_EntityReference::replaceChild(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_EntityReference::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_EntityReference::removeChild(const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant Dom_EntityReference::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant Dom_EntityReference::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_EntityReference::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_EntityReference::C14N(const Variant &exclusive,
-                                  const Variant &with_comments,
-                                  const Variant &xpath,
-                                  const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_EntityReference::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_EntityReference::C14NFile(const Variant &uri,
-                                      const Variant &exclusive,
-                                      const Variant &with_comments,
-                                      const Variant &xpath,
-                                      const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_EntityReference::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_EntityReference::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_EntityReference::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
 }
 DOMProcessingInstruction::DOMProcessingInstruction(const Variant &name, const Variant &value) {
     this_ = newObject(LITERAL_STRING[502], {name, value});
 }
-Variant DOMProcessingInstruction::appendChild(const DOMNode &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant DOMProcessingInstruction::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant DOMProcessingInstruction::C14N(const Variant &exclusive,
-                                       const Variant &with_comments,
-                                       const Variant &xpath,
-                                       const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMProcessingInstruction::C14NFile(const Variant &uri,
-                                           const Variant &exclusive,
-                                           const Variant &with_comments,
-                                           const Variant &xpath,
-                                           const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-}
-Variant DOMProcessingInstruction::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant DOMProcessingInstruction::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMProcessingInstruction::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMProcessingInstruction::hasAttributes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[353]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMProcessingInstruction::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMProcessingInstruction::insertBefore(const DOMNode &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child});
-}
-Variant DOMProcessingInstruction::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMProcessingInstruction::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMProcessingInstruction::isSameNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMProcessingInstruction::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMProcessingInstruction::isEqualNode(const DOMNode &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant DOMProcessingInstruction::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant DOMProcessingInstruction::isSupported(const Variant &feature, const Variant &version) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[359]);
-    }
-    return this_.call(_method_fn, {feature, version});
-}
-Variant DOMProcessingInstruction::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant DOMProcessingInstruction::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant DOMProcessingInstruction::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMProcessingInstruction::removeChild(const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant DOMProcessingInstruction::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant DOMProcessingInstruction::replaceChild(const DOMNode &node, const DOMNode &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant DOMProcessingInstruction::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant DOMProcessingInstruction::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-DOMNode DOMProcessingInstruction::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return DOMNode(Object(this_.call(_method_fn, {options})));
-}
-Variant DOMProcessingInstruction::compareDocumentPosition(const DOMNode &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant DOMProcessingInstruction::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant DOMProcessingInstruction::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant DOMProcessingInstruction::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
 Dom_ProcessingInstruction::Dom_ProcessingInstruction() {
     this_ = newObject(LITERAL_STRING[503]);
-}
-Variant Dom_ProcessingInstruction::substringData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[445]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant Dom_ProcessingInstruction::appendData(const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[444]);
-    }
-    return this_.call(_method_fn, {data});
-}
-Variant Dom_ProcessingInstruction::insertData(const Variant &offset, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
-    }
-    return this_.call(_method_fn, {offset, data});
-}
-Variant Dom_ProcessingInstruction::deleteData(const Variant &offset, const Variant &count) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[447]);
-    }
-    return this_.call(_method_fn, {offset, count});
-}
-Variant Dom_ProcessingInstruction::replaceData(const Variant &offset, const Variant &count, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
-    }
-    return this_.call(_method_fn, {offset, count, data});
-}
-Variant Dom_ProcessingInstruction::remove() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[450]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_ProcessingInstruction::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return this_.call(_method_fn, {options});
-}
-Variant Dom_ProcessingInstruction::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_ProcessingInstruction::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_ProcessingInstruction::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant Dom_ProcessingInstruction::isEqualNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_ProcessingInstruction::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_ProcessingInstruction::isSameNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_ProcessingInstruction::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_ProcessingInstruction::compareDocumentPosition(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_ProcessingInstruction::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_ProcessingInstruction::contains(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_ProcessingInstruction::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_ProcessingInstruction::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_ProcessingInstruction::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant Dom_ProcessingInstruction::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_ProcessingInstruction::insertBefore(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_ProcessingInstruction::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_ProcessingInstruction::appendChild(const Dom_Node &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant Dom_ProcessingInstruction::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant Dom_ProcessingInstruction::replaceChild(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_ProcessingInstruction::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_ProcessingInstruction::removeChild(const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant Dom_ProcessingInstruction::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant Dom_ProcessingInstruction::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_ProcessingInstruction::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_ProcessingInstruction::C14N(const Variant &exclusive,
-                                        const Variant &with_comments,
-                                        const Variant &xpath,
-                                        const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_ProcessingInstruction::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_ProcessingInstruction::C14NFile(const Variant &uri,
-                                            const Variant &exclusive,
-                                            const Variant &with_comments,
-                                            const Variant &xpath,
-                                            const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_ProcessingInstruction::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_ProcessingInstruction::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_ProcessingInstruction::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
 }
 DOMXPath::DOMXPath(const DOMDocument &document, const Variant &register_node_n_s) {
     this_ = newObject(LITERAL_STRING[504], {document.getObject(), register_node_n_s});
@@ -6786,12 +1334,12 @@ Variant DOMXPath::query(const Variant &expression, const Variant &context_node, 
     }
     return this_.call(_method_fn, {expression, context_node, register_node_n_s});
 }
-Variant DOMXPath::registerNamespace(const Variant &prefix, const Variant &_namespace) {
+Variant DOMXPath::registerNamespace(const Variant &prefix, const Variant &namespace_) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[507]);
     }
-    return this_.call(_method_fn, {prefix, _namespace});
+    return this_.call(_method_fn, {prefix, namespace_});
 }
 Variant DOMXPath::registerPhpFunctions(const Variant &restrict) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -6833,12 +1381,12 @@ Dom_NodeList Dom_XPath::query(const Variant &expression,
     }
     return Dom_NodeList(Object(this_.call(_method_fn, {expression, context_node, register_node_n_s})));
 }
-Variant Dom_XPath::registerNamespace(const Variant &prefix, const Variant &_namespace) {
+Variant Dom_XPath::registerNamespace(const Variant &prefix, const Variant &namespace_) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[507]);
     }
-    return this_.call(_method_fn, {prefix, _namespace});
+    return this_.call(_method_fn, {prefix, namespace_});
 }
 Variant Dom_XPath::registerPhpFunctions(const Variant &restrict) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -6920,12 +1468,12 @@ Variant Dom_DocumentFragment::appendXml(const Variant &data) {
     }
     return this_.call(_method_fn, {data});
 }
-Variant Dom_DocumentFragment::querySelector(const Variant &selectors) {
+Dom_Element Dom_DocumentFragment::querySelector(const Variant &selectors) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[378]);
     }
-    return this_.call(_method_fn, {selectors});
+    return Dom_Element(Object(this_.call(_method_fn, {selectors})));
 }
 Dom_NodeList Dom_DocumentFragment::querySelectorAll(const Variant &selectors) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -6934,240 +1482,22 @@ Dom_NodeList Dom_DocumentFragment::querySelectorAll(const Variant &selectors) {
     }
     return Dom_NodeList(Object(this_.call(_method_fn, {selectors})));
 }
-Variant Dom_DocumentFragment::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return this_.call(_method_fn, {options});
-}
-Variant Dom_DocumentFragment::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_DocumentFragment::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_DocumentFragment::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant Dom_DocumentFragment::isEqualNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_DocumentFragment::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_DocumentFragment::isSameNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_DocumentFragment::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_DocumentFragment::compareDocumentPosition(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_DocumentFragment::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_DocumentFragment::contains(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_DocumentFragment::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_DocumentFragment::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_DocumentFragment::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant Dom_DocumentFragment::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_DocumentFragment::insertBefore(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_DocumentFragment::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_DocumentFragment::appendChild(const Dom_Node &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant Dom_DocumentFragment::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant Dom_DocumentFragment::replaceChild(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_DocumentFragment::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_DocumentFragment::removeChild(const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant Dom_DocumentFragment::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant Dom_DocumentFragment::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_DocumentFragment::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_DocumentFragment::C14N(const Variant &exclusive,
-                                   const Variant &with_comments,
-                                   const Variant &xpath,
-                                   const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_DocumentFragment::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_DocumentFragment::C14NFile(const Variant &uri,
-                                       const Variant &exclusive,
-                                       const Variant &with_comments,
-                                       const Variant &xpath,
-                                       const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_DocumentFragment::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_DocumentFragment::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_DocumentFragment::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
 Dom_HTMLCollection::Dom_HTMLCollection() {
     this_ = newObject(LITERAL_STRING[441]);
 }
-Variant Dom_HTMLCollection::item(const Variant &index) {
+Dom_Element Dom_HTMLCollection::item(const Variant &index) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[434]);
     }
-    return this_.call(_method_fn, {index});
+    return Dom_Element(Object(this_.call(_method_fn, {index})));
 }
-Variant Dom_HTMLCollection::namedItem(const Variant &key) {
+Dom_Element Dom_HTMLCollection::namedItem(const Variant &key) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[442]);
     }
-    return this_.call(_method_fn, {key});
+    return Dom_Element(Object(this_.call(_method_fn, {key})));
 }
 Variant Dom_HTMLCollection::count() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -7207,12 +1537,12 @@ Variant Dom_Element::getAttribute(const Variant &qualified_name) {
     }
     return this_.call(_method_fn, {qualified_name});
 }
-Variant Dom_Element::getAttributeNS(const Variant &_namespace, const Variant &local_name) {
+Variant Dom_Element::getAttributeNS(const Variant &namespace_, const Variant &local_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[461]);
     }
-    return this_.call(_method_fn, {_namespace, local_name});
+    return this_.call(_method_fn, {namespace_, local_name});
 }
 Variant Dom_Element::setAttribute(const Variant &qualified_name, const Variant &value) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -7221,12 +1551,12 @@ Variant Dom_Element::setAttribute(const Variant &qualified_name, const Variant &
     }
     return this_.call(_method_fn, {qualified_name, value});
 }
-Variant Dom_Element::setAttributeNS(const Variant &_namespace, const Variant &qualified_name, const Variant &value) {
+Variant Dom_Element::setAttributeNS(const Variant &namespace_, const Variant &qualified_name, const Variant &value) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[470]);
     }
-    return this_.call(_method_fn, {_namespace, qualified_name, value});
+    return this_.call(_method_fn, {namespace_, qualified_name, value});
 }
 Variant Dom_Element::removeAttribute(const Variant &qualified_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -7235,12 +1565,12 @@ Variant Dom_Element::removeAttribute(const Variant &qualified_name) {
     }
     return this_.call(_method_fn, {qualified_name});
 }
-Variant Dom_Element::removeAttributeNS(const Variant &_namespace, const Variant &local_name) {
+Variant Dom_Element::removeAttributeNS(const Variant &namespace_, const Variant &local_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[467]);
     }
-    return this_.call(_method_fn, {_namespace, local_name});
+    return this_.call(_method_fn, {namespace_, local_name});
 }
 Variant Dom_Element::toggleAttribute(const Variant &qualified_name, const Variant &force) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -7256,12 +1586,12 @@ Variant Dom_Element::hasAttribute(const Variant &qualified_name) {
     }
     return this_.call(_method_fn, {qualified_name});
 }
-Variant Dom_Element::hasAttributeNS(const Variant &_namespace, const Variant &local_name) {
+Variant Dom_Element::hasAttributeNS(const Variant &namespace_, const Variant &local_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[465]);
     }
-    return this_.call(_method_fn, {_namespace, local_name});
+    return this_.call(_method_fn, {namespace_, local_name});
 }
 Dom_Attr Dom_Element::getAttributeNode(const Variant &qualified_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -7270,12 +1600,12 @@ Dom_Attr Dom_Element::getAttributeNode(const Variant &qualified_name) {
     }
     return Dom_Attr(Object(this_.call(_method_fn, {qualified_name})));
 }
-Dom_Attr Dom_Element::getAttributeNodeNS(const Variant &_namespace, const Variant &local_name) {
+Dom_Attr Dom_Element::getAttributeNodeNS(const Variant &namespace_, const Variant &local_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[463]);
     }
-    return Dom_Attr(Object(this_.call(_method_fn, {_namespace, local_name})));
+    return Dom_Attr(Object(this_.call(_method_fn, {namespace_, local_name})));
 }
 Dom_Attr Dom_Element::setAttributeNode(const Dom_Attr &attr) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -7326,12 +1656,12 @@ Dom_HTMLCollection Dom_Element::getElementsByTagName(const Variant &qualified_na
     }
     return Dom_HTMLCollection(Object(this_.call(_method_fn, {qualified_name})));
 }
-Dom_HTMLCollection Dom_Element::getElementsByTagNameNS(const Variant &_namespace, const Variant &local_name) {
+Dom_HTMLCollection Dom_Element::getElementsByTagNameNS(const Variant &namespace_, const Variant &local_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[393]);
     }
-    return Dom_HTMLCollection(Object(this_.call(_method_fn, {_namespace, local_name})));
+    return Dom_HTMLCollection(Object(this_.call(_method_fn, {namespace_, local_name})));
 }
 Dom_Element Dom_Element::insertAdjacentElement(const Dom_AdjacentPosition &where, const Dom_Element &element) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -7368,12 +1698,12 @@ Variant Dom_Element::setIdAttribute(const Variant &qualified_name, const Variant
     }
     return this_.call(_method_fn, {qualified_name, is_id});
 }
-Variant Dom_Element::setIdAttributeNS(const Variant &_namespace, const Variant &qualified_name, const Variant &is_id) {
+Variant Dom_Element::setIdAttributeNS(const Variant &namespace_, const Variant &qualified_name, const Variant &is_id) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[474]);
     }
-    return this_.call(_method_fn, {_namespace, qualified_name, is_id});
+    return this_.call(_method_fn, {namespace_, qualified_name, is_id});
 }
 Variant Dom_Element::setIdAttributeNode(const Dom_Attr &attr, const Variant &is_id) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -7445,224 +1775,6 @@ Variant Dom_Element::rename(const Variant &namespace_u_r_i, const Variant &quali
     }
     return this_.call(_method_fn, {namespace_u_r_i, qualified_name});
 }
-Variant Dom_Element::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return this_.call(_method_fn, {options});
-}
-Variant Dom_Element::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Element::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Element::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant Dom_Element::isEqualNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_Element::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_Element::isSameNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_Element::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_Element::compareDocumentPosition(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_Element::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_Element::contains(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_Element::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_Element::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_Element::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant Dom_Element::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_Element::insertBefore(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_Element::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_Element::appendChild(const Dom_Node &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant Dom_Element::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant Dom_Element::replaceChild(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_Element::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_Element::removeChild(const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant Dom_Element::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant Dom_Element::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Element::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Element::C14N(const Variant &exclusive,
-                          const Variant &with_comments,
-                          const Variant &xpath,
-                          const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_Element::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_Element::C14NFile(const Variant &uri,
-                              const Variant &exclusive,
-                              const Variant &with_comments,
-                              const Variant &xpath,
-                              const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_Element::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_Element::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_Element::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
-}
 Dom_HTMLDocument::Dom_HTMLDocument() {
     this_ = newObject(LITERAL_STRING[412]);
 }
@@ -7696,22 +1808,14 @@ Variant Dom_HTMLDocument::saveXml(const Variant &node, const Variant &options) {
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[420]);
     }
-    auto _rv = this_.call(_method_fn, {node, options});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_HTMLDocument::saveXml() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
+    return this_.call(_method_fn, {node, options});
 }
 Variant Dom_HTMLDocument::saveXmlFile(const Variant &filename, const Variant &options) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[421]);
     }
-    auto _rv = this_.call(_method_fn, {filename, options});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_HTMLDocument::saveXmlFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
+    return this_.call(_method_fn, {filename, options});
 }
 Variant Dom_HTMLDocument::saveHtml(const Variant &node) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -7725,11 +1829,7 @@ Variant Dom_HTMLDocument::saveHtmlFile(const Variant &filename) {
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[423]);
     }
-    auto _rv = this_.call(_method_fn, {filename});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_HTMLDocument::saveHtmlFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
+    return this_.call(_method_fn, {filename});
 }
 Variant Dom_HTMLDocument::debugGetTemplateCount() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -7745,12 +1845,12 @@ Dom_HTMLCollection Dom_HTMLDocument::getElementsByTagName(const Variant &qualifi
     }
     return Dom_HTMLCollection(Object(this_.call(_method_fn, {qualified_name})));
 }
-Dom_HTMLCollection Dom_HTMLDocument::getElementsByTagNameNS(const Variant &_namespace, const Variant &local_name) {
+Dom_HTMLCollection Dom_HTMLDocument::getElementsByTagNameNS(const Variant &namespace_, const Variant &local_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[393]);
     }
-    return Dom_HTMLCollection(Object(this_.call(_method_fn, {_namespace, local_name})));
+    return Dom_HTMLCollection(Object(this_.call(_method_fn, {namespace_, local_name})));
 }
 Dom_Element Dom_HTMLDocument::createElement(const Variant &local_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -7759,12 +1859,12 @@ Dom_Element Dom_HTMLDocument::createElement(const Variant &local_name) {
     }
     return Dom_Element(Object(this_.call(_method_fn, {local_name})));
 }
-Dom_Element Dom_HTMLDocument::createElementNS(const Variant &_namespace, const Variant &qualified_name) {
+Dom_Element Dom_HTMLDocument::createElementNS(const Variant &namespace_, const Variant &qualified_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[387]);
     }
-    return Dom_Element(Object(this_.call(_method_fn, {_namespace, qualified_name})));
+    return Dom_Element(Object(this_.call(_method_fn, {namespace_, qualified_name})));
 }
 Dom_DocumentFragment Dom_HTMLDocument::createDocumentFragment() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -7836,12 +1936,12 @@ Dom_Attr Dom_HTMLDocument::createAttribute(const Variant &local_name) {
     }
     return Dom_Attr(Object(this_.call(_method_fn, {local_name})));
 }
-Dom_Attr Dom_HTMLDocument::createAttributeNS(const Variant &_namespace, const Variant &qualified_name) {
+Dom_Attr Dom_HTMLDocument::createAttributeNS(const Variant &namespace_, const Variant &qualified_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[382]);
     }
-    return Dom_Attr(Object(this_.call(_method_fn, {_namespace, qualified_name})));
+    return Dom_Attr(Object(this_.call(_method_fn, {namespace_, qualified_name})));
 }
 Dom_Element Dom_HTMLDocument::getElementById(const Variant &element_id) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -7997,12 +2097,12 @@ Variant Dom_HTMLDocument::contains(const Variant &other) {
     }
     return this_.call(_method_fn, {other});
 }
-Variant Dom_HTMLDocument::lookupPrefix(const Variant &_namespace) {
+Variant Dom_HTMLDocument::lookupPrefix(const Variant &namespace_) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
     }
-    return this_.call(_method_fn, {_namespace});
+    return this_.call(_method_fn, {namespace_});
 }
 Variant Dom_HTMLDocument::lookupNamespaceURI(const Variant &prefix) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -8011,12 +2111,12 @@ Variant Dom_HTMLDocument::lookupNamespaceURI(const Variant &prefix) {
     }
     return this_.call(_method_fn, {prefix});
 }
-Variant Dom_HTMLDocument::isDefaultNamespace(const Variant &_namespace) {
+Variant Dom_HTMLDocument::isDefaultNamespace(const Variant &namespace_) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
     }
-    return this_.call(_method_fn, {_namespace});
+    return this_.call(_method_fn, {namespace_});
 }
 Variant Dom_HTMLDocument::insertBefore(const Dom_Node &node, const Dom_Node &child) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -8096,11 +2196,7 @@ Variant Dom_HTMLDocument::C14N(const Variant &exclusive,
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
     }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_HTMLDocument::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
+    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
 }
 Variant Dom_HTMLDocument::C14NFile(const Variant &uri,
                                    const Variant &exclusive,
@@ -8111,11 +2207,7 @@ Variant Dom_HTMLDocument::C14NFile(const Variant &uri,
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
     }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_HTMLDocument::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
+    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
 }
 Variant Dom_HTMLDocument::__sleep() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -8185,22 +2277,14 @@ Variant Dom_XMLDocument::saveXml(const Variant &node, const Variant &options) {
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[420]);
     }
-    auto _rv = this_.call(_method_fn, {node, options});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_XMLDocument::saveXml() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
+    return this_.call(_method_fn, {node, options});
 }
 Variant Dom_XMLDocument::saveXmlFile(const Variant &filename, const Variant &options) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[421]);
     }
-    auto _rv = this_.call(_method_fn, {filename, options});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_XMLDocument::saveXmlFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
+    return this_.call(_method_fn, {filename, options});
 }
 Dom_HTMLCollection Dom_XMLDocument::getElementsByTagName(const Variant &qualified_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -8209,12 +2293,12 @@ Dom_HTMLCollection Dom_XMLDocument::getElementsByTagName(const Variant &qualifie
     }
     return Dom_HTMLCollection(Object(this_.call(_method_fn, {qualified_name})));
 }
-Dom_HTMLCollection Dom_XMLDocument::getElementsByTagNameNS(const Variant &_namespace, const Variant &local_name) {
+Dom_HTMLCollection Dom_XMLDocument::getElementsByTagNameNS(const Variant &namespace_, const Variant &local_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[393]);
     }
-    return Dom_HTMLCollection(Object(this_.call(_method_fn, {_namespace, local_name})));
+    return Dom_HTMLCollection(Object(this_.call(_method_fn, {namespace_, local_name})));
 }
 Dom_Element Dom_XMLDocument::createElement(const Variant &local_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -8223,12 +2307,12 @@ Dom_Element Dom_XMLDocument::createElement(const Variant &local_name) {
     }
     return Dom_Element(Object(this_.call(_method_fn, {local_name})));
 }
-Dom_Element Dom_XMLDocument::createElementNS(const Variant &_namespace, const Variant &qualified_name) {
+Dom_Element Dom_XMLDocument::createElementNS(const Variant &namespace_, const Variant &qualified_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[387]);
     }
-    return Dom_Element(Object(this_.call(_method_fn, {_namespace, qualified_name})));
+    return Dom_Element(Object(this_.call(_method_fn, {namespace_, qualified_name})));
 }
 Dom_DocumentFragment Dom_XMLDocument::createDocumentFragment() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -8300,12 +2384,12 @@ Dom_Attr Dom_XMLDocument::createAttribute(const Variant &local_name) {
     }
     return Dom_Attr(Object(this_.call(_method_fn, {local_name})));
 }
-Dom_Attr Dom_XMLDocument::createAttributeNS(const Variant &_namespace, const Variant &qualified_name) {
+Dom_Attr Dom_XMLDocument::createAttributeNS(const Variant &namespace_, const Variant &qualified_name) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[382]);
     }
-    return Dom_Attr(Object(this_.call(_method_fn, {_namespace, qualified_name})));
+    return Dom_Attr(Object(this_.call(_method_fn, {namespace_, qualified_name})));
 }
 Dom_Element Dom_XMLDocument::getElementById(const Variant &element_id) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -8461,12 +2545,12 @@ Variant Dom_XMLDocument::contains(const Variant &other) {
     }
     return this_.call(_method_fn, {other});
 }
-Variant Dom_XMLDocument::lookupPrefix(const Variant &_namespace) {
+Variant Dom_XMLDocument::lookupPrefix(const Variant &namespace_) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
     }
-    return this_.call(_method_fn, {_namespace});
+    return this_.call(_method_fn, {namespace_});
 }
 Variant Dom_XMLDocument::lookupNamespaceURI(const Variant &prefix) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -8475,12 +2559,12 @@ Variant Dom_XMLDocument::lookupNamespaceURI(const Variant &prefix) {
     }
     return this_.call(_method_fn, {prefix});
 }
-Variant Dom_XMLDocument::isDefaultNamespace(const Variant &_namespace) {
+Variant Dom_XMLDocument::isDefaultNamespace(const Variant &namespace_) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
     }
-    return this_.call(_method_fn, {_namespace});
+    return this_.call(_method_fn, {namespace_});
 }
 Variant Dom_XMLDocument::insertBefore(const Dom_Node &node, const Dom_Node &child) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -8560,11 +2644,7 @@ Variant Dom_XMLDocument::C14N(const Variant &exclusive,
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
     }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_XMLDocument::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
+    return this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
 }
 Variant Dom_XMLDocument::C14NFile(const Variant &uri,
                                   const Variant &exclusive,
@@ -8575,11 +2655,7 @@ Variant Dom_XMLDocument::C14NFile(const Variant &uri,
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
     }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_XMLDocument::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
+    return this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
 }
 Variant Dom_XMLDocument::__sleep() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -8607,14 +2683,14 @@ Dom_DocumentType Dom_Implementation::createDocumentType(const Variant &qualified
     }
     return Dom_DocumentType(Object(this_.call(_method_fn, {qualified_name, public_id, system_id})));
 }
-Dom_XMLDocument Dom_Implementation::createDocument(const Variant &_namespace,
+Dom_XMLDocument Dom_Implementation::createDocument(const Variant &namespace_,
                                                    const Variant &qualified_name,
                                                    const Variant &doctype) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
         _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[343]);
     }
-    return Dom_XMLDocument(Object(this_.call(_method_fn, {_namespace, qualified_name, doctype})));
+    return Dom_XMLDocument(Object(this_.call(_method_fn, {namespace_, qualified_name, doctype})));
 }
 Dom_HTMLDocument Dom_Implementation::createHTMLDocument(const Variant &title) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -8625,486 +2701,5 @@ Dom_HTMLDocument Dom_Implementation::createHTMLDocument(const Variant &title) {
 }
 Dom_HTMLElement::Dom_HTMLElement() {
     this_ = newObject(LITERAL_STRING[484]);
-}
-Variant Dom_HTMLElement::hasAttributes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[353]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_HTMLElement::getAttributeNames() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[460]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_HTMLElement::getAttribute(const Variant &qualified_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[459]);
-    }
-    return this_.call(_method_fn, {qualified_name});
-}
-Variant Dom_HTMLElement::getAttributeNS(const Variant &_namespace, const Variant &local_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[461]);
-    }
-    return this_.call(_method_fn, {_namespace, local_name});
-}
-Variant Dom_HTMLElement::setAttribute(const Variant &qualified_name, const Variant &value) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[469]);
-    }
-    return this_.call(_method_fn, {qualified_name, value});
-}
-Variant Dom_HTMLElement::setAttributeNS(const Variant &_namespace,
-                                        const Variant &qualified_name,
-                                        const Variant &value) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[470]);
-    }
-    return this_.call(_method_fn, {_namespace, qualified_name, value});
-}
-Variant Dom_HTMLElement::removeAttribute(const Variant &qualified_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[466]);
-    }
-    return this_.call(_method_fn, {qualified_name});
-}
-Variant Dom_HTMLElement::removeAttributeNS(const Variant &_namespace, const Variant &local_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[467]);
-    }
-    return this_.call(_method_fn, {_namespace, local_name});
-}
-Variant Dom_HTMLElement::toggleAttribute(const Variant &qualified_name, const Variant &force) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[476]);
-    }
-    return this_.call(_method_fn, {qualified_name, force});
-}
-Variant Dom_HTMLElement::hasAttribute(const Variant &qualified_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[464]);
-    }
-    return this_.call(_method_fn, {qualified_name});
-}
-Variant Dom_HTMLElement::hasAttributeNS(const Variant &_namespace, const Variant &local_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[465]);
-    }
-    return this_.call(_method_fn, {_namespace, local_name});
-}
-Dom_Attr Dom_HTMLElement::getAttributeNode(const Variant &qualified_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[462]);
-    }
-    return Dom_Attr(Object(this_.call(_method_fn, {qualified_name})));
-}
-Dom_Attr Dom_HTMLElement::getAttributeNodeNS(const Variant &_namespace, const Variant &local_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[463]);
-    }
-    return Dom_Attr(Object(this_.call(_method_fn, {_namespace, local_name})));
-}
-Dom_Attr Dom_HTMLElement::setAttributeNode(const Dom_Attr &attr) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[471]);
-    }
-    return Dom_Attr(Object(this_.call(_method_fn, {attr.getObject()})));
-}
-Variant Dom_HTMLElement::setAttributeNode(const Variant &attr) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[471]);
-    }
-    return this_.call(_method_fn, {attr});
-}
-Dom_Attr Dom_HTMLElement::setAttributeNodeNS(const Dom_Attr &attr) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[472]);
-    }
-    return Dom_Attr(Object(this_.call(_method_fn, {attr.getObject()})));
-}
-Variant Dom_HTMLElement::setAttributeNodeNS(const Variant &attr) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[472]);
-    }
-    return this_.call(_method_fn, {attr});
-}
-Dom_Attr Dom_HTMLElement::removeAttributeNode(const Dom_Attr &attr) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[468]);
-    }
-    return Dom_Attr(Object(this_.call(_method_fn, {attr.getObject()})));
-}
-Variant Dom_HTMLElement::removeAttributeNode(const Variant &attr) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[468]);
-    }
-    return this_.call(_method_fn, {attr});
-}
-Dom_HTMLCollection Dom_HTMLElement::getElementsByTagName(const Variant &qualified_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[392]);
-    }
-    return Dom_HTMLCollection(Object(this_.call(_method_fn, {qualified_name})));
-}
-Dom_HTMLCollection Dom_HTMLElement::getElementsByTagNameNS(const Variant &_namespace, const Variant &local_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[393]);
-    }
-    return Dom_HTMLCollection(Object(this_.call(_method_fn, {_namespace, local_name})));
-}
-Dom_Element Dom_HTMLElement::insertAdjacentElement(const Dom_AdjacentPosition &where, const Dom_Element &element) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[477]);
-    }
-    return Dom_Element(Object(this_.call(_method_fn, {where.getObject(), element.getObject()})));
-}
-Variant Dom_HTMLElement::insertAdjacentElement(const Variant &where, const Variant &element) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[477]);
-    }
-    return this_.call(_method_fn, {where, element});
-}
-Variant Dom_HTMLElement::insertAdjacentText(const Dom_AdjacentPosition &where, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[478]);
-    }
-    return this_.call(_method_fn, {where.getObject(), data});
-}
-Variant Dom_HTMLElement::insertAdjacentText(const Variant &where, const Variant &data) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[478]);
-    }
-    return this_.call(_method_fn, {where, data});
-}
-Variant Dom_HTMLElement::setIdAttribute(const Variant &qualified_name, const Variant &is_id) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[473]);
-    }
-    return this_.call(_method_fn, {qualified_name, is_id});
-}
-Variant Dom_HTMLElement::setIdAttributeNS(const Variant &_namespace,
-                                          const Variant &qualified_name,
-                                          const Variant &is_id) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[474]);
-    }
-    return this_.call(_method_fn, {_namespace, qualified_name, is_id});
-}
-Variant Dom_HTMLElement::setIdAttributeNode(const Dom_Attr &attr, const Variant &is_id) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[475]);
-    }
-    return this_.call(_method_fn, {attr.getObject(), is_id});
-}
-Variant Dom_HTMLElement::setIdAttributeNode(const Variant &attr, const Variant &is_id) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[475]);
-    }
-    return this_.call(_method_fn, {attr, is_id});
-}
-Variant Dom_HTMLElement::remove() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[450]);
-    }
-    return this_.call(_method_fn, {});
-}
-Dom_Element Dom_HTMLElement::querySelector(const Variant &selectors) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[378]);
-    }
-    return Dom_Element(Object(this_.call(_method_fn, {selectors})));
-}
-Dom_NodeList Dom_HTMLElement::querySelectorAll(const Variant &selectors) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[379]);
-    }
-    return Dom_NodeList(Object(this_.call(_method_fn, {selectors})));
-}
-Dom_Element Dom_HTMLElement::closest(const Variant &selectors) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[480]);
-    }
-    return Dom_Element(Object(this_.call(_method_fn, {selectors})));
-}
-Variant Dom_HTMLElement::matches(const Variant &selectors) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[481]);
-    }
-    return this_.call(_method_fn, {selectors});
-}
-Variant Dom_HTMLElement::getInScopeNamespaces() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[482]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_HTMLElement::getDescendantNamespaces() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[483]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_HTMLElement::rename(const Variant &namespace_u_r_i, const Variant &qualified_name) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[457]);
-    }
-    return this_.call(_method_fn, {namespace_u_r_i, qualified_name});
-}
-Variant Dom_HTMLElement::getRootNode(const Variant &options) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[366]);
-    }
-    return this_.call(_method_fn, {options});
-}
-Variant Dom_HTMLElement::hasChildNodes() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[354]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_HTMLElement::normalize() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[362]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_HTMLElement::cloneNode(const Variant &deep) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[350]);
-    }
-    return this_.call(_method_fn, {deep});
-}
-Variant Dom_HTMLElement::isEqualNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_HTMLElement::isEqualNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[358]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_HTMLElement::isSameNode(const Dom_Node &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node.getObject()});
-}
-Variant Dom_HTMLElement::isSameNode(const Variant &other_node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[357]);
-    }
-    return this_.call(_method_fn, {other_node});
-}
-Variant Dom_HTMLElement::compareDocumentPosition(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_HTMLElement::compareDocumentPosition(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[367]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_HTMLElement::contains(const Dom_Node &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other.getObject()});
-}
-Variant Dom_HTMLElement::contains(const Variant &other) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[365]);
-    }
-    return this_.call(_method_fn, {other});
-}
-Variant Dom_HTMLElement::lookupPrefix(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[361]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_HTMLElement::lookupNamespaceURI(const Variant &prefix) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[360]);
-    }
-    return this_.call(_method_fn, {prefix});
-}
-Variant Dom_HTMLElement::isDefaultNamespace(const Variant &_namespace) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[356]);
-    }
-    return this_.call(_method_fn, {_namespace});
-}
-Variant Dom_HTMLElement::insertBefore(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_HTMLElement::insertBefore(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[355]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_HTMLElement::appendChild(const Dom_Node &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node.getObject()});
-}
-Variant Dom_HTMLElement::appendChild(const Variant &node) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[347]);
-    }
-    return this_.call(_method_fn, {node});
-}
-Variant Dom_HTMLElement::replaceChild(const Dom_Node &node, const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node.getObject(), child.getObject()});
-}
-Variant Dom_HTMLElement::replaceChild(const Variant &node, const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[364]);
-    }
-    return this_.call(_method_fn, {node, child});
-}
-Variant Dom_HTMLElement::removeChild(const Dom_Node &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child.getObject()});
-}
-Variant Dom_HTMLElement::removeChild(const Variant &child) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[363]);
-    }
-    return this_.call(_method_fn, {child});
-}
-Variant Dom_HTMLElement::getLineNo() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[351]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_HTMLElement::getNodePath() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[352]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_HTMLElement::C14N(const Variant &exclusive,
-                              const Variant &with_comments,
-                              const Variant &xpath,
-                              const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[348]);
-    }
-    auto _rv = this_.call(_method_fn, {exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_HTMLElement::C14N() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_HTMLElement::C14NFile(const Variant &uri,
-                                  const Variant &exclusive,
-                                  const Variant &with_comments,
-                                  const Variant &xpath,
-                                  const Variant &ns_prefixes) {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[349]);
-    }
-    auto _rv = this_.call(_method_fn, {uri, exclusive, with_comments, xpath, ns_prefixes});
-    if (!_rv.toBool()) {
-        throwException(String("RuntimeException"), "Dom_HTMLElement::C14NFile() returned false");
-    }
-    return Variant(Object(std::move(_rv)));
-}
-Variant Dom_HTMLElement::__sleep() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[368]);
-    }
-    return this_.call(_method_fn, {});
-}
-Variant Dom_HTMLElement::__wakeup() {
-    static THREAD_LOCAL zend_function *_method_fn = nullptr;
-    if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[97]);
-    }
-    return this_.call(_method_fn, {});
 }
 }  // namespace php

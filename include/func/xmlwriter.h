@@ -24,18 +24,18 @@ Variant xmlwriter_write_attribute(const Variant &writer, const Variant &name, co
 Variant xmlwriter_start_attribute_ns(const XMLWriter &writer,
                                      const Variant &prefix,
                                      const Variant &name,
-                                     const Variant &_namespace);
+                                     const Variant &namespace_);
 Variant xmlwriter_start_attribute_ns(const Variant &writer,
                                      const Variant &prefix,
                                      const Variant &name,
-                                     const Variant &_namespace);
+                                     const Variant &namespace_);
 Variant xmlwriter_write_attribute_ns(const XMLWriter &writer,
                                      const Variant &prefix,
                                      const Variant &name,
-                                     const Variant &_namespace,
+                                     const Variant &namespace_,
                                      const Variant &value);
 Variant xmlwriter_write_attribute_ns(
-    const Variant &writer, const Variant &prefix, const Variant &name, const Variant &_namespace, const Variant &value);
+    const Variant &writer, const Variant &prefix, const Variant &name, const Variant &namespace_, const Variant &value);
 Variant xmlwriter_start_element(const XMLWriter &writer, const Variant &name);
 Variant xmlwriter_start_element(const Variant &writer, const Variant &name);
 Variant xmlwriter_end_element(const XMLWriter &writer);
@@ -45,22 +45,22 @@ Variant xmlwriter_full_end_element(const Variant &writer);
 Variant xmlwriter_start_element_ns(const XMLWriter &writer,
                                    const Variant &prefix,
                                    const Variant &name,
-                                   const Variant &_namespace);
+                                   const Variant &namespace_);
 Variant xmlwriter_start_element_ns(const Variant &writer,
                                    const Variant &prefix,
                                    const Variant &name,
-                                   const Variant &_namespace);
+                                   const Variant &namespace_);
 Variant xmlwriter_write_element(const XMLWriter &writer, const Variant &name, const Variant &content = {});
 Variant xmlwriter_write_element(const Variant &writer, const Variant &name, const Variant &content = {});
 Variant xmlwriter_write_element_ns(const XMLWriter &writer,
                                    const Variant &prefix,
                                    const Variant &name,
-                                   const Variant &_namespace,
+                                   const Variant &namespace_,
                                    const Variant &content = {});
 Variant xmlwriter_write_element_ns(const Variant &writer,
                                    const Variant &prefix,
                                    const Variant &name,
-                                   const Variant &_namespace,
+                                   const Variant &namespace_,
                                    const Variant &content = {});
 Variant xmlwriter_start_pi(const XMLWriter &writer, const Variant &target);
 Variant xmlwriter_start_pi(const Variant &writer, const Variant &target);

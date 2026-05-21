@@ -1,16 +1,49 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
+#include "class/core.h"
 
 namespace php {
+class DateTimeZone;
+class DateInterval;
+class DatePeriod;
+class DateError;
+class DateObjectError;
+class DateRangeError;
+class DateException;
+class DateInvalidTimeZoneException;
+class DateInvalidOperationException;
+class DateMalformedStringException;
+class DateMalformedIntervalStringException;
+class DateMalformedPeriodStringException;
+class DateTime;
+class DateTimeImmutable;
+
 class DateTimeZone {
+  protected:
     Object this_;
+    DateTimeZone() = default;
 
   public:
     Object getObject() const {
         return this_;
     }
+    static constexpr int AFRICA = 1;
+    static constexpr int AMERICA = 2;
+    static constexpr int ANTARCTICA = 4;
+    static constexpr int ARCTIC = 8;
+    static constexpr int ASIA = 16;
+    static constexpr int ATLANTIC = 32;
+    static constexpr int AUSTRALIA = 64;
+    static constexpr int EUROPE = 128;
+    static constexpr int INDIAN = 256;
+    static constexpr int PACIFIC = 512;
+    static constexpr int UTC = 1024;
+    static constexpr int ALL = 2047;
+    static constexpr int ALL_WITH_BC = 4095;
+    static constexpr int PER_COUNTRY = 4096;
+
     DateTimeZone(const Variant &timezone);
     Variant getName();
     Variant getOffset(const Variant &datetime);
@@ -25,7 +58,9 @@ class DateTimeZone {
 };
 
 class DateInterval {
+  protected:
     Object this_;
+    DateInterval() = default;
 
   public:
     Object getObject() const {
@@ -41,12 +76,17 @@ class DateInterval {
 };
 
 class DatePeriod {
+  protected:
     Object this_;
+    DatePeriod() = default;
 
   public:
     Object getObject() const {
         return this_;
     }
+    static constexpr int EXCLUDE_START_DATE = 1;
+    static constexpr int INCLUDE_END_DATE = 2;
+
     static Variant createFromISO8601String(const Variant &specification, const Variant &options = 0);
     DatePeriod(const Variant &start,
                const Variant &interval = {},
@@ -63,182 +103,57 @@ class DatePeriod {
     Variant getIterator();
 };
 
-class DateError {
-    Object this_;
-
+class DateError : public Error {
   public:
-    Object getObject() const {
-        return this_;
-    }
     DateError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class DateObjectError {
-    Object this_;
-
+class DateObjectError : public DateError {
   public:
-    Object getObject() const {
-        return this_;
-    }
     DateObjectError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class DateRangeError {
-    Object this_;
-
+class DateRangeError : public DateError {
   public:
-    Object getObject() const {
-        return this_;
-    }
     DateRangeError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class DateException {
-    Object this_;
-
+class DateException : public Exception {
   public:
-    Object getObject() const {
-        return this_;
-    }
     DateException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class DateInvalidTimeZoneException {
-    Object this_;
-
+class DateInvalidTimeZoneException : public DateException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     DateInvalidTimeZoneException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class DateInvalidOperationException {
-    Object this_;
-
+class DateInvalidOperationException : public DateException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     DateInvalidOperationException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class DateMalformedStringException {
-    Object this_;
-
+class DateMalformedStringException : public DateException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     DateMalformedStringException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class DateMalformedIntervalStringException {
-    Object this_;
-
+class DateMalformedIntervalStringException : public DateException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     DateMalformedIntervalStringException(const Variant &message = "",
                                          const Variant &code = 0,
                                          const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class DateMalformedPeriodStringException {
-    Object this_;
-
+class DateMalformedPeriodStringException : public DateException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     DateMalformedPeriodStringException(const Variant &message = "",
                                        const Variant &code = 0,
                                        const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
 class DateTime {
+  protected:
     Object this_;
 
   public:
@@ -250,6 +165,7 @@ class DateTime {
     Variant __unserialize(const Variant &data);
     Variant __wakeup();
     static Variant __set_state(const Variant &array);
+    static Variant createFromImmutable(const DateTimeImmutable &object);
     static Variant createFromImmutable(const Variant &object);
     static Variant createFromInterface(const Variant &object);
     static Variant createFromFormat(const Variant &format, const Variant &datetime, const Variant &timezone = {});
@@ -279,6 +195,7 @@ class DateTime {
 };
 
 class DateTimeImmutable {
+  protected:
     Object this_;
 
   public:
@@ -315,7 +232,7 @@ class DateTimeImmutable {
     Variant setTimestamp(const Variant &timestamp);
     Variant setMicrosecond(const Variant &microsecond);
     static Variant createFromMutable(const DateTime &object);
-    Variant createFromMutable(const Variant &object);
+    static Variant createFromMutable(const Variant &object);
     static Variant createFromInterface(const Variant &object);
 };
 

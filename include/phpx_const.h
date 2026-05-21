@@ -17,6 +17,8 @@
 #pragma once
 
 #include "phpx.h"
+#include "const/standard.h"
+#include "const/core.h"
 #include "const/curl.h"
 #include "const/date.h"
 #include "const/dom.h"
@@ -25,7 +27,10 @@
 #include "const/hash.h"
 #include "const/json.h"
 #include "const/libxml.h"
+#include "const/mysqli.h"
 #include "const/openssl.h"
+#include "const/pcntl.h"
+#include "const/random.h"
 #include "const/session.h"
 #include "const/sockets.h"
 #include "const/sqlite3.h"

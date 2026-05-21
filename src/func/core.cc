@@ -108,26 +108,26 @@ Variant get_parent_class(const Variant &object_or_class) {
     }
     return call(fn, {object_or_class});
 }
-Variant is_subclass_of(const Variant &object_or_class, const Variant &_class, const Variant &allow_string) {
+Variant is_subclass_of(const Variant &object_or_class, const Variant &class_, const Variant &allow_string) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[47]);
     }
-    return call(fn, {object_or_class, _class, allow_string});
+    return call(fn, {object_or_class, class_, allow_string});
 }
-Variant is_a(const Variant &object_or_class, const Variant &_class, const Variant &allow_string) {
+Variant is_a(const Variant &object_or_class, const Variant &class_, const Variant &allow_string) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[48]);
     }
-    return call(fn, {object_or_class, _class, allow_string});
+    return call(fn, {object_or_class, class_, allow_string});
 }
-Variant get_class_vars(const Variant &_class) {
+Variant get_class_vars(const Variant &class_) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[49]);
     }
-    return call(fn, {_class});
+    return call(fn, {class_});
 }
 Variant get_object_vars(const Variant &object) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -164,12 +164,12 @@ Variant property_exists(const Variant &object_or_class, const Variant &property)
     }
     return call(fn, {object_or_class, property});
 }
-Variant class_exists(const Variant &_class, const Variant &autoload) {
+Variant class_exists(const Variant &class_, const Variant &autoload) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[55]);
     }
-    return call(fn, {_class, autoload});
+    return call(fn, {class_, autoload});
 }
 Variant interface_exists(const Variant &interface, const Variant &autoload) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -185,12 +185,12 @@ Variant trait_exists(const Variant &trait, const Variant &autoload) {
     }
     return call(fn, {trait, autoload});
 }
-Variant enum_exists(const Variant &_enum, const Variant &autoload) {
+Variant enum_exists(const Variant &enum_, const Variant &autoload) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[58]);
     }
-    return call(fn, {_enum, autoload});
+    return call(fn, {enum_, autoload});
 }
 Variant function_exists(const Variant &function) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -199,12 +199,12 @@ Variant function_exists(const Variant &function) {
     }
     return call(fn, {function});
 }
-Variant class_alias(const Variant &_class, const Variant &alias, const Variant &autoload) {
+Variant class_alias(const Variant &class_, const Variant &alias, const Variant &autoload) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[60]);
     }
-    return call(fn, {_class, alias, autoload});
+    return call(fn, {class_, alias, autoload});
 }
 Variant get_included_files() {
     static THREAD_LOCAL zend_function *fn = nullptr;

@@ -45,6 +45,36 @@ class Generator
      */
     static protected array $classHasCtor = [];
 
+    /**
+     * Method overrides for methods whose PHP reflection signatures are too
+     * complex (e.g. multiple overloads with variadic). Key is "Class::method".
+     *
+     * Each entry may specify:
+     *  - signature: array of param descriptors [{name, type, default?}, ...]
+     *    where type is a PHP type hint (string, ?int, array, ClassName, etc.).
+     *    When set, these params replace the reflection-based parameters entirely.
+     */
+    static protected array $methodOverrides = [
+        'PDO::query' => [
+            'signature' => [
+                ['name' => 'query', 'type' => 'string'],
+                ['name' => 'fetch_mode', 'type' => '?int', 'default' => 'null'],
+            ],
+        ],
+        'Pdo_Mysql::query' => [
+            'signature' => [
+                ['name' => 'query', 'type' => 'string'],
+                ['name' => 'fetch_mode', 'type' => '?int', 'default' => 'null'],
+            ],
+        ],
+        'Pdo_Sqlite::query' => [
+            'signature' => [
+                ['name' => 'query', 'type' => 'string'],
+                ['name' => 'fetch_mode', 'type' => '?int', 'default' => 'null'],
+            ],
+        ],
+    ];
+
     const array BUILTIN_TYPES = [
         'int', 'string', 'float', 'bool', 'array', 'void', 'callable',
         'mixed', 'iterable', 'object', 'never', 'true', 'false', 'null',
@@ -71,6 +101,44 @@ class Generator
         'char',
         'operator',
     ];
+
+    // PHP class constant names that collide with C preprocessor macros in PHP headers.
+    // These must be suffixed with _ to avoid macro expansion at compile time.
+    const array MACRO_CONFLICTS = [
+        'IS_STATIC',
+        'NULL', 'TRUE', 'FALSE',
+        'STDIN', 'STDOUT', 'STDERR',
+        'NAN',
+    ];
+
+    // Extensions whose constants are prone to macro conflicts.
+    // All constants from these extensions get a _ suffix instead of per-name checks.
+    const array HIGH_CONFLICT_EXTENSIONS = [
+        'pcntl', 'standard', 'core', 'random',
+    ];
+
+    /**
+     * Returns '_' if all constants from this extension should be suffixed,
+     * '' otherwise. High-conflict extensions always suffix; for others,
+     * the caller may additionally check MACRO_CONFLICTS.
+     */
+    protected function constSuffix(string $name): string
+    {
+        if (str_ends_with($name, '_')) {
+            return '';
+        }
+        $ext = strtolower($this->extension);
+        if (in_array($ext, self::HIGH_CONFLICT_EXTENSIONS)) {
+            return '_';
+        }
+        if ($ext === 'sockets' and !str_starts_with($name, 'SOCKET_')) {
+            return '_';
+        }
+        if (in_array($name, self::MACRO_CONFLICTS)) {
+            return '_';
+        }
+        return '';
+    }
 
     public static function getRootDir(): string
     {
@@ -131,7 +199,7 @@ class Generator
                 }
                 $cppName = $className;
                 if (in_array($cppName, self::BUILTIN_CLASSES)) {
-                    $cppName = '_' . $cppName;
+                    $cppName = $cppName . '_';
                 }
                 $cppName = str_replace('\\', '_', $cppName);
                 self::$facadeClassMap[$className] = $cppName;
@@ -229,7 +297,7 @@ class Generator
             }
 
             // Return type dependency
-            $rt = $method->getReturnType();
+            $rt = $method->getReturnType() ?? $method->getTentativeReturnType();
             if ($rt instanceof ReflectionNamedType) {
                 $dep = self::resolveType($rt, $cppName);
                 if ($dep !== 'Variant' && $dep !== $cppName) {
@@ -264,9 +332,19 @@ class Generator
      * Check whether $selfClass referencing $depClass is a back-edge in the
      * topological sort (i.e. $selfClass is defined before $depClass, so the
      * type won't be visible when the compiler reaches $selfClass).
+     *
+     * Classes within the same extension are generated in the same header,
+     * so ordering between them is irrelevant — only cross-extension edges
+     * can be back-edges.
      */
     static protected function isBackEdge(string $selfClass, string $depClass): bool
     {
+        // Same-extension classes share a header, so the order doesn't matter
+        $selfExt = self::$classToExtension[$selfClass] ?? '';
+        $depExt = self::$classToExtension[$depClass] ?? '';
+        if ($selfExt !== '' && $selfExt === $depExt) {
+            return false;
+        }
         $selfPos = array_search($selfClass, self::$sortedClasses);
         $depPos = array_search($depClass, self::$sortedClasses);
         return $selfPos !== false && $depPos !== false && $selfPos < $depPos;
@@ -381,7 +459,10 @@ class Generator
                 }
                 if ($valid && $hasFalse && $otherType !== null) {
                     $resolved = self::resolveType($otherType, $selfClass);
-                    return ['return_type' => $resolved, 'check_false' => true];
+                    // Only enable false-check when the resolved type is a Facade class;
+                    // built-in types like `array|false` should stay as Variant with no check.
+                    $checkFalse = ($resolved !== 'Variant');
+                    return ['return_type' => $resolved, 'check_false' => $checkFalse];
                 }
             }
         }
@@ -485,6 +566,42 @@ class Generator
         $constants = $this->getConstants();
         $classes = $this->getClasses();
 
+        // Compute cross-extension includes for class headers.
+        // Each class header only needs to include headers for Facade types
+        // referenced as return/param types that belong to OTHER extensions.
+        $classIncludes = [];
+        $extLower = strtolower($this->extension);
+        foreach ($classes as $className => $info) {
+            // Include parent class header when extending a Facade class from another extension
+            if (!empty($info['extends'])) {
+                $parentExt = strtolower(self::$classToExtension[$info['extends']] ?? '');
+                if ($parentExt !== '' && $parentExt !== $extLower) {
+                    $classIncludes[$parentExt] = true;
+                }
+            }
+            foreach ($info['methods'] as $minfo) {
+                $returnType = $minfo['return_type'] ?? 'Variant';
+                if ($returnType !== 'Variant') {
+                    $depExt = strtolower(self::$classToExtension[$returnType] ?? '');
+                    if ($depExt !== '' && $depExt !== $extLower) {
+                        $classIncludes[$depExt] = true;
+                    }
+                }
+                if (!empty($minfo['has_facade_params'])) {
+                    $argsV = $minfo['args_v'] ?? '';
+                    // args_v contains "const ClassName &name" patterns
+                    if (preg_match_all('/const\s+(\w+)\s*&/', $argsV, $matches)) {
+                        foreach ($matches[1] as $facadeType) {
+                            $depExt = strtolower(self::$classToExtension[$facadeType] ?? '');
+                            if ($depExt !== '' && $depExt !== $extLower) {
+                                $classIncludes[$depExt] = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         if (!empty($constants)) {
             self::render(
                 __DIR__ . '/templates/const-impl.tpl',
@@ -517,13 +634,15 @@ class Generator
             self::render(
                 __DIR__ . '/templates/class-impl.tpl',
                 self::$rootDir . '/src/class/' . $ext . '.cc',
-                compact('classes', 'ext')
+                compact('classes', 'ext', 'classIncludes')
             );
 
+            $classIncludesSorted = array_keys($classIncludes);
+            sort($classIncludesSorted);
             self::render(
                 __DIR__ . '/templates/class-decl.tpl',
                 self::$rootDir . '/include/class/' . $ext . '.h',
-                compact('classes', 'ext')
+                compact('classes', 'ext') + ['classIncludes' => $classIncludesSorted]
             );
         }
     }
@@ -541,7 +660,8 @@ class Generator
             [$args, $call, $args_impl, $variadic, $hasFacade, $args_v, $call_v, $args_impl_v] = $this->getArgs($function->getParameters());
             $symbol = $function->getName();
 
-            $returnInfo = self::resolveReturnType($function->getReturnType());
+            $rt = $function->getReturnType() ?? $function->getTentativeReturnType();
+            $returnInfo = self::resolveReturnType($rt);
             $returnType = $returnInfo['return_type'];
             // Fall back to Variant if the return-type class has PHP __construct
             // (no Object constructor exists, so we can't wrap the result)
@@ -596,7 +716,7 @@ class Generator
     public static function nameSafety(string &$name): void
     {
         if (in_array($name, self::KEYWORDS)) {
-            $name = '_' . $name;
+            $name = $name . '_';
         }
         $name = str_replace('\\', '_', $name);
     }
@@ -683,6 +803,76 @@ class Generator
         ];
     }
 
+    /**
+     * Build args arrays from an override signature (see $methodOverrides).
+     * Each param descriptor: ['name' => ..., 'type' => ..., 'default'? => ...]
+     * where type is a PHP type hint string (e.g. 'string', '?int', 'PDOStatement').
+     *
+     * @return array  [args, call, args_impl, variadic, has_facade, args_v, call_v, args_impl_v]
+     */
+    protected function buildOverrideArgs(array $signature, string $selfClass = ''): array
+    {
+        $args = $call = $args_impl = [];
+        $args_v = $call_v = $args_impl_v = [];
+        $hasFacade = false;
+
+        foreach ($signature as $param) {
+            $arg_name = $param['name'];
+            self::nameSafety($arg_name);
+            self::changeCasePascal2Snake($arg_name);
+
+            $phpType = $param['type'] ?? 'mixed';
+            // Strip leading '?' for nullable types
+            $phpTypeClean = ltrim($phpType, '?');
+
+            // Check if this is a Facade class type
+            $cppType = 'Variant';
+            $isFacade = false;
+            if (isset(self::$facadeClassMap[$phpTypeClean])) {
+                $resolved = self::$facadeClassMap[$phpTypeClean];
+                if ($selfClass && self::isBackEdge($selfClass, $resolved)) {
+                    // Don't use Facade type for back-edges
+                } else {
+                    $cppType = $resolved;
+                    $isFacade = true;
+                    $hasFacade = true;
+                }
+            }
+
+            $type = $isFacade ? "const {$cppType} &" : 'const Variant &';
+            $typeV = 'const Variant &';
+
+            if (isset($param['default'])) {
+                $defaultVal = $param['default'];
+                if ($defaultVal === 'null') {
+                    $args[] = "$type $arg_name = {}";
+                    $args_v[] = "$typeV $arg_name = {}";
+                } else {
+                    $args[] = "$type $arg_name = $defaultVal";
+                    $args_v[] = "$typeV $arg_name = $defaultVal";
+                }
+            } else {
+                $args[] = "$type $arg_name";
+                $args_v[] = "$typeV $arg_name";
+            }
+            $args_impl[] = "$type $arg_name";
+            $args_impl_v[] = "$typeV $arg_name";
+            $call[] = $isFacade ? $arg_name . '.getObject()' : $arg_name;
+            $call_v[] = $arg_name;
+        }
+
+        return [
+            $args,
+            $call,
+            $args_impl,
+            false,      // variadic = false for overrides
+            $hasFacade,
+            $args_v,
+            $call_v,
+            $args_impl_v,
+        ];
+    }
+
     protected function getClasses(): array
     {
         $classes = [];
@@ -690,7 +880,7 @@ class Generator
         foreach ($list as $className => $ref) {
             $methods = [];
             if (in_array($className, self::BUILTIN_CLASSES)) {
-                $className = '_' . $className;
+                $className = $className . '_';
             }
 
             $classSymbol = $ref->getName();
@@ -699,10 +889,37 @@ class Generator
                 continue;
             }
 
+            // Detect parent Facade class
+            $extends = '';
+            $parentRef = $ref->getParentClass();
+            if ($parentRef !== false) {
+                $parentPhpName = $parentRef->getName();
+                if (isset(self::$facadeClassMap[$parentPhpName])) {
+                    $extends = self::$facadeClassMap[$parentPhpName];
+                }
+            }
+
             $hasCtor = false;
             foreach ($ref->getMethods() as $method) {
                 if ($method->isConstructor()) {
                     $hasCtor = true;
+                }
+            }
+
+            // Check if the __construct has required params — if so, derived
+            // classes need a protected default constructor to avoid implicit
+            // base-class constructor calls.
+            $needsProtectedCtor = false;
+            if ($hasCtor) {
+                $ctor = $ref->getConstructor();
+                if ($ctor) {
+                    $needsProtectedCtor = false;
+                    foreach ($ctor->getParameters() as $p) {
+                        if (!$p->isOptional()) {
+                            $needsProtectedCtor = true;
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -728,6 +945,13 @@ class Generator
                 if (!$method->isPublic() || $method->isDestructor()) {
                     continue;
                 }
+                // Skip methods declared on parent when this class extends a Facade parent.
+                // Constructors are never skipped — the child needs its own constructor
+                // that creates the correct PHP object class.
+                if ($extends && !$method->isConstructor()
+                    && $method->getDeclaringClass()->getName() !== $ref->getName()) {
+                    continue;
+                }
                 $params = $method->getParameters();
                 $name = $method->getName();
 
@@ -736,13 +960,22 @@ class Generator
                 }
                 self::nameSafety($name);
 
-                [$args, $call, $args_impl, $variadic, $hasFacade, $args_v, $call_v, $args_impl_v] = $this->getArgs($params, $className);
+                // Check for method override
+                $overrideKey = $className . '::' . $method->getName();
+                $override = self::$methodOverrides[$overrideKey] ?? null;
+                if ($override !== null && isset($override['signature'])) {
+                    [$args, $call, $args_impl, $variadic, $hasFacade, $args_v, $call_v, $args_impl_v] =
+                        $this->buildOverrideArgs($override['signature'], $className);
+                } else {
+                    [$args, $call, $args_impl, $variadic, $hasFacade, $args_v, $call_v, $args_impl_v] =
+                        $this->getArgs($params, $className);
+                }
                 $symbol = $method->isStatic() ? $className . '::' . $method->getName() : $method->getName();
 
                 // Resolve return type
                 $returnType = 'Variant';
                 $checkFalse = false;
-                $rt = $method->getReturnType();
+                $rt = $method->getReturnType() ?? $method->getTentativeReturnType();
                 if ($rt !== null) {
                     $returnInfo = self::resolveReturnType($rt, $className);
                     $returnType = $returnInfo['return_type'];
@@ -853,10 +1086,44 @@ class Generator
                 continue;
             }
 
+            // Collect class constants declared on this class
+            $classConstants = [];
+            foreach ($ref->getReflectionConstants() as $const) {
+                if ($const->isPrivate() || $const->isProtected()) {
+                    continue;
+                }
+                if ($const->getDeclaringClass()->getName() !== $ref->getName()) {
+                    continue;
+                }
+                $val = $const->getValue();
+                if (is_array($val) || is_object($val) || is_resource($val)) {
+                    continue;
+                }
+                $name = $const->getName();
+                self::nameSafety($name);
+                $name = $name . $this->constSuffix($name);
+                $repr = self::valueToCppRepr($val);
+                if (is_string($val)) {
+                    $classConstants[$name] = ['repr' => 'ZEND_STRL(' . $repr . '), true', 'inline_init' => true];
+                } elseif (is_null($val)) {
+                    $classConstants[$name] = ['repr' => '', 'inline_init' => true];
+                } elseif (is_bool($val)) {
+                    $classConstants[$name] = ['repr' => $repr, 'type' => 'bool'];
+                } elseif (is_float($val)) {
+                    $classConstants[$name] = ['repr' => $repr, 'type' => 'double'];
+                } else {
+                    $classConstants[$name] = ['repr' => $repr, 'type' => 'int'];
+                }
+            }
+
             $classes[$className] = [
                 'methods' => $methods,
                 'class' => self::addLiteralString($classSymbol),
                 'has_ctor' => $hasCtor,
+                'needs_protected_ctor' => $needsProtectedCtor,
+                'extends' => $extends,
+                'parent_has_ctor' => $extends ? !empty(self::$classHasCtor[$extends]) : false,
+                'constants' => $classConstants,
             ];
         }
 
@@ -883,14 +1150,8 @@ class Generator
                     echo "Skipping constant $name, unsupported type `{$type}`\n";
                     continue;
                 }
-                $ext = strtolower($this->extension);
-                if ($ext === 'pcntl' or $ext === 'standard' or $ext === 'core' or $ext === 'random') {
-                    continue;
-                }
-                if ($ext === 'sockets' and !str_starts_with($name, 'SOCKET_')) {
-                    continue;
-                }
                 self::nameSafety($name);
+                $name = $name . $this->constSuffix($name);
                 $repr = self::valueToCppRepr($value);
                 if (is_string($value)) {
                     $constants[$name] = "ZEND_STRL(" . $repr . "), true";

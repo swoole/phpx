@@ -1,35 +1,64 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
+#include "class/core.h"
+#include "class/spl.h"
 
 namespace php {
-class PharException {
-    Object this_;
+class PharException;
+class PharFileInfo;
+class Phar;
+class PharData;
 
+class PharException : public Exception {
   public:
-    Object getObject() const {
-        return this_;
-    }
     PharException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class Phar {
-    Object this_;
+class PharFileInfo : public SplFileInfo {
+  protected:
+    PharFileInfo() = default;
 
   public:
-    Object getObject() const {
-        return this_;
-    }
+    PharFileInfo(const Variant &filename);
+    Variant chmod(const Variant &perms);
+    Variant compress(const Variant &compression);
+    Variant decompress();
+    Variant delMetadata();
+    Variant getCompressedSize();
+    Variant getCRC32();
+    Variant getContent();
+    Variant getMetadata(const Variant &unserialize_options = Array{});
+    Variant getPharFlags();
+    Variant hasMetadata();
+    Variant isCompressed(const Variant &compression = {});
+    Variant isCRCChecked();
+    Variant setMetadata(const Variant &metadata);
+};
+
+class Phar : public RecursiveDirectoryIterator {
+  protected:
+    Phar() = default;
+
+  public:
+    static constexpr int BZ2 = 8192;
+    static constexpr int GZ = 4096;
+    static constexpr int NONE = 0;
+    static constexpr int PHAR = 1;
+    static constexpr int TAR = 2;
+    static constexpr int ZIP = 3;
+    static constexpr int COMPRESSED = 61440;
+    static constexpr int PHP = 0;
+    static constexpr int PHPS = 1;
+    static constexpr int MD5 = 1;
+    static constexpr int OPENSSL = 16;
+    static constexpr int OPENSSL_SHA256 = 17;
+    static constexpr int OPENSSL_SHA512 = 18;
+    static constexpr int SHA1 = 2;
+    static constexpr int SHA256 = 3;
+    static constexpr int SHA512 = 4;
+
     Phar(const Variant &filename, const Variant &flags = 12288, const Variant &alias = {});
     Variant addEmptyDir(const Variant &directory);
     Variant addFile(const Variant &filename, const Variant &local_name = {});
@@ -46,7 +75,7 @@ class Phar {
     Variant convertToData(const Variant &format = {}, const Variant &compression = {}, const Variant &extension = {});
     Variant copy(const Variant &from, const Variant &to);
     Variant count(const Variant &mode = 0);
-    Variant _delete(const Variant &local_name);
+    Variant delete_(const Variant &local_name);
     Variant delMetadata();
     Variant extractTo(const Variant &directory, const Variant &files = {}, const Variant &overwrite = false);
     Variant getAlias();
@@ -91,56 +120,13 @@ class Phar {
                            const Variant &file_not_found_script = {},
                            const Variant &mime_types = Array{},
                            const Variant &rewrite = {});
-    Variant hasChildren(const Variant &allow_links = false);
-    Variant getChildren();
-    Variant getSubPath();
-    Variant getSubPathname();
-    Variant rewind();
-    Variant key();
-    Variant current();
-    Variant getFlags();
-    Variant setFlags(const Variant &flags);
-    Variant getFilename();
-    Variant getExtension();
-    Variant getBasename(const Variant &suffix = "");
-    Variant isDot();
-    Variant valid();
-    Variant next();
-    Variant seek(const Variant &offset);
-    Variant __toString();
-    Variant getPathname();
-    Variant getPerms();
-    Variant getInode();
-    Variant getSize();
-    Variant getOwner();
-    Variant getGroup();
-    Variant getATime();
-    Variant getMTime();
-    Variant getCTime();
-    Variant getType();
-    Variant isReadable();
-    Variant isExecutable();
-    Variant isFile();
-    Variant isDir();
-    Variant isLink();
-    Variant getLinkTarget();
-    Variant getRealPath();
-    Variant getFileInfo(const Variant &_class = {});
-    Variant getPathInfo(const Variant &_class = {});
-    Variant openFile(const Variant &mode = "r", const Variant &use_include_path = false, const Variant &context = {});
-    Variant setFileClass(const Variant &_class = "SplFileObject");
-    Variant setInfoClass(const Variant &_class = "SplFileInfo");
-    Variant __debugInfo();
-    Variant _bad_state_ex();
 };
 
-class PharData {
-    Object this_;
+class PharData : public RecursiveDirectoryIterator {
+  protected:
+    PharData() = default;
 
   public:
-    Object getObject() const {
-        return this_;
-    }
     PharData(const Variant &filename,
              const Variant &flags = 12288,
              const Variant &alias = {},
@@ -160,7 +146,7 @@ class PharData {
     Variant convertToData(const Variant &format = {}, const Variant &compression = {}, const Variant &extension = {});
     Variant copy(const Variant &from, const Variant &to);
     Variant count(const Variant &mode = 0);
-    Variant _delete(const Variant &local_name);
+    Variant delete_(const Variant &local_name);
     Variant delMetadata();
     Variant extractTo(const Variant &directory, const Variant &files = {}, const Variant &overwrite = false);
     Variant getAlias();
@@ -205,100 +191,6 @@ class PharData {
                            const Variant &file_not_found_script = {},
                            const Variant &mime_types = Array{},
                            const Variant &rewrite = {});
-    Variant hasChildren(const Variant &allow_links = false);
-    Variant getChildren();
-    Variant getSubPath();
-    Variant getSubPathname();
-    Variant rewind();
-    Variant key();
-    Variant current();
-    Variant getFlags();
-    Variant setFlags(const Variant &flags);
-    Variant getFilename();
-    Variant getExtension();
-    Variant getBasename(const Variant &suffix = "");
-    Variant isDot();
-    Variant valid();
-    Variant next();
-    Variant seek(const Variant &offset);
-    Variant __toString();
-    Variant getPathname();
-    Variant getPerms();
-    Variant getInode();
-    Variant getSize();
-    Variant getOwner();
-    Variant getGroup();
-    Variant getATime();
-    Variant getMTime();
-    Variant getCTime();
-    Variant getType();
-    Variant isReadable();
-    Variant isExecutable();
-    Variant isFile();
-    Variant isDir();
-    Variant isLink();
-    Variant getLinkTarget();
-    Variant getRealPath();
-    Variant getFileInfo(const Variant &_class = {});
-    Variant getPathInfo(const Variant &_class = {});
-    Variant openFile(const Variant &mode = "r", const Variant &use_include_path = false, const Variant &context = {});
-    Variant setFileClass(const Variant &_class = "SplFileObject");
-    Variant setInfoClass(const Variant &_class = "SplFileInfo");
-    Variant __debugInfo();
-    Variant _bad_state_ex();
-};
-
-class PharFileInfo {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    PharFileInfo(const Variant &filename);
-    Variant chmod(const Variant &perms);
-    Variant compress(const Variant &compression);
-    Variant decompress();
-    Variant delMetadata();
-    Variant getCompressedSize();
-    Variant getCRC32();
-    Variant getContent();
-    Variant getMetadata(const Variant &unserialize_options = Array{});
-    Variant getPharFlags();
-    Variant hasMetadata();
-    Variant isCompressed(const Variant &compression = {});
-    Variant isCRCChecked();
-    Variant setMetadata(const Variant &metadata);
-    Variant getPath();
-    Variant getFilename();
-    Variant getExtension();
-    Variant getBasename(const Variant &suffix = "");
-    Variant getPathname();
-    Variant getPerms();
-    Variant getInode();
-    Variant getSize();
-    Variant getOwner();
-    Variant getGroup();
-    Variant getATime();
-    Variant getMTime();
-    Variant getCTime();
-    Variant getType();
-    Variant isWritable();
-    Variant isReadable();
-    Variant isExecutable();
-    Variant isFile();
-    Variant isDir();
-    Variant isLink();
-    Variant getLinkTarget();
-    Variant getRealPath();
-    Variant getFileInfo(const Variant &_class = {});
-    Variant getPathInfo(const Variant &_class = {});
-    Variant openFile(const Variant &mode = "r", const Variant &use_include_path = false, const Variant &context = {});
-    Variant setFileClass(const Variant &_class = "SplFileObject");
-    Variant setInfoClass(const Variant &_class = "SplFileInfo");
-    Variant __toString();
-    Variant __debugInfo();
-    Variant _bad_state_ex();
 };
 
 }  // namespace php

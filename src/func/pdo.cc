@@ -6,7 +6,7 @@ namespace php {
 Variant pdo_drivers() {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[857]);
+        fn = getFunction(LITERAL_STRING[1037]);
     }
     return call(fn, {});
 }

@@ -1,10 +1,40 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
 
 namespace php {
+class InternalIterator;
+class Exception;
+class ErrorException;
+class Error;
+class CompileError;
+class ParseError;
+class TypeError;
+class ArgumentCountError;
+class ValueError;
+class ArithmeticError;
+class DivisionByZeroError;
+class UnhandledMatchError;
+class RequestParseBodyException;
+class Closure;
+class Generator;
+class ClosedGeneratorException;
+class WeakReference;
+class WeakMap;
+class Attribute;
+class ReturnTypeWillChange;
+class AllowDynamicProperties;
+class SensitiveParameter;
+class SensitiveParameterValue;
+class Override;
+class Deprecated;
+class Fiber;
+class FiberError;
+class stdClass;
+
 class InternalIterator {
+  protected:
     Object this_;
 
   public:
@@ -19,6 +49,7 @@ class InternalIterator {
 };
 
 class Exception {
+  protected:
     Object this_;
 
   public:
@@ -37,13 +68,8 @@ class Exception {
     Variant __toString();
 };
 
-class ErrorException {
-    Object this_;
-
+class ErrorException : public Exception {
   public:
-    Object getObject() const {
-        return this_;
-    }
     ErrorException(const Variant &message = "",
                    const Variant &code = 0,
                    const Variant &severity = 1,
@@ -51,18 +77,10 @@ class ErrorException {
                    const Variant &line = {},
                    const Variant &previous = {});
     Variant getSeverity();
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
 class Error {
+  protected:
     Object this_;
 
   public:
@@ -81,178 +99,53 @@ class Error {
     Variant __toString();
 };
 
-class CompileError {
-    Object this_;
-
+class CompileError : public Error {
   public:
-    Object getObject() const {
-        return this_;
-    }
     CompileError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class ParseError {
-    Object this_;
-
+class ParseError : public CompileError {
   public:
-    Object getObject() const {
-        return this_;
-    }
     ParseError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class TypeError {
-    Object this_;
-
+class TypeError : public Error {
   public:
-    Object getObject() const {
-        return this_;
-    }
     TypeError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class ArgumentCountError {
-    Object this_;
-
+class ArgumentCountError : public TypeError {
   public:
-    Object getObject() const {
-        return this_;
-    }
     ArgumentCountError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class ValueError {
-    Object this_;
-
+class ValueError : public Error {
   public:
-    Object getObject() const {
-        return this_;
-    }
     ValueError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class ArithmeticError {
-    Object this_;
-
+class ArithmeticError : public Error {
   public:
-    Object getObject() const {
-        return this_;
-    }
     ArithmeticError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class DivisionByZeroError {
-    Object this_;
-
+class DivisionByZeroError : public ArithmeticError {
   public:
-    Object getObject() const {
-        return this_;
-    }
     DivisionByZeroError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class UnhandledMatchError {
-    Object this_;
-
+class UnhandledMatchError : public Error {
   public:
-    Object getObject() const {
-        return this_;
-    }
     UnhandledMatchError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class RequestParseBodyException {
-    Object this_;
-
+class RequestParseBodyException : public Exception {
   public:
-    Object getObject() const {
-        return this_;
-    }
     RequestParseBodyException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
 class Closure {
+  protected:
     Object this_;
 
   public:
@@ -260,7 +153,7 @@ class Closure {
         return this_;
     }
     static Variant bind(const Closure &closure, const Variant &new_this, const Variant &new_scope = "static");
-    Variant bind(const Variant &closure, const Variant &new_this, const Variant &new_scope = "static");
+    static Variant bind(const Variant &closure, const Variant &new_this, const Variant &new_scope = "static");
     Variant bindTo(const Variant &new_this, const Variant &new_scope = "static");
     template <typename... Args>
     Variant call(const Variant &new_this, const Args &...args) {
@@ -275,6 +168,7 @@ class Closure {
 };
 
 class Generator {
+  protected:
     Object this_;
 
   public:
@@ -289,31 +183,18 @@ class Generator {
     Variant key();
     Variant next();
     Variant send(const Variant &value);
-    Variant _throw(const Variant &exception);
+    Variant throw_(const Variant &exception);
     Variant getReturn();
     Variant __debugInfo();
 };
 
-class ClosedGeneratorException {
-    Object this_;
-
+class ClosedGeneratorException : public Exception {
   public:
-    Object getObject() const {
-        return this_;
-    }
     ClosedGeneratorException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
 class WeakReference {
+  protected:
     Object this_;
 
   public:
@@ -326,6 +207,7 @@ class WeakReference {
 };
 
 class WeakMap {
+  protected:
     Object this_;
 
   public:
@@ -343,16 +225,27 @@ class WeakMap {
 };
 
 class Attribute {
+  protected:
     Object this_;
 
   public:
     Object getObject() const {
         return this_;
     }
+    static constexpr int TARGET_CLASS_ = 1;
+    static constexpr int TARGET_FUNCTION_ = 2;
+    static constexpr int TARGET_METHOD_ = 4;
+    static constexpr int TARGET_PROPERTY_ = 8;
+    static constexpr int TARGET_CLASS_CONSTANT_ = 16;
+    static constexpr int TARGET_PARAMETER_ = 32;
+    static constexpr int TARGET_ALL_ = 63;
+    static constexpr int IS_REPEATABLE_ = 64;
+
     Attribute(const Variant &flags = 63);
 };
 
 class ReturnTypeWillChange {
+  protected:
     Object this_;
 
   public:
@@ -363,6 +256,7 @@ class ReturnTypeWillChange {
 };
 
 class AllowDynamicProperties {
+  protected:
     Object this_;
 
   public:
@@ -373,6 +267,7 @@ class AllowDynamicProperties {
 };
 
 class SensitiveParameter {
+  protected:
     Object this_;
 
   public:
@@ -383,7 +278,9 @@ class SensitiveParameter {
 };
 
 class SensitiveParameterValue {
+  protected:
     Object this_;
+    SensitiveParameterValue() = default;
 
   public:
     Object getObject() const {
@@ -395,6 +292,7 @@ class SensitiveParameterValue {
 };
 
 class Override {
+  protected:
     Object this_;
 
   public:
@@ -405,6 +303,7 @@ class Override {
 };
 
 class Deprecated {
+  protected:
     Object this_;
 
   public:
@@ -415,7 +314,9 @@ class Deprecated {
 };
 
 class Fiber {
+  protected:
     Object this_;
+    Fiber() = default;
 
   public:
     Object getObject() const {
@@ -431,7 +332,7 @@ class Fiber {
         return this_.call(_method_fn, {args...});
     }
     Variant resume(const Variant &value = {});
-    Variant _throw(const Variant &exception);
+    Variant throw_(const Variant &exception);
     Variant isStarted();
     Variant isSuspended();
     Variant isRunning();
@@ -441,26 +342,13 @@ class Fiber {
     static Variant suspend(const Variant &value = {});
 };
 
-class FiberError {
-    Object this_;
-
+class FiberError : public Error {
   public:
-    Object getObject() const {
-        return this_;
-    }
     FiberError();
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
 class stdClass {
+  protected:
     Object this_;
 
   public:

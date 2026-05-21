@@ -1,26 +1,15 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
+#include "class/core.h"
 
 namespace php {
-class JsonException {
-    Object this_;
+class JsonException;
 
+class JsonException : public Exception {
   public:
-    Object getObject() const {
-        return this_;
-    }
     JsonException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
 }  // namespace php

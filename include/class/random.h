@@ -1,67 +1,37 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
+#include "class/core.h"
 
 namespace php {
-class Random_RandomError {
-    Object this_;
+class Random_RandomError;
+class Random_BrokenRandomEngineError;
+class Random_RandomException;
+class Random_Engine_Mt19937;
+class Random_Engine_PcgOneseq128XslRr64;
+class Random_Engine_Xoshiro256StarStar;
+class Random_Engine_Secure;
+class Random_IntervalBoundary;
+class Random_Randomizer;
 
+class Random_RandomError : public Error {
   public:
-    Object getObject() const {
-        return this_;
-    }
     Random_RandomError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class Random_BrokenRandomEngineError {
-    Object this_;
-
+class Random_BrokenRandomEngineError : public Random_RandomError {
   public:
-    Object getObject() const {
-        return this_;
-    }
     Random_BrokenRandomEngineError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class Random_RandomException {
-    Object this_;
-
+class Random_RandomException : public Exception {
   public:
-    Object getObject() const {
-        return this_;
-    }
     Random_RandomException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
 class Random_Engine_Mt19937 {
+  protected:
     Object this_;
 
   public:
@@ -76,6 +46,7 @@ class Random_Engine_Mt19937 {
 };
 
 class Random_Engine_PcgOneseq128XslRr64 {
+  protected:
     Object this_;
 
   public:
@@ -91,6 +62,7 @@ class Random_Engine_PcgOneseq128XslRr64 {
 };
 
 class Random_Engine_Xoshiro256StarStar {
+  protected:
     Object this_;
 
   public:
@@ -107,6 +79,7 @@ class Random_Engine_Xoshiro256StarStar {
 };
 
 class Random_Engine_Secure {
+  protected:
     Object this_;
 
   public:
@@ -119,6 +92,7 @@ class Random_Engine_Secure {
 };
 
 class Random_IntervalBoundary {
+  protected:
     Object this_;
 
   public:
@@ -131,6 +105,7 @@ class Random_IntervalBoundary {
 };
 
 class Random_Randomizer {
+  protected:
     Object this_;
 
   public:

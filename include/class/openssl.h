@@ -1,10 +1,15 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
 
 namespace php {
+class OpenSSLCertificate;
+class OpenSSLCertificateSigningRequest;
+class OpenSSLAsymmetricKey;
+
 class OpenSSLCertificate {
+  protected:
     Object this_;
 
   public:
@@ -16,6 +21,7 @@ class OpenSSLCertificate {
 };
 
 class OpenSSLCertificateSigningRequest {
+  protected:
     Object this_;
 
   public:
@@ -27,6 +33,7 @@ class OpenSSLCertificateSigningRequest {
 };
 
 class OpenSSLAsymmetricKey {
+  protected:
     Object this_;
 
   public:

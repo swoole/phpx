@@ -1,11 +1,15 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
 
 namespace php {
+class BcMath_Number;
+
 class BcMath_Number {
+  protected:
     Object this_;
+    BcMath_Number() = default;
 
   public:
     Object getObject() const {

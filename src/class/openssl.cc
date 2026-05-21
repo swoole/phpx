@@ -1,14 +1,15 @@
 #include "phpx.h"
+#include "phpx_class.h"
 #include "class/openssl.h"
 
 namespace php {
 OpenSSLCertificate::OpenSSLCertificate() {
-    this_ = newObject(LITERAL_STRING[811]);
+    this_ = newObject(LITERAL_STRING[991]);
 }
 OpenSSLCertificateSigningRequest::OpenSSLCertificateSigningRequest() {
-    this_ = newObject(LITERAL_STRING[812]);
+    this_ = newObject(LITERAL_STRING[992]);
 }
 OpenSSLAsymmetricKey::OpenSSLAsymmetricKey() {
-    this_ = newObject(LITERAL_STRING[813]);
+    this_ = newObject(LITERAL_STRING[993]);
 }
 }  // namespace php

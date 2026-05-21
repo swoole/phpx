@@ -1,35 +1,36 @@
 #include "phpx.h"
+#include "phpx_class.h"
 #include "class/tokenizer.h"
 
 namespace php {
 Variant PhpToken::tokenize(const Variant &code, const Variant &flags) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(LITERAL_STRING[2423], LITERAL_STRING[2424]);
+        _method_fn = php::getMethod(LITERAL_STRING[2587], LITERAL_STRING[2588]);
     }
     return php::call(_method_fn, {code, flags});
 }
 PhpToken::PhpToken(const Variant &id, const Variant &text, const Variant &line, const Variant &pos) {
-    this_ = newObject(LITERAL_STRING[2423], {id, text, line, pos});
+    this_ = newObject(LITERAL_STRING[2587], {id, text, line, pos});
 }
 Variant PhpToken::is(const Variant &kind) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2425]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2589]);
     }
     return this_.call(_method_fn, {kind});
 }
 Variant PhpToken::isIgnorable() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2426]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2590]);
     }
     return this_.call(_method_fn, {});
 }
 Variant PhpToken::getTokenName() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2427]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2591]);
     }
     return this_.call(_method_fn, {});
 }

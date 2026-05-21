@@ -8,12 +8,12 @@ namespace php {
 Variant class_implements(const Variant &object_or_class, const Variant &autoload = true);
 Variant class_parents(const Variant &object_or_class, const Variant &autoload = true);
 Variant class_uses(const Variant &object_or_class, const Variant &autoload = true);
-Variant spl_autoload(const Variant &_class, const Variant &file_extensions = {});
-Variant spl_autoload_call(const Variant &_class);
+Variant spl_autoload(const Variant &class_, const Variant &file_extensions = {});
+Variant spl_autoload_call(const Variant &class_);
 Variant spl_autoload_extensions(const Variant &file_extensions = {});
 Variant spl_autoload_functions();
 Variant spl_autoload_register(const Variant &callback = {},
-                              const Variant &_throw = true,
+                              const Variant &throw_ = true,
                               const Variant &prepend = false);
 Variant spl_autoload_unregister(const Variant &callback);
 Variant spl_classes();

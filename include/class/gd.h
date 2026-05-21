@@ -1,10 +1,14 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
 
 namespace php {
+class GdImage;
+class GdFont;
+
 class GdImage {
+  protected:
     Object this_;
 
   public:
@@ -16,6 +20,7 @@ class GdImage {
 };
 
 class GdFont {
+  protected:
     Object this_;
 
   public:

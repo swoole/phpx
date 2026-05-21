@@ -1,10 +1,13 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
 
 namespace php {
+class XMLWriter;
+
 class XMLWriter {
+  protected:
     Object this_;
 
   public:
@@ -25,19 +28,19 @@ class XMLWriter {
     Variant startAttribute(const Variant &name);
     Variant endAttribute();
     Variant writeAttribute(const Variant &name, const Variant &value);
-    Variant startAttributeNs(const Variant &prefix, const Variant &name, const Variant &_namespace);
+    Variant startAttributeNs(const Variant &prefix, const Variant &name, const Variant &namespace_);
     Variant writeAttributeNs(const Variant &prefix,
                              const Variant &name,
-                             const Variant &_namespace,
+                             const Variant &namespace_,
                              const Variant &value);
     Variant startElement(const Variant &name);
     Variant endElement();
     Variant fullEndElement();
-    Variant startElementNs(const Variant &prefix, const Variant &name, const Variant &_namespace);
+    Variant startElementNs(const Variant &prefix, const Variant &name, const Variant &namespace_);
     Variant writeElement(const Variant &name, const Variant &content = {});
     Variant writeElementNs(const Variant &prefix,
                            const Variant &name,
-                           const Variant &_namespace,
+                           const Variant &namespace_,
                            const Variant &content = {});
     Variant startPi(const Variant &target);
     Variant endPi();

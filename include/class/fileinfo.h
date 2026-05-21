@@ -1,10 +1,13 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
 
 namespace php {
+class finfo;
+
 class finfo {
+  protected:
     Object this_;
 
   public:

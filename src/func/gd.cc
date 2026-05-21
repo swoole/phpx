@@ -1131,49 +1131,49 @@ Variant imagechar(const GdImage &image,
                   const Variant &font,
                   const Variant &x,
                   const Variant &y,
-                  const Variant &_char,
+                  const Variant &char_,
                   const Variant &color) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[614]);
     }
-    return call(fn, {image.getObject(), font, x, y, _char, color});
+    return call(fn, {image.getObject(), font, x, y, char_, color});
 }
 Variant imagechar(const Variant &image,
                   const Variant &font,
                   const Variant &x,
                   const Variant &y,
-                  const Variant &_char,
+                  const Variant &char_,
                   const Variant &color) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[614]);
     }
-    return call(fn, {image, font, x, y, _char, color});
+    return call(fn, {image, font, x, y, char_, color});
 }
 Variant imagecharup(const GdImage &image,
                     const Variant &font,
                     const Variant &x,
                     const Variant &y,
-                    const Variant &_char,
+                    const Variant &char_,
                     const Variant &color) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[615]);
     }
-    return call(fn, {image.getObject(), font, x, y, _char, color});
+    return call(fn, {image.getObject(), font, x, y, char_, color});
 }
 Variant imagecharup(const Variant &image,
                     const Variant &font,
                     const Variant &x,
                     const Variant &y,
-                    const Variant &_char,
+                    const Variant &char_,
                     const Variant &color) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(LITERAL_STRING[615]);
     }
-    return call(fn, {image, font, x, y, _char, color});
+    return call(fn, {image, font, x, y, char_, color});
 }
 Variant imagestring(const GdImage &image,
                     const Variant &font,

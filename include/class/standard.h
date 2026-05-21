@@ -1,10 +1,19 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
+#include "class/core.h"
 
 namespace php {
+class __PHP_Incomplete_Class;
+class AssertionError;
+class RoundingMode;
+class php_user_filter;
+class StreamBucket;
+class Directory;
+
 class __PHP_Incomplete_Class {
+  protected:
     Object this_;
 
   public:
@@ -15,26 +24,13 @@ class __PHP_Incomplete_Class {
     __PHP_Incomplete_Class();
 };
 
-class AssertionError {
-    Object this_;
-
+class AssertionError : public Error {
   public:
-    Object getObject() const {
-        return this_;
-    }
     AssertionError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
 class RoundingMode {
+  protected:
     Object this_;
 
   public:
@@ -47,6 +43,7 @@ class RoundingMode {
 };
 
 class php_user_filter {
+  protected:
     Object this_;
 
   public:
@@ -61,6 +58,7 @@ class php_user_filter {
 };
 
 class StreamBucket {
+  protected:
     Object this_;
 
   public:
@@ -72,6 +70,7 @@ class StreamBucket {
 };
 
 class Directory {
+  protected:
     Object this_;
 
   public:

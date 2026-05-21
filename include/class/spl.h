@@ -1,263 +1,137 @@
 #pragma once
 
-#include "phpx_class.h"
+#include "phpx.h"
 #include "phpx_literal_string.h"
+#include "class/core.h"
 
 namespace php {
-class LogicException {
-    Object this_;
+class LogicException;
+class BadFunctionCallException;
+class BadMethodCallException;
+class DomainException;
+class InvalidArgumentException;
+class LengthException;
+class OutOfRangeException;
+class RuntimeException;
+class OutOfBoundsException;
+class OverflowException;
+class RangeException;
+class UnderflowException;
+class UnexpectedValueException;
+class RecursiveIteratorIterator;
+class IteratorIterator;
+class CallbackFilterIterator;
+class RecursiveCallbackFilterIterator;
+class ParentIterator;
+class LimitIterator;
+class CachingIterator;
+class RecursiveCachingIterator;
+class NoRewindIterator;
+class InfiniteIterator;
+class RegexIterator;
+class RecursiveRegexIterator;
+class EmptyIterator;
+class RecursiveTreeIterator;
+class ArrayObject;
+class ArrayIterator_;
+class AppendIterator;
+class RecursiveArrayIterator;
+class SplDoublyLinkedList;
+class SplQueue;
+class SplStack;
+class SplMinHeap;
+class SplMaxHeap;
+class SplPriorityQueue;
+class SplFixedArray;
+class SplObjectStorage;
+class MultipleIterator;
+class SplFileInfo;
+class SplFileObject;
+class DirectoryIterator;
+class FilesystemIterator;
+class RecursiveDirectoryIterator;
+class GlobIterator;
+class SplTempFileObject;
 
+class LogicException : public Exception {
   public:
-    Object getObject() const {
-        return this_;
-    }
     LogicException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class BadFunctionCallException {
-    Object this_;
-
+class BadFunctionCallException : public LogicException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     BadFunctionCallException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class BadMethodCallException {
-    Object this_;
-
+class BadMethodCallException : public BadFunctionCallException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     BadMethodCallException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class DomainException {
-    Object this_;
-
+class DomainException : public LogicException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     DomainException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class InvalidArgumentException {
-    Object this_;
-
+class InvalidArgumentException : public LogicException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     InvalidArgumentException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class LengthException {
-    Object this_;
-
+class LengthException : public LogicException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     LengthException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class OutOfRangeException {
-    Object this_;
-
+class OutOfRangeException : public LogicException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     OutOfRangeException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class RuntimeException {
-    Object this_;
-
+class RuntimeException : public Exception {
   public:
-    Object getObject() const {
-        return this_;
-    }
     RuntimeException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class OutOfBoundsException {
-    Object this_;
-
+class OutOfBoundsException : public RuntimeException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     OutOfBoundsException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class OverflowException {
-    Object this_;
-
+class OverflowException : public RuntimeException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     OverflowException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class RangeException {
-    Object this_;
-
+class RangeException : public RuntimeException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     RangeException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class UnderflowException {
-    Object this_;
-
+class UnderflowException : public RuntimeException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     UnderflowException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
-class UnexpectedValueException {
-    Object this_;
-
+class UnexpectedValueException : public RuntimeException {
   public:
-    Object getObject() const {
-        return this_;
-    }
     UnexpectedValueException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-    Variant __wakeup();
-    Variant getMessage();
-    Variant getCode();
-    Variant getFile();
-    Variant getLine();
-    Variant getTrace();
-    Variant getPrevious();
-    Variant getTraceAsString();
-    Variant __toString();
 };
 
 class RecursiveIteratorIterator {
+  protected:
     Object this_;
+    RecursiveIteratorIterator() = default;
 
   public:
     Object getObject() const {
         return this_;
     }
+    static constexpr int LEAVES_ONLY = 0;
+    static constexpr int SELF_FIRST = 1;
+    static constexpr int CHILD_FIRST = 2;
+    static constexpr int CATCH_GET_CHILD = 16;
+
     RecursiveIteratorIterator(const Variant &iterator, const Variant &mode = 0, const Variant &flags = 0);
     Variant rewind();
     Variant valid();
@@ -279,13 +153,15 @@ class RecursiveIteratorIterator {
 };
 
 class IteratorIterator {
+  protected:
     Object this_;
+    IteratorIterator() = default;
 
   public:
     Object getObject() const {
         return this_;
     }
-    IteratorIterator(const Variant &iterator, const Variant &_class = {});
+    IteratorIterator(const Variant &iterator, const Variant &class_ = {});
     Variant getInnerIterator();
     Variant rewind();
     Variant valid();
@@ -295,7 +171,9 @@ class IteratorIterator {
 };
 
 class CallbackFilterIterator {
+  protected:
     Object this_;
+    CallbackFilterIterator() = default;
 
   public:
     Object getObject() const {
@@ -311,27 +189,20 @@ class CallbackFilterIterator {
     Variant current();
 };
 
-class RecursiveCallbackFilterIterator {
-    Object this_;
+class RecursiveCallbackFilterIterator : public CallbackFilterIterator {
+  protected:
+    RecursiveCallbackFilterIterator() = default;
 
   public:
-    Object getObject() const {
-        return this_;
-    }
     RecursiveCallbackFilterIterator(const Variant &iterator, const Variant &callback);
     Variant hasChildren();
     Variant getChildren();
-    Variant accept();
-    Variant rewind();
-    Variant next();
-    Variant getInnerIterator();
-    Variant valid();
-    Variant key();
-    Variant current();
 };
 
 class ParentIterator {
+  protected:
     Object this_;
+    ParentIterator() = default;
 
   public:
     Object getObject() const {
@@ -349,31 +220,31 @@ class ParentIterator {
     Variant current();
 };
 
-class LimitIterator {
-    Object this_;
+class LimitIterator : public IteratorIterator {
+  protected:
+    LimitIterator() = default;
 
   public:
-    Object getObject() const {
-        return this_;
-    }
     LimitIterator(const Variant &iterator, const Variant &offset = 0, const Variant &limit = -1);
     Variant rewind();
     Variant valid();
     Variant next();
     Variant seek(const Variant &offset);
     Variant getPosition();
-    Variant getInnerIterator();
-    Variant key();
-    Variant current();
 };
 
-class CachingIterator {
-    Object this_;
+class CachingIterator : public IteratorIterator {
+  protected:
+    CachingIterator() = default;
 
   public:
-    Object getObject() const {
-        return this_;
-    }
+    static constexpr int CALL_TOSTRING = 1;
+    static constexpr int CATCH_GET_CHILD = 16;
+    static constexpr int TOSTRING_USE_KEY = 2;
+    static constexpr int TOSTRING_USE_CURRENT = 4;
+    static constexpr int TOSTRING_USE_INNER = 8;
+    static constexpr int FULL_CACHE = 256;
+
     CachingIterator(const Variant &iterator, const Variant &flags = 1);
     Variant rewind();
     Variant valid();
@@ -388,97 +259,57 @@ class CachingIterator {
     Variant offsetExists(const Variant &key);
     Variant getCache();
     Variant count();
-    Variant getInnerIterator();
-    Variant key();
-    Variant current();
 };
 
-class RecursiveCachingIterator {
-    Object this_;
+class RecursiveCachingIterator : public CachingIterator {
+  protected:
+    RecursiveCachingIterator() = default;
 
   public:
-    Object getObject() const {
-        return this_;
-    }
     RecursiveCachingIterator(const Variant &iterator, const Variant &flags = 1);
     Variant hasChildren();
     Variant getChildren();
-    Variant rewind();
-    Variant valid();
-    Variant next();
-    Variant hasNext();
-    Variant __toString();
-    Variant getFlags();
-    Variant setFlags(const Variant &flags);
-    Variant offsetGet(const Variant &key);
-    Variant offsetSet(const Variant &key, const Variant &value);
-    Variant offsetUnset(const Variant &key);
-    Variant offsetExists(const Variant &key);
-    Variant getCache();
-    Variant count();
-    Variant getInnerIterator();
-    Variant key();
-    Variant current();
 };
 
-class NoRewindIterator {
-    Object this_;
+class NoRewindIterator : public IteratorIterator {
+  protected:
+    NoRewindIterator() = default;
 
   public:
-    Object getObject() const {
-        return this_;
-    }
     NoRewindIterator(const Variant &iterator);
     Variant rewind();
     Variant valid();
     Variant key();
     Variant current();
     Variant next();
-    Variant getInnerIterator();
 };
 
-class AppendIterator {
-    Object this_;
+class InfiniteIterator : public IteratorIterator {
+  protected:
+    InfiniteIterator() = default;
 
   public:
-    Object getObject() const {
-        return this_;
-    }
-    AppendIterator();
-    Variant append(const Variant &iterator);
-    Variant rewind();
-    Variant valid();
-    Variant current();
-    Variant next();
-    Variant getIteratorIndex();
-    Variant getArrayIterator();
-    Variant getInnerIterator();
-    Variant key();
-};
-
-class InfiniteIterator {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
     InfiniteIterator(const Variant &iterator);
     Variant next();
-    Variant getInnerIterator();
-    Variant rewind();
-    Variant valid();
-    Variant key();
-    Variant current();
 };
 
 class RegexIterator {
+  protected:
     Object this_;
+    RegexIterator() = default;
 
   public:
     Object getObject() const {
         return this_;
     }
+    static constexpr int USE_KEY = 1;
+    static constexpr int INVERT_MATCH = 2;
+    static constexpr int MATCH = 0;
+    static constexpr int GET_MATCH = 1;
+    static constexpr int ALL_MATCHES = 2;
+    static constexpr int SPLIT = 3;
+    static constexpr int REPLACE = 4;
+
     RegexIterator(const Variant &iterator,
                   const Variant &pattern,
                   const Variant &mode = 0,
@@ -500,13 +331,11 @@ class RegexIterator {
     Variant current();
 };
 
-class RecursiveRegexIterator {
-    Object this_;
+class RecursiveRegexIterator : public RegexIterator {
+  protected:
+    RecursiveRegexIterator() = default;
 
   public:
-    Object getObject() const {
-        return this_;
-    }
     RecursiveRegexIterator(const Variant &iterator,
                            const Variant &pattern,
                            const Variant &mode = 0,
@@ -515,22 +344,10 @@ class RecursiveRegexIterator {
     Variant accept();
     Variant hasChildren();
     Variant getChildren();
-    Variant getMode();
-    Variant setMode(const Variant &mode);
-    Variant getFlags();
-    Variant setFlags(const Variant &flags);
-    Variant getRegex();
-    Variant getPregFlags();
-    Variant setPregFlags(const Variant &preg_flags);
-    Variant rewind();
-    Variant next();
-    Variant getInnerIterator();
-    Variant valid();
-    Variant key();
-    Variant current();
 };
 
 class EmptyIterator {
+  protected:
     Object this_;
 
   public:
@@ -546,13 +363,20 @@ class EmptyIterator {
     Variant rewind();
 };
 
-class RecursiveTreeIterator {
-    Object this_;
+class RecursiveTreeIterator : public RecursiveIteratorIterator {
+  protected:
+    RecursiveTreeIterator() = default;
 
   public:
-    Object getObject() const {
-        return this_;
-    }
+    static constexpr int BYPASS_CURRENT = 4;
+    static constexpr int BYPASS_KEY = 8;
+    static constexpr int PREFIX_LEFT = 0;
+    static constexpr int PREFIX_MID_HAS_NEXT = 1;
+    static constexpr int PREFIX_MID_LAST = 2;
+    static constexpr int PREFIX_END_HAS_NEXT = 3;
+    static constexpr int PREFIX_END_LAST = 4;
+    static constexpr int PREFIX_RIGHT = 5;
+
     RecursiveTreeIterator(const Variant &iterator,
                           const Variant &flags = 8,
                           const Variant &caching_iterator_flags = 16,
@@ -564,30 +388,19 @@ class RecursiveTreeIterator {
     Variant setPrefixPart(const Variant &part, const Variant &value);
     Variant getEntry();
     Variant getPostfix();
-    Variant rewind();
-    Variant valid();
-    Variant next();
-    Variant getDepth();
-    Variant getSubIterator(const Variant &level = {});
-    Variant getInnerIterator();
-    Variant beginIteration();
-    Variant endIteration();
-    Variant callHasChildren();
-    Variant callGetChildren();
-    Variant beginChildren();
-    Variant endChildren();
-    Variant nextElement();
-    Variant setMaxDepth(const Variant &max_depth = -1);
-    Variant getMaxDepth();
 };
 
 class ArrayObject {
+  protected:
     Object this_;
 
   public:
     Object getObject() const {
         return this_;
     }
+    static constexpr int STD_PROP_LIST = 1;
+    static constexpr int ARRAY_AS_PROPS = 2;
+
     ArrayObject(const Variant &array = Array{},
                 const Variant &flags = 0,
                 const Variant &iterator_class = "ArrayIterator");
@@ -617,14 +430,18 @@ class ArrayObject {
     Variant __debugInfo();
 };
 
-class _ArrayIterator {
+class ArrayIterator_ {
+  protected:
     Object this_;
 
   public:
     Object getObject() const {
         return this_;
     }
-    _ArrayIterator(const Variant &array = Array{}, const Variant &flags = 0);
+    static constexpr int STD_PROP_LIST = 1;
+    static constexpr int ARRAY_AS_PROPS = 2;
+
+    ArrayIterator_(const Variant &array = Array{}, const Variant &flags = 0);
     Variant offsetExists(const Variant &key);
     Variant offsetGet(const Variant &key);
     Variant offsetSet(const Variant &key, const Variant &value);
@@ -653,453 +470,29 @@ class _ArrayIterator {
     Variant __debugInfo();
 };
 
-class RecursiveArrayIterator {
-    Object this_;
-
+class AppendIterator : public IteratorIterator {
   public:
-    Object getObject() const {
-        return this_;
-    }
+    AppendIterator();
+    Variant append(const Variant &iterator);
+    Variant rewind();
+    Variant valid();
+    Variant current();
+    Variant next();
+    Variant getIteratorIndex();
+    Variant getArrayIterator();
+};
+
+class RecursiveArrayIterator : public ArrayIterator_ {
+  public:
+    static constexpr int CHILD_ARRAYS_ONLY = 4;
+
     Variant hasChildren();
     Variant getChildren();
     RecursiveArrayIterator(const Variant &array = Array{}, const Variant &flags = 0);
-    Variant offsetExists(const Variant &key);
-    Variant offsetGet(const Variant &key);
-    Variant offsetSet(const Variant &key, const Variant &value);
-    Variant offsetUnset(const Variant &key);
-    Variant append(const Variant &value);
-    Variant getArrayCopy();
-    Variant count();
-    Variant getFlags();
-    Variant setFlags(const Variant &flags);
-    Variant asort(const Variant &flags = 0);
-    Variant ksort(const Variant &flags = 0);
-    Variant uasort(const Variant &callback);
-    Variant uksort(const Variant &callback);
-    Variant natsort();
-    Variant natcasesort();
-    Variant unserialize(const Variant &data);
-    Variant serialize();
-    Variant __serialize();
-    Variant __unserialize(const Variant &data);
-    Variant rewind();
-    Variant current();
-    Variant key();
-    Variant next();
-    Variant valid();
-    Variant seek(const Variant &offset);
-    Variant __debugInfo();
-};
-
-class SplFileInfo {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    SplFileInfo(const Variant &filename);
-    Variant getPath();
-    Variant getFilename();
-    Variant getExtension();
-    Variant getBasename(const Variant &suffix = "");
-    Variant getPathname();
-    Variant getPerms();
-    Variant getInode();
-    Variant getSize();
-    Variant getOwner();
-    Variant getGroup();
-    Variant getATime();
-    Variant getMTime();
-    Variant getCTime();
-    Variant getType();
-    Variant isWritable();
-    Variant isReadable();
-    Variant isExecutable();
-    Variant isFile();
-    Variant isDir();
-    Variant isLink();
-    Variant getLinkTarget();
-    Variant getRealPath();
-    Variant getFileInfo(const Variant &_class = {});
-    Variant getPathInfo(const Variant &_class = {});
-    Variant openFile(const Variant &mode = "r", const Variant &use_include_path = false, const Variant &context = {});
-    Variant setFileClass(const Variant &_class = "SplFileObject");
-    Variant setInfoClass(const Variant &_class = "SplFileInfo");
-    Variant __toString();
-    Variant __debugInfo();
-    Variant _bad_state_ex();
-};
-
-class DirectoryIterator {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    DirectoryIterator(const Variant &directory);
-    Variant getFilename();
-    Variant getExtension();
-    Variant getBasename(const Variant &suffix = "");
-    Variant isDot();
-    Variant rewind();
-    Variant valid();
-    Variant key();
-    Variant current();
-    Variant next();
-    Variant seek(const Variant &offset);
-    Variant __toString();
-    Variant getPath();
-    Variant getPathname();
-    Variant getPerms();
-    Variant getInode();
-    Variant getSize();
-    Variant getOwner();
-    Variant getGroup();
-    Variant getATime();
-    Variant getMTime();
-    Variant getCTime();
-    Variant getType();
-    Variant isWritable();
-    Variant isReadable();
-    Variant isExecutable();
-    Variant isFile();
-    Variant isDir();
-    Variant isLink();
-    Variant getLinkTarget();
-    Variant getRealPath();
-    Variant getFileInfo(const Variant &_class = {});
-    Variant getPathInfo(const Variant &_class = {});
-    Variant openFile(const Variant &mode = "r", const Variant &use_include_path = false, const Variant &context = {});
-    Variant setFileClass(const Variant &_class = "SplFileObject");
-    Variant setInfoClass(const Variant &_class = "SplFileInfo");
-    Variant __debugInfo();
-    Variant _bad_state_ex();
-};
-
-class FilesystemIterator {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    FilesystemIterator(const Variant &directory, const Variant &flags = 4096);
-    Variant rewind();
-    Variant key();
-    Variant current();
-    Variant getFlags();
-    Variant setFlags(const Variant &flags);
-    Variant getFilename();
-    Variant getExtension();
-    Variant getBasename(const Variant &suffix = "");
-    Variant isDot();
-    Variant valid();
-    Variant next();
-    Variant seek(const Variant &offset);
-    Variant __toString();
-    Variant getPath();
-    Variant getPathname();
-    Variant getPerms();
-    Variant getInode();
-    Variant getSize();
-    Variant getOwner();
-    Variant getGroup();
-    Variant getATime();
-    Variant getMTime();
-    Variant getCTime();
-    Variant getType();
-    Variant isWritable();
-    Variant isReadable();
-    Variant isExecutable();
-    Variant isFile();
-    Variant isDir();
-    Variant isLink();
-    Variant getLinkTarget();
-    Variant getRealPath();
-    Variant getFileInfo(const Variant &_class = {});
-    Variant getPathInfo(const Variant &_class = {});
-    Variant openFile(const Variant &mode = "r", const Variant &use_include_path = false, const Variant &context = {});
-    Variant setFileClass(const Variant &_class = "SplFileObject");
-    Variant setInfoClass(const Variant &_class = "SplFileInfo");
-    Variant __debugInfo();
-    Variant _bad_state_ex();
-};
-
-class RecursiveDirectoryIterator {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    RecursiveDirectoryIterator(const Variant &directory, const Variant &flags = 0);
-    Variant hasChildren(const Variant &allow_links = false);
-    Variant getChildren();
-    Variant getSubPath();
-    Variant getSubPathname();
-    Variant rewind();
-    Variant key();
-    Variant current();
-    Variant getFlags();
-    Variant setFlags(const Variant &flags);
-    Variant getFilename();
-    Variant getExtension();
-    Variant getBasename(const Variant &suffix = "");
-    Variant isDot();
-    Variant valid();
-    Variant next();
-    Variant seek(const Variant &offset);
-    Variant __toString();
-    Variant getPath();
-    Variant getPathname();
-    Variant getPerms();
-    Variant getInode();
-    Variant getSize();
-    Variant getOwner();
-    Variant getGroup();
-    Variant getATime();
-    Variant getMTime();
-    Variant getCTime();
-    Variant getType();
-    Variant isWritable();
-    Variant isReadable();
-    Variant isExecutable();
-    Variant isFile();
-    Variant isDir();
-    Variant isLink();
-    Variant getLinkTarget();
-    Variant getRealPath();
-    Variant getFileInfo(const Variant &_class = {});
-    Variant getPathInfo(const Variant &_class = {});
-    Variant openFile(const Variant &mode = "r", const Variant &use_include_path = false, const Variant &context = {});
-    Variant setFileClass(const Variant &_class = "SplFileObject");
-    Variant setInfoClass(const Variant &_class = "SplFileInfo");
-    Variant __debugInfo();
-    Variant _bad_state_ex();
-};
-
-class GlobIterator {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    GlobIterator(const Variant &pattern, const Variant &flags = 0);
-    Variant count();
-    Variant rewind();
-    Variant key();
-    Variant current();
-    Variant getFlags();
-    Variant setFlags(const Variant &flags);
-    Variant getFilename();
-    Variant getExtension();
-    Variant getBasename(const Variant &suffix = "");
-    Variant isDot();
-    Variant valid();
-    Variant next();
-    Variant seek(const Variant &offset);
-    Variant __toString();
-    Variant getPath();
-    Variant getPathname();
-    Variant getPerms();
-    Variant getInode();
-    Variant getSize();
-    Variant getOwner();
-    Variant getGroup();
-    Variant getATime();
-    Variant getMTime();
-    Variant getCTime();
-    Variant getType();
-    Variant isWritable();
-    Variant isReadable();
-    Variant isExecutable();
-    Variant isFile();
-    Variant isDir();
-    Variant isLink();
-    Variant getLinkTarget();
-    Variant getRealPath();
-    Variant getFileInfo(const Variant &_class = {});
-    Variant getPathInfo(const Variant &_class = {});
-    Variant openFile(const Variant &mode = "r", const Variant &use_include_path = false, const Variant &context = {});
-    Variant setFileClass(const Variant &_class = "SplFileObject");
-    Variant setInfoClass(const Variant &_class = "SplFileInfo");
-    Variant __debugInfo();
-    Variant _bad_state_ex();
-};
-
-class SplFileObject {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    SplFileObject(const Variant &filename,
-                  const Variant &mode = "r",
-                  const Variant &use_include_path = false,
-                  const Variant &context = {});
-    Variant rewind();
-    Variant eof();
-    Variant valid();
-    Variant fgets();
-    Variant fread(const Variant &length);
-    Variant fgetcsv(const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\");
-    Variant fputcsv(const Variant &fields,
-                    const Variant &separator = ",",
-                    const Variant &enclosure = "\"",
-                    const Variant &escape = "\\",
-                    const Variant &eol = "\n");
-    Variant setCsvControl(const Variant &separator = ",",
-                          const Variant &enclosure = "\"",
-                          const Variant &escape = "\\");
-    Variant getCsvControl();
-    Variant flock(const Variant &operation, const Reference &would_block = {});
-    Variant fflush();
-    Variant ftell();
-    Variant fseek(const Variant &offset, const Variant &whence = 0);
-    Variant fgetc();
-    Variant fpassthru();
-    template <typename... Args>
-    Variant fscanf(const Variant &format, const Args &...vars) {
-        static THREAD_LOCAL zend_function *_method_fn = nullptr;
-        if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1837]);
-        }
-        return this_.call(_method_fn, {format, vars...});
-    }
-    Variant fwrite(const Variant &data, const Variant &length = 0);
-    Variant fstat();
-    Variant ftruncate(const Variant &size);
-    Variant current();
-    Variant key();
-    Variant next();
-    Variant setFlags(const Variant &flags);
-    Variant getFlags();
-    Variant setMaxLineLen(const Variant &max_length);
-    Variant getMaxLineLen();
-    Variant hasChildren();
-    Variant getChildren();
-    Variant seek(const Variant &line);
-    Variant getCurrentLine();
-    Variant __toString();
-    Variant getPath();
-    Variant getFilename();
-    Variant getExtension();
-    Variant getBasename(const Variant &suffix = "");
-    Variant getPathname();
-    Variant getPerms();
-    Variant getInode();
-    Variant getSize();
-    Variant getOwner();
-    Variant getGroup();
-    Variant getATime();
-    Variant getMTime();
-    Variant getCTime();
-    Variant getType();
-    Variant isWritable();
-    Variant isReadable();
-    Variant isExecutable();
-    Variant isFile();
-    Variant isDir();
-    Variant isLink();
-    Variant getLinkTarget();
-    Variant getRealPath();
-    Variant getFileInfo(const Variant &_class = {});
-    Variant getPathInfo(const Variant &_class = {});
-    Variant openFile(const Variant &mode = "r", const Variant &use_include_path = false, const Variant &context = {});
-    Variant setFileClass(const Variant &_class = "SplFileObject");
-    Variant setInfoClass(const Variant &_class = "SplFileInfo");
-    Variant __debugInfo();
-    Variant _bad_state_ex();
-};
-
-class SplTempFileObject {
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    SplTempFileObject(const Variant &max_memory = 2097152);
-    Variant rewind();
-    Variant eof();
-    Variant valid();
-    Variant fgets();
-    Variant fread(const Variant &length);
-    Variant fgetcsv(const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\");
-    Variant fputcsv(const Variant &fields,
-                    const Variant &separator = ",",
-                    const Variant &enclosure = "\"",
-                    const Variant &escape = "\\",
-                    const Variant &eol = "\n");
-    Variant setCsvControl(const Variant &separator = ",",
-                          const Variant &enclosure = "\"",
-                          const Variant &escape = "\\");
-    Variant getCsvControl();
-    Variant flock(const Variant &operation, const Reference &would_block = {});
-    Variant fflush();
-    Variant ftell();
-    Variant fseek(const Variant &offset, const Variant &whence = 0);
-    Variant fgetc();
-    Variant fpassthru();
-    template <typename... Args>
-    Variant fscanf(const Variant &format, const Args &...vars) {
-        static THREAD_LOCAL zend_function *_method_fn = nullptr;
-        if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1837]);
-        }
-        return this_.call(_method_fn, {format, vars...});
-    }
-    Variant fwrite(const Variant &data, const Variant &length = 0);
-    Variant fstat();
-    Variant ftruncate(const Variant &size);
-    Variant current();
-    Variant key();
-    Variant next();
-    Variant setFlags(const Variant &flags);
-    Variant getFlags();
-    Variant setMaxLineLen(const Variant &max_length);
-    Variant getMaxLineLen();
-    Variant hasChildren();
-    Variant getChildren();
-    Variant seek(const Variant &line);
-    Variant getCurrentLine();
-    Variant __toString();
-    Variant getPath();
-    Variant getFilename();
-    Variant getExtension();
-    Variant getBasename(const Variant &suffix = "");
-    Variant getPathname();
-    Variant getPerms();
-    Variant getInode();
-    Variant getSize();
-    Variant getOwner();
-    Variant getGroup();
-    Variant getATime();
-    Variant getMTime();
-    Variant getCTime();
-    Variant getType();
-    Variant isWritable();
-    Variant isReadable();
-    Variant isExecutable();
-    Variant isFile();
-    Variant isDir();
-    Variant isLink();
-    Variant getLinkTarget();
-    Variant getRealPath();
-    Variant getFileInfo(const Variant &_class = {});
-    Variant getPathInfo(const Variant &_class = {});
-    Variant openFile(const Variant &mode = "r", const Variant &use_include_path = false, const Variant &context = {});
-    Variant setFileClass(const Variant &_class = "SplFileObject");
-    Variant setInfoClass(const Variant &_class = "SplFileInfo");
-    Variant __debugInfo();
-    Variant _bad_state_ex();
 };
 
 class SplDoublyLinkedList {
+  protected:
     Object this_;
 
   public:
@@ -1107,6 +500,11 @@ class SplDoublyLinkedList {
         return this_;
     }
     explicit SplDoublyLinkedList(const Object &obj) : this_(obj) {}
+    static constexpr int IT_MODE_LIFO = 2;
+    static constexpr int IT_MODE_FIFO = 0;
+    static constexpr int IT_MODE_DELETE = 1;
+    static constexpr int IT_MODE_KEEP = 0;
+
     SplDoublyLinkedList();
     Variant add(const Variant &index, const Variant &value);
     Variant pop();
@@ -1136,83 +534,22 @@ class SplDoublyLinkedList {
     Variant __unserialize(const Variant &data);
 };
 
-class SplQueue {
-    Object this_;
-
+class SplQueue : public SplDoublyLinkedList {
   public:
-    Object getObject() const {
-        return this_;
-    }
-    explicit SplQueue(const Object &obj) : this_(obj) {}
+    explicit SplQueue(const Object &obj) : SplDoublyLinkedList(obj) {}
     SplQueue();
     Variant enqueue(const Variant &value);
     Variant dequeue();
-    Variant add(const Variant &index, const Variant &value);
-    Variant pop();
-    Variant shift();
-    Variant push(const Variant &value);
-    Variant unshift(const Variant &value);
-    Variant top();
-    Variant bottom();
-    Variant __debugInfo();
-    Variant count();
-    Variant isEmpty();
-    Variant setIteratorMode(const Variant &mode);
-    Variant getIteratorMode();
-    Variant offsetExists(const Variant &index);
-    Variant offsetGet(const Variant &index);
-    Variant offsetSet(const Variant &index, const Variant &value);
-    Variant offsetUnset(const Variant &index);
-    Variant rewind();
-    Variant current();
-    Variant key();
-    Variant prev();
-    Variant next();
-    Variant valid();
-    Variant unserialize(const Variant &data);
-    Variant serialize();
-    Variant __serialize();
-    Variant __unserialize(const Variant &data);
 };
 
-class SplStack {
-    Object this_;
-
+class SplStack : public SplDoublyLinkedList {
   public:
-    Object getObject() const {
-        return this_;
-    }
-    explicit SplStack(const Object &obj) : this_(obj) {}
+    explicit SplStack(const Object &obj) : SplDoublyLinkedList(obj) {}
     SplStack();
-    Variant add(const Variant &index, const Variant &value);
-    Variant pop();
-    Variant shift();
-    Variant push(const Variant &value);
-    Variant unshift(const Variant &value);
-    Variant top();
-    Variant bottom();
-    Variant __debugInfo();
-    Variant count();
-    Variant isEmpty();
-    Variant setIteratorMode(const Variant &mode);
-    Variant getIteratorMode();
-    Variant offsetExists(const Variant &index);
-    Variant offsetGet(const Variant &index);
-    Variant offsetSet(const Variant &index, const Variant &value);
-    Variant offsetUnset(const Variant &index);
-    Variant rewind();
-    Variant current();
-    Variant key();
-    Variant prev();
-    Variant next();
-    Variant valid();
-    Variant unserialize(const Variant &data);
-    Variant serialize();
-    Variant __serialize();
-    Variant __unserialize(const Variant &data);
 };
 
 class SplMinHeap {
+  protected:
     Object this_;
 
   public:
@@ -1237,6 +574,7 @@ class SplMinHeap {
 };
 
 class SplMaxHeap {
+  protected:
     Object this_;
 
   public:
@@ -1261,6 +599,7 @@ class SplMaxHeap {
 };
 
 class SplPriorityQueue {
+  protected:
     Object this_;
 
   public:
@@ -1268,6 +607,10 @@ class SplPriorityQueue {
         return this_;
     }
     explicit SplPriorityQueue(const Object &obj) : this_(obj) {}
+    static constexpr int EXTR_BOTH = 3;
+    static constexpr int EXTR_PRIORITY = 2;
+    static constexpr int EXTR_DATA = 1;
+
     SplPriorityQueue();
     Variant compare(const Variant &priority1, const Variant &priority2);
     Variant insert(const Variant &value, const Variant &priority);
@@ -1288,6 +631,7 @@ class SplPriorityQueue {
 };
 
 class SplFixedArray {
+  protected:
     Object this_;
 
   public:
@@ -1312,6 +656,7 @@ class SplFixedArray {
 };
 
 class SplObjectStorage {
+  protected:
     Object this_;
 
   public:
@@ -1351,12 +696,18 @@ class SplObjectStorage {
 };
 
 class MultipleIterator {
+  protected:
     Object this_;
 
   public:
     Object getObject() const {
         return this_;
     }
+    static constexpr int MIT_NEED_ANY = 0;
+    static constexpr int MIT_NEED_ALL = 1;
+    static constexpr int MIT_KEYS_NUMERIC = 0;
+    static constexpr int MIT_KEYS_ASSOC = 2;
+
     MultipleIterator(const Variant &flags = 1);
     Variant getFlags();
     Variant setFlags(const Variant &flags);
@@ -1370,6 +721,179 @@ class MultipleIterator {
     Variant current();
     Variant next();
     Variant __debugInfo();
+};
+
+class SplFileInfo {
+  protected:
+    Object this_;
+    SplFileInfo() = default;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    SplFileInfo(const Variant &filename);
+    Variant getPath();
+    Variant getFilename();
+    Variant getExtension();
+    Variant getBasename(const Variant &suffix = "");
+    Variant getPathname();
+    Variant getPerms();
+    Variant getInode();
+    Variant getSize();
+    Variant getOwner();
+    Variant getGroup();
+    Variant getATime();
+    Variant getMTime();
+    Variant getCTime();
+    Variant getType();
+    Variant isWritable();
+    Variant isReadable();
+    Variant isExecutable();
+    Variant isFile();
+    Variant isDir();
+    Variant isLink();
+    Variant getLinkTarget();
+    Variant getRealPath();
+    Variant getFileInfo(const Variant &class_ = {});
+    Variant getPathInfo(const Variant &class_ = {});
+    Variant openFile(const Variant &mode = "r", const Variant &use_include_path = false, const Variant &context = {});
+    Variant setFileClass(const Variant &class_ = "SplFileObject");
+    Variant setInfoClass(const Variant &class_ = "SplFileInfo");
+    Variant __toString();
+    Variant __debugInfo();
+    Variant _bad_state_ex();
+};
+
+class SplFileObject : public SplFileInfo {
+  protected:
+    SplFileObject() = default;
+
+  public:
+    static constexpr int DROP_NEW_LINE = 1;
+    static constexpr int READ_AHEAD = 2;
+    static constexpr int SKIP_EMPTY = 4;
+    static constexpr int READ_CSV = 8;
+
+    SplFileObject(const Variant &filename,
+                  const Variant &mode = "r",
+                  const Variant &use_include_path = false,
+                  const Variant &context = {});
+    Variant rewind();
+    Variant eof();
+    Variant valid();
+    Variant fgets();
+    Variant fread(const Variant &length);
+    Variant fgetcsv(const Variant &separator = ",", const Variant &enclosure = "\"", const Variant &escape = "\\");
+    Variant fputcsv(const Variant &fields,
+                    const Variant &separator = ",",
+                    const Variant &enclosure = "\"",
+                    const Variant &escape = "\\",
+                    const Variant &eol = "\n");
+    Variant setCsvControl(const Variant &separator = ",",
+                          const Variant &enclosure = "\"",
+                          const Variant &escape = "\\");
+    Variant getCsvControl();
+    Variant flock(const Variant &operation, const Reference &would_block = {});
+    Variant fflush();
+    Variant ftell();
+    Variant fseek(const Variant &offset, const Variant &whence = 0);
+    Variant fgetc();
+    Variant fpassthru();
+    template <typename... Args>
+    Variant fscanf(const Variant &format, const Args &...vars) {
+        static THREAD_LOCAL zend_function *_method_fn = nullptr;
+        if (UNEXPECTED(!_method_fn)) {
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2002]);
+        }
+        return this_.call(_method_fn, {format, vars...});
+    }
+    Variant fwrite(const Variant &data, const Variant &length = 0);
+    Variant fstat();
+    Variant ftruncate(const Variant &size);
+    Variant current();
+    Variant key();
+    Variant next();
+    Variant setFlags(const Variant &flags);
+    Variant getFlags();
+    Variant setMaxLineLen(const Variant &max_length);
+    Variant getMaxLineLen();
+    Variant hasChildren();
+    Variant getChildren();
+    Variant seek(const Variant &line);
+    Variant getCurrentLine();
+    Variant __toString();
+};
+
+class DirectoryIterator : public SplFileInfo {
+  protected:
+    DirectoryIterator() = default;
+
+  public:
+    DirectoryIterator(const Variant &directory);
+    Variant getFilename();
+    Variant getExtension();
+    Variant getBasename(const Variant &suffix = "");
+    Variant isDot();
+    Variant rewind();
+    Variant valid();
+    Variant key();
+    Variant current();
+    Variant next();
+    Variant seek(const Variant &offset);
+    Variant __toString();
+};
+
+class FilesystemIterator : public DirectoryIterator {
+  protected:
+    FilesystemIterator() = default;
+
+  public:
+    static constexpr int CURRENT_MODE_MASK = 240;
+    static constexpr int CURRENT_AS_PATHNAME = 32;
+    static constexpr int CURRENT_AS_FILEINFO = 0;
+    static constexpr int CURRENT_AS_SELF = 16;
+    static constexpr int KEY_MODE_MASK = 3840;
+    static constexpr int KEY_AS_PATHNAME = 0;
+    static constexpr int FOLLOW_SYMLINKS = 16384;
+    static constexpr int KEY_AS_FILENAME = 256;
+    static constexpr int NEW_CURRENT_AND_KEY = 256;
+    static constexpr int OTHER_MODE_MASK = 28672;
+    static constexpr int SKIP_DOTS = 4096;
+    static constexpr int UNIX_PATHS = 8192;
+
+    FilesystemIterator(const Variant &directory, const Variant &flags = 4096);
+    Variant rewind();
+    Variant key();
+    Variant current();
+    Variant getFlags();
+    Variant setFlags(const Variant &flags);
+};
+
+class RecursiveDirectoryIterator : public FilesystemIterator {
+  protected:
+    RecursiveDirectoryIterator() = default;
+
+  public:
+    RecursiveDirectoryIterator(const Variant &directory, const Variant &flags = 0);
+    Variant hasChildren(const Variant &allow_links = false);
+    Variant getChildren();
+    Variant getSubPath();
+    Variant getSubPathname();
+};
+
+class GlobIterator : public FilesystemIterator {
+  protected:
+    GlobIterator() = default;
+
+  public:
+    GlobIterator(const Variant &pattern, const Variant &flags = 0);
+    Variant count();
+};
+
+class SplTempFileObject : public SplFileObject {
+  public:
+    SplTempFileObject(const Variant &max_memory = 2097152);
 };
 
 }  // namespace php
