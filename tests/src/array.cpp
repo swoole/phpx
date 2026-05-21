@@ -478,3 +478,33 @@ TEST(array, ref_vargs) {
     php::call(fn, tmp_var_1);
     ASSERT_EQ(array.count(), 6);
 }
+
+TEST(array, reverse_iteration) {
+    Array arr{1, 2, 3, 4, 5};
+    zend_ulong count = 0;
+    int expected = 5;
+    for (auto it = arr.rbegin(); it != arr.rend(); it--) {
+        ASSERT_EQ(it.value().toInt(), expected--);
+        count++;
+    }
+    ASSERT_EQ(count, 5);
+
+    // Empty array reverse iteration
+    Array empty;
+    count = 0;
+    for (auto it = empty.rbegin(); it != empty.rend(); it--) {
+        count++;
+    }
+    ASSERT_EQ(count, 0);
+
+    // Reverse iteration with gaps (undef buckets)
+    Array sparse;
+    sparse.set(zend_ulong(0), Variant("a"));
+    sparse.set(zend_ulong(10), Variant("b"));
+    sparse.set(zend_ulong(20), Variant("c"));
+    count = 0;
+    for (auto it = sparse.rbegin(); it != sparse.rend(); it--) {
+        count++;
+    }
+    ASSERT_EQ(count, 3);
+}

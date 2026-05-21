@@ -654,3 +654,34 @@ TEST(object, call_array) {
     auto rs = obj.call("format", {"Y-m-d H:i:s"});
     ASSERT_STREQ(rs.toCString(), "2000-01-01 10:10:10");
 }
+
+TEST(object, getProperties) {
+    auto obj = newObject("stdClass");
+    obj.set("name", Variant("test"));
+    obj.set("value", Variant(42));
+    obj.set("flag", Variant(true));
+
+    auto props = obj.getProperties();
+    ASSERT_EQ(props.count(), 3);
+    ASSERT_STREQ(props.get("name").toCString(), "test");
+    ASSERT_EQ(props.get("value").toInt(), 42);
+    ASSERT_TRUE(props.get("flag").toBool());
+
+    // Empty object
+    auto empty = newObject("stdClass");
+    auto emptyProps = empty.getProperties();
+    ASSERT_EQ(emptyProps.count(), 0);
+
+    // Forward and reverse iteration via Array
+    int count = 0;
+    for (auto it = props.begin(); it != props.end(); it++) {
+        count++;
+    }
+    ASSERT_EQ(count, 3);
+
+    count = 0;
+    for (auto it = props.rbegin(); it != props.rend(); it--) {
+        count++;
+    }
+    ASSERT_EQ(count, 3);
+}

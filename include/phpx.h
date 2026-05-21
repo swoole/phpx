@@ -1206,16 +1206,20 @@ class ArrayIterator {
     zend_ulong idx_;
 
   public:
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::bidirectional_iterator_tag;
     using value_type = ArrayKeyValue;
     using difference_type = std::ptrdiff_t;
     using reference = value_type;
     using pointer = void;
 
-    ArrayIterator(zend_array *array, zend_ulong idx) {
+    ArrayIterator(zend_array *array, zend_ulong idx, bool skip_forward = true) {
         array_ = array;
         idx_ = idx;
-        skipUndefBucket();
+        if (skip_forward) {
+            skipUndefBucket();
+        } else {
+            skipUndefBucketBackwards();
+        }
     }
     ArrayIterator operator++(int) {
         ArrayIterator tmp = *this;
@@ -1224,6 +1228,15 @@ class ArrayIterator {
     }
     ArrayIterator &operator++() {
         next();
+        return *this;
+    }
+    ArrayIterator operator--(int) {
+        ArrayIterator tmp = *this;
+        prev();
+        return tmp;
+    }
+    ArrayIterator &operator--() {
+        prev();
         return *this;
     }
     value_type operator*() const {
@@ -1247,6 +1260,17 @@ class ArrayIterator {
         ++idx_;
         skipUndefBucket();
     }
+    void prev() {
+        if (UNEXPECTED(!array_ || idx_ >= array_->nNumUsed)) {
+            return;
+        }
+        if (idx_ == 0) {
+            idx_ = array_->nNumUsed;
+            return;
+        }
+        --idx_;
+        skipUndefBucketBackwards();
+    }
     zval *current() const {
         if (UNEXPECTED(!array_ || idx_ >= array_->nNumUsed)) {
             return nullptr;
@@ -1257,6 +1281,8 @@ class ArrayIterator {
 
   private:
     void skipUndefBucket();
+  public:
+    void skipUndefBucketBackwards();
 };
 
 class ArrayItem : public Variant {
@@ -1441,6 +1467,17 @@ class Array : public Variant {
         const auto ht = array();
         return {ht, ht->nNumUsed};
     }
+    ArrayIterator rbegin() const {
+        const auto ht = array();
+        if (ht->nNumUsed == 0) {
+            return {ht, ht->nNumUsed};
+        }
+        return {ht, ht->nNumUsed - 1, false};
+    }
+    ArrayIterator rend() const {
+        const auto ht = array();
+        return {ht, ht->nNumUsed};
+    }
     size_t count() const {
         return zend_hash_num_elements(array());
     }
@@ -1600,6 +1637,14 @@ class Object : public Variant {
     template <class T>
     void oSet(const String &name, const char *resource_name, T *ptr) {
         set(name, newResource<T>(resource_name, ptr));
+    }
+
+    Array getProperties() const {
+        auto ht = zend_std_get_properties(object());
+        if (UNEXPECTED(!ht)) {
+            return Array{};
+        }
+        return Array(ht);
     }
 
     String getClassName() const {

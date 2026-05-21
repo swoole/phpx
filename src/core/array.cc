@@ -281,6 +281,21 @@ void ArrayIterator::skipUndefBucket() {
     }
 }
 
+void ArrayIterator::skipUndefBucketBackwards() {
+    while (idx_ < array_->nNumUsed) {
+        zval *cur = current();
+        if (!cur || Z_TYPE_P(cur) == IS_UNDEF) {
+            if (idx_ == 0) {
+                idx_ = array_->nNumUsed;
+                break;
+            }
+            --idx_;
+            continue;
+        }
+        break;
+    }
+}
+
 ArrayItem::ArrayItem(Array &_array, zend_ulong _index, const String &_key)
     : array_(_array), index_(_index), key_(_key) {
     zval *zv;
