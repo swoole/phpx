@@ -126,7 +126,7 @@ class Generator
     // Extensions whose constants are prone to macro conflicts.
     // All constants from these extensions get a _ suffix instead of per-name checks.
     const array HIGH_CONFLICT_EXTENSIONS = [
-        'pcntl', 'standard', 'core', 'random', 'dom',
+        'pcntl', 'standard', 'core', 'random',
     ];
 
     /**
@@ -683,28 +683,17 @@ class Generator
         }
         unset($fnInfo);
 
-        // Group constants by namespace
-        $groupedConstants = [];
-        foreach ($constants as $shortName => $entry) {
-            $nsInfo = $entry['ns_info'];
-            $nsKey = empty($nsInfo['ns']) ? '' : implode('::', $nsInfo['ns']);
-            if (!isset($groupedConstants[$nsKey])) {
-                $groupedConstants[$nsKey] = [];
-            }
-            $groupedConstants[$nsKey][$shortName] = $entry['repr'];
-        }
-
         if (!empty($constants)) {
             self::render(
                 __DIR__ . '/templates/const-impl.tpl',
                 self::$rootDir . '/src/const/' . $ext . '.cc',
-                ['groupedConstants' => $groupedConstants, 'constants' => $constants]
+                ['constants' => $constants]
             );
 
             self::render(
                 __DIR__ . '/templates/const-decl.tpl',
                 self::$rootDir . '/include/const/' . $ext . '.h',
-                ['groupedConstants' => $groupedConstants, 'constants' => $constants]
+                ['constants' => $constants]
             );
         }
 
@@ -1302,16 +1291,14 @@ class Generator
                     echo "Skipping constant $name, unsupported type `{$type}`\n";
                     continue;
                 }
-                $originalName = $name;
-                $nsInfo = self::parsePhpName($originalName);
-                $shortName = $nsInfo['short'];
-                self::nameSafety($shortName);
-                $shortName = $shortName . $this->constSuffix($shortName);
+                $name = str_replace('\\', '_', $name);
+                self::nameSafety($name);
+                $name = $name . $this->constSuffix($name);
                 $repr = self::valueToCppRepr($value);
                 if (is_string($value)) {
-                    $constants[$shortName] = ['ns_info' => $nsInfo, 'repr' => 'ZEND_STRL(' . $repr . '), true'];
+                    $constants[$name] = 'ZEND_STRL(' . $repr . '), true';
                 } else {
-                    $constants[$shortName] = ['ns_info' => $nsInfo, 'repr' => $repr];
+                    $constants[$name] = $repr;
                 }
             }
         }

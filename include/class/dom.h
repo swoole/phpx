@@ -77,12 +77,12 @@ class Node {
     Object getObject() const {
         return this_;
     }
-    static constexpr int DOCUMENT_POSITION_DISCONNECTED_ = 1;
-    static constexpr int DOCUMENT_POSITION_PRECEDING_ = 2;
-    static constexpr int DOCUMENT_POSITION_FOLLOWING_ = 4;
-    static constexpr int DOCUMENT_POSITION_CONTAINS_ = 8;
-    static constexpr int DOCUMENT_POSITION_CONTAINED_BY_ = 16;
-    static constexpr int DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC_ = 32;
+    static constexpr int DOCUMENT_POSITION_DISCONNECTED = 1;
+    static constexpr int DOCUMENT_POSITION_PRECEDING = 2;
+    static constexpr int DOCUMENT_POSITION_FOLLOWING = 4;
+    static constexpr int DOCUMENT_POSITION_CONTAINS = 8;
+    static constexpr int DOCUMENT_POSITION_CONTAINED_BY = 16;
+    static constexpr int DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32;
 
     Variant getRootNode(const Variant &options = Array{});
     Variant hasChildNodes();
@@ -755,12 +755,12 @@ class DOMNode {
         return this_;
     }
     explicit DOMNode(const Object &obj) : this_(obj) {}
-    static constexpr int DOCUMENT_POSITION_DISCONNECTED_ = 1;
-    static constexpr int DOCUMENT_POSITION_PRECEDING_ = 2;
-    static constexpr int DOCUMENT_POSITION_FOLLOWING_ = 4;
-    static constexpr int DOCUMENT_POSITION_CONTAINS_ = 8;
-    static constexpr int DOCUMENT_POSITION_CONTAINED_BY_ = 16;
-    static constexpr int DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC_ = 32;
+    static constexpr int DOCUMENT_POSITION_DISCONNECTED = 1;
+    static constexpr int DOCUMENT_POSITION_PRECEDING = 2;
+    static constexpr int DOCUMENT_POSITION_FOLLOWING = 4;
+    static constexpr int DOCUMENT_POSITION_CONTAINS = 8;
+    static constexpr int DOCUMENT_POSITION_CONTAINED_BY = 16;
+    static constexpr int DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC = 32;
 
     DOMNode();
     Variant appendChild(const DOMNode &node);
