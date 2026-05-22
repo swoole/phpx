@@ -29,16 +29,16 @@ TEST(facade, uname) {
 }
 
 TEST(facade, pdo) {
-	var dsn = "mysql:dbname=test;host=127.0.0.1";
-	var user = "root";
-	var password = "root";
+    var dsn = "mysql:dbname=test;host=127.0.0.1";
+    var user = "root";
+    var password = "root";
 
-	PDO dbh(dsn, user, password);
-	PDOStatement stmt = dbh.query("show tables", PDO::FETCH_NUM);
+    PDO dbh(dsn, user, password);
+    PDOStatement stmt = dbh.query("show tables", PDO::FETCH_NUM);
 
-	while (var result = stmt.fetch()) {
-		ASSERT_TRUE(result.isArray());
-		var table_name = result.item(0);
-		ASSERT_TRUE(table_name.isString());
-	}
+    while (var result = stmt.fetch()) {
+        ASSERT_TRUE(result.isArray());
+        var table_name = result.item(0);
+        ASSERT_TRUE(table_name.isString());
+    }
 }

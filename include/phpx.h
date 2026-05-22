@@ -1281,6 +1281,7 @@ class ArrayIterator {
 
   private:
     void skipUndefBucket();
+
   public:
     void skipUndefBucketBackwards();
 };
