@@ -4,6 +4,9 @@ ignore:
   - "src/func/*"
   - "src/class/*"
   - "src/const/*"
+  - "include/func/*"
+  - "include/class/*"
+  - "include/const/*"
 
 coverage:
   range: 60..80
