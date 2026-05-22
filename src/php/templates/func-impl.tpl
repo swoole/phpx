@@ -2,10 +2,15 @@
 #include "phpx_literal_string.h"
 #include "phpx_class.h"
 
+<?php foreach ($groupedFunctions as $nsKey => $nsFuncs): ?>
+<?php if ($nsKey === ''): ?>
 namespace php {
-<?php foreach ($functions as $name => $fn): ?>
+<?php else: ?>
+namespace php::<?=$nsKey?> {
+<?php endif; ?>
+<?php foreach ($nsFuncs as $shortName => $fn): ?>
 <?php if (!$fn['variadic']): ?>
-<?=($fn['return_type'] ?? 'Variant')?> <?=$name?>(<?=$fn['args_impl']?>) {
+<?=($fn['return_type'] ?? 'Variant')?> <?=$shortName?>(<?=$fn['args_impl']?>) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(<?=$fn['symbol']?>);
@@ -21,7 +26,7 @@ namespace php {
 <?php endif; ?>
 }
 <?php if (!empty($fn['has_facade_params'])): ?>
-Variant <?=$name?>(<?=$fn['args_impl_v']?>) {
+Variant <?=$shortName?>(<?=$fn['args_impl_v']?>) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
         fn = getFunction(<?=$fn['symbol']?>);
@@ -32,3 +37,4 @@ Variant <?=$name?>(<?=$fn['args_impl_v']?>) {
 <?php endif; ?>
 <?php endforeach; ?>
 }
+<?php endforeach; ?>

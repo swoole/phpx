@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant mb_language(const Variant &language = {});
 Variant mb_internal_encoding(const Variant &encoding = {});
 Variant mb_http_input(const Variant &type = {});
@@ -89,7 +90,7 @@ Variant mb_convert_variables(const Variant &to_encoding,
                              const Args &...vars) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[721]);
+        fn = getFunction(LITERAL_STRING[717]);
     }
     return call(fn, {to_encoding, from_encoding, &var, vars...});
 }
@@ -138,4 +139,5 @@ Variant mb_ereg_search_getregs();
 Variant mb_ereg_search_getpos();
 Variant mb_ereg_search_setpos(const Variant &offset);
 Variant mb_regex_set_options(const Variant &options = {});
+
 }  // namespace php

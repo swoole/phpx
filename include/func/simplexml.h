@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant simplexml_load_file(const Variant &filename,
                             const Variant &class_name = "SimpleXMLElement",
                             const Variant &options = 0,
@@ -16,4 +17,5 @@ Variant simplexml_load_string(const Variant &data,
                               const Variant &namespace_or_prefix = "",
                               const Variant &is_prefix = false);
 Variant simplexml_import_dom(const Variant &node, const Variant &class_name = "SimpleXMLElement");
+
 }  // namespace php

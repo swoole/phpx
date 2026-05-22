@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant socket_select(const Reference &read,
                       const Reference &write,
                       const Reference &except,
@@ -93,4 +94,5 @@ Socket socket_addrinfo_bind(const AddressInfo &address);
 Variant socket_addrinfo_bind(const Variant &address);
 Variant socket_addrinfo_explain(const AddressInfo &address);
 Variant socket_addrinfo_explain(const Variant &address);
+
 }  // namespace php

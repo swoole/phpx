@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant mysqli_affected_rows(const mysqli &mysql);
 Variant mysqli_affected_rows(const Variant &mysql);
 Variant mysqli_autocommit(const mysqli &mysql, const Variant &enable);
@@ -177,7 +178,7 @@ template <typename... Args>
 Variant mysqli_stmt_bind_param(const mysqli_stmt &statement, const Variant &types, const Args &...vars) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[820]);
+        fn = getFunction(LITERAL_STRING[816]);
     }
     return call(fn, {statement.getObject(), types, vars...});
 }
@@ -185,7 +186,7 @@ template <typename... Args>
 Variant mysqli_stmt_bind_result(const mysqli_stmt &statement, const Args &...vars) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[821]);
+        fn = getFunction(LITERAL_STRING[817]);
     }
     return call(fn, {statement.getObject(), vars...});
 }
@@ -260,4 +261,5 @@ Variant mysqli_warning_count(const mysqli &mysql);
 Variant mysqli_warning_count(const Variant &mysql);
 Variant mysqli_refresh(const mysqli &mysql, const Variant &flags);
 Variant mysqli_refresh(const Variant &mysql, const Variant &flags);
+
 }  // namespace php

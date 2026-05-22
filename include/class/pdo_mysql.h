@@ -5,11 +5,15 @@
 #include "class/pdo.h"
 
 namespace php {
-class Pdo_Mysql;
+namespace Pdo {
+class Mysql;
+}
 
-class Pdo_Mysql : public PDO {
+namespace Pdo {
+
+class Mysql : public PDO {
   protected:
-    Pdo_Mysql() = default;
+    Mysql() = default;
 
   public:
     static constexpr int ATTR_USE_BUFFERED_QUERY = 1000;
@@ -30,10 +34,8 @@ class Pdo_Mysql : public PDO {
     static constexpr int ATTR_LOCAL_INFILE_DIRECTORY = 1015;
 
     Variant getWarningCount();
-    Pdo_Mysql(const Variant &dsn,
-              const Variant &username = {},
-              const Variant &password = {},
-              const Variant &options = {});
+    Mysql(const Variant &dsn, const Variant &username = {}, const Variant &password = {}, const Variant &options = {});
 };
 
+}  // namespace Pdo
 }  // namespace php

@@ -5,32 +5,38 @@
 #include "class/core.h"
 
 namespace php {
-class Random_RandomError;
-class Random_BrokenRandomEngineError;
-class Random_RandomException;
-class Random_Engine_Mt19937;
-class Random_Engine_PcgOneseq128XslRr64;
-class Random_Engine_Xoshiro256StarStar;
-class Random_Engine_Secure;
-class Random_IntervalBoundary;
-class Random_Randomizer;
+namespace Random {
+class RandomError;
+class BrokenRandomEngineError;
+class RandomException;
+class IntervalBoundary;
+class Randomizer;
+}  // namespace Random
+namespace Random::Engine {
+class Mt19937;
+class PcgOneseq128XslRr64;
+class Xoshiro256StarStar;
+class Secure;
+}  // namespace Random::Engine
 
-class Random_RandomError : public Error {
+namespace Random {
+
+class RandomError : public Error {
   public:
-    Random_RandomError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    RandomError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
 };
 
-class Random_BrokenRandomEngineError : public Random_RandomError {
+class BrokenRandomEngineError : public RandomError {
   public:
-    Random_BrokenRandomEngineError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    BrokenRandomEngineError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
 };
 
-class Random_RandomException : public Exception {
+class RandomException : public Exception {
   public:
-    Random_RandomException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    RandomException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
 };
 
-class Random_Engine_Mt19937 {
+class IntervalBoundary {
   protected:
     Object this_;
 
@@ -38,73 +44,12 @@ class Random_Engine_Mt19937 {
     Object getObject() const {
         return this_;
     }
-    Random_Engine_Mt19937(const Variant &seed = {}, const Variant &mode = 0);
-    Variant generate();
-    Variant __serialize();
-    Variant __unserialize(const Variant &data);
-    Variant __debugInfo();
-};
-
-class Random_Engine_PcgOneseq128XslRr64 {
-  protected:
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    Random_Engine_PcgOneseq128XslRr64(const Variant &seed = {});
-    Variant generate();
-    Variant jump(const Variant &advance);
-    Variant __serialize();
-    Variant __unserialize(const Variant &data);
-    Variant __debugInfo();
-};
-
-class Random_Engine_Xoshiro256StarStar {
-  protected:
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    Random_Engine_Xoshiro256StarStar(const Variant &seed = {});
-    Variant generate();
-    Variant jump();
-    Variant jumpLong();
-    Variant __serialize();
-    Variant __unserialize(const Variant &data);
-    Variant __debugInfo();
-};
-
-class Random_Engine_Secure {
-  protected:
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    explicit Random_Engine_Secure(const Object &obj) : this_(obj) {}
-    Random_Engine_Secure();
-    Variant generate();
-};
-
-class Random_IntervalBoundary {
-  protected:
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    explicit Random_IntervalBoundary(const Object &obj) : this_(obj) {}
-    Random_IntervalBoundary();
+    explicit IntervalBoundary(const Object &obj) : this_(obj) {}
+    IntervalBoundary();
     static Variant cases();
 };
 
-class Random_Randomizer {
+class Randomizer {
   protected:
     Object this_;
 
@@ -112,7 +57,7 @@ class Random_Randomizer {
     Object getObject() const {
         return this_;
     }
-    Random_Randomizer(const Variant &engine = {});
+    Randomizer(const Variant &engine = {});
     Variant nextInt();
     Variant nextFloat();
     Variant getFloat(const Variant &min, const Variant &max, const Variant &boundary = {});
@@ -126,4 +71,69 @@ class Random_Randomizer {
     Variant __unserialize(const Variant &data);
 };
 
+}  // namespace Random
+namespace Random::Engine {
+
+class Mt19937 {
+  protected:
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    Mt19937(const Variant &seed = {}, const Variant &mode = 0);
+    Variant generate();
+    Variant __serialize();
+    Variant __unserialize(const Variant &data);
+    Variant __debugInfo();
+};
+
+class PcgOneseq128XslRr64 {
+  protected:
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    PcgOneseq128XslRr64(const Variant &seed = {});
+    Variant generate();
+    Variant jump(const Variant &advance);
+    Variant __serialize();
+    Variant __unserialize(const Variant &data);
+    Variant __debugInfo();
+};
+
+class Xoshiro256StarStar {
+  protected:
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    Xoshiro256StarStar(const Variant &seed = {});
+    Variant generate();
+    Variant jump();
+    Variant jumpLong();
+    Variant __serialize();
+    Variant __unserialize(const Variant &data);
+    Variant __debugInfo();
+};
+
+class Secure {
+  protected:
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    explicit Secure(const Object &obj) : this_(obj) {}
+    Secure();
+    Variant generate();
+};
+
+}  // namespace Random::Engine
 }  // namespace php

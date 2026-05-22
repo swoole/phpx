@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant exif_tagname(const Variant &index);
 Variant exif_read_data(const Variant &file,
                        const Variant &required_sections = {},
@@ -15,4 +16,5 @@ Variant exif_thumbnail(const Variant &file,
                        const Reference &height = {},
                        const Reference &image_type = {});
 Variant exif_imagetype(const Variant &filename);
+
 }  // namespace php

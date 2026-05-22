@@ -64,45 +64,26 @@ class DateInvalidOperationException;
 class DateMalformedStringException;
 class DateMalformedIntervalStringException;
 class DateMalformedPeriodStringException;
-class Dom_AdjacentPosition;
 class DOMException;
-class dom_domexception;
 class DOMNode;
-class Dom_Node;
 class DOMNameSpaceNode;
-class Dom_NamespaceInfo;
 class DOMDocumentFragment;
 class DOMNodeList;
-class Dom_NodeList;
 class DOMNamedNodeMap;
 class DOMCharacterData;
-class Dom_CharacterData;
 class DOMAttr;
-class Dom_Attr;
-class Dom_NamedNodeMap;
 class DOMElement;
 class DOMText;
-class Dom_Text;
 class DOMComment;
 class DOMDocument;
-class Dom_Comment;
 class DOMCdataSection;
-class Dom_CDATASection;
 class DOMDocumentType;
 class DOMImplementation;
-class Dom_DocumentType;
 class DOMNotation;
-class Dom_Notation;
 class DOMEntity;
-class Dom_Entity;
-class Dom_DtdNamedNodeMap;
 class DOMEntityReference;
-class Dom_EntityReference;
 class DOMProcessingInstruction;
-class Dom_ProcessingInstruction;
 class DOMXPath;
-class Dom_XPath;
-class Dom_TokenList;
 class finfo;
 class GdImage;
 class GdFont;
@@ -115,23 +96,11 @@ class mysqli_warning;
 class OpenSSLCertificate;
 class OpenSSLCertificateSigningRequest;
 class OpenSSLAsymmetricKey;
-class Pcntl_QosClass;
 class PDOException;
 class PDOStatement;
 class PDO;
 class PDORow;
-class Pdo_Mysql;
-class Pdo_Sqlite;
 class PharException;
-class Random_RandomError;
-class Random_BrokenRandomEngineError;
-class Random_RandomException;
-class Random_Engine_Mt19937;
-class Random_Engine_PcgOneseq128XslRr64;
-class Random_Engine_Xoshiro256StarStar;
-class Random_Engine_Secure;
-class Random_IntervalBoundary;
-class Random_Randomizer;
 class Redis;
 class RedisArray;
 class RedisCluster;
@@ -203,7 +172,6 @@ class SQLite3;
 class __PHP_Incomplete_Class;
 class AssertionError;
 class RoundingMode;
-class BcMath_Number;
 class php_user_filter;
 class StreamBucket;
 class Directory;
@@ -216,13 +184,6 @@ class InflateContext;
 class DeflateContext;
 class DateTime;
 class DateTimeImmutable;
-class Dom_DocumentFragment;
-class Dom_HTMLCollection;
-class Dom_Element;
-class Dom_HTMLDocument;
-class Dom_XMLDocument;
-class Dom_Implementation;
-class Dom_HTMLElement;
 class mysqli_result;
 class mysqli;
 class mysqli_stmt;
@@ -246,6 +207,61 @@ class GlobIterator;
 class SplTempFileObject;
 class Phar;
 class PharData;
+    namespace Dom {
+        class AdjacentPosition;
+        class Node;
+        class NamespaceInfo;
+        class NodeList;
+        class CharacterData;
+        class Attr;
+        class NamedNodeMap;
+        class Text;
+        class Comment;
+        class CDATASection;
+        class DocumentType;
+        class Notation;
+        class Entity;
+        class DtdNamedNodeMap;
+        class EntityReference;
+        class ProcessingInstruction;
+        class XPath;
+        class TokenList;
+        class DocumentFragment;
+        class HTMLCollection;
+        class Element;
+        class HTMLDocument;
+        class XMLDocument;
+        class Implementation;
+        class HTMLElement;
+    }  // namespace Dom
+    namespace dom {
+        class domexception;
+    }  // namespace dom
+    namespace Pcntl {
+        class QosClass;
+    }  // namespace Pcntl
+    namespace Pdo {
+        class Mysql;
+        class Sqlite;
+    }  // namespace Pdo
+    namespace Random {
+        class RandomError;
+        class BrokenRandomEngineError;
+        class RandomException;
+        class IntervalBoundary;
+        class Randomizer;
+    }  // namespace Random
+    namespace Random {
+        namespace Engine {
+            class Mt19937;
+            class PcgOneseq128XslRr64;
+            class Xoshiro256StarStar;
+            class Secure;
+        }  // namespace Engine
+    }  // namespace Random
+    namespace BcMath {
+        class Number;
+    }  // namespace BcMath
 }  // namespace php
 
 #include "class/standard.h"

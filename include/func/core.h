@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant die(const Variant &status = 0);
 Variant zend_version();
 Variant func_num_args();
@@ -63,4 +64,5 @@ Variant gc_enabled();
 Variant gc_enable();
 Variant gc_disable();
 Variant gc_status();
+
 }  // namespace php

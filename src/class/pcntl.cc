@@ -2,15 +2,15 @@
 #include "phpx_class.h"
 #include "class/pcntl.h"
 
-namespace php {
-Pcntl_QosClass::Pcntl_QosClass() {
-    this_ = newObject(LITERAL_STRING[1023]);
+namespace php::Pcntl {
+QosClass::QosClass() {
+    this_ = newObject(LITERAL_STRING[1019]);
 }
-Variant Pcntl_QosClass::cases() {
+Variant QosClass::cases() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(LITERAL_STRING[1025], LITERAL_STRING[334]);
+        _method_fn = php::getMethod(LITERAL_STRING[1019], LITERAL_STRING[333]);
     }
     return php::call(_method_fn, {});
 }
-}  // namespace php
+}  // namespace php::Pcntl

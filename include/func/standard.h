@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant set_time_limit(const Variant &seconds);
 Variant header_register_callback(const Variant &callback);
 Variant ob_start(const Variant &callback = {}, const Variant &chunk_size = 0, const Variant &flags = 112);
@@ -30,7 +31,7 @@ template <typename... Args>
 Variant array_push(const Reference &array, const Args &...values) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2103]);
+        fn = getFunction(LITERAL_STRING[2097]);
     }
     return call(fn, {&array, values...});
 }
@@ -57,7 +58,7 @@ template <typename... Args>
 Variant min(const Variant &value, const Args &...values) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2110]);
+        fn = getFunction(LITERAL_STRING[2104]);
     }
     return call(fn, {value, values...});
 }
@@ -65,7 +66,7 @@ template <typename... Args>
 Variant max(const Variant &value, const Args &...values) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2111]);
+        fn = getFunction(LITERAL_STRING[2105]);
     }
     return call(fn, {value, values...});
 }
@@ -78,7 +79,7 @@ template <typename... Args>
 Variant compact(const Variant &var_name, const Args &...var_names) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2116]);
+        fn = getFunction(LITERAL_STRING[2110]);
     }
     return call(fn, {var_name, var_names...});
 }
@@ -92,7 +93,7 @@ template <typename... Args>
 Variant array_unshift(const Reference &array, const Args &...values) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2123]);
+        fn = getFunction(LITERAL_STRING[2117]);
     }
     return call(fn, {&array, values...});
 }
@@ -108,7 +109,7 @@ template <typename... Args>
 Variant array_merge(const Args &...arrays) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2126]);
+        fn = getFunction(LITERAL_STRING[2120]);
     }
     return call(fn, {arrays...});
 }
@@ -116,7 +117,7 @@ template <typename... Args>
 Variant array_merge_recursive(const Args &...arrays) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2127]);
+        fn = getFunction(LITERAL_STRING[2121]);
     }
     return call(fn, {arrays...});
 }
@@ -124,7 +125,7 @@ template <typename... Args>
 Variant array_replace(const Variant &array, const Args &...replacements) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2128]);
+        fn = getFunction(LITERAL_STRING[2122]);
     }
     return call(fn, {array, replacements...});
 }
@@ -132,7 +133,7 @@ template <typename... Args>
 Variant array_replace_recursive(const Variant &array, const Args &...replacements) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2129]);
+        fn = getFunction(LITERAL_STRING[2123]);
     }
     return call(fn, {array, replacements...});
 }
@@ -151,7 +152,7 @@ template <typename... Args>
 Variant array_intersect_key(const Variant &array, const Args &...arrays) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2141]);
+        fn = getFunction(LITERAL_STRING[2135]);
     }
     return call(fn, {array, arrays...});
 }
@@ -159,7 +160,7 @@ template <typename... Args>
 Variant array_intersect_ukey(const Variant &array, const Args &...rest) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2142]);
+        fn = getFunction(LITERAL_STRING[2136]);
     }
     return call(fn, {array, rest...});
 }
@@ -167,7 +168,7 @@ template <typename... Args>
 Variant array_intersect(const Variant &array, const Args &...arrays) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2143]);
+        fn = getFunction(LITERAL_STRING[2137]);
     }
     return call(fn, {array, arrays...});
 }
@@ -175,7 +176,7 @@ template <typename... Args>
 Variant array_uintersect(const Variant &array, const Args &...rest) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2144]);
+        fn = getFunction(LITERAL_STRING[2138]);
     }
     return call(fn, {array, rest...});
 }
@@ -183,7 +184,7 @@ template <typename... Args>
 Variant array_intersect_assoc(const Variant &array, const Args &...arrays) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2145]);
+        fn = getFunction(LITERAL_STRING[2139]);
     }
     return call(fn, {array, arrays...});
 }
@@ -191,7 +192,7 @@ template <typename... Args>
 Variant array_uintersect_assoc(const Variant &array, const Args &...rest) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2146]);
+        fn = getFunction(LITERAL_STRING[2140]);
     }
     return call(fn, {array, rest...});
 }
@@ -199,7 +200,7 @@ template <typename... Args>
 Variant array_intersect_uassoc(const Variant &array, const Args &...rest) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2147]);
+        fn = getFunction(LITERAL_STRING[2141]);
     }
     return call(fn, {array, rest...});
 }
@@ -207,7 +208,7 @@ template <typename... Args>
 Variant array_uintersect_uassoc(const Variant &array, const Args &...rest) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2148]);
+        fn = getFunction(LITERAL_STRING[2142]);
     }
     return call(fn, {array, rest...});
 }
@@ -215,7 +216,7 @@ template <typename... Args>
 Variant array_diff_key(const Variant &array, const Args &...arrays) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2149]);
+        fn = getFunction(LITERAL_STRING[2143]);
     }
     return call(fn, {array, arrays...});
 }
@@ -223,7 +224,7 @@ template <typename... Args>
 Variant array_diff_ukey(const Variant &array, const Args &...rest) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2150]);
+        fn = getFunction(LITERAL_STRING[2144]);
     }
     return call(fn, {array, rest...});
 }
@@ -231,7 +232,7 @@ template <typename... Args>
 Variant array_diff(const Variant &array, const Args &...arrays) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2151]);
+        fn = getFunction(LITERAL_STRING[2145]);
     }
     return call(fn, {array, arrays...});
 }
@@ -239,7 +240,7 @@ template <typename... Args>
 Variant array_udiff(const Variant &array, const Args &...rest) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2152]);
+        fn = getFunction(LITERAL_STRING[2146]);
     }
     return call(fn, {array, rest...});
 }
@@ -247,7 +248,7 @@ template <typename... Args>
 Variant array_diff_assoc(const Variant &array, const Args &...arrays) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2153]);
+        fn = getFunction(LITERAL_STRING[2147]);
     }
     return call(fn, {array, arrays...});
 }
@@ -255,7 +256,7 @@ template <typename... Args>
 Variant array_diff_uassoc(const Variant &array, const Args &...rest) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2154]);
+        fn = getFunction(LITERAL_STRING[2148]);
     }
     return call(fn, {array, rest...});
 }
@@ -263,7 +264,7 @@ template <typename... Args>
 Variant array_udiff_assoc(const Variant &array, const Args &...rest) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2155]);
+        fn = getFunction(LITERAL_STRING[2149]);
     }
     return call(fn, {array, rest...});
 }
@@ -271,7 +272,7 @@ template <typename... Args>
 Variant array_udiff_uassoc(const Variant &array, const Args &...rest) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2156]);
+        fn = getFunction(LITERAL_STRING[2150]);
     }
     return call(fn, {array, rest...});
 }
@@ -279,7 +280,7 @@ template <typename... Args>
 Variant array_multisort(const Reference &array, const Args &...rest) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2157]);
+        fn = getFunction(LITERAL_STRING[2151]);
     }
     return call(fn, {&array, rest...});
 }
@@ -296,7 +297,7 @@ template <typename... Args>
 Variant array_map(const Variant &callback, const Variant &array, const Args &...arrays) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2167]);
+        fn = getFunction(LITERAL_STRING[2161]);
     }
     return call(fn, {callback, array, arrays...});
 }
@@ -329,7 +330,7 @@ template <typename... Args>
 Variant call_user_func(const Variant &callback, const Args &...args) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2190]);
+        fn = getFunction(LITERAL_STRING[2184]);
     }
     return call(fn, {callback, args...});
 }
@@ -338,7 +339,7 @@ template <typename... Args>
 Variant forward_static_call(const Variant &callback, const Args &...args) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2192]);
+        fn = getFunction(LITERAL_STRING[2186]);
     }
     return call(fn, {callback, args...});
 }
@@ -347,7 +348,7 @@ template <typename... Args>
 Variant register_shutdown_function(const Variant &callback, const Args &...args) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2194]);
+        fn = getFunction(LITERAL_STRING[2188]);
     }
     return call(fn, {callback, args...});
 }
@@ -375,7 +376,7 @@ template <typename... Args>
 Variant register_tick_function(const Variant &callback, const Args &...args) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2215]);
+        fn = getFunction(LITERAL_STRING[2209]);
     }
     return call(fn, {callback, args...});
 }
@@ -528,7 +529,7 @@ template <typename... Args>
 Variant setlocale(const Variant &category, const Variant &locales, const Args &...rest) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2320]);
+        fn = getFunction(LITERAL_STRING[2314]);
     }
     return call(fn, {category, locales, rest...});
 }
@@ -552,7 +553,7 @@ template <typename... Args>
 Variant sscanf(const Variant &string, const Variant &format, const Args &...vars) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2328]);
+        fn = getFunction(LITERAL_STRING[2322]);
     }
     return call(fn, {string, format, vars...});
 }
@@ -605,7 +606,7 @@ template <typename... Args>
 Variant fscanf(const Variant &stream, const Variant &format, const Args &...vars) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2002]);
+        fn = getFunction(LITERAL_STRING[1996]);
     }
     return call(fn, {stream, format, vars...});
 }
@@ -687,7 +688,7 @@ template <typename... Args>
 Variant sprintf(const Variant &format, const Args &...values) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2399]);
+        fn = getFunction(LITERAL_STRING[2393]);
     }
     return call(fn, {format, values...});
 }
@@ -695,7 +696,7 @@ template <typename... Args>
 Variant printf(const Variant &format, const Args &...values) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2400]);
+        fn = getFunction(LITERAL_STRING[2394]);
     }
     return call(fn, {format, values...});
 }
@@ -705,7 +706,7 @@ template <typename... Args>
 Variant fprintf(const Variant &stream, const Variant &format, const Args &...values) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2403]);
+        fn = getFunction(LITERAL_STRING[2397]);
     }
     return call(fn, {stream, format, values...});
 }
@@ -807,7 +808,7 @@ template <typename... Args>
 Variant pack(const Variant &format, const Args &...values) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2471]);
+        fn = getFunction(LITERAL_STRING[2465]);
     }
     return call(fn, {format, values...});
 }
@@ -948,7 +949,7 @@ template <typename... Args>
 Variant var_dump(const Variant &value, const Args &...values) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2564]);
+        fn = getFunction(LITERAL_STRING[2558]);
     }
     return call(fn, {value, values...});
 }
@@ -957,7 +958,7 @@ template <typename... Args>
 Variant debug_zval_dump(const Variant &value, const Args &...values) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2566]);
+        fn = getFunction(LITERAL_STRING[2560]);
     }
     return call(fn, {value, values...});
 }
@@ -970,4 +971,5 @@ Variant version_compare(const Variant &version1, const Variant &version2, const 
 Variant dl(const Variant &extension_filename);
 Variant cli_set_process_title(const Variant &title);
 Variant cli_get_process_title();
+
 }  // namespace php

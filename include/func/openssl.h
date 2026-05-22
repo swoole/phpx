@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant openssl_x509_export_to_file(const Variant &certificate,
                                     const Variant &output_filename,
                                     const Variant &no_text = true);
@@ -197,4 +198,5 @@ Variant openssl_spki_verify(const Variant &spki);
 Variant openssl_spki_export(const Variant &spki);
 Variant openssl_spki_export_challenge(const Variant &spki);
 Variant openssl_get_cert_locations();
+
 }  // namespace php

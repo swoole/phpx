@@ -8,42 +8,42 @@ Variant openssl_x509_export_to_file(const Variant &certificate,
                                     const Variant &no_text) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[927]);
+        fn = getFunction(LITERAL_STRING[923]);
     }
     return call(fn, {certificate, output_filename, no_text});
 }
 Variant openssl_x509_export(const Variant &certificate, const Reference &output, const Variant &no_text) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[928]);
+        fn = getFunction(LITERAL_STRING[924]);
     }
     return call(fn, {certificate, &output, no_text});
 }
 Variant openssl_x509_fingerprint(const Variant &certificate, const Variant &digest_algo, const Variant &binary) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[929]);
+        fn = getFunction(LITERAL_STRING[925]);
     }
     return call(fn, {certificate, digest_algo, binary});
 }
 Variant openssl_x509_check_private_key(const Variant &certificate, const Variant &private_key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[930]);
+        fn = getFunction(LITERAL_STRING[926]);
     }
     return call(fn, {certificate, private_key});
 }
 Variant openssl_x509_verify(const Variant &certificate, const Variant &public_key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[931]);
+        fn = getFunction(LITERAL_STRING[927]);
     }
     return call(fn, {certificate, public_key});
 }
 Variant openssl_x509_parse(const Variant &certificate, const Variant &short_names) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[932]);
+        fn = getFunction(LITERAL_STRING[928]);
     }
     return call(fn, {certificate, short_names});
 }
@@ -53,14 +53,14 @@ Variant openssl_x509_checkpurpose(const Variant &certificate,
                                   const Variant &untrusted_certificates_file) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[933]);
+        fn = getFunction(LITERAL_STRING[929]);
     }
     return call(fn, {certificate, purpose, ca_info, untrusted_certificates_file});
 }
 OpenSSLCertificate openssl_x509_read(const Variant &certificate) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[934]);
+        fn = getFunction(LITERAL_STRING[930]);
     }
     auto _rv = call(fn, {certificate});
     if (!_rv.toBool()) {
@@ -71,14 +71,14 @@ OpenSSLCertificate openssl_x509_read(const Variant &certificate) {
 Variant openssl_x509_free(const OpenSSLCertificate &certificate) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[935]);
+        fn = getFunction(LITERAL_STRING[931]);
     }
     return call(fn, {certificate.getObject()});
 }
 Variant openssl_x509_free(const Variant &certificate) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[935]);
+        fn = getFunction(LITERAL_STRING[931]);
     }
     return call(fn, {certificate});
 }
@@ -89,7 +89,7 @@ Variant openssl_pkcs12_export_to_file(const Variant &certificate,
                                       const Variant &options) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[936]);
+        fn = getFunction(LITERAL_STRING[932]);
     }
     return call(fn, {certificate, output_filename, private_key, passphrase, options});
 }
@@ -100,28 +100,28 @@ Variant openssl_pkcs12_export(const Variant &certificate,
                               const Variant &options) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[937]);
+        fn = getFunction(LITERAL_STRING[933]);
     }
     return call(fn, {certificate, &output, private_key, passphrase, options});
 }
 Variant openssl_pkcs12_read(const Variant &pkcs12, const Reference &certificates, const Variant &passphrase) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[938]);
+        fn = getFunction(LITERAL_STRING[934]);
     }
     return call(fn, {pkcs12, &certificates, passphrase});
 }
 Variant openssl_csr_export_to_file(const Variant &csr, const Variant &output_filename, const Variant &no_text) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[939]);
+        fn = getFunction(LITERAL_STRING[935]);
     }
     return call(fn, {csr, output_filename, no_text});
 }
 Variant openssl_csr_export(const Variant &csr, const Reference &output, const Variant &no_text) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[940]);
+        fn = getFunction(LITERAL_STRING[936]);
     }
     return call(fn, {csr, &output, no_text});
 }
@@ -134,7 +134,7 @@ OpenSSLCertificate openssl_csr_sign(const Variant &csr,
                                     const Variant &serial_hex) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[941]);
+        fn = getFunction(LITERAL_STRING[937]);
     }
     auto _rv = call(fn, {csr, ca_certificate, private_key, days, options, serial, serial_hex});
     if (!_rv.toBool()) {
@@ -148,21 +148,21 @@ Variant openssl_csr_new(const Variant &distinguished_names,
                         const Variant &extra_attributes) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[942]);
+        fn = getFunction(LITERAL_STRING[938]);
     }
     return call(fn, {distinguished_names, &private_key, options, extra_attributes});
 }
 Variant openssl_csr_get_subject(const Variant &csr, const Variant &short_names) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[943]);
+        fn = getFunction(LITERAL_STRING[939]);
     }
     return call(fn, {csr, short_names});
 }
 OpenSSLAsymmetricKey openssl_csr_get_public_key(const Variant &csr, const Variant &short_names) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[944]);
+        fn = getFunction(LITERAL_STRING[940]);
     }
     auto _rv = call(fn, {csr, short_names});
     if (!_rv.toBool()) {
@@ -173,7 +173,7 @@ OpenSSLAsymmetricKey openssl_csr_get_public_key(const Variant &csr, const Varian
 OpenSSLAsymmetricKey openssl_pkey_new(const Variant &options) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[945]);
+        fn = getFunction(LITERAL_STRING[941]);
     }
     auto _rv = call(fn, {options});
     if (!_rv.toBool()) {
@@ -187,7 +187,7 @@ Variant openssl_pkey_export_to_file(const Variant &key,
                                     const Variant &options) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[946]);
+        fn = getFunction(LITERAL_STRING[942]);
     }
     return call(fn, {key, output_filename, passphrase, options});
 }
@@ -197,14 +197,14 @@ Variant openssl_pkey_export(const Variant &key,
                             const Variant &options) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[947]);
+        fn = getFunction(LITERAL_STRING[943]);
     }
     return call(fn, {key, &output, passphrase, options});
 }
 OpenSSLAsymmetricKey openssl_pkey_get_public(const Variant &public_key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[948]);
+        fn = getFunction(LITERAL_STRING[944]);
     }
     auto _rv = call(fn, {public_key});
     if (!_rv.toBool()) {
@@ -215,7 +215,7 @@ OpenSSLAsymmetricKey openssl_pkey_get_public(const Variant &public_key) {
 OpenSSLAsymmetricKey openssl_get_publickey(const Variant &public_key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[949]);
+        fn = getFunction(LITERAL_STRING[945]);
     }
     auto _rv = call(fn, {public_key});
     if (!_rv.toBool()) {
@@ -226,35 +226,35 @@ OpenSSLAsymmetricKey openssl_get_publickey(const Variant &public_key) {
 Variant openssl_pkey_free(const OpenSSLAsymmetricKey &key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[950]);
+        fn = getFunction(LITERAL_STRING[946]);
     }
     return call(fn, {key.getObject()});
 }
 Variant openssl_pkey_free(const Variant &key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[950]);
+        fn = getFunction(LITERAL_STRING[946]);
     }
     return call(fn, {key});
 }
 Variant openssl_free_key(const OpenSSLAsymmetricKey &key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[951]);
+        fn = getFunction(LITERAL_STRING[947]);
     }
     return call(fn, {key.getObject()});
 }
 Variant openssl_free_key(const Variant &key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[951]);
+        fn = getFunction(LITERAL_STRING[947]);
     }
     return call(fn, {key});
 }
 OpenSSLAsymmetricKey openssl_pkey_get_private(const Variant &private_key, const Variant &passphrase) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[952]);
+        fn = getFunction(LITERAL_STRING[948]);
     }
     auto _rv = call(fn, {private_key, passphrase});
     if (!_rv.toBool()) {
@@ -265,7 +265,7 @@ OpenSSLAsymmetricKey openssl_pkey_get_private(const Variant &private_key, const 
 OpenSSLAsymmetricKey openssl_get_privatekey(const Variant &private_key, const Variant &passphrase) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[953]);
+        fn = getFunction(LITERAL_STRING[949]);
     }
     auto _rv = call(fn, {private_key, passphrase});
     if (!_rv.toBool()) {
@@ -276,14 +276,14 @@ OpenSSLAsymmetricKey openssl_get_privatekey(const Variant &private_key, const Va
 Variant openssl_pkey_get_details(const OpenSSLAsymmetricKey &key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[954]);
+        fn = getFunction(LITERAL_STRING[950]);
     }
     return call(fn, {key.getObject()});
 }
 Variant openssl_pkey_get_details(const Variant &key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[954]);
+        fn = getFunction(LITERAL_STRING[950]);
     }
     return call(fn, {key});
 }
@@ -294,7 +294,7 @@ Variant openssl_pbkdf2(const Variant &password,
                        const Variant &digest_algo) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[955]);
+        fn = getFunction(LITERAL_STRING[951]);
     }
     return call(fn, {password, salt, key_length, iterations, digest_algo});
 }
@@ -307,7 +307,7 @@ Variant openssl_pkcs7_verify(const Variant &input_filename,
                              const Variant &output_filename) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[956]);
+        fn = getFunction(LITERAL_STRING[952]);
     }
     return call(fn,
                 {input_filename,
@@ -326,7 +326,7 @@ Variant openssl_pkcs7_encrypt(const Variant &input_filename,
                               const Variant &cipher_algo) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[957]);
+        fn = getFunction(LITERAL_STRING[953]);
     }
     return call(fn, {input_filename, output_filename, certificate, headers, flags, cipher_algo});
 }
@@ -339,7 +339,7 @@ Variant openssl_pkcs7_sign(const Variant &input_filename,
                            const Variant &untrusted_certificates_filename) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[958]);
+        fn = getFunction(LITERAL_STRING[954]);
     }
     return call(
         fn,
@@ -351,14 +351,14 @@ Variant openssl_pkcs7_decrypt(const Variant &input_filename,
                               const Variant &private_key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[959]);
+        fn = getFunction(LITERAL_STRING[955]);
     }
     return call(fn, {input_filename, output_filename, certificate, private_key});
 }
 Variant openssl_pkcs7_read(const Variant &data, const Reference &certificates) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[960]);
+        fn = getFunction(LITERAL_STRING[956]);
     }
     return call(fn, {data, &certificates});
 }
@@ -373,7 +373,7 @@ Variant openssl_cms_verify(const Variant &input_filename,
                            const Variant &encoding) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[961]);
+        fn = getFunction(LITERAL_STRING[957]);
     }
     return call(fn,
                 {input_filename,
@@ -395,7 +395,7 @@ Variant openssl_cms_encrypt(const Variant &input_filename,
                             const Variant &cipher_algo) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[962]);
+        fn = getFunction(LITERAL_STRING[958]);
     }
     return call(fn, {input_filename, output_filename, certificate, headers, flags, encoding, cipher_algo});
 }
@@ -409,7 +409,7 @@ Variant openssl_cms_sign(const Variant &input_filename,
                          const Variant &untrusted_certificates_filename) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[963]);
+        fn = getFunction(LITERAL_STRING[959]);
     }
     return call(fn,
                 {input_filename,
@@ -428,14 +428,14 @@ Variant openssl_cms_decrypt(const Variant &input_filename,
                             const Variant &encoding) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[964]);
+        fn = getFunction(LITERAL_STRING[960]);
     }
     return call(fn, {input_filename, output_filename, certificate, private_key, encoding});
 }
 Variant openssl_cms_read(const Variant &input_filename, const Reference &certificates) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[965]);
+        fn = getFunction(LITERAL_STRING[961]);
     }
     return call(fn, {input_filename, &certificates});
 }
@@ -445,7 +445,7 @@ Variant openssl_private_encrypt(const Variant &data,
                                 const Variant &padding) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[966]);
+        fn = getFunction(LITERAL_STRING[962]);
     }
     return call(fn, {data, &encrypted_data, private_key, padding});
 }
@@ -455,7 +455,7 @@ Variant openssl_private_decrypt(const Variant &data,
                                 const Variant &padding) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[967]);
+        fn = getFunction(LITERAL_STRING[963]);
     }
     return call(fn, {data, &decrypted_data, private_key, padding});
 }
@@ -465,7 +465,7 @@ Variant openssl_public_encrypt(const Variant &data,
                                const Variant &padding) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[968]);
+        fn = getFunction(LITERAL_STRING[964]);
     }
     return call(fn, {data, &encrypted_data, public_key, padding});
 }
@@ -475,14 +475,14 @@ Variant openssl_public_decrypt(const Variant &data,
                                const Variant &padding) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[969]);
+        fn = getFunction(LITERAL_STRING[965]);
     }
     return call(fn, {data, &decrypted_data, public_key, padding});
 }
 Variant openssl_error_string() {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[970]);
+        fn = getFunction(LITERAL_STRING[966]);
     }
     return call(fn, {});
 }
@@ -492,7 +492,7 @@ Variant openssl_sign(const Variant &data,
                      const Variant &algorithm) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[971]);
+        fn = getFunction(LITERAL_STRING[967]);
     }
     return call(fn, {data, &signature, private_key, algorithm});
 }
@@ -502,7 +502,7 @@ Variant openssl_verify(const Variant &data,
                        const Variant &algorithm) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[972]);
+        fn = getFunction(LITERAL_STRING[968]);
     }
     return call(fn, {data, signature, public_key, algorithm});
 }
@@ -514,7 +514,7 @@ Variant openssl_seal(const Variant &data,
                      const Reference &iv) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[973]);
+        fn = getFunction(LITERAL_STRING[969]);
     }
     return call(fn, {data, &sealed_data, &encrypted_keys, public_key, cipher_algo, &iv});
 }
@@ -526,35 +526,35 @@ Variant openssl_open(const Variant &data,
                      const Variant &iv) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[974]);
+        fn = getFunction(LITERAL_STRING[970]);
     }
     return call(fn, {data, &output, encrypted_key, private_key, cipher_algo, iv});
 }
 Variant openssl_get_md_methods(const Variant &aliases) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[975]);
+        fn = getFunction(LITERAL_STRING[971]);
     }
     return call(fn, {aliases});
 }
 Variant openssl_get_cipher_methods(const Variant &aliases) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[976]);
+        fn = getFunction(LITERAL_STRING[972]);
     }
     return call(fn, {aliases});
 }
 Variant openssl_get_curve_names() {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[977]);
+        fn = getFunction(LITERAL_STRING[973]);
     }
     return call(fn, {});
 }
 Variant openssl_digest(const Variant &data, const Variant &digest_algo, const Variant &binary) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[978]);
+        fn = getFunction(LITERAL_STRING[974]);
     }
     return call(fn, {data, digest_algo, binary});
 }
@@ -568,7 +568,7 @@ Variant openssl_encrypt(const Variant &data,
                         const Variant &tag_length) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[979]);
+        fn = getFunction(LITERAL_STRING[975]);
     }
     return call(fn, {data, cipher_algo, passphrase, options, iv, &tag, aad, tag_length});
 }
@@ -581,49 +581,49 @@ Variant openssl_decrypt(const Variant &data,
                         const Variant &aad) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[980]);
+        fn = getFunction(LITERAL_STRING[976]);
     }
     return call(fn, {data, cipher_algo, passphrase, options, iv, tag, aad});
 }
 Variant openssl_cipher_iv_length(const Variant &cipher_algo) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[981]);
+        fn = getFunction(LITERAL_STRING[977]);
     }
     return call(fn, {cipher_algo});
 }
 Variant openssl_cipher_key_length(const Variant &cipher_algo) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[982]);
+        fn = getFunction(LITERAL_STRING[978]);
     }
     return call(fn, {cipher_algo});
 }
 Variant openssl_dh_compute_key(const Variant &public_key, const OpenSSLAsymmetricKey &private_key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[983]);
+        fn = getFunction(LITERAL_STRING[979]);
     }
     return call(fn, {public_key, private_key.getObject()});
 }
 Variant openssl_dh_compute_key(const Variant &public_key, const Variant &private_key) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[983]);
+        fn = getFunction(LITERAL_STRING[979]);
     }
     return call(fn, {public_key, private_key});
 }
 Variant openssl_pkey_derive(const Variant &public_key, const Variant &private_key, const Variant &key_length) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[984]);
+        fn = getFunction(LITERAL_STRING[980]);
     }
     return call(fn, {public_key, private_key, key_length});
 }
 Variant openssl_random_pseudo_bytes(const Variant &length, const Reference &strong_result) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[985]);
+        fn = getFunction(LITERAL_STRING[981]);
     }
     return call(fn, {length, &strong_result});
 }
@@ -632,42 +632,42 @@ Variant openssl_spki_new(const OpenSSLAsymmetricKey &private_key,
                          const Variant &digest_algo) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[986]);
+        fn = getFunction(LITERAL_STRING[982]);
     }
     return call(fn, {private_key.getObject(), challenge, digest_algo});
 }
 Variant openssl_spki_new(const Variant &private_key, const Variant &challenge, const Variant &digest_algo) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[986]);
+        fn = getFunction(LITERAL_STRING[982]);
     }
     return call(fn, {private_key, challenge, digest_algo});
 }
 Variant openssl_spki_verify(const Variant &spki) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[987]);
+        fn = getFunction(LITERAL_STRING[983]);
     }
     return call(fn, {spki});
 }
 Variant openssl_spki_export(const Variant &spki) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[988]);
+        fn = getFunction(LITERAL_STRING[984]);
     }
     return call(fn, {spki});
 }
 Variant openssl_spki_export_challenge(const Variant &spki) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[989]);
+        fn = getFunction(LITERAL_STRING[985]);
     }
     return call(fn, {spki});
 }
 Variant openssl_get_cert_locations() {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[990]);
+        fn = getFunction(LITERAL_STRING[986]);
     }
     return call(fn, {});
 }

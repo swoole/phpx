@@ -25,9 +25,21 @@ class Generator
     static protected array $literalString = [];
     static protected int $literalStringIndex = 0;
     /**
-     * @var array<string, string> PHP class name => C++ facade class name
+     * @var array<string, string> PHP class name => C++ facade class name (flat, with _)
      */
     static protected array $facadeClassMap = [];
+    /**
+     * @var array<string, array{ns: string[], short: string}> Flat C++ class name => namespace info
+     */
+    static protected array $facadeClassNamespace = [];
+
+    /**
+     * @return array<string, array{ns: string[], short: string}>
+     */
+    public static function getFacadeClassNamespace(): array
+    {
+        return self::$facadeClassNamespace;
+    }
     /**
      * @var array<string, string[]> C++ facade class name => list of C++ facade classes it depends on
      */
@@ -114,7 +126,7 @@ class Generator
     // Extensions whose constants are prone to macro conflicts.
     // All constants from these extensions get a _ suffix instead of per-name checks.
     const array HIGH_CONFLICT_EXTENSIONS = [
-        'pcntl', 'standard', 'core', 'random',
+        'pcntl', 'standard', 'core', 'random', 'dom',
     ];
 
     /**
@@ -204,6 +216,12 @@ class Generator
                 $cppName = str_replace('\\', '_', $cppName);
                 self::$facadeClassMap[$className] = $cppName;
                 self::$classToExtension[$cppName] = $extension;
+                $parts = explode('\\', $className);
+                $shortName = array_pop($parts);
+                if (in_array($className, self::BUILTIN_CLASSES)) {
+                    $shortName = $shortName . '_';
+                }
+                self::$facadeClassNamespace[$cppName] = ['ns' => $parts, 'short' => $shortName];
 
                 // Check if class has PHP __construct (no Object constructor)
                 $hasCtor = false;
@@ -602,17 +620,91 @@ class Generator
             }
         }
 
+        // Group classes by namespace and shorten type references
+        $groupedClasses = [];
+        foreach ($classes as $flatName => &$info) {
+            $nsInfo = $info['ns_info'];
+            $nsKey = empty($nsInfo['ns']) ? '' : implode('::', $nsInfo['ns']);
+            if (!isset($groupedClasses[$nsKey])) {
+                $groupedClasses[$nsKey] = [];
+            }
+            // Shorten extends
+            if (!empty($info['extends'])) {
+                $extInfo = self::$facadeClassNamespace[$info['extends']] ?? null;
+                if ($extInfo && $extInfo['ns'] === $nsInfo['ns']) {
+                    $info['extends_short'] = $extInfo['short'];
+                } else {
+                    $info['extends_short'] = $info['extends'];
+                }
+            }
+            // Shorten method types
+            foreach ($info['methods'] as &$minfo) {
+                $minfo['return_type'] = self::shortTypeInContext($minfo['return_type'] ?? null, $nsInfo['ns']);
+                $minfo['args'] = self::shortTypesInString($minfo['args'] ?? '', $nsInfo['ns']);
+                $minfo['args_impl'] = self::shortTypesInString($minfo['args_impl'] ?? '', $nsInfo['ns']);
+                if (isset($minfo['args_v'])) {
+                    $minfo['args_v'] = self::shortTypesInString($minfo['args_v'], $nsInfo['ns']);
+                }
+                if (isset($minfo['args_impl_v'])) {
+                    $minfo['args_impl_v'] = self::shortTypesInString($minfo['args_impl_v'], $nsInfo['ns']);
+                }
+                if (isset($minfo['impl_code'])) {
+                    $minfo['impl_code'] = self::shortTypesInString($minfo['impl_code'], $nsInfo['ns']);
+                }
+                if (isset($minfo['impl_code_v'])) {
+                    $minfo['impl_code_v'] = self::shortTypesInString($minfo['impl_code_v'], $nsInfo['ns']);
+                }
+            }
+            unset($minfo);
+            $groupedClasses[$nsKey][$nsInfo['short']] = $info;
+        }
+        unset($info);
+
+        // Group functions by namespace and shorten type references
+        $groupedFunctions = [];
+        foreach ($functions as $flatName => &$fnInfo) {
+            $nsInfo = $fnInfo['ns_info'];
+            $nsKey = empty($nsInfo['ns']) ? '' : implode('::', $nsInfo['ns']);
+            if (!isset($groupedFunctions[$nsKey])) {
+                $groupedFunctions[$nsKey] = [];
+            }
+            $fnInfo['return_type'] = self::shortTypeInContext($fnInfo['return_type'], $nsInfo['ns']);
+            $fnInfo['args'] = self::shortTypesInString($fnInfo['args'], $nsInfo['ns']);
+            $fnInfo['args_impl'] = self::shortTypesInString($fnInfo['args_impl'], $nsInfo['ns']);
+            $fnInfo['args_v'] = self::shortTypesInString($fnInfo['args_v'], $nsInfo['ns']);
+            $fnInfo['args_impl_v'] = self::shortTypesInString($fnInfo['args_impl_v'], $nsInfo['ns']);
+            if (!empty($fnInfo['return_expr'])) {
+                $fnInfo['return_expr'] = self::shortTypesInString($fnInfo['return_expr'], $nsInfo['ns']);
+            }
+            if (!empty($fnInfo['return_expr_v'])) {
+                $fnInfo['return_expr_v'] = self::shortTypesInString($fnInfo['return_expr_v'], $nsInfo['ns']);
+            }
+            $groupedFunctions[$nsKey][$nsInfo['short']] = $fnInfo;
+        }
+        unset($fnInfo);
+
+        // Group constants by namespace
+        $groupedConstants = [];
+        foreach ($constants as $shortName => $entry) {
+            $nsInfo = $entry['ns_info'];
+            $nsKey = empty($nsInfo['ns']) ? '' : implode('::', $nsInfo['ns']);
+            if (!isset($groupedConstants[$nsKey])) {
+                $groupedConstants[$nsKey] = [];
+            }
+            $groupedConstants[$nsKey][$shortName] = $entry['repr'];
+        }
+
         if (!empty($constants)) {
             self::render(
                 __DIR__ . '/templates/const-impl.tpl',
                 self::$rootDir . '/src/const/' . $ext . '.cc',
-                compact('constants')
+                ['groupedConstants' => $groupedConstants, 'constants' => $constants]
             );
 
             self::render(
                 __DIR__ . '/templates/const-decl.tpl',
                 self::$rootDir . '/include/const/' . $ext . '.h',
-                compact('constants')
+                ['groupedConstants' => $groupedConstants, 'constants' => $constants]
             );
         }
 
@@ -620,13 +712,13 @@ class Generator
             self::render(
                 __DIR__ . '/templates/func-impl.tpl',
                 self::$rootDir . '/src/func/' . $ext . '.cc',
-                compact('functions')
+                ['groupedFunctions' => $groupedFunctions, 'functions' => $functions]
             );
 
             self::render(
                 __DIR__ . '/templates/func-decl.tpl',
                 self::$rootDir . '/include/func/' . $ext . '.h',
-                compact('functions')
+                ['groupedFunctions' => $groupedFunctions, 'functions' => $functions]
             );
         }
 
@@ -634,7 +726,7 @@ class Generator
             self::render(
                 __DIR__ . '/templates/class-impl.tpl',
                 self::$rootDir . '/src/class/' . $ext . '.cc',
-                compact('classes', 'ext', 'classIncludes')
+                ['groupedClasses' => $groupedClasses, 'classes' => $classes, 'ext' => $ext]
             );
 
             $classIncludesSorted = array_keys($classIncludes);
@@ -642,7 +734,7 @@ class Generator
             self::render(
                 __DIR__ . '/templates/class-decl.tpl',
                 self::$rootDir . '/include/class/' . $ext . '.h',
-                compact('classes', 'ext') + ['classIncludes' => $classIncludesSorted]
+                ['groupedClasses' => $groupedClasses, 'classes' => $classes, 'classIncludes' => $classIncludesSorted]
             );
         }
     }
@@ -651,14 +743,16 @@ class Generator
     {
         $functions = [];
         foreach ($this->extRef->getFunctions() as $function) {
-            $name = $function->getName();
-            if (in_array($name, self::BUILTIN_FUNCTIONS)) {
+            $originalName = $function->getName();
+            if (in_array($originalName, self::BUILTIN_FUNCTIONS)) {
                 continue;
             }
+            $name = $originalName;
             self::nameSafety($name);
+            $nsInfo = self::parsePhpName($originalName);
 
             [$args, $call, $args_impl, $variadic, $hasFacade, $args_v, $call_v, $args_impl_v] = $this->getArgs($function->getParameters());
-            $symbol = $function->getName();
+            $symbol = $originalName;
 
             $rt = $function->getReturnType() ?? $function->getTentativeReturnType();
             $returnInfo = self::resolveReturnType($rt);
@@ -690,6 +784,7 @@ class Generator
             }
 
             $functions[$name] = [
+                'ns_info' => $nsInfo,
                 'args' => $args ? implode(', ', $args) : '',
                 'args_impl' => $args ? implode(', ', $args_impl) : '',
                 'call' => $call ? '{' . implode(', ', $call) . '}' : '{}',
@@ -718,7 +813,58 @@ class Generator
         if (in_array($name, self::KEYWORDS)) {
             $name = $name . '_';
         }
-        $name = str_replace('\\', '_', $name);
+        // PHP namespace separators are handled at a higher level (see parsePhpName)
+    }
+
+    /**
+     * Split a PHP fully-qualified name into namespace parts and the leaf short name.
+     * e.g. "Dom\\import_simplexml" => ['ns' => ['Dom'], 'short' => 'import_simplexml']
+     *      "DateTime" => ['ns' => [], 'short' => 'DateTime']
+     */
+    public static function parsePhpName(string $phpName): array
+    {
+        if (!str_contains($phpName, '\\')) {
+            return ['ns' => [], 'short' => $phpName];
+        }
+        $parts = explode('\\', $phpName);
+        $short = array_pop($parts);
+        return ['ns' => $parts, 'short' => $short];
+    }
+
+    /**
+     * Shorten a flat C++ type name when it belongs to the given namespace context.
+     * Returns the short name if the type is in the same namespace, unchanged otherwise.
+     */
+    public static function shortTypeInContext(?string $flatType, array $nsContext): string
+    {
+        if ($flatType === null || $flatType === 'Variant' || $flatType === 'void' || $flatType === '') {
+            return $flatType ?? 'Variant';
+        }
+        $nsInfo = self::$facadeClassNamespace[$flatType] ?? null;
+        if ($nsInfo !== null && $nsInfo['ns'] === $nsContext) {
+            return $nsInfo['short'];
+        }
+        return $flatType;
+    }
+
+    /**
+     * Regex-replace flat facade class names with short names when they belong
+     * to the given namespace context. Used for args strings which contain
+     * multiple type references.
+     */
+    public static function shortTypesInString(?string $str, array $nsContext): string
+    {
+        if ($str === null || $str === '') return $str ?? '';
+        foreach (self::$facadeClassNamespace as $flatName => $nsInfo) {
+            if ($nsInfo['ns'] === $nsContext) {
+                $str = preg_replace(
+                    '/\b' . preg_quote($flatName, '/') . '\b/',
+                    $nsInfo['short'],
+                    $str
+                );
+            }
+        }
+        return $str;
     }
 
     /**
@@ -884,6 +1030,10 @@ class Generator
             }
 
             $classSymbol = $ref->getName();
+            $nsInfo = self::parsePhpName($classSymbol);
+            if (in_array($classSymbol, self::BUILTIN_CLASSES)) {
+                $nsInfo['short'] = $nsInfo['short'] . '_';
+            }
             $className = str_replace("\\", '_', $className);
             if ($ref->isAbstract() || $ref->isInterface() || $ref->isTrait()) {
                 continue;
@@ -925,17 +1075,18 @@ class Generator
 
             if (!$hasCtor) {
                 $classSymbolLiteralString = self::addLiteralString($classSymbol);
-                $code = "{$className}::{$className}() {\n";
+                $shortName = $nsInfo['short'];
+                $code = "{$shortName}::{$shortName}() {\n";
                 $code .= "\tthis_ = newObject({$classSymbolLiteralString});\n";
                 $code .= "}\n";
-                $methods[$className] = [
+                $methods[$shortName] = [
                     'args' => '',
                     'args_impl' => '',
                     'call' => '{}',
                     'variadic' => false,
                     'static' => false,
                     'ctor' => true,
-                    'name' => $className,
+                    'name' => $shortName,
                     'symbol' => self::addLiteralString($classSymbol),
                     'impl_code' => $code,
                 ];
@@ -956,7 +1107,7 @@ class Generator
                 $name = $method->getName();
 
                 if ($method->isConstructor()) {
-                    $name = $className;
+                    $name = $nsInfo['short'];
                 }
                 self::nameSafety($name);
 
@@ -1013,13 +1164,13 @@ class Generator
                 if (!$info['ctor']) {
                     $code .= $returnType . ' ';
                 }
-                $code .= $variadic ? $name : $className . '::' . $name;
+                $code .= $variadic ? $name : $nsInfo['short'] . '::' . $name;
                 $code .= "({$info['args_impl']}) {" . "\n";
                  if ($info['ctor']) {
                      $classSymbolLiteralString = self::addLiteralString($classSymbol);
                      $code .= "\tthis_ = newObject({$classSymbolLiteralString}, {$info['call']});\n";
                  } elseif ($info['static']) {
-                     $classLiteralString = self::addLiteralString($className);
+                     $classLiteralString = self::addLiteralString($classSymbol);
                      $methodLiteralString = self::addLiteralString($method->getName());
                      $code .= "\tstatic THREAD_LOCAL zend_function *_method_fn = nullptr;\n";
                      $code .= "\tif (UNEXPECTED(!_method_fn)) {\n";
@@ -1029,7 +1180,7 @@ class Generator
                          $callExpr = "php::call(_method_fn, {$info['call']})";
                          $code .= "\tauto _rv = {$callExpr};\n";
                          $code .= "\tif (!_rv.toBool()) {\n";
-                         $code .= "\t\tthrowException(String(\"RuntimeException\"), \"{$className}::{$method->getName()}() returned false\");\n";
+                         $code .= "\t\tthrowException(String(\"RuntimeException\"), \"{$classSymbol}::{$method->getName()}() returned false\");\n";
                          $code .= "\t}\n";
                          $code .= "\treturn {$returnType}(Object(std::move(_rv)));\n";
                      } elseif ($returnType !== 'Variant') {
@@ -1046,7 +1197,7 @@ class Generator
                          $callExpr = "this_.call(_method_fn, {$info['call']})";
                          $code .= "\tauto _rv = {$callExpr};\n";
                          $code .= "\tif (!_rv.toBool()) {\n";
-                         $code .= "\t\tthrowException(String(\"RuntimeException\"), \"{$className}::{$method->getName()}() returned false\");\n";
+                         $code .= "\t\tthrowException(String(\"RuntimeException\"), \"{$classSymbol}::{$method->getName()}() returned false\");\n";
                          $code .= "\t}\n";
                          $code .= "\treturn {$returnType}(Object(std::move(_rv)));\n";
                      } elseif ($returnType !== 'Variant') {
@@ -1062,7 +1213,7 @@ class Generator
                 $info['impl_code_v'] = '';
                 if ($hasFacade && !$variadic && !$info['ctor']) {
                     $codeV = "Variant ";
-                    $codeV .= "{$className}::{$name}({$info['args_impl_v']}) {" . "\n";
+                    $codeV .= "{$nsInfo['short']}::{$name}({$info['args_impl_v']}) {" . "\n";
                     if ($info['static']) {
                         $codeV .= "\tstatic THREAD_LOCAL zend_function *_method_fn = nullptr;\n";
                         $codeV .= "\tif (UNEXPECTED(!_method_fn)) {\n";
@@ -1117,6 +1268,7 @@ class Generator
             }
 
             $classes[$className] = [
+                'ns_info' => $nsInfo,
                 'methods' => $methods,
                 'class' => self::addLiteralString($classSymbol),
                 'has_ctor' => $hasCtor,
@@ -1150,13 +1302,16 @@ class Generator
                     echo "Skipping constant $name, unsupported type `{$type}`\n";
                     continue;
                 }
-                self::nameSafety($name);
-                $name = $name . $this->constSuffix($name);
+                $originalName = $name;
+                $nsInfo = self::parsePhpName($originalName);
+                $shortName = $nsInfo['short'];
+                self::nameSafety($shortName);
+                $shortName = $shortName . $this->constSuffix($shortName);
                 $repr = self::valueToCppRepr($value);
                 if (is_string($value)) {
-                    $constants[$name] = "ZEND_STRL(" . $repr . "), true";
+                    $constants[$shortName] = ['ns_info' => $nsInfo, 'repr' => 'ZEND_STRL(' . $repr . '), true'];
                 } else {
-                    $constants[$name] = $repr;
+                    $constants[$shortName] = ['ns_info' => $nsInfo, 'repr' => $repr];
                 }
             }
         }

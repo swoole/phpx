@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant lcg_value();
 Variant mt_srand(const Variant &seed = {}, const Variant &mode = 0);
 Variant srand(const Variant &seed = {}, const Variant &mode = 0);
@@ -14,4 +15,5 @@ Variant mt_getrandmax();
 Variant getrandmax();
 Variant random_bytes(const Variant &length);
 Variant random_int(const Variant &min, const Variant &max);
+
 }  // namespace php

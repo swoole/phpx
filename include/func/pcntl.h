@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant pcntl_fork();
 Variant pcntl_waitpid(const Variant &process_id,
                       const Reference &status,
@@ -45,4 +46,5 @@ Variant pcntl_unshare(const Variant &flags);
 Variant pcntl_getcpuaffinity(const Variant &process_id = {});
 Variant pcntl_setcpuaffinity(const Variant &process_id = {}, const Variant &cpu_ids = Array{});
 Variant pcntl_getcpu();
+
 }  // namespace php

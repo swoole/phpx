@@ -5,5 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant pdo_drivers();
+
 }

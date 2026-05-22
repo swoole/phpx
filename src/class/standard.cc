@@ -4,23 +4,23 @@
 
 namespace php {
 __PHP_Incomplete_Class::__PHP_Incomplete_Class() {
-    this_ = newObject(LITERAL_STRING[2574]);
+    this_ = newObject(LITERAL_STRING[2568]);
 }
 AssertionError::AssertionError(const Variant &message, const Variant &code, const Variant &previous) {
-    this_ = newObject(LITERAL_STRING[2575], {message, code, previous});
+    this_ = newObject(LITERAL_STRING[2569], {message, code, previous});
 }
 RoundingMode::RoundingMode() {
-    this_ = newObject(LITERAL_STRING[2576]);
+    this_ = newObject(LITERAL_STRING[2570]);
 }
 Variant RoundingMode::cases() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(LITERAL_STRING[2576], LITERAL_STRING[334]);
+        _method_fn = php::getMethod(LITERAL_STRING[2570], LITERAL_STRING[333]);
     }
     return php::call(_method_fn, {});
 }
 php_user_filter::php_user_filter() {
-    this_ = newObject(LITERAL_STRING[2578]);
+    this_ = newObject(LITERAL_STRING[2572]);
 }
 Variant php_user_filter::filter(const Variant &in,
                                 const Variant &out,
@@ -28,34 +28,34 @@ Variant php_user_filter::filter(const Variant &in,
                                 const Variant &closing) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2579]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2573]);
     }
     return this_.call(_method_fn, {in, out, &consumed, closing});
 }
 Variant php_user_filter::onCreate() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2580]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2574]);
     }
     return this_.call(_method_fn, {});
 }
 Variant php_user_filter::onClose() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2581]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2575]);
     }
     return this_.call(_method_fn, {});
 }
 StreamBucket::StreamBucket() {
-    this_ = newObject(LITERAL_STRING[2582]);
+    this_ = newObject(LITERAL_STRING[2576]);
 }
 Directory::Directory() {
-    this_ = newObject(LITERAL_STRING[2583]);
+    this_ = newObject(LITERAL_STRING[2577]);
 }
 Variant Directory::close() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[861]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[857]);
     }
     return this_.call(_method_fn, {});
 }
@@ -69,7 +69,7 @@ Variant Directory::rewind() {
 Variant Directory::read() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1810]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1804]);
     }
     return this_.call(_method_fn, {});
 }

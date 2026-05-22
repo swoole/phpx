@@ -4,18 +4,22 @@
 #include "phpx_literal_string.h"
 
 namespace php {
-class BcMath_Number;
+namespace BcMath {
+class Number;
+}
 
-class BcMath_Number {
+namespace BcMath {
+
+class Number {
   protected:
     Object this_;
-    BcMath_Number() = default;
+    Number() = default;
 
   public:
     Object getObject() const {
         return this_;
     }
-    BcMath_Number(const Variant &num);
+    Number(const Variant &num);
     Variant add(const Variant &num, const Variant &scale = {});
     Variant sub(const Variant &num, const Variant &scale = {});
     Variant mul(const Variant &num, const Variant &scale = {});
@@ -34,4 +38,5 @@ class BcMath_Number {
     Variant __unserialize(const Variant &data);
 };
 
+}  // namespace BcMath
 }  // namespace php

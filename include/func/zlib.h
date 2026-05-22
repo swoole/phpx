@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant ob_gzhandler(const Variant &data, const Variant &flags);
 Variant zlib_get_coding_type();
 Variant gzfile(const Variant &filename, const Variant &use_include_path = 0);
@@ -39,4 +40,5 @@ Variant inflate_get_status(const InflateContext &context);
 Variant inflate_get_status(const Variant &context);
 Variant inflate_get_read_len(const InflateContext &context);
 Variant inflate_get_read_len(const Variant &context);
+
 }  // namespace php

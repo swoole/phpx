@@ -4,9 +4,9 @@
 
 namespace php {
 GdImage::GdImage() {
-    this_ = newObject(LITERAL_STRING[639]);
+    this_ = newObject(LITERAL_STRING[635]);
 }
 GdFont::GdFont() {
-    this_ = newObject(LITERAL_STRING[640]);
+    this_ = newObject(LITERAL_STRING[636]);
 }
 }  // namespace php

@@ -253,7 +253,7 @@ class ReflectionFunction {
     Variant invoke(const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1604]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1598]);
         }
         return this_.call(_method_fn, {args...});
     }
@@ -357,7 +357,7 @@ class ReflectionMethod {
     Variant invoke(const Variant &object, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1604]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1598]);
         }
         return this_.call(_method_fn, {object, args...});
     }
@@ -518,7 +518,7 @@ class ReflectionClass {
     Variant newInstance(const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1706]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1700]);
         }
         return this_.call(_method_fn, {args...});
     }

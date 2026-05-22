@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant gd_info();
 GdFont imageloadfont(const Variant &filename);
 Variant imagesetstyle(const GdImage &image, const Variant &style);
@@ -425,7 +426,7 @@ template <typename... Args>
 Variant imagefilter(const GdImage &image, const Variant &filter, const Args &...args) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[626]);
+        fn = getFunction(LITERAL_STRING[622]);
     }
     return call(fn, {image.getObject(), filter, args...});
 }
@@ -457,4 +458,5 @@ Variant imagesetinterpolation(const GdImage &image, const Variant &method = 3);
 Variant imagesetinterpolation(const Variant &image, const Variant &method = 3);
 Variant imageresolution(const GdImage &image, const Variant &resolution_x = {}, const Variant &resolution_y = {});
 Variant imageresolution(const Variant &image, const Variant &resolution_x = {}, const Variant &resolution_y = {});
+
 }  // namespace php

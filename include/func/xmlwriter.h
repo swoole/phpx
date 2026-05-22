@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 XMLWriter xmlwriter_open_uri(const Variant &uri);
 XMLWriter xmlwriter_open_memory();
 Variant xmlwriter_set_indent(const XMLWriter &writer, const Variant &enable);
@@ -144,4 +145,5 @@ Variant xmlwriter_output_memory(const XMLWriter &writer, const Variant &flush = 
 Variant xmlwriter_output_memory(const Variant &writer, const Variant &flush = true);
 Variant xmlwriter_flush(const XMLWriter &writer, const Variant &empty = true);
 Variant xmlwriter_flush(const Variant &writer, const Variant &empty = true);
+
 }  // namespace php

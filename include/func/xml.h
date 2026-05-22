@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 XMLParser xml_parser_create(const Variant &encoding = {});
 XMLParser xml_parser_create_ns(const Variant &encoding = {}, const Variant &separator = ":");
 Variant xml_set_object(const XMLParser &parser, const Variant &object);
@@ -52,4 +53,5 @@ Variant xml_parser_set_option(const XMLParser &parser, const Variant &option, co
 Variant xml_parser_set_option(const Variant &parser, const Variant &option, const Variant &value);
 Variant xml_parser_get_option(const XMLParser &parser, const Variant &option);
 Variant xml_parser_get_option(const Variant &parser, const Variant &option);
+
 }  // namespace php

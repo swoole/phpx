@@ -4,9 +4,9 @@
 
 namespace php {
 Socket::Socket() {
-    this_ = newObject(LITERAL_STRING[1868]);
+    this_ = newObject(LITERAL_STRING[1862]);
 }
 AddressInfo::AddressInfo() {
-    this_ = newObject(LITERAL_STRING[1869]);
+    this_ = newObject(LITERAL_STRING[1863]);
 }
 }  // namespace php

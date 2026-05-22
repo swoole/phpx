@@ -4,12 +4,12 @@
 
 namespace php {
 OpenSSLCertificate::OpenSSLCertificate() {
-    this_ = newObject(LITERAL_STRING[991]);
+    this_ = newObject(LITERAL_STRING[987]);
 }
 OpenSSLCertificateSigningRequest::OpenSSLCertificateSigningRequest() {
-    this_ = newObject(LITERAL_STRING[992]);
+    this_ = newObject(LITERAL_STRING[988]);
 }
 OpenSSLAsymmetricKey::OpenSSLAsymmetricKey() {
-    this_ = newObject(LITERAL_STRING[993]);
+    this_ = newObject(LITERAL_STRING[989]);
 }
 }  // namespace php

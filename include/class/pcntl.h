@@ -4,9 +4,13 @@
 #include "phpx_literal_string.h"
 
 namespace php {
-class Pcntl_QosClass;
+namespace Pcntl {
+class QosClass;
+}
 
-class Pcntl_QosClass {
+namespace Pcntl {
+
+class QosClass {
   protected:
     Object this_;
 
@@ -14,9 +18,10 @@ class Pcntl_QosClass {
     Object getObject() const {
         return this_;
     }
-    explicit Pcntl_QosClass(const Object &obj) : this_(obj) {}
-    Pcntl_QosClass();
+    explicit QosClass(const Object &obj) : this_(obj) {}
+    QosClass();
     static Variant cases();
 };
 
+}  // namespace Pcntl
 }  // namespace php

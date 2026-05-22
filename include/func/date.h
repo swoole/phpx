@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant strtotime(const Variant &datetime, const Variant &base_timestamp = {});
 Variant date(const Variant &format, const Variant &timestamp = {});
 Variant idate(const Variant &format, const Variant &timestamp = {});
@@ -104,4 +105,5 @@ Variant date_sunset(const Variant &timestamp,
                     const Variant &zenith = {},
                     const Variant &utc_offset = {});
 Variant date_sun_info(const Variant &timestamp, const Variant &latitude, const Variant &longitude);
+
 }  // namespace php

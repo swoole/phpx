@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant class_implements(const Variant &object_or_class, const Variant &autoload = true);
 Variant class_parents(const Variant &object_or_class, const Variant &autoload = true);
 Variant class_uses(const Variant &object_or_class, const Variant &autoload = true);
@@ -22,4 +23,5 @@ Variant spl_object_id(const Variant &object);
 Variant iterator_apply(const Variant &iterator, const Variant &callback, const Variant &args = {});
 Variant iterator_count(const Variant &iterator);
 Variant iterator_to_array(const Variant &iterator, const Variant &preserve_keys = true);
+
 }  // namespace php

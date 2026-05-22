@@ -4,6 +4,6 @@
 
 namespace php {
 LibXMLError::LibXMLError() {
-    this_ = newObject(LITERAL_STRING[681]);
+    this_ = newObject(LITERAL_STRING[677]);
 }
 }  // namespace php

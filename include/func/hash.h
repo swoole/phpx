@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant hash(const Variant &algo, const Variant &data, const Variant &binary = false, const Variant &options = Array{});
 Variant hash_file(const Variant &algo,
                   const Variant &filename,
@@ -41,4 +42,5 @@ Variant hash_hkdf(const Variant &algo,
                   const Variant &length = 0,
                   const Variant &info = "",
                   const Variant &salt = "");
+
 }  // namespace php

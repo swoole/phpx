@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant session_name(const Variant &name = {});
 Variant session_module_name(const Variant &module = {});
 Variant session_save_path(const Variant &path = {});
@@ -40,4 +41,5 @@ Variant session_set_cookie_params(const Variant &lifetime_or_options,
                                   const Variant &secure = {},
                                   const Variant &httponly = {});
 Variant session_start(const Variant &options = Array{});
+
 }  // namespace php

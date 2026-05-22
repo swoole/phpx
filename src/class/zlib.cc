@@ -4,9 +4,9 @@
 
 namespace php {
 InflateContext::InflateContext() {
-    this_ = newObject(LITERAL_STRING[2778]);
+    this_ = newObject(LITERAL_STRING[2772]);
 }
 DeflateContext::DeflateContext() {
-    this_ = newObject(LITERAL_STRING[2779]);
+    this_ = newObject(LITERAL_STRING[2773]);
 }
 }  // namespace php

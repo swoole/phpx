@@ -5,6 +5,7 @@
 #include "phpx_class.h"
 
 namespace php {
+
 Variant preg_match(const Variant &pattern,
                    const Variant &subject,
                    const Reference &matches = {},
@@ -41,4 +42,5 @@ Variant preg_quote(const Variant &str, const Variant &delimiter = {});
 Variant preg_grep(const Variant &pattern, const Variant &array, const Variant &flags = 0);
 Variant preg_last_error();
 Variant preg_last_error_msg();
+
 }  // namespace php

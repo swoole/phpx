@@ -2,8 +2,13 @@
 #include "phpx_class.h"
 #include "class/<?= $ext ?>.h"
 
+<?php foreach ($groupedClasses as $nsKey => $nsClasses): ?>
+<?php if ($nsKey === ''): ?>
 namespace php {
-<?php foreach ($classes as $className => $info): ?>
+<?php else: ?>
+namespace php::<?=$nsKey?> {
+<?php endif; ?>
+<?php foreach ($nsClasses as $shortName => $info): ?>
 <?php foreach ($info['methods'] as $name => $minfo): ?>
 <?php if (!$minfo['variadic']):?>
 <?=$minfo['impl_code']?>
@@ -14,3 +19,4 @@ namespace php {
 <?php endforeach; ?>
 <?php endforeach; ?>
 }
+<?php endforeach; ?>

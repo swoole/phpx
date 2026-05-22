@@ -5,11 +5,15 @@
 #include "class/pdo.h"
 
 namespace php {
-class Pdo_Sqlite;
+namespace Pdo {
+class Sqlite;
+}
 
-class Pdo_Sqlite : public PDO {
+namespace Pdo {
+
+class Sqlite : public PDO {
   protected:
-    Pdo_Sqlite() = default;
+    Sqlite() = default;
 
   public:
     static constexpr int DETERMINISTIC = 2048;
@@ -35,10 +39,8 @@ class Pdo_Sqlite : public PDO {
                      const Variant &rowid,
                      const Variant &dbname = "main",
                      const Variant &flags = 1);
-    Pdo_Sqlite(const Variant &dsn,
-               const Variant &username = {},
-               const Variant &password = {},
-               const Variant &options = {});
+    Sqlite(const Variant &dsn, const Variant &username = {}, const Variant &password = {}, const Variant &options = {});
 };
 
+}  // namespace Pdo
 }  // namespace php

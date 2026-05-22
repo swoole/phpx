@@ -9,35 +9,50 @@
 <?php endif; ?>
 
 namespace php {
-<?php foreach ($classes as $className => $info): ?>
-class <?=$className?>;
+<?php foreach ($groupedClasses as $nsKey => $nsClasses): ?>
+<?php if ($nsKey === ''): ?>
+<?php foreach ($nsClasses as $shortName => $info): ?>
+class <?=$shortName?>;
+<?php endforeach; ?>
+<?php else: ?>
+namespace <?=$nsKey?> {
+<?php foreach ($nsClasses as $shortName => $info): ?>
+    class <?=$shortName?>;
+<?php endforeach; ?>
+}
+<?php endif; ?>
 <?php endforeach; ?>
 
-<?php foreach ($classes as $className => $info): ?>
-class <?=$className?><?php if (!empty($info['extends'])): ?> : public <?=$info['extends']?><?php endif; ?> {
+<?php foreach ($groupedClasses as $nsKey => $nsClasses): ?>
+<?php if ($nsKey !== ''): ?>
+namespace <?=$nsKey?> {
+<?php endif; ?>
+
+<?php foreach ($nsClasses as $shortName => $info): ?>
+class <?=$shortName?><?php if (!empty($info['extends_short'])): ?> : public <?=$info['extends_short']?><?php endif; ?> {
 <?php if (empty($info['extends'])): ?>
   protected:
     Object this_;
 <?php if (!empty($info['needs_protected_ctor'])): ?>
-    <?=$className?>() = default;
+    <?=$shortName?>() = default;
 <?php endif; ?>
   public:
     Object getObject() const {
         return this_;
     }
 <?php if (!$info['has_ctor']): ?>
-    explicit <?=$className?>(const Object &obj) : this_(obj) {}
+    explicit <?=$shortName?>(const Object &obj) : this_(obj) {}
 <?php endif; ?>
 <?php else: ?>
 <?php if (!empty($info['needs_protected_ctor'])): ?>
   protected:
-    <?=$className?>() = default;
+    <?=$shortName?>() = default;
 <?php endif; ?>
   public:
 <?php if (!$info['has_ctor'] && !$info['parent_has_ctor']): ?>
-    explicit <?=$className?>(const Object &obj) : <?=$info['extends']?>(obj) {}
+    explicit <?=$shortName?>(const Object &obj) : <?=$info['extends_short']?>(obj) {}
 <?php elseif (!$info['has_ctor'] && $info['parent_has_ctor']): ?>
-    explicit <?=$className?>(const Object &obj) {
+    explicit <?=$shortName?>(const Object &obj) {
         this_ = obj;
     }
 <?php endif; ?>
@@ -65,5 +80,10 @@ class <?=$className?><?php if (!empty($info['extends'])): ?> : public <?=$info['
 <?php endforeach; ?>
 };
 
+<?php endforeach; ?>
+
+<?php if ($nsKey !== ''): ?>
+}
+<?php endif; ?>
 <?php endforeach; ?>
 }
