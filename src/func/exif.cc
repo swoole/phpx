@@ -6,7 +6,7 @@ namespace php {
 Variant exif_tagname(const Variant &index) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[515]);
+        fn = getFunction(LITERAL_STRING[543]);
     }
     return call(fn, {index});
 }
@@ -16,7 +16,7 @@ Variant exif_read_data(const Variant &file,
                        const Variant &read_thumbnail) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[516]);
+        fn = getFunction(LITERAL_STRING[544]);
     }
     return call(fn, {file, required_sections, as_arrays, read_thumbnail});
 }
@@ -26,14 +26,14 @@ Variant exif_thumbnail(const Variant &file,
                        const Reference &image_type) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[517]);
+        fn = getFunction(LITERAL_STRING[545]);
     }
     return call(fn, {file, &width, &height, &image_type});
 }
 Variant exif_imagetype(const Variant &filename) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[518]);
+        fn = getFunction(LITERAL_STRING[546]);
     }
     return call(fn, {filename});
 }

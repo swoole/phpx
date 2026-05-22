@@ -10,7 +10,7 @@ Variant simplexml_load_file(const Variant &filename,
                             const Variant &is_prefix) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1809]);
+        fn = getFunction(LITERAL_STRING[1854]);
     }
     return call(fn, {filename, class_name, options, namespace_or_prefix, is_prefix});
 }
@@ -21,14 +21,14 @@ Variant simplexml_load_string(const Variant &data,
                               const Variant &is_prefix) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1810]);
+        fn = getFunction(LITERAL_STRING[1855]);
     }
     return call(fn, {data, class_name, options, namespace_or_prefix, is_prefix});
 }
 Variant simplexml_import_dom(const Variant &node, const Variant &class_name) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1811]);
+        fn = getFunction(LITERAL_STRING[1856]);
     }
     return call(fn, {node, class_name});
 }

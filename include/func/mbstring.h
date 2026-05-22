@@ -90,7 +90,7 @@ Variant mb_convert_variables(const Variant &to_encoding,
                              const Args &...vars) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[717]);
+        fn = getFunction(LITERAL_STRING[755]);
     }
     return call(fn, {to_encoding, from_encoding, &var, vars...});
 }

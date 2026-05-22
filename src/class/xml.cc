@@ -4,6 +4,6 @@
 
 namespace php {
 XMLParser::XMLParser() {
-    this_ = newObject(LITERAL_STRING[2608]);
+    this_ = newObject(LITERAL_STRING[2758]);
 }
 }  // namespace php

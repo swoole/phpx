@@ -178,7 +178,7 @@ template <typename... Args>
 Variant mysqli_stmt_bind_param(const mysqli_stmt &statement, const Variant &types, const Args &...vars) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[816]);
+        fn = getFunction(LITERAL_STRING[854]);
     }
     return call(fn, {statement.getObject(), types, vars...});
 }
@@ -186,7 +186,7 @@ template <typename... Args>
 Variant mysqli_stmt_bind_result(const mysqli_stmt &statement, const Args &...vars) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[817]);
+        fn = getFunction(LITERAL_STRING[855]);
     }
     return call(fn, {statement.getObject(), vars...});
 }

@@ -804,7 +804,7 @@ class SplFileObject : public SplFileInfo {
     Variant fscanf(const Variant &format, const Args &...vars) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1996]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[2146]);
         }
         return this_.call(_method_fn, {format, vars...});
     }

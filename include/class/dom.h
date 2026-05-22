@@ -153,7 +153,7 @@ class CharacterData : public Node {
     Variant before(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[476]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -161,7 +161,7 @@ class CharacterData : public Node {
     Variant after(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[477]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -169,7 +169,7 @@ class CharacterData : public Node {
     Variant replaceWith(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[474]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -232,7 +232,7 @@ class DocumentType : public Node {
     Variant before(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[476]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -240,7 +240,7 @@ class DocumentType : public Node {
     Variant after(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[477]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -248,7 +248,7 @@ class DocumentType : public Node {
     Variant replaceWith(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[474]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -345,7 +345,7 @@ class TokenList {
     Variant remove(const Args &...tokens) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[447]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[475]);
         }
         return this_.call(_method_fn, {tokens...});
     }
@@ -367,7 +367,7 @@ class DocumentFragment : public Node {
     Variant append(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[372]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[400]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -375,7 +375,7 @@ class DocumentFragment : public Node {
     Variant prepend(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[373]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[401]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -383,7 +383,7 @@ class DocumentFragment : public Node {
     Variant replaceChildren(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[374]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[402]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -447,7 +447,7 @@ class Element : public Node {
     Variant before(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[476]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -455,7 +455,7 @@ class Element : public Node {
     Variant after(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[477]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -463,7 +463,7 @@ class Element : public Node {
     Variant replaceWith(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[474]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -471,7 +471,7 @@ class Element : public Node {
     Variant append(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[372]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[400]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -479,7 +479,7 @@ class Element : public Node {
     Variant prepend(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[373]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[401]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -487,7 +487,7 @@ class Element : public Node {
     Variant replaceChildren(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[374]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[402]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -547,7 +547,7 @@ class HTMLDocument {
     Variant append(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[372]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[400]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -555,7 +555,7 @@ class HTMLDocument {
     Variant prepend(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[373]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[401]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -563,7 +563,7 @@ class HTMLDocument {
     Variant replaceChildren(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[374]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[402]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -656,7 +656,7 @@ class XMLDocument {
     Variant append(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[372]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[400]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -664,7 +664,7 @@ class XMLDocument {
     Variant prepend(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[373]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[401]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -672,7 +672,7 @@ class XMLDocument {
     Variant replaceChildren(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[374]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[402]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -824,7 +824,7 @@ class DOMDocumentFragment : public DOMNode {
     Variant append(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[372]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[400]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -832,7 +832,7 @@ class DOMDocumentFragment : public DOMNode {
     Variant prepend(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[373]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[401]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -840,7 +840,7 @@ class DOMDocumentFragment : public DOMNode {
     Variant replaceChildren(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[374]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[402]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -891,7 +891,7 @@ class DOMCharacterData : public DOMNode {
     Variant replaceWith(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[474]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -900,7 +900,7 @@ class DOMCharacterData : public DOMNode {
     Variant before(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[476]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -908,7 +908,7 @@ class DOMCharacterData : public DOMNode {
     Variant after(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[477]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -958,7 +958,7 @@ class DOMElement : public DOMNode {
     Variant before(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[448]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[476]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -966,7 +966,7 @@ class DOMElement : public DOMNode {
     Variant after(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[449]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[477]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -974,7 +974,7 @@ class DOMElement : public DOMNode {
     Variant replaceWith(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[446]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[474]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -982,7 +982,7 @@ class DOMElement : public DOMNode {
     Variant append(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[372]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[400]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -990,7 +990,7 @@ class DOMElement : public DOMNode {
     Variant prepend(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[373]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[401]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -998,7 +998,7 @@ class DOMElement : public DOMNode {
     Variant replaceChildren(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[374]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[402]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -1060,7 +1060,7 @@ class DOMDocument : public DOMNode {
     Variant append(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[372]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[400]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -1068,7 +1068,7 @@ class DOMDocument : public DOMNode {
     Variant prepend(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[373]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[401]);
         }
         return this_.call(_method_fn, {nodes...});
     }
@@ -1076,7 +1076,7 @@ class DOMDocument : public DOMNode {
     Variant replaceChildren(const Args &...nodes) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[374]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[402]);
         }
         return this_.call(_method_fn, {nodes...});
     }

@@ -121,10 +121,12 @@ class ReflectionFiber;
 class ReflectionConstant;
 class PropertyHookType;
 class SessionHandler;
+class Shmop;
 class SimpleXMLElement;
 class SimpleXMLIterator;
 class Socket;
 class AddressInfo;
+class SodiumException;
 class LogicException;
 class BadFunctionCallException;
 class BadMethodCallException;
@@ -180,6 +182,7 @@ class XMLParser;
 class XMLReader;
 class XMLWriter;
 class XSLTProcessor;
+class ZipArchive;
 class InflateContext;
 class DeflateContext;
 class DateTime;
@@ -287,12 +290,15 @@ class PharData;
 #include "class/redis.h"
 #include "class/reflection.h"
 #include "class/session.h"
+#include "class/shmop.h"
 #include "class/simplexml.h"
 #include "class/sockets.h"
+#include "class/sodium.h"
 #include "class/sqlite3.h"
 #include "class/tokenizer.h"
 #include "class/xml.h"
 #include "class/xmlreader.h"
 #include "class/xmlwriter.h"
 #include "class/xsl.h"
+#include "class/zip.h"
 #include "class/zlib.h"

@@ -1,2 +1,2 @@
 #include <phpx.h>
-extern php::Variant LITERAL_STRING[2774];
+extern php::Variant LITERAL_STRING[2982];

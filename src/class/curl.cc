@@ -4,53 +4,53 @@
 
 namespace php {
 CurlHandle::CurlHandle() {
-    this_ = newObject(LITERAL_STRING[207]);
+    this_ = newObject(LITERAL_STRING[235]);
 }
 CurlMultiHandle::CurlMultiHandle() {
-    this_ = newObject(LITERAL_STRING[208]);
+    this_ = newObject(LITERAL_STRING[236]);
 }
 CurlShareHandle::CurlShareHandle() {
-    this_ = newObject(LITERAL_STRING[209]);
+    this_ = newObject(LITERAL_STRING[237]);
 }
 CURLFile::CURLFile(const Variant &filename, const Variant &mime_type, const Variant &posted_filename) {
-    this_ = newObject(LITERAL_STRING[210], {filename, mime_type, posted_filename});
+    this_ = newObject(LITERAL_STRING[238], {filename, mime_type, posted_filename});
 }
 Variant CURLFile::getFilename() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[211]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[239]);
     }
     return this_.call(_method_fn, {});
 }
 Variant CURLFile::getMimeType() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[212]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[240]);
     }
     return this_.call(_method_fn, {});
 }
 Variant CURLFile::getPostFilename() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[213]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[241]);
     }
     return this_.call(_method_fn, {});
 }
 Variant CURLFile::setMimeType(const Variant &mime_type) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[214]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[242]);
     }
     return this_.call(_method_fn, {mime_type});
 }
 Variant CURLFile::setPostFilename(const Variant &posted_filename) {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[215]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[243]);
     }
     return this_.call(_method_fn, {posted_filename});
 }
 CURLStringFile::CURLStringFile(const Variant &data, const Variant &postname, const Variant &mime) {
-    this_ = newObject(LITERAL_STRING[216], {data, postname, mime});
+    this_ = newObject(LITERAL_STRING[244], {data, postname, mime});
 }
 }  // namespace php

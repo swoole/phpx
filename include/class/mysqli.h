@@ -162,7 +162,7 @@ class mysqli_stmt {
     Variant bind_param(const Variant &types, const Args &...vars) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[914]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[952]);
         }
         return this_.call(_method_fn, {types, vars...});
     }
@@ -170,7 +170,7 @@ class mysqli_stmt {
     Variant bind_result(const Args &...vars) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[915]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[953]);
         }
         return this_.call(_method_fn, {vars...});
     }

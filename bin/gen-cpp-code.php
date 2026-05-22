@@ -6,6 +6,8 @@ use Phpx\Generator;
 
 $extensions = [
     'bcmath',
+    'bz2',
+    'calendar',
     'Core',
     'ctype',
     'curl',
@@ -15,13 +17,14 @@ $extensions = [
     'fileinfo',
     'filter',
     'gd',
+    'gettext',
     'hash',
     'iconv',
     'json',
     'libxml',
     'mbstring',
-    'mysqlnd',
     'mysqli',
+    'mysqlnd',
     'openssl',
     'pcntl',
     'pcre',
@@ -34,8 +37,10 @@ $extensions = [
     'redis',
     'Reflection',
     'session',
+    'shmop',
     'SimpleXML',
     'sockets',
+    'sodium',
     'SPL',
     'sqlite3',
     'standard',
@@ -44,6 +49,7 @@ $extensions = [
     'xmlreader',
     'xmlwriter',
     'xsl',
+    'zip',
     'zlib',
 ];
 

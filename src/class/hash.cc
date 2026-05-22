@@ -20,7 +20,7 @@ Variant HashContext::__unserialize(const Variant &data) {
 Variant HashContext::__debugInfo() {
     static THREAD_LOCAL zend_function *_method_fn = nullptr;
     if (UNEXPECTED(!_method_fn)) {
-        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[129]);
+        _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[157]);
     }
     return this_.call(_method_fn, {});
 }

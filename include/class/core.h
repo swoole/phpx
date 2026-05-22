@@ -159,7 +159,7 @@ class Closure {
     Variant call(const Variant &new_this, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[121]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[149]);
         }
         return this_.call(_method_fn, {new_this, args...});
     }
@@ -327,7 +327,7 @@ class Fiber {
     Variant start(const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[151]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[179]);
         }
         return this_.call(_method_fn, {args...});
     }

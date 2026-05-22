@@ -6,168 +6,168 @@ namespace php {
 XMLParser xml_parser_create(const Variant &encoding) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2586]);
+        fn = getFunction(LITERAL_STRING[2736]);
     }
     return XMLParser(Object(call(fn, {encoding})));
 }
 XMLParser xml_parser_create_ns(const Variant &encoding, const Variant &separator) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2587]);
+        fn = getFunction(LITERAL_STRING[2737]);
     }
     return XMLParser(Object(call(fn, {encoding, separator})));
 }
 Variant xml_set_object(const XMLParser &parser, const Variant &object) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2588]);
+        fn = getFunction(LITERAL_STRING[2738]);
     }
     return call(fn, {parser.getObject(), object});
 }
 Variant xml_set_object(const Variant &parser, const Variant &object) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2588]);
+        fn = getFunction(LITERAL_STRING[2738]);
     }
     return call(fn, {parser, object});
 }
 Variant xml_set_element_handler(const XMLParser &parser, const Variant &start_handler, const Variant &end_handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2589]);
+        fn = getFunction(LITERAL_STRING[2739]);
     }
     return call(fn, {parser.getObject(), start_handler, end_handler});
 }
 Variant xml_set_element_handler(const Variant &parser, const Variant &start_handler, const Variant &end_handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2589]);
+        fn = getFunction(LITERAL_STRING[2739]);
     }
     return call(fn, {parser, start_handler, end_handler});
 }
 Variant xml_set_character_data_handler(const XMLParser &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2590]);
+        fn = getFunction(LITERAL_STRING[2740]);
     }
     return call(fn, {parser.getObject(), handler});
 }
 Variant xml_set_character_data_handler(const Variant &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2590]);
+        fn = getFunction(LITERAL_STRING[2740]);
     }
     return call(fn, {parser, handler});
 }
 Variant xml_set_processing_instruction_handler(const XMLParser &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2591]);
+        fn = getFunction(LITERAL_STRING[2741]);
     }
     return call(fn, {parser.getObject(), handler});
 }
 Variant xml_set_processing_instruction_handler(const Variant &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2591]);
+        fn = getFunction(LITERAL_STRING[2741]);
     }
     return call(fn, {parser, handler});
 }
 Variant xml_set_default_handler(const XMLParser &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2592]);
+        fn = getFunction(LITERAL_STRING[2742]);
     }
     return call(fn, {parser.getObject(), handler});
 }
 Variant xml_set_default_handler(const Variant &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2592]);
+        fn = getFunction(LITERAL_STRING[2742]);
     }
     return call(fn, {parser, handler});
 }
 Variant xml_set_unparsed_entity_decl_handler(const XMLParser &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2593]);
+        fn = getFunction(LITERAL_STRING[2743]);
     }
     return call(fn, {parser.getObject(), handler});
 }
 Variant xml_set_unparsed_entity_decl_handler(const Variant &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2593]);
+        fn = getFunction(LITERAL_STRING[2743]);
     }
     return call(fn, {parser, handler});
 }
 Variant xml_set_notation_decl_handler(const XMLParser &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2594]);
+        fn = getFunction(LITERAL_STRING[2744]);
     }
     return call(fn, {parser.getObject(), handler});
 }
 Variant xml_set_notation_decl_handler(const Variant &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2594]);
+        fn = getFunction(LITERAL_STRING[2744]);
     }
     return call(fn, {parser, handler});
 }
 Variant xml_set_external_entity_ref_handler(const XMLParser &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2595]);
+        fn = getFunction(LITERAL_STRING[2745]);
     }
     return call(fn, {parser.getObject(), handler});
 }
 Variant xml_set_external_entity_ref_handler(const Variant &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2595]);
+        fn = getFunction(LITERAL_STRING[2745]);
     }
     return call(fn, {parser, handler});
 }
 Variant xml_set_start_namespace_decl_handler(const XMLParser &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2596]);
+        fn = getFunction(LITERAL_STRING[2746]);
     }
     return call(fn, {parser.getObject(), handler});
 }
 Variant xml_set_start_namespace_decl_handler(const Variant &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2596]);
+        fn = getFunction(LITERAL_STRING[2746]);
     }
     return call(fn, {parser, handler});
 }
 Variant xml_set_end_namespace_decl_handler(const XMLParser &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2597]);
+        fn = getFunction(LITERAL_STRING[2747]);
     }
     return call(fn, {parser.getObject(), handler});
 }
 Variant xml_set_end_namespace_decl_handler(const Variant &parser, const Variant &handler) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2597]);
+        fn = getFunction(LITERAL_STRING[2747]);
     }
     return call(fn, {parser, handler});
 }
 Variant xml_parse(const XMLParser &parser, const Variant &data, const Variant &is_final) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2598]);
+        fn = getFunction(LITERAL_STRING[2748]);
     }
     return call(fn, {parser.getObject(), data, is_final});
 }
 Variant xml_parse(const Variant &parser, const Variant &data, const Variant &is_final) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2598]);
+        fn = getFunction(LITERAL_STRING[2748]);
     }
     return call(fn, {parser, data, is_final});
 }
@@ -177,7 +177,7 @@ Variant xml_parse_into_struct(const XMLParser &parser,
                               const Reference &index) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2599]);
+        fn = getFunction(LITERAL_STRING[2749]);
     }
     return call(fn, {parser.getObject(), data, &values, &index});
 }
@@ -187,112 +187,112 @@ Variant xml_parse_into_struct(const Variant &parser,
                               const Reference &index) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2599]);
+        fn = getFunction(LITERAL_STRING[2749]);
     }
     return call(fn, {parser, data, &values, &index});
 }
 Variant xml_get_error_code(const XMLParser &parser) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2600]);
+        fn = getFunction(LITERAL_STRING[2750]);
     }
     return call(fn, {parser.getObject()});
 }
 Variant xml_get_error_code(const Variant &parser) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2600]);
+        fn = getFunction(LITERAL_STRING[2750]);
     }
     return call(fn, {parser});
 }
 Variant xml_error_string(const Variant &error_code) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2601]);
+        fn = getFunction(LITERAL_STRING[2751]);
     }
     return call(fn, {error_code});
 }
 Variant xml_get_current_line_number(const XMLParser &parser) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2602]);
+        fn = getFunction(LITERAL_STRING[2752]);
     }
     return call(fn, {parser.getObject()});
 }
 Variant xml_get_current_line_number(const Variant &parser) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2602]);
+        fn = getFunction(LITERAL_STRING[2752]);
     }
     return call(fn, {parser});
 }
 Variant xml_get_current_column_number(const XMLParser &parser) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2603]);
+        fn = getFunction(LITERAL_STRING[2753]);
     }
     return call(fn, {parser.getObject()});
 }
 Variant xml_get_current_column_number(const Variant &parser) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2603]);
+        fn = getFunction(LITERAL_STRING[2753]);
     }
     return call(fn, {parser});
 }
 Variant xml_get_current_byte_index(const XMLParser &parser) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2604]);
+        fn = getFunction(LITERAL_STRING[2754]);
     }
     return call(fn, {parser.getObject()});
 }
 Variant xml_get_current_byte_index(const Variant &parser) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2604]);
+        fn = getFunction(LITERAL_STRING[2754]);
     }
     return call(fn, {parser});
 }
 Variant xml_parser_free(const XMLParser &parser) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2605]);
+        fn = getFunction(LITERAL_STRING[2755]);
     }
     return call(fn, {parser.getObject()});
 }
 Variant xml_parser_free(const Variant &parser) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2605]);
+        fn = getFunction(LITERAL_STRING[2755]);
     }
     return call(fn, {parser});
 }
 Variant xml_parser_set_option(const XMLParser &parser, const Variant &option, const Variant &value) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2606]);
+        fn = getFunction(LITERAL_STRING[2756]);
     }
     return call(fn, {parser.getObject(), option, value});
 }
 Variant xml_parser_set_option(const Variant &parser, const Variant &option, const Variant &value) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2606]);
+        fn = getFunction(LITERAL_STRING[2756]);
     }
     return call(fn, {parser, option, value});
 }
 Variant xml_parser_get_option(const XMLParser &parser, const Variant &option) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2607]);
+        fn = getFunction(LITERAL_STRING[2757]);
     }
     return call(fn, {parser.getObject(), option});
 }
 Variant xml_parser_get_option(const Variant &parser, const Variant &option) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2607]);
+        fn = getFunction(LITERAL_STRING[2757]);
     }
     return call(fn, {parser, option});
 }

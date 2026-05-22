@@ -426,7 +426,7 @@ template <typename... Args>
 Variant imagefilter(const GdImage &image, const Variant &filter, const Args &...args) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[622]);
+        fn = getFunction(LITERAL_STRING[650]);
     }
     return call(fn, {image.getObject(), filter, args...});
 }

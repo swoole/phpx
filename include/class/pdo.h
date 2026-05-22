@@ -47,7 +47,7 @@ class PDOStatement {
     Variant fetchAll(const Variant &mode, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1052]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1090]);
         }
         return this_.call(_method_fn, {mode, args...});
     }
@@ -62,7 +62,7 @@ class PDOStatement {
     Variant setFetchMode(const Variant &mode, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
         if (UNEXPECTED(!_method_fn)) {
-            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1058]);
+            _method_fn = php::getMethod(this_.ce(), LITERAL_STRING[1096]);
         }
         return this_.call(_method_fn, {mode, args...});
     }

@@ -1,0 +1,23 @@
+namespace php {
+extern Variant CAL_GREGORIAN;
+extern Variant CAL_JULIAN;
+extern Variant CAL_JEWISH;
+extern Variant CAL_FRENCH;
+extern Variant CAL_NUM_CALS;
+extern Variant CAL_DOW_DAYNO;
+extern Variant CAL_DOW_SHORT;
+extern Variant CAL_DOW_LONG;
+extern Variant CAL_MONTH_GREGORIAN_SHORT;
+extern Variant CAL_MONTH_GREGORIAN_LONG;
+extern Variant CAL_MONTH_JULIAN_SHORT;
+extern Variant CAL_MONTH_JULIAN_LONG;
+extern Variant CAL_MONTH_JEWISH;
+extern Variant CAL_MONTH_FRENCH;
+extern Variant CAL_EASTER_DEFAULT;
+extern Variant CAL_EASTER_ROMAN;
+extern Variant CAL_EASTER_ALWAYS_GREGORIAN;
+extern Variant CAL_EASTER_ALWAYS_JULIAN;
+extern Variant CAL_JEWISH_ADD_ALAFIM_GERESH;
+extern Variant CAL_JEWISH_ADD_ALAFIM;
+extern Variant CAL_JEWISH_ADD_GERESHAYIM;
+}  // namespace php

@@ -6,14 +6,14 @@ namespace php {
 Variant token_get_all(const Variant &code, const Variant &flags) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2578]);
+        fn = getFunction(LITERAL_STRING[2728]);
     }
     return call(fn, {code, flags});
 }
 Variant token_name(const Variant &id) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2579]);
+        fn = getFunction(LITERAL_STRING[2729]);
     }
     return call(fn, {id});
 }
