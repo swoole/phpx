@@ -122,6 +122,16 @@ static inline bool toBool(bool v) {
     return v;
 }
 
+template <typename T, enable_if_integral_non_bool<T> = 0>
+static inline bool toBool(T v) {
+    return v != 0;
+}
+
+template <typename T, enable_if_floating_point<T> = 0>
+static inline bool toBool(T v) {
+    return v != 0.0;
+}
+
 static inline bool toBool(const Variant &v) {
     return v.toBool();
 }

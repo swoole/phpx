@@ -506,6 +506,25 @@ struct is_std_container : std::integral_constant<bool,
                                                  is_std_array<T>::value || is_std_vector<T>::value ||
                                                      is_std_map<T>::value || is_std_unordered_map<T>::value> {};
 
+template <typename T>
+inline constexpr bool is_integral_non_bool_v =
+    std::is_integral_v<std::decay_t<T>> && !std::is_same_v<std::decay_t<T>, bool>;
+
+template <typename T>
+inline constexpr bool is_floating_point_v = std::is_floating_point_v<std::decay_t<T>>;
+
+template <typename T>
+inline constexpr bool is_arithmetic_non_bool_v = is_integral_non_bool_v<T> || is_floating_point_v<T>;
+
+template <typename T, typename Ret = int>
+using enable_if_integral_non_bool = std::enable_if_t<is_integral_non_bool_v<T>, Ret>;
+
+template <typename T, typename Ret = int>
+using enable_if_floating_point = std::enable_if_t<is_floating_point_v<T>, Ret>;
+
+template <typename T, typename Ret = int>
+using enable_if_arithmetic_non_bool = std::enable_if_t<is_arithmetic_non_bool_v<T>, Ret>;
+
 class Variant {
   protected:
     zval val;
@@ -534,15 +553,11 @@ class Variant {
     Variant(std::nullptr_t) noexcept {
         ZVAL_NULL(&val);
     }
-    template <typename T,
-              typename std::enable_if<std::is_integral<typename std::decay<T>::type>::value &&
-                                          !std::is_same<typename std::decay<T>::type, bool>::value,
-                                      int>::type = 0>
+    template <typename T, enable_if_integral_non_bool<T> = 0>
     Variant(T v) noexcept {
         ZVAL_LONG(&val, static_cast<zend_long>(v));
     }
-    template <typename T,
-              typename std::enable_if<std::is_floating_point<typename std::decay<T>::type>::value, int>::type = 0>
+    template <typename T, enable_if_floating_point<T> = 0>
     Variant(T v) noexcept {
         ZVAL_DOUBLE(&val, static_cast<double>(v));
     }
@@ -663,17 +678,13 @@ class Variant {
             destroy();
         }
     }
-    template <typename T,
-              typename D = typename std::decay<T>::type,
-              typename std::enable_if<std::is_integral<D>::value && !std::is_same<D, bool>::value, int>::type = 0>
+    template <typename T, enable_if_integral_non_bool<T> = 0>
     Variant &operator=(T v) {
         destroy();
         ZVAL_LONG(unwrap_ptr(), static_cast<zend_long>(v));
         return *this;
     }
-    template <typename T,
-              typename D = typename std::decay<T>::type,
-              typename std::enable_if<std::is_floating_point<D>::value, int>::type = 0>
+    template <typename T, enable_if_floating_point<T> = 0>
     Variant &operator=(T v) {
         destroy();
         ZVAL_DOUBLE(unwrap_ptr(), static_cast<double>(v));
