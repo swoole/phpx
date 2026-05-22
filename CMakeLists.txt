@@ -65,6 +65,13 @@ if (enable_asan AND NOT IS_WINDOWS)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
 endif ()
 
+# ============ GitHub Action 配置 ============
+option(GITHUB_ACTION "Enable GitHub Action mode" OFF)
+if(GITHUB_ACTION)
+    message(STATUS "GitHub Action mode enabled")
+    add_definitions(-DGITHUB_ACTION)
+endif()
+
 # ============ PHP 配置 ============
 if(IS_WINDOWS)
     # Windows 平台：必须设置 PHP_HOME 环境变量
@@ -434,4 +441,5 @@ else()
 endif()
 message(STATUS "Build Tests: ${BUILD_TESTS}")
 message(STATUS "Build Extension: ${BUILD_EXT}")
+message(STATUS "GitHub Action: ${GITHUB_ACTION}")
 message(STATUS "=================================")

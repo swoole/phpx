@@ -26,7 +26,7 @@ jobs:
           php --ini
       - name: Build
         run: |
-          cmake . -D CODE_COVERAGE=ON || exit 1
+          cmake . -D CODE_COVERAGE=ON -D GITHUB_ACTION=ON || exit 1
           make VERBOSE=1 -j$(nproc)
       - name: Run google tests
         run: |

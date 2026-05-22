@@ -28,6 +28,7 @@ TEST(facade, uname) {
     ASSERT_STREQ(m.toCString(), "x86_64");
 }
 
+#ifndef GITHUB_ACTION
 TEST(facade, pdo) {
     var dsn = "mysql:dbname=test;host=127.0.0.1";
     var user = "root";
@@ -42,3 +43,4 @@ TEST(facade, pdo) {
         ASSERT_TRUE(table_name.isString());
     }
 }
+#endif
