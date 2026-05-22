@@ -20,9 +20,11 @@ var user = "root";
 var password = "root";
 
 PDO dbh(dsn, user, password);
-PDOStatement stmt = dbh.query("show tables");
-while (stmt.fetch()) {
-    std::cout << stmt.column(0) << std::endl;
+PDOStatement stmt = dbh.query("show tables", PDO::FETCH_NUM);
+
+while (var result = stmt.fetch()) {
+    var table_name = result.item(0);
+    std::cout << table_name.toCString() << std::endl;
 }
 ```
 
