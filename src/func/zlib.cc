@@ -6,175 +6,175 @@ namespace php {
 Variant ob_gzhandler(const Variant &data, const Variant &flags) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2950]);
+        fn = getFunction(LITERAL_STRING[3520]);
     }
     return call(fn, {data, flags});
 }
 Variant zlib_get_coding_type() {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2951]);
+        fn = getFunction(LITERAL_STRING[3521]);
     }
     return call(fn, {});
 }
 Variant gzfile(const Variant &filename, const Variant &use_include_path) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2952]);
+        fn = getFunction(LITERAL_STRING[3522]);
     }
     return call(fn, {filename, use_include_path});
 }
 Variant gzopen(const Variant &filename, const Variant &mode, const Variant &use_include_path) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2953]);
+        fn = getFunction(LITERAL_STRING[3523]);
     }
     return call(fn, {filename, mode, use_include_path});
 }
 Variant readgzfile(const Variant &filename, const Variant &use_include_path) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2954]);
+        fn = getFunction(LITERAL_STRING[3524]);
     }
     return call(fn, {filename, use_include_path});
 }
 Variant zlib_encode(const Variant &data, const Variant &encoding, const Variant &level) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2955]);
+        fn = getFunction(LITERAL_STRING[3525]);
     }
     return call(fn, {data, encoding, level});
 }
 Variant zlib_decode(const Variant &data, const Variant &max_length) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2956]);
+        fn = getFunction(LITERAL_STRING[3526]);
     }
     return call(fn, {data, max_length});
 }
 Variant gzdeflate(const Variant &data, const Variant &level, const Variant &encoding) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2957]);
+        fn = getFunction(LITERAL_STRING[3527]);
     }
     return call(fn, {data, level, encoding});
 }
 Variant gzencode(const Variant &data, const Variant &level, const Variant &encoding) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2958]);
+        fn = getFunction(LITERAL_STRING[3528]);
     }
     return call(fn, {data, level, encoding});
 }
 Variant gzcompress(const Variant &data, const Variant &level, const Variant &encoding) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2959]);
+        fn = getFunction(LITERAL_STRING[3529]);
     }
     return call(fn, {data, level, encoding});
 }
 Variant gzinflate(const Variant &data, const Variant &max_length) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2960]);
+        fn = getFunction(LITERAL_STRING[3530]);
     }
     return call(fn, {data, max_length});
 }
 Variant gzdecode(const Variant &data, const Variant &max_length) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2961]);
+        fn = getFunction(LITERAL_STRING[3531]);
     }
     return call(fn, {data, max_length});
 }
 Variant gzuncompress(const Variant &data, const Variant &max_length) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2962]);
+        fn = getFunction(LITERAL_STRING[3532]);
     }
     return call(fn, {data, max_length});
 }
 Variant gzwrite(const Variant &stream, const Variant &data, const Variant &length) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2963]);
+        fn = getFunction(LITERAL_STRING[3533]);
     }
     return call(fn, {stream, data, length});
 }
 Variant gzputs(const Variant &stream, const Variant &data, const Variant &length) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2964]);
+        fn = getFunction(LITERAL_STRING[3534]);
     }
     return call(fn, {stream, data, length});
 }
 Variant gzrewind(const Variant &stream) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2965]);
+        fn = getFunction(LITERAL_STRING[3535]);
     }
     return call(fn, {stream});
 }
 Variant gzclose(const Variant &stream) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2966]);
+        fn = getFunction(LITERAL_STRING[3536]);
     }
     return call(fn, {stream});
 }
 Variant gzeof(const Variant &stream) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2967]);
+        fn = getFunction(LITERAL_STRING[3537]);
     }
     return call(fn, {stream});
 }
 Variant gzgetc(const Variant &stream) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2968]);
+        fn = getFunction(LITERAL_STRING[3538]);
     }
     return call(fn, {stream});
 }
 Variant gzpassthru(const Variant &stream) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2969]);
+        fn = getFunction(LITERAL_STRING[3539]);
     }
     return call(fn, {stream});
 }
 Variant gzseek(const Variant &stream, const Variant &offset, const Variant &whence) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2970]);
+        fn = getFunction(LITERAL_STRING[3540]);
     }
     return call(fn, {stream, offset, whence});
 }
 Variant gztell(const Variant &stream) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2971]);
+        fn = getFunction(LITERAL_STRING[3541]);
     }
     return call(fn, {stream});
 }
 Variant gzread(const Variant &stream, const Variant &length) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2972]);
+        fn = getFunction(LITERAL_STRING[3542]);
     }
     return call(fn, {stream, length});
 }
 Variant gzgets(const Variant &stream, const Variant &length) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2973]);
+        fn = getFunction(LITERAL_STRING[3543]);
     }
     return call(fn, {stream, length});
 }
 DeflateContext deflate_init(const Variant &encoding, const Variant &options) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2974]);
+        fn = getFunction(LITERAL_STRING[3544]);
     }
     auto _rv = call(fn, {encoding, options});
     if (!_rv.toBool()) {
@@ -185,21 +185,21 @@ DeflateContext deflate_init(const Variant &encoding, const Variant &options) {
 Variant deflate_add(const DeflateContext &context, const Variant &data, const Variant &flush_mode) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2975]);
+        fn = getFunction(LITERAL_STRING[3545]);
     }
     return call(fn, {context.getObject(), data, flush_mode});
 }
 Variant deflate_add(const Variant &context, const Variant &data, const Variant &flush_mode) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2975]);
+        fn = getFunction(LITERAL_STRING[3545]);
     }
     return call(fn, {context, data, flush_mode});
 }
 InflateContext inflate_init(const Variant &encoding, const Variant &options) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2976]);
+        fn = getFunction(LITERAL_STRING[3546]);
     }
     auto _rv = call(fn, {encoding, options});
     if (!_rv.toBool()) {
@@ -210,42 +210,42 @@ InflateContext inflate_init(const Variant &encoding, const Variant &options) {
 Variant inflate_add(const InflateContext &context, const Variant &data, const Variant &flush_mode) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2977]);
+        fn = getFunction(LITERAL_STRING[3547]);
     }
     return call(fn, {context.getObject(), data, flush_mode});
 }
 Variant inflate_add(const Variant &context, const Variant &data, const Variant &flush_mode) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2977]);
+        fn = getFunction(LITERAL_STRING[3547]);
     }
     return call(fn, {context, data, flush_mode});
 }
 Variant inflate_get_status(const InflateContext &context) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2978]);
+        fn = getFunction(LITERAL_STRING[3548]);
     }
     return call(fn, {context.getObject()});
 }
 Variant inflate_get_status(const Variant &context) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2978]);
+        fn = getFunction(LITERAL_STRING[3548]);
     }
     return call(fn, {context});
 }
 Variant inflate_get_read_len(const InflateContext &context) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2979]);
+        fn = getFunction(LITERAL_STRING[3549]);
     }
     return call(fn, {context.getObject()});
 }
 Variant inflate_get_read_len(const Variant &context) {
     static THREAD_LOCAL zend_function *fn = nullptr;
     if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2979]);
+        fn = getFunction(LITERAL_STRING[3549]);
     }
     return call(fn, {context});
 }

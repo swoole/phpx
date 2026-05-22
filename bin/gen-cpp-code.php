@@ -44,6 +44,7 @@ $extensions = [
     'SPL',
     'sqlite3',
     'standard',
+    'swoole',
     'tokenizer',
     'xml',
     'xmlreader',

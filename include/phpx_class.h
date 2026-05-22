@@ -177,6 +177,8 @@ class RoundingMode;
 class php_user_filter;
 class StreamBucket;
 class Directory;
+class co;
+class chan;
 class PhpToken;
 class XMLParser;
 class XMLReader;
@@ -265,6 +267,222 @@ class PharData;
     namespace BcMath {
         class Number;
     }  // namespace BcMath
+    namespace Swoole {
+        class Exception;
+        class Error;
+        class Event;
+        class Atomic;
+        class Lock;
+        class Table;
+        class Timer;
+        class Coroutine;
+        class ExitException;
+        class Runtime;
+        class Process;
+        class Client;
+        class Server;
+        class Thread;
+    }  // namespace Swoole
+    namespace Swoole {
+        namespace Atomic {
+            class Long;
+        }  // namespace Atomic
+    }  // namespace Swoole
+    namespace Swoole {
+        namespace Timer {
+            class Iterator;
+        }  // namespace Timer
+    }  // namespace Swoole
+    namespace Swoole {
+        namespace Coroutine {
+            class Iterator;
+            class Context;
+            class CanceledException;
+            class TimeoutException;
+            class System;
+            class Scheduler;
+            class Lock;
+            class Channel;
+            class Socket;
+            class Client;
+        }  // namespace Coroutine
+    }  // namespace Swoole
+    namespace co {
+        class iterator;
+        class context;
+        class system;
+        class scheduler;
+        class channel;
+        class socket;
+        class client;
+    }  // namespace co
+    namespace Swoole {
+        namespace Coroutine {
+            namespace Curl {
+                class Exception;
+            }  // namespace Curl
+        }  // namespace Coroutine
+    }  // namespace Swoole
+    namespace co {
+        namespace coroutine {
+            namespace curl {
+                class exception;
+            }  // namespace curl
+        }  // namespace coroutine
+    }  // namespace co
+    namespace Swoole {
+        namespace Process {
+            class Pool;
+        }  // namespace Process
+    }  // namespace Swoole
+    namespace Swoole {
+        namespace Coroutine {
+            namespace Socket {
+                class Exception;
+            }  // namespace Socket
+        }  // namespace Coroutine
+    }  // namespace Swoole
+    namespace co {
+        namespace socket {
+            class exception;
+        }  // namespace socket
+    }  // namespace co
+    namespace Swoole {
+        namespace Client {
+            class Exception;
+        }  // namespace Client
+    }  // namespace Swoole
+    namespace Swoole {
+        namespace Async {
+            class Client;
+        }  // namespace Async
+    }  // namespace Swoole
+    namespace Swoole {
+        namespace Coroutine {
+            namespace Http {
+                namespace Client {
+                    class Exception;
+                }  // namespace Client
+            }  // namespace Http
+        }  // namespace Coroutine
+    }  // namespace Swoole
+    namespace co {
+        namespace http {
+            namespace client {
+                class exception;
+            }  // namespace client
+        }  // namespace http
+    }  // namespace co
+    namespace Swoole {
+        namespace Coroutine {
+            namespace Http2 {
+                namespace Client {
+                    class Exception;
+                }  // namespace Client
+            }  // namespace Http2
+        }  // namespace Coroutine
+    }  // namespace Swoole
+    namespace co {
+        namespace http2 {
+            namespace client {
+                class exception;
+            }  // namespace client
+        }  // namespace http2
+    }  // namespace co
+    namespace Swoole {
+        namespace Http2 {
+            class Request;
+            class Response;
+        }  // namespace Http2
+    }  // namespace Swoole
+    namespace Swoole {
+        namespace Coroutine {
+            namespace Http2 {
+                class Client;
+            }  // namespace Http2
+        }  // namespace Coroutine
+    }  // namespace Swoole
+    namespace co {
+        namespace http2 {
+            class client;
+        }  // namespace http2
+    }  // namespace co
+    namespace FTP {
+        class Connection;
+    }  // namespace FTP
+    namespace Swoole {
+        namespace Server {
+            class Task;
+            class Event;
+            class Packet;
+            class PipeMessage;
+            class StatusInfo;
+            class TaskResult;
+            class Port;
+        }  // namespace Server
+    }  // namespace Swoole
+    namespace Swoole {
+        namespace Connection {
+            class Iterator;
+        }  // namespace Connection
+    }  // namespace Swoole
+    namespace Swoole {
+        namespace Http {
+            class Request;
+            class Cookie;
+            class Server;
+            class Response;
+        }  // namespace Http
+    }  // namespace Swoole
+    namespace Swoole {
+        namespace WebSocket {
+            class Frame;
+            class Server;
+            class CloseFrame;
+        }  // namespace WebSocket
+    }  // namespace Swoole
+    namespace Swoole {
+        namespace Coroutine {
+            namespace Http {
+                class Client;
+                class Server;
+            }  // namespace Http
+        }  // namespace Coroutine
+    }  // namespace Swoole
+    namespace co {
+        namespace http {
+            class client;
+            class server;
+        }  // namespace http
+    }  // namespace co
+    namespace Swoole {
+        namespace Redis {
+            class Server;
+        }  // namespace Redis
+    }  // namespace Swoole
+    namespace Swoole {
+        namespace NameResolver {
+            class Context;
+        }  // namespace NameResolver
+    }  // namespace Swoole
+    namespace Swoole {
+        namespace Thread {
+            class Error;
+            class Atomic;
+            class Lock;
+            class Barrier;
+            class Queue;
+            class Map;
+            class ArrayList;
+        }  // namespace Thread
+    }  // namespace Swoole
+    namespace Swoole {
+        namespace Thread {
+            namespace Atomic {
+                class Long;
+            }  // namespace Atomic
+        }  // namespace Thread
+    }  // namespace Swoole
 }  // namespace php
 
 #include "class/standard.h"
@@ -295,6 +513,7 @@ class PharData;
 #include "class/sockets.h"
 #include "class/sodium.h"
 #include "class/sqlite3.h"
+#include "class/swoole.h"
 #include "class/tokenizer.h"
 #include "class/xml.h"
 #include "class/xmlreader.h"

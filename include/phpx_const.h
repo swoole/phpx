@@ -35,6 +35,7 @@
 #include "const/sockets.h"
 #include "const/sodium.h"
 #include "const/sqlite3.h"
+#include "const/swoole.h"
 #include "const/tokenizer.h"
 #include "const/xml.h"
 #include "const/xsl.h"

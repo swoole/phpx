@@ -39,6 +39,7 @@
 #include "func/simplexml.h"
 #include "func/sockets.h"
 #include "func/sodium.h"
+#include "func/swoole.h"
 #include "func/tokenizer.h"
 #include "func/xml.h"
 #include "func/xmlwriter.h"
