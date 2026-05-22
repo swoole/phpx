@@ -1,5 +1,4 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/bcmath.h"
 
 namespace php::BcMath {

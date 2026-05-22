@@ -23,7 +23,7 @@ Variant ZEND_THREAD_SAFE_{true};
 Variant ZEND_DEBUG_BUILD_{true};
 Variant TRUE_{true};
 Variant FALSE_{false};
-Variant NULL_{{}};
+Variant NULL_{nullptr};
 Variant PHP_VERSION_{ZEND_STRL("8.4.14"), true};
 Variant PHP_MAJOR_VERSION_{8};
 Variant PHP_MINOR_VERSION_{4};

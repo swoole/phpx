@@ -10,8 +10,8 @@ Variant mysqli_affected_rows(const mysqli &mysql);
 Variant mysqli_affected_rows(const Variant &mysql);
 Variant mysqli_autocommit(const mysqli &mysql, const Variant &enable);
 Variant mysqli_autocommit(const Variant &mysql, const Variant &enable);
-Variant mysqli_begin_transaction(const mysqli &mysql, const Variant &flags = 0, const Variant &name = {});
-Variant mysqli_begin_transaction(const Variant &mysql, const Variant &flags = 0, const Variant &name = {});
+Variant mysqli_begin_transaction(const mysqli &mysql, const Variant &flags = 0, const Variant &name = nullptr);
+Variant mysqli_begin_transaction(const Variant &mysql, const Variant &flags = 0, const Variant &name = nullptr);
 Variant mysqli_change_user(const mysqli &mysql,
                            const Variant &username,
                            const Variant &password,
@@ -24,14 +24,14 @@ Variant mysqli_character_set_name(const mysqli &mysql);
 Variant mysqli_character_set_name(const Variant &mysql);
 Variant mysqli_close(const mysqli &mysql);
 Variant mysqli_close(const Variant &mysql);
-Variant mysqli_commit(const mysqli &mysql, const Variant &flags = 0, const Variant &name = {});
-Variant mysqli_commit(const Variant &mysql, const Variant &flags = 0, const Variant &name = {});
-Variant mysqli_connect(const Variant &hostname = {},
-                       const Variant &username = {},
-                       const Variant &password = {},
-                       const Variant &database = {},
-                       const Variant &port = {},
-                       const Variant &socket = {});
+Variant mysqli_commit(const mysqli &mysql, const Variant &flags = 0, const Variant &name = nullptr);
+Variant mysqli_commit(const Variant &mysql, const Variant &flags = 0, const Variant &name = nullptr);
+Variant mysqli_connect(const Variant &hostname = nullptr,
+                       const Variant &username = nullptr,
+                       const Variant &password = nullptr,
+                       const Variant &database = nullptr,
+                       const Variant &port = nullptr,
+                       const Variant &socket = nullptr);
 Variant mysqli_connect_errno();
 Variant mysqli_connect_error();
 Variant mysqli_data_seek(const mysqli_result &result, const Variant &offset);
@@ -45,12 +45,12 @@ Variant mysqli_error(const mysqli &mysql);
 Variant mysqli_error(const Variant &mysql);
 Variant mysqli_error_list(const mysqli &mysql);
 Variant mysqli_error_list(const Variant &mysql);
-Variant mysqli_stmt_execute(const mysqli_stmt &statement, const Variant &params = {});
-Variant mysqli_stmt_execute(const Variant &statement, const Variant &params = {});
-Variant mysqli_execute(const mysqli_stmt &statement, const Variant &params = {});
-Variant mysqli_execute(const Variant &statement, const Variant &params = {});
-Variant mysqli_execute_query(const mysqli &mysql, const Variant &query, const Variant &params = {});
-Variant mysqli_execute_query(const Variant &mysql, const Variant &query, const Variant &params = {});
+Variant mysqli_stmt_execute(const mysqli_stmt &statement, const Variant &params = nullptr);
+Variant mysqli_stmt_execute(const Variant &statement, const Variant &params = nullptr);
+Variant mysqli_execute(const mysqli_stmt &statement, const Variant &params = nullptr);
+Variant mysqli_execute(const Variant &statement, const Variant &params = nullptr);
+Variant mysqli_execute_query(const mysqli &mysql, const Variant &query, const Variant &params = nullptr);
+Variant mysqli_execute_query(const Variant &mysql, const Variant &query, const Variant &params = nullptr);
 Variant mysqli_fetch_field(const mysqli_result &result);
 Variant mysqli_fetch_field(const Variant &result);
 Variant mysqli_fetch_fields(const mysqli_result &result);
@@ -88,7 +88,7 @@ Variant mysqli_get_connection_stats(const Variant &mysql);
 Variant mysqli_get_client_stats();
 Variant mysqli_get_charset(const mysqli &mysql);
 Variant mysqli_get_charset(const Variant &mysql);
-Variant mysqli_get_client_info(const Variant &mysql = {});
+Variant mysqli_get_client_info(const Variant &mysql = nullptr);
 Variant mysqli_get_client_version();
 Variant mysqli_get_links_stats();
 Variant mysqli_get_host_info(const mysqli &mysql);
@@ -135,20 +135,20 @@ Variant mysqli_report(const Variant &flags);
 Variant mysqli_query(const mysqli &mysql, const Variant &query, const Variant &result_mode = 0);
 Variant mysqli_query(const Variant &mysql, const Variant &query, const Variant &result_mode = 0);
 Variant mysqli_real_connect(const mysqli &mysql,
-                            const Variant &hostname = {},
-                            const Variant &username = {},
-                            const Variant &password = {},
-                            const Variant &database = {},
-                            const Variant &port = {},
-                            const Variant &socket = {},
+                            const Variant &hostname = nullptr,
+                            const Variant &username = nullptr,
+                            const Variant &password = nullptr,
+                            const Variant &database = nullptr,
+                            const Variant &port = nullptr,
+                            const Variant &socket = nullptr,
                             const Variant &flags = 0);
 Variant mysqli_real_connect(const Variant &mysql,
-                            const Variant &hostname = {},
-                            const Variant &username = {},
-                            const Variant &password = {},
-                            const Variant &database = {},
-                            const Variant &port = {},
-                            const Variant &socket = {},
+                            const Variant &hostname = nullptr,
+                            const Variant &username = nullptr,
+                            const Variant &password = nullptr,
+                            const Variant &database = nullptr,
+                            const Variant &port = nullptr,
+                            const Variant &socket = nullptr,
                             const Variant &flags = 0);
 Variant mysqli_real_escape_string(const mysqli &mysql, const Variant &string);
 Variant mysqli_real_escape_string(const Variant &mysql, const Variant &string);
@@ -160,8 +160,8 @@ Variant mysqli_reap_async_query(const mysqli &mysql);
 Variant mysqli_reap_async_query(const Variant &mysql);
 Variant mysqli_release_savepoint(const mysqli &mysql, const Variant &name);
 Variant mysqli_release_savepoint(const Variant &mysql, const Variant &name);
-Variant mysqli_rollback(const mysqli &mysql, const Variant &flags = 0, const Variant &name = {});
-Variant mysqli_rollback(const Variant &mysql, const Variant &flags = 0, const Variant &name = {});
+Variant mysqli_rollback(const mysqli &mysql, const Variant &flags = 0, const Variant &name = nullptr);
+Variant mysqli_rollback(const Variant &mysql, const Variant &flags = 0, const Variant &name = nullptr);
 Variant mysqli_savepoint(const mysqli &mysql, const Variant &name);
 Variant mysqli_savepoint(const Variant &mysql, const Variant &name);
 Variant mysqli_select_db(const mysqli &mysql, const Variant &database);

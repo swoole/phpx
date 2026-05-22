@@ -1,6 +1,6 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/standard.h"
+#include "class/core.h"
 
 namespace php {
 __PHP_Incomplete_Class::__PHP_Incomplete_Class() {

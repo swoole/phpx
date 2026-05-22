@@ -10,8 +10,8 @@ Variant cal_days_in_month(const Variant &calendar, const Variant &month, const V
 Variant cal_from_jd(const Variant &julian_day, const Variant &calendar);
 Variant cal_info(const Variant &calendar = -1);
 Variant cal_to_jd(const Variant &calendar, const Variant &month, const Variant &day, const Variant &year);
-Variant easter_date(const Variant &year = {}, const Variant &mode = 0);
-Variant easter_days(const Variant &year = {}, const Variant &mode = 0);
+Variant easter_date(const Variant &year = nullptr, const Variant &mode = 0);
+Variant easter_days(const Variant &year = nullptr, const Variant &mode = 0);
 Variant frenchtojd(const Variant &month, const Variant &day, const Variant &year);
 Variant gregoriantojd(const Variant &month, const Variant &day, const Variant &year);
 Variant jddayofweek(const Variant &julian_day, const Variant &mode = 0);
@@ -23,6 +23,6 @@ Variant jdtojulian(const Variant &julian_day);
 Variant jdtounix(const Variant &julian_day);
 Variant jewishtojd(const Variant &month, const Variant &day, const Variant &year);
 Variant juliantojd(const Variant &month, const Variant &day, const Variant &year);
-Variant unixtojd(const Variant &timestamp = {});
+Variant unixtojd(const Variant &timestamp = nullptr);
 
 }  // namespace php

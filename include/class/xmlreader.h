@@ -54,13 +54,13 @@ class XMLReader {
     Variant moveToFirstAttribute();
     Variant moveToNextAttribute();
     Variant read();
-    Variant next(const Variant &name = {});
-    static Variant open(const Variant &uri, const Variant &encoding = {}, const Variant &flags = 0);
-    static Variant fromUri(const Variant &uri, const Variant &encoding = {}, const Variant &flags = 0);
+    Variant next(const Variant &name = nullptr);
+    static Variant open(const Variant &uri, const Variant &encoding = nullptr, const Variant &flags = 0);
+    static Variant fromUri(const Variant &uri, const Variant &encoding = nullptr, const Variant &flags = 0);
     static Variant fromStream(const Variant &stream,
-                              const Variant &encoding = {},
+                              const Variant &encoding = nullptr,
                               const Variant &flags = 0,
-                              const Variant &document_uri = {});
+                              const Variant &document_uri = nullptr);
     Variant readInnerXml();
     Variant readOuterXml();
     Variant readString();
@@ -68,9 +68,9 @@ class XMLReader {
     Variant setParserProperty(const Variant &property, const Variant &value);
     Variant setRelaxNGSchema(const Variant &filename);
     Variant setRelaxNGSchemaSource(const Variant &source);
-    static Variant XML(const Variant &source, const Variant &encoding = {}, const Variant &flags = 0);
-    static Variant fromString(const Variant &source, const Variant &encoding = {}, const Variant &flags = 0);
-    DOMNode expand(const Variant &base_node = {});
+    static Variant XML(const Variant &source, const Variant &encoding = nullptr, const Variant &flags = 0);
+    static Variant fromString(const Variant &source, const Variant &encoding = nullptr, const Variant &flags = 0);
+    DOMNode expand(const Variant &base_node = nullptr);
 };
 
 }  // namespace php

@@ -34,7 +34,10 @@ class Mysql : public PDO {
     static constexpr int ATTR_LOCAL_INFILE_DIRECTORY = 1015;
 
     Variant getWarningCount();
-    Mysql(const Variant &dsn, const Variant &username = {}, const Variant &password = {}, const Variant &options = {});
+    Mysql(const Variant &dsn,
+          const Variant &username = nullptr,
+          const Variant &password = nullptr,
+          const Variant &options = nullptr);
 };
 
 }  // namespace Pdo

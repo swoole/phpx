@@ -1,6 +1,6 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/random.h"
+#include "class/core.h"
 
 namespace php::Random {
 RandomError::RandomError(const Variant &message, const Variant &code, const Variant &previous) {

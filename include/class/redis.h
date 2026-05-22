@@ -64,7 +64,7 @@ class Redis {
     static constexpr int OPT_BACKOFF_BASE = 13;
     static constexpr int OPT_BACKOFF_CAP = 14;
 
-    Redis(const Variant &options = {});
+    Redis(const Variant &options = nullptr);
     Variant _compress(const Variant &value);
     Variant _uncompress(const Variant &value);
     Variant _prefix(const Variant &key);
@@ -157,15 +157,15 @@ class Redis {
         }
         return this_.call(_method_fn, {opt, args...});
     }
-    Variant config(const Variant &operation, const Variant &key_or_settings = {}, const Variant &value = {});
+    Variant config(const Variant &operation, const Variant &key_or_settings = nullptr, const Variant &value = nullptr);
     Variant connect(const Variant &host,
                     const Variant &port = 6379,
                     const Variant &timeout = 0,
-                    const Variant &persistent_id = {},
+                    const Variant &persistent_id = nullptr,
                     const Variant &retry_interval = 0,
                     const Variant &read_timeout = 0,
-                    const Variant &context = {});
-    Variant copy(const Variant &src, const Variant &dst, const Variant &options = {});
+                    const Variant &context = nullptr);
+    Variant copy(const Variant &src, const Variant &dst, const Variant &options = nullptr);
     Variant dbSize();
     Variant debug(const Variant &key);
     Variant decr(const Variant &key, const Variant &by = 1);
@@ -202,15 +202,15 @@ class Redis {
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
-    Variant expire(const Variant &key, const Variant &timeout, const Variant &mode = {});
-    Variant expireAt(const Variant &key, const Variant &timestamp, const Variant &mode = {});
-    Variant failover(const Variant &to = {}, const Variant &abort = false, const Variant &timeout = 0);
+    Variant expire(const Variant &key, const Variant &timeout, const Variant &mode = nullptr);
+    Variant expireAt(const Variant &key, const Variant &timestamp, const Variant &mode = nullptr);
+    Variant failover(const Variant &to = nullptr, const Variant &abort = false, const Variant &timeout = 0);
     Variant expiretime(const Variant &key);
     Variant pexpiretime(const Variant &key);
     Variant fcall(const Variant &fn, const Variant &keys = Array{}, const Variant &args = Array{});
     Variant fcall_ro(const Variant &fn, const Variant &keys = Array{}, const Variant &args = Array{});
-    Variant flushAll(const Variant &sync = {});
-    Variant flushDB(const Variant &sync = {});
+    Variant flushAll(const Variant &sync = nullptr);
+    Variant flushDB(const Variant &sync = nullptr);
     template <typename... Args>
     Variant function(const Variant &operation, const Args &...args) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -231,7 +231,7 @@ class Redis {
         }
         return this_.call(_method_fn, {key, lng, lat, member, other_triples_and_options...});
     }
-    Variant geodist(const Variant &key, const Variant &src, const Variant &dst, const Variant &unit = {});
+    Variant geodist(const Variant &key, const Variant &src, const Variant &dst, const Variant &unit = nullptr);
     template <typename... Args>
     Variant geohash(const Variant &key, const Variant &member, const Args &...other_members) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -297,7 +297,7 @@ class Redis {
     Variant serverName();
     Variant serverVersion();
     Variant getRange(const Variant &key, const Variant &start, const Variant &end);
-    Variant lcs(const Variant &key1, const Variant &key2, const Variant &options = {});
+    Variant lcs(const Variant &key1, const Variant &key2, const Variant &options = nullptr);
     Variant getReadTimeout();
     Variant getset(const Variant &key, const Variant &value);
     Variant getTimeout();
@@ -320,7 +320,7 @@ class Redis {
     Variant hLen(const Variant &key);
     Variant hMget(const Variant &key, const Variant &fields);
     Variant hMset(const Variant &key, const Variant &fieldvals);
-    Variant hRandField(const Variant &key, const Variant &options = {});
+    Variant hRandField(const Variant &key, const Variant &options = nullptr);
     template <typename... Args>
     Variant hSet(const Variant &key, const Args &...fields_and_vals) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -332,8 +332,11 @@ class Redis {
     Variant hSetNx(const Variant &key, const Variant &field, const Variant &value);
     Variant hStrLen(const Variant &key, const Variant &field);
     Variant hVals(const Variant &key);
-    Variant hscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
-    Variant expiremember(const Variant &key, const Variant &field, const Variant &ttl, const Variant &unit = {});
+    Variant hscan(const Variant &key,
+                  const Reference &iterator,
+                  const Variant &pattern = nullptr,
+                  const Variant &count = 0);
+    Variant expiremember(const Variant &key, const Variant &field, const Variant &ttl, const Variant &unit = nullptr);
     Variant expirememberat(const Variant &key, const Variant &field, const Variant &timestamp);
     Variant incr(const Variant &key, const Variant &by = 1);
     Variant incrBy(const Variant &key, const Variant &value);
@@ -357,7 +360,7 @@ class Redis {
                    const Variant &whereto,
                    const Variant &timeout);
     Variant lPop(const Variant &key, const Variant &count = 0);
-    Variant lPos(const Variant &key, const Variant &value, const Variant &options = {});
+    Variant lPos(const Variant &key, const Variant &value, const Variant &options = nullptr);
     template <typename... Args>
     Variant lPush(const Variant &key, const Args &...elements) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -390,7 +393,7 @@ class Redis {
                     const Variant &timeout,
                     const Variant &copy = false,
                     const Variant &replace = false,
-                    const Variant &credentials = {});
+                    const Variant &credentials = nullptr);
     Variant move(const Variant &key, const Variant &index);
     Variant mset(const Variant &key_values);
     Variant msetnx(const Variant &key_values);
@@ -399,37 +402,37 @@ class Redis {
     Variant open(const Variant &host,
                  const Variant &port = 6379,
                  const Variant &timeout = 0,
-                 const Variant &persistent_id = {},
+                 const Variant &persistent_id = nullptr,
                  const Variant &retry_interval = 0,
                  const Variant &read_timeout = 0,
-                 const Variant &context = {});
+                 const Variant &context = nullptr);
     Variant pconnect(const Variant &host,
                      const Variant &port = 6379,
                      const Variant &timeout = 0,
-                     const Variant &persistent_id = {},
+                     const Variant &persistent_id = nullptr,
                      const Variant &retry_interval = 0,
                      const Variant &read_timeout = 0,
-                     const Variant &context = {});
+                     const Variant &context = nullptr);
     Variant persist(const Variant &key);
-    Variant pexpire(const Variant &key, const Variant &timeout, const Variant &mode = {});
-    Variant pexpireAt(const Variant &key, const Variant &timestamp, const Variant &mode = {});
+    Variant pexpire(const Variant &key, const Variant &timeout, const Variant &mode = nullptr);
+    Variant pexpireAt(const Variant &key, const Variant &timestamp, const Variant &mode = nullptr);
     Variant pfadd(const Variant &key, const Variant &elements);
     Variant pfcount(const Variant &key_or_keys);
     Variant pfmerge(const Variant &dst, const Variant &srckeys);
-    Variant ping(const Variant &message = {});
+    Variant ping(const Variant &message = nullptr);
     Variant pipeline();
     Variant popen(const Variant &host,
                   const Variant &port = 6379,
                   const Variant &timeout = 0,
-                  const Variant &persistent_id = {},
+                  const Variant &persistent_id = nullptr,
                   const Variant &retry_interval = 0,
                   const Variant &read_timeout = 0,
-                  const Variant &context = {});
+                  const Variant &context = nullptr);
     Variant psetex(const Variant &key, const Variant &expire, const Variant &value);
     Variant psubscribe(const Variant &patterns, const Variant &cb);
     Variant pttl(const Variant &key);
     Variant publish(const Variant &channel, const Variant &message);
-    Variant pubsub(const Variant &command, const Variant &arg = {});
+    Variant pubsub(const Variant &command, const Variant &arg = nullptr);
     Variant punsubscribe(const Variant &patterns);
     Variant rPop(const Variant &key, const Variant &count = 0);
     Variant randomKey();
@@ -444,7 +447,7 @@ class Redis {
     Variant rename(const Variant &old_name, const Variant &new_name);
     Variant renameNx(const Variant &key_src, const Variant &key_dst);
     Variant reset();
-    Variant restore(const Variant &key, const Variant &ttl, const Variant &value, const Variant &options = {});
+    Variant restore(const Variant &key, const Variant &ttl, const Variant &value, const Variant &options = nullptr);
     Variant role();
     Variant rpoplpush(const Variant &srckey, const Variant &dstkey);
     template <typename... Args>
@@ -519,9 +522,9 @@ class Redis {
     }
     Variant save();
     Variant scan(const Reference &iterator,
-                 const Variant &pattern = {},
+                 const Variant &pattern = nullptr,
                  const Variant &count = 0,
-                 const Variant &type = {});
+                 const Variant &type = nullptr);
     Variant scard(const Variant &key);
     template <typename... Args>
     Variant script(const Variant &command, const Args &...args) {
@@ -532,15 +535,15 @@ class Redis {
         return this_.call(_method_fn, {command, args...});
     }
     Variant select(const Variant &db);
-    Variant set(const Variant &key, const Variant &value, const Variant &options = {});
+    Variant set(const Variant &key, const Variant &value, const Variant &options = nullptr);
     Variant setBit(const Variant &key, const Variant &idx, const Variant &value);
     Variant setRange(const Variant &key, const Variant &index, const Variant &value);
     Variant setOption(const Variant &option, const Variant &value);
     Variant setex(const Variant &key, const Variant &expire, const Variant &value);
     Variant setnx(const Variant &key, const Variant &value);
     Variant sismember(const Variant &key, const Variant &value);
-    Variant slaveof(const Variant &host = {}, const Variant &port = 6379);
-    Variant replicaof(const Variant &host = {}, const Variant &port = 6379);
+    Variant slaveof(const Variant &host = nullptr, const Variant &port = 6379);
+    Variant replicaof(const Variant &host = nullptr, const Variant &port = 6379);
     template <typename... Args>
     Variant touch(const Variant &key_or_array, const Args &...more_keys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -550,32 +553,32 @@ class Redis {
         return this_.call(_method_fn, {key_or_array, more_keys...});
     }
     Variant slowlog(const Variant &operation, const Variant &length = 0);
-    Variant sort(const Variant &key, const Variant &options = {});
-    Variant sort_ro(const Variant &key, const Variant &options = {});
+    Variant sort(const Variant &key, const Variant &options = nullptr);
+    Variant sort_ro(const Variant &key, const Variant &options = nullptr);
     Variant sortAsc(const Variant &key,
-                    const Variant &pattern = {},
-                    const Variant &get = {},
+                    const Variant &pattern = nullptr,
+                    const Variant &get = nullptr,
                     const Variant &offset = -1,
                     const Variant &count = -1,
-                    const Variant &store = {});
+                    const Variant &store = nullptr);
     Variant sortAscAlpha(const Variant &key,
-                         const Variant &pattern = {},
-                         const Variant &get = {},
+                         const Variant &pattern = nullptr,
+                         const Variant &get = nullptr,
                          const Variant &offset = -1,
                          const Variant &count = -1,
-                         const Variant &store = {});
+                         const Variant &store = nullptr);
     Variant sortDesc(const Variant &key,
-                     const Variant &pattern = {},
-                     const Variant &get = {},
+                     const Variant &pattern = nullptr,
+                     const Variant &get = nullptr,
                      const Variant &offset = -1,
                      const Variant &count = -1,
-                     const Variant &store = {});
+                     const Variant &store = nullptr);
     Variant sortDescAlpha(const Variant &key,
-                          const Variant &pattern = {},
-                          const Variant &get = {},
+                          const Variant &pattern = nullptr,
+                          const Variant &get = nullptr,
                           const Variant &offset = -1,
                           const Variant &count = -1,
-                          const Variant &store = {});
+                          const Variant &store = nullptr);
     template <typename... Args>
     Variant srem(const Variant &key, const Variant &value, const Args &...other_values) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -584,7 +587,10 @@ class Redis {
         }
         return this_.call(_method_fn, {key, value, other_values...});
     }
-    Variant sscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    Variant sscan(const Variant &key,
+                  const Reference &iterator,
+                  const Variant &pattern = nullptr,
+                  const Variant &count = 0);
     Variant ssubscribe(const Variant &channels, const Variant &cb);
     Variant strlen(const Variant &key);
     Variant subscribe(const Variant &channels, const Variant &cb);
@@ -634,22 +640,22 @@ class Redis {
                    const Variant &options);
     Variant xdel(const Variant &key, const Variant &ids);
     Variant xgroup(const Variant &operation,
-                   const Variant &key = {},
-                   const Variant &group = {},
-                   const Variant &id_or_consumer = {},
+                   const Variant &key = nullptr,
+                   const Variant &group = nullptr,
+                   const Variant &id_or_consumer = nullptr,
                    const Variant &mkstream = false,
                    const Variant &entries_read = -2);
     Variant xinfo(const Variant &operation,
-                  const Variant &arg1 = {},
-                  const Variant &arg2 = {},
+                  const Variant &arg1 = nullptr,
+                  const Variant &arg2 = nullptr,
                   const Variant &count = -1);
     Variant xlen(const Variant &key);
     Variant xpending(const Variant &key,
                      const Variant &group,
-                     const Variant &start = {},
-                     const Variant &end = {},
+                     const Variant &start = nullptr,
+                     const Variant &end = nullptr,
                      const Variant &count = -1,
-                     const Variant &consumer = {});
+                     const Variant &consumer = nullptr);
     Variant xrange(const Variant &key, const Variant &start, const Variant &end, const Variant &count = -1);
     Variant xread(const Variant &streams, const Variant &count = -1, const Variant &block = -1);
     Variant xreadgroup(const Variant &group,
@@ -683,9 +689,9 @@ class Redis {
         }
         return this_.call(_method_fn, {key, member, other_members...});
     }
-    Variant zPopMax(const Variant &key, const Variant &count = {});
-    Variant zPopMin(const Variant &key, const Variant &count = {});
-    Variant zRange(const Variant &key, const Variant &start, const Variant &end, const Variant &options = {});
+    Variant zPopMax(const Variant &key, const Variant &count = nullptr);
+    Variant zPopMin(const Variant &key, const Variant &count = nullptr);
+    Variant zRange(const Variant &key, const Variant &start, const Variant &end, const Variant &options = nullptr);
     Variant zRangeByLex(const Variant &key,
                         const Variant &min,
                         const Variant &max,
@@ -699,8 +705,8 @@ class Redis {
                         const Variant &srckey,
                         const Variant &start,
                         const Variant &end,
-                        const Variant &options = {});
-    Variant zRandMember(const Variant &key, const Variant &options = {});
+                        const Variant &options = nullptr);
+    Variant zRandMember(const Variant &key, const Variant &options = nullptr);
     Variant zRank(const Variant &key, const Variant &member);
     template <typename... Args>
     Variant zRem(const Variant &key, const Variant &member, const Args &...other_members) {
@@ -713,7 +719,7 @@ class Redis {
     Variant zRemRangeByLex(const Variant &key, const Variant &min, const Variant &max);
     Variant zRemRangeByRank(const Variant &key, const Variant &start, const Variant &end);
     Variant zRemRangeByScore(const Variant &key, const Variant &start, const Variant &end);
-    Variant zRevRange(const Variant &key, const Variant &start, const Variant &end, const Variant &scores = {});
+    Variant zRevRange(const Variant &key, const Variant &start, const Variant &end, const Variant &scores = nullptr);
     Variant zRevRangeByLex(const Variant &key,
                            const Variant &max,
                            const Variant &min,
@@ -725,20 +731,23 @@ class Redis {
                              const Variant &options = Array{});
     Variant zRevRank(const Variant &key, const Variant &member);
     Variant zScore(const Variant &key, const Variant &member);
-    Variant zdiff(const Variant &keys, const Variant &options = {});
+    Variant zdiff(const Variant &keys, const Variant &options = nullptr);
     Variant zdiffstore(const Variant &dst, const Variant &keys);
-    Variant zinter(const Variant &keys, const Variant &weights = {}, const Variant &options = {});
+    Variant zinter(const Variant &keys, const Variant &weights = nullptr, const Variant &options = nullptr);
     Variant zintercard(const Variant &keys, const Variant &limit = -1);
     Variant zinterstore(const Variant &dst,
                         const Variant &keys,
-                        const Variant &weights = {},
-                        const Variant &aggregate = {});
-    Variant zscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
-    Variant zunion(const Variant &keys, const Variant &weights = {}, const Variant &options = {});
+                        const Variant &weights = nullptr,
+                        const Variant &aggregate = nullptr);
+    Variant zscan(const Variant &key,
+                  const Reference &iterator,
+                  const Variant &pattern = nullptr,
+                  const Variant &count = 0);
+    Variant zunion(const Variant &keys, const Variant &weights = nullptr, const Variant &options = nullptr);
     Variant zunionstore(const Variant &dst,
                         const Variant &keys,
-                        const Variant &weights = {},
-                        const Variant &aggregate = {});
+                        const Variant &weights = nullptr,
+                        const Variant &aggregate = nullptr);
 };
 
 class RedisArray {
@@ -751,13 +760,13 @@ class RedisArray {
         return this_;
     }
     Variant __call(const Variant &function_name, const Variant &arguments);
-    RedisArray(const Variant &name_or_hosts, const Variant &options = {});
+    RedisArray(const Variant &name_or_hosts, const Variant &options = nullptr);
     Variant _continuum();
     Variant _distributor();
     Variant _function();
     Variant _hosts();
     Variant _instance(const Variant &host);
-    Variant _rehash(const Variant &fn = {});
+    Variant _rehash(const Variant &fn = nullptr);
     Variant _target(const Variant &key);
     Variant bgsave();
     template <typename... Args>
@@ -773,18 +782,27 @@ class RedisArray {
     Variant flushall();
     Variant flushdb();
     Variant getOption(const Variant &opt);
-    Variant hscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    Variant hscan(const Variant &key,
+                  const Reference &iterator,
+                  const Variant &pattern = nullptr,
+                  const Variant &count = 0);
     Variant info();
     Variant keys(const Variant &pattern);
     Variant mget(const Variant &keys);
     Variant mset(const Variant &pairs);
-    Variant multi(const Variant &host, const Variant &mode = {});
+    Variant multi(const Variant &host, const Variant &mode = nullptr);
     Variant ping();
     Variant save();
-    Variant scan(const Reference &iterator, const Variant &node, const Variant &pattern = {}, const Variant &count = 0);
+    Variant scan(const Reference &iterator,
+                 const Variant &node,
+                 const Variant &pattern = nullptr,
+                 const Variant &count = 0);
     Variant select(const Variant &index);
     Variant setOption(const Variant &opt, const Variant &value);
-    Variant sscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    Variant sscan(const Variant &key,
+                  const Reference &iterator,
+                  const Variant &pattern = nullptr,
+                  const Variant &count = 0);
     template <typename... Args>
     Variant unlink(const Variant &key, const Args &...otherkeys) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -794,7 +812,10 @@ class RedisArray {
         return this_.call(_method_fn, {key, otherkeys...});
     }
     Variant unwatch();
-    Variant zscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    Variant zscan(const Variant &key,
+                  const Reference &iterator,
+                  const Variant &pattern = nullptr,
+                  const Variant &count = 0);
 };
 
 class RedisCluster {
@@ -813,12 +834,12 @@ class RedisCluster {
     static constexpr int FAILOVER_DISTRIBUTE_SLAVES = 3;
 
     RedisCluster(const Variant &name,
-                 const Variant &seeds = {},
+                 const Variant &seeds = nullptr,
                  const Variant &timeout = 0,
                  const Variant &read_timeout = 0,
                  const Variant &persistent = false,
-                 const Variant &auth = {},
-                 const Variant &context = {});
+                 const Variant &auth = nullptr,
+                 const Variant &context = nullptr);
     Variant _compress(const Variant &value);
     Variant _uncompress(const Variant &value);
     Variant _serialize(const Variant &value);
@@ -904,7 +925,7 @@ class RedisCluster {
     Variant blmpop(const Variant &timeout, const Variant &keys, const Variant &from, const Variant &count = 1);
     Variant lmpop(const Variant &keys, const Variant &from, const Variant &count = 1);
     Variant clearlasterror();
-    Variant client(const Variant &key_or_address, const Variant &subcommand, const Variant &arg = {});
+    Variant client(const Variant &key_or_address, const Variant &subcommand, const Variant &arg = nullptr);
     Variant close();
     template <typename... Args>
     Variant cluster(const Variant &key_or_address, const Variant &command, const Args &...extra_args) {
@@ -931,7 +952,7 @@ class RedisCluster {
         return this_.call(_method_fn, {key_or_address, subcommand, extra_args...});
     }
     Variant dbsize(const Variant &key_or_address);
-    Variant copy(const Variant &src, const Variant &dst, const Variant &options = {});
+    Variant copy(const Variant &src, const Variant &dst, const Variant &options = nullptr);
     Variant decr(const Variant &key, const Variant &by = 1);
     Variant decrby(const Variant &key, const Variant &value);
     Variant decrbyfloat(const Variant &key, const Variant &value);
@@ -967,8 +988,8 @@ class RedisCluster {
         }
         return this_.call(_method_fn, {key, other_keys...});
     }
-    Variant expire(const Variant &key, const Variant &timeout, const Variant &mode = {});
-    Variant expireat(const Variant &key, const Variant &timestamp, const Variant &mode = {});
+    Variant expire(const Variant &key, const Variant &timeout, const Variant &mode = nullptr);
+    Variant expireat(const Variant &key, const Variant &timestamp, const Variant &mode = nullptr);
     Variant expiretime(const Variant &key);
     Variant pexpiretime(const Variant &key);
     Variant flushall(const Variant &key_or_address, const Variant &async = false);
@@ -985,7 +1006,7 @@ class RedisCluster {
         }
         return this_.call(_method_fn, {key, lng, lat, member, other_triples_and_options...});
     }
-    Variant geodist(const Variant &key, const Variant &src, const Variant &dest, const Variant &unit = {});
+    Variant geodist(const Variant &key, const Variant &src, const Variant &dest, const Variant &unit = nullptr);
     template <typename... Args>
     Variant geohash(const Variant &key, const Variant &member, const Args &...other_members) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -1044,7 +1065,7 @@ class RedisCluster {
     Variant getmode();
     Variant getoption(const Variant &option);
     Variant getrange(const Variant &key, const Variant &start, const Variant &end);
-    Variant lcs(const Variant &key1, const Variant &key2, const Variant &options = {});
+    Variant lcs(const Variant &key1, const Variant &key2, const Variant &options = nullptr);
     Variant getset(const Variant &key, const Variant &value);
     Variant gettransferredbytes();
     Variant cleartransferredbytes();
@@ -1065,10 +1086,13 @@ class RedisCluster {
     Variant hlen(const Variant &key);
     Variant hmget(const Variant &key, const Variant &keys);
     Variant hmset(const Variant &key, const Variant &key_values);
-    Variant hscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
-    Variant expiremember(const Variant &key, const Variant &field, const Variant &ttl, const Variant &unit = {});
+    Variant hscan(const Variant &key,
+                  const Reference &iterator,
+                  const Variant &pattern = nullptr,
+                  const Variant &count = 0);
+    Variant expiremember(const Variant &key, const Variant &field, const Variant &ttl, const Variant &unit = nullptr);
     Variant expirememberat(const Variant &key, const Variant &field, const Variant &timestamp);
-    Variant hrandfield(const Variant &key, const Variant &options = {});
+    Variant hrandfield(const Variant &key, const Variant &options = nullptr);
     Variant hset(const Variant &key, const Variant &member, const Variant &value);
     Variant hsetnx(const Variant &key, const Variant &member, const Variant &value);
     Variant hstrlen(const Variant &key, const Variant &field);
@@ -1091,7 +1115,7 @@ class RedisCluster {
     Variant linsert(const Variant &key, const Variant &pos, const Variant &pivot, const Variant &value);
     Variant llen(const Variant &key);
     Variant lpop(const Variant &key, const Variant &count = 0);
-    Variant lpos(const Variant &key, const Variant &value, const Variant &options = {});
+    Variant lpos(const Variant &key, const Variant &value, const Variant &options = nullptr);
     template <typename... Args>
     Variant lpush(const Variant &key, const Variant &value, const Args &...other_values) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -1111,12 +1135,12 @@ class RedisCluster {
     Variant multi(const Variant &value = 1);
     Variant object(const Variant &subcommand, const Variant &key);
     Variant persist(const Variant &key);
-    Variant pexpire(const Variant &key, const Variant &timeout, const Variant &mode = {});
-    Variant pexpireat(const Variant &key, const Variant &timestamp, const Variant &mode = {});
+    Variant pexpire(const Variant &key, const Variant &timeout, const Variant &mode = nullptr);
+    Variant pexpireat(const Variant &key, const Variant &timestamp, const Variant &mode = nullptr);
     Variant pfadd(const Variant &key, const Variant &elements);
     Variant pfcount(const Variant &key);
     Variant pfmerge(const Variant &key, const Variant &keys);
-    Variant ping(const Variant &key_or_address, const Variant &message = {});
+    Variant ping(const Variant &key_or_address, const Variant &message = nullptr);
     Variant psetex(const Variant &key, const Variant &timeout, const Variant &value);
     Variant psubscribe(const Variant &patterns, const Variant &callback);
     Variant pttl(const Variant &key);
@@ -1148,7 +1172,7 @@ class RedisCluster {
     }
     Variant rename(const Variant &key_src, const Variant &key_dst);
     Variant renamenx(const Variant &key, const Variant &newkey);
-    Variant restore(const Variant &key, const Variant &timeout, const Variant &value, const Variant &options = {});
+    Variant restore(const Variant &key, const Variant &timeout, const Variant &value, const Variant &options = nullptr);
     Variant role(const Variant &key_or_address);
     Variant rpop(const Variant &key, const Variant &count = 0);
     Variant rpoplpush(const Variant &src, const Variant &dst);
@@ -1173,7 +1197,7 @@ class RedisCluster {
     Variant save(const Variant &key_or_address);
     Variant scan(const Reference &iterator,
                  const Variant &key_or_address,
-                 const Variant &pattern = {},
+                 const Variant &pattern = nullptr,
                  const Variant &count = 0);
     Variant scard(const Variant &key);
     template <typename... Args>
@@ -1200,7 +1224,7 @@ class RedisCluster {
         }
         return this_.call(_method_fn, {dst, key, other_keys...});
     }
-    Variant set(const Variant &key, const Variant &value, const Variant &options = {});
+    Variant set(const Variant &key, const Variant &value, const Variant &options = nullptr);
     Variant setbit_(const Variant &key, const Variant &offset, const Variant &onoff);
     Variant setex(const Variant &key, const Variant &expire, const Variant &value);
     Variant setnx(const Variant &key, const Variant &value);
@@ -1242,8 +1266,8 @@ class RedisCluster {
     }
     Variant smembers(const Variant &key);
     Variant smove(const Variant &src, const Variant &dst, const Variant &member);
-    Variant sort(const Variant &key, const Variant &options = {});
-    Variant sort_ro(const Variant &key, const Variant &options = {});
+    Variant sort(const Variant &key, const Variant &options = nullptr);
+    Variant sort_ro(const Variant &key, const Variant &options = nullptr);
     Variant spop(const Variant &key, const Variant &count = 0);
     Variant srandmember(const Variant &key, const Variant &count = 0);
     template <typename... Args>
@@ -1254,7 +1278,10 @@ class RedisCluster {
         }
         return this_.call(_method_fn, {key, value, other_values...});
     }
-    Variant sscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    Variant sscan(const Variant &key,
+                  const Reference &iterator,
+                  const Variant &pattern = nullptr,
+                  const Variant &count = 0);
     Variant strlen(const Variant &key);
     Variant subscribe(const Variant &channels, const Variant &cb);
     template <typename... Args>
@@ -1308,9 +1335,9 @@ class RedisCluster {
                    const Variant &options);
     Variant xdel(const Variant &key, const Variant &ids);
     Variant xgroup(const Variant &operation,
-                   const Variant &key = {},
-                   const Variant &group = {},
-                   const Variant &id_or_consumer = {},
+                   const Variant &key = nullptr,
+                   const Variant &group = nullptr,
+                   const Variant &id_or_consumer = nullptr,
                    const Variant &mkstream = false,
                    const Variant &entries_read = -2);
     Variant xautoclaim(const Variant &key,
@@ -1321,16 +1348,16 @@ class RedisCluster {
                        const Variant &count = -1,
                        const Variant &justid = false);
     Variant xinfo(const Variant &operation,
-                  const Variant &arg1 = {},
-                  const Variant &arg2 = {},
+                  const Variant &arg1 = nullptr,
+                  const Variant &arg2 = nullptr,
                   const Variant &count = -1);
     Variant xlen(const Variant &key);
     Variant xpending(const Variant &key,
                      const Variant &group,
-                     const Variant &start = {},
-                     const Variant &end = {},
+                     const Variant &start = nullptr,
+                     const Variant &end = nullptr,
                      const Variant &count = -1,
-                     const Variant &consumer = {});
+                     const Variant &consumer = nullptr);
     Variant xrange(const Variant &key, const Variant &start, const Variant &end, const Variant &count = -1);
     Variant xread(const Variant &streams, const Variant &count = -1, const Variant &block = -1);
     Variant xreadgroup(const Variant &group,
@@ -1357,19 +1384,19 @@ class RedisCluster {
     Variant zincrby(const Variant &key, const Variant &value, const Variant &member);
     Variant zinterstore(const Variant &dst,
                         const Variant &keys,
-                        const Variant &weights = {},
-                        const Variant &aggregate = {});
+                        const Variant &weights = nullptr,
+                        const Variant &aggregate = nullptr);
     Variant zintercard(const Variant &keys, const Variant &limit = -1);
     Variant zlexcount(const Variant &key, const Variant &min, const Variant &max);
-    Variant zpopmax(const Variant &key, const Variant &value = {});
-    Variant zpopmin(const Variant &key, const Variant &value = {});
-    Variant zrange(const Variant &key, const Variant &start, const Variant &end, const Variant &options = {});
+    Variant zpopmax(const Variant &key, const Variant &value = nullptr);
+    Variant zpopmin(const Variant &key, const Variant &value = nullptr);
+    Variant zrange(const Variant &key, const Variant &start, const Variant &end, const Variant &options = nullptr);
     Variant zrangestore(const Variant &dstkey,
                         const Variant &srckey,
                         const Variant &start,
                         const Variant &end,
-                        const Variant &options = {});
-    Variant zrandmember(const Variant &key, const Variant &options = {});
+                        const Variant &options = nullptr);
+    Variant zrandmember(const Variant &key, const Variant &options = nullptr);
     Variant zrangebylex(const Variant &key,
                         const Variant &min,
                         const Variant &max,
@@ -1391,11 +1418,20 @@ class RedisCluster {
     Variant zremrangebylex(const Variant &key, const Variant &min, const Variant &max);
     Variant zremrangebyrank(const Variant &key, const Variant &min, const Variant &max);
     Variant zremrangebyscore(const Variant &key, const Variant &min, const Variant &max);
-    Variant zrevrange(const Variant &key, const Variant &min, const Variant &max, const Variant &options = {});
-    Variant zrevrangebylex(const Variant &key, const Variant &min, const Variant &max, const Variant &options = {});
-    Variant zrevrangebyscore(const Variant &key, const Variant &min, const Variant &max, const Variant &options = {});
+    Variant zrevrange(const Variant &key, const Variant &min, const Variant &max, const Variant &options = nullptr);
+    Variant zrevrangebylex(const Variant &key,
+                           const Variant &min,
+                           const Variant &max,
+                           const Variant &options = nullptr);
+    Variant zrevrangebyscore(const Variant &key,
+                             const Variant &min,
+                             const Variant &max,
+                             const Variant &options = nullptr);
     Variant zrevrank(const Variant &key, const Variant &member);
-    Variant zscan(const Variant &key, const Reference &iterator, const Variant &pattern = {}, const Variant &count = 0);
+    Variant zscan(const Variant &key,
+                  const Reference &iterator,
+                  const Variant &pattern = nullptr,
+                  const Variant &count = 0);
     Variant zscore(const Variant &key, const Variant &member);
     template <typename... Args>
     Variant zmscore(const Variant &key, const Variant &member, const Args &...other_members) {
@@ -1407,17 +1443,17 @@ class RedisCluster {
     }
     Variant zunionstore(const Variant &dst,
                         const Variant &keys,
-                        const Variant &weights = {},
-                        const Variant &aggregate = {});
-    Variant zinter(const Variant &keys, const Variant &weights = {}, const Variant &options = {});
+                        const Variant &weights = nullptr,
+                        const Variant &aggregate = nullptr);
+    Variant zinter(const Variant &keys, const Variant &weights = nullptr, const Variant &options = nullptr);
     Variant zdiffstore(const Variant &dst, const Variant &keys);
-    Variant zunion(const Variant &keys, const Variant &weights = {}, const Variant &options = {});
-    Variant zdiff(const Variant &keys, const Variant &options = {});
+    Variant zunion(const Variant &keys, const Variant &weights = nullptr, const Variant &options = nullptr);
+    Variant zdiff(const Variant &keys, const Variant &options = nullptr);
 };
 
 class RedisClusterException : public RuntimeException {
   public:
-    RedisClusterException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    RedisClusterException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class RedisSentinel {
@@ -1428,7 +1464,7 @@ class RedisSentinel {
     Object getObject() const {
         return this_;
     }
-    RedisSentinel(const Variant &options = {});
+    RedisSentinel(const Variant &options = nullptr);
     Variant ckquorum(const Variant &master);
     Variant failover(const Variant &master);
     Variant flushconfig();
@@ -1444,7 +1480,7 @@ class RedisSentinel {
 
 class RedisException : public RuntimeException {
   public:
-    RedisException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    RedisException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 }  // namespace php

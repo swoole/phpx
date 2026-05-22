@@ -55,7 +55,7 @@ class CURLFile {
     Object getObject() const {
         return this_;
     }
-    CURLFile(const Variant &filename, const Variant &mime_type = {}, const Variant &posted_filename = {});
+    CURLFile(const Variant &filename, const Variant &mime_type = nullptr, const Variant &posted_filename = nullptr);
     Variant getFilename();
     Variant getMimeType();
     Variant getPostFilename();

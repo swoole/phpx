@@ -50,7 +50,7 @@ class DateTimeZone {
     Variant getTransitions(const Variant &timestamp_begin = LONG_MIN, const Variant &timestamp_end = LONG_MAX);
     Variant getLocation();
     static Variant listAbbreviations();
-    static Variant listIdentifiers(const Variant &timezone_group = 2047, const Variant &country_code = {});
+    static Variant listIdentifiers(const Variant &timezone_group = 2047, const Variant &country_code = nullptr);
     Variant __serialize();
     Variant __unserialize(const Variant &data);
     Variant __wakeup();
@@ -105,51 +105,57 @@ class DatePeriod {
 
 class DateError : public Error {
   public:
-    DateError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    DateError(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class DateObjectError : public DateError {
   public:
-    DateObjectError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    DateObjectError(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class DateRangeError : public DateError {
   public:
-    DateRangeError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    DateRangeError(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class DateException : public Exception {
   public:
-    DateException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    DateException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class DateInvalidTimeZoneException : public DateException {
   public:
-    DateInvalidTimeZoneException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    DateInvalidTimeZoneException(const Variant &message = "",
+                                 const Variant &code = 0,
+                                 const Variant &previous = nullptr);
 };
 
 class DateInvalidOperationException : public DateException {
   public:
-    DateInvalidOperationException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    DateInvalidOperationException(const Variant &message = "",
+                                  const Variant &code = 0,
+                                  const Variant &previous = nullptr);
 };
 
 class DateMalformedStringException : public DateException {
   public:
-    DateMalformedStringException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    DateMalformedStringException(const Variant &message = "",
+                                 const Variant &code = 0,
+                                 const Variant &previous = nullptr);
 };
 
 class DateMalformedIntervalStringException : public DateException {
   public:
     DateMalformedIntervalStringException(const Variant &message = "",
                                          const Variant &code = 0,
-                                         const Variant &previous = {});
+                                         const Variant &previous = nullptr);
 };
 
 class DateMalformedPeriodStringException : public DateException {
   public:
     DateMalformedPeriodStringException(const Variant &message = "",
                                        const Variant &code = 0,
-                                       const Variant &previous = {});
+                                       const Variant &previous = nullptr);
 };
 
 class DateTime {
@@ -160,7 +166,7 @@ class DateTime {
     Object getObject() const {
         return this_;
     }
-    DateTime(const Variant &datetime = "now", const Variant &timezone = {});
+    DateTime(const Variant &datetime = "now", const Variant &timezone = nullptr);
     Variant __serialize();
     Variant __unserialize(const Variant &data);
     Variant __wakeup();
@@ -168,7 +174,7 @@ class DateTime {
     static Variant createFromImmutable(const DateTimeImmutable &object);
     static Variant createFromImmutable(const Variant &object);
     static Variant createFromInterface(const Variant &object);
-    static Variant createFromFormat(const Variant &format, const Variant &datetime, const Variant &timezone = {});
+    static Variant createFromFormat(const Variant &format, const Variant &datetime, const Variant &timezone = nullptr);
     static Variant createFromTimestamp(const Variant &timestamp);
     static Variant getLastErrors();
     Variant format(const Variant &format);
@@ -202,12 +208,12 @@ class DateTimeImmutable {
     Object getObject() const {
         return this_;
     }
-    DateTimeImmutable(const Variant &datetime = "now", const Variant &timezone = {});
+    DateTimeImmutable(const Variant &datetime = "now", const Variant &timezone = nullptr);
     Variant __serialize();
     Variant __unserialize(const Variant &data);
     Variant __wakeup();
     static Variant __set_state(const Variant &array);
-    static Variant createFromFormat(const Variant &format, const Variant &datetime, const Variant &timezone = {});
+    static Variant createFromFormat(const Variant &format, const Variant &datetime, const Variant &timezone = nullptr);
     static Variant createFromTimestamp(const Variant &timestamp);
     static Variant getLastErrors();
     Variant format(const Variant &format);

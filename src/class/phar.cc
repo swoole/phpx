@@ -1,6 +1,7 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/phar.h"
+#include "class/core.h"
+#include "class/spl.h"
 
 namespace php {
 PharException::PharException(const Variant &message, const Variant &code, const Variant &previous) {

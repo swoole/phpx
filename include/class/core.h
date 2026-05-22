@@ -56,7 +56,7 @@ class Exception {
     Object getObject() const {
         return this_;
     }
-    Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
     Variant __wakeup();
     Variant getMessage();
     Variant getCode();
@@ -73,9 +73,9 @@ class ErrorException : public Exception {
     ErrorException(const Variant &message = "",
                    const Variant &code = 0,
                    const Variant &severity = 1,
-                   const Variant &filename = {},
-                   const Variant &line = {},
-                   const Variant &previous = {});
+                   const Variant &filename = nullptr,
+                   const Variant &line = nullptr,
+                   const Variant &previous = nullptr);
     Variant getSeverity();
 };
 
@@ -87,7 +87,7 @@ class Error {
     Object getObject() const {
         return this_;
     }
-    Error(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Error(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
     Variant __wakeup();
     Variant getMessage();
     Variant getCode();
@@ -101,47 +101,47 @@ class Error {
 
 class CompileError : public Error {
   public:
-    CompileError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    CompileError(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class ParseError : public CompileError {
   public:
-    ParseError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    ParseError(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class TypeError : public Error {
   public:
-    TypeError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    TypeError(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class ArgumentCountError : public TypeError {
   public:
-    ArgumentCountError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    ArgumentCountError(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class ValueError : public Error {
   public:
-    ValueError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    ValueError(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class ArithmeticError : public Error {
   public:
-    ArithmeticError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    ArithmeticError(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class DivisionByZeroError : public ArithmeticError {
   public:
-    DivisionByZeroError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    DivisionByZeroError(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class UnhandledMatchError : public Error {
   public:
-    UnhandledMatchError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    UnhandledMatchError(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class RequestParseBodyException : public Exception {
   public:
-    RequestParseBodyException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    RequestParseBodyException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class Closure {
@@ -190,7 +190,7 @@ class Generator {
 
 class ClosedGeneratorException : public Exception {
   public:
-    ClosedGeneratorException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    ClosedGeneratorException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class WeakReference {
@@ -310,7 +310,7 @@ class Deprecated {
     Object getObject() const {
         return this_;
     }
-    Deprecated(const Variant &message = {}, const Variant &since = {});
+    Deprecated(const Variant &message = nullptr, const Variant &since = nullptr);
 };
 
 class Fiber {
@@ -331,7 +331,7 @@ class Fiber {
         }
         return this_.call(_method_fn, {args...});
     }
-    Variant resume(const Variant &value = {});
+    Variant resume(const Variant &value = nullptr);
     Variant throw_(const Variant &exception);
     Variant isStarted();
     Variant isSuspended();
@@ -339,7 +339,7 @@ class Fiber {
     Variant isTerminated();
     Variant getReturn();
     static Variant getCurrent();
-    static Variant suspend(const Variant &value = {});
+    static Variant suspend(const Variant &value = nullptr);
 };
 
 class FiberError : public Error {

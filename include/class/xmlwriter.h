@@ -37,11 +37,11 @@ class XMLWriter {
     Variant endElement();
     Variant fullEndElement();
     Variant startElementNs(const Variant &prefix, const Variant &name, const Variant &namespace_);
-    Variant writeElement(const Variant &name, const Variant &content = {});
+    Variant writeElement(const Variant &name, const Variant &content = nullptr);
     Variant writeElementNs(const Variant &prefix,
                            const Variant &name,
                            const Variant &namespace_,
-                           const Variant &content = {});
+                           const Variant &content = nullptr);
     Variant startPi(const Variant &target);
     Variant endPi();
     Variant writePi(const Variant &target, const Variant &content);
@@ -50,15 +50,19 @@ class XMLWriter {
     Variant writeCdata(const Variant &content);
     Variant text(const Variant &content);
     Variant writeRaw(const Variant &content);
-    Variant startDocument(const Variant &version = "1.0", const Variant &encoding = {}, const Variant &standalone = {});
+    Variant startDocument(const Variant &version = "1.0",
+                          const Variant &encoding = nullptr,
+                          const Variant &standalone = nullptr);
     Variant endDocument();
     Variant writeComment(const Variant &content);
-    Variant startDtd(const Variant &qualified_name, const Variant &public_id = {}, const Variant &system_id = {});
+    Variant startDtd(const Variant &qualified_name,
+                     const Variant &public_id = nullptr,
+                     const Variant &system_id = nullptr);
     Variant endDtd();
     Variant writeDtd(const Variant &name,
-                     const Variant &public_id = {},
-                     const Variant &system_id = {},
-                     const Variant &content = {});
+                     const Variant &public_id = nullptr,
+                     const Variant &system_id = nullptr,
+                     const Variant &content = nullptr);
     Variant startDtdElement(const Variant &qualified_name);
     Variant endDtdElement();
     Variant writeDtdElement(const Variant &name, const Variant &content);
@@ -70,9 +74,9 @@ class XMLWriter {
     Variant writeDtdEntity(const Variant &name,
                            const Variant &content,
                            const Variant &is_param = false,
-                           const Variant &public_id = {},
-                           const Variant &system_id = {},
-                           const Variant &notation_data = {});
+                           const Variant &public_id = nullptr,
+                           const Variant &system_id = nullptr,
+                           const Variant &notation_data = nullptr);
     Variant outputMemory(const Variant &flush = true);
     Variant flush(const Variant &empty = true);
 };

@@ -4,108 +4,108 @@
 
 namespace php {
 Variant mysqli_affected_rows(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[781]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[781]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_affected_rows(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[781]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[781]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_autocommit(const mysqli &mysql, const Variant &enable) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[782]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[782]);
     }
-    return call(fn, {mysql.getObject(), enable});
+    return call(_fn, {mysql.getObject(), enable});
 }
 Variant mysqli_autocommit(const Variant &mysql, const Variant &enable) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[782]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[782]);
     }
-    return call(fn, {mysql, enable});
+    return call(_fn, {mysql, enable});
 }
 Variant mysqli_begin_transaction(const mysqli &mysql, const Variant &flags, const Variant &name) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[783]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[783]);
     }
-    return call(fn, {mysql.getObject(), flags, name});
+    return call(_fn, {mysql.getObject(), flags, name});
 }
 Variant mysqli_begin_transaction(const Variant &mysql, const Variant &flags, const Variant &name) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[783]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[783]);
     }
-    return call(fn, {mysql, flags, name});
+    return call(_fn, {mysql, flags, name});
 }
 Variant mysqli_change_user(const mysqli &mysql,
                            const Variant &username,
                            const Variant &password,
                            const Variant &database) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[784]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[784]);
     }
-    return call(fn, {mysql.getObject(), username, password, database});
+    return call(_fn, {mysql.getObject(), username, password, database});
 }
 Variant mysqli_change_user(const Variant &mysql,
                            const Variant &username,
                            const Variant &password,
                            const Variant &database) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[784]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[784]);
     }
-    return call(fn, {mysql, username, password, database});
+    return call(_fn, {mysql, username, password, database});
 }
 Variant mysqli_character_set_name(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[785]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[785]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_character_set_name(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[785]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[785]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_close(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[786]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[786]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_close(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[786]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[786]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_commit(const mysqli &mysql, const Variant &flags, const Variant &name) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[787]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[787]);
     }
-    return call(fn, {mysql.getObject(), flags, name});
+    return call(_fn, {mysql.getObject(), flags, name});
 }
 Variant mysqli_commit(const Variant &mysql, const Variant &flags, const Variant &name) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[787]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[787]);
     }
-    return call(fn, {mysql, flags, name});
+    return call(_fn, {mysql, flags, name});
 }
 Variant mysqli_connect(const Variant &hostname,
                        const Variant &username,
@@ -113,673 +113,673 @@ Variant mysqli_connect(const Variant &hostname,
                        const Variant &database,
                        const Variant &port,
                        const Variant &socket) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[788]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[788]);
     }
-    return call(fn, {hostname, username, password, database, port, socket});
+    return call(_fn, {hostname, username, password, database, port, socket});
 }
 Variant mysqli_connect_errno() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[789]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[789]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant mysqli_connect_error() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[790]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[790]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant mysqli_data_seek(const mysqli_result &result, const Variant &offset) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[791]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[791]);
     }
-    return call(fn, {result.getObject(), offset});
+    return call(_fn, {result.getObject(), offset});
 }
 Variant mysqli_data_seek(const Variant &result, const Variant &offset) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[791]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[791]);
     }
-    return call(fn, {result, offset});
+    return call(_fn, {result, offset});
 }
 Variant mysqli_dump_debug_info(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[792]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[792]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_dump_debug_info(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[792]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[792]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_debug(const Variant &options) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[793]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[793]);
     }
-    return call(fn, {options});
+    return call(_fn, {options});
 }
 Variant mysqli_errno(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[794]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[794]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_errno(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[794]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[794]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_error(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[795]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[795]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_error(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[795]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[795]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_error_list(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[796]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[796]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_error_list(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[796]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[796]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_stmt_execute(const mysqli_stmt &statement, const Variant &params) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[797]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[797]);
     }
-    return call(fn, {statement.getObject(), params});
+    return call(_fn, {statement.getObject(), params});
 }
 Variant mysqli_stmt_execute(const Variant &statement, const Variant &params) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[797]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[797]);
     }
-    return call(fn, {statement, params});
+    return call(_fn, {statement, params});
 }
 Variant mysqli_execute(const mysqli_stmt &statement, const Variant &params) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[798]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[798]);
     }
-    return call(fn, {statement.getObject(), params});
+    return call(_fn, {statement.getObject(), params});
 }
 Variant mysqli_execute(const Variant &statement, const Variant &params) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[798]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[798]);
     }
-    return call(fn, {statement, params});
+    return call(_fn, {statement, params});
 }
 Variant mysqli_execute_query(const mysqli &mysql, const Variant &query, const Variant &params) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[799]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[799]);
     }
-    return call(fn, {mysql.getObject(), query, params});
+    return call(_fn, {mysql.getObject(), query, params});
 }
 Variant mysqli_execute_query(const Variant &mysql, const Variant &query, const Variant &params) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[799]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[799]);
     }
-    return call(fn, {mysql, query, params});
+    return call(_fn, {mysql, query, params});
 }
 Variant mysqli_fetch_field(const mysqli_result &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[800]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[800]);
     }
-    return call(fn, {result.getObject()});
+    return call(_fn, {result.getObject()});
 }
 Variant mysqli_fetch_field(const Variant &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[800]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[800]);
     }
-    return call(fn, {result});
+    return call(_fn, {result});
 }
 Variant mysqli_fetch_fields(const mysqli_result &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[801]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[801]);
     }
-    return call(fn, {result.getObject()});
+    return call(_fn, {result.getObject()});
 }
 Variant mysqli_fetch_fields(const Variant &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[801]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[801]);
     }
-    return call(fn, {result});
+    return call(_fn, {result});
 }
 Variant mysqli_fetch_field_direct(const mysqli_result &result, const Variant &index) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[802]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[802]);
     }
-    return call(fn, {result.getObject(), index});
+    return call(_fn, {result.getObject(), index});
 }
 Variant mysqli_fetch_field_direct(const Variant &result, const Variant &index) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[802]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[802]);
     }
-    return call(fn, {result, index});
+    return call(_fn, {result, index});
 }
 Variant mysqli_fetch_lengths(const mysqli_result &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[803]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[803]);
     }
-    return call(fn, {result.getObject()});
+    return call(_fn, {result.getObject()});
 }
 Variant mysqli_fetch_lengths(const Variant &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[803]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[803]);
     }
-    return call(fn, {result});
+    return call(_fn, {result});
 }
 Variant mysqli_fetch_all(const mysqli_result &result, const Variant &mode) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[804]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[804]);
     }
-    return call(fn, {result.getObject(), mode});
+    return call(_fn, {result.getObject(), mode});
 }
 Variant mysqli_fetch_all(const Variant &result, const Variant &mode) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[804]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[804]);
     }
-    return call(fn, {result, mode});
+    return call(_fn, {result, mode});
 }
 Variant mysqli_fetch_array(const mysqli_result &result, const Variant &mode) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[805]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[805]);
     }
-    return call(fn, {result.getObject(), mode});
+    return call(_fn, {result.getObject(), mode});
 }
 Variant mysqli_fetch_array(const Variant &result, const Variant &mode) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[805]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[805]);
     }
-    return call(fn, {result, mode});
+    return call(_fn, {result, mode});
 }
 Variant mysqli_fetch_assoc(const mysqli_result &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[806]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[806]);
     }
-    return call(fn, {result.getObject()});
+    return call(_fn, {result.getObject()});
 }
 Variant mysqli_fetch_assoc(const Variant &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[806]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[806]);
     }
-    return call(fn, {result});
+    return call(_fn, {result});
 }
 Variant mysqli_fetch_object(const mysqli_result &result, const Variant &class_, const Variant &constructor_args) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[807]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[807]);
     }
-    return call(fn, {result.getObject(), class_, constructor_args});
+    return call(_fn, {result.getObject(), class_, constructor_args});
 }
 Variant mysqli_fetch_object(const Variant &result, const Variant &class_, const Variant &constructor_args) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[807]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[807]);
     }
-    return call(fn, {result, class_, constructor_args});
+    return call(_fn, {result, class_, constructor_args});
 }
 Variant mysqli_fetch_row(const mysqli_result &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[808]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[808]);
     }
-    return call(fn, {result.getObject()});
+    return call(_fn, {result.getObject()});
 }
 Variant mysqli_fetch_row(const Variant &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[808]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[808]);
     }
-    return call(fn, {result});
+    return call(_fn, {result});
 }
 Variant mysqli_fetch_column(const mysqli_result &result, const Variant &column) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[809]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[809]);
     }
-    return call(fn, {result.getObject(), column});
+    return call(_fn, {result.getObject(), column});
 }
 Variant mysqli_fetch_column(const Variant &result, const Variant &column) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[809]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[809]);
     }
-    return call(fn, {result, column});
+    return call(_fn, {result, column});
 }
 Variant mysqli_field_count(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[810]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[810]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_field_count(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[810]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[810]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_field_seek(const mysqli_result &result, const Variant &index) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[811]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[811]);
     }
-    return call(fn, {result.getObject(), index});
+    return call(_fn, {result.getObject(), index});
 }
 Variant mysqli_field_seek(const Variant &result, const Variant &index) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[811]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[811]);
     }
-    return call(fn, {result, index});
+    return call(_fn, {result, index});
 }
 Variant mysqli_field_tell(const mysqli_result &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[812]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[812]);
     }
-    return call(fn, {result.getObject()});
+    return call(_fn, {result.getObject()});
 }
 Variant mysqli_field_tell(const Variant &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[812]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[812]);
     }
-    return call(fn, {result});
+    return call(_fn, {result});
 }
 Variant mysqli_free_result(const mysqli_result &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[813]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[813]);
     }
-    return call(fn, {result.getObject()});
+    return call(_fn, {result.getObject()});
 }
 Variant mysqli_free_result(const Variant &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[813]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[813]);
     }
-    return call(fn, {result});
+    return call(_fn, {result});
 }
 Variant mysqli_get_connection_stats(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[814]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[814]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_get_connection_stats(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[814]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[814]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_get_client_stats() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[815]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[815]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant mysqli_get_charset(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[816]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[816]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_get_charset(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[816]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[816]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_get_client_info(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[817]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[817]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_get_client_version() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[818]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[818]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant mysqli_get_links_stats() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[819]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[819]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant mysqli_get_host_info(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[820]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[820]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_get_host_info(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[820]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[820]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_get_proto_info(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[821]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[821]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_get_proto_info(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[821]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[821]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_get_server_info(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[822]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[822]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_get_server_info(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[822]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[822]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_get_server_version(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[823]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[823]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_get_server_version(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[823]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[823]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_get_warnings(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[824]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[824]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_get_warnings(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[824]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[824]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_init() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[825]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[825]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant mysqli_info(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[826]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[826]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_info(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[826]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[826]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_insert_id(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[827]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[827]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_insert_id(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[827]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[827]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_kill(const mysqli &mysql, const Variant &process_id) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[828]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[828]);
     }
-    return call(fn, {mysql.getObject(), process_id});
+    return call(_fn, {mysql.getObject(), process_id});
 }
 Variant mysqli_kill(const Variant &mysql, const Variant &process_id) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[828]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[828]);
     }
-    return call(fn, {mysql, process_id});
+    return call(_fn, {mysql, process_id});
 }
 Variant mysqli_more_results(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[829]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[829]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_more_results(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[829]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[829]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_multi_query(const mysqli &mysql, const Variant &query) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[830]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[830]);
     }
-    return call(fn, {mysql.getObject(), query});
+    return call(_fn, {mysql.getObject(), query});
 }
 Variant mysqli_multi_query(const Variant &mysql, const Variant &query) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[830]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[830]);
     }
-    return call(fn, {mysql, query});
+    return call(_fn, {mysql, query});
 }
 Variant mysqli_next_result(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[831]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[831]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_next_result(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[831]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[831]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_num_fields(const mysqli_result &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[832]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[832]);
     }
-    return call(fn, {result.getObject()});
+    return call(_fn, {result.getObject()});
 }
 Variant mysqli_num_fields(const Variant &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[832]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[832]);
     }
-    return call(fn, {result});
+    return call(_fn, {result});
 }
 Variant mysqli_num_rows(const mysqli_result &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[833]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[833]);
     }
-    return call(fn, {result.getObject()});
+    return call(_fn, {result.getObject()});
 }
 Variant mysqli_num_rows(const Variant &result) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[833]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[833]);
     }
-    return call(fn, {result});
+    return call(_fn, {result});
 }
 Variant mysqli_options(const mysqli &mysql, const Variant &option, const Variant &value) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[834]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[834]);
     }
-    return call(fn, {mysql.getObject(), option, value});
+    return call(_fn, {mysql.getObject(), option, value});
 }
 Variant mysqli_options(const Variant &mysql, const Variant &option, const Variant &value) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[834]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[834]);
     }
-    return call(fn, {mysql, option, value});
+    return call(_fn, {mysql, option, value});
 }
 Variant mysqli_set_opt(const mysqli &mysql, const Variant &option, const Variant &value) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[835]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[835]);
     }
-    return call(fn, {mysql.getObject(), option, value});
+    return call(_fn, {mysql.getObject(), option, value});
 }
 Variant mysqli_set_opt(const Variant &mysql, const Variant &option, const Variant &value) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[835]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[835]);
     }
-    return call(fn, {mysql, option, value});
+    return call(_fn, {mysql, option, value});
 }
 Variant mysqli_ping(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[836]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[836]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_ping(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[836]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[836]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_poll(const Reference &read,
                     const Reference &error,
                     const Reference &reject,
                     const Variant &seconds,
                     const Variant &microseconds) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[837]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[837]);
     }
-    return call(fn, {&read, &error, &reject, seconds, microseconds});
+    return call(_fn, {&read, &error, &reject, seconds, microseconds});
 }
 Variant mysqli_prepare(const mysqli &mysql, const Variant &query) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[838]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[838]);
     }
-    return call(fn, {mysql.getObject(), query});
+    return call(_fn, {mysql.getObject(), query});
 }
 Variant mysqli_prepare(const Variant &mysql, const Variant &query) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[838]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[838]);
     }
-    return call(fn, {mysql, query});
+    return call(_fn, {mysql, query});
 }
 Variant mysqli_report(const Variant &flags) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[839]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[839]);
     }
-    return call(fn, {flags});
+    return call(_fn, {flags});
 }
 Variant mysqli_query(const mysqli &mysql, const Variant &query, const Variant &result_mode) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[840]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[840]);
     }
-    return call(fn, {mysql.getObject(), query, result_mode});
+    return call(_fn, {mysql.getObject(), query, result_mode});
 }
 Variant mysqli_query(const Variant &mysql, const Variant &query, const Variant &result_mode) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[840]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[840]);
     }
-    return call(fn, {mysql, query, result_mode});
+    return call(_fn, {mysql, query, result_mode});
 }
 Variant mysqli_real_connect(const mysqli &mysql,
                             const Variant &hostname,
@@ -789,11 +789,11 @@ Variant mysqli_real_connect(const mysqli &mysql,
                             const Variant &port,
                             const Variant &socket,
                             const Variant &flags) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[841]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[841]);
     }
-    return call(fn, {mysql.getObject(), hostname, username, password, database, port, socket, flags});
+    return call(_fn, {mysql.getObject(), hostname, username, password, database, port, socket, flags});
 }
 Variant mysqli_real_connect(const Variant &mysql,
                             const Variant &hostname,
@@ -803,501 +803,501 @@ Variant mysqli_real_connect(const Variant &mysql,
                             const Variant &port,
                             const Variant &socket,
                             const Variant &flags) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[841]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[841]);
     }
-    return call(fn, {mysql, hostname, username, password, database, port, socket, flags});
+    return call(_fn, {mysql, hostname, username, password, database, port, socket, flags});
 }
 Variant mysqli_real_escape_string(const mysqli &mysql, const Variant &string) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[842]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[842]);
     }
-    return call(fn, {mysql.getObject(), string});
+    return call(_fn, {mysql.getObject(), string});
 }
 Variant mysqli_real_escape_string(const Variant &mysql, const Variant &string) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[842]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[842]);
     }
-    return call(fn, {mysql, string});
+    return call(_fn, {mysql, string});
 }
 Variant mysqli_escape_string(const mysqli &mysql, const Variant &string) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[843]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[843]);
     }
-    return call(fn, {mysql.getObject(), string});
+    return call(_fn, {mysql.getObject(), string});
 }
 Variant mysqli_escape_string(const Variant &mysql, const Variant &string) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[843]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[843]);
     }
-    return call(fn, {mysql, string});
+    return call(_fn, {mysql, string});
 }
 Variant mysqli_real_query(const mysqli &mysql, const Variant &query) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[844]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[844]);
     }
-    return call(fn, {mysql.getObject(), query});
+    return call(_fn, {mysql.getObject(), query});
 }
 Variant mysqli_real_query(const Variant &mysql, const Variant &query) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[844]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[844]);
     }
-    return call(fn, {mysql, query});
+    return call(_fn, {mysql, query});
 }
 Variant mysqli_reap_async_query(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[845]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[845]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_reap_async_query(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[845]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[845]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_release_savepoint(const mysqli &mysql, const Variant &name) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[846]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[846]);
     }
-    return call(fn, {mysql.getObject(), name});
+    return call(_fn, {mysql.getObject(), name});
 }
 Variant mysqli_release_savepoint(const Variant &mysql, const Variant &name) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[846]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[846]);
     }
-    return call(fn, {mysql, name});
+    return call(_fn, {mysql, name});
 }
 Variant mysqli_rollback(const mysqli &mysql, const Variant &flags, const Variant &name) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[847]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[847]);
     }
-    return call(fn, {mysql.getObject(), flags, name});
+    return call(_fn, {mysql.getObject(), flags, name});
 }
 Variant mysqli_rollback(const Variant &mysql, const Variant &flags, const Variant &name) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[847]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[847]);
     }
-    return call(fn, {mysql, flags, name});
+    return call(_fn, {mysql, flags, name});
 }
 Variant mysqli_savepoint(const mysqli &mysql, const Variant &name) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[848]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[848]);
     }
-    return call(fn, {mysql.getObject(), name});
+    return call(_fn, {mysql.getObject(), name});
 }
 Variant mysqli_savepoint(const Variant &mysql, const Variant &name) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[848]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[848]);
     }
-    return call(fn, {mysql, name});
+    return call(_fn, {mysql, name});
 }
 Variant mysqli_select_db(const mysqli &mysql, const Variant &database) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[849]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[849]);
     }
-    return call(fn, {mysql.getObject(), database});
+    return call(_fn, {mysql.getObject(), database});
 }
 Variant mysqli_select_db(const Variant &mysql, const Variant &database) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[849]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[849]);
     }
-    return call(fn, {mysql, database});
+    return call(_fn, {mysql, database});
 }
 Variant mysqli_set_charset(const mysqli &mysql, const Variant &charset) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[850]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[850]);
     }
-    return call(fn, {mysql.getObject(), charset});
+    return call(_fn, {mysql.getObject(), charset});
 }
 Variant mysqli_set_charset(const Variant &mysql, const Variant &charset) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[850]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[850]);
     }
-    return call(fn, {mysql, charset});
+    return call(_fn, {mysql, charset});
 }
 Variant mysqli_stmt_affected_rows(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[851]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[851]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_affected_rows(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[851]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[851]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_attr_get(const mysqli_stmt &statement, const Variant &attribute) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[852]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[852]);
     }
-    return call(fn, {statement.getObject(), attribute});
+    return call(_fn, {statement.getObject(), attribute});
 }
 Variant mysqli_stmt_attr_get(const Variant &statement, const Variant &attribute) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[852]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[852]);
     }
-    return call(fn, {statement, attribute});
+    return call(_fn, {statement, attribute});
 }
 Variant mysqli_stmt_attr_set(const mysqli_stmt &statement, const Variant &attribute, const Variant &value) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[853]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[853]);
     }
-    return call(fn, {statement.getObject(), attribute, value});
+    return call(_fn, {statement.getObject(), attribute, value});
 }
 Variant mysqli_stmt_attr_set(const Variant &statement, const Variant &attribute, const Variant &value) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[853]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[853]);
     }
-    return call(fn, {statement, attribute, value});
+    return call(_fn, {statement, attribute, value});
 }
 Variant mysqli_stmt_close(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[856]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[856]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_close(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[856]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[856]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_data_seek(const mysqli_stmt &statement, const Variant &offset) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[857]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[857]);
     }
-    return call(fn, {statement.getObject(), offset});
+    return call(_fn, {statement.getObject(), offset});
 }
 Variant mysqli_stmt_data_seek(const Variant &statement, const Variant &offset) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[857]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[857]);
     }
-    return call(fn, {statement, offset});
+    return call(_fn, {statement, offset});
 }
 Variant mysqli_stmt_errno(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[858]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[858]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_errno(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[858]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[858]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_error(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[859]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[859]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_error(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[859]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[859]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_error_list(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[860]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[860]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_error_list(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[860]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[860]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_fetch(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[861]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[861]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_fetch(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[861]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[861]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_field_count(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[862]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[862]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_field_count(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[862]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[862]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_free_result(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[863]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[863]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_free_result(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[863]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[863]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_get_result(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[864]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[864]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_get_result(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[864]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[864]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_get_warnings(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[865]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[865]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_get_warnings(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[865]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[865]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_init(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[866]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[866]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_stmt_init(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[866]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[866]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_stmt_insert_id(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[867]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[867]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_insert_id(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[867]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[867]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_more_results(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[868]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[868]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_more_results(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[868]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[868]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_next_result(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[869]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[869]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_next_result(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[869]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[869]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_num_rows(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[870]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[870]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_num_rows(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[870]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[870]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_param_count(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[871]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[871]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_param_count(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[871]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[871]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_prepare(const mysqli_stmt &statement, const Variant &query) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[872]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[872]);
     }
-    return call(fn, {statement.getObject(), query});
+    return call(_fn, {statement.getObject(), query});
 }
 Variant mysqli_stmt_prepare(const Variant &statement, const Variant &query) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[872]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[872]);
     }
-    return call(fn, {statement, query});
+    return call(_fn, {statement, query});
 }
 Variant mysqli_stmt_reset(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[873]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[873]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_reset(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[873]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[873]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_result_metadata(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[874]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[874]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_result_metadata(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[874]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[874]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_send_long_data(const mysqli_stmt &statement, const Variant &param_num, const Variant &data) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[875]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[875]);
     }
-    return call(fn, {statement.getObject(), param_num, data});
+    return call(_fn, {statement.getObject(), param_num, data});
 }
 Variant mysqli_stmt_send_long_data(const Variant &statement, const Variant &param_num, const Variant &data) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[875]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[875]);
     }
-    return call(fn, {statement, param_num, data});
+    return call(_fn, {statement, param_num, data});
 }
 Variant mysqli_stmt_store_result(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[876]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[876]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_store_result(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[876]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[876]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_stmt_sqlstate(const mysqli_stmt &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[877]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[877]);
     }
-    return call(fn, {statement.getObject()});
+    return call(_fn, {statement.getObject()});
 }
 Variant mysqli_stmt_sqlstate(const Variant &statement) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[877]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[877]);
     }
-    return call(fn, {statement});
+    return call(_fn, {statement});
 }
 Variant mysqli_sqlstate(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[878]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[878]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_sqlstate(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[878]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[878]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_ssl_set(const mysqli &mysql,
                        const Variant &key,
@@ -1305,11 +1305,11 @@ Variant mysqli_ssl_set(const mysqli &mysql,
                        const Variant &ca_certificate,
                        const Variant &ca_path,
                        const Variant &cipher_algos) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[879]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[879]);
     }
-    return call(fn, {mysql.getObject(), key, certificate, ca_certificate, ca_path, cipher_algos});
+    return call(_fn, {mysql.getObject(), key, certificate, ca_certificate, ca_path, cipher_algos});
 }
 Variant mysqli_ssl_set(const Variant &mysql,
                        const Variant &key,
@@ -1317,101 +1317,101 @@ Variant mysqli_ssl_set(const Variant &mysql,
                        const Variant &ca_certificate,
                        const Variant &ca_path,
                        const Variant &cipher_algos) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[879]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[879]);
     }
-    return call(fn, {mysql, key, certificate, ca_certificate, ca_path, cipher_algos});
+    return call(_fn, {mysql, key, certificate, ca_certificate, ca_path, cipher_algos});
 }
 Variant mysqli_stat(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[880]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[880]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_stat(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[880]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[880]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_store_result(const mysqli &mysql, const Variant &mode) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[881]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[881]);
     }
-    return call(fn, {mysql.getObject(), mode});
+    return call(_fn, {mysql.getObject(), mode});
 }
 Variant mysqli_store_result(const Variant &mysql, const Variant &mode) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[881]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[881]);
     }
-    return call(fn, {mysql, mode});
+    return call(_fn, {mysql, mode});
 }
 Variant mysqli_thread_id(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[882]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[882]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_thread_id(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[882]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[882]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_thread_safe() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[883]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[883]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant mysqli_use_result(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[884]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[884]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_use_result(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[884]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[884]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_warning_count(const mysqli &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[885]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[885]);
     }
-    return call(fn, {mysql.getObject()});
+    return call(_fn, {mysql.getObject()});
 }
 Variant mysqli_warning_count(const Variant &mysql) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[885]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[885]);
     }
-    return call(fn, {mysql});
+    return call(_fn, {mysql});
 }
 Variant mysqli_refresh(const mysqli &mysql, const Variant &flags) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[886]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[886]);
     }
-    return call(fn, {mysql.getObject(), flags});
+    return call(_fn, {mysql.getObject(), flags});
 }
 Variant mysqli_refresh(const Variant &mysql, const Variant &flags) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[886]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[886]);
     }
-    return call(fn, {mysql, flags});
+    return call(_fn, {mysql, flags});
 }
 }  // namespace php

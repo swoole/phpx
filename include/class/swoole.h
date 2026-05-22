@@ -11,17 +11,17 @@ namespace Swoole {
 class Exception;
 class Error;
 class Event;
-class Atomic;
 class Lock;
 class Table;
-class Timer;
-class Coroutine;
 class ExitException;
 class Runtime;
-class Process;
-class Client;
-class Server;
-class Thread;
+class Atomic_;
+class Process_;
+class Timer_;
+class Coroutine_;
+class Client_;
+class Server_;
+class Thread_;
 }  // namespace Swoole
 namespace Swoole::Atomic {
 class Long;
@@ -38,8 +38,8 @@ class System;
 class Scheduler;
 class Lock;
 class Channel;
-class Socket;
 class Client;
+class Socket_;
 }  // namespace Swoole::Coroutine
 namespace Swoole::Coroutine::Curl {
 class Exception;
@@ -66,9 +66,6 @@ namespace Swoole::Http2 {
 class Request;
 class Response;
 }  // namespace Swoole::Http2
-namespace Swoole::Coroutine::Http2 {
-class Client;
-}
 namespace FTP {
 class Connection;
 }
@@ -95,39 +92,42 @@ class Frame;
 class Server;
 class CloseFrame;
 }  // namespace Swoole::WebSocket
-namespace Swoole::Coroutine::Http {
-class Client;
-class Server;
-}  // namespace Swoole::Coroutine::Http
 namespace Swoole::Redis {
 class Server;
 }
+namespace Swoole::Coroutine::Http {
+class Server;
+class Client_;
+}  // namespace Swoole::Coroutine::Http
 namespace Swoole::NameResolver {
 class Context;
 }
 namespace Swoole::Thread {
 class Error;
-class Atomic;
 class Lock;
 class Barrier;
 class Queue;
 class Map;
 class ArrayList;
+class Atomic_;
 }  // namespace Swoole::Thread
 namespace Swoole::Thread::Atomic {
 class Long;
 }
+namespace Swoole::Coroutine::Http2 {
+class Client_;
+}
 
 namespace Swoole {
 
-class Exception : public Exception {
+class Exception : public ::php::Exception {
   public:
-    Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
-class Error : public Error {
+class Error : public ::php::Error {
   public:
-    Error(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Error(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class Event {
@@ -141,15 +141,15 @@ class Event {
     explicit Event(const Object &obj) : this_(obj) {}
     Event();
     static Variant add(const Variant &fd,
-                       const Variant &read_callback = {},
-                       const Variant &write_callback = {},
+                       const Variant &read_callback = nullptr,
+                       const Variant &write_callback = nullptr,
                        const Variant &events = 512);
     static Variant del(const Variant &fd);
     static Variant set(const Variant &fd,
-                       const Variant &read_callback = {},
-                       const Variant &write_callback = {},
+                       const Variant &read_callback = nullptr,
+                       const Variant &write_callback = nullptr,
                        const Variant &events = 0);
-    static Variant isset(const Variant &fd, const Variant &events = 1536);
+    static Variant isset_(const Variant &fd, const Variant &events = 1536);
     static Variant dispatch();
     static Variant defer(const Variant &callback);
     static Variant cycle(const Variant &callback, const Variant &before = false);
@@ -157,24 +157,6 @@ class Event {
     static Variant wait();
     static Variant rshutdown();
     static Variant exit();
-};
-
-class Atomic {
-  protected:
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    Atomic(const Variant &value = 0);
-    Variant add(const Variant &add_value = 1);
-    Variant sub(const Variant &sub_value = 1);
-    Variant get();
-    Variant set(const Variant &value);
-    Variant wait(const Variant &timeout = 1);
-    Variant wakeup(const Variant &count = 1);
-    Variant cmpset(const Variant &cmp_value, const Variant &new_value);
 };
 
 class Lock {
@@ -212,7 +194,7 @@ class Table {
     Variant create();
     Variant destroy();
     Variant set(const Variant &key, const Variant &value);
-    Variant get(const Variant &key, const Variant &field = {});
+    Variant get(const Variant &key, const Variant &field = nullptr);
     Variant count();
     Variant del(const Variant &key);
     Variant delete_(const Variant &key);
@@ -230,7 +212,14 @@ class Table {
     Variant key();
 };
 
-class Timer {
+class ExitException : public Exception {
+  public:
+    Variant getFlags();
+    Variant getStatus();
+    ExitException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
+};
+
+class Runtime {
   protected:
     Object this_;
 
@@ -238,8 +227,90 @@ class Timer {
     Object getObject() const {
         return this_;
     }
-    explicit Timer(const Object &obj) : this_(obj) {}
-    Timer();
+    explicit Runtime(const Object &obj) : this_(obj) {}
+    Runtime();
+    static Variant enableCoroutine(const Variant &flags = 2143287295);
+    static Variant getHookFlags();
+    static Variant setHookFlags(const Variant &flags);
+};
+
+class Atomic_ {
+  protected:
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    Atomic_(const Variant &value = 0);
+    Variant add(const Variant &add_value = 1);
+    Variant sub(const Variant &sub_value = 1);
+    Variant get();
+    Variant set(const Variant &value);
+    Variant wait(const Variant &timeout = 1);
+    Variant wakeup(const Variant &count = 1);
+    Variant cmpset(const Variant &cmp_value, const Variant &new_value);
+};
+
+class Process_ {
+  protected:
+    Object this_;
+    Process_() = default;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    static constexpr int IPC_NOWAIT = 256;
+    static constexpr int PIPE_MASTER = 1;
+    static constexpr int PIPE_WORKER = 2;
+    static constexpr int PIPE_READ = 3;
+    static constexpr int PIPE_WRITE = 4;
+    static constexpr int PIPE_TYPE_NONE = 0;
+    static constexpr int PIPE_TYPE_STREAM = 1;
+    static constexpr int PIPE_TYPE_DGRAM = 2;
+
+    Process_(const Variant &callback,
+             const Variant &redirect_stdin_and_stdout = false,
+             const Variant &pipe_type = 2,
+             const Variant &enable_coroutine = false);
+    static Variant wait(const Variant &blocking = true);
+    static Variant signal(const Variant &signal_no, const Variant &callback = nullptr);
+    static Variant alarm(const Variant &usec, const Variant &type = 0);
+    static Variant kill(const Variant &pid, const Variant &signal_no = 15);
+    static Variant daemon(const Variant &nochdir = true, const Variant &noclose = true, const Variant &pipes = Array{});
+    static Variant setAffinity(const Variant &cpu_settings);
+    static Variant getAffinity();
+    Variant setPriority(const Variant &which, const Variant &priority, const Variant &who = nullptr);
+    Variant getPriority(const Variant &which, const Variant &who = nullptr);
+    Variant set(const Variant &settings);
+    Variant setTimeout(const Variant &seconds);
+    Variant setBlocking(const Variant &blocking);
+    Variant useQueue(const Variant &key = 0, const Variant &mode = 2, const Variant &capacity = -1);
+    Variant statQueue();
+    Variant freeQueue();
+    Variant start();
+    Variant write(const Variant &data);
+    Variant close(const Variant &which = 0);
+    Variant read(const Variant &size = 8192);
+    Variant push(const Variant &data);
+    Variant pop(const Variant &size = 65536);
+    Variant exit(const Variant &exit_code = 0);
+    Variant exec(const Variant &exec_file, const Variant &args);
+    Variant exportSocket();
+    Variant name(const Variant &process_name);
+};
+
+class Timer_ {
+  protected:
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    explicit Timer_(const Object &obj) : this_(obj) {}
+    Timer_();
     template <typename... Args>
     Variant tick(const Variant &ms, const Variant &callback, const Args &...params) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -264,7 +335,7 @@ class Timer {
     static Variant clearAll();
 };
 
-class Coroutine {
+class Coroutine_ {
   protected:
     Object this_;
 
@@ -272,8 +343,8 @@ class Coroutine {
     Object getObject() const {
         return this_;
     }
-    explicit Coroutine(const Object &obj) : this_(obj) {}
-    Coroutine();
+    explicit Coroutine_(const Object &obj) : this_(obj) {}
+    Coroutine_();
     template <typename... Args>
     Variant create(const Variant &func, const Args &...param) {
         static THREAD_LOCAL zend_function *_method_fn = nullptr;
@@ -314,7 +385,7 @@ class Coroutine {
                                const Variant &family = 2,
                                const Variant &socktype = 1,
                                const Variant &protocol = 6,
-                               const Variant &service = {},
+                               const Variant &service = nullptr,
                                const Variant &timeout = -1);
     static Variant statvfs(const Variant &path);
     static Variant readFile(const Variant &filename, const Variant &flag = 0);
@@ -325,81 +396,10 @@ class Coroutine {
     static Variant waitEvent(const Variant &socket, const Variant &events = 512, const Variant &timeout = -1);
 };
 
-class ExitException : public Exception {
-  public:
-    Variant getFlags();
-    Variant getStatus();
-    ExitException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
-};
-
-class Runtime {
+class Client_ {
   protected:
     Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    explicit Runtime(const Object &obj) : this_(obj) {}
-    Runtime();
-    static Variant enableCoroutine(const Variant &flags = 2143287295);
-    static Variant getHookFlags();
-    static Variant setHookFlags(const Variant &flags);
-};
-
-class Process {
-  protected:
-    Object this_;
-    Process() = default;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    static constexpr int IPC_NOWAIT = 256;
-    static constexpr int PIPE_MASTER = 1;
-    static constexpr int PIPE_WORKER = 2;
-    static constexpr int PIPE_READ = 3;
-    static constexpr int PIPE_WRITE = 4;
-    static constexpr int PIPE_TYPE_NONE = 0;
-    static constexpr int PIPE_TYPE_STREAM = 1;
-    static constexpr int PIPE_TYPE_DGRAM = 2;
-
-    Process(const Variant &callback,
-            const Variant &redirect_stdin_and_stdout = false,
-            const Variant &pipe_type = 2,
-            const Variant &enable_coroutine = false);
-    static Variant wait(const Variant &blocking = true);
-    static Variant signal(const Variant &signal_no, const Variant &callback = {});
-    static Variant alarm(const Variant &usec, const Variant &type = 0);
-    static Variant kill(const Variant &pid, const Variant &signal_no = 15);
-    static Variant daemon(const Variant &nochdir = true, const Variant &noclose = true, const Variant &pipes = Array{});
-    static Variant setAffinity(const Variant &cpu_settings);
-    static Variant getAffinity();
-    Variant setPriority(const Variant &which, const Variant &priority, const Variant &who = {});
-    Variant getPriority(const Variant &which, const Variant &who = {});
-    Variant set(const Variant &settings);
-    Variant setTimeout(const Variant &seconds);
-    Variant setBlocking(const Variant &blocking);
-    Variant useQueue(const Variant &key = 0, const Variant &mode = 2, const Variant &capacity = -1);
-    Variant statQueue();
-    Variant freeQueue();
-    Variant start();
-    Variant write(const Variant &data);
-    Variant close(const Variant &which = 0);
-    Variant read(const Variant &size = 8192);
-    Variant push(const Variant &data);
-    Variant pop(const Variant &size = 65536);
-    Variant exit(const Variant &exit_code = 0);
-    Variant exec(const Variant &exec_file, const Variant &args);
-    Variant exportSocket();
-    Variant name(const Variant &process_name);
-};
-
-class Client {
-  protected:
-    Object this_;
-    Client() = default;
+    Client_() = default;
 
   public:
     Object getObject() const {
@@ -413,7 +413,7 @@ class Client {
     static constexpr int SHUT_RD = 0;
     static constexpr int SHUT_WR = 1;
 
-    Client(const Variant &type, const Variant &async = false, const Variant &id = "");
+    Client_(const Variant &type, const Variant &async = false, const Variant &id = "");
     Variant set(const Variant &settings);
     Variant connect(const Variant &host,
                     const Variant &port = 0,
@@ -424,7 +424,7 @@ class Client {
     Variant sendfile(const Variant &filename, const Variant &offset = 0, const Variant &length = 0);
     Variant sendto(const Variant &ip, const Variant &port, const Variant &data);
     Variant shutdown(const Variant &how);
-    Variant enableSSL(const Variant &on_ssl_ready = {});
+    Variant enableSSL(const Variant &on_ssl_ready = nullptr);
     Variant getPeerCert();
     Variant verifyPeerCert();
     Variant isConnected();
@@ -434,7 +434,7 @@ class Client {
     Socket getSocket();
 };
 
-class Server {
+class Server_ {
   protected:
     Object this_;
 
@@ -442,10 +442,10 @@ class Server {
     Object getObject() const {
         return this_;
     }
-    Server(const Variant &host = "0.0.0.0",
-           const Variant &port = 0,
-           const Variant &mode = 1,
-           const Variant &sock_type = 1);
+    Server_(const Variant &host = "0.0.0.0",
+            const Variant &port = 0,
+            const Variant &mode = 1,
+            const Variant &sock_type = 1);
     Variant listen(const Variant &host, const Variant &port, const Variant &sock_type);
     Variant addlistener(const Variant &host, const Variant &port, const Variant &sock_type);
     Variant on(const Variant &event_name, const Variant &callback);
@@ -466,7 +466,7 @@ class Server {
     Variant confirm(const Variant &fd);
     Variant pause(const Variant &fd);
     Variant resume(const Variant &fd);
-    Variant task(const Variant &data, const Variant &task_worker_index = -1, const Variant &finish_callback = {});
+    Variant task(const Variant &data, const Variant &task_worker_index = -1, const Variant &finish_callback = nullptr);
     Variant taskwait(const Variant &data, const Variant &timeout = 0.5, const Variant &task_worker_index = -1);
     Variant taskWaitMulti(const Variant &tasks, const Variant &timeout = 0.5);
     Variant taskCo(const Variant &tasks, const Variant &timeout = 0.5);
@@ -492,17 +492,17 @@ class Server {
                     const Variant &data,
                     const Variant &json_decode = true);
     Variant addCommand(const Variant &name, const Variant &accepted_process_types, const Variant &callback);
-    Variant addProcess(const Process &process);
+    Variant addProcess(const Process_ &process);
     Variant addProcess(const Variant &process);
     Variant stats();
     Socket getSocket(const Variant &port = 0);
     Variant bind(const Variant &fd, const Variant &uid);
 };
 
-class Thread {
+class Thread_ {
   protected:
     Object this_;
-    Thread() = default;
+    Thread_() = default;
 
   public:
     Object getObject() const {
@@ -510,16 +510,16 @@ class Thread {
     }
     static constexpr int HARDWARE_CONCURRENCY = 12;
     static inline const Variant API_NAME{ZEND_STRL("POSIX Threads"), true};
-    static constexpr int SCHED_OTHER = 0;
-    static constexpr int SCHED_FIFO = 1;
-    static constexpr int SCHED_RR = 2;
-    static constexpr int SCHED_BATCH = 3;
-    static constexpr int SCHED_ISO = 4;
-    static constexpr int SCHED_IDLE = 5;
-    static constexpr int SCHED_DEADLINE = 6;
+    static constexpr int SCHED_OTHER_ = 0;
+    static constexpr int SCHED_FIFO_ = 1;
+    static constexpr int SCHED_RR_ = 2;
+    static constexpr int SCHED_BATCH_ = 3;
+    static constexpr int SCHED_ISO_ = 4;
+    static constexpr int SCHED_IDLE_ = 5;
+    static constexpr int SCHED_DEADLINE_ = 6;
 
     template <typename... Args>
-    Thread(const Variant &script_file, const Args &...args) {
+    Thread_(const Variant &script_file, const Args &...args) {
         this_ = newObject(LITERAL_STRING[3268], {script_file, args...});
     }
     Variant isAlive();
@@ -582,12 +582,12 @@ class Context : public ArrayObject {
 
 class CanceledException : public Exception {
   public:
-    CanceledException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    CanceledException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class TimeoutException : public Exception {
   public:
-    TimeoutException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    TimeoutException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class System {
@@ -608,7 +608,7 @@ class System {
                                const Variant &family = 2,
                                const Variant &socktype = 1,
                                const Variant &protocol = 6,
-                               const Variant &service = {},
+                               const Variant &service = nullptr,
                                const Variant &timeout = -1);
     static Variant statvfs(const Variant &path);
     static Variant readFile(const Variant &filename, const Variant &flag = 0);
@@ -681,16 +681,52 @@ class Channel {
     Variant length();
 };
 
-class Socket {
+class Client {
   protected:
     Object this_;
-    Socket() = default;
+    Client() = default;
 
   public:
     Object getObject() const {
         return this_;
     }
-    Socket(const Variant &domain, const Variant &type, const Variant &protocol = 0);
+    static constexpr int MSG_OOB = 1;
+    static constexpr int MSG_PEEK = 2;
+    static constexpr int MSG_DONTWAIT = 64;
+    static constexpr int MSG_WAITALL = 256;
+
+    Client(const Variant &type);
+    Variant set(const Variant &settings);
+    Variant connect(const Variant &host,
+                    const Variant &port = 0,
+                    const Variant &timeout = 0,
+                    const Variant &sock_flag = 0);
+    Variant recv(const Variant &timeout = 0);
+    Variant peek(const Variant &length = 65535);
+    Variant send(const Variant &data, const Variant &timeout = 0);
+    Variant sendfile(const Variant &filename, const Variant &offset = 0, const Variant &length = 0);
+    Variant sendto(const Variant &address, const Variant &port, const Variant &data);
+    Variant recvfrom(const Variant &length, const Reference &address, const Reference &port = newReference(0));
+    Variant enableSSL();
+    Variant getPeerCert();
+    Variant verifyPeerCert(const Variant &allow_self_signed = false);
+    Variant isConnected();
+    Variant getsockname();
+    Variant getpeername();
+    Variant close();
+    Variant exportSocket();
+};
+
+class Socket_ {
+  protected:
+    Object this_;
+    Socket_() = default;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    Socket_(const Variant &domain, const Variant &type, const Variant &protocol = 0);
     Variant bind(const Variant &address, const Variant &port = 0);
     Variant listen(const Variant &backlog = 512);
     Variant accept(const Variant &timeout = 0);
@@ -725,48 +761,12 @@ class Socket {
     static Variant import(const Variant &stream);
 };
 
-class Client {
-  protected:
-    Object this_;
-    Client() = default;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    static constexpr int MSG_OOB = 1;
-    static constexpr int MSG_PEEK = 2;
-    static constexpr int MSG_DONTWAIT = 64;
-    static constexpr int MSG_WAITALL = 256;
-
-    Client(const Variant &type);
-    Variant set(const Variant &settings);
-    Variant connect(const Variant &host,
-                    const Variant &port = 0,
-                    const Variant &timeout = 0,
-                    const Variant &sock_flag = 0);
-    Variant recv(const Variant &timeout = 0);
-    Variant peek(const Variant &length = 65535);
-    Variant send(const Variant &data, const Variant &timeout = 0);
-    Variant sendfile(const Variant &filename, const Variant &offset = 0, const Variant &length = 0);
-    Variant sendto(const Variant &address, const Variant &port, const Variant &data);
-    Variant recvfrom(const Variant &length, const Reference &address, const Reference &port = 0);
-    Variant enableSSL();
-    Variant getPeerCert();
-    Variant verifyPeerCert(const Variant &allow_self_signed = false);
-    Variant isConnected();
-    Variant getsockname();
-    Variant getpeername();
-    Variant close();
-    Variant exportSocket();
-};
-
 }  // namespace Swoole::Coroutine
 namespace Swoole::Coroutine::Curl {
 
-class Exception : public Swoole_Exception {
+class Exception : public ::php::Swoole::Exception {
   public:
-    Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 }  // namespace Swoole::Coroutine::Curl
@@ -800,23 +800,23 @@ class Pool {
 }  // namespace Swoole::Process
 namespace Swoole::Coroutine::Socket {
 
-class Exception : public Swoole_Exception {
+class Exception : public ::php::Swoole::Exception {
   public:
-    Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 }  // namespace Swoole::Coroutine::Socket
 namespace Swoole::Client {
 
-class Exception : public Swoole_Exception {
+class Exception : public ::php::Swoole::Exception {
   public:
-    Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 }  // namespace Swoole::Client
 namespace Swoole::Async {
 
-class Client : public Swoole_Client {
+class Client : public Swoole::Client_ {
   protected:
     Client() = default;
 
@@ -830,7 +830,7 @@ class Client : public Swoole_Client {
     Variant wakeup();
     Variant pause();
     Variant resume();
-    Variant enableSSL(const Variant &on_ssl_ready = {});
+    Variant enableSSL(const Variant &on_ssl_ready = nullptr);
     Variant isConnected();
     Variant close(const Variant &force = false);
     Variant on(const Variant &host, const Variant &callback);
@@ -839,17 +839,17 @@ class Client : public Swoole_Client {
 }  // namespace Swoole::Async
 namespace Swoole::Coroutine::Http::Client {
 
-class Exception : public Swoole_Exception {
+class Exception : public ::php::Swoole::Exception {
   public:
-    Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 }  // namespace Swoole::Coroutine::Http::Client
 namespace Swoole::Coroutine::Http2::Client {
 
-class Exception : public Swoole_Exception {
+class Exception : public ::php::Swoole::Exception {
   public:
-    Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 }  // namespace Swoole::Coroutine::Http2::Client
@@ -880,33 +880,6 @@ class Response {
 };
 
 }  // namespace Swoole::Http2
-namespace Swoole::Coroutine::Http2 {
-
-class Client {
-  protected:
-    Object this_;
-    Client() = default;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    Client(const Variant &host, const Variant &port = 80, const Variant &open_ssl = false);
-    Variant set(const Variant &settings);
-    Variant connect();
-    Variant stats(const Variant &key = "");
-    Variant isStreamExist(const Variant &stream_id);
-    Variant send(const Swoole_Http2_Request &request);
-    Variant send(const Variant &request);
-    Variant write(const Variant &stream_id, const Variant &data, const Variant &end_stream = false);
-    Swoole_Http2_Response recv(const Variant &timeout = 0);
-    Swoole_Http2_Response read(const Variant &timeout = 0);
-    Variant goaway(const Variant &error_code = 0, const Variant &debug_data = "");
-    Variant ping();
-    Variant close();
-};
-
-}  // namespace Swoole::Coroutine::Http2
 namespace FTP {
 
 class Connection {
@@ -1083,7 +1056,7 @@ class Cookie {
     Variant reset();
 };
 
-class Server : public Swoole_Server {
+class Server : public Swoole::Server_ {
   public:
     Server(const Variant &host = "0.0.0.0",
            const Variant &port = 0,
@@ -1151,7 +1124,7 @@ class Response {
     Variant ping(const Variant &data = "");
     Variant goaway(const Variant &error_code = 0, const Variant &debug_data = "");
     Variant write(const Variant &content);
-    Variant end(const Variant &content = {});
+    Variant end(const Variant &content = nullptr);
     Variant sendfile(const Variant &filename, const Variant &offset = 0, const Variant &length = 0);
     Variant redirect(const Variant &location, const Variant &http_code = 302);
     Variant detach();
@@ -1181,7 +1154,7 @@ class Frame {
     static Frame unpack(const Variant &data);
 };
 
-class Server : public Swoole_Http_Server {
+class Server : public ::php::Swoole::Http::Server {
   public:
     Variant push(const Variant &fd, const Variant &data, const Variant &opcode = 1, const Variant &flags = 1);
     Variant disconnect(const Variant &fd, const Variant &code = 1000, const Variant &reason = "");
@@ -1202,18 +1175,56 @@ class CloseFrame : public Frame {
 };
 
 }  // namespace Swoole::WebSocket
+namespace Swoole::Redis {
+
+class Server : public Swoole::Server_ {
+  public:
+    static constexpr int NIL = 1;
+    static constexpr int ERROR = 0;
+    static constexpr int STATUS = 2;
+    static constexpr int INT = 3;
+    static constexpr int STRING = 4;
+    static constexpr int SET = 5;
+    static constexpr int MAP = 6;
+
+    Variant setHandler(const Variant &command, const Variant &callback);
+    Variant getHandler(const Variant &command);
+    static Variant format(const Variant &type, const Variant &value = nullptr);
+    Server(const Variant &host = "0.0.0.0",
+           const Variant &port = 0,
+           const Variant &mode = 1,
+           const Variant &sock_type = 1);
+};
+
+}  // namespace Swoole::Redis
 namespace Swoole::Coroutine::Http {
 
-class Client {
+class Server {
   protected:
     Object this_;
-    Client() = default;
+    Server() = default;
 
   public:
     Object getObject() const {
         return this_;
     }
-    Client(const Variant &host, const Variant &port = 0, const Variant &ssl = false);
+    Server(const Variant &host, const Variant &port = 0, const Variant &ssl = false, const Variant &reuse_port = false);
+    Variant set(const Variant &settings);
+    Variant handle(const Variant &pattern, const Variant &callback);
+    Variant start();
+    Variant shutdown();
+};
+
+class Client_ {
+  protected:
+    Object this_;
+    Client_() = default;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    Client_(const Variant &host, const Variant &port = 0, const Variant &ssl = false);
     Variant set(const Variant &settings);
     Variant getDefer();
     Variant setDefer(const Variant &defer = true);
@@ -1224,11 +1235,14 @@ class Client {
     Variant setData(const Variant &data);
     Variant addFile(const Variant &path,
                     const Variant &name,
-                    const Variant &type = {},
-                    const Variant &filename = {},
+                    const Variant &type = nullptr,
+                    const Variant &filename = nullptr,
                     const Variant &offset = 0,
                     const Variant &length = 0);
-    Variant addData(const Variant &path, const Variant &name, const Variant &type = {}, const Variant &filename = {});
+    Variant addData(const Variant &path,
+                    const Variant &name,
+                    const Variant &type = nullptr,
+                    const Variant &filename = nullptr);
     Variant execute(const Variant &path);
     Variant getpeername();
     Variant getsockname();
@@ -1249,45 +1263,7 @@ class Client {
     Variant disconnect(const Variant &code = 1000, const Variant &reason = "");
 };
 
-class Server {
-  protected:
-    Object this_;
-    Server() = default;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    Server(const Variant &host, const Variant &port = 0, const Variant &ssl = false, const Variant &reuse_port = false);
-    Variant set(const Variant &settings);
-    Variant handle(const Variant &pattern, const Variant &callback);
-    Variant start();
-    Variant shutdown();
-};
-
 }  // namespace Swoole::Coroutine::Http
-namespace Swoole::Redis {
-
-class Server : public Swoole_Server {
-  public:
-    static constexpr int NIL = 1;
-    static constexpr int ERROR = 0;
-    static constexpr int STATUS = 2;
-    static constexpr int INT = 3;
-    static constexpr int STRING = 4;
-    static constexpr int SET = 5;
-    static constexpr int MAP = 6;
-
-    Variant setHandler(const Variant &command, const Variant &callback);
-    Variant getHandler(const Variant &command);
-    static Variant format(const Variant &type, const Variant &value = {});
-    Server(const Variant &host = "0.0.0.0",
-           const Variant &port = 0,
-           const Variant &mode = 1,
-           const Variant &sock_type = 1);
-};
-
-}  // namespace Swoole::Redis
 namespace Swoole::NameResolver {
 
 class Context {
@@ -1314,24 +1290,6 @@ class Error {
     }
     explicit Error(const Object &obj) : this_(obj) {}
     Error();
-};
-
-class Atomic {
-  protected:
-    Object this_;
-
-  public:
-    Object getObject() const {
-        return this_;
-    }
-    Atomic(const Variant &value = 0);
-    Variant add(const Variant &add_value = 1);
-    Variant sub(const Variant &sub_value = 1);
-    Variant get();
-    Variant set(const Variant &value);
-    Variant wait(const Variant &timeout = 1);
-    Variant wakeup(const Variant &count = 1);
-    Variant cmpset(const Variant &cmp_value, const Variant &new_value);
 };
 
 class Lock {
@@ -1390,7 +1348,7 @@ class Map {
     Object getObject() const {
         return this_;
     }
-    Map(const Variant &array = {});
+    Map(const Variant &array = nullptr);
     Variant offsetGet(const Variant &key);
     Variant offsetExists(const Variant &key);
     Variant offsetSet(const Variant &key, const Variant &value);
@@ -1416,7 +1374,7 @@ class ArrayList {
     Object getObject() const {
         return this_;
     }
-    ArrayList(const Variant &array = {});
+    ArrayList(const Variant &array = nullptr);
     Variant offsetGet(const Variant &key);
     Variant offsetExists(const Variant &key);
     Variant offsetSet(const Variant &key, const Variant &value);
@@ -1428,6 +1386,24 @@ class ArrayList {
     Variant count();
     Variant toArray();
     Variant sort();
+};
+
+class Atomic_ {
+  protected:
+    Object this_;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    Atomic_(const Variant &value = 0);
+    Variant add(const Variant &add_value = 1);
+    Variant sub(const Variant &sub_value = 1);
+    Variant get();
+    Variant set(const Variant &value);
+    Variant wait(const Variant &timeout = 1);
+    Variant wakeup(const Variant &count = 1);
+    Variant cmpset(const Variant &cmp_value, const Variant &new_value);
 };
 
 }  // namespace Swoole::Thread
@@ -1450,4 +1426,31 @@ class Long {
 };
 
 }  // namespace Swoole::Thread::Atomic
+namespace Swoole::Coroutine::Http2 {
+
+class Client_ {
+  protected:
+    Object this_;
+    Client_() = default;
+
+  public:
+    Object getObject() const {
+        return this_;
+    }
+    Client_(const Variant &host, const Variant &port = 80, const Variant &open_ssl = false);
+    Variant set(const Variant &settings);
+    Variant connect();
+    Variant stats(const Variant &key = "");
+    Variant isStreamExist(const Variant &stream_id);
+    Variant send(const Swoole::Http2::Request &request);
+    Variant send(const Variant &request);
+    Variant write(const Variant &stream_id, const Variant &data, const Variant &end_stream = false);
+    Swoole::Http2::Response recv(const Variant &timeout = 0);
+    Swoole::Http2::Response read(const Variant &timeout = 0);
+    Variant goaway(const Variant &error_code = 0, const Variant &debug_data = "");
+    Variant ping();
+    Variant close();
+};
+
+}  // namespace Swoole::Coroutine::Http2
 }  // namespace php

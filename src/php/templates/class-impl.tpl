@@ -1,6 +1,10 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/<?= $ext ?>.h"
+<?php if (!empty($classIncludes)): ?>
+<?php foreach ($classIncludes as $inc): ?>
+#include "class/<?=$inc?>.h"
+<?php endforeach; ?>
+<?php endif; ?>
 
 <?php foreach ($groupedClasses as $nsKey => $nsClasses): ?>
 <?php if ($nsKey === ''): ?>

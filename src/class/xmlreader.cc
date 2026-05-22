@@ -1,6 +1,6 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/xmlreader.h"
+#include "class/dom.h"
 
 namespace php {
 XMLReader::XMLReader() {

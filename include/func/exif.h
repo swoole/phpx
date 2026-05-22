@@ -8,13 +8,13 @@ namespace php {
 
 Variant exif_tagname(const Variant &index);
 Variant exif_read_data(const Variant &file,
-                       const Variant &required_sections = {},
+                       const Variant &required_sections = nullptr,
                        const Variant &as_arrays = false,
                        const Variant &read_thumbnail = false);
 Variant exif_thumbnail(const Variant &file,
-                       const Reference &width = {},
-                       const Reference &height = {},
-                       const Reference &image_type = {});
+                       const Reference &width = nullptr,
+                       const Reference &height = nullptr,
+                       const Reference &image_type = nullptr);
 Variant exif_imagetype(const Variant &filename);
 
 }  // namespace php

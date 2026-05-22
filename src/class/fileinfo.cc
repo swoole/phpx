@@ -1,5 +1,4 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/fileinfo.h"
 
 namespace php {

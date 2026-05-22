@@ -4,19 +4,19 @@
 
 namespace php {
 Variant dom_import_simplexml(const Variant &node) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[357]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[357]);
     }
-    return call(fn, {node});
+    return call(_fn, {node});
 }
 }  // namespace php
 namespace php::Dom {
 Variant import_simplexml(const Variant &node) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[358]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[358]);
     }
-    return call(fn, {node});
+    return call(_fn, {node});
 }
 }  // namespace php::Dom

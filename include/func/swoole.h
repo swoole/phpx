@@ -33,7 +33,7 @@ Variant swoole_select(const Reference &read,
 Variant swoole_set_process_name(const Variant &process_name);
 Variant swoole_get_local_ip(const Variant &family = 2);
 Variant swoole_get_local_mac();
-Variant swoole_strerror(const Variant &errno, const Variant &error_type = 0);
+Variant swoole_strerror(const Variant &errno_, const Variant &error_type = 0);
 Variant swoole_errno();
 Variant swoole_clear_error();
 Variant swoole_error_log(const Variant &level, const Variant &msg);
@@ -59,11 +59,11 @@ Variant swoole_substr_json_decode(const Variant &str,
                                   const Variant &depth = 512,
                                   const Variant &flags = 0);
 Variant swoole_internal_call_user_shutdown_begin();
-Variant swoole_implicit_fn(const Variant &fn, const Variant &args = {});
+Variant swoole_implicit_fn(const Variant &fn, const Variant &args = nullptr);
 Variant swoole_get_objects();
 Variant swoole_get_vm_status();
 Variant swoole_get_object_by_handle(const Variant &handle);
-Variant swoole_name_resolver_lookup(const Variant &name, const Swoole_NameResolver_Context &ctx);
+Variant swoole_name_resolver_lookup(const Variant &name, const Swoole::NameResolver::Context &ctx);
 Variant swoole_name_resolver_lookup(const Variant &name, const Variant &ctx);
 Variant swoole_name_resolver_add(const Variant &ns);
 Variant swoole_name_resolver_remove(const Variant &ns);
@@ -109,7 +109,7 @@ Variant swoole_hash(const Variant &data,
                     const Variant &algo,
                     const Variant &binary = false,
                     const Variant &options = Array{});
-Variant swoole_typed_array(const Variant &type_def, const Variant &init_array = {});
+Variant swoole_typed_array(const Variant &type_def, const Variant &init_array = nullptr);
 Variant swoole_array_is_typed(const Variant &array, const Variant &type_def = "");
 Variant swoole_str_is_empty(const Variant &string);
 Variant swoole_array_is_empty(const Variant &array);
@@ -129,8 +129,8 @@ Variant swoole_array_replace_str(const Variant &subjects, const Variant &search,
 Variant swoole_array_ireplace_str(const Variant &subjects, const Variant &search, const Variant &replace);
 Variant ssh2_connect(const Variant &host,
                      const Variant &port = 22,
-                     const Variant &methods = {},
-                     const Variant &callbacks = {});
+                     const Variant &methods = nullptr,
+                     const Variant &callbacks = nullptr);
 Variant ssh2_disconnect(const Variant &session);
 Variant ssh2_methods_negotiated(const Variant &session);
 Variant ssh2_fingerprint(const Variant &session, const Variant &flags = 0);
@@ -140,27 +140,27 @@ Variant ssh2_auth_pubkey_file(const Variant &session,
                               const Variant &username,
                               const Variant &pubkeyfile,
                               const Variant &privkeyfile,
-                              const Variant &passphrase = {});
+                              const Variant &passphrase = nullptr);
 Variant ssh2_auth_pubkey(const Variant &session,
                          const Variant &username,
                          const Variant &pubkey,
                          const Variant &privkey,
-                         const Variant &passphrase = {});
+                         const Variant &passphrase = nullptr);
 Variant ssh2_auth_hostbased_file(const Variant &session,
                                  const Variant &username,
                                  const Variant &hostname,
                                  const Variant &pubkeyfile,
                                  const Variant &privkeyfile,
-                                 const Variant &passphrase = {},
-                                 const Variant &local_username = {});
+                                 const Variant &passphrase = nullptr,
+                                 const Variant &local_username = nullptr);
 Variant ssh2_forward_listen(const Variant &session,
                             const Variant &port,
                             const Variant &host = "127.0.0.1",
                             const Variant &max_connections = 1);
-Variant ssh2_forward_accept(const Variant &listener, const Reference &host = {}, const Reference &port = {});
+Variant ssh2_forward_accept(const Variant &listener, const Reference &host = nullptr, const Reference &port = nullptr);
 Variant ssh2_shell(const Variant &session,
                    const Variant &termtype = "vanilla",
-                   const Variant &env = {},
+                   const Variant &env = nullptr,
                    const Variant &width = 80,
                    const Variant &height = 25,
                    const Variant &width_height_type = 0);
@@ -168,7 +168,7 @@ Variant ssh2_shell_resize(const Variant &session, const Variant &width, const Va
 Variant ssh2_exec(const Variant &session,
                   const Variant &command,
                   const Variant &pty = false,
-                  const Variant &env = {},
+                  const Variant &env = nullptr,
                   const Variant &width = 80,
                   const Variant &height = 25,
                   const Variant &width_height_type = 0);
@@ -199,41 +199,41 @@ Variant ssh2_publickey_add(const Variant &pkey,
                            const Variant &algoname,
                            const Variant &blob,
                            const Variant &overwrite = false,
-                           const Variant &attributes = {});
+                           const Variant &attributes = nullptr);
 Variant ssh2_publickey_remove(const Variant &pkey, const Variant &algoname, const Variant &blob);
 Variant ssh2_publickey_list(const Variant &pkey);
 Variant ssh2_auth_agent(const Variant &session, const Variant &username);
-FTP_Connection ftp_connect(const Variant &hostname, const Variant &port = 21, const Variant &timeout = 90);
-FTP_Connection ftp_ssl_connect(const Variant &hostname, const Variant &port = 21, const Variant &timeout = 90);
-Variant ftp_login(const FTP_Connection &ftp, const Variant &username, const Variant &password);
+FTP::Connection ftp_connect(const Variant &hostname, const Variant &port = 21, const Variant &timeout = 90);
+FTP::Connection ftp_ssl_connect(const Variant &hostname, const Variant &port = 21, const Variant &timeout = 90);
+Variant ftp_login(const FTP::Connection &ftp, const Variant &username, const Variant &password);
 Variant ftp_login(const Variant &ftp, const Variant &username, const Variant &password);
-Variant ftp_pwd(const FTP_Connection &ftp);
+Variant ftp_pwd(const FTP::Connection &ftp);
 Variant ftp_pwd(const Variant &ftp);
-Variant ftp_cdup(const FTP_Connection &ftp);
+Variant ftp_cdup(const FTP::Connection &ftp);
 Variant ftp_cdup(const Variant &ftp);
-Variant ftp_chdir(const FTP_Connection &ftp, const Variant &directory);
+Variant ftp_chdir(const FTP::Connection &ftp, const Variant &directory);
 Variant ftp_chdir(const Variant &ftp, const Variant &directory);
-Variant ftp_exec(const FTP_Connection &ftp, const Variant &command);
+Variant ftp_exec(const FTP::Connection &ftp, const Variant &command);
 Variant ftp_exec(const Variant &ftp, const Variant &command);
-Variant ftp_raw(const FTP_Connection &ftp, const Variant &command);
+Variant ftp_raw(const FTP::Connection &ftp, const Variant &command);
 Variant ftp_raw(const Variant &ftp, const Variant &command);
-Variant ftp_mkdir(const FTP_Connection &ftp, const Variant &directory);
+Variant ftp_mkdir(const FTP::Connection &ftp, const Variant &directory);
 Variant ftp_mkdir(const Variant &ftp, const Variant &directory);
-Variant ftp_rmdir(const FTP_Connection &ftp, const Variant &directory);
+Variant ftp_rmdir(const FTP::Connection &ftp, const Variant &directory);
 Variant ftp_rmdir(const Variant &ftp, const Variant &directory);
-Variant ftp_chmod(const FTP_Connection &ftp, const Variant &permissions, const Variant &filename);
+Variant ftp_chmod(const FTP::Connection &ftp, const Variant &permissions, const Variant &filename);
 Variant ftp_chmod(const Variant &ftp, const Variant &permissions, const Variant &filename);
-Variant ftp_alloc(const FTP_Connection &ftp, const Variant &size, const Reference &response = {});
-Variant ftp_alloc(const Variant &ftp, const Variant &size, const Reference &response = {});
-Variant ftp_nlist(const FTP_Connection &ftp, const Variant &directory);
+Variant ftp_alloc(const FTP::Connection &ftp, const Variant &size, const Reference &response = nullptr);
+Variant ftp_alloc(const Variant &ftp, const Variant &size, const Reference &response = nullptr);
+Variant ftp_nlist(const FTP::Connection &ftp, const Variant &directory);
 Variant ftp_nlist(const Variant &ftp, const Variant &directory);
-Variant ftp_rawlist(const FTP_Connection &ftp, const Variant &directory, const Variant &recursive = false);
+Variant ftp_rawlist(const FTP::Connection &ftp, const Variant &directory, const Variant &recursive = false);
 Variant ftp_rawlist(const Variant &ftp, const Variant &directory, const Variant &recursive = false);
-Variant ftp_mlsd(const FTP_Connection &ftp, const Variant &directory);
+Variant ftp_mlsd(const FTP::Connection &ftp, const Variant &directory);
 Variant ftp_mlsd(const Variant &ftp, const Variant &directory);
-Variant ftp_systype(const FTP_Connection &ftp);
+Variant ftp_systype(const FTP::Connection &ftp);
 Variant ftp_systype(const Variant &ftp);
-Variant ftp_fget(const FTP_Connection &ftp,
+Variant ftp_fget(const FTP::Connection &ftp,
                  const Variant &stream,
                  const Variant &remote_filename,
                  const Variant &mode = 2,
@@ -243,7 +243,7 @@ Variant ftp_fget(const Variant &ftp,
                  const Variant &remote_filename,
                  const Variant &mode = 2,
                  const Variant &offset = 0);
-Variant ftp_nb_fget(const FTP_Connection &ftp,
+Variant ftp_nb_fget(const FTP::Connection &ftp,
                     const Variant &stream,
                     const Variant &remote_filename,
                     const Variant &mode = 2,
@@ -253,9 +253,9 @@ Variant ftp_nb_fget(const Variant &ftp,
                     const Variant &remote_filename,
                     const Variant &mode = 2,
                     const Variant &offset = 0);
-Variant ftp_pasv(const FTP_Connection &ftp, const Variant &enable);
+Variant ftp_pasv(const FTP::Connection &ftp, const Variant &enable);
 Variant ftp_pasv(const Variant &ftp, const Variant &enable);
-Variant ftp_get(const FTP_Connection &ftp,
+Variant ftp_get(const FTP::Connection &ftp,
                 const Variant &local_filename,
                 const Variant &remote_filename,
                 const Variant &mode = 2,
@@ -265,7 +265,7 @@ Variant ftp_get(const Variant &ftp,
                 const Variant &remote_filename,
                 const Variant &mode = 2,
                 const Variant &offset = 0);
-Variant ftp_nb_get(const FTP_Connection &ftp,
+Variant ftp_nb_get(const FTP::Connection &ftp,
                    const Variant &local_filename,
                    const Variant &remote_filename,
                    const Variant &mode = 2,
@@ -275,9 +275,9 @@ Variant ftp_nb_get(const Variant &ftp,
                    const Variant &remote_filename,
                    const Variant &mode = 2,
                    const Variant &offset = 0);
-Variant ftp_nb_continue(const FTP_Connection &ftp);
+Variant ftp_nb_continue(const FTP::Connection &ftp);
 Variant ftp_nb_continue(const Variant &ftp);
-Variant ftp_fput(const FTP_Connection &ftp,
+Variant ftp_fput(const FTP::Connection &ftp,
                  const Variant &remote_filename,
                  const Variant &stream,
                  const Variant &mode = 2,
@@ -287,7 +287,7 @@ Variant ftp_fput(const Variant &ftp,
                  const Variant &stream,
                  const Variant &mode = 2,
                  const Variant &offset = 0);
-Variant ftp_nb_fput(const FTP_Connection &ftp,
+Variant ftp_nb_fput(const FTP::Connection &ftp,
                     const Variant &remote_filename,
                     const Variant &stream,
                     const Variant &mode = 2,
@@ -297,7 +297,7 @@ Variant ftp_nb_fput(const Variant &ftp,
                     const Variant &stream,
                     const Variant &mode = 2,
                     const Variant &offset = 0);
-Variant ftp_put(const FTP_Connection &ftp,
+Variant ftp_put(const FTP::Connection &ftp,
                 const Variant &remote_filename,
                 const Variant &local_filename,
                 const Variant &mode = 2,
@@ -307,7 +307,7 @@ Variant ftp_put(const Variant &ftp,
                 const Variant &local_filename,
                 const Variant &mode = 2,
                 const Variant &offset = 0);
-Variant ftp_append(const FTP_Connection &ftp,
+Variant ftp_append(const FTP::Connection &ftp,
                    const Variant &remote_filename,
                    const Variant &local_filename,
                    const Variant &mode = 2);
@@ -315,7 +315,7 @@ Variant ftp_append(const Variant &ftp,
                    const Variant &remote_filename,
                    const Variant &local_filename,
                    const Variant &mode = 2);
-Variant ftp_nb_put(const FTP_Connection &ftp,
+Variant ftp_nb_put(const FTP::Connection &ftp,
                    const Variant &remote_filename,
                    const Variant &local_filename,
                    const Variant &mode = 2,
@@ -325,38 +325,38 @@ Variant ftp_nb_put(const Variant &ftp,
                    const Variant &local_filename,
                    const Variant &mode = 2,
                    const Variant &offset = 0);
-Variant ftp_size(const FTP_Connection &ftp, const Variant &filename);
+Variant ftp_size(const FTP::Connection &ftp, const Variant &filename);
 Variant ftp_size(const Variant &ftp, const Variant &filename);
-Variant ftp_mdtm(const FTP_Connection &ftp, const Variant &filename);
+Variant ftp_mdtm(const FTP::Connection &ftp, const Variant &filename);
 Variant ftp_mdtm(const Variant &ftp, const Variant &filename);
-Variant ftp_rename(const FTP_Connection &ftp, const Variant &from, const Variant &to);
+Variant ftp_rename(const FTP::Connection &ftp, const Variant &from, const Variant &to);
 Variant ftp_rename(const Variant &ftp, const Variant &from, const Variant &to);
-Variant ftp_delete(const FTP_Connection &ftp, const Variant &filename);
+Variant ftp_delete(const FTP::Connection &ftp, const Variant &filename);
 Variant ftp_delete(const Variant &ftp, const Variant &filename);
-Variant ftp_site(const FTP_Connection &ftp, const Variant &command);
+Variant ftp_site(const FTP::Connection &ftp, const Variant &command);
 Variant ftp_site(const Variant &ftp, const Variant &command);
-Variant ftp_close(const FTP_Connection &ftp);
+Variant ftp_close(const FTP::Connection &ftp);
 Variant ftp_close(const Variant &ftp);
-Variant ftp_quit(const FTP_Connection &ftp);
+Variant ftp_quit(const FTP::Connection &ftp);
 Variant ftp_quit(const Variant &ftp);
-Variant ftp_set_option(const FTP_Connection &ftp, const Variant &option, const Variant &value);
+Variant ftp_set_option(const FTP::Connection &ftp, const Variant &option, const Variant &value);
 Variant ftp_set_option(const Variant &ftp, const Variant &option, const Variant &value);
-Variant ftp_get_option(const FTP_Connection &ftp, const Variant &option);
+Variant ftp_get_option(const FTP::Connection &ftp, const Variant &option);
 Variant ftp_get_option(const Variant &ftp, const Variant &option);
 Variant swoole_tracer_leak_detect(const Variant &threshold = 64);
-Variant swoole_tracer_prof_begin(const Variant &options = {});
+Variant swoole_tracer_prof_begin(const Variant &options = nullptr);
 Variant swoole_tracer_prof_end(const Variant &output_file);
 Variant go(const Variant &func);
 Variant defer(const Variant &callback);
-Variant typed_array(const Variant &type_def, const Variant &init_array = {});
+Variant typed_array(const Variant &type_def, const Variant &init_array = nullptr);
 Variant swoole_event_add(const Variant &fd,
-                         const Variant &read_callback = {},
-                         const Variant &write_callback = {},
+                         const Variant &read_callback = nullptr,
+                         const Variant &write_callback = nullptr,
                          const Variant &events = 512);
 Variant swoole_event_del(const Variant &fd);
 Variant swoole_event_set(const Variant &fd,
-                         const Variant &read_callback = {},
-                         const Variant &write_callback = {},
+                         const Variant &read_callback = nullptr,
+                         const Variant &write_callback = nullptr,
                          const Variant &events = 0);
 Variant swoole_event_wait();
 Variant swoole_event_isset(const Variant &fd, const Variant &events = 1536);
@@ -392,9 +392,9 @@ Variant swoole_native_curl_multi_setopt(const CurlMultiHandle &multi_handle,
 Variant swoole_native_curl_multi_setopt(const Variant &multi_handle, const Variant &option, const Variant &value);
 Variant swoole_native_curl_exec(const CurlHandle &handle);
 Variant swoole_native_curl_exec(const Variant &handle);
-Variant swoole_native_curl_getinfo(const CurlHandle &handle, const Variant &option = {});
-Variant swoole_native_curl_getinfo(const Variant &handle, const Variant &option = {});
-CurlHandle swoole_native_curl_init(const Variant &url = {});
+Variant swoole_native_curl_getinfo(const CurlHandle &handle, const Variant &option = nullptr);
+Variant swoole_native_curl_getinfo(const Variant &handle, const Variant &option = nullptr);
+CurlHandle swoole_native_curl_init(const Variant &url = nullptr);
 Variant swoole_native_curl_upkeep(const CurlHandle &handle);
 Variant swoole_native_curl_upkeep(const Variant &handle);
 Variant swoole_native_curl_multi_add_handle(const CurlMultiHandle &multi_handle, const CurlHandle &handle);
@@ -407,8 +407,9 @@ Variant swoole_native_curl_multi_exec(const CurlMultiHandle &multi_handle, const
 Variant swoole_native_curl_multi_exec(const Variant &multi_handle, const Reference &still_running);
 Variant swoole_native_curl_multi_getcontent(const CurlHandle &handle);
 Variant swoole_native_curl_multi_getcontent(const Variant &handle);
-Variant swoole_native_curl_multi_info_read(const CurlMultiHandle &multi_handle, const Reference &queued_messages = {});
-Variant swoole_native_curl_multi_info_read(const Variant &multi_handle, const Reference &queued_messages = {});
+Variant swoole_native_curl_multi_info_read(const CurlMultiHandle &multi_handle,
+                                           const Reference &queued_messages = nullptr);
+Variant swoole_native_curl_multi_info_read(const Variant &multi_handle, const Reference &queued_messages = nullptr);
 CurlMultiHandle swoole_native_curl_multi_init();
 Variant swoole_native_curl_multi_remove_handle(const CurlMultiHandle &multi_handle, const CurlHandle &handle);
 Variant swoole_native_curl_multi_remove_handle(const Variant &multi_handle, const Variant &handle);

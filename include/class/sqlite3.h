@@ -12,7 +12,7 @@ class SQLite3;
 
 class SQLite3Exception : public Exception {
   public:
-    SQLite3Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    SQLite3Exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class SQLite3Result {

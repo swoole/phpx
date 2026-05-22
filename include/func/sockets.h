@@ -22,17 +22,17 @@ Variant socket_listen(const Socket &socket, const Variant &backlog = 0);
 Variant socket_listen(const Variant &socket, const Variant &backlog = 0);
 Variant socket_close(const Socket &socket);
 Variant socket_close(const Variant &socket);
-Variant socket_write(const Socket &socket, const Variant &data, const Variant &length = {});
-Variant socket_write(const Variant &socket, const Variant &data, const Variant &length = {});
+Variant socket_write(const Socket &socket, const Variant &data, const Variant &length = nullptr);
+Variant socket_write(const Variant &socket, const Variant &data, const Variant &length = nullptr);
 Variant socket_read(const Socket &socket, const Variant &length, const Variant &mode = 2);
 Variant socket_read(const Variant &socket, const Variant &length, const Variant &mode = 2);
-Variant socket_getsockname(const Socket &socket, const Reference &address, const Reference &port = {});
-Variant socket_getsockname(const Variant &socket, const Reference &address, const Reference &port = {});
-Variant socket_getpeername(const Socket &socket, const Reference &address, const Reference &port = {});
-Variant socket_getpeername(const Variant &socket, const Reference &address, const Reference &port = {});
+Variant socket_getsockname(const Socket &socket, const Reference &address, const Reference &port = nullptr);
+Variant socket_getsockname(const Variant &socket, const Reference &address, const Reference &port = nullptr);
+Variant socket_getpeername(const Socket &socket, const Reference &address, const Reference &port = nullptr);
+Variant socket_getpeername(const Variant &socket, const Reference &address, const Reference &port = nullptr);
 Socket socket_create(const Variant &domain, const Variant &type, const Variant &protocol);
-Variant socket_connect(const Socket &socket, const Variant &address, const Variant &port = {});
-Variant socket_connect(const Variant &socket, const Variant &address, const Variant &port = {});
+Variant socket_connect(const Socket &socket, const Variant &address, const Variant &port = nullptr);
+Variant socket_connect(const Variant &socket, const Variant &address, const Variant &port = nullptr);
 Variant socket_strerror(const Variant &error_code);
 Variant socket_bind(const Socket &socket, const Variant &address, const Variant &port = 0);
 Variant socket_bind(const Variant &socket, const Variant &address, const Variant &port = 0);
@@ -45,25 +45,25 @@ Variant socket_recvfrom(const Socket &socket,
                         const Variant &length,
                         const Variant &flags,
                         const Reference &address,
-                        const Reference &port = {});
+                        const Reference &port = nullptr);
 Variant socket_recvfrom(const Variant &socket,
                         const Reference &data,
                         const Variant &length,
                         const Variant &flags,
                         const Reference &address,
-                        const Reference &port = {});
+                        const Reference &port = nullptr);
 Variant socket_sendto(const Socket &socket,
                       const Variant &data,
                       const Variant &length,
                       const Variant &flags,
                       const Variant &address,
-                      const Variant &port = {});
+                      const Variant &port = nullptr);
 Variant socket_sendto(const Variant &socket,
                       const Variant &data,
                       const Variant &length,
                       const Variant &flags,
                       const Variant &address,
-                      const Variant &port = {});
+                      const Variant &port = nullptr);
 Variant socket_get_option(const Socket &socket, const Variant &level, const Variant &option);
 Variant socket_get_option(const Variant &socket, const Variant &level, const Variant &option);
 Variant socket_getopt(const Socket &socket, const Variant &level, const Variant &option);
@@ -77,8 +77,8 @@ Variant socket_shutdown(const Socket &socket, const Variant &mode = 2);
 Variant socket_shutdown(const Variant &socket, const Variant &mode = 2);
 Variant socket_atmark(const Socket &socket);
 Variant socket_atmark(const Variant &socket);
-Variant socket_last_error(const Variant &socket = {});
-Variant socket_clear_error(const Variant &socket = {});
+Variant socket_last_error(const Variant &socket = nullptr);
+Variant socket_clear_error(const Variant &socket = nullptr);
 Socket socket_import_stream(const Variant &stream);
 Variant socket_export_stream(const Socket &socket);
 Variant socket_export_stream(const Variant &socket);
@@ -87,7 +87,7 @@ Variant socket_sendmsg(const Variant &socket, const Variant &message, const Vari
 Variant socket_recvmsg(const Socket &socket, const Reference &message, const Variant &flags = 0);
 Variant socket_recvmsg(const Variant &socket, const Reference &message, const Variant &flags = 0);
 Variant socket_cmsg_space(const Variant &level, const Variant &type, const Variant &num = 0);
-Variant socket_addrinfo_lookup(const Variant &host, const Variant &service = {}, const Variant &hints = Array{});
+Variant socket_addrinfo_lookup(const Variant &host, const Variant &service = nullptr, const Variant &hints = Array{});
 Socket socket_addrinfo_connect(const AddressInfo &address);
 Variant socket_addrinfo_connect(const Variant &address);
 Socket socket_addrinfo_bind(const AddressInfo &address);

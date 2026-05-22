@@ -4,108 +4,108 @@
 
 namespace php {
 Variant class_implements(const Variant &object_or_class, const Variant &autoload) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2014]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2014]);
     }
-    return call(fn, {object_or_class, autoload});
+    return call(_fn, {object_or_class, autoload});
 }
 Variant class_parents(const Variant &object_or_class, const Variant &autoload) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2015]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2015]);
     }
-    return call(fn, {object_or_class, autoload});
+    return call(_fn, {object_or_class, autoload});
 }
 Variant class_uses(const Variant &object_or_class, const Variant &autoload) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2016]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2016]);
     }
-    return call(fn, {object_or_class, autoload});
+    return call(_fn, {object_or_class, autoload});
 }
 Variant spl_autoload(const Variant &class_, const Variant &file_extensions) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2017]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2017]);
     }
-    return call(fn, {class_, file_extensions});
+    return call(_fn, {class_, file_extensions});
 }
 Variant spl_autoload_call(const Variant &class_) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2018]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2018]);
     }
-    return call(fn, {class_});
+    return call(_fn, {class_});
 }
 Variant spl_autoload_extensions(const Variant &file_extensions) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2019]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2019]);
     }
-    return call(fn, {file_extensions});
+    return call(_fn, {file_extensions});
 }
 Variant spl_autoload_functions() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2020]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2020]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant spl_autoload_register(const Variant &callback, const Variant &throw_, const Variant &prepend) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2021]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2021]);
     }
-    return call(fn, {callback, throw_, prepend});
+    return call(_fn, {callback, throw_, prepend});
 }
 Variant spl_autoload_unregister(const Variant &callback) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2022]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2022]);
     }
-    return call(fn, {callback});
+    return call(_fn, {callback});
 }
 Variant spl_classes() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2023]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2023]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant spl_object_hash(const Variant &object) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2024]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2024]);
     }
-    return call(fn, {object});
+    return call(_fn, {object});
 }
 Variant spl_object_id(const Variant &object) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2025]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2025]);
     }
-    return call(fn, {object});
+    return call(_fn, {object});
 }
 Variant iterator_apply(const Variant &iterator, const Variant &callback, const Variant &args) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2026]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2026]);
     }
-    return call(fn, {iterator, callback, args});
+    return call(_fn, {iterator, callback, args});
 }
 Variant iterator_count(const Variant &iterator) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2027]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2027]);
     }
-    return call(fn, {iterator});
+    return call(_fn, {iterator});
 }
 Variant iterator_to_array(const Variant &iterator, const Variant &preserve_keys) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2028]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2028]);
     }
-    return call(fn, {iterator, preserve_keys});
+    return call(_fn, {iterator, preserve_keys});
 }
 }  // namespace php

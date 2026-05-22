@@ -7,8 +7,8 @@
 namespace php {
 
 Variant lcg_value();
-Variant mt_srand(const Variant &seed = {}, const Variant &mode = 0);
-Variant srand(const Variant &seed = {}, const Variant &mode = 0);
+Variant mt_srand(const Variant &seed = nullptr, const Variant &mode = 0);
+Variant srand(const Variant &seed = nullptr, const Variant &mode = 0);
 Variant rand(const Variant &min = {}, const Variant &max = {});
 Variant mt_rand(const Variant &min = {}, const Variant &max = {});
 Variant mt_getrandmax();

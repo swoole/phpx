@@ -1,6 +1,6 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/spl.h"
+#include "class/core.h"
 
 namespace php {
 LogicException::LogicException(const Variant &message, const Variant &code, const Variant &previous) {

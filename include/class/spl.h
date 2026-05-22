@@ -55,67 +55,67 @@ class SplTempFileObject;
 
 class LogicException : public Exception {
   public:
-    LogicException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    LogicException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class BadFunctionCallException : public LogicException {
   public:
-    BadFunctionCallException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    BadFunctionCallException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class BadMethodCallException : public BadFunctionCallException {
   public:
-    BadMethodCallException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    BadMethodCallException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class DomainException : public LogicException {
   public:
-    DomainException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    DomainException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class InvalidArgumentException : public LogicException {
   public:
-    InvalidArgumentException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    InvalidArgumentException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class LengthException : public LogicException {
   public:
-    LengthException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    LengthException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class OutOfRangeException : public LogicException {
   public:
-    OutOfRangeException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    OutOfRangeException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class RuntimeException : public Exception {
   public:
-    RuntimeException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    RuntimeException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class OutOfBoundsException : public RuntimeException {
   public:
-    OutOfBoundsException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    OutOfBoundsException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class OverflowException : public RuntimeException {
   public:
-    OverflowException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    OverflowException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class RangeException : public RuntimeException {
   public:
-    RangeException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    RangeException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class UnderflowException : public RuntimeException {
   public:
-    UnderflowException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    UnderflowException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class UnexpectedValueException : public RuntimeException {
   public:
-    UnexpectedValueException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    UnexpectedValueException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class RecursiveIteratorIterator {
@@ -139,7 +139,7 @@ class RecursiveIteratorIterator {
     Variant current();
     Variant next();
     Variant getDepth();
-    Variant getSubIterator(const Variant &level = {});
+    Variant getSubIterator(const Variant &level = nullptr);
     Variant getInnerIterator();
     Variant beginIteration();
     Variant endIteration();
@@ -161,7 +161,7 @@ class IteratorIterator {
     Object getObject() const {
         return this_;
     }
-    IteratorIterator(const Variant &iterator, const Variant &class_ = {});
+    IteratorIterator(const Variant &iterator, const Variant &class_ = nullptr);
     Variant getInnerIterator();
     Variant rewind();
     Variant valid();
@@ -665,7 +665,7 @@ class SplObjectStorage {
     }
     explicit SplObjectStorage(const Object &obj) : this_(obj) {}
     SplObjectStorage();
-    Variant attach(const Variant &object, const Variant &info = {});
+    Variant attach(const Variant &object, const Variant &info = nullptr);
     Variant detach(const Variant &object);
     Variant contains(const Variant &object);
     Variant addAll(const SplObjectStorage &storage);
@@ -687,7 +687,7 @@ class SplObjectStorage {
     Variant serialize();
     Variant offsetExists(const Variant &object);
     Variant offsetGet(const Variant &object);
-    Variant offsetSet(const Variant &object, const Variant &info = {});
+    Variant offsetSet(const Variant &object, const Variant &info = nullptr);
     Variant offsetUnset(const Variant &object);
     Variant getHash(const Variant &object);
     Variant __serialize();
@@ -711,7 +711,7 @@ class MultipleIterator {
     MultipleIterator(const Variant &flags = 1);
     Variant getFlags();
     Variant setFlags(const Variant &flags);
-    Variant attachIterator(const Variant &iterator, const Variant &info = {});
+    Variant attachIterator(const Variant &iterator, const Variant &info = nullptr);
     Variant detachIterator(const Variant &iterator);
     Variant containsIterator(const Variant &iterator);
     Variant countIterators();
@@ -755,9 +755,11 @@ class SplFileInfo {
     Variant isLink();
     Variant getLinkTarget();
     Variant getRealPath();
-    Variant getFileInfo(const Variant &class_ = {});
-    Variant getPathInfo(const Variant &class_ = {});
-    Variant openFile(const Variant &mode = "r", const Variant &use_include_path = false, const Variant &context = {});
+    Variant getFileInfo(const Variant &class_ = nullptr);
+    Variant getPathInfo(const Variant &class_ = nullptr);
+    Variant openFile(const Variant &mode = "r",
+                     const Variant &use_include_path = false,
+                     const Variant &context = nullptr);
     Variant setFileClass(const Variant &class_ = "SplFileObject");
     Variant setInfoClass(const Variant &class_ = "SplFileInfo");
     Variant __toString();
@@ -778,7 +780,7 @@ class SplFileObject : public SplFileInfo {
     SplFileObject(const Variant &filename,
                   const Variant &mode = "r",
                   const Variant &use_include_path = false,
-                  const Variant &context = {});
+                  const Variant &context = nullptr);
     Variant rewind();
     Variant eof();
     Variant valid();
@@ -794,7 +796,7 @@ class SplFileObject : public SplFileInfo {
                           const Variant &enclosure = "\"",
                           const Variant &escape = "\\");
     Variant getCsvControl();
-    Variant flock(const Variant &operation, const Reference &would_block = {});
+    Variant flock(const Variant &operation, const Reference &would_block = nullptr);
     Variant fflush();
     Variant ftell();
     Variant fseek(const Variant &offset, const Variant &whence = 0);

@@ -12,7 +12,7 @@ Variant pcntl_waitpid(const Variant &process_id,
                       const Variant &flags = 0,
                       const Reference &resource_usage = getEmptyArrayRef());
 Variant pcntl_waitid(const Variant &idtype = 0,
-                     const Variant &id = {},
+                     const Variant &id = nullptr,
                      const Reference &info = getEmptyArrayRef(),
                      const Variant &flags = 4);
 Variant pcntl_wait(const Reference &status,
@@ -21,7 +21,7 @@ Variant pcntl_wait(const Reference &status,
 Variant pcntl_signal(const Variant &signal, const Variant &handler, const Variant &restart_syscalls = true);
 Variant pcntl_signal_get_handler(const Variant &signal);
 Variant pcntl_signal_dispatch();
-Variant pcntl_sigprocmask(const Variant &mode, const Variant &signals, const Reference &old_signals = {});
+Variant pcntl_sigprocmask(const Variant &mode, const Variant &signals, const Reference &old_signals = nullptr);
 Variant pcntl_sigwaitinfo(const Variant &signals, const Reference &info = getEmptyArrayRef());
 Variant pcntl_sigtimedwait(const Variant &signals,
                            const Reference &info = getEmptyArrayRef(),
@@ -38,13 +38,13 @@ Variant pcntl_exec(const Variant &path, const Variant &args = Array{}, const Var
 Variant pcntl_alarm(const Variant &seconds);
 Variant pcntl_get_last_error();
 Variant pcntl_errno();
-Variant pcntl_getpriority(const Variant &process_id = {}, const Variant &mode = 0);
-Variant pcntl_setpriority(const Variant &priority, const Variant &process_id = {}, const Variant &mode = 0);
+Variant pcntl_getpriority(const Variant &process_id = nullptr, const Variant &mode = 0);
+Variant pcntl_setpriority(const Variant &priority, const Variant &process_id = nullptr, const Variant &mode = 0);
 Variant pcntl_strerror(const Variant &error_code);
-Variant pcntl_async_signals(const Variant &enable = {});
+Variant pcntl_async_signals(const Variant &enable = nullptr);
 Variant pcntl_unshare(const Variant &flags);
-Variant pcntl_getcpuaffinity(const Variant &process_id = {});
-Variant pcntl_setcpuaffinity(const Variant &process_id = {}, const Variant &cpu_ids = Array{});
+Variant pcntl_getcpuaffinity(const Variant &process_id = nullptr);
+Variant pcntl_setcpuaffinity(const Variant &process_id = nullptr, const Variant &cpu_ids = Array{});
 Variant pcntl_getcpu();
 
 }  // namespace php

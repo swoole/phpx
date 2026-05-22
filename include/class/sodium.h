@@ -9,7 +9,7 @@ class SodiumException;
 
 class SodiumException : public Exception {
   public:
-    SodiumException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    SodiumException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 }  // namespace php

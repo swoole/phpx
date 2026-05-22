@@ -23,17 +23,17 @@ namespace Random {
 
 class RandomError : public Error {
   public:
-    RandomError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    RandomError(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class BrokenRandomEngineError : public RandomError {
   public:
-    BrokenRandomEngineError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    BrokenRandomEngineError(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class RandomException : public Exception {
   public:
-    RandomException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    RandomException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class IntervalBoundary {
@@ -57,7 +57,7 @@ class Randomizer {
     Object getObject() const {
         return this_;
     }
-    Randomizer(const Variant &engine = {});
+    Randomizer(const Variant &engine = nullptr);
     Variant nextInt();
     Variant nextFloat();
     Variant getFloat(const Variant &min, const Variant &max, const Variant &boundary = {});
@@ -82,7 +82,7 @@ class Mt19937 {
     Object getObject() const {
         return this_;
     }
-    Mt19937(const Variant &seed = {}, const Variant &mode = 0);
+    Mt19937(const Variant &seed = nullptr, const Variant &mode = 0);
     Variant generate();
     Variant __serialize();
     Variant __unserialize(const Variant &data);
@@ -97,7 +97,7 @@ class PcgOneseq128XslRr64 {
     Object getObject() const {
         return this_;
     }
-    PcgOneseq128XslRr64(const Variant &seed = {});
+    PcgOneseq128XslRr64(const Variant &seed = nullptr);
     Variant generate();
     Variant jump(const Variant &advance);
     Variant __serialize();
@@ -113,7 +113,7 @@ class Xoshiro256StarStar {
     Object getObject() const {
         return this_;
     }
-    Xoshiro256StarStar(const Variant &seed = {});
+    Xoshiro256StarStar(const Variant &seed = nullptr);
     Variant generate();
     Variant jump();
     Variant jumpLong();

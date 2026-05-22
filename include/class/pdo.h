@@ -12,7 +12,7 @@ class PDORow;
 
 class PDOException : public RuntimeException {
   public:
-    PDOException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    PDOException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class PDOStatement {
@@ -29,19 +29,19 @@ class PDOStatement {
                        const Reference &var,
                        const Variant &type = 2,
                        const Variant &max_length = 0,
-                       const Variant &driver_options = {});
+                       const Variant &driver_options = nullptr);
     Variant bindParam(const Variant &param,
                       const Reference &var,
                       const Variant &type = 2,
                       const Variant &max_length = 0,
-                      const Variant &driver_options = {});
+                      const Variant &driver_options = nullptr);
     Variant bindValue(const Variant &param, const Variant &value, const Variant &type = 2);
     Variant closeCursor();
     Variant columnCount();
     Variant debugDumpParams();
     Variant errorCode();
     Variant errorInfo();
-    Variant execute(const Variant &params = {});
+    Variant execute(const Variant &params = nullptr);
     Variant fetch(const Variant &mode = 0, const Variant &cursor_orientation = 0, const Variant &cursor_offset = 0);
     template <typename... Args>
     Variant fetchAll(const Variant &mode, const Args &...args) {
@@ -190,11 +190,14 @@ class PDO {
     static constexpr int FB_ATTR_TIME_FORMAT = 1001;
     static constexpr int FB_ATTR_TIMESTAMP_FORMAT = 1002;
 
-    PDO(const Variant &dsn, const Variant &username = {}, const Variant &password = {}, const Variant &options = {});
+    PDO(const Variant &dsn,
+        const Variant &username = nullptr,
+        const Variant &password = nullptr,
+        const Variant &options = nullptr);
     static Variant connect(const Variant &dsn,
-                           const Variant &username = {},
-                           const Variant &password = {},
-                           const Variant &options = {});
+                           const Variant &username = nullptr,
+                           const Variant &password = nullptr,
+                           const Variant &options = nullptr);
     Variant beginTransaction();
     Variant commit();
     Variant errorCode();
@@ -203,7 +206,7 @@ class PDO {
     Variant getAttribute(const Variant &attribute);
     static Variant getAvailableDrivers();
     Variant inTransaction();
-    Variant lastInsertId(const Variant &name = {});
+    Variant lastInsertId(const Variant &name = nullptr);
     PDOStatement prepare(const Variant &query, const Variant &options = Array{});
     PDOStatement query(const Variant &query, const Variant &fetch_mode = {});
     Variant quote(const Variant &string, const Variant &type = 2);

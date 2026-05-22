@@ -56,6 +56,10 @@ class Generator
      * @var array<string, bool> C++ facade class name => has PHP __construct
      */
     static protected array $classHasCtor = [];
+    /**
+     * @var array<string, true> PHP class names (with \) whose short name conflicts with a namespace segment
+     */
+    static protected array $classNamespaceConflicts = [];
 
     /**
      * Method overrides for methods whose PHP reflection signatures are too
@@ -112,6 +116,8 @@ class Generator
         'enum',
         'char',
         'operator',
+        'isset',
+        'errno',
     ];
 
     // PHP class constant names that collide with C preprocessor macros in PHP headers.
@@ -121,6 +127,7 @@ class Generator
         'NULL', 'TRUE', 'FALSE',
         'STDIN', 'STDOUT', 'STDERR',
         'NAN',
+        'TCP_INFO',
     ];
 
     // Extensions whose constants are prone to macro conflicts.
@@ -144,6 +151,9 @@ class Generator
             return '_';
         }
         if ($ext === 'sockets' and !str_starts_with($name, 'SOCKET_')) {
+            return '_';
+        }
+        if ($ext === 'swoole' and str_starts_with($name, 'SCHED_')) {
             return '_';
         }
         if (in_array($name, self::MACRO_CONFLICTS)) {
@@ -256,6 +266,71 @@ class Generator
         // Uses Kahn's algorithm (BFS) so circular dependencies are handled gracefully:
         // when cycles prevent progress, the remaining node with fewest deps goes next.
         self::$sortedClasses = self::topologicalSort(self::$classDependencies);
+
+        // Detect class/namespace name conflicts: a PHP class name that is also used
+        // as a namespace segment (e.g., Swoole\Atomic is a class, and Swoole\Atomic\Long
+        // uses "Atomic" as a namespace). C++ forbids this, so we suffix the class with _.
+        $nsPrefixes = [];
+        foreach (self::$facadeClassNamespace as $nsInfo) {
+            $ns = $nsInfo['ns'];
+            for ($i = 0, $n = count($ns); $i < $n; $i++) {
+                $nsPrefixes[implode('\\', array_slice($ns, 0, $i + 1))] = true;
+            }
+        }
+        $renames = []; // [oldFlatName => newFlatName]
+        foreach (self::$facadeClassNamespace as $flatName => $nsInfo) {
+            if (str_ends_with($nsInfo['short'], '_')) {
+                continue; // already suffixed (e.g., BUILTIN_CLASSES)
+            }
+            $classPath = empty($nsInfo['ns']) ? $nsInfo['short'] : implode('\\', $nsInfo['ns']) . '\\' . $nsInfo['short'];
+            if (isset($nsPrefixes[$classPath])) {
+                self::$classNamespaceConflicts[$classPath] = true;
+                $newShort = $nsInfo['short'] . '_';
+                $oldFlatParts = explode('_', $flatName);
+                $oldFlatParts[count($oldFlatParts) - 1] = $newShort;
+                $newFlatName = implode('_', $oldFlatParts);
+                $renames[$flatName] = $newFlatName;
+                // Update namespace info with suffixed short name
+                self::$facadeClassNamespace[$flatName]['short'] = $newShort;
+            }
+        }
+        // Apply renames to all related maps
+        foreach ($renames as $oldName => $newName) {
+            self::$facadeClassNamespace[$newName] = self::$facadeClassNamespace[$oldName];
+            unset(self::$facadeClassNamespace[$oldName]);
+            if (isset(self::$classToExtension[$oldName])) {
+                self::$classToExtension[$newName] = self::$classToExtension[$oldName];
+                unset(self::$classToExtension[$oldName]);
+            }
+            if (isset(self::$classHasCtor[$oldName])) {
+                self::$classHasCtor[$newName] = self::$classHasCtor[$oldName];
+                unset(self::$classHasCtor[$oldName]);
+            }
+            if (isset(self::$classDependencies[$oldName])) {
+                self::$classDependencies[$newName] = self::$classDependencies[$oldName];
+                unset(self::$classDependencies[$oldName]);
+            }
+            // Update references in classDependencies values
+            foreach (self::$classDependencies as &$deps) {
+                $idx = array_search($oldName, $deps);
+                if ($idx !== false) {
+                    $deps[$idx] = $newName;
+                }
+            }
+            unset($deps);
+            // Update sortedClasses
+            $idx = array_search($oldName, self::$sortedClasses);
+            if ($idx !== false) {
+                self::$sortedClasses[$idx] = $newName;
+            }
+            // Update facadeClassMap (PHP name → flat name)
+            foreach (self::$facadeClassMap as $phpName => $flatName) {
+                if ($flatName === $oldName) {
+                    self::$facadeClassMap[$phpName] = $newName;
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -516,9 +591,9 @@ class Generator
             return "\"$v\"";
         } elseif (is_numeric($v)) {
             if (is_infinite($v)) {
-                return "std::INFINITY";
+                return "__builtin_huge_val()";
             } elseif (is_nan($v)) {
-                return "std::NAN";
+                return "__builtin_nan(\"\")";
             } elseif ($v === PHP_INT_MIN) {
                 return "LONG_MIN";
             } elseif ($v === PHP_INT_MAX) {
@@ -547,6 +622,8 @@ class Generator
                     $v
                 )) . '}';
             }
+        } elseif (is_null($v)) {
+            return 'nullptr';
         } else {
             return '{}';
         }
@@ -631,8 +708,21 @@ class Generator
             // Shorten extends
             if (!empty($info['extends'])) {
                 $extInfo = self::$facadeClassNamespace[$info['extends']] ?? null;
-                if ($extInfo && $extInfo['ns'] === $nsInfo['ns']) {
-                    $info['extends_short'] = $extInfo['short'];
+                if ($extInfo !== null) {
+                    if ($extInfo['ns'] === $nsInfo['ns']) {
+                        $info['extends_short'] = $extInfo['short'];
+                    } elseif ($extInfo['short'] === $nsInfo['short']) {
+                        // Self-shadowing: e.g., Swoole\Exception extends \Exception.
+                        // Within Swoole namespace, "Exception" resolves to the class
+                        // being defined, not php::Exception. Use a qualified path.
+                        if (empty($extInfo['ns'])) {
+                            $info['extends_short'] = '::php::' . $extInfo['short'];
+                        } else {
+                            $info['extends_short'] = '::php::' . implode('::', $extInfo['ns']) . '::' . $extInfo['short'];
+                        }
+                    } else {
+                        $info['extends_short'] = self::shortTypeInContext($info['extends'], $nsInfo['ns']);
+                    }
                 } else {
                     $info['extends_short'] = $info['extends'];
                 }
@@ -712,14 +802,14 @@ class Generator
         }
 
         if (!empty($classes)) {
+            $classIncludesSorted = array_keys($classIncludes);
+            sort($classIncludesSorted);
             self::render(
                 __DIR__ . '/templates/class-impl.tpl',
                 self::$rootDir . '/src/class/' . $ext . '.cc',
-                ['groupedClasses' => $groupedClasses, 'classes' => $classes, 'ext' => $ext]
+                ['groupedClasses' => $groupedClasses, 'classes' => $classes, 'ext' => $ext, 'classIncludes' => $classIncludesSorted]
             );
 
-            $classIncludesSorted = array_keys($classIncludes);
-            sort($classIncludesSorted);
             self::render(
                 __DIR__ . '/templates/class-decl.tpl',
                 self::$rootDir . '/include/class/' . $ext . '.h',
@@ -754,9 +844,9 @@ class Generator
             $returnBody = $returnExpr = $returnExprV = '';
             if ($returnType !== 'Variant') {
                 $callArgs = $call ? '{' . implode(', ', $call) . '}' : '{}';
-                $innerExpr = "call(fn, {$callArgs})";
+                $innerExpr = "call(_fn, {$callArgs})";
                 if ($returnInfo['check_false']) {
-                    $funcName = $function->getName();
+                    $funcName = str_replace('\\', '\\\\', $function->getName());
                     $returnBody = "auto _rv = {$innerExpr};\n"
                         . "\tif (!_rv.toBool()) {\n"
                         . "\t\tthrowException(String(\"RuntimeException\"), \"{$funcName}() returned false\");\n"
@@ -769,7 +859,7 @@ class Generator
             // Variant overload: uses Variant args without unwrapping, always returns Variant
             if ($hasFacade) {
                 $callArgsV = $call_v ? '{' . implode(', ', $call_v) . '}' : '{}';
-                $returnExprV = "call(fn, {$callArgsV})";
+                $returnExprV = "call(_fn, {$callArgsV})";
             }
 
             $functions[$name] = [
@@ -830,15 +920,24 @@ class Generator
             return $flatType ?? 'Variant';
         }
         $nsInfo = self::$facadeClassNamespace[$flatType] ?? null;
-        if ($nsInfo !== null && $nsInfo['ns'] === $nsContext) {
+        if ($nsInfo === null) {
+            return $flatType;
+        }
+        if ($nsInfo['ns'] === $nsContext) {
             return $nsInfo['short'];
         }
-        return $flatType;
+        // Different namespace: emit full C++ namespace path so enclosing
+        // lookup resolves it (e.g., Swoole::Http2::Request from within
+        // Swoole::Coroutine::Http2).
+        if (empty($nsInfo['ns'])) {
+            return $nsInfo['short'];
+        }
+        return implode('::', $nsInfo['ns']) . '::' . $nsInfo['short'];
     }
 
     /**
-     * Regex-replace flat facade class names with short names when they belong
-     * to the given namespace context. Used for args strings which contain
+     * Regex-replace flat facade class names with proper C++ type references
+     * for the given namespace context. Used for args strings which contain
      * multiple type references.
      */
     public static function shortTypesInString(?string $str, array $nsContext): string
@@ -849,6 +948,12 @@ class Generator
                 $str = preg_replace(
                     '/\b' . preg_quote($flatName, '/') . '\b/',
                     $nsInfo['short'],
+                    $str
+                );
+            } elseif (!empty($nsInfo['ns'])) {
+                $str = preg_replace(
+                    '/\b' . preg_quote($flatName, '/') . '\b/',
+                    implode('::', $nsInfo['ns']) . '::' . $nsInfo['short'],
                     $str
                 );
             }
@@ -910,6 +1015,9 @@ class Generator
                 if ($param->isDefaultValueAvailable()) {
                     $default_value = $param->getDefaultValue();
                     $default_repr = self::valueToCppRepr($default_value, $param->isPassedByReference());
+                    if ($byRef && (is_int($default_value) || is_float($default_value))) {
+                        $default_repr = "newReference($default_repr)";
+                    }
                     $args[] = "$type &$arg_name = " . $default_repr;
                     $args_v[] = "$typeV &$arg_name = " . $default_repr;
                 } else {
@@ -1020,7 +1128,7 @@ class Generator
 
             $classSymbol = $ref->getName();
             $nsInfo = self::parsePhpName($classSymbol);
-            if (in_array($classSymbol, self::BUILTIN_CLASSES)) {
+            if (in_array($classSymbol, self::BUILTIN_CLASSES) || isset(self::$classNamespaceConflicts[$classSymbol])) {
                 $nsInfo['short'] = $nsInfo['short'] . '_';
             }
             $className = str_replace("\\", '_', $className);
@@ -1169,7 +1277,7 @@ class Generator
                          $callExpr = "php::call(_method_fn, {$info['call']})";
                          $code .= "\tauto _rv = {$callExpr};\n";
                          $code .= "\tif (!_rv.toBool()) {\n";
-                         $code .= "\t\tthrowException(String(\"RuntimeException\"), \"{$classSymbol}::{$method->getName()}() returned false\");\n";
+                         $code .= "\t\tthrowException(String(\"RuntimeException\"), \"" . str_replace('\\', '\\\\', $classSymbol) . "::{$method->getName()}() returned false\");\n";
                          $code .= "\t}\n";
                          $code .= "\treturn {$returnType}(Object(std::move(_rv)));\n";
                      } elseif ($returnType !== 'Variant') {
@@ -1186,7 +1294,7 @@ class Generator
                          $callExpr = "this_.call(_method_fn, {$info['call']})";
                          $code .= "\tauto _rv = {$callExpr};\n";
                          $code .= "\tif (!_rv.toBool()) {\n";
-                         $code .= "\t\tthrowException(String(\"RuntimeException\"), \"{$classSymbol}::{$method->getName()}() returned false\");\n";
+                         $code .= "\t\tthrowException(String(\"RuntimeException\"), \"" . str_replace('\\', '\\\\', $classSymbol) . "::{$method->getName()}() returned false\");\n";
                          $code .= "\t}\n";
                          $code .= "\treturn {$returnType}(Object(std::move(_rv)));\n";
                      } elseif ($returnType !== 'Variant') {

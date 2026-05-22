@@ -1,6 +1,6 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/mysqli.h"
+#include "class/spl.h"
 
 namespace php {
 Variant mysqli_sql_exception::getSqlState() {

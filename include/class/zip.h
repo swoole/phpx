@@ -161,7 +161,7 @@ class ZipArchive {
     Variant unchangeAll();
     Variant unchangeIndex(const Variant &index);
     Variant unchangeName(const Variant &name);
-    Variant extractTo(const Variant &pathto, const Variant &files = {});
+    Variant extractTo(const Variant &pathto, const Variant &files = nullptr);
     Variant getFromName(const Variant &name, const Variant &len = 0, const Variant &flags = 0);
     Variant getFromIndex(const Variant &index, const Variant &len = 0, const Variant &flags = 0);
     Variant getStreamIndex(const Variant &index, const Variant &flags = 0);
@@ -185,8 +185,8 @@ class ZipArchive {
                                        const Variant &flags = 0);
     Variant setCompressionName(const Variant &name, const Variant &method, const Variant &compflags = 0);
     Variant setCompressionIndex(const Variant &index, const Variant &method, const Variant &compflags = 0);
-    Variant setEncryptionName(const Variant &name, const Variant &method, const Variant &password = {});
-    Variant setEncryptionIndex(const Variant &index, const Variant &method, const Variant &password = {});
+    Variant setEncryptionName(const Variant &name, const Variant &method, const Variant &password = nullptr);
+    Variant setEncryptionIndex(const Variant &index, const Variant &method, const Variant &password = nullptr);
     Variant registerProgressCallback(const Variant &rate, const Variant &callback);
     Variant registerCancelCallback(const Variant &callback);
     static Variant isCompressionMethodSupported(const Variant &method, const Variant &enc = true);

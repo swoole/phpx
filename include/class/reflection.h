@@ -31,7 +31,7 @@ class ReflectionEnumBackedCase;
 
 class ReflectionException : public Exception {
   public:
-    ReflectionException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    ReflectionException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class Reflection {
@@ -289,7 +289,7 @@ class ReflectionFunction {
     Variant getReturnType();
     Variant hasTentativeReturnType();
     Variant getTentativeReturnType();
-    Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
+    Variant getAttributes(const Variant &name = nullptr, const Variant &flags = 0);
 };
 
 class ReflectionParameter {
@@ -322,7 +322,7 @@ class ReflectionParameter {
     Variant getDefaultValueConstantName();
     Variant isVariadic();
     Variant isPromoted();
-    Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
+    Variant getAttributes(const Variant &name = nullptr, const Variant &flags = 0);
 };
 
 class ReflectionMethod {
@@ -341,7 +341,7 @@ class ReflectionMethod {
     static constexpr int IS_ABSTRACT = 64;
     static constexpr int IS_FINAL = 32;
 
-    ReflectionMethod(const Variant &object_or_method, const Variant &method = {});
+    ReflectionMethod(const Variant &object_or_method, const Variant &method = nullptr);
     static Variant createFromMethodName(const Variant &method);
     Variant __toString();
     Variant isPublic();
@@ -351,7 +351,7 @@ class ReflectionMethod {
     Variant isFinal();
     Variant isConstructor();
     Variant isDestructor();
-    Variant getClosure(const Variant &object = {});
+    Variant getClosure(const Variant &object = nullptr);
     Variant getModifiers();
     template <typename... Args>
     Variant invoke(const Variant &object, const Args &...args) {
@@ -396,7 +396,7 @@ class ReflectionMethod {
     Variant getReturnType();
     Variant hasTentativeReturnType();
     Variant getTentativeReturnType();
-    Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
+    Variant getAttributes(const Variant &name = nullptr, const Variant &flags = 0);
 };
 
 class ReflectionProperty {
@@ -422,14 +422,14 @@ class ReflectionProperty {
     ReflectionProperty(const Variant &class_, const Variant &property);
     Variant __toString();
     Variant getName();
-    Variant getValue(const Variant &object = {});
+    Variant getValue(const Variant &object = nullptr);
     Variant setValue(const Variant &object_or_value, const Variant &value = {});
     Variant getRawValue(const Variant &object);
     Variant setRawValue(const Variant &object, const Variant &value);
     Variant setRawValueWithoutLazyInitialization(const Variant &object, const Variant &value);
     Variant skipLazyInitialization(const Variant &object);
     Variant isLazy(const Variant &object);
-    Variant isInitialized(const Variant &object = {});
+    Variant isInitialized(const Variant &object = nullptr);
     Variant isPublic();
     Variant isPrivate();
     Variant isProtected();
@@ -451,7 +451,7 @@ class ReflectionProperty {
     Variant hasType();
     Variant hasDefaultValue();
     Variant getDefaultValue();
-    Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
+    Variant getAttributes(const Variant &name = nullptr, const Variant &flags = 0);
     Variant hasHooks();
     Variant getHooks();
     Variant hasHook(const PropertyHookType &type);
@@ -492,13 +492,13 @@ class ReflectionClass {
     Variant getConstructor();
     Variant hasMethod(const Variant &name);
     Variant getMethod(const Variant &name);
-    Variant getMethods(const Variant &filter = {});
+    Variant getMethods(const Variant &filter = nullptr);
     Variant hasProperty(const Variant &name);
     Variant getProperty(const Variant &name);
-    Variant getProperties(const Variant &filter = {});
+    Variant getProperties(const Variant &filter = nullptr);
     Variant hasConstant(const Variant &name);
-    Variant getConstants(const Variant &filter = {});
-    Variant getReflectionConstants(const Variant &filter = {});
+    Variant getConstants(const Variant &filter = nullptr);
+    Variant getReflectionConstants(const Variant &filter = nullptr);
     Variant getConstant(const Variant &name);
     Variant getReflectionConstant(const Variant &name);
     Variant getInterfaces();
@@ -546,7 +546,7 @@ class ReflectionClass {
     Variant inNamespace();
     Variant getNamespaceName();
     Variant getShortName();
-    Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
+    Variant getAttributes(const Variant &name = nullptr, const Variant &flags = 0);
 };
 
 class ReflectionClassConstant {
@@ -574,7 +574,7 @@ class ReflectionClassConstant {
     Variant getModifiers();
     Variant getDeclaringClass();
     Variant getDocComment();
-    Variant getAttributes(const Variant &name = {}, const Variant &flags = 0);
+    Variant getAttributes(const Variant &name = nullptr, const Variant &flags = 0);
     Variant isEnumCase();
     Variant isDeprecated();
     Variant hasType();

@@ -1,6 +1,6 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/reflection.h"
+#include "class/core.h"
 
 namespace php {
 ReflectionException::ReflectionException(const Variant &message, const Variant &code, const Variant &previous) {

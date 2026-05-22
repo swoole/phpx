@@ -8,7 +8,7 @@ namespace php {
 
 Variant set_time_limit(const Variant &seconds);
 Variant header_register_callback(const Variant &callback);
-Variant ob_start(const Variant &callback = {}, const Variant &chunk_size = 0, const Variant &flags = 112);
+Variant ob_start(const Variant &callback = nullptr, const Variant &chunk_size = 0, const Variant &flags = 112);
 Variant ob_flush();
 Variant ob_clean();
 Variant ob_end_flush();
@@ -99,11 +99,11 @@ Variant array_unshift(const Reference &array, const Args &...values) {
 }
 Variant array_splice(const Reference &array,
                      const Variant &offset,
-                     const Variant &length = {},
+                     const Variant &length = nullptr,
                      const Variant &replacement = Array{});
 Variant array_slice(const Variant &array,
                     const Variant &offset,
-                    const Variant &length = {},
+                    const Variant &length = nullptr,
                     const Variant &preserve_keys = false);
 template <typename... Args>
 Variant array_merge(const Args &...arrays) {
@@ -142,7 +142,7 @@ Variant array_key_first(const Variant &array);
 Variant array_key_last(const Variant &array);
 Variant array_values(const Variant &array);
 Variant array_count_values(const Variant &array);
-Variant array_column(const Variant &array, const Variant &column_key, const Variant &index_key = {});
+Variant array_column(const Variant &array, const Variant &column_key, const Variant &index_key = nullptr);
 Variant array_reverse(const Variant &array, const Variant &preserve_keys = false);
 Variant array_pad(const Variant &array, const Variant &length, const Variant &value);
 Variant array_flip(const Variant &array);
@@ -287,8 +287,8 @@ Variant array_multisort(const Reference &array, const Args &...rest) {
 Variant array_rand(const Variant &array, const Variant &num = 1);
 Variant array_sum(const Variant &array);
 Variant array_product(const Variant &array);
-Variant array_reduce(const Variant &array, const Variant &callback, const Variant &initial = {});
-Variant array_filter(const Variant &array, const Variant &callback = {}, const Variant &mode = 0);
+Variant array_reduce(const Variant &array, const Variant &callback, const Variant &initial = nullptr);
+Variant array_filter(const Variant &array, const Variant &callback = nullptr, const Variant &mode = 0);
 Variant array_find(const Variant &array, const Variant &callback);
 Variant array_find_key(const Variant &array, const Variant &callback);
 Variant array_any(const Variant &array, const Variant &callback);
@@ -310,9 +310,11 @@ Variant base64_encode(const Variant &string);
 Variant base64_decode(const Variant &string, const Variant &strict = false);
 Variant ip2long(const Variant &ip);
 Variant long2ip(const Variant &ip);
-Variant getenv(const Variant &name = {}, const Variant &local_only = false);
+Variant getenv(const Variant &name = nullptr, const Variant &local_only = false);
 Variant putenv(const Variant &assignment);
-Variant getopt(const Variant &short_options, const Variant &long_options = Array{}, const Reference &rest_index = {});
+Variant getopt(const Variant &short_options,
+               const Variant &long_options = Array{},
+               const Reference &rest_index = nullptr);
 Variant flush();
 Variant sleep(const Variant &seconds);
 Variant usleep(const Variant &microseconds);
@@ -322,8 +324,8 @@ Variant get_current_user();
 Variant get_cfg_var(const Variant &option);
 Variant error_log(const Variant &message,
                   const Variant &message_type = 0,
-                  const Variant &destination = {},
-                  const Variant &additional_headers = {});
+                  const Variant &destination = nullptr,
+                  const Variant &additional_headers = nullptr);
 Variant error_get_last();
 Variant error_clear_last();
 template <typename... Args>
@@ -357,7 +359,7 @@ Variant show_source(const Variant &filename, const Variant &return_ = false);
 Variant php_strip_whitespace(const Variant &filename);
 Variant highlight_string(const Variant &string, const Variant &return_ = false);
 Variant ini_get(const Variant &option);
-Variant ini_get_all(const Variant &extension = {}, const Variant &details = true);
+Variant ini_get_all(const Variant &extension = nullptr, const Variant &details = true);
 Variant ini_set(const Variant &option, const Variant &value);
 Variant ini_alter(const Variant &option, const Variant &value);
 Variant ini_restore(const Variant &option);
@@ -367,7 +369,7 @@ Variant get_include_path();
 Variant print_r(const Variant &value, const Variant &return_ = false);
 Variant connection_aborted();
 Variant connection_status();
-Variant ignore_user_abort(const Variant &enable = {});
+Variant ignore_user_abort(const Variant &enable = nullptr);
 Variant getservbyname(const Variant &service, const Variant &protocol);
 Variant getservbyport(const Variant &port, const Variant &protocol);
 Variant getprotobyname(const Variant &protocol);
@@ -391,7 +393,7 @@ Variant parse_ini_string(const Variant &ini_string,
                          const Variant &scanner_mode = 0);
 Variant config_get_hash();
 Variant sys_getloadavg();
-Variant get_browser(const Variant &user_agent = {}, const Variant &return_array = false);
+Variant get_browser(const Variant &user_agent = nullptr, const Variant &return_array = false);
 Variant crc32(const Variant &string);
 Variant crypt(const Variant &string, const Variant &salt);
 Variant strptime(const Variant &timestamp, const Variant &format);
@@ -403,11 +405,11 @@ Variant dns_check_record(const Variant &hostname, const Variant &type = "MX");
 Variant checkdnsrr(const Variant &hostname, const Variant &type = "MX");
 Variant dns_get_record(const Variant &hostname,
                        const Variant &type = 268435456,
-                       const Reference &authoritative_name_servers = {},
-                       const Reference &additional_records = {},
+                       const Reference &authoritative_name_servers = nullptr,
+                       const Reference &additional_records = nullptr,
                        const Variant &raw = false);
-Variant dns_get_mx(const Variant &hostname, const Reference &hosts, const Reference &weights = {});
-Variant getmxrr(const Variant &hostname, const Reference &hosts, const Reference &weights = {});
+Variant dns_get_mx(const Variant &hostname, const Reference &hosts, const Reference &weights = nullptr);
+Variant getmxrr(const Variant &hostname, const Reference &hosts, const Reference &weights = nullptr);
 Variant net_get_interfaces();
 Variant ftok(const Variant &filename, const Variant &project_id);
 Variant hrtime(const Variant &as_number = false);
@@ -427,7 +429,7 @@ Variant inet_ntop(const Variant &ip);
 Variant inet_pton(const Variant &ip);
 Variant metaphone(const Variant &string, const Variant &max_phonemes = 0);
 Variant header(const Variant &header, const Variant &replace = true, const Variant &response_code = 0);
-Variant header_remove(const Variant &name = {});
+Variant header_remove(const Variant &name = nullptr);
 Variant setrawcookie(const Variant &name,
                      const Variant &value = "",
                      const Variant &expires_or_options = 0,
@@ -443,17 +445,17 @@ Variant setcookie(const Variant &name,
                   const Variant &secure = false,
                   const Variant &httponly = false);
 Variant http_response_code(const Variant &response_code = 0);
-Variant headers_sent(const Reference &filename = {}, const Reference &line = {});
+Variant headers_sent(const Reference &filename = nullptr, const Reference &line = nullptr);
 Variant headers_list();
 Variant htmlspecialchars(const Variant &string,
                          const Variant &flags = 11,
-                         const Variant &encoding = {},
+                         const Variant &encoding = nullptr,
                          const Variant &double_encode = true);
 Variant htmlspecialchars_decode(const Variant &string, const Variant &flags = 11);
-Variant html_entity_decode(const Variant &string, const Variant &flags = 11, const Variant &encoding = {});
+Variant html_entity_decode(const Variant &string, const Variant &flags = 11, const Variant &encoding = nullptr);
 Variant htmlentities(const Variant &string,
                      const Variant &flags = 11,
-                     const Variant &encoding = {},
+                     const Variant &encoding = nullptr,
                      const Variant &double_encode = true);
 Variant get_html_translation_table(const Variant &table = 0,
                                    const Variant &flags = 11,
@@ -461,11 +463,14 @@ Variant get_html_translation_table(const Variant &table = 0,
 Variant assert_options(const Variant &option, const Variant &value = {});
 Variant bin2hex(const Variant &string);
 Variant hex2bin(const Variant &string);
-Variant strspn(const Variant &string, const Variant &characters, const Variant &offset = 0, const Variant &length = {});
+Variant strspn(const Variant &string,
+               const Variant &characters,
+               const Variant &offset = 0,
+               const Variant &length = nullptr);
 Variant strcspn(const Variant &string,
                 const Variant &characters,
                 const Variant &offset = 0,
-                const Variant &length = {});
+                const Variant &length = nullptr);
 Variant nl_langinfo(const Variant &item);
 Variant strcoll(const Variant &string1, const Variant &string2);
 Variant trim(const Variant &string, const Variant &characters = " \n\r\t\v\000");
@@ -477,9 +482,9 @@ Variant wordwrap(const Variant &string,
                  const Variant &break_ = "\n",
                  const Variant &cut_long_words = false);
 Variant explode(const Variant &separator, const Variant &string, const Variant &limit = LONG_MAX);
-Variant implode(const Variant &separator, const Variant &array = {});
-Variant join(const Variant &separator, const Variant &array = {});
-Variant strtok(const Variant &string, const Variant &token = {});
+Variant implode(const Variant &separator, const Variant &array = nullptr);
+Variant join(const Variant &separator, const Variant &array = nullptr);
+Variant strtok(const Variant &string, const Variant &token = nullptr);
 Variant strtoupper(const Variant &string);
 Variant strtolower(const Variant &string);
 Variant str_increment(const Variant &string);
@@ -499,32 +504,35 @@ Variant str_contains(const Variant &haystack, const Variant &needle);
 Variant str_starts_with(const Variant &haystack, const Variant &needle);
 Variant str_ends_with(const Variant &haystack, const Variant &needle);
 Variant chunk_split(const Variant &string, const Variant &length = 76, const Variant &separator = "\r\n");
-Variant substr(const Variant &string, const Variant &offset, const Variant &length = {});
+Variant substr(const Variant &string, const Variant &offset, const Variant &length = nullptr);
 Variant substr_replace(const Variant &string,
                        const Variant &replace,
                        const Variant &offset,
-                       const Variant &length = {});
+                       const Variant &length = nullptr);
 Variant quotemeta(const Variant &string);
 Variant ord(const Variant &character);
 Variant chr(const Variant &codepoint);
 Variant ucfirst(const Variant &string);
 Variant lcfirst(const Variant &string);
 Variant ucwords(const Variant &string, const Variant &separators = " \t\r\n\f\v");
-Variant strtr(const Variant &string, const Variant &from, const Variant &to = {});
+Variant strtr(const Variant &string, const Variant &from, const Variant &to = nullptr);
 Variant strrev(const Variant &string);
-Variant similar_text(const Variant &string1, const Variant &string2, const Reference &percent = {});
+Variant similar_text(const Variant &string1, const Variant &string2, const Reference &percent = nullptr);
 Variant addcslashes(const Variant &string, const Variant &characters);
 Variant addslashes(const Variant &string);
 Variant stripcslashes(const Variant &string);
 Variant stripslashes(const Variant &string);
-Variant str_replace(const Variant &search, const Variant &replace, const Variant &subject, const Reference &count = {});
+Variant str_replace(const Variant &search,
+                    const Variant &replace,
+                    const Variant &subject,
+                    const Reference &count = nullptr);
 Variant str_ireplace(const Variant &search,
                      const Variant &replace,
                      const Variant &subject,
-                     const Reference &count = {});
+                     const Reference &count = nullptr);
 Variant hebrev(const Variant &string, const Variant &max_chars_per_line = 0);
 Variant nl2br(const Variant &string, const Variant &use_xhtml = true);
-Variant strip_tags(const Variant &string, const Variant &allowed_tags = {});
+Variant strip_tags(const Variant &string, const Variant &allowed_tags = nullptr);
 template <typename... Args>
 Variant setlocale(const Variant &category, const Variant &locales, const Args &...rest) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -544,7 +552,7 @@ Variant localeconv();
 Variant substr_count(const Variant &haystack,
                      const Variant &needle,
                      const Variant &offset = 0,
-                     const Variant &length = {});
+                     const Variant &length = nullptr);
 Variant str_pad(const Variant &string,
                 const Variant &length,
                 const Variant &pad_string = " ",
@@ -559,49 +567,49 @@ Variant sscanf(const Variant &string, const Variant &format, const Args &...vars
 }
 Variant str_rot13(const Variant &string);
 Variant str_shuffle(const Variant &string);
-Variant str_word_count(const Variant &string, const Variant &format = 0, const Variant &characters = {});
+Variant str_word_count(const Variant &string, const Variant &format = 0, const Variant &characters = nullptr);
 Variant str_split(const Variant &string, const Variant &length = 1);
 Variant strpbrk(const Variant &string, const Variant &characters);
 Variant substr_compare(const Variant &haystack,
                        const Variant &needle,
                        const Variant &offset,
-                       const Variant &length = {},
+                       const Variant &length = nullptr,
                        const Variant &case_insensitive = false);
 Variant utf8_encode(const Variant &string);
 Variant utf8_decode(const Variant &string);
-Variant opendir(const Variant &directory, const Variant &context = {});
-Directory dir(const Variant &directory, const Variant &context = {});
-Variant closedir(const Variant &dir_handle = {});
+Variant opendir(const Variant &directory, const Variant &context = nullptr);
+Directory dir(const Variant &directory, const Variant &context = nullptr);
+Variant closedir(const Variant &dir_handle = nullptr);
 Variant chdir(const Variant &directory);
 Variant getcwd();
-Variant rewinddir(const Variant &dir_handle = {});
-Variant readdir(const Variant &dir_handle = {});
-Variant scandir(const Variant &directory, const Variant &sorting_order = 0, const Variant &context = {});
+Variant rewinddir(const Variant &dir_handle = nullptr);
+Variant readdir(const Variant &dir_handle = nullptr);
+Variant scandir(const Variant &directory, const Variant &sorting_order = 0, const Variant &context = nullptr);
 Variant glob(const Variant &pattern, const Variant &flags = 0);
-Variant exec(const Variant &command, const Reference &output = {}, const Reference &result_code = {});
-Variant system(const Variant &command, const Reference &result_code = {});
-Variant passthru(const Variant &command, const Reference &result_code = {});
+Variant exec(const Variant &command, const Reference &output = nullptr, const Reference &result_code = nullptr);
+Variant system(const Variant &command, const Reference &result_code = nullptr);
+Variant passthru(const Variant &command, const Reference &result_code = nullptr);
 Variant escapeshellcmd(const Variant &command);
 Variant escapeshellarg(const Variant &arg);
 Variant shell_exec(const Variant &command);
 Variant proc_nice(const Variant &priority);
-Variant flock(const Variant &stream, const Variant &operation, const Reference &would_block = {});
+Variant flock(const Variant &stream, const Variant &operation, const Reference &would_block = nullptr);
 Variant get_meta_tags(const Variant &filename, const Variant &use_include_path = false);
 Variant pclose(const Variant &handle);
 Variant popen(const Variant &command, const Variant &mode);
-Variant readfile(const Variant &filename, const Variant &use_include_path = false, const Variant &context = {});
+Variant readfile(const Variant &filename, const Variant &use_include_path = false, const Variant &context = nullptr);
 Variant rewind(const Variant &stream);
-Variant rmdir(const Variant &directory, const Variant &context = {});
-Variant umask(const Variant &mask = {});
+Variant rmdir(const Variant &directory, const Variant &context = nullptr);
+Variant umask(const Variant &mask = nullptr);
 Variant fclose(const Variant &stream);
 Variant feof(const Variant &stream);
 Variant fgetc(const Variant &stream);
-Variant fgets(const Variant &stream, const Variant &length = {});
+Variant fgets(const Variant &stream, const Variant &length = nullptr);
 Variant fread(const Variant &stream, const Variant &length);
 Variant fopen(const Variant &filename,
               const Variant &mode,
               const Variant &use_include_path = false,
-              const Variant &context = {});
+              const Variant &context = nullptr);
 template <typename... Args>
 Variant fscanf(const Variant &stream, const Variant &format, const Args &...vars) {
     static THREAD_LOCAL zend_function *fn = nullptr;
@@ -618,27 +626,27 @@ Variant ftell(const Variant &stream);
 Variant fflush(const Variant &stream);
 Variant fsync(const Variant &stream);
 Variant fdatasync(const Variant &stream);
-Variant fwrite(const Variant &stream, const Variant &data, const Variant &length = {});
-Variant fputs(const Variant &stream, const Variant &data, const Variant &length = {});
+Variant fwrite(const Variant &stream, const Variant &data, const Variant &length = nullptr);
+Variant fputs(const Variant &stream, const Variant &data, const Variant &length = nullptr);
 Variant mkdir(const Variant &directory,
               const Variant &permissions = 511,
               const Variant &recursive = false,
-              const Variant &context = {});
-Variant rename(const Variant &from, const Variant &to, const Variant &context = {});
-Variant copy(const Variant &from, const Variant &to, const Variant &context = {});
+              const Variant &context = nullptr);
+Variant rename(const Variant &from, const Variant &to, const Variant &context = nullptr);
+Variant copy(const Variant &from, const Variant &to, const Variant &context = nullptr);
 Variant tempnam(const Variant &directory, const Variant &prefix);
 Variant tmpfile();
-Variant file(const Variant &filename, const Variant &flags = 0, const Variant &context = {});
+Variant file(const Variant &filename, const Variant &flags = 0, const Variant &context = nullptr);
 Variant file_get_contents(const Variant &filename,
                           const Variant &use_include_path = false,
-                          const Variant &context = {},
+                          const Variant &context = nullptr,
                           const Variant &offset = 0,
-                          const Variant &length = {});
-Variant unlink(const Variant &filename, const Variant &context = {});
+                          const Variant &length = nullptr);
+Variant unlink(const Variant &filename, const Variant &context = nullptr);
 Variant file_put_contents(const Variant &filename,
                           const Variant &data,
                           const Variant &flags = 0,
-                          const Variant &context = {});
+                          const Variant &context = nullptr);
 Variant fputcsv(const Variant &stream,
                 const Variant &fields,
                 const Variant &separator = ",",
@@ -646,7 +654,7 @@ Variant fputcsv(const Variant &stream,
                 const Variant &escape = "\\",
                 const Variant &eol = "\n");
 Variant fgetcsv(const Variant &stream,
-                const Variant &length = {},
+                const Variant &length = nullptr,
                 const Variant &separator = ",",
                 const Variant &enclosure = "\"",
                 const Variant &escape = "\\");
@@ -677,7 +685,7 @@ Variant chgrp(const Variant &filename, const Variant &group);
 Variant lchown(const Variant &filename, const Variant &user);
 Variant lchgrp(const Variant &filename, const Variant &group);
 Variant chmod(const Variant &filename, const Variant &permissions);
-Variant touch(const Variant &filename, const Variant &mtime = {}, const Variant &atime = {});
+Variant touch(const Variant &filename, const Variant &mtime = nullptr, const Variant &atime = nullptr);
 Variant clearstatcache(const Variant &clear_realpath_cache = false, const Variant &filename = "");
 Variant disk_total_space(const Variant &directory);
 Variant disk_free_space(const Variant &directory);
@@ -713,27 +721,27 @@ Variant fprintf(const Variant &stream, const Variant &format, const Args &...val
 Variant vfprintf(const Variant &stream, const Variant &format, const Variant &values);
 Variant fsockopen(const Variant &hostname,
                   const Variant &port = -1,
-                  const Reference &error_code = {},
-                  const Reference &error_message = {},
-                  const Variant &timeout = {});
+                  const Reference &error_code = nullptr,
+                  const Reference &error_message = nullptr,
+                  const Variant &timeout = nullptr);
 Variant pfsockopen(const Variant &hostname,
                    const Variant &port = -1,
-                   const Reference &error_code = {},
-                   const Reference &error_message = {},
-                   const Variant &timeout = {});
+                   const Reference &error_code = nullptr,
+                   const Reference &error_message = nullptr,
+                   const Variant &timeout = nullptr);
 Variant http_build_query(const Variant &data,
                          const Variant &numeric_prefix = "",
-                         const Variant &arg_separator = {},
+                         const Variant &arg_separator = nullptr,
                          const Variant &encoding_type = 1);
 Variant http_get_last_response_headers();
 Variant http_clear_last_response_headers();
-Variant request_parse_body(const Variant &options = {});
+Variant request_parse_body(const Variant &options = nullptr);
 Variant image_type_to_mime_type(const Variant &image_type);
 Variant image_type_to_extension(const Variant &image_type, const Variant &include_dot = true);
-Variant getimagesize(const Variant &filename, const Reference &image_info = {});
-Variant getimagesizefromstring(const Variant &string, const Reference &image_info = {});
+Variant getimagesize(const Variant &filename, const Reference &image_info = nullptr);
+Variant getimagesizefromstring(const Variant &string, const Reference &image_info = nullptr);
 Variant phpinfo(const Variant &flags = 4294967295);
-Variant phpversion(const Variant &extension = {});
+Variant phpversion(const Variant &extension = nullptr);
 Variant phpcredits(const Variant &flags = 4294967295);
 Variant php_sapi_name();
 Variant php_uname(const Variant &mode = "a");
@@ -821,9 +829,9 @@ Variant password_algos();
 Variant proc_open(const Variant &command,
                   const Variant &descriptor_spec,
                   const Reference &pipes,
-                  const Variant &cwd = {},
-                  const Variant &env_vars = {},
-                  const Variant &options = {});
+                  const Variant &cwd = nullptr,
+                  const Variant &env_vars = nullptr,
+                  const Variant &options = nullptr);
 Variant proc_close(const Variant &process);
 Variant proc_terminate(const Variant &process, const Variant &signal = 15);
 Variant proc_get_status(const Variant &process);
@@ -834,17 +842,17 @@ Variant stream_select(const Reference &read,
                       const Reference &write,
                       const Reference &except,
                       const Variant &seconds,
-                      const Variant &microseconds = {});
-Variant stream_context_create(const Variant &options = {}, const Variant &params = {});
+                      const Variant &microseconds = nullptr);
+Variant stream_context_create(const Variant &options = nullptr, const Variant &params = nullptr);
 Variant stream_context_set_params(const Variant &context, const Variant &params);
 Variant stream_context_get_params(const Variant &context);
 Variant stream_context_set_option(const Variant &context,
                                   const Variant &wrapper_or_options,
-                                  const Variant &option_name = {},
+                                  const Variant &option_name = nullptr,
                                   const Variant &value = {});
 Variant stream_context_set_options(const Variant &context, const Variant &options);
 Variant stream_context_get_options(const Variant &stream_or_context);
-Variant stream_context_get_default(const Variant &options = {});
+Variant stream_context_get_default(const Variant &options = nullptr);
 Variant stream_context_set_default(const Variant &options);
 Variant stream_filter_prepend(const Variant &stream,
                               const Variant &filter_name,
@@ -856,37 +864,39 @@ Variant stream_filter_append(const Variant &stream,
                              const Variant &params = {});
 Variant stream_filter_remove(const Variant &stream_filter);
 Variant stream_socket_client(const Variant &address,
-                             const Reference &error_code = {},
-                             const Reference &error_message = {},
-                             const Variant &timeout = {},
+                             const Reference &error_code = nullptr,
+                             const Reference &error_message = nullptr,
+                             const Variant &timeout = nullptr,
                              const Variant &flags = 4,
-                             const Variant &context = {});
+                             const Variant &context = nullptr);
 Variant stream_socket_server(const Variant &address,
-                             const Reference &error_code = {},
-                             const Reference &error_message = {},
+                             const Reference &error_code = nullptr,
+                             const Reference &error_message = nullptr,
                              const Variant &flags = 12,
-                             const Variant &context = {});
-Variant stream_socket_accept(const Variant &socket, const Variant &timeout = {}, const Reference &peer_name = {});
+                             const Variant &context = nullptr);
+Variant stream_socket_accept(const Variant &socket,
+                             const Variant &timeout = nullptr,
+                             const Reference &peer_name = nullptr);
 Variant stream_socket_get_name(const Variant &socket, const Variant &remote);
 Variant stream_socket_recvfrom(const Variant &socket,
                                const Variant &length,
                                const Variant &flags = 0,
-                               const Reference &address = {});
+                               const Reference &address = nullptr);
 Variant stream_socket_sendto(const Variant &socket,
                              const Variant &data,
                              const Variant &flags = 0,
                              const Variant &address = "");
 Variant stream_socket_enable_crypto(const Variant &stream,
                                     const Variant &enable,
-                                    const Variant &crypto_method = {},
-                                    const Variant &session_stream = {});
+                                    const Variant &crypto_method = nullptr,
+                                    const Variant &session_stream = nullptr);
 Variant stream_socket_shutdown(const Variant &stream, const Variant &mode);
 Variant stream_socket_pair(const Variant &domain, const Variant &type, const Variant &protocol);
 Variant stream_copy_to_stream(const Variant &from,
                               const Variant &to,
-                              const Variant &length = {},
+                              const Variant &length = nullptr,
                               const Variant &offset = 0);
-Variant stream_get_contents(const Variant &stream, const Variant &length = {}, const Variant &offset = -1);
+Variant stream_get_contents(const Variant &stream, const Variant &length = nullptr, const Variant &offset = -1);
 Variant stream_supports_lock(const Variant &stream);
 Variant stream_set_write_buffer(const Variant &stream, const Variant &size);
 Variant set_file_buffer(const Variant &stream, const Variant &size);
@@ -925,7 +935,7 @@ Variant is_string(const Variant &value);
 Variant is_array(const Variant &value);
 Variant is_object(const Variant &value);
 Variant is_scalar(const Variant &value);
-Variant is_callable(const Variant &value, const Variant &syntax_only = false, const Reference &callable_name = {});
+Variant is_callable(const Variant &value, const Variant &syntax_only = false, const Reference &callable_name = nullptr);
 Variant is_iterable(const Variant &value);
 Variant is_countable(const Variant &value);
 Variant uniqid(const Variant &prefix = "", const Variant &more_entropy = false);
@@ -934,7 +944,7 @@ Variant urlencode(const Variant &string);
 Variant urldecode(const Variant &string);
 Variant rawurlencode(const Variant &string);
 Variant rawurldecode(const Variant &string);
-Variant get_headers(const Variant &url, const Variant &associative = false, const Variant &context = {});
+Variant get_headers(const Variant &url, const Variant &associative = false, const Variant &context = nullptr);
 StreamBucket stream_bucket_make_writeable(const Variant &brigade);
 Variant stream_bucket_prepend(const Variant &brigade, const StreamBucket &bucket);
 Variant stream_bucket_prepend(const Variant &brigade, const Variant &bucket);
@@ -967,7 +977,7 @@ Variant unserialize(const Variant &data, const Variant &options = Array{});
 Variant memory_get_usage(const Variant &real_usage = false);
 Variant memory_get_peak_usage(const Variant &real_usage = false);
 Variant memory_reset_peak_usage();
-Variant version_compare(const Variant &version1, const Variant &version2, const Variant &operator_ = {});
+Variant version_compare(const Variant &version1, const Variant &version2, const Variant &operator_ = nullptr);
 Variant dl(const Variant &extension_filename);
 Variant cli_set_process_title(const Variant &title);
 Variant cli_get_process_title();

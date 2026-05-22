@@ -7,7 +7,7 @@
 namespace php {
 
 Variant libxml_set_streams_context(const Variant &context);
-Variant libxml_use_internal_errors(const Variant &use_errors = {});
+Variant libxml_use_internal_errors(const Variant &use_errors = nullptr);
 LibXMLError libxml_get_last_error();
 Variant libxml_get_errors();
 Variant libxml_clear_errors();

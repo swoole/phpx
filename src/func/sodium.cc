@@ -4,395 +4,395 @@
 
 namespace php {
 Variant sodium_crypto_aead_aes256gcm_is_available() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1909]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1909]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_aead_aes256gcm_decrypt(const Variant &ciphertext,
                                              const Variant &additional_data,
                                              const Variant &nonce,
                                              const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1910]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1910]);
     }
-    return call(fn, {ciphertext, additional_data, nonce, key});
+    return call(_fn, {ciphertext, additional_data, nonce, key});
 }
 Variant sodium_crypto_aead_aes256gcm_encrypt(const Variant &message,
                                              const Variant &additional_data,
                                              const Variant &nonce,
                                              const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1911]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1911]);
     }
-    return call(fn, {message, additional_data, nonce, key});
+    return call(_fn, {message, additional_data, nonce, key});
 }
 Variant sodium_crypto_aead_aes256gcm_keygen() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1912]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1912]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_aead_chacha20poly1305_decrypt(const Variant &ciphertext,
                                                     const Variant &additional_data,
                                                     const Variant &nonce,
                                                     const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1913]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1913]);
     }
-    return call(fn, {ciphertext, additional_data, nonce, key});
+    return call(_fn, {ciphertext, additional_data, nonce, key});
 }
 Variant sodium_crypto_aead_chacha20poly1305_encrypt(const Variant &message,
                                                     const Variant &additional_data,
                                                     const Variant &nonce,
                                                     const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1914]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1914]);
     }
-    return call(fn, {message, additional_data, nonce, key});
+    return call(_fn, {message, additional_data, nonce, key});
 }
 Variant sodium_crypto_aead_chacha20poly1305_keygen() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1915]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1915]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_aead_chacha20poly1305_ietf_decrypt(const Variant &ciphertext,
                                                          const Variant &additional_data,
                                                          const Variant &nonce,
                                                          const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1916]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1916]);
     }
-    return call(fn, {ciphertext, additional_data, nonce, key});
+    return call(_fn, {ciphertext, additional_data, nonce, key});
 }
 Variant sodium_crypto_aead_chacha20poly1305_ietf_encrypt(const Variant &message,
                                                          const Variant &additional_data,
                                                          const Variant &nonce,
                                                          const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1917]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1917]);
     }
-    return call(fn, {message, additional_data, nonce, key});
+    return call(_fn, {message, additional_data, nonce, key});
 }
 Variant sodium_crypto_aead_chacha20poly1305_ietf_keygen() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1918]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1918]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_aead_xchacha20poly1305_ietf_decrypt(const Variant &ciphertext,
                                                           const Variant &additional_data,
                                                           const Variant &nonce,
                                                           const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1919]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1919]);
     }
-    return call(fn, {ciphertext, additional_data, nonce, key});
+    return call(_fn, {ciphertext, additional_data, nonce, key});
 }
 Variant sodium_crypto_aead_xchacha20poly1305_ietf_keygen() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1920]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1920]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_aead_xchacha20poly1305_ietf_encrypt(const Variant &message,
                                                           const Variant &additional_data,
                                                           const Variant &nonce,
                                                           const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1921]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1921]);
     }
-    return call(fn, {message, additional_data, nonce, key});
+    return call(_fn, {message, additional_data, nonce, key});
 }
 Variant sodium_crypto_auth(const Variant &message, const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1922]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1922]);
     }
-    return call(fn, {message, key});
+    return call(_fn, {message, key});
 }
 Variant sodium_crypto_auth_keygen() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1923]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1923]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_auth_verify(const Variant &mac, const Variant &message, const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1924]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1924]);
     }
-    return call(fn, {mac, message, key});
+    return call(_fn, {mac, message, key});
 }
 Variant sodium_crypto_box(const Variant &message, const Variant &nonce, const Variant &key_pair) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1925]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1925]);
     }
-    return call(fn, {message, nonce, key_pair});
+    return call(_fn, {message, nonce, key_pair});
 }
 Variant sodium_crypto_box_keypair() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1926]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1926]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_box_seed_keypair(const Variant &seed) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1927]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1927]);
     }
-    return call(fn, {seed});
+    return call(_fn, {seed});
 }
 Variant sodium_crypto_box_keypair_from_secretkey_and_publickey(const Variant &secret_key, const Variant &public_key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1928]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1928]);
     }
-    return call(fn, {secret_key, public_key});
+    return call(_fn, {secret_key, public_key});
 }
 Variant sodium_crypto_box_open(const Variant &ciphertext, const Variant &nonce, const Variant &key_pair) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1929]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1929]);
     }
-    return call(fn, {ciphertext, nonce, key_pair});
+    return call(_fn, {ciphertext, nonce, key_pair});
 }
 Variant sodium_crypto_box_publickey(const Variant &key_pair) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1930]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1930]);
     }
-    return call(fn, {key_pair});
+    return call(_fn, {key_pair});
 }
 Variant sodium_crypto_box_publickey_from_secretkey(const Variant &secret_key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1931]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1931]);
     }
-    return call(fn, {secret_key});
+    return call(_fn, {secret_key});
 }
 Variant sodium_crypto_box_seal(const Variant &message, const Variant &public_key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1932]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1932]);
     }
-    return call(fn, {message, public_key});
+    return call(_fn, {message, public_key});
 }
 Variant sodium_crypto_box_seal_open(const Variant &ciphertext, const Variant &key_pair) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1933]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1933]);
     }
-    return call(fn, {ciphertext, key_pair});
+    return call(_fn, {ciphertext, key_pair});
 }
 Variant sodium_crypto_box_secretkey(const Variant &key_pair) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1934]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1934]);
     }
-    return call(fn, {key_pair});
+    return call(_fn, {key_pair});
 }
 Variant sodium_crypto_core_ristretto255_add(const Variant &p, const Variant &q) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1935]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1935]);
     }
-    return call(fn, {p, q});
+    return call(_fn, {p, q});
 }
 Variant sodium_crypto_core_ristretto255_from_hash(const Variant &s) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1936]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1936]);
     }
-    return call(fn, {s});
+    return call(_fn, {s});
 }
 Variant sodium_crypto_core_ristretto255_is_valid_point(const Variant &s) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1937]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1937]);
     }
-    return call(fn, {s});
+    return call(_fn, {s});
 }
 Variant sodium_crypto_core_ristretto255_random() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1938]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1938]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_core_ristretto255_scalar_add(const Variant &x, const Variant &y) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1939]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1939]);
     }
-    return call(fn, {x, y});
+    return call(_fn, {x, y});
 }
 Variant sodium_crypto_core_ristretto255_scalar_complement(const Variant &s) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1940]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1940]);
     }
-    return call(fn, {s});
+    return call(_fn, {s});
 }
 Variant sodium_crypto_core_ristretto255_scalar_invert(const Variant &s) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1941]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1941]);
     }
-    return call(fn, {s});
+    return call(_fn, {s});
 }
 Variant sodium_crypto_core_ristretto255_scalar_mul(const Variant &x, const Variant &y) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1942]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1942]);
     }
-    return call(fn, {x, y});
+    return call(_fn, {x, y});
 }
 Variant sodium_crypto_core_ristretto255_scalar_negate(const Variant &s) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1943]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1943]);
     }
-    return call(fn, {s});
+    return call(_fn, {s});
 }
 Variant sodium_crypto_core_ristretto255_scalar_random() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1944]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1944]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_core_ristretto255_scalar_reduce(const Variant &s) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1945]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1945]);
     }
-    return call(fn, {s});
+    return call(_fn, {s});
 }
 Variant sodium_crypto_core_ristretto255_scalar_sub(const Variant &x, const Variant &y) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1946]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1946]);
     }
-    return call(fn, {x, y});
+    return call(_fn, {x, y});
 }
 Variant sodium_crypto_core_ristretto255_sub(const Variant &p, const Variant &q) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1947]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1947]);
     }
-    return call(fn, {p, q});
+    return call(_fn, {p, q});
 }
 Variant sodium_crypto_kx_keypair() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1948]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1948]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_kx_publickey(const Variant &key_pair) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1949]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1949]);
     }
-    return call(fn, {key_pair});
+    return call(_fn, {key_pair});
 }
 Variant sodium_crypto_kx_secretkey(const Variant &key_pair) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1950]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1950]);
     }
-    return call(fn, {key_pair});
+    return call(_fn, {key_pair});
 }
 Variant sodium_crypto_kx_seed_keypair(const Variant &seed) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1951]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1951]);
     }
-    return call(fn, {seed});
+    return call(_fn, {seed});
 }
 Variant sodium_crypto_kx_client_session_keys(const Variant &client_key_pair, const Variant &server_key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1952]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1952]);
     }
-    return call(fn, {client_key_pair, server_key});
+    return call(_fn, {client_key_pair, server_key});
 }
 Variant sodium_crypto_kx_server_session_keys(const Variant &server_key_pair, const Variant &client_key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1953]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1953]);
     }
-    return call(fn, {server_key_pair, client_key});
+    return call(_fn, {server_key_pair, client_key});
 }
 Variant sodium_crypto_generichash(const Variant &message, const Variant &key, const Variant &length) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1954]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1954]);
     }
-    return call(fn, {message, key, length});
+    return call(_fn, {message, key, length});
 }
 Variant sodium_crypto_generichash_keygen() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1955]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1955]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_generichash_init(const Variant &key, const Variant &length) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1956]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1956]);
     }
-    return call(fn, {key, length});
+    return call(_fn, {key, length});
 }
 Variant sodium_crypto_generichash_update(const Reference &state, const Variant &message) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1957]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1957]);
     }
-    return call(fn, {&state, message});
+    return call(_fn, {&state, message});
 }
 Variant sodium_crypto_generichash_final(const Reference &state, const Variant &length) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1958]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1958]);
     }
-    return call(fn, {&state, length});
+    return call(_fn, {&state, length});
 }
 Variant sodium_crypto_kdf_derive_from_key(const Variant &subkey_length,
                                           const Variant &subkey_id,
                                           const Variant &context,
                                           const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1959]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1959]);
     }
-    return call(fn, {subkey_length, subkey_id, context, key});
+    return call(_fn, {subkey_length, subkey_id, context, key});
 }
 Variant sodium_crypto_kdf_keygen() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1960]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1960]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_pwhash(const Variant &length,
                              const Variant &password,
@@ -400,385 +400,385 @@ Variant sodium_crypto_pwhash(const Variant &length,
                              const Variant &opslimit,
                              const Variant &memlimit,
                              const Variant &algo) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1961]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1961]);
     }
-    return call(fn, {length, password, salt, opslimit, memlimit, algo});
+    return call(_fn, {length, password, salt, opslimit, memlimit, algo});
 }
 Variant sodium_crypto_pwhash_str(const Variant &password, const Variant &opslimit, const Variant &memlimit) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1962]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1962]);
     }
-    return call(fn, {password, opslimit, memlimit});
+    return call(_fn, {password, opslimit, memlimit});
 }
 Variant sodium_crypto_pwhash_str_verify(const Variant &hash, const Variant &password) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1963]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1963]);
     }
-    return call(fn, {hash, password});
+    return call(_fn, {hash, password});
 }
 Variant sodium_crypto_pwhash_str_needs_rehash(const Variant &password,
                                               const Variant &opslimit,
                                               const Variant &memlimit) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1964]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1964]);
     }
-    return call(fn, {password, opslimit, memlimit});
+    return call(_fn, {password, opslimit, memlimit});
 }
 Variant sodium_crypto_pwhash_scryptsalsa208sha256(const Variant &length,
                                                   const Variant &password,
                                                   const Variant &salt,
                                                   const Variant &opslimit,
                                                   const Variant &memlimit) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1965]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1965]);
     }
-    return call(fn, {length, password, salt, opslimit, memlimit});
+    return call(_fn, {length, password, salt, opslimit, memlimit});
 }
 Variant sodium_crypto_pwhash_scryptsalsa208sha256_str(const Variant &password,
                                                       const Variant &opslimit,
                                                       const Variant &memlimit) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1966]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1966]);
     }
-    return call(fn, {password, opslimit, memlimit});
+    return call(_fn, {password, opslimit, memlimit});
 }
 Variant sodium_crypto_pwhash_scryptsalsa208sha256_str_verify(const Variant &hash, const Variant &password) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1967]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1967]);
     }
-    return call(fn, {hash, password});
+    return call(_fn, {hash, password});
 }
 Variant sodium_crypto_scalarmult(const Variant &n, const Variant &p) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1968]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1968]);
     }
-    return call(fn, {n, p});
+    return call(_fn, {n, p});
 }
 Variant sodium_crypto_scalarmult_ristretto255(const Variant &n, const Variant &p) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1969]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1969]);
     }
-    return call(fn, {n, p});
+    return call(_fn, {n, p});
 }
 Variant sodium_crypto_scalarmult_ristretto255_base(const Variant &n) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1970]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1970]);
     }
-    return call(fn, {n});
+    return call(_fn, {n});
 }
 Variant sodium_crypto_secretbox(const Variant &message, const Variant &nonce, const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1971]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1971]);
     }
-    return call(fn, {message, nonce, key});
+    return call(_fn, {message, nonce, key});
 }
 Variant sodium_crypto_secretbox_keygen() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1972]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1972]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_secretbox_open(const Variant &ciphertext, const Variant &nonce, const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1973]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1973]);
     }
-    return call(fn, {ciphertext, nonce, key});
+    return call(_fn, {ciphertext, nonce, key});
 }
 Variant sodium_crypto_secretstream_xchacha20poly1305_keygen() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1974]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1974]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_secretstream_xchacha20poly1305_init_push(const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1975]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1975]);
     }
-    return call(fn, {key});
+    return call(_fn, {key});
 }
 Variant sodium_crypto_secretstream_xchacha20poly1305_push(const Reference &state,
                                                           const Variant &message,
                                                           const Variant &additional_data,
                                                           const Variant &tag) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1976]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1976]);
     }
-    return call(fn, {&state, message, additional_data, tag});
+    return call(_fn, {&state, message, additional_data, tag});
 }
 Variant sodium_crypto_secretstream_xchacha20poly1305_init_pull(const Variant &header, const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1977]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1977]);
     }
-    return call(fn, {header, key});
+    return call(_fn, {header, key});
 }
 Variant sodium_crypto_secretstream_xchacha20poly1305_pull(const Reference &state,
                                                           const Variant &ciphertext,
                                                           const Variant &additional_data) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1978]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1978]);
     }
-    return call(fn, {&state, ciphertext, additional_data});
+    return call(_fn, {&state, ciphertext, additional_data});
 }
 Variant sodium_crypto_secretstream_xchacha20poly1305_rekey(const Reference &state) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1979]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1979]);
     }
-    return call(fn, {&state});
+    return call(_fn, {&state});
 }
 Variant sodium_crypto_shorthash(const Variant &message, const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1980]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1980]);
     }
-    return call(fn, {message, key});
+    return call(_fn, {message, key});
 }
 Variant sodium_crypto_shorthash_keygen() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1981]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1981]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_sign(const Variant &message, const Variant &secret_key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1982]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1982]);
     }
-    return call(fn, {message, secret_key});
+    return call(_fn, {message, secret_key});
 }
 Variant sodium_crypto_sign_detached(const Variant &message, const Variant &secret_key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1983]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1983]);
     }
-    return call(fn, {message, secret_key});
+    return call(_fn, {message, secret_key});
 }
 Variant sodium_crypto_sign_ed25519_pk_to_curve25519(const Variant &public_key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1984]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1984]);
     }
-    return call(fn, {public_key});
+    return call(_fn, {public_key});
 }
 Variant sodium_crypto_sign_ed25519_sk_to_curve25519(const Variant &secret_key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1985]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1985]);
     }
-    return call(fn, {secret_key});
+    return call(_fn, {secret_key});
 }
 Variant sodium_crypto_sign_keypair() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1986]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1986]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_sign_keypair_from_secretkey_and_publickey(const Variant &secret_key, const Variant &public_key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1987]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1987]);
     }
-    return call(fn, {secret_key, public_key});
+    return call(_fn, {secret_key, public_key});
 }
 Variant sodium_crypto_sign_open(const Variant &signed_message, const Variant &public_key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1988]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1988]);
     }
-    return call(fn, {signed_message, public_key});
+    return call(_fn, {signed_message, public_key});
 }
 Variant sodium_crypto_sign_publickey(const Variant &key_pair) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1989]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1989]);
     }
-    return call(fn, {key_pair});
+    return call(_fn, {key_pair});
 }
 Variant sodium_crypto_sign_secretkey(const Variant &key_pair) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1990]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1990]);
     }
-    return call(fn, {key_pair});
+    return call(_fn, {key_pair});
 }
 Variant sodium_crypto_sign_publickey_from_secretkey(const Variant &secret_key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1991]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1991]);
     }
-    return call(fn, {secret_key});
+    return call(_fn, {secret_key});
 }
 Variant sodium_crypto_sign_seed_keypair(const Variant &seed) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1992]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1992]);
     }
-    return call(fn, {seed});
+    return call(_fn, {seed});
 }
 Variant sodium_crypto_sign_verify_detached(const Variant &signature,
                                            const Variant &message,
                                            const Variant &public_key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1993]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1993]);
     }
-    return call(fn, {signature, message, public_key});
+    return call(_fn, {signature, message, public_key});
 }
 Variant sodium_crypto_stream(const Variant &length, const Variant &nonce, const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1994]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1994]);
     }
-    return call(fn, {length, nonce, key});
+    return call(_fn, {length, nonce, key});
 }
 Variant sodium_crypto_stream_keygen() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1995]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1995]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_stream_xor(const Variant &message, const Variant &nonce, const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1996]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1996]);
     }
-    return call(fn, {message, nonce, key});
+    return call(_fn, {message, nonce, key});
 }
 Variant sodium_crypto_stream_xchacha20(const Variant &length, const Variant &nonce, const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1997]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1997]);
     }
-    return call(fn, {length, nonce, key});
+    return call(_fn, {length, nonce, key});
 }
 Variant sodium_crypto_stream_xchacha20_keygen() {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1998]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1998]);
     }
-    return call(fn, {});
+    return call(_fn, {});
 }
 Variant sodium_crypto_stream_xchacha20_xor(const Variant &message, const Variant &nonce, const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1999]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1999]);
     }
-    return call(fn, {message, nonce, key});
+    return call(_fn, {message, nonce, key});
 }
 Variant sodium_crypto_stream_xchacha20_xor_ic(const Variant &message,
                                               const Variant &nonce,
                                               const Variant &counter,
                                               const Variant &key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2000]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2000]);
     }
-    return call(fn, {message, nonce, counter, key});
+    return call(_fn, {message, nonce, counter, key});
 }
 Variant sodium_add(const Reference &string1, const Variant &string2) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2001]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2001]);
     }
-    return call(fn, {&string1, string2});
+    return call(_fn, {&string1, string2});
 }
 Variant sodium_compare(const Variant &string1, const Variant &string2) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2002]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2002]);
     }
-    return call(fn, {string1, string2});
+    return call(_fn, {string1, string2});
 }
 Variant sodium_increment(const Reference &string) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2003]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2003]);
     }
-    return call(fn, {&string});
+    return call(_fn, {&string});
 }
 Variant sodium_memcmp(const Variant &string1, const Variant &string2) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2004]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2004]);
     }
-    return call(fn, {string1, string2});
+    return call(_fn, {string1, string2});
 }
 Variant sodium_memzero(const Reference &string) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2005]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2005]);
     }
-    return call(fn, {&string});
+    return call(_fn, {&string});
 }
 Variant sodium_pad(const Variant &string, const Variant &block_size) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2006]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2006]);
     }
-    return call(fn, {string, block_size});
+    return call(_fn, {string, block_size});
 }
 Variant sodium_unpad(const Variant &string, const Variant &block_size) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2007]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2007]);
     }
-    return call(fn, {string, block_size});
+    return call(_fn, {string, block_size});
 }
 Variant sodium_bin2hex(const Variant &string) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2008]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2008]);
     }
-    return call(fn, {string});
+    return call(_fn, {string});
 }
 Variant sodium_hex2bin(const Variant &string, const Variant &ignore) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2009]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2009]);
     }
-    return call(fn, {string, ignore});
+    return call(_fn, {string, ignore});
 }
 Variant sodium_bin2base64(const Variant &string, const Variant &id) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2010]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2010]);
     }
-    return call(fn, {string, id});
+    return call(_fn, {string, id});
 }
 Variant sodium_base642bin(const Variant &string, const Variant &id, const Variant &ignore) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2011]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2011]);
     }
-    return call(fn, {string, id, ignore});
+    return call(_fn, {string, id, ignore});
 }
 Variant sodium_crypto_scalarmult_base(const Variant &secret_key) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[2012]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[2012]);
     }
-    return call(fn, {secret_key});
+    return call(_fn, {secret_key});
 }
 }  // namespace php

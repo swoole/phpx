@@ -137,46 +137,10 @@ foreach ($funcIncludes as $name) {
 }
 fclose($funcHeaderFile);
 
-// Write phpx_class.h with forward declarations of all facade classes
+// Write phpx_class.h — convenience header that includes all class headers
 $classHeaderFile = fopen($rootDir . '/include/phpx_class.h', "w");
 fwrite($classHeaderFile, $header);
-fwrite($classHeaderFile, "\nnamespace php {\n");
-
-// Group sorted classes by namespace for nested forward declarations
-$groupedSorted = [];
-foreach (Generator::$sortedClasses as $className) {
-    $facadeNs = Generator::getFacadeClassNamespace();
-    $nsInfo = $facadeNs[$className] ?? ['ns' => [], 'short' => $className];
-    $nsKey = empty($nsInfo['ns']) ? '' : implode('::', $nsInfo['ns']);
-    $groupedSorted[$nsKey][] = $nsInfo['short'];
-}
-
-// Write flat (non-namespaced) forward declarations
-if (isset($groupedSorted[''])) {
-    foreach ($groupedSorted[''] as $short) {
-        fwrite($classHeaderFile, "class {$short};\n");
-    }
-}
-
-// Write namespaced forward declarations
-foreach ($groupedSorted as $nsKey => $shortNames) {
-    if ($nsKey === '') continue;
-    $nsParts = explode('::', $nsKey);
-    $indent = '    ';
-    foreach ($nsParts as $part) {
-        fwrite($classHeaderFile, "{$indent}namespace {$part} {\n");
-        $indent .= '    ';
-    }
-    foreach ($shortNames as $short) {
-        fwrite($classHeaderFile, "{$indent}class {$short};\n");
-    }
-    foreach (array_reverse($nsParts) as $part) {
-        $indent = substr($indent, 4);
-        fwrite($classHeaderFile, "{$indent}}  // namespace {$part}\n");
-    }
-}
-
-fwrite($classHeaderFile, "}  // namespace php\n\n");
+fwrite($classHeaderFile, "\n");
 foreach ($classIncludes as $name) {
     fwrite($classHeaderFile, "#include \"class/{$name}.h\"\n");
 }

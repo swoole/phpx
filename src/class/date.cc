@@ -1,6 +1,6 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/date.h"
+#include "class/core.h"
 
 namespace php {
 DateTimeZone::DateTimeZone(const Variant &timezone) {

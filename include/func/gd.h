@@ -114,36 +114,36 @@ GdImage imagecreatefromgd2part(
     const Variant &filename, const Variant &x, const Variant &y, const Variant &width, const Variant &height);
 GdImage imagecreatefrombmp(const Variant &filename);
 GdImage imagecreatefromtga(const Variant &filename);
-Variant imagexbm(const GdImage &image, const Variant &filename, const Variant &foreground_color = {});
-Variant imagexbm(const Variant &image, const Variant &filename, const Variant &foreground_color = {});
-Variant imagegif(const GdImage &image, const Variant &file = {});
-Variant imagegif(const Variant &image, const Variant &file = {});
+Variant imagexbm(const GdImage &image, const Variant &filename, const Variant &foreground_color = nullptr);
+Variant imagexbm(const Variant &image, const Variant &filename, const Variant &foreground_color = nullptr);
+Variant imagegif(const GdImage &image, const Variant &file = nullptr);
+Variant imagegif(const Variant &image, const Variant &file = nullptr);
 Variant imagepng(const GdImage &image,
-                 const Variant &file = {},
+                 const Variant &file = nullptr,
                  const Variant &quality = -1,
                  const Variant &filters = -1);
 Variant imagepng(const Variant &image,
-                 const Variant &file = {},
+                 const Variant &file = nullptr,
                  const Variant &quality = -1,
                  const Variant &filters = -1);
-Variant imagewebp(const GdImage &image, const Variant &file = {}, const Variant &quality = -1);
-Variant imagewebp(const Variant &image, const Variant &file = {}, const Variant &quality = -1);
-Variant imagejpeg(const GdImage &image, const Variant &file = {}, const Variant &quality = -1);
-Variant imagejpeg(const Variant &image, const Variant &file = {}, const Variant &quality = -1);
-Variant imagewbmp(const GdImage &image, const Variant &file = {}, const Variant &foreground_color = {});
-Variant imagewbmp(const Variant &image, const Variant &file = {}, const Variant &foreground_color = {});
-Variant imagegd(const GdImage &image, const Variant &file = {});
-Variant imagegd(const Variant &image, const Variant &file = {});
+Variant imagewebp(const GdImage &image, const Variant &file = nullptr, const Variant &quality = -1);
+Variant imagewebp(const Variant &image, const Variant &file = nullptr, const Variant &quality = -1);
+Variant imagejpeg(const GdImage &image, const Variant &file = nullptr, const Variant &quality = -1);
+Variant imagejpeg(const Variant &image, const Variant &file = nullptr, const Variant &quality = -1);
+Variant imagewbmp(const GdImage &image, const Variant &file = nullptr, const Variant &foreground_color = nullptr);
+Variant imagewbmp(const Variant &image, const Variant &file = nullptr, const Variant &foreground_color = nullptr);
+Variant imagegd(const GdImage &image, const Variant &file = nullptr);
+Variant imagegd(const Variant &image, const Variant &file = nullptr);
 Variant imagegd2(const GdImage &image,
-                 const Variant &file = {},
+                 const Variant &file = nullptr,
                  const Variant &chunk_size = 128,
                  const Variant &mode = 1);
 Variant imagegd2(const Variant &image,
-                 const Variant &file = {},
+                 const Variant &file = nullptr,
                  const Variant &chunk_size = 128,
                  const Variant &mode = 1);
-Variant imagebmp(const GdImage &image, const Variant &file = {}, const Variant &compressed = true);
-Variant imagebmp(const Variant &image, const Variant &file = {}, const Variant &compressed = true);
+Variant imagebmp(const GdImage &image, const Variant &file = nullptr, const Variant &compressed = true);
+Variant imagebmp(const Variant &image, const Variant &file = nullptr, const Variant &compressed = true);
 Variant imagedestroy(const GdImage &image);
 Variant imagedestroy(const Variant &image);
 Variant imagecolorallocate(const GdImage &image, const Variant &red, const Variant &green, const Variant &blue);
@@ -264,34 +264,34 @@ Variant imagefill(const GdImage &image, const Variant &x, const Variant &y, cons
 Variant imagefill(const Variant &image, const Variant &x, const Variant &y, const Variant &color);
 Variant imagecolorstotal(const GdImage &image);
 Variant imagecolorstotal(const Variant &image);
-Variant imagecolortransparent(const GdImage &image, const Variant &color = {});
-Variant imagecolortransparent(const Variant &image, const Variant &color = {});
-Variant imageinterlace(const GdImage &image, const Variant &enable = {});
-Variant imageinterlace(const Variant &image, const Variant &enable = {});
+Variant imagecolortransparent(const GdImage &image, const Variant &color = nullptr);
+Variant imagecolortransparent(const Variant &image, const Variant &color = nullptr);
+Variant imageinterlace(const GdImage &image, const Variant &enable = nullptr);
+Variant imageinterlace(const Variant &image, const Variant &enable = nullptr);
 Variant imagepolygon(const GdImage &image,
                      const Variant &points,
                      const Variant &num_points_or_color,
-                     const Variant &color = {});
+                     const Variant &color = nullptr);
 Variant imagepolygon(const Variant &image,
                      const Variant &points,
                      const Variant &num_points_or_color,
-                     const Variant &color = {});
+                     const Variant &color = nullptr);
 Variant imageopenpolygon(const GdImage &image,
                          const Variant &points,
                          const Variant &num_points_or_color,
-                         const Variant &color = {});
+                         const Variant &color = nullptr);
 Variant imageopenpolygon(const Variant &image,
                          const Variant &points,
                          const Variant &num_points_or_color,
-                         const Variant &color = {});
+                         const Variant &color = nullptr);
 Variant imagefilledpolygon(const GdImage &image,
                            const Variant &points,
                            const Variant &num_points_or_color,
-                           const Variant &color = {});
+                           const Variant &color = nullptr);
 Variant imagefilledpolygon(const Variant &image,
                            const Variant &points,
                            const Variant &num_points_or_color,
-                           const Variant &color = {});
+                           const Variant &color = nullptr);
 Variant imagefontwidth(const Variant &font);
 Variant imagefontheight(const Variant &font);
 Variant imagechar(const GdImage &image,
@@ -448,15 +448,19 @@ Variant imagecropauto(const Variant &image,
                       const Variant &color = -1);
 GdImage imagescale(const GdImage &image, const Variant &width, const Variant &height = -1, const Variant &mode = 3);
 Variant imagescale(const Variant &image, const Variant &width, const Variant &height = -1, const Variant &mode = 3);
-GdImage imageaffine(const GdImage &image, const Variant &affine, const Variant &clip = {});
-Variant imageaffine(const Variant &image, const Variant &affine, const Variant &clip = {});
+GdImage imageaffine(const GdImage &image, const Variant &affine, const Variant &clip = nullptr);
+Variant imageaffine(const Variant &image, const Variant &affine, const Variant &clip = nullptr);
 Variant imageaffinematrixget(const Variant &type, const Variant &options);
 Variant imageaffinematrixconcat(const Variant &matrix1, const Variant &matrix2);
 Variant imagegetinterpolation(const GdImage &image);
 Variant imagegetinterpolation(const Variant &image);
 Variant imagesetinterpolation(const GdImage &image, const Variant &method = 3);
 Variant imagesetinterpolation(const Variant &image, const Variant &method = 3);
-Variant imageresolution(const GdImage &image, const Variant &resolution_x = {}, const Variant &resolution_y = {});
-Variant imageresolution(const Variant &image, const Variant &resolution_x = {}, const Variant &resolution_y = {});
+Variant imageresolution(const GdImage &image,
+                        const Variant &resolution_x = nullptr,
+                        const Variant &resolution_y = nullptr);
+Variant imageresolution(const Variant &image,
+                        const Variant &resolution_x = nullptr,
+                        const Variant &resolution_y = nullptr);
 
 }  // namespace php

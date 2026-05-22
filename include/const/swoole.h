@@ -294,7 +294,7 @@ extern Variant SWOOLE_HOOK_NET_FUNCTION;
 extern Variant SWOOLE_HOOK_MONGODB;
 extern Variant SWOOLE_HOOK_ALL;
 extern Variant SOCKET_ECANCELED;
-extern Variant TCP_INFO;
+extern Variant TCP_INFO_;
 extern Variant SWOOLE_SYNC;
 extern Variant SWOOLE_ASYNC;
 extern Variant SWOOLE_KEEP;

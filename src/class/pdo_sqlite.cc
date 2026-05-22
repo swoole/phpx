@@ -1,6 +1,6 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/pdo_sqlite.h"
+#include "class/pdo.h"
 
 namespace php::Pdo {
 Variant Sqlite::createAggregate(const Variant &name,

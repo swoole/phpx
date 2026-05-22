@@ -1,6 +1,6 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/sqlite3.h"
+#include "class/core.h"
 
 namespace php {
 SQLite3Exception::SQLite3Exception(const Variant &message, const Variant &code, const Variant &previous) {

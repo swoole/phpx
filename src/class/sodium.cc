@@ -1,6 +1,6 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/sodium.h"
+#include "class/core.h"
 
 namespace php {
 SodiumException::SodiumException(const Variant &message, const Variant &code, const Variant &previous) {

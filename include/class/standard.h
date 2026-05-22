@@ -26,7 +26,7 @@ class __PHP_Incomplete_Class {
 
 class AssertionError : public Error {
   public:
-    AssertionError(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    AssertionError(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class RoundingMode {

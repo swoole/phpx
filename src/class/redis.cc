@@ -1,6 +1,6 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/redis.h"
+#include "class/spl.h"
 
 namespace php {
 Redis::Redis(const Variant &options) {

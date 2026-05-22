@@ -8,7 +8,7 @@ namespace php {
 
 Variant bzopen(const Variant &file, const Variant &mode);
 Variant bzread(const Variant &bz, const Variant &length = 1024);
-Variant bzwrite(const Variant &bz, const Variant &data, const Variant &length = {});
+Variant bzwrite(const Variant &bz, const Variant &data, const Variant &length = nullptr);
 Variant bzflush(const Variant &bz);
 Variant bzclose(const Variant &bz);
 Variant bzerrno(const Variant &bz);

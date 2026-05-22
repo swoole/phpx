@@ -8,28 +8,28 @@ Variant simplexml_load_file(const Variant &filename,
                             const Variant &options,
                             const Variant &namespace_or_prefix,
                             const Variant &is_prefix) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1854]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1854]);
     }
-    return call(fn, {filename, class_name, options, namespace_or_prefix, is_prefix});
+    return call(_fn, {filename, class_name, options, namespace_or_prefix, is_prefix});
 }
 Variant simplexml_load_string(const Variant &data,
                               const Variant &class_name,
                               const Variant &options,
                               const Variant &namespace_or_prefix,
                               const Variant &is_prefix) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1855]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1855]);
     }
-    return call(fn, {data, class_name, options, namespace_or_prefix, is_prefix});
+    return call(_fn, {data, class_name, options, namespace_or_prefix, is_prefix});
 }
 Variant simplexml_import_dom(const Variant &node, const Variant &class_name) {
-    static THREAD_LOCAL zend_function *fn = nullptr;
-    if (UNEXPECTED(!fn)) {
-        fn = getFunction(LITERAL_STRING[1856]);
+    static THREAD_LOCAL zend_function *_fn = nullptr;
+    if (UNEXPECTED(!_fn)) {
+        _fn = getFunction(LITERAL_STRING[1856]);
     }
-    return call(fn, {node, class_name});
+    return call(_fn, {node, class_name});
 }
 }  // namespace php

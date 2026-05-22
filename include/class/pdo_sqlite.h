@@ -39,7 +39,10 @@ class Sqlite : public PDO {
                      const Variant &rowid,
                      const Variant &dbname = "main",
                      const Variant &flags = 1);
-    Sqlite(const Variant &dsn, const Variant &username = {}, const Variant &password = {}, const Variant &options = {});
+    Sqlite(const Variant &dsn,
+           const Variant &username = nullptr,
+           const Variant &password = nullptr,
+           const Variant &options = nullptr);
 };
 
 }  // namespace Pdo

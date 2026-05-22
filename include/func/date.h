@@ -6,32 +6,34 @@
 
 namespace php {
 
-Variant strtotime(const Variant &datetime, const Variant &base_timestamp = {});
-Variant date(const Variant &format, const Variant &timestamp = {});
-Variant idate(const Variant &format, const Variant &timestamp = {});
-Variant gmdate(const Variant &format, const Variant &timestamp = {});
+Variant strtotime(const Variant &datetime, const Variant &base_timestamp = nullptr);
+Variant date(const Variant &format, const Variant &timestamp = nullptr);
+Variant idate(const Variant &format, const Variant &timestamp = nullptr);
+Variant gmdate(const Variant &format, const Variant &timestamp = nullptr);
 Variant mktime(const Variant &hour,
-               const Variant &minute = {},
-               const Variant &second = {},
-               const Variant &month = {},
-               const Variant &day = {},
-               const Variant &year = {});
+               const Variant &minute = nullptr,
+               const Variant &second = nullptr,
+               const Variant &month = nullptr,
+               const Variant &day = nullptr,
+               const Variant &year = nullptr);
 Variant gmmktime(const Variant &hour,
-                 const Variant &minute = {},
-                 const Variant &second = {},
-                 const Variant &month = {},
-                 const Variant &day = {},
-                 const Variant &year = {});
+                 const Variant &minute = nullptr,
+                 const Variant &second = nullptr,
+                 const Variant &month = nullptr,
+                 const Variant &day = nullptr,
+                 const Variant &year = nullptr);
 Variant checkdate(const Variant &month, const Variant &day, const Variant &year);
-Variant strftime(const Variant &format, const Variant &timestamp = {});
-Variant gmstrftime(const Variant &format, const Variant &timestamp = {});
+Variant strftime(const Variant &format, const Variant &timestamp = nullptr);
+Variant gmstrftime(const Variant &format, const Variant &timestamp = nullptr);
 Variant time();
-Variant localtime(const Variant &timestamp = {}, const Variant &associative = false);
-Variant getdate(const Variant &timestamp = {});
-Variant date_create(const Variant &datetime = "now", const Variant &timezone = {});
-Variant date_create_immutable(const Variant &datetime = "now", const Variant &timezone = {});
-Variant date_create_from_format(const Variant &format, const Variant &datetime, const Variant &timezone = {});
-Variant date_create_immutable_from_format(const Variant &format, const Variant &datetime, const Variant &timezone = {});
+Variant localtime(const Variant &timestamp = nullptr, const Variant &associative = false);
+Variant getdate(const Variant &timestamp = nullptr);
+Variant date_create(const Variant &datetime = "now", const Variant &timezone = nullptr);
+Variant date_create_immutable(const Variant &datetime = "now", const Variant &timezone = nullptr);
+Variant date_create_from_format(const Variant &format, const Variant &datetime, const Variant &timezone = nullptr);
+Variant date_create_immutable_from_format(const Variant &format,
+                                          const Variant &datetime,
+                                          const Variant &timezone = nullptr);
 Variant date_parse(const Variant &datetime);
 Variant date_parse_from_format(const Variant &format, const Variant &datetime);
 Variant date_get_last_errors();
@@ -84,7 +86,7 @@ Variant timezone_transitions_get(const Variant &object,
                                  const Variant &timestamp_end = LONG_MAX);
 Variant timezone_location_get(const DateTimeZone &object);
 Variant timezone_location_get(const Variant &object);
-Variant timezone_identifiers_list(const Variant &timezone_group = 2047, const Variant &country_code = {});
+Variant timezone_identifiers_list(const Variant &timezone_group = 2047, const Variant &country_code = nullptr);
 Variant timezone_abbreviations_list();
 Variant timezone_version_get();
 Variant date_interval_create_from_date_string(const Variant &datetime);
@@ -94,16 +96,16 @@ Variant date_default_timezone_set(const Variant &timezone_id);
 Variant date_default_timezone_get();
 Variant date_sunrise(const Variant &timestamp,
                      const Variant &return_format = 1,
-                     const Variant &latitude = {},
-                     const Variant &longitude = {},
-                     const Variant &zenith = {},
-                     const Variant &utc_offset = {});
+                     const Variant &latitude = nullptr,
+                     const Variant &longitude = nullptr,
+                     const Variant &zenith = nullptr,
+                     const Variant &utc_offset = nullptr);
 Variant date_sunset(const Variant &timestamp,
                     const Variant &return_format = 1,
-                    const Variant &latitude = {},
-                    const Variant &longitude = {},
-                    const Variant &zenith = {},
-                    const Variant &utc_offset = {});
+                    const Variant &latitude = nullptr,
+                    const Variant &longitude = nullptr,
+                    const Variant &zenith = nullptr,
+                    const Variant &utc_offset = nullptr);
 Variant date_sun_info(const Variant &timestamp, const Variant &latitude, const Variant &longitude);
 
 }  // namespace php

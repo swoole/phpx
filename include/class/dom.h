@@ -111,13 +111,13 @@ class Node {
     Variant getNodePath();
     Variant C14N(const Variant &exclusive = false,
                  const Variant &with_comments = false,
-                 const Variant &xpath = {},
-                 const Variant &ns_prefixes = {});
+                 const Variant &xpath = nullptr,
+                 const Variant &ns_prefixes = nullptr);
     Variant C14NFile(const Variant &uri,
                      const Variant &exclusive = false,
                      const Variant &with_comments = false,
-                     const Variant &xpath = {},
-                     const Variant &ns_prefixes = {});
+                     const Variant &xpath = nullptr,
+                     const Variant &ns_prefixes = nullptr);
     Variant __sleep();
     Variant __wakeup();
 };
@@ -312,13 +312,13 @@ class XPath {
     }
     XPath(const Variant &document, const Variant &register_node_n_s = true);
     Variant evaluate(const Variant &expression,
-                     const Variant &context_node = {},
+                     const Variant &context_node = nullptr,
                      const Variant &register_node_n_s = true);
     NodeList query(const Variant &expression,
-                   const Variant &context_node = {},
+                   const Variant &context_node = nullptr,
                    const Variant &register_node_n_s = true);
     Variant registerNamespace(const Variant &prefix, const Variant &namespace_);
-    Variant registerPhpFunctions(const Variant &restrict = {});
+    Variant registerPhpFunctions(const Variant &restrict = nullptr);
     Variant registerPhpFunctionNS(const Variant &namespace_u_r_i, const Variant &name, const Variant &callable);
     static Variant quote(const Variant &str);
 };
@@ -349,7 +349,7 @@ class TokenList {
         }
         return this_.call(_method_fn, {tokens...});
     }
-    Variant toggle(const Variant &token, const Variant &force = {});
+    Variant toggle(const Variant &token, const Variant &force = nullptr);
     Variant replace(const Variant &token, const Variant &new_token);
     Variant supports(const Variant &token);
     Variant count();
@@ -421,7 +421,7 @@ class Element : public Node {
     Variant setAttributeNS(const Variant &namespace_, const Variant &qualified_name, const Variant &value);
     Variant removeAttribute(const Variant &qualified_name);
     Variant removeAttributeNS(const Variant &namespace_, const Variant &local_name);
-    Variant toggleAttribute(const Variant &qualified_name, const Variant &force = {});
+    Variant toggleAttribute(const Variant &qualified_name, const Variant &force = nullptr);
     Variant hasAttribute(const Variant &qualified_name);
     Variant hasAttributeNS(const Variant &namespace_, const Variant &local_name);
     Attr getAttributeNode(const Variant &qualified_name);
@@ -513,13 +513,13 @@ class HTMLDocument {
     static HTMLDocument createEmpty(const Variant &encoding = "UTF-8");
     static HTMLDocument createFromFile(const Variant &path,
                                        const Variant &options = 0,
-                                       const Variant &override_encoding = {});
+                                       const Variant &override_encoding = nullptr);
     static HTMLDocument createFromString(const Variant &source,
                                          const Variant &options = 0,
-                                         const Variant &override_encoding = {});
-    Variant saveXml(const Variant &node = {}, const Variant &options = 0);
+                                         const Variant &override_encoding = nullptr);
+    Variant saveXml(const Variant &node = nullptr, const Variant &options = 0);
     Variant saveXmlFile(const Variant &filename, const Variant &options = 0);
-    Variant saveHtml(const Variant &node = {});
+    Variant saveHtml(const Variant &node = nullptr);
     Variant saveHtmlFile(const Variant &filename);
     Variant debugGetTemplateCount();
     HTMLCollection getElementsByTagName(const Variant &qualified_name);
@@ -598,13 +598,13 @@ class HTMLDocument {
     Variant getNodePath();
     Variant C14N(const Variant &exclusive = false,
                  const Variant &with_comments = false,
-                 const Variant &xpath = {},
-                 const Variant &ns_prefixes = {});
+                 const Variant &xpath = nullptr,
+                 const Variant &ns_prefixes = nullptr);
     Variant C14NFile(const Variant &uri,
                      const Variant &exclusive = false,
                      const Variant &with_comments = false,
-                     const Variant &xpath = {},
-                     const Variant &ns_prefixes = {});
+                     const Variant &xpath = nullptr,
+                     const Variant &ns_prefixes = nullptr);
     Variant __sleep();
     Variant __wakeup();
 };
@@ -622,14 +622,14 @@ class XMLDocument {
     static XMLDocument createEmpty(const Variant &version = "1.0", const Variant &encoding = "UTF-8");
     static XMLDocument createFromFile(const Variant &path,
                                       const Variant &options = 0,
-                                      const Variant &override_encoding = {});
+                                      const Variant &override_encoding = nullptr);
     static XMLDocument createFromString(const Variant &source,
                                         const Variant &options = 0,
-                                        const Variant &override_encoding = {});
+                                        const Variant &override_encoding = nullptr);
     EntityReference createEntityReference(const Variant &name);
     Variant validate();
     Variant xinclude(const Variant &options = 0);
-    Variant saveXml(const Variant &node = {}, const Variant &options = 0);
+    Variant saveXml(const Variant &node = nullptr, const Variant &options = 0);
     Variant saveXmlFile(const Variant &filename, const Variant &options = 0);
     HTMLCollection getElementsByTagName(const Variant &qualified_name);
     HTMLCollection getElementsByTagNameNS(const Variant &namespace_, const Variant &local_name);
@@ -707,13 +707,13 @@ class XMLDocument {
     Variant getNodePath();
     Variant C14N(const Variant &exclusive = false,
                  const Variant &with_comments = false,
-                 const Variant &xpath = {},
-                 const Variant &ns_prefixes = {});
+                 const Variant &xpath = nullptr,
+                 const Variant &ns_prefixes = nullptr);
     Variant C14NFile(const Variant &uri,
                      const Variant &exclusive = false,
                      const Variant &with_comments = false,
-                     const Variant &xpath = {},
-                     const Variant &ns_prefixes = {});
+                     const Variant &xpath = nullptr,
+                     const Variant &ns_prefixes = nullptr);
     Variant __sleep();
     Variant __wakeup();
 };
@@ -729,8 +729,10 @@ class Implementation {
     explicit Implementation(const Object &obj) : this_(obj) {}
     Implementation();
     DocumentType createDocumentType(const Variant &qualified_name, const Variant &public_id, const Variant &system_id);
-    XMLDocument createDocument(const Variant &namespace_, const Variant &qualified_name, const Variant &doctype = {});
-    HTMLDocument createHTMLDocument(const Variant &title = {});
+    XMLDocument createDocument(const Variant &namespace_,
+                               const Variant &qualified_name,
+                               const Variant &doctype = nullptr);
+    HTMLDocument createHTMLDocument(const Variant &title = nullptr);
 };
 
 class HTMLElement : public Element {
@@ -743,7 +745,7 @@ class HTMLElement : public Element {
 
 class DOMException : public Exception {
   public:
-    DOMException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    DOMException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class DOMNode {
@@ -767,20 +769,20 @@ class DOMNode {
     Variant appendChild(const Variant &node);
     Variant C14N(const Variant &exclusive = false,
                  const Variant &with_comments = false,
-                 const Variant &xpath = {},
-                 const Variant &ns_prefixes = {});
+                 const Variant &xpath = nullptr,
+                 const Variant &ns_prefixes = nullptr);
     Variant C14NFile(const Variant &uri,
                      const Variant &exclusive = false,
                      const Variant &with_comments = false,
-                     const Variant &xpath = {},
-                     const Variant &ns_prefixes = {});
+                     const Variant &xpath = nullptr,
+                     const Variant &ns_prefixes = nullptr);
     Variant cloneNode(const Variant &deep = false);
     Variant getLineNo();
     Variant getNodePath();
     Variant hasAttributes();
     Variant hasChildNodes();
-    Variant insertBefore(const DOMNode &node, const Variant &child = {});
-    Variant insertBefore(const Variant &node, const Variant &child = {});
+    Variant insertBefore(const DOMNode &node, const Variant &child = nullptr);
+    Variant insertBefore(const Variant &node, const Variant &child = nullptr);
     Variant isDefaultNamespace(const Variant &namespace_);
     Variant isSameNode(const DOMNode &other_node);
     Variant isSameNode(const Variant &other_node);
@@ -795,7 +797,7 @@ class DOMNode {
     Variant replaceChild(const DOMNode &node, const DOMNode &child);
     Variant replaceChild(const Variant &node, const Variant &child);
     Variant contains(const Variant &other);
-    DOMNode getRootNode(const Variant &options = {});
+    DOMNode getRootNode(const Variant &options = nullptr);
     Variant compareDocumentPosition(const DOMNode &other);
     Variant compareDocumentPosition(const Variant &other);
     Variant __sleep();
@@ -928,7 +930,7 @@ class DOMElement : public DOMNode {
     DOMElement() = default;
 
   public:
-    DOMElement(const Variant &qualified_name, const Variant &value = {}, const Variant &namespace_ = "");
+    DOMElement(const Variant &qualified_name, const Variant &value = nullptr, const Variant &namespace_ = "");
     Variant getAttribute(const Variant &qualified_name);
     Variant getAttributeNames();
     Variant getAttributeNS(const Variant &namespace_, const Variant &local_name);
@@ -952,7 +954,7 @@ class DOMElement : public DOMNode {
     Variant setIdAttributeNS(const Variant &namespace_, const Variant &qualified_name, const Variant &is_id);
     Variant setIdAttributeNode(const DOMAttr &attr, const Variant &is_id);
     Variant setIdAttributeNode(const Variant &attr, const Variant &is_id);
-    Variant toggleAttribute(const Variant &qualified_name, const Variant &force = {});
+    Variant toggleAttribute(const Variant &qualified_name, const Variant &force = nullptr);
     Variant remove();
     template <typename... Args>
     Variant before(const Args &...nodes) {
@@ -1045,9 +1047,9 @@ class DOMDocument : public DOMNode {
     Variant save(const Variant &filename, const Variant &options = 0);
     Variant loadHTML(const Variant &source, const Variant &options = 0);
     Variant loadHTMLFile(const Variant &filename, const Variant &options = 0);
-    Variant saveHTML(const Variant &node = {});
+    Variant saveHTML(const Variant &node = nullptr);
     Variant saveHTMLFile(const Variant &filename);
-    Variant saveXML(const Variant &node = {}, const Variant &options = 0);
+    Variant saveXML(const Variant &node = nullptr, const Variant &options = 0);
     Variant schemaValidate(const Variant &filename, const Variant &flags = 0);
     Variant schemaValidateSource(const Variant &source, const Variant &flags = 0);
     Variant relaxNGValidate(const Variant &filename);
@@ -1110,9 +1112,9 @@ class DOMImplementation {
     Variant createDocumentType(const Variant &qualified_name,
                                const Variant &public_id = "",
                                const Variant &system_id = "");
-    Variant createDocument(const Variant &namespace_ = {},
+    Variant createDocument(const Variant &namespace_ = nullptr,
                            const Variant &qualified_name = "",
-                           const Variant &doctype = {});
+                           const Variant &doctype = nullptr);
 };
 
 class DOMNotation : public DOMNode {
@@ -1154,11 +1156,13 @@ class DOMXPath {
     }
     DOMXPath(const DOMDocument &document, const Variant &register_node_n_s = true);
     Variant evaluate(const Variant &expression,
-                     const Variant &context_node = {},
+                     const Variant &context_node = nullptr,
                      const Variant &register_node_n_s = true);
-    Variant query(const Variant &expression, const Variant &context_node = {}, const Variant &register_node_n_s = true);
+    Variant query(const Variant &expression,
+                  const Variant &context_node = nullptr,
+                  const Variant &register_node_n_s = true);
     Variant registerNamespace(const Variant &prefix, const Variant &namespace_);
-    Variant registerPhpFunctions(const Variant &restrict = {});
+    Variant registerPhpFunctions(const Variant &restrict = nullptr);
     Variant registerPhpFunctionNS(const Variant &namespace_u_r_i, const Variant &name, const Variant &callable);
     static Variant quote(const Variant &str);
 };

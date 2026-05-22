@@ -1,6 +1,6 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/dom.h"
+#include "class/core.h"
 
 namespace php::Dom {
 AdjacentPosition::AdjacentPosition() {

@@ -6,8 +6,8 @@
 
 namespace php {
 
-XMLParser xml_parser_create(const Variant &encoding = {});
-XMLParser xml_parser_create_ns(const Variant &encoding = {}, const Variant &separator = ":");
+XMLParser xml_parser_create(const Variant &encoding = nullptr);
+XMLParser xml_parser_create_ns(const Variant &encoding = nullptr, const Variant &separator = ":");
 Variant xml_set_object(const XMLParser &parser, const Variant &object);
 Variant xml_set_object(const Variant &parser, const Variant &object);
 Variant xml_set_element_handler(const XMLParser &parser, const Variant &start_handler, const Variant &end_handler);
@@ -33,11 +33,11 @@ Variant xml_parse(const Variant &parser, const Variant &data, const Variant &is_
 Variant xml_parse_into_struct(const XMLParser &parser,
                               const Variant &data,
                               const Reference &values,
-                              const Reference &index = {});
+                              const Reference &index = nullptr);
 Variant xml_parse_into_struct(const Variant &parser,
                               const Variant &data,
                               const Reference &values,
-                              const Reference &index = {});
+                              const Reference &index = nullptr);
 Variant xml_get_error_code(const XMLParser &parser);
 Variant xml_get_error_code(const Variant &parser);
 Variant xml_error_string(const Variant &error_code);

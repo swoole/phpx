@@ -9,7 +9,7 @@ class JsonException;
 
 class JsonException : public Exception {
   public:
-    JsonException(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    JsonException(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 }  // namespace php

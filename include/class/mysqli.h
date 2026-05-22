@@ -15,7 +15,7 @@ class mysqli_stmt;
 class mysqli_sql_exception : public RuntimeException {
   public:
     Variant getSqlState();
-    mysqli_sql_exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = {});
+    mysqli_sql_exception(const Variant &message = "", const Variant &code = 0, const Variant &previous = nullptr);
 };
 
 class mysqli_driver {
@@ -76,28 +76,28 @@ class mysqli {
     Object getObject() const {
         return this_;
     }
-    mysqli(const Variant &hostname = {},
-           const Variant &username = {},
-           const Variant &password = {},
-           const Variant &database = {},
-           const Variant &port = {},
-           const Variant &socket = {});
+    mysqli(const Variant &hostname = nullptr,
+           const Variant &username = nullptr,
+           const Variant &password = nullptr,
+           const Variant &database = nullptr,
+           const Variant &port = nullptr,
+           const Variant &socket = nullptr);
     Variant autocommit(const Variant &enable);
-    Variant begin_transaction(const Variant &flags = 0, const Variant &name = {});
+    Variant begin_transaction(const Variant &flags = 0, const Variant &name = nullptr);
     Variant change_user(const Variant &username, const Variant &password, const Variant &database);
     Variant character_set_name();
     Variant close();
-    Variant commit(const Variant &flags = 0, const Variant &name = {});
-    Variant connect(const Variant &hostname = {},
-                    const Variant &username = {},
-                    const Variant &password = {},
-                    const Variant &database = {},
-                    const Variant &port = {},
-                    const Variant &socket = {});
+    Variant commit(const Variant &flags = 0, const Variant &name = nullptr);
+    Variant connect(const Variant &hostname = nullptr,
+                    const Variant &username = nullptr,
+                    const Variant &password = nullptr,
+                    const Variant &database = nullptr,
+                    const Variant &port = nullptr,
+                    const Variant &socket = nullptr);
     Variant dump_debug_info();
     Variant debug(const Variant &options);
     Variant get_charset();
-    Variant execute_query(const Variant &query, const Variant &params = {});
+    Variant execute_query(const Variant &query, const Variant &params = nullptr);
     Variant get_client_info();
     Variant get_connection_stats();
     Variant get_server_info();
@@ -115,19 +115,19 @@ class mysqli {
                         const Variant &microseconds = 0);
     Variant prepare(const Variant &query);
     Variant query(const Variant &query, const Variant &result_mode = 0);
-    Variant real_connect(const Variant &hostname = {},
-                         const Variant &username = {},
-                         const Variant &password = {},
-                         const Variant &database = {},
-                         const Variant &port = {},
-                         const Variant &socket = {},
+    Variant real_connect(const Variant &hostname = nullptr,
+                         const Variant &username = nullptr,
+                         const Variant &password = nullptr,
+                         const Variant &database = nullptr,
+                         const Variant &port = nullptr,
+                         const Variant &socket = nullptr,
                          const Variant &flags = 0);
     Variant real_escape_string(const Variant &string);
     Variant reap_async_query();
     Variant escape_string(const Variant &string);
     Variant real_query(const Variant &query);
     Variant release_savepoint(const Variant &name);
-    Variant rollback(const Variant &flags = 0, const Variant &name = {});
+    Variant rollback(const Variant &flags = 0, const Variant &name = nullptr);
     Variant savepoint(const Variant &name);
     Variant select_db(const Variant &database);
     Variant set_charset(const Variant &charset);
@@ -155,7 +155,7 @@ class mysqli_stmt {
     Object getObject() const {
         return this_;
     }
-    mysqli_stmt(const mysqli &mysql, const Variant &query = {});
+    mysqli_stmt(const mysqli &mysql, const Variant &query = nullptr);
     Variant attr_get(const Variant &attribute);
     Variant attr_set(const Variant &attribute, const Variant &value);
     template <typename... Args>
@@ -176,7 +176,7 @@ class mysqli_stmt {
     }
     Variant close();
     Variant data_seek(const Variant &offset);
-    Variant execute(const Variant &params = {});
+    Variant execute(const Variant &params = nullptr);
     Variant fetch();
     Variant get_warnings();
     Variant result_metadata();

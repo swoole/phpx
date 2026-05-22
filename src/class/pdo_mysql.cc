@@ -1,6 +1,6 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/pdo_mysql.h"
+#include "class/pdo.h"
 
 namespace php::Pdo {
 Variant Mysql::getWarningCount() {

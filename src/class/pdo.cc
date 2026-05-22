@@ -1,6 +1,6 @@
 #include "phpx.h"
-#include "phpx_class.h"
 #include "class/pdo.h"
+#include "class/spl.h"
 
 namespace php {
 PDOException::PDOException(const Variant &message, const Variant &code, const Variant &previous) {

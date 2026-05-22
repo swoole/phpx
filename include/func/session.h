@@ -6,10 +6,10 @@
 
 namespace php {
 
-Variant session_name(const Variant &name = {});
-Variant session_module_name(const Variant &module = {});
-Variant session_save_path(const Variant &path = {});
-Variant session_id(const Variant &id = {});
+Variant session_name(const Variant &name = nullptr);
+Variant session_module_name(const Variant &module = nullptr);
+Variant session_save_path(const Variant &path = nullptr);
+Variant session_id(const Variant &id = nullptr);
 Variant session_create_id(const Variant &prefix = "");
 Variant session_regenerate_id(const Variant &delete_old_session = false);
 Variant session_decode(const Variant &data);
@@ -30,16 +30,16 @@ Variant session_set_save_handler(const Variant &open,
                                  const Variant &write = {},
                                  const Variant &destroy = {},
                                  const Variant &gc = {},
-                                 const Variant &create_sid = {},
-                                 const Variant &validate_sid = {},
-                                 const Variant &update_timestamp = {});
-Variant session_cache_limiter(const Variant &value = {});
-Variant session_cache_expire(const Variant &value = {});
+                                 const Variant &create_sid = nullptr,
+                                 const Variant &validate_sid = nullptr,
+                                 const Variant &update_timestamp = nullptr);
+Variant session_cache_limiter(const Variant &value = nullptr);
+Variant session_cache_expire(const Variant &value = nullptr);
 Variant session_set_cookie_params(const Variant &lifetime_or_options,
-                                  const Variant &path = {},
-                                  const Variant &domain = {},
-                                  const Variant &secure = {},
-                                  const Variant &httponly = {});
+                                  const Variant &path = nullptr,
+                                  const Variant &domain = nullptr,
+                                  const Variant &secure = nullptr,
+                                  const Variant &httponly = nullptr);
 Variant session_start(const Variant &options = Array{});
 
 }  // namespace php

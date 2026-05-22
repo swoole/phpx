@@ -38,7 +38,7 @@ Variant posix_getgrnam(const Variant &name);
 Variant posix_getgrgid(const Variant &group_id);
 Variant posix_getpwnam(const Variant &username);
 Variant posix_getpwuid(const Variant &user_id);
-Variant posix_getrlimit(const Variant &resource = {});
+Variant posix_getrlimit(const Variant &resource = nullptr);
 Variant posix_setrlimit(const Variant &resource, const Variant &soft_limit, const Variant &hard_limit);
 Variant posix_get_last_error();
 Variant posix_errno();
