@@ -309,6 +309,10 @@ if (IS_WINDOWS)
     endif()
 endif()
 
+if (NOT IS_WINDOWS)
+    target_link_libraries(phpx PUBLIC gmp gmpxx)
+endif()
+
 if (CODE_COVERAGE AND NOT IS_WINDOWS)
     target_link_libraries(phpx PRIVATE coverage_config gcov)
 endif()

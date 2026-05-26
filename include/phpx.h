@@ -1821,3 +1821,5 @@ static inline String getEnumCaseName(Object &obj) {
     return {zend_enum_fetch_case_name(obj.object()), Ctor::Indirect};
 }
 }  // namespace php
+
+#include "phpx_big_int.h"
