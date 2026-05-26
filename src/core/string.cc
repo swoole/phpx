@@ -16,6 +16,10 @@
 
 #include "phpx.h"
 
+extern "C" {
+#include "ext/pcre/php_pcre.h"
+}
+
 namespace php {
 String String::format(const char *format, ...) {
     va_list args;
@@ -71,7 +75,7 @@ bool String::equals(const String &s, const bool ci) const {
     return zend_string_equals(s.str(), str());
 }
 
-String String::offsetGet(zend_long _offset) const {
+String String::offsetGet(Int _offset) const {
     _offset = offset(_offset);
     if (UNEXPECTED(_offset == -1)) {
         return String{zend_empty_string};
@@ -81,7 +85,7 @@ String String::offsetGet(zend_long _offset) const {
     }
 }
 
-void String::offsetSet(zend_long _offset, const Variant &value) {
+void String::offsetSet(Int _offset, const Variant &value) {
     _offset = offset(_offset);
     if (_offset != -1) {
         auto wr_str = value.toString();
@@ -94,6 +98,39 @@ void String::offsetSet(zend_long _offset, const Variant &value) {
     }
 }
 
+static Array php_do_pcre_match(String &str, const String &regx, Int flags, Int start_offset, bool global) {
+    pcre_cache_entry *pce; /* Compiled regular expression */
+
+    /* Compile regex or get it from cache. */
+    if ((pce = pcre_get_compiled_regex_cache(regx.str())) == nullptr) {
+        throwError("Failed to compile regular expression");
+        return {};
+    }
+
+    zval count = {};
+    zval return_value = {};
+    php_pcre_pce_incref(pce);
+#if PHP_VERSION_ID >= 80400
+    php_pcre_match_impl(pce, str.str(), &count, &return_value, global, flags, start_offset);
+#else
+    php_pcre_match_impl(pce, str.str(), &count, &return_value, global, flags > 0, flags, start_offset);
+#endif
+    php_pcre_pce_decref(pce);
+
+    if (!zval_is_array(&return_value)) {
+        return {};
+    }
+    return Array{&return_value, Ctor::Move};
+}
+
+Array String::match(const String &regx, Int flags, Int start_offset) {
+    return php_do_pcre_match(*this, regx, flags, start_offset, false);
+}
+
+Array String::matchAll(const String &regx, Int flags, Int start_offset) {
+    return php_do_pcre_match(*this, regx, flags, start_offset, true);
+}
+
 bool prepare_slice(long &offset, long &length, size_t total) {
     if (offset < 0) {
         /* if "from" position is negative, count start position from the end
@@ -102,7 +139,7 @@ bool prepare_slice(long &offset, long &length, size_t total) {
         if (-(size_t) offset > total) {
             offset = 0;
         } else {
-            offset = (zend_long) total + offset;
+            offset = (Int) total + offset;
         }
     } else if ((size_t) offset > total) {
         return false;
@@ -115,10 +152,10 @@ bool prepare_slice(long &offset, long &length, size_t total) {
         if (-(size_t) length > total - (size_t) offset) {
             length = 0;
         } else {
-            length = (zend_long) total - offset + length;
+            length = (Int) total - offset + length;
         }
     } else if ((size_t) length > total - (size_t) offset) {
-        length = (zend_long) total - offset;
+        length = (Int) total - offset;
     }
 
     return true;
@@ -131,7 +168,7 @@ String String::substr(long f, long l) const {
     return {data() + f, (size_t) l};
 }
 
-Array String::split(const String &delim, const zend_long limit) const {
+Array String::split(const String &delim, const Int limit) const {
     Array retval;
     php_explode(delim.str(), str(), retval.ptr(), limit);
     return retval;

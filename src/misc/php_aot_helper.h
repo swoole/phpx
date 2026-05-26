@@ -17,13 +17,21 @@ struct Scope {
     zend_execute_data *frame;
 };
 
-class UnsafePtr : public php::Box {
+class UnsafePtr : public Box {
   public:
     void *ptr;
     uint32_t type_id;
 
     UnsafePtr(void *ptr, uint32_t type_id) : ptr(ptr), type_id(type_id) {}
 };
+
+static inline Var toStream(Var &var) {
+    if (UNEXPECTED(!var.isResource())) {
+        php::throwException(zend_ce_type_error, "Invalid stream resource");
+        return php::null;
+    }
+    return var;
+}
 };  // namespace php
 
 static inline php::Var php_create_unsafe_ptr(void *ptr, uint32_t type_id) {

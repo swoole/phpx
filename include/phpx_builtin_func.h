@@ -27,5 +27,6 @@ static inline String get_class(const Object &o) {
 Int strlen(const Variant &v);
 Int ord(const Variant &v);
 String chr(Int c);
+Array parse_str(const String &str);
 }  // namespace fn
 }  // namespace php

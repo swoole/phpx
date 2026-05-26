@@ -128,17 +128,17 @@ void augmentException();
 #define throwError(format, ...)                                                                                        \
     do {                                                                                                               \
         zend_throw_error(NULL, format, ##__VA_ARGS__);                                                                 \
-        augmentException();                                                                                            \
-        if (throw_impl) {                                                                                              \
-            throw_impl(EG(exception));                                                                                 \
+        php::augmentException();                                                                                       \
+        if (php::throw_impl) {                                                                                         \
+            php::throw_impl(EG(exception));                                                                            \
         }                                                                                                              \
     } while (0)
 
 #define throwErrorIfOccurred()                                                                                         \
     do {                                                                                                               \
-        if (UNEXPECTED(EG(exception) != nullptr && throw_impl != nullptr)) {                                           \
-            augmentException();                                                                                        \
-            throw_impl(EG(exception));                                                                                 \
+        if (UNEXPECTED(EG(exception) != nullptr && php::throw_impl != nullptr)) {                                      \
+            php::augmentException();                                                                                   \
+            php::throw_impl(EG(exception));                                                                            \
         }                                                                                                              \
     } while (0)
 
@@ -1126,29 +1126,34 @@ class String : public Variant {
     size_t length() const {
         return Z_STRLEN_P(unwrap_ptr());
     }
+    bool empty() const {
+    	return length() == 0;
+    }
     const char *data() const {
         return Z_STRVAL_P(unwrap_ptr());
     }
-    String offsetGet(zend_long _offset) const;
+    String offsetGet(Int _offset) const;
     String offsetGet(const Variant &_offset) const {
         return offsetGet(_offset.toInt());
     }
-    void offsetSet(zend_long _offset, const Variant &value);
+    void offsetSet(Int _offset, const Variant &value);
     void offsetSet(const Variant &_offset, const Variant &value) {
         offsetSet(_offset.toInt(), value);
     }
-    uint64_t hashCode() const {
-        return zend_string_hash_val(str());
+    Int hashCode() const {
+        return static_cast<Int>(zend_string_hash_val(str()));
     }
-    zend_long offset(zend_long _offset) const {
+    Array match(const String &regx, Int flags = 0, Int start_offset = 0);
+    Array matchAll(const String &regx, Int flags = 0, Int start_offset = 0);
+    Int offset(Int _offset) const {
         size_t len = length();
 
         if (_offset < 0) {
-            zend_long positive_offset = -_offset;
+            Int positive_offset = -_offset;
             if (UNEXPECTED(static_cast<size_t>(positive_offset) > len)) {
                 return -1;
             }
-            return static_cast<zend_long>(len) + _offset;
+            return static_cast<Int>(len) + _offset;
         } else {
             if (UNEXPECTED(static_cast<size_t>(_offset) >= len)) {
                 return -1;

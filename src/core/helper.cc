@@ -19,6 +19,10 @@
 #include "phpx_func.h"
 #include "zend_operators.h"
 
+extern "C" {
+#include "php_variables.h"
+}
+
 namespace php {
 namespace math {
 Variant abs(const Variant &v) {
@@ -67,6 +71,13 @@ Int strlen(const Variant &v) {
 
 String chr(Int c) {
     return {zend_one_char_string[c]};
+}
+
+Array parse_str(const String &str) {
+    Array retval;
+    auto res = estrndup(str.data(), str.length());
+    sapi_module.treat_data(PARSE_STRING, res, retval.ptr());
+    return retval;
 }
 }  // namespace fn
 }  // namespace php
