@@ -1823,3 +1823,5 @@ static inline String getEnumCaseName(Object &obj) {
 }  // namespace php
 
 #include "phpx_big_int.h"
+#include "phpx_decimal.h"
+#include "phpx_big_float.h"

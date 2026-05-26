@@ -11,6 +11,7 @@ class BigInt : public Box {
 
     BigInt() = default;
     BigInt(const std::string &s, int base = 10) : value(s, base) {}
+    BigInt(const char *s, int base = 10) : value(s, base) {}
     BigInt(const mpz_class &v) : value(v) {}
     BigInt(php::Int v) : value((signed long)v) {}
 
@@ -41,7 +42,7 @@ static inline Variant newBigInt(php::Int v) {
 }
 
 static inline Variant newBigInt(const String &s) {
-    return Variant(new BigInt(s.toCString()));
+    return Variant(new BigInt(s.data()));
 }
 
 }  // namespace php

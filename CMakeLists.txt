@@ -310,7 +310,7 @@ if (IS_WINDOWS)
 endif()
 
 if (NOT IS_WINDOWS)
-    target_link_libraries(phpx PUBLIC gmp gmpxx)
+    target_link_libraries(phpx PUBLIC gmp gmpxx mpdec++ mpfr)
 endif()
 
 if (CODE_COVERAGE AND NOT IS_WINDOWS)
