@@ -83,7 +83,8 @@ TEST(bigint, add_large_numbers) {
     auto a = bi("999999999999999999999999999999");
     auto b = bi("1");
     auto r = BigInt::add(a, b);
-    ASSERT_STREQ(BigInt::toString(r).toCString(), "1000000000000000000000000000000");
+    auto str = BigInt::toString(r);
+    ASSERT_STREQ(str.toCString(), "1000000000000000000000000000000");
 }
 
 TEST(bigint, add_negative) {
@@ -126,7 +127,8 @@ TEST(bigint, mul_large) {
     auto a = bi("12345678901234567890");
     auto b = bi("98765432109876543210");
     auto r = BigInt::mul(a, b);
-    ASSERT_STREQ(BigInt::toString(r).toCString(),
+    auto tmp = BigInt::toString(r);
+    ASSERT_STREQ(tmp.toCString(),
                  "1219326311370217952237463801111263526900");
 }
 
@@ -251,7 +253,8 @@ TEST(bigint, pow_large) {
     auto a = bi(2);
     auto b = bi(100);
     auto r = BigInt::pow(a, b);
-    ASSERT_STREQ(BigInt::toString(r).toCString(),
+    auto tmp = BigInt::toString(r);
+    ASSERT_STREQ(tmp.toCString(),
                  "1267650600228229401496703205376");
 }
 

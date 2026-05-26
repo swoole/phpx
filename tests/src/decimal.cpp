@@ -10,7 +10,8 @@ TEST(decimal, construct_from_string) {
     auto a = php::newDecimal("123.456");
     auto *d = a.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
-    auto s = Decimal::toString(a).toCString();
+    auto str = Decimal::toString(a);
+    auto s = str.toCString();
     ASSERT_TRUE(std::strstr(s, "123.456") != nullptr);
 }
 
@@ -25,7 +26,8 @@ TEST(decimal, construct_negative) {
     auto a = php::newDecimal("-99.99");
     auto *d = a.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
-    auto s = Decimal::toString(a).toCString();
+    auto str = Decimal::toString(a);
+    auto s = str.toCString();
     ASSERT_EQ(s[0], '-');
 }
 
@@ -41,7 +43,8 @@ TEST(decimal, newInstance_from_string) {
     auto v = Decimal::newInstance(s);
     auto *d = v.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
-    auto str = Decimal::toString(v).toCString();
+    auto tmp = Decimal::toString(v);
+    auto str = tmp.toCString();
     ASSERT_TRUE(std::strstr(str, "12345.6789") != nullptr);
 }
 
@@ -95,7 +98,8 @@ TEST(decimal, sub_negative_result) {
     auto a = php::newDecimal("10.00");
     auto b = php::newDecimal("50.00");
     auto r = Decimal::sub(a, b);
-    auto str = Decimal::toString(r).toCString();
+    auto tmp = Decimal::toString(r);
+    auto str = tmp.toCString();
     ASSERT_EQ(str[0], '-');
     ASSERT_NEAR(Decimal::toFloat(r).toFloat(), -40.0, 0.01);
 }
@@ -275,7 +279,8 @@ TEST(decimal, toFloat) {
 
 TEST(decimal, high_precision_string) {
     auto a = php::newDecimal("123.45678901234567890");
-    auto s = Decimal::toString(a).toCString();
+    auto tmp = Decimal::toString(a);
+    auto s = tmp.toCString();
     ASSERT_TRUE(std::strstr(s, "123.45678901234567890") != nullptr);
 }
 

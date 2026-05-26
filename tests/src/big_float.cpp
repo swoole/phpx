@@ -24,7 +24,8 @@ TEST(bigfloat, construct_from_string) {
     auto a = php::newBigFloat(String("123.456"));
     auto *bf = a.toBox<BigFloat>();
     ASSERT_NE(bf, nullptr);
-    auto s = BigFloat::toString(a).toCString();
+    auto str = BigFloat::toString(a);
+    auto s = str.toCString();
     ASSERT_TRUE(std::strstr(s, "123.456") != nullptr);
 }
 
@@ -32,7 +33,8 @@ TEST(bigfloat, construct_negative) {
     auto a = php::newBigFloat(-100.5);
     auto *bf = a.toBox<BigFloat>();
     ASSERT_NE(bf, nullptr);
-    auto s = BigFloat::toString(a).toCString();
+    auto str = BigFloat::toString(a);
+    auto s = str.toCString();
     ASSERT_EQ(s[0], '-');
 }
 
@@ -48,7 +50,8 @@ TEST(bigfloat, newInstance_from_string) {
     auto v = BigFloat::newInstance(s);
     auto *bf = v.toBox<BigFloat>();
     ASSERT_NE(bf, nullptr);
-    auto str = BigFloat::toString(v).toCString();
+    auto tmp = BigFloat::toString(v);
+    auto str = tmp.toCString();
     ASSERT_TRUE(std::strstr(str, "3.14") != nullptr);
 }
 
@@ -111,7 +114,8 @@ TEST(bigfloat, sub_negative_result) {
     auto a = php::newBigFloat(10.0);
     auto b = php::newBigFloat(50.0);
     auto r = BigFloat::sub(a, b);
-    auto str = BigFloat::toString(r).toCString();
+    auto tmp = BigFloat::toString(r);
+    auto str = tmp.toCString();
     ASSERT_EQ(str[0], '-');
     ASSERT_NEAR(BigFloat::toFloat(r).toFloat(), -40.0, 0.01);
 }
