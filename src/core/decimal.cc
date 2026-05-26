@@ -120,8 +120,13 @@ Variant Decimal::toInt(Variant a) {
         throwError("Decimal::toInt expects Decimal argument");
         return nullptr;
     }
+    // Truncate toward zero with traps disabled (truncation sets Inexact flag)
+    decimal::Context ctx = decimal::context;
+    ctx.clear_traps();
+    decimal::Decimal truncated = d->value.trunc(ctx);
+
     uint32_t status = 0;
-    int64_t val = mpd_qget_i64(d->value.getconst(), &status);
+    int64_t val = mpd_qget_i64(truncated.getconst(), &status);
     if (status & MPD_Invalid_operation) {
         throwError("Decimal::toInt: value too large for int64");
         return nullptr;

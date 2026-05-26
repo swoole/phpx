@@ -363,6 +363,7 @@ if(BUILD_TESTS)
                     ${PHP_LIBS}
                     ${PHP_LDFLAGS}
                     ${GTEST_BOTH_LIBRARIES}
+                    gmp gmpxx mpdec mpdec++ mpfr
             )
         endif()
     endif()

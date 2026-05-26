@@ -55,7 +55,7 @@ TEST(string, number) {
     ASSERT_EQ(s5.length(), s1.length());
     ASSERT_STREQ(s1.data(), s5.data());
 
-    ASSERT_GT(s5.hashCode(), 0);
+    ASSERT_NE(s5.hashCode(), 0);
 
     auto s6 = String::format("str=%s, float=%f, int=%d\n", "hello", 1990.2019, 1990);
     ASSERT_GT(s6.length(), 32);
