@@ -24,6 +24,7 @@ static inline bool extractBigFloat(Variant &v, mpfr_t &out) {
         mpfr_set_str(out, v.toString().data(), 10, MPFR_RNDN);
         return true;
     }
+    throwException(zend_ce_type_error, "expects valid BigFloat argument");
     return false;
 }
 
@@ -33,61 +34,58 @@ Variant BigFloat::newInstance(Variant s) {
 
 Variant BigFloat::add(Variant a, Variant b) {
     mpfr_t va, vb, vr;
-    mpfr_inits(va, vb, vr, (mpfr_ptr)nullptr);
+    mpfr_inits(va, vb, vr, (mpfr_ptr) nullptr);
     if (UNEXPECTED(!extractBigFloat(a, va) || !extractBigFloat(b, vb))) {
-        mpfr_clears(va, vb, vr, (mpfr_ptr)nullptr);
-        throwError("BigFloat::add expects valid BigFloat arguments");
+        mpfr_clears(va, vb, vr, (mpfr_ptr) nullptr);
+
         return nullptr;
     }
     mpfr_add(vr, va, vb, MPFR_RNDN);
     auto *result = new BigFloat();
     mpfr_set(result->value, vr, MPFR_RNDN);
-    mpfr_clears(va, vb, vr, (mpfr_ptr)nullptr);
+    mpfr_clears(va, vb, vr, (mpfr_ptr) nullptr);
     return Variant(result);
 }
 
 Variant BigFloat::sub(Variant a, Variant b) {
     mpfr_t va, vb, vr;
-    mpfr_inits(va, vb, vr, (mpfr_ptr)nullptr);
+    mpfr_inits(va, vb, vr, (mpfr_ptr) nullptr);
     if (UNEXPECTED(!extractBigFloat(a, va) || !extractBigFloat(b, vb))) {
-        mpfr_clears(va, vb, vr, (mpfr_ptr)nullptr);
-        throwError("BigFloat::sub expects valid BigFloat arguments");
+        mpfr_clears(va, vb, vr, (mpfr_ptr) nullptr);
         return nullptr;
     }
     mpfr_sub(vr, va, vb, MPFR_RNDN);
     auto *result = new BigFloat();
     mpfr_set(result->value, vr, MPFR_RNDN);
-    mpfr_clears(va, vb, vr, (mpfr_ptr)nullptr);
+    mpfr_clears(va, vb, vr, (mpfr_ptr) nullptr);
     return Variant(result);
 }
 
 Variant BigFloat::mul(Variant a, Variant b) {
     mpfr_t va, vb, vr;
-    mpfr_inits(va, vb, vr, (mpfr_ptr)nullptr);
+    mpfr_inits(va, vb, vr, (mpfr_ptr) nullptr);
     if (UNEXPECTED(!extractBigFloat(a, va) || !extractBigFloat(b, vb))) {
-        mpfr_clears(va, vb, vr, (mpfr_ptr)nullptr);
-        throwError("BigFloat::mul expects valid BigFloat arguments");
+        mpfr_clears(va, vb, vr, (mpfr_ptr) nullptr);
         return nullptr;
     }
     mpfr_mul(vr, va, vb, MPFR_RNDN);
     auto *result = new BigFloat();
     mpfr_set(result->value, vr, MPFR_RNDN);
-    mpfr_clears(va, vb, vr, (mpfr_ptr)nullptr);
+    mpfr_clears(va, vb, vr, (mpfr_ptr) nullptr);
     return Variant(result);
 }
 
 Variant BigFloat::div(Variant a, Variant b) {
     mpfr_t va, vb, vr;
-    mpfr_inits(va, vb, vr, (mpfr_ptr)nullptr);
+    mpfr_inits(va, vb, vr, (mpfr_ptr) nullptr);
     if (UNEXPECTED(!extractBigFloat(a, va) || !extractBigFloat(b, vb))) {
-        mpfr_clears(va, vb, vr, (mpfr_ptr)nullptr);
-        throwError("BigFloat::div expects valid BigFloat arguments");
+        mpfr_clears(va, vb, vr, (mpfr_ptr) nullptr);
         return nullptr;
     }
     mpfr_div(vr, va, vb, MPFR_RNDN);
     auto *result = new BigFloat();
     mpfr_set(result->value, vr, MPFR_RNDN);
-    mpfr_clears(va, vb, vr, (mpfr_ptr)nullptr);
+    mpfr_clears(va, vb, vr, (mpfr_ptr) nullptr);
     return Variant(result);
 }
 
@@ -96,7 +94,6 @@ Variant BigFloat::neg(Variant a) {
     mpfr_init(va);
     if (UNEXPECTED(!extractBigFloat(a, va))) {
         mpfr_clear(va);
-        throwError("BigFloat::neg expects BigFloat argument");
         return nullptr;
     }
     auto *result = new BigFloat();
@@ -107,14 +104,13 @@ Variant BigFloat::neg(Variant a) {
 
 Variant BigFloat::cmp(Variant a, Variant b) {
     mpfr_t va, vb;
-    mpfr_inits(va, vb, (mpfr_ptr)nullptr);
+    mpfr_inits(va, vb, (mpfr_ptr) nullptr);
     if (UNEXPECTED(!extractBigFloat(a, va) || !extractBigFloat(b, vb))) {
-        mpfr_clears(va, vb, (mpfr_ptr)nullptr);
-        throwError("BigFloat::cmp expects valid BigFloat arguments");
+        mpfr_clears(va, vb, (mpfr_ptr) nullptr);
         return nullptr;
     }
     int result = mpfr_cmp(va, vb);
-    mpfr_clears(va, vb, (mpfr_ptr)nullptr);
+    mpfr_clears(va, vb, (mpfr_ptr) nullptr);
     return Variant(result);
 }
 
@@ -123,7 +119,6 @@ Variant BigFloat::abs(Variant a) {
     mpfr_init(va);
     if (UNEXPECTED(!extractBigFloat(a, va))) {
         mpfr_clear(va);
-        throwError("BigFloat::abs expects BigFloat argument");
         return nullptr;
     }
     auto *result = new BigFloat();
@@ -135,7 +130,7 @@ Variant BigFloat::abs(Variant a) {
 Variant BigFloat::toString(Variant a) {
     auto *bf = a.toBox<BigFloat>();
     if (UNEXPECTED(!bf)) {
-        throwError("BigFloat::toString expects BigFloat argument");
+        throwException(zend_ce_type_error, "expects BigFloat argument");
         return nullptr;
     }
     mpfr_exp_t exp;
@@ -151,9 +146,9 @@ Variant BigFloat::toString(Variant a) {
         result = "0.";
         for (mpfr_exp_t i = 0; i < -exp; i++) result += '0';
         result += digits;
-    } else if ((size_t)exp >= len) {
+    } else if ((size_t) exp >= len) {
         result = digits;
-        for (size_t i = 0; i < (size_t)exp - len; i++) result += '0';
+        for (size_t i = 0; i < (size_t) exp - len; i++) result += '0';
     } else {
         result = std::string(digits, exp) + "." + (digits + exp);
     }
@@ -175,19 +170,19 @@ Variant BigFloat::toString(Variant a) {
 Variant BigFloat::toInt(Variant a) {
     auto *bf = a.toBox<BigFloat>();
     if (UNEXPECTED(!bf)) {
-        throwError("BigFloat::toInt expects BigFloat argument");
+        throwException(zend_ce_type_error, "expects BigFloat argument");
         return nullptr;
     }
-    return Variant((php::Int)mpfr_get_sj(bf->value, MPFR_RNDZ));
+    return Variant((php::Int) mpfr_get_sj(bf->value, MPFR_RNDZ));
 }
 
 Variant BigFloat::toFloat(Variant a) {
     auto *bf = a.toBox<BigFloat>();
     if (UNEXPECTED(!bf)) {
-        throwError("BigFloat::toFloat expects BigFloat argument");
+        throwException(zend_ce_type_error, "expects BigFloat argument");
         return nullptr;
     }
-    return Variant((php::Float)mpfr_get_d(bf->value, MPFR_RNDN));
+    return Variant((php::Float) mpfr_get_d(bf->value, MPFR_RNDN));
 }
 
 }  // namespace php

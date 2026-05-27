@@ -23,7 +23,7 @@ TEST(bigint, construct_from_string) {
 }
 
 TEST(bigint, construct_from_int) {
-    auto a = php::newBigInt((php::Int)42);
+    auto a = php::newBigInt((php::Int) 42);
     auto *bi_ptr = a.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
     ASSERT_EQ(bi_ptr->value.get_si(), 42);
@@ -52,7 +52,7 @@ TEST(bigint, newInstance_from_string) {
 }
 
 TEST(bigint, newInstance_from_int) {
-    Variant s((php::Int)12345);
+    Variant s((php::Int) 12345);
     auto v = BigInt::newInstance(s);
     auto *bi_ptr = v.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
@@ -72,7 +72,7 @@ TEST(bigint, add) {
 
 TEST(bigint, add_int_promotion) {
     auto a = bi(100);
-    Variant b((php::Int)200);
+    Variant b((php::Int) 200);
     auto r = BigInt::add(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
@@ -128,13 +128,12 @@ TEST(bigint, mul_large) {
     auto b = bi("98765432109876543210");
     auto r = BigInt::mul(a, b);
     auto tmp = BigInt::toString(r);
-    ASSERT_STREQ(tmp.toCString(),
-                 "1219326311370217952237463801111263526900");
+    ASSERT_STREQ(tmp.toCString(), "1219326311370217952237463801111263526900");
 }
 
 TEST(bigint, mul_zero) {
     auto a = bi(99999);
-    auto b = bi((php::Int)0);
+    auto b = bi((php::Int) 0);
     auto r = BigInt::mul(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
@@ -169,7 +168,7 @@ TEST(bigint, div_negative) {
 }
 
 TEST(bigint, div_by_zero) {
-    try_call([]() { BigInt::div(bi(100), bi((php::Int)0)); }, "Division by zero");
+    try_call([]() { BigInt::div(bi(100), bi((php::Int) 0)); }, "Division by zero");
 }
 
 TEST(bigint, mod) {
@@ -191,7 +190,7 @@ TEST(bigint, mod_exact) {
 }
 
 TEST(bigint, mod_by_zero) {
-    try_call([]() { BigInt::mod(bi(100), bi((php::Int)0)); }, "Division by zero");
+    try_call([]() { BigInt::mod(bi(100), bi((php::Int) 0)); }, "Division by zero");
 }
 
 TEST(bigint, neg) {
@@ -211,7 +210,7 @@ TEST(bigint, neg_negative) {
 }
 
 TEST(bigint, neg_zero) {
-    auto a = bi((php::Int)0);
+    auto a = bi((php::Int) 0);
     auto r = BigInt::neg(a);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
@@ -229,7 +228,7 @@ TEST(bigint, pow_small) {
 
 TEST(bigint, pow_zero) {
     auto a = bi(999);
-    auto b = bi((php::Int)0);
+    auto b = bi((php::Int) 0);
     auto r = BigInt::pow(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
@@ -254,8 +253,7 @@ TEST(bigint, pow_large) {
     auto b = bi(100);
     auto r = BigInt::pow(a, b);
     auto tmp = BigInt::toString(r);
-    ASSERT_STREQ(tmp.toCString(),
-                 "1267650600228229401496703205376");
+    ASSERT_STREQ(tmp.toCString(), "1267650600228229401496703205376");
 }
 
 TEST(bigint, abs_positive) {
@@ -275,7 +273,7 @@ TEST(bigint, abs_negative) {
 }
 
 TEST(bigint, abs_zero) {
-    auto a = bi((php::Int)0);
+    auto a = bi((php::Int) 0);
     auto r = BigInt::abs(a);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
@@ -301,7 +299,7 @@ TEST(bigint, gcd_coprime) {
 }
 
 TEST(bigint, gcd_one_zero) {
-    auto a = bi((php::Int)0);
+    auto a = bi((php::Int) 0);
     auto b = bi(42);
     auto r = BigInt::gcd(a, b);
     auto *bi_ptr = r.toBox<BigInt>();

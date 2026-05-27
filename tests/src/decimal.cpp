@@ -16,7 +16,7 @@ TEST(decimal, construct_from_string) {
 }
 
 TEST(decimal, construct_from_int) {
-    auto a = php::newDecimal((php::Int)42);
+    auto a = php::newDecimal((php::Int) 42);
     auto *d = a.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
     ASSERT_EQ(Decimal::toInt(a).toInt(), 42);
@@ -49,7 +49,7 @@ TEST(decimal, newInstance_from_string) {
 }
 
 TEST(decimal, newInstance_from_int) {
-    Variant s((php::Int)100);
+    Variant s((php::Int) 100);
     auto v = Decimal::newInstance(s);
     auto *d = v.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
@@ -115,7 +115,7 @@ TEST(decimal, mul) {
 
 TEST(decimal, mul_int) {
     auto a = php::newDecimal("6.25");
-    auto b = php::newDecimal((php::Int)4);
+    auto b = php::newDecimal((php::Int) 4);
     auto r = Decimal::mul(a, b);
     auto *d = r.toBox<Decimal>();
     ASSERT_NE(d, nullptr);

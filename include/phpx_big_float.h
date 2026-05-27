@@ -10,7 +10,9 @@ class BigFloat : public Box {
   public:
     mpfr_t value;
 
-    BigFloat() { mpfr_init(value); }
+    BigFloat() {
+        mpfr_init(value);
+    }
     BigFloat(const String &s) : BigFloat(s.data()) {}
     BigFloat(const char *s) {
         mpfr_init(value);
@@ -28,7 +30,9 @@ class BigFloat : public Box {
         mpfr_init(value);
         mpfr_set(value, other.value, MPFR_RNDN);
     }
-    ~BigFloat() override { mpfr_clear(value); }
+    ~BigFloat() override {
+        mpfr_clear(value);
+    }
 
     static Variant newInstance(Variant s);
     static Variant add(Variant a, Variant b);

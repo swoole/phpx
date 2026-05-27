@@ -13,28 +13,30 @@ static inline bool extractDecimal(Variant &v, decimal::Decimal &out) {
         }
     }
     if (v.isInt()) {
-        out = decimal::Decimal((int64_t)v.toInt());
+        out = decimal::Decimal((int64_t) v.toInt());
         return true;
     }
     if (v.isFloat()) {
-        out = decimal::Decimal(v.toString().data());
-        return true;
+        throwException(zend_ce_type_error, "Cannot convert float to Decimal, use string or int instead");
     }
     if (v.isString()) {
         out = decimal::Decimal(v.toString().data());
         return true;
     }
+    throwException(zend_ce_type_error, "expects valid Decimal argument");
     return false;
 }
 
 Variant Decimal::newInstance(Variant s) {
+    if (UNEXPECTED(s.isFloat())) {
+        throwException(zend_ce_type_error, "Cannot construct Decimal from float, use string or int instead");
+    }
     return Variant(new Decimal(s.toString().toCString()));
 }
 
 Variant Decimal::add(Variant a, Variant b) {
     decimal::Decimal va, vb;
     if (UNEXPECTED(!extractDecimal(a, va) || !extractDecimal(b, vb))) {
-        throwError("Decimal::add expects valid Decimal arguments");
         return nullptr;
     }
     return Variant(new Decimal(va + vb));
@@ -43,7 +45,6 @@ Variant Decimal::add(Variant a, Variant b) {
 Variant Decimal::sub(Variant a, Variant b) {
     decimal::Decimal va, vb;
     if (UNEXPECTED(!extractDecimal(a, va) || !extractDecimal(b, vb))) {
-        throwError("Decimal::sub expects valid Decimal arguments");
         return nullptr;
     }
     return Variant(new Decimal(va - vb));
@@ -52,7 +53,6 @@ Variant Decimal::sub(Variant a, Variant b) {
 Variant Decimal::mul(Variant a, Variant b) {
     decimal::Decimal va, vb;
     if (UNEXPECTED(!extractDecimal(a, va) || !extractDecimal(b, vb))) {
-        throwError("Decimal::mul expects valid Decimal arguments");
         return nullptr;
     }
     return Variant(new Decimal(va * vb));
@@ -61,7 +61,6 @@ Variant Decimal::mul(Variant a, Variant b) {
 Variant Decimal::div(Variant a, Variant b) {
     decimal::Decimal va, vb;
     if (UNEXPECTED(!extractDecimal(a, va) || !extractDecimal(b, vb))) {
-        throwError("Decimal::div expects valid Decimal arguments");
         return nullptr;
     }
     return Variant(new Decimal(va / vb));
@@ -70,7 +69,6 @@ Variant Decimal::div(Variant a, Variant b) {
 Variant Decimal::mod(Variant a, Variant b) {
     decimal::Decimal va, vb;
     if (UNEXPECTED(!extractDecimal(a, va) || !extractDecimal(b, vb))) {
-        throwError("Decimal::mod expects valid Decimal arguments");
         return nullptr;
     }
     return Variant(new Decimal(va % vb));
@@ -79,7 +77,6 @@ Variant Decimal::mod(Variant a, Variant b) {
 Variant Decimal::neg(Variant a) {
     decimal::Decimal va;
     if (UNEXPECTED(!extractDecimal(a, va))) {
-        throwError("Decimal::neg expects Decimal argument");
         return nullptr;
     }
     return Variant(new Decimal(-va));
@@ -88,7 +85,6 @@ Variant Decimal::neg(Variant a) {
 Variant Decimal::cmp(Variant a, Variant b) {
     decimal::Decimal va, vb;
     if (UNEXPECTED(!extractDecimal(a, va) || !extractDecimal(b, vb))) {
-        throwError("Decimal::cmp expects valid Decimal arguments");
         return nullptr;
     }
     if (va < vb) return Variant(-1);
@@ -99,7 +95,6 @@ Variant Decimal::cmp(Variant a, Variant b) {
 Variant Decimal::abs(Variant a) {
     decimal::Decimal va;
     if (UNEXPECTED(!extractDecimal(a, va))) {
-        throwError("Decimal::abs expects Decimal argument");
         return nullptr;
     }
     return Variant(new Decimal(va.sign() < 0 ? -va : va));
@@ -108,7 +103,7 @@ Variant Decimal::abs(Variant a) {
 Variant Decimal::toString(Variant a) {
     auto *d = a.toBox<Decimal>();
     if (UNEXPECTED(!d)) {
-        throwError("Decimal::toString expects Decimal argument");
+        throwException(zend_ce_type_error, "expects Decimal argument");
         return nullptr;
     }
     return Variant(d->value.to_sci());
@@ -117,7 +112,7 @@ Variant Decimal::toString(Variant a) {
 Variant Decimal::toInt(Variant a) {
     auto *d = a.toBox<Decimal>();
     if (UNEXPECTED(!d)) {
-        throwError("Decimal::toInt expects Decimal argument");
+        throwException(zend_ce_type_error, "expects Decimal argument");
         return nullptr;
     }
     // Truncate toward zero with traps disabled (truncation sets Inexact flag)
@@ -128,19 +123,19 @@ Variant Decimal::toInt(Variant a) {
     uint32_t status = 0;
     int64_t val = mpd_qget_i64(truncated.getconst(), &status);
     if (status & MPD_Invalid_operation) {
-        throwError("Decimal::toInt: value too large for int64");
+        throwException(zend_ce_type_error, "value too large for int64");
         return nullptr;
     }
-    return Variant((php::Int)val);
+    return Variant((php::Int) val);
 }
 
 Variant Decimal::toFloat(Variant a) {
     auto *d = a.toBox<Decimal>();
     if (UNEXPECTED(!d)) {
-        throwError("Decimal::toFloat expects Decimal argument");
+        throwException(zend_ce_type_error, "expects Decimal argument");
         return nullptr;
     }
-    return Variant((php::Float)std::stod(d->value.to_sci()));
+    return Variant((php::Float) std::stod(d->value.to_sci()));
 }
 
 Variant Decimal::toBigInt(Variant a) {

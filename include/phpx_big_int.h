@@ -10,10 +10,9 @@ class BigInt : public Box {
     mpz_class value;
 
     BigInt() = default;
-    BigInt(const std::string &s, int base = 10) : value(s, base) {}
     BigInt(const char *s, int base = 10) : value(s, base) {}
     BigInt(const mpz_class &v) : value(v) {}
-    BigInt(php::Int v) : value((signed long)v) {}
+    BigInt(php::Int v) : value((signed long) v) {}
 
     static Variant newInstance(Variant s);
     static Variant add(Variant a, Variant b);
@@ -32,10 +31,6 @@ class BigInt : public Box {
     static Variant toFloat(Variant a);
     static Variant toBigDecimal(Variant a);
 };
-
-static inline Variant newBigInt(const std::string &s, int base = 10) {
-    return Variant(new BigInt(s, base));
-}
 
 static inline Variant newBigInt(php::Int v) {
     return Variant(new BigInt(v));

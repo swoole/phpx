@@ -1127,7 +1127,7 @@ class String : public Variant {
         return Z_STRLEN_P(unwrap_ptr());
     }
     bool empty() const {
-    	return length() == 0;
+        return length() == 0;
     }
     const char *data() const {
         return Z_STRVAL_P(unwrap_ptr());

@@ -7,7 +7,7 @@ using namespace php;
 // ============ Construction ============
 
 TEST(bigfloat, construct_from_int) {
-    auto a = php::newBigFloat((php::Int)42);
+    auto a = php::newBigFloat((php::Int) 42);
     auto *bf = a.toBox<BigFloat>();
     ASSERT_NE(bf, nullptr);
     ASSERT_EQ(BigFloat::toInt(a).toInt(), 42);
@@ -39,7 +39,7 @@ TEST(bigfloat, construct_negative) {
 }
 
 TEST(bigfloat, construct_zero) {
-    auto a = php::newBigFloat((php::Int)0);
+    auto a = php::newBigFloat((php::Int) 0);
     auto *bf = a.toBox<BigFloat>();
     ASSERT_NE(bf, nullptr);
     ASSERT_EQ(BigFloat::toInt(a).toInt(), 0);
@@ -56,7 +56,7 @@ TEST(bigfloat, newInstance_from_string) {
 }
 
 TEST(bigfloat, newInstance_from_int) {
-    Variant s((php::Int)42);
+    Variant s((php::Int) 42);
     auto v = BigFloat::newInstance(s);
     auto *bf = v.toBox<BigFloat>();
     ASSERT_NE(bf, nullptr);
@@ -131,7 +131,7 @@ TEST(bigfloat, mul) {
 
 TEST(bigfloat, mul_zero) {
     auto a = php::newBigFloat(123.456);
-    auto b = php::newBigFloat((php::Int)0);
+    auto b = php::newBigFloat((php::Int) 0);
     auto r = BigFloat::mul(a, b);
     ASSERT_EQ(BigFloat::toInt(r).toInt(), 0);
 }
@@ -187,7 +187,7 @@ TEST(bigfloat, abs_negative) {
 }
 
 TEST(bigfloat, abs_zero) {
-    auto a = php::newBigFloat((php::Int)0);
+    auto a = php::newBigFloat((php::Int) 0);
     auto r = BigFloat::abs(a);
     ASSERT_EQ(BigFloat::toInt(r).toInt(), 0);
 }
@@ -239,7 +239,7 @@ TEST(bigfloat, toString) {
 }
 
 TEST(bigfloat, toString_integer) {
-    auto a = php::newBigFloat((php::Int)42);
+    auto a = php::newBigFloat((php::Int) 42);
     auto r = BigFloat::toString(a);
     ASSERT_TRUE(r.isString());
     ASSERT_TRUE(std::strstr(r.toCString(), "42") != nullptr);

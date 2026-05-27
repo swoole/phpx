@@ -12,7 +12,7 @@ class Decimal : public Box {
     Decimal() = default;
     Decimal(const String &s) : value(s.data()) {}
     Decimal(const decimal::Decimal &v) : value(v) {}
-    Decimal(php::Int v) : value((int64_t)v) {}
+    Decimal(php::Int v) : value((int64_t) v) {}
 
     static Variant newInstance(Variant s);
     static Variant add(Variant a, Variant b);
