@@ -277,7 +277,7 @@ zend_result extension_after_request(int type, int module_number) {
 }
 
 Array Args::toArray() const {
-    Array array;
+    Array array(params.size());
     for (const auto &param : params) {
         array.append(param);
     }

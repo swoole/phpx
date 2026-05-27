@@ -76,9 +76,9 @@ TEST(decimal, add_int_promotion) {
     ASSERT_NEAR(Decimal::toFloat(r).toFloat(), 150.25, 0.01);
 }
 
-TEST(decimal, add_float_promotion) {
+TEST(decimal, add_string_promotion) {
     auto a = php::newDecimal("100.0");
-    Variant b(0.5);
+    Variant b("0.5");
     auto r = Decimal::add(a, b);
     auto *d = r.toBox<Decimal>();
     ASSERT_NE(d, nullptr);

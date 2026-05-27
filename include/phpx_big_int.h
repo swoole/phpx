@@ -25,6 +25,9 @@ class BigInt : public Box {
     static Variant cmp(Variant a, Variant b);
     static Variant abs(Variant a);
     static Variant gcd(Variant a, Variant b);
+    static Variant divmod(Variant a, Variant b);
+    static Variant powmod(Variant base, Variant exp, Variant mod);
+    static Variant sqrt(Variant a);
 
     static Variant toString(Variant a);
     static Variant toInt(Variant a);

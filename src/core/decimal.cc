@@ -138,6 +138,105 @@ Variant Decimal::toFloat(Variant a) {
     return Variant((php::Float) std::stod(d->value.to_sci()));
 }
 
+Variant Decimal::pow(Variant base, Variant exp) {
+    decimal::Decimal vb, ve;
+    if (UNEXPECTED(!extractDecimal(base, vb) || !extractDecimal(exp, ve))) {
+        return nullptr;
+    }
+    decimal::Decimal result;
+    uint32_t status = 0;
+    mpd_qpow(result.get(), vb.getconst(), ve.getconst(), decimal::context.getconst(), &status);
+    if (status & MPD_Invalid_operation) {
+        throwException(zend_ce_type_error, "Decimal::pow: invalid operation");
+        return nullptr;
+    }
+    return Variant(new Decimal(result));
+}
+
+Variant Decimal::divmod(Variant a, Variant b) {
+    decimal::Decimal va, vb;
+    if (UNEXPECTED(!extractDecimal(a, va) || !extractDecimal(b, vb))) {
+        return nullptr;
+    }
+    decimal::Decimal q, r;
+    uint32_t status = 0;
+    mpd_qdivmod(q.get(), r.get(), va.getconst(), vb.getconst(), decimal::context.getconst(), &status);
+    if (status & MPD_Division_by_zero) {
+        throwException(zend_ce_type_error, "Division by zero");
+        return nullptr;
+    }
+    Array result(2);
+    result.append(Variant(new Decimal(q)));
+    result.append(Variant(new Decimal(r)));
+    return result;
+}
+
+Variant Decimal::powmod(Variant base, Variant exp, Variant mod) {
+    decimal::Decimal vb, ve, vm;
+    if (UNEXPECTED(!extractDecimal(base, vb) || !extractDecimal(exp, ve) || !extractDecimal(mod, vm))) {
+        return nullptr;
+    }
+    decimal::Decimal result;
+    uint32_t status = 0;
+    mpd_qpowmod(result.get(), vb.getconst(), ve.getconst(), vm.getconst(), decimal::context.getconst(), &status);
+    if (status & MPD_Invalid_operation) {
+        throwException(zend_ce_type_error, "Decimal::powmod: invalid operation");
+        return nullptr;
+    }
+    return Variant(new Decimal(result));
+}
+
+Variant Decimal::sqrt(Variant a) {
+    decimal::Decimal va;
+    if (UNEXPECTED(!extractDecimal(a, va))) {
+        return nullptr;
+    }
+    decimal::Decimal result;
+    uint32_t status = 0;
+    mpd_qsqrt(result.get(), va.getconst(), decimal::context.getconst(), &status);
+    if (status & MPD_Invalid_operation) {
+        throwException(zend_ce_type_error, "Decimal::sqrt: invalid operation (negative number?)");
+        return nullptr;
+    }
+    return Variant(new Decimal(result));
+}
+
+Variant Decimal::floor(Variant a) {
+    decimal::Decimal va;
+    if (UNEXPECTED(!extractDecimal(a, va))) {
+        return nullptr;
+    }
+    return Variant(new Decimal(va.floor()));
+}
+
+Variant Decimal::ceil(Variant a) {
+    decimal::Decimal va;
+    if (UNEXPECTED(!extractDecimal(a, va))) {
+        return nullptr;
+    }
+    return Variant(new Decimal(va.ceil()));
+}
+
+Variant Decimal::round(Variant a, Variant precision) {
+    decimal::Decimal va;
+    if (UNEXPECTED(!extractDecimal(a, va))) {
+        return nullptr;
+    }
+    php::Int prec = precision.toInt();
+    if (prec == 0) {
+        return Variant(new Decimal(va.to_integral()));
+    }
+    // Build quantum = 10^(-prec)
+    std::string quantumStr;
+    if (prec > 0) {
+        quantumStr = "1E-" + std::to_string(prec);
+    } else {
+        quantumStr = "1E" + std::to_string(-prec);
+    }
+    decimal::Decimal quantum(quantumStr);
+    return Variant(new Decimal(va.quantize(quantum)));
+}
+
 Variant Decimal::toBigInt(Variant a) {
     // Placeholder — will be implemented when BigInt<->Decimal conversion is needed
     return a;

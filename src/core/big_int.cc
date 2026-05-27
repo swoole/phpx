@@ -152,6 +152,55 @@ Variant BigInt::toFloat(Variant a) {
     return Variant(bi_a->value.get_d());
 }
 
+Variant BigInt::divmod(Variant a, Variant b) {
+    mpz_class va, vb;
+    if (UNEXPECTED(!extractBigInt(a, va) || !extractBigInt(b, vb))) {
+        return nullptr;
+    }
+    if (vb == 0) {
+        throwException(zend_ce_type_error, "Division by zero");
+        return nullptr;
+    }
+    mpz_class q, r;
+    mpz_tdiv_qr(q.get_mpz_t(), r.get_mpz_t(), va.get_mpz_t(), vb.get_mpz_t());
+    Array result(2);
+    result.append(Variant(new BigInt(q)));
+    result.append(Variant(new BigInt(r)));
+    return result;
+}
+
+Variant BigInt::powmod(Variant base, Variant exp, Variant mod) {
+    mpz_class vb, ve, vm;
+    if (UNEXPECTED(!extractBigInt(base, vb) || !extractBigInt(exp, ve) || !extractBigInt(mod, vm))) {
+        return nullptr;
+    }
+    if (vm == 0) {
+        throwException(zend_ce_type_error, "Modulo by zero in powmod");
+        return nullptr;
+    }
+    if (ve < 0) {
+        throwException(zend_ce_type_error, "Negative exponent not supported in powmod");
+        return nullptr;
+    }
+    mpz_class result;
+    mpz_powm(result.get_mpz_t(), vb.get_mpz_t(), ve.get_mpz_t(), vm.get_mpz_t());
+    return Variant(new BigInt(result));
+}
+
+Variant BigInt::sqrt(Variant a) {
+    mpz_class va;
+    if (UNEXPECTED(!extractBigInt(a, va))) {
+        return nullptr;
+    }
+    if (va < 0) {
+        throwException(zend_ce_type_error, "Cannot compute square root of negative BigInt");
+        return nullptr;
+    }
+    mpz_class result;
+    mpz_sqrt(result.get_mpz_t(), va.get_mpz_t());
+    return Variant(new BigInt(result));
+}
+
 Variant BigInt::toBigDecimal(Variant a) {
     // Placeholder — will be implemented when BigDecimal is added
     return a;

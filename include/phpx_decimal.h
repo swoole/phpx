@@ -23,6 +23,13 @@ class Decimal : public Box {
     static Variant neg(Variant a);
     static Variant cmp(Variant a, Variant b);
     static Variant abs(Variant a);
+    static Variant pow(Variant base, Variant exp);
+    static Variant divmod(Variant a, Variant b);
+    static Variant powmod(Variant base, Variant exp, Variant mod);
+    static Variant sqrt(Variant a);
+    static Variant floor(Variant a);
+    static Variant ceil(Variant a);
+    static Variant round(Variant a, Variant precision);
 
     static Variant toString(Variant a);
     static Variant toInt(Variant a);
