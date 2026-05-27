@@ -1,4 +1,3 @@
-#include "phpx.h"
 #include "phpx_big_int.h"
 
 namespace php {
@@ -23,6 +22,9 @@ Variant BigInt::newInstance(Variant s) {
     if (UNEXPECTED(s.isFloat())) {
         throwException(zend_ce_type_error, "Cannot construct BigInt from float, use string or int instead");
         return null;
+    }
+    if (s.isResource() && s.toBox<BigInt>()) {
+        return s;
     }
     return Variant(new BigInt(s.toString().toCString()));
 }

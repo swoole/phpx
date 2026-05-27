@@ -1,4 +1,3 @@
-#include "phpx.h"
 #include "phpx_decimal.h"
 #include <string>
 
@@ -30,6 +29,9 @@ static inline bool extractDecimal(Variant &v, decimal::Decimal &out) {
 Variant Decimal::newInstance(Variant s) {
     if (UNEXPECTED(s.isFloat())) {
         throwException(zend_ce_type_error, "Cannot construct Decimal from float, use string or int instead");
+    }
+    if (s.isResource() && s.toBox<Decimal>()) {
+        return s;
     }
     return Variant(new Decimal(s.toString().toCString()));
 }

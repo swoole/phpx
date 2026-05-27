@@ -29,7 +29,7 @@ class Decimal : public Box {
     static Variant sqrt(Variant a);
     static Variant floor(Variant a);
     static Variant ceil(Variant a);
-    static Variant round(Variant a, Variant precision);
+    static Variant round(Variant a, Variant precision = 0);
 
     static Variant toString(Variant a);
     static Variant toInt(Variant a);

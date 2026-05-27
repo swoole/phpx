@@ -1,4 +1,3 @@
-#include "phpx.h"
 #include "phpx_big_float.h"
 #include <string>
 
@@ -29,6 +28,9 @@ static inline bool extractBigFloat(Variant &v, mpfr_t &out) {
 }
 
 Variant BigFloat::newInstance(Variant s) {
+    if (s.isResource() && s.toBox<BigFloat>()) {
+        return s;
+    }
     return Variant(new BigFloat(s.toString().data()));
 }
 
