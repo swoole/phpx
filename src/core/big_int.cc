@@ -203,6 +203,96 @@ Variant BigInt::sqrt(Variant a) {
     return Variant(new BigInt(result));
 }
 
+Variant BigInt::bitAnd(Variant a, Variant b) {
+    mpz_class va, vb;
+    if (UNEXPECTED(!extractBigInt(a, va) || !extractBigInt(b, vb))) {
+        return nullptr;
+    }
+    return Variant(new BigInt(va & vb));
+}
+
+Variant BigInt::bitOr(Variant a, Variant b) {
+    mpz_class va, vb;
+    if (UNEXPECTED(!extractBigInt(a, va) || !extractBigInt(b, vb))) {
+        return nullptr;
+    }
+    return Variant(new BigInt(va | vb));
+}
+
+Variant BigInt::bitXor(Variant a, Variant b) {
+    mpz_class va, vb;
+    if (UNEXPECTED(!extractBigInt(a, va) || !extractBigInt(b, vb))) {
+        return nullptr;
+    }
+    return Variant(new BigInt(va ^ vb));
+}
+
+Variant BigInt::bitNot(Variant a) {
+    mpz_class va;
+    if (UNEXPECTED(!extractBigInt(a, va))) {
+        return nullptr;
+    }
+    return Variant(new BigInt(~va));
+}
+
+Variant BigInt::testBit(Variant a, Variant index) {
+    mpz_class va;
+    if (UNEXPECTED(!extractBigInt(a, va))) {
+        return nullptr;
+    }
+    if (!index.isInt()) {
+        throwException(zend_ce_type_error, "testBit expects int index");
+        return nullptr;
+    }
+    return Variant(mpz_tstbit(va.get_mpz_t(), index.toInt()));
+}
+
+Variant BigInt::popCount(Variant a) {
+    mpz_class va;
+    if (UNEXPECTED(!extractBigInt(a, va))) {
+        return nullptr;
+    }
+    return Variant((php::Int) mpz_popcount(va.get_mpz_t()));
+}
+
+Variant BigInt::bitShiftLeft(Variant a, Variant n) {
+    mpz_class va;
+    if (UNEXPECTED(!extractBigInt(a, va))) {
+        return nullptr;
+    }
+    if (UNEXPECTED(!n.isInt())) {
+        throwException(zend_ce_type_error, "bitShiftLeft expects int shift amount");
+        return nullptr;
+    }
+    php::Int shift = n.toInt();
+    if (shift < 0) {
+        throwException(zend_ce_value_error, "bitShiftLeft shift amount must be non-negative");
+        return nullptr;
+    }
+    mpz_class result;
+    mpz_mul_2exp(result.get_mpz_t(), va.get_mpz_t(), (mp_bitcnt_t) shift);
+    return Variant(new BigInt(result));
+}
+
+Variant BigInt::bitShiftRight(Variant a, Variant n) {
+    mpz_class va;
+    if (UNEXPECTED(!extractBigInt(a, va))) {
+        return nullptr;
+    }
+    if (UNEXPECTED(!n.isInt())) {
+        throwException(zend_ce_type_error, "bitShiftRight expects int shift amount");
+        return nullptr;
+    }
+    php::Int shift = n.toInt();
+    if (shift < 0) {
+        throwException(zend_ce_value_error, "bitShiftRight shift amount must be non-negative");
+        return nullptr;
+    }
+    mpz_class result;
+    mpz_tdiv_q_2exp(result.get_mpz_t(), va.get_mpz_t(), (mp_bitcnt_t) shift);
+    return Variant(new BigInt(result));
+}
+
 Variant BigInt::toBigDecimal(Variant a) {
     // Placeholder — will be implemented when BigDecimal is added
     return a;

@@ -28,6 +28,14 @@ class BigInt : public Box {
     static Variant divmod(Variant a, Variant b);
     static Variant powmod(Variant base, Variant exp, Variant mod);
     static Variant sqrt(Variant a);
+    static Variant bitAnd(Variant a, Variant b);
+    static Variant bitOr(Variant a, Variant b);
+    static Variant bitXor(Variant a, Variant b);
+    static Variant bitNot(Variant a);
+    static Variant testBit(Variant a, Variant index);
+    static Variant popCount(Variant a);
+    static Variant bitShiftLeft(Variant a, Variant n);
+    static Variant bitShiftRight(Variant a, Variant n);
 
     static Variant toString(Variant a);
     static Variant toInt(Variant a);
