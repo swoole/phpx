@@ -2,6 +2,8 @@
 #include "phpx_func.h"
 #include "phpx_decimal.h"
 
+#include <cstring>
+
 using namespace php;
 
 // ============ Construction ============

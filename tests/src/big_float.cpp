@@ -2,6 +2,8 @@
 #include "phpx_func.h"
 #include "phpx_big_float.h"
 
+#include <cstring>
+
 using namespace php;
 
 // ============ Construction ============

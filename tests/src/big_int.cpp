@@ -2,6 +2,8 @@
 #include "phpx_func.h"
 #include "phpx_big_int.h"
 
+#include <cstring>
+
 using namespace php;
 
 // Helper: create a BigInt from a string literal without ambiguity
