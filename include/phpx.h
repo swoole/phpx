@@ -96,6 +96,8 @@ PHPX_API Variant global(const String &name);
 PHPX_API Variant constant(const String &name);
 PHPX_API Variant constant(const String &cls, const String &name);
 PHPX_API Variant constant(zend_class_entry *ce, const String &name);
+PHPX_API bool updateConstant(const String &cls, const String &name, const Variant &data);
+PHPX_API bool updateConstant(zend_class_entry *ce, const String &name, const Variant &data);
 PHPX_API void initGlobal(const String &name, Variant &var);
 PHPX_API void unsetGlobal(const String &name);
 PHPX_API Variant include(const String &file, IncludeType type = INCLUDE);

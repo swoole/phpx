@@ -227,6 +227,27 @@ Variant constant(zend_class_entry *ce, const String &name) {
     return ret_constant;
 }
 
+bool updateConstant(const String &cls, const String &name, const Variant &data) {
+    auto ce = getClassEntrySafe(cls);
+    if (!ce) {
+        return false;
+    }
+    return updateConstant(ce, name, data);
+}
+
+bool updateConstant(zend_class_entry *ce, const String &name, const Variant &data) {
+    auto constant_name = name.str();
+    zval *ret_constant = NULL;
+    auto c = (zend_class_constant *) zend_hash_find_ptr(CE_CONSTANTS_TABLE(ce), constant_name);
+    if (c != NULL) {
+        zval_ptr_dtor(&c->value);
+        ZVAL_COPY(&c->value, data.const_ptr());
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void exit(const Variant &status) {
     if (status.isInt()) {
         EG(exit_status) = status.toInt();

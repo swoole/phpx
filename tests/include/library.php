@@ -27,6 +27,8 @@ class TestClass2 extends TestClass
     public array $propArray = [1, 2, 3, 4, 5];
     public int $propInt2 = 0;
     public array $propArray2 = ['value' => 'hello'];
+    
+    public const CONST_ARRAY = [];
 
     public function test(): string
     {

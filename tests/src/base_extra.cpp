@@ -149,6 +149,23 @@ TEST(base_extra, constant_class_mixed) {
     ASSERT_TRUE(c4.isInt());
 }
 
+TEST(base_extra, update_class_const) {
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
+
+    auto ce = getClassEntry("TestClass2");
+    var rs1 = constant(ce, "CONST_ARRAY");
+    ASSERT_TRUE(rs1.isArray());
+    ASSERT_EQ(rs1.length(), 0);
+
+    Array array = create_map();
+    updateConstant(ce, "CONST_ARRAY", array);
+
+    var rs2 = constant(ce, "CONST_ARRAY");
+    ASSERT_TRUE(rs2.isArray());
+    ASSERT_EQ(rs2.length(), array.count());
+    ASSERT_EQ(rs2.item("php").toInt(), 3);
+}
+
 // Test throwException with different overloads
 TEST(base_extra, throwException_overloads) {
     try {
