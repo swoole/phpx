@@ -379,8 +379,12 @@ zend_function *getMethod(zend_class_entry *ce, const String &name) {
     return (zend_function *) Z_PTR_P(zv);
 }
 
-static void call_function_impl(
-    const zval *zobject, const zval *function_name, zval *retval_ptr, uint32_t param_count, zval params[]) {
+static void call_function_impl(const zval *zobject,
+                               const zval *function_name,
+                               zval *retval_ptr,
+                               uint32_t param_count,
+                               zval params[],
+                               zend_array *named_params = nullptr) {
     zend_fcall_info fci;
 
     fci.size = sizeof(fci);
@@ -393,7 +397,7 @@ static void call_function_impl(
     fci.retval = retval_ptr;
     fci.param_count = param_count;
     fci.params = params;
-    fci.named_params = nullptr;
+    fci.named_params = named_params;
 
     zend_fcall_info_cache fcc;
     zend_fcall_info_cache *fci_cache;
@@ -432,9 +436,9 @@ static void call_function_impl(
     throwErrorIfOccurred();
 }
 
-Variant call_impl(const zval *object, const zval *func, Args &args) {
+Variant call_impl(const zval *object, const zval *func, Args &args, zend_array *named_args) {
     Variant retval{};
-    call_function_impl(object, func, retval.ptr(), args.count(), args.ptr());
+    call_function_impl(object, func, retval.ptr(), args.count(), args.ptr(), named_args);
     return retval;
 }
 

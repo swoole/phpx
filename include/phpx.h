@@ -171,7 +171,7 @@ void request_init();
 void request_shutdown();
 int array_data_compare(Bucket *f, Bucket *s);
 bool prepare_slice(long &offset, long &length, size_t total);
-Variant call_impl(const zval *object, const zval *func, Args &args);
+Variant call_impl(const zval *object, const zval *func, Args &args, zend_array *named_args = nullptr);
 Variant call_impl(const zval *object, const zval *func);
 
 #ifdef ZTS
@@ -951,11 +951,11 @@ class Variant {
         return call_impl(ptr(), fn.unwrap_ptr(), args);
     }
     Variant call(const Variant &fn, Array &args);
-    Variant call(const Variant &fn, const ArgList &args);
+    Variant call(const Variant &fn, const ArgList &args, zend_array *named_args = nullptr);
     Variant call(zend_function *fn);
-    Variant call(zend_function *fn, Args &args);
+    Variant call(zend_function *fn, Args &args, zend_array *named_args = nullptr);
     Variant call(zend_function *fn, Array &args);
-    Variant call(zend_function *fn, const ArgList &args);
+    Variant call(zend_function *fn, const ArgList &args, zend_array *named_args = nullptr);
 
     bool operator==(const Variant &v) const {
         return equals(v);
@@ -1829,8 +1829,8 @@ static inline Object newObject(const String &name) {
     return newObject(getClassEntrySafe(name));
 }
 
-static inline Object newObject(const String &name, const ArgList &args) {
-    return newObject(getClassEntrySafe(name), args);
+static inline Object newObject(const String &name, const ArgList &args, zend_array *named_args = nullptr) {
+    return newObject(getClassEntrySafe(name), args, named_args);
 }
 
 static inline Object getEnumCase(zend_class_entry *ce, const String &name) {

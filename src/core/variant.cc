@@ -849,13 +849,13 @@ Variant Variant::newItem() {
     return Variant{retval, Ctor::Indirect};
 }
 
-Variant Variant::call(const Variant &fn, const ArgList &args) {
+Variant Variant::call(const Variant &fn, const ArgList &args, zend_array *named_args) {
     if (UNEXPECTED(!isObject())) {
         throwError("call method `%s` on %s", fn.toCString(), typeStr());
         return {};
     }
     Args _args(args);
-    return call_impl(unwrap_ptr(), fn.unwrap_ptr(), _args);
+    return call_impl(unwrap_ptr(), fn.unwrap_ptr(), _args, named_args);
 }
 
 Variant Variant::call(const Variant &fn, Array &args) {
@@ -870,9 +870,9 @@ Variant Variant::call(zend_function *fn) {
     return retval;
 }
 
-Variant Variant::call(zend_function *fn, Args &_args) {
+Variant Variant::call(zend_function *fn, Args &_args, zend_array *named_args) {
     Variant retval{};
-    zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), nullptr);
+    zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), named_args);
     throwErrorIfOccurred();
     return retval;
 }
@@ -882,9 +882,9 @@ Variant Variant::call(zend_function *fn, Array &args) {
     return call(fn, _args);
 }
 
-Variant Variant::call(zend_function *fn, const ArgList &args) {
+Variant Variant::call(zend_function *fn, const ArgList &args, zend_array *named_args) {
     Args _args(args);
-    return call(fn, _args);
+    return call(fn, _args, named_args);
 }
 
 void Reference::copyRef(const zval *zv) {
