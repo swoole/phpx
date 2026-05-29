@@ -1742,6 +1742,21 @@ class Box {
     virtual ~Box() = default;
 };
 
+template <typename ContainerType>
+class StdContainerBox : public Box {
+  public:
+    ContainerType container;
+
+    StdContainerBox() = default;
+    explicit StdContainerBox(uint32_t type_id) : container{} {
+        type_info = type_id;
+    }
+    template <typename... Args>
+    StdContainerBox(uint32_t type_id, Args &&...args) : container(std::forward<Args>(args)...) {
+        type_info = type_id;
+    }
+};
+
 static inline Reference newReference() {
     return Reference{};
 }

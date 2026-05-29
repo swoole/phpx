@@ -17,14 +17,6 @@ struct Scope {
     zend_execute_data *frame;
 };
 
-class UnsafePtr : public Box {
-  public:
-    void *ptr;
-    uint32_t type_id;
-
-    UnsafePtr(void *ptr, uint32_t type_id) : ptr(ptr), type_id(type_id) {}
-};
-
 static inline Var toStream(Var &var) {
     if (UNEXPECTED(!var.isResource())) {
         php::throwException(zend_ce_type_error, "Invalid stream resource");
@@ -34,17 +26,13 @@ static inline Var toStream(Var &var) {
 }
 };  // namespace php
 
-static inline php::Var php_create_unsafe_ptr(void *ptr, uint32_t type_id) {
-    return php::Var(new php::UnsafePtr(ptr, type_id));
-}
-
 template <typename T>
-static inline T &php_unsafe_cast(php::Var &unsafePtr, uint32_t type_id) {
-    auto *ptr = unsafePtr.toBox<php::UnsafePtr>();
-    if (UNEXPECTED(ptr->type_id != type_id)) {
-        php::throwException(zend_ce_type_error, "std::unsafe_cast(): UnsafePtr type mismatch");
+static inline T &php_unsafe_cast(php::Var &var, uint32_t type_id) {
+    auto *box = var.toBox<php::StdContainerBox<T>>();
+    if (UNEXPECTED(box->getTypeInfo() != type_id)) {
+        php::throwException(zend_ce_type_error, "std::unsafe_cast(): std container type mismatch");
     }
-    return *reinterpret_cast<T *>(ptr->ptr);
+    return box->container;
 }
 
 extern const char *php_get_called_class(php::Object &this_);
