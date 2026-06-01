@@ -228,7 +228,7 @@ else()
 endif()
 
 # ============ 包含目录 ============
-include_directories(include tests/include)
+include_directories(include tests/include src/misc)
 
 if(IS_WINDOWS)
     include_directories(${PHP_INCLUDE_DIRS})

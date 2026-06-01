@@ -10,7 +10,7 @@ class BigInt : public Box {
     mpz_class value;
 
     BigInt() = default;
-    BigInt(const char *s, int base = 10) : value(s, base) {}
+    BigInt(const char *s, int base = 0) : value(s, base) {}
     BigInt(const mpz_class &v) : value(v) {}
     BigInt(php::Int v) : value((signed long) v) {}
 
