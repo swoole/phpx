@@ -228,15 +228,15 @@ Variant Decimal::round(Variant a, Variant precision) {
     if (prec == 0) {
         return Variant(new Decimal(va.to_integral()));
     }
-    // Build quantum = 10^(-prec)
-    std::string quantumStr;
-    if (prec > 0) {
-        quantumStr = "1E-" + std::to_string(prec);
-    } else {
-        quantumStr = "1E" + std::to_string(-prec);
+    decimal::Decimal result;
+    uint32_t status = 0;
+    mpd_ssize_t targetExp = -(mpd_ssize_t) prec;
+    mpd_qrescale(result.get(), va.getconst(), targetExp, decimal::context.getconst(), &status);
+    if (status & MPD_Invalid_operation) {
+        throwException(zend_ce_type_error, "Decimal::round: invalid operation");
+        return nullptr;
     }
-    decimal::Decimal quantum(quantumStr);
-    return Variant(new Decimal(va.quantize(quantum)));
+    return Variant(new Decimal(result));
 }
 
 Variant Decimal::toBigInt(Variant a) {
