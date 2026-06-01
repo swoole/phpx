@@ -309,7 +309,12 @@ if (IS_WINDOWS)
     endif()
 endif()
 
-if (NOT IS_WINDOWS)
+if (IS_WINDOWS)
+    target_link_libraries(phpx PRIVATE
+        ${PHP_LIBRARY}
+        gmp gmpxx libmpdec libmpdec++ mpfr
+    )
+else()
     target_link_libraries(phpx PUBLIC gmp gmpxx mpdec++ mpfr)
 endif()
 
@@ -337,6 +342,7 @@ if(BUILD_TESTS)
                     ${PHP_LIBRARY}
                     phpx
                     ${GTEST_BOTH_LIBRARIES}
+                    gmp gmpxx libmpdec libmpdec++ mpfr
             )
 
             # 复制 DLL 到测试可执行文件目录
