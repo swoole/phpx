@@ -4,18 +4,18 @@
 
 TEST(same, int_comparison) {
     // Test same integers
-    ASSERT_TRUE(php::same(5LL, 5LL));
-    ASSERT_TRUE(php::same(-10LL, -10LL));
-    ASSERT_TRUE(php::same(0LL, 0LL));
+    ASSERT_TRUE(php::same(5L, 5L));
+    ASSERT_TRUE(php::same(-10L, -10L));
+    ASSERT_TRUE(php::same(0L, 0L));
     ASSERT_TRUE(php::same((php::Int) LONG_MAX, (php::Int) LONG_MAX));
     ASSERT_TRUE(php::same((php::Int) LONG_MIN, (php::Int) LONG_MIN));
 
     // Test different integers
-    ASSERT_FALSE(php::same(5LL, 10LL));
-    ASSERT_FALSE(php::same(-5LL, 5LL));
-    ASSERT_FALSE(php::same(0LL, 1LL));
+    ASSERT_FALSE(php::same(5L, 10L));
+    ASSERT_FALSE(php::same(-5L, 5L));
+    ASSERT_FALSE(php::same(0L, 1L));
     ASSERT_FALSE(php::same((php::Int) LONG_MAX, (php::Int) LONG_MIN));
-    ASSERT_FALSE(php::same(100LL, -100LL));
+    ASSERT_FALSE(php::same(100L, -100L));
 }
 
 TEST(same, float_comparison) {
@@ -71,12 +71,12 @@ TEST(same, cross_type_comparison) {
     // Test comparison between different types (these should be compile errors, but test boundary cases at runtime)
 
     // Integer and float comparison (requires explicit conversion)
-    ASSERT_TRUE(php::same((php::Float) 5LL, 5.0));
-    ASSERT_FALSE(php::same((php::Float) 5LL, 5.1));
+    ASSERT_TRUE(php::same((php::Float) 5L, 5.0));
+    ASSERT_FALSE(php::same((php::Float) 5L, 5.1));
 
     // Integer and boolean comparison (requires explicit conversion)
-    ASSERT_TRUE(php::same((php::Bool)(1LL != 0), true));
-    ASSERT_TRUE(php::same((php::Bool)(0LL == 0), true));
+    ASSERT_TRUE(php::same((php::Bool)(1L != 0), true));
+    ASSERT_TRUE(php::same((php::Bool)(0L == 0), true));
 
     // Float and boolean comparison (requires explicit conversion)
     ASSERT_TRUE(php::same((php::Bool)(1.0 != 0.0), true));
@@ -97,7 +97,7 @@ TEST(same, edge_cases) {
     ASSERT_FALSE(php::same(DBL_MAX, -DBL_MAX));
 
     // Various representations of zero
-    ASSERT_TRUE(php::same(0LL, 0LL));
+    ASSERT_TRUE(php::same(0L, 0L));
     ASSERT_TRUE(php::same(0.0, 0.0));
     ASSERT_TRUE(php::same(-0.0, -0.0));
     ASSERT_TRUE(php::same(-0.0, 0.0));  // In IEEE 754, -0.0 == 0.0

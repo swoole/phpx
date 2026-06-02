@@ -38,7 +38,7 @@ TEST(string, number) {
     ASSERT_TRUE(s0.equals("1990"));
     ASSERT_EQ(s0.toInt(), 1990);
 
-    String s1(19902019LL);
+    String s1(19902019L);
     ASSERT_TRUE(s1.equals("19902019"));
 
     String s2(1990.2019);
@@ -222,7 +222,7 @@ TEST(string, update) {
 
 TEST(string, assign) {
     String s;
-    s = php::toInt(100LL);
+    s = php::toInt(100L);
     ASSERT_STREQ(s.toCString(), "100");
 
     s = 3.0;

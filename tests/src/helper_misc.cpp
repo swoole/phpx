@@ -18,11 +18,11 @@ TEST(helper_equals, float_equals) {
     ASSERT_TRUE(php::equals(static_cast<Float>(-1.5f), static_cast<Float>(-1.5f)));
     ASSERT_FALSE(php::equals(static_cast<Float>(0.0f), static_cast<Float>(0.1f)));
 
-    ASSERT_TRUE(php::equals(2.0, 2LL));
-    ASSERT_TRUE(php::equals(3LL, 3.0));
+    ASSERT_TRUE(php::equals(2.0, 2L));
+    ASSERT_TRUE(php::equals(3L, 3.0));
 
-    ASSERT_FALSE(php::equals(2.1, 22LL));
-    ASSERT_FALSE(php::equals(3LL, 3.23));
+    ASSERT_FALSE(php::equals(2.1, 22L));
+    ASSERT_FALSE(php::equals(3L, 3.23));
 }
 
 // Test toInt conversion functions
@@ -40,7 +40,7 @@ TEST(helper_misc, toInt) {
 }
 
 TEST(helper_misc, toFloat) {
-    ASSERT_EQ(php::toFloat(34LL), 34.00);
+    ASSERT_EQ(php::toFloat(34L), 34.00);
 
     ASSERT_EQ(php::toFloat("3.1415"), 3.1415);
 
