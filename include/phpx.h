@@ -1678,7 +1678,8 @@ class Object : public Variant {
     String hash() const;
     zend_long count();
     bool methodExists(const String &name) const {
-        return zend_hash_exists(&ce()->function_table, name.str());
+    	auto lcname = name.lower();
+        return zend_hash_exists(&ce()->function_table, lcname.str());
     }
     bool propertyExists(const String &name, PropertyOperation op = PROP_EXISTS) const;
     bool instanceOf(const String &name) const;

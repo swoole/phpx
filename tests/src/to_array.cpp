@@ -280,3 +280,81 @@ TEST(to_array, line_337_empty_array_branch) {
     ASSERT_TRUE(empty_arr.isArray());
     // Empty stdClass should convert to empty or populated array
 }
+
+TEST(to_array, object_with_toarray_method) {
+    // Define a class with a toArray() method
+    eval(R"(
+        class ToArrayClass {
+            public $name;
+            public $value;
+
+            public function __construct($name, $value) {
+                $this->name = $name;
+                $this->value = $value;
+            }
+
+            public function toArray(): array {
+                return [
+                    'custom_name' => $this->name,
+                    'custom_value' => $this->value,
+                    'extra' => 'from_toArray',
+                ];
+            }
+        }
+    )");
+
+    auto obj = eval("return new ToArrayClass('test', 42);");
+    ASSERT_TRUE(obj.isObject());
+
+    Variant obj_var(obj);
+    Array arr = toArray(obj_var);
+
+    ASSERT_TRUE(arr.isArray());
+    ASSERT_EQ(arr.count(), 3);
+    ASSERT_TRUE(arr.exists("custom_name"));
+    ASSERT_STREQ(arr.get("custom_name").toCString(), "test");
+    ASSERT_TRUE(arr.exists("custom_value"));
+    ASSERT_EQ(arr.get("custom_value").toInt(), 42);
+    ASSERT_TRUE(arr.exists("extra"));
+    ASSERT_STREQ(arr.get("extra").toCString(), "from_toArray");
+}
+
+TEST(to_array, object_with_bad_toarray_no_throw) {
+    // toArray() returns non-array — should throw
+    eval(R"(
+        class BadToArrayClass {
+            public function toArray(): string {
+                return "not an array";
+            }
+        }
+    )");
+
+    auto obj = eval("return new BadToArrayClass();");
+    ASSERT_TRUE(obj.isObject());
+
+    Variant obj_var(obj);
+    try_call([&]() { toArray(obj_var); }, "toArray() method must return an array, got string");
+}
+
+TEST(to_array, object_without_toarray_fallback) {
+    // Object without toArray() should still convert via properties table
+    eval(R"(
+        class NoToArrayClass {
+            public $prop_a = 'hello';
+            public $prop_b = 100;
+        }
+    )");
+
+    auto obj = eval("return new NoToArrayClass();");
+    ASSERT_TRUE(obj.isObject());
+
+    Variant obj_var(obj);
+    Array arr = toArray(obj_var);
+
+    ASSERT_TRUE(arr.isArray());
+    ASSERT_GE(arr.count(), 2);
+    ASSERT_TRUE(arr.exists("prop_a"));
+    ASSERT_STREQ(arr.get("prop_a").toCString(), "hello");
+    ASSERT_TRUE(arr.exists("prop_b"));
+    ASSERT_EQ(arr.get("prop_b").toInt(), 100);
+}

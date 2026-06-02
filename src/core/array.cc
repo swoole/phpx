@@ -353,6 +353,13 @@ Array toArray(const Variant &v) {
         } else {
             ZVAL_EMPTY_ARRAY(&result);
         }
+    } else if (zend_hash_str_find_ptr(&Z_OBJCE_P(expr)->function_table, ZEND_STRL("toarray"))) {
+        Variant obj(expr);
+        Variant ret = obj.call("toArray");
+        if (!ret.isArray()) {
+            throwError("toArray() method must return an array, got %s", ret.typeStr());
+        }
+        return Array(ret.unwrap_ptr());
     } else if (Z_OBJ_P(expr)->properties == NULL && Z_OBJ_HT_P(expr)->get_properties_for == NULL &&
                Z_OBJ_HT_P(expr)->get_properties == zend_std_get_properties) {
         /* Optimized version without rebuilding properties HashTable */
