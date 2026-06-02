@@ -59,11 +59,13 @@ TEST(std_container_box, stdarray_out_of_bounds) {
     Var v = Var(new StdContainerBox<StdArray5Int>(0));
     auto &arr = v.toBox<StdContainerBox<StdArray5Int>>()->container;
 
-    try_call([]() {
-        Var v2 = Var(new StdContainerBox<StdArray5Int>(0));
-        auto &a = v2.toBox<StdContainerBox<StdArray5Int>>()->container;
-        a.offsetGet(100);
-    }, "out of bounds");
+    try_call(
+        []() {
+            Var v2 = Var(new StdContainerBox<StdArray5Int>(0));
+            auto &a = v2.toBox<StdContainerBox<StdArray5Int>>()->container;
+            a.offsetGet(100);
+        },
+        "out of bounds");
 }
 
 TEST(std_container_box, stdarray_unset) {
@@ -226,10 +228,12 @@ TEST(unsafe_cast, vector_modify) {
 }
 
 TEST(unsafe_cast, type_mismatch_throws) {
-    try_call([]() {
-        Var v = Var(new StdContainerBox<StdVector<Int>>(1));
-        php_unsafe_cast<StdVector<Int>>(v, 999);  // wrong type_id
-    }, "type mismatch");
+    try_call(
+        []() {
+            Var v = Var(new StdContainerBox<StdVector<Int>>(1));
+            php_unsafe_cast<StdVector<Int>>(v, 999);  // wrong type_id
+        },
+        "type mismatch");
 }
 
 TEST(unsafe_cast, array_type) {

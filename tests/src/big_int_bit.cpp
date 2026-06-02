@@ -17,8 +17,8 @@ static inline Variant bi(php::Int v) {
 // ============ bitAnd ============
 
 TEST(bigint_bit, and_basic) {
-    auto a = bi(0b1010);   // 10
-    auto b = bi(0b1100);   // 12
+    auto a = bi(0b1010);  // 10
+    auto b = bi(0b1100);  // 12
     auto r = BigInt::bitAnd(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
@@ -49,8 +49,8 @@ TEST(bigint_bit, and_with_self) {
 // ============ bitOr ============
 
 TEST(bigint_bit, or_basic) {
-    auto a = bi(0b1010);   // 10
-    auto b = bi(0b0101);   // 5
+    auto a = bi(0b1010);  // 10
+    auto b = bi(0b0101);  // 5
     auto r = BigInt::bitOr(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
@@ -75,8 +75,8 @@ TEST(bigint_bit, or_with_zero) {
 // ============ bitXor ============
 
 TEST(bigint_bit, xor_basic) {
-    auto a = bi(0b1111);   // 15
-    auto b = bi(0b1010);   // 10
+    auto a = bi(0b1111);  // 15
+    auto b = bi(0b1010);  // 10
     auto r = BigInt::bitXor(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
