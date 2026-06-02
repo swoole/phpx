@@ -207,38 +207,38 @@ TEST(std_container_box, stdunordered_map_unset) {
     ASSERT_EQ(map.offsetGet(2), 20);
 }
 
-// ============ php_unsafe_cast ============
+// ============ php_std_container_cast ============
 
-TEST(unsafe_cast, vector_int) {
+TEST(std_container_cast, vector_int) {
     Var v = Var(new StdContainerBox<StdVector<Int>>(42, std::initializer_list<Int>{1, 2, 3, 4, 5}));
-    auto &vec = php_unsafe_cast<StdVector<Int>>(v, 42);
+    auto &vec = php_std_container_cast<StdVector<Int>>(v, 42);
 
     ASSERT_EQ(vec.size(), 5u);
     ASSERT_EQ(vec[0], 1);
     ASSERT_EQ(vec[4], 5);
 }
 
-TEST(unsafe_cast, vector_modify) {
+TEST(std_container_cast, vector_modify) {
     Var v = Var(new StdContainerBox<StdVector<Int>>(100));
-    auto &vec = php_unsafe_cast<StdVector<Int>>(v, 100);
+    auto &vec = php_std_container_cast<StdVector<Int>>(v, 100);
 
     vec.push_back(42);
     ASSERT_EQ(vec.size(), 1u);
     ASSERT_EQ(vec[0], 42);
 }
 
-TEST(unsafe_cast, type_mismatch_throws) {
+TEST(std_container_cast, type_mismatch_throws) {
     try_call(
         []() {
             Var v = Var(new StdContainerBox<StdVector<Int>>(1));
-            php_unsafe_cast<StdVector<Int>>(v, 999);  // wrong type_id
+            php_std_container_cast<StdVector<Int>>(v, 999);  // wrong type_id
         },
         "type mismatch");
 }
 
-TEST(unsafe_cast, array_type) {
+TEST(std_container_cast, array_type) {
     Var v = Var(new StdContainerBox<StdArray<Int, 3>>(7, std::initializer_list<Int>{10, 20, 30}));
-    auto &arr = php_unsafe_cast<StdArray<Int, 3>>(v, 7);
+    auto &arr = php_std_container_cast<StdArray<Int, 3>>(v, 7);
 
     ASSERT_EQ(arr.size(), 3u);
     ASSERT_EQ(arr[0], 10);
@@ -246,9 +246,47 @@ TEST(unsafe_cast, array_type) {
     ASSERT_EQ(arr[2], 30);
 }
 
-TEST(unsafe_cast, map_type) {
+TEST(std_container_cast, map_type) {
     Var v = Var(new StdContainerBox<StdMap<Int, String>>(5));
-    auto &map = php_unsafe_cast<StdMap<Int, String>>(v, 5);
+    auto &map = php_std_container_cast<StdMap<Int, String>>(v, 5);
+
+    map.offsetSet(1, String("alpha"));
+    ASSERT_STREQ(map.offsetGet(1).toCString(), "alpha");
+}
+
+// ============ toBox recovery ============
+
+TEST(to_box, vector_int) {
+    Var v = Var(new StdContainerBox<StdVector<Int>>(42, std::initializer_list<Int>{1, 2, 3, 4, 5}));
+    auto &vec = v.toBox<StdContainerBox<StdVector<Int>>>()->container;
+
+    ASSERT_EQ(vec.size(), 5u);
+    ASSERT_EQ(vec[0], 1);
+    ASSERT_EQ(vec[4], 5);
+}
+
+TEST(to_box, vector_modify) {
+    Var v = Var(new StdContainerBox<StdVector<Int>>(100));
+    auto &vec = v.toBox<StdContainerBox<StdVector<Int>>>()->container;
+
+    vec.push_back(42);
+    ASSERT_EQ(vec.size(), 1u);
+    ASSERT_EQ(vec[0], 42);
+}
+
+TEST(to_box, array_type) {
+    Var v = Var(new StdContainerBox<StdArray<Int, 3>>(7, std::initializer_list<Int>{10, 20, 30}));
+    auto &arr = v.toBox<StdContainerBox<StdArray<Int, 3>>>()->container;
+
+    ASSERT_EQ(arr.size(), 3u);
+    ASSERT_EQ(arr[0], 10);
+    ASSERT_EQ(arr[1], 20);
+    ASSERT_EQ(arr[2], 30);
+}
+
+TEST(to_box, map_type) {
+    Var v = Var(new StdContainerBox<StdMap<Int, String>>(5));
+    auto &map = v.toBox<StdContainerBox<StdMap<Int, String>>>()->container;
 
     map.offsetSet(1, String("alpha"));
     ASSERT_STREQ(map.offsetGet(1).toCString(), "alpha");

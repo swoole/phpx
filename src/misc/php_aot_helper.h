@@ -19,7 +19,7 @@ struct Scope {
 };  // namespace php
 
 template <typename T>
-static inline T &php_unsafe_cast(php::Var &var, uint32_t type_id) {
+static inline T &php_std_container_cast(php::Var &var, uint32_t type_id) {
     auto *box = var.toBox<php::StdContainerBox<T>>();
     if (UNEXPECTED(box->getTypeInfo() != type_id)) {
         php::throwException(zend_ce_type_error, "std container type mismatch");
