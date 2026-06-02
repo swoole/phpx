@@ -1,0 +1,79 @@
+
+SRCDIR = ..\libmpdec
+LIBSTATIC = libmpdec-4.0.1.lib
+LIBSHARED = libmpdec-4.0.1.dll
+LIBIMPORT = libmpdec-4.0.1.dll.lib
+
+SRCDIR_CXX = ..\libmpdec++
+LIBSTATIC_CXX = libmpdec++-4.0.1.lib
+LIBSHARED_CXX = libmpdec++-4.0.1.dll
+LIBIMPORT_CXX = libmpdec++-4.0.1.dll.lib
+
+!if "$(DEBUG)" == "1"
+OPT = /MTd /Od /Zi /EHsc
+OPT_SHARED = /MDd /Od /Zi /EHsc
+!else
+OPT = /MT /O2 /GS /EHsc /DNDEBUG
+OPT_SHARED = /MD /O2 /GS /EHsc /DNDEBUG
+!endif
+
+!if "$(CC)" == "clang-cl"
+WARN = /W4 /wd4200 /wd4204 /wd4221 /wd4714 -Wno-undefined-inline /D_CRT_SECURE_NO_WARNINGS
+!else
+WARN = /W4 /wd4200 /wd4204 /wd4221 /wd4714 /D_CRT_SECURE_NO_WARNINGS
+!endif
+
+MPD_CXXFLAGS = $(WARN) /nologo $(OPT)
+MPD_CXXFLAGS_SHARED = $(WARN) /nologo $(OPT_SHARED)
+
+
+default: runtest runtest_shared apitest apitest_shared copy_dll
+
+
+runtest:\
+Makefile runtest.cc test.cc $(SRCDIR)\mpdecimal.h $(SRCDIR_CXX)\decimal.hh test.hh vctest.hh \
+$(SRCDIR)\$(LIBSTATIC) $(SRCDIR_CXX)\$(LIBSTATIC_CXX)
+	$(CXX) -I$(SRCDIR) -I$(SRCDIR_CXX) $(MPD_CXXFLAGS) /Fe:runtest runtest.cc test.cc $(SRCDIR_CXX)\$(LIBSTATIC_CXX) $(SRCDIR)\$(LIBSTATIC)
+
+runtest_shared:\
+Makefile runtest.cc test.cc $(SRCDIR)\mpdecimal.h $(SRCDIR_CXX)\decimal.hh test.hh vctest.hh \
+$(SRCDIR_CXX)\$(LIBIMPORT_CXX) $(SRCDIR)\$(LIBIMPORT)
+	$(CXX) -I$(SRCDIR) -I$(SRCDIR_CXX) $(MPD_CXXFLAGS_SHARED) /Fe:runtest_shared runtest.cc test.cc $(SRCDIR_CXX)\$(LIBIMPORT_CXX) $(SRCDIR)\$(LIBIMPORT)
+
+
+apitest:\
+Makefile apitest.cc test.cc $(SRCDIR)\mpdecimal.h $(SRCDIR_CXX)\decimal.hh test.hh vctest.hh \
+$(SRCDIR_CXX)\$(LIBSTATIC_CXX) $(SRCDIR)\$(LIBSTATIC)
+	$(CXX) -I$(SRCDIR) -I$(SRCDIR_CXX) $(MPD_CXXFLAGS) /Fe:apitest apitest.cc test.cc $(SRCDIR_CXX)\$(LIBSTATIC_CXX) $(SRCDIR)\$(LIBSTATIC)
+
+apitest_shared:\
+Makefile apitest.cc test.cc $(SRCDIR)\mpdecimal.h $(SRCDIR_CXX)\decimal.hh test.hh vctest.hh \
+$(SRCDIR_CXX)\$(LIBIMPORT_CXX) $(SRCDIR)\$(LIBIMPORT)
+	$(CXX) -I$(SRCDIR) -I$(SRCDIR_CXX) $(MPD_CXXFLAGS_SHARED) /Fe:apitest_shared apitest.cc test.cc $(SRCDIR_CXX)\$(LIBIMPORT_CXX) $(SRCDIR)\$(LIBIMPORT)
+
+
+FORCE:
+
+copy_dll:
+	copy /y "$(SRCDIR)\$(LIBSHARED)" .
+	copy /y "$(SRCDIR_CXX)\$(LIBSHARED_CXX)" .
+
+clean: FORCE
+	-@if exist *.obj del *.obj
+	-@if exist *.dll del *.dll
+	-@if exist *.exp del *.exp
+	-@if exist *.lib del *.lib
+	-@if exist *.ilk del *.ilk
+	-@if exist *.pdb del *.pdb
+	-@if exist *.pgc del *.pgc
+	-@if exist *.pgd del *.pgd
+	-@if exist *.manifest del *.manifest
+	-@if exist *.exe del *.exe
+	-@if exist runtest del runtest
+	-@if exist apitest del apitest
+
+distclean: FORCE
+	nmake clean
+	-@if exist testdata rd /q /s testdata
+	-@if exist Makefile del Makefile
+

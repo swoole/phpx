@@ -1,0 +1,19 @@
+-- Selected test cases to reduce both the archive size and runtime.  For the
+-- large test suite, download the separate mpdecimal-testdata distribution and
+-- replace the testdata_dist directory.
+
+shlx0  shiftleft  0  0  ->  0
+shlx1  shiftleft  0  1  ->  0
+shlx2  shiftleft  0  2  ->  0
+shlx3  shiftleft  0  3  ->  0
+
+shlx190  shiftleft  1  90  ->  1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+shlx200  shiftleft  12  0  ->  12
+shlx201  shiftleft  12  1  ->  120
+shlx209  shiftleft  12  9  ->  12000000000
+
+shlr4800  shiftright  12123456789  0  ->  12123456789
+shlr4801  shiftright  12123456789  1  ->  1212345678
+shlr4802  shiftright  12123456789  2  ->  121234567
+shlr4810  shiftright  12123456789  10  ->  1

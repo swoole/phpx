@@ -1,0 +1,472 @@
+-- Selected test cases to reduce both the archive size and runtime.  For the
+-- large test suite, download the separate mpdecimal-testdata distribution and
+-- replace the testdata_dist directory.
+
+precision:   MAX_PREC
+rounding:    half_up
+maxExponent: MAX_EMAX
+minexponent: MIN_EMIN
+
+-- basics
+sqtx001 squareroot 1       -> 1
+sqtx002 squareroot -1      -> NaN Invalid_operation
+sqtx003 squareroot 1.00    -> 1.0
+sqtx004 squareroot -1.00   -> NaN Invalid_operation
+sqtx005 squareroot 0       -> 0
+sqtx006 squareroot 00.0    -> 0.0
+sqtx007 squareroot 0.00    -> 0.0
+sqtx008 squareroot 00.00   -> 0.0
+sqtx009 squareroot 00.000  -> 0.00
+sqtx010 squareroot 00.0000 -> 0.00
+
+sqtx012 squareroot -2      -> NaN Invalid_operation
+sqtx014 squareroot -2.00   -> NaN Invalid_operation
+sqtx016 squareroot -0      -> -0
+sqtx017 squareroot -0.0    -> -0.0
+sqtx018 squareroot -00.00  -> -0.0
+sqtx019 squareroot -00.000 -> -0.00
+sqtx020 squareroot -0.0000 -> -0.00
+sqtx021 squareroot -0E+9   -> -0E+4
+sqtx022 squareroot -0E+10  -> -0E+5
+sqtx023 squareroot -0E+11  -> -0E+5
+sqtx024 squareroot -0E+12  -> -0E+6
+sqtx025 squareroot -00     -> -0
+sqtx026 squareroot 0E+5    -> 0E+2
+sqtx027 squareroot 4.0     -> 2.0
+sqtx028 squareroot 4.00    -> 2.0
+
+sqtx031 squareroot -0.1            -> NaN Invalid_operation
+sqtx032 squareroot +0.01           -> 0.1
+sqtx033 squareroot -0.01           -> NaN Invalid_operation
+sqtx035 squareroot -0.001          -> NaN Invalid_operation
+sqtx036 squareroot +0.000001       -> 0.001
+sqtx037 squareroot -0.000001       -> NaN Invalid_operation
+sqtx038 squareroot +0.000000000001 -> 0.000001
+sqtx039 squareroot -0.000000000001 -> NaN Invalid_operation
+
+sqtx045 squareroot -1.1       -> NaN Invalid_operation
+sqtx046 squareroot -1.10      -> NaN Invalid_operation
+sqtx047 squareroot -1.100     -> NaN Invalid_operation
+sqtx048 squareroot -1.110     -> NaN Invalid_operation
+sqtx053 squareroot -9.9       -> NaN Invalid_operation
+sqtx054 squareroot -9.90      -> NaN Invalid_operation
+sqtx055 squareroot -9.900     -> NaN Invalid_operation
+sqtx056 squareroot -9.990     -> NaN Invalid_operation
+
+sqtx060 squareroot  1           -> 1
+sqtx061 squareroot  1.0         -> 1.0
+sqtx062 squareroot  1.00        -> 1.0
+sqtx067 squareroot  100         -> 10
+sqtx068 squareroot  100.0       -> 10.0
+sqtx069 squareroot  100.00      -> 10.0
+sqtx072 squareroot -10.0        -> NaN Invalid_operation
+sqtx073 squareroot -10.00       -> NaN Invalid_operation
+sqtx074 squareroot -100.0       -> NaN Invalid_operation
+sqtx075 squareroot -100.00      -> NaN Invalid_operation
+sqtx076 squareroot -1.1000E+3   -> NaN Invalid_operation
+sqtx077 squareroot -1.10000E+3  -> NaN Invalid_operation
+sqtx078 squareroot  1.000       -> 1.00
+sqtx079 squareroot  1.0000      -> 1.00
+
+---- famous squares
+sqtx080 squareroot     1  -> 1
+sqtx081 squareroot     4  -> 2
+sqtx082 squareroot     9  -> 3
+sqtx083 squareroot    16  -> 4
+sqtx084 squareroot    25  -> 5
+sqtx085 squareroot    36  -> 6
+sqtx086 squareroot    49  -> 7
+sqtx087 squareroot    64  -> 8
+sqtx088 squareroot    81  -> 9
+sqtx089 squareroot   100  -> 10
+sqtx090 squareroot   121  -> 11
+sqtx091 squareroot   144  -> 12
+sqtx092 squareroot   169  -> 13
+sqtx093 squareroot   256  -> 16
+sqtx094 squareroot  1024  -> 32
+sqtx095 squareroot  4096  -> 64
+sqtx100 squareroot   0.01 -> 0.1
+sqtx101 squareroot   0.04 -> 0.2
+sqtx102 squareroot   0.09 -> 0.3
+sqtx103 squareroot   0.16 -> 0.4
+sqtx104 squareroot   0.25 -> 0.5
+sqtx105 squareroot   0.36 -> 0.6
+sqtx106 squareroot   0.49 -> 0.7
+sqtx107 squareroot   0.64 -> 0.8
+sqtx108 squareroot   0.81 -> 0.9
+sqtx109 squareroot   1.00 -> 1.0
+sqtx110 squareroot   1.21 -> 1.1
+sqtx111 squareroot   1.44 -> 1.2
+sqtx112 squareroot   1.69 -> 1.3
+sqtx113 squareroot   2.56 -> 1.6
+sqtx114 squareroot  10.24 -> 3.2
+sqtx115 squareroot  40.96 -> 6.4
+
+---- Precision 1 squareroot tests [exhaustive, plus exponent adjusts]
+sqtx1202 squareroot 0.01 -> 0.1
+sqtx1204 squareroot 1.00E-2 -> 0.10
+sqtx1207 squareroot 1E+2 -> 1E+1
+sqtx1226 squareroot 0.04 -> 0.2
+sqtx1228 squareroot 4.00E-2 -> 0.20
+sqtx1231 squareroot 4E+2 -> 2E+1
+sqtx1266 squareroot 0.09 -> 0.3
+sqtx1268 squareroot 9.00E-2 -> 0.30
+sqtx1271 squareroot 9E+2 -> 3E+1
+
+---- Precision 2 squareroot tests [exhaustive, plus exponent adjusts]
+sqtx2202 squareroot 0.01 -> 0.1
+sqtx2204 squareroot 1.00E-2 -> 0.10
+sqtx2207 squareroot 1E+2 -> 1E+1
+sqtx2226 squareroot 0.04 -> 0.2
+sqtx2228 squareroot 4.00E-2 -> 0.20
+--sqtx2231 squareroot 4E+2 -> 2E+1
+sqtx2266 squareroot 0.09 -> 0.3
+sqtx2268 squareroot 9.00E-2 -> 0.30
+sqtx2271 squareroot 9E+2 -> 3E+1
+sqtx2274 squareroot 0.010 -> 0.10
+sqtx2275 squareroot 10.0E-1 -> 1.0
+sqtx2277 squareroot 10E-3 -> 0.10
+sqtx2278 squareroot 10E+1 -> 10
+sqtx2280 squareroot 10E+3 -> 1.0E+2
+sqtx2321 squareroot 0.16 -> 0.4
+sqtx2324 squareroot 16.00E-2 -> 0.40
+sqtx2327 squareroot 16E+2 -> 4E+1
+sqtx2399 squareroot 25E+2 -> 5E+1
+sqtx2484 squareroot 36.00E-2 -> 0.60
+sqtx2487 squareroot 36E+2 -> 6E+1
+sqtx2514 squareroot 0.040 -> 0.20
+sqtx2515 squareroot 40.0E-1 -> 2.0
+sqtx2517 squareroot 40E-3 -> 0.20
+sqtx2518 squareroot 40E+1 -> 20
+sqtx2520 squareroot 40E+3 -> 2.0E+2
+sqtx2585 squareroot 0.49 -> 0.7
+sqtx2588 squareroot 49.00E-2 -> 0.70
+sqtx2591 squareroot 49E+2 -> 7E+1
+sqtx2705 squareroot 0.64 -> 0.8
+sqtx2708 squareroot 64.00E-2 -> 0.80
+sqtx2711 squareroot 64E+2 -> 8E+1
+sqtx2841 squareroot 0.81 -> 0.9
+sqtx2844 squareroot 81.00E-2 -> 0.90
+sqtx2847 squareroot 81E+2 -> 9E+1
+sqtx2914 squareroot 0.090 -> 0.30
+sqtx2915 squareroot 90.0E-1 -> 3.0
+sqtx2917 squareroot 90E-3 -> 0.30
+sqtx2918 squareroot 90E+1 -> 30
+sqtx2920 squareroot 90E+3 -> 3.0E+2
+
+sqtx3002 squareroot 0.01 -> 0.1
+sqtx3008 squareroot 0.04 -> 0.2
+
+precision:   MAX_PREC
+rounding:    half_up
+maxExponent: MAX_EMAX
+minexponent: MIN_EMIN
+
+divx001 divide  1     1    ->  1
+divx002 divide  2     1    ->  2
+divx003 divide  1     2    ->  0.5
+divx004 divide  2     2    ->  1
+divx005 divide  0     1    ->  0
+divx006 divide  0     2    ->  0
+divx009 divide  3     3    ->  1
+
+divx010 divide  2.4   1    ->  2.4
+divx011 divide  2.4   -1   ->  -2.4
+divx012 divide  -2.4  1    ->  -2.4
+divx013 divide  -2.4  -1   ->  2.4
+divx014 divide  2.40  1    ->  2.40
+divx015 divide  2.400 1    ->  2.400
+divx016 divide  2.4   2    ->  1.2
+divx017 divide  2.400 2    ->  1.200
+divx018 divide  2.    2    ->  1
+divx019 divide  20    20   ->  1
+
+divx020 divide  187   187    ->  1
+divx021 divide  5     2      ->  2.5
+divx022 divide  50    20     ->  2.5
+divx023 divide  500   200    ->  2.5
+divx024 divide  50.0  20.0   ->  2.5
+divx025 divide  5.00  2.00   ->  2.5
+divx026 divide  5     2.0    ->  2.5
+divx027 divide  5     2.000  ->  2.5
+divx028 divide  5     0.20   ->  25
+divx029 divide  5     0.200  ->  25
+divx030 divide  10    1      ->  10
+divx031 divide  100   1      ->  100
+divx032 divide  1000  1      ->  1000
+divx033 divide  1000  100    ->  10
+
+divx035 divide  1     2      ->  0.5
+divx036 divide  1     4      ->  0.25
+divx037 divide  1     8      ->  0.125
+divx038 divide  1     16     ->  0.0625
+divx039 divide  1     32     ->  0.03125
+divx040 divide  1     64     ->  0.015625
+divx041 divide  1    -2      ->  -0.5
+divx042 divide  1    -4      ->  -0.25
+divx043 divide  1    -8      ->  -0.125
+divx044 divide  1    -16     ->  -0.0625
+divx045 divide  1    -32     ->  -0.03125
+divx046 divide  1    -64     ->  -0.015625
+divx047 divide -1     2      ->  -0.5
+divx048 divide -1     4      ->  -0.25
+divx049 divide -1     8      ->  -0.125
+divx050 divide -1     16     ->  -0.0625
+divx051 divide -1     32     ->  -0.03125
+divx052 divide -1     64     ->  -0.015625
+divx053 divide -1    -2      ->  0.5
+divx054 divide -1    -4      ->  0.25
+divx055 divide -1    -8      ->  0.125
+divx056 divide -1    -16     ->  0.0625
+divx057 divide -1    -32     ->  0.03125
+divx058 divide -1    -64     ->  0.015625
+
+divx070 divide  999999999        1    ->  999999999
+
+divx083 divide  999999        1  ->  999999
+divx084 divide  99999         1  ->  99999
+divx085 divide  9999          1  ->  9999
+divx086 divide  999           1  ->  999
+divx087 divide  99            1  ->  99
+divx088 divide  9             1  ->  9
+
+divx090 divide  0.            1    ->  0
+divx091 divide  .0            1    ->  0.0
+divx092 divide  0.00          1    ->  0.00
+divx093 divide  0.00E+9       1    ->  0E+7
+divx094 divide  0.0000E-50    1    ->  0E-54
+
+divx095 divide  1            1E-8  ->  1E+8
+divx096 divide  1            1E-9  ->  1E+9
+divx097 divide  1            1E-10 ->  1E+10
+divx098 divide  1            1E-11 ->  1E+11
+divx099 divide  1            1E-12 ->  1E+12
+
+divx100 divide  1  1   -> 1
+divx101 divide  1  2   -> 0.5
+divx103 divide  1  4   -> 0.25
+divx104 divide  1  5   -> 0.2
+divx107 divide  1  8   -> 0.125
+divx109 divide  1  10  -> 0.1
+divx110 divide  1  1   -> 1
+divx111 divide  2  1   -> 2
+divx112 divide  3  1   -> 3
+divx113 divide  4  1   -> 4
+divx114 divide  5  1   -> 5
+divx115 divide  6  1   -> 6
+divx116 divide  7  1   -> 7
+divx117 divide  8  1   -> 8
+divx118 divide  9  1   -> 9
+divx119 divide  10 1   -> 10
+
+divx120 divide  3E+1 0.001  -> 3E+4
+divx121 divide  2.200 2     -> 1.100
+
+divx133 divide  12345  5      ->  2469
+
+
+divx301 divide    0    7     -> 0
+divx302 divide    0    7E-5  -> 0E+5
+divx303 divide    0    7E-1  -> 0E+1
+divx304 divide    0    7E+1  -> 0.0
+divx305 divide    0    7E+5  -> 0.00000
+divx306 divide    0    7E+6  -> 0.000000
+divx307 divide    0    7E+7  -> 0E-7
+divx308 divide    0   70E-5  -> 0E+5
+divx309 divide    0   70E-1  -> 0E+1
+divx310 divide    0   70E+0  -> 0
+divx311 divide    0   70E+1  -> 0.0
+divx312 divide    0   70E+5  -> 0.00000
+divx313 divide    0   70E+6  -> 0.000000
+divx314 divide    0   70E+7  -> 0E-7
+divx315 divide    0  700E-5  -> 0E+5
+divx316 divide    0  700E-1  -> 0E+1
+divx317 divide    0  700E+0  -> 0
+divx318 divide    0  700E+1  -> 0.0
+divx319 divide    0  700E+5  -> 0.00000
+divx320 divide    0  700E+6  -> 0.000000
+divx321 divide    0  700E+7  -> 0E-7
+divx322 divide    0  700E+77 -> 0E-77
+
+divx351 divide 0E-92   7E-1  -> 0E-91
+divx352 divide 0E-92   7E+1  -> 0E-93
+divx353 divide 0E-92   7E+5  -> 0E-97
+divx354 divide 0E-92   7E+6  -> 0E-98
+divx356 divide 0E-92 777E-1  -> 0E-91
+divx357 divide 0E-92 777E+1  -> 0E-93
+divx358 divide 0E-92 777E+3  -> 0E-95
+divx359 divide 0E-92 777E+4  -> 0E-96
+divx360 divide 0E-92 777E+5  -> 0E-97
+divx361 divide 0E-92 777E+6  -> 0E-98
+
+divx386 divide 0E+90 777E-2  -> 0E+92
+
+divx391 divide 0E+90 700E+1  -> 0E+89
+divx392 divide 0E+90 700E-1  -> 0E+91
+divx393 divide 0E+90 700E-2  -> 0E+92
+
+divx441 divide 12345678000 1 -> 12345678000
+divx443 divide 1234567800  1 -> 1234567800
+divx445 divide 1234567890  1 -> 1234567890
+divx447 divide 1234567891  1 -> 1234567891
+divx449 divide 12345678901 1 -> 12345678901
+divx451 divide 1234567896  1 -> 1234567896
+
+divx453 divide 1e+1   1    ->   1E+1
+divx454 divide 1e+1   1.0  ->   1E+1
+divx455 divide 1e+1   1.00 ->   1E+1
+divx456 divide 1e+2   2    ->   5E+1
+divx457 divide 1e+2   2.0  ->   5E+1
+divx458 divide 1e+2   2.00 ->   5E+1
+
+divx460 divide 3e0      2e0     -> 1.5
+divx461 divide 30e-1    2e0     -> 1.5
+divx462 divide 300e-2   2e0     -> 1.50
+divx464 divide 3000e-3  2e0     -> 1.500
+divx465 divide 3e0      20e-1   -> 1.5
+divx466 divide 30e-1    20e-1   -> 1.5
+divx467 divide 300e-2   20e-1   -> 1.5
+divx468 divide 3000e-3  20e-1   -> 1.50
+divx469 divide 3e0      200e-2  -> 1.5
+divx470 divide 30e-1    200e-2  -> 1.5
+divx471 divide 300e-2   200e-2  -> 1.5
+divx472 divide 3000e-3  200e-2  -> 1.5
+divx473 divide 3e0      2000e-3 -> 1.5
+divx474 divide 30e-1    2000e-3 -> 1.5
+divx475 divide 300e-2   2000e-3 -> 1.5
+divx476 divide 3000e-3  2000e-3 -> 1.5
+
+divx480 divide 1        1.0E+33 -> 1E-33
+divx481 divide 1        10E+33  -> 1E-34
+divx482 divide 1        1.0E-33 -> 1E+33
+divx483 divide 1        10E-33  -> 1E+32
+
+divx484 divide 0e5     1e3 ->   0E+2
+divx485 divide 0e5     2e3 ->   0E+2
+divx486 divide 0e5    10e2 ->   0E+3
+divx487 divide 0e5    20e2 ->   0E+3
+divx488 divide 0e5   100e1 ->   0E+4
+divx489 divide 0e5   200e1 ->   0E+4
+
+divx491 divide 1e5     1e3 ->   1E+2
+divx492 divide 1e5     2e3 ->   5E+1
+divx493 divide 1e5    10e2 ->   1E+2
+divx494 divide 1e5    20e2 ->   5E+1
+divx495 divide 1e5   100e1 ->   1E+2
+divx496 divide 1e5   200e1 ->   5E+1
+
+divx511 divide 1         2    -> 0.5
+divx512 divide 1.0       2    -> 0.5
+divx513 divide 1.00      2    -> 0.50
+divx514 divide 1.000     2    -> 0.500
+divx515 divide 1.0000    2    -> 0.5000
+divx516 divide 1.00000   2    -> 0.50000
+divx517 divide 1.000000  2    -> 0.500000
+divx518 divide 1.0000000 2    -> 0.5000000
+divx519 divide 1.00      2.00 -> 0.5
+
+divx521 divide 2    1         -> 2
+divx522 divide 2    1.0       -> 2
+divx523 divide 2    1.00      -> 2
+divx524 divide 2    1.000     -> 2
+divx525 divide 2    1.0000    -> 2
+divx526 divide 2    1.00000   -> 2
+divx527 divide 2    1.000000  -> 2
+divx528 divide 2    1.0000000 -> 2
+divx529 divide 2.00 1.00      -> 2
+
+divx530 divide  2.40   2      ->  1.20
+divx531 divide  2.40   4      ->  0.60
+divx532 divide  2.40  10      ->  0.24
+divx533 divide  2.40   2.0    ->  1.2
+divx534 divide  2.40   4.0    ->  0.6
+divx535 divide  2.40  10.0    ->  0.24
+divx536 divide  2.40   2.00   ->  1.2
+divx537 divide  2.40   4.00   ->  0.6
+divx538 divide  2.40  10.00   ->  0.24
+divx539 divide  0.9    0.1    ->  9
+divx540 divide  0.9    0.01   ->  9E+1
+divx541 divide  0.9    0.001  ->  9E+2
+divx542 divide  5      2      ->  2.5
+divx543 divide  5      2.0    ->  2.5
+divx544 divide  5      2.00   ->  2.5
+divx545 divide  5      20     ->  0.25
+divx546 divide  5      20.0   ->  0.25
+divx547 divide  2.400  2      ->  1.200
+divx548 divide  2.400  2.0    ->  1.20
+divx549 divide  2.400  2.400  ->  1
+
+divx550 divide  240    1      ->  240
+divx551 divide  240    10     ->  24
+divx552 divide  240    100    ->  2.4
+divx553 divide  240    1000   ->  0.24
+divx554 divide  2400   1      ->  2400
+divx555 divide  2400   10     ->  240
+divx556 divide  2400   100    ->  24
+divx557 divide  2400   1000   ->  2.4
+
+divx570 divide  2.4E+6     2  ->  1.2E+6
+divx571 divide  2.40E+6    2  ->  1.20E+6
+divx572 divide  2.400E+6   2  ->  1.200E+6
+divx573 divide  2.4000E+6  2  ->  1.2000E+6
+divx574 divide  24E+5      2  ->  1.2E+6
+divx575 divide  240E+4     2  ->  1.20E+6
+divx576 divide  2400E+3    2  ->  1.200E+6
+divx577 divide  24000E+2   2  ->  1.2000E+6
+divx580 divide  2.4E+6     2  ->  1.2E+6
+divx581 divide  2.40E+6    2  ->  1.20E+6
+divx582 divide  2.400E+6   2  ->  1.200E+6
+divx583 divide  2.4000E+6  2  ->  1.2000E+6
+divx584 divide  24E+5      2  ->  1.2E+6
+divx585 divide  240E+4     2  ->  1.20E+6
+divx586 divide  2400E+3    2  ->  1.200E+6
+divx587 divide  24000E+2   2  ->  1.2000E+6
+divx590 divide  2.4E+6     2  ->  1.2E+6
+divx591 divide  2.40E+6    2  ->  1.20E+6
+divx592 divide  2.400E+6   2  ->  1.200E+6
+divx593 divide  2.4000E+6  2  ->  1.2000E+6
+divx594 divide  24E+5      2  ->  1.2E+6
+divx595 divide  240E+4     2  ->  1.20E+6
+divx596 divide  2400E+3    2  ->  1.200E+6
+divx597 divide  24000E+2   2  ->  1.2000E+6
+divx600 divide  2.4E+9     2  ->  1.2E+9
+divx601 divide  2.40E+9    2  ->  1.20E+9
+divx602 divide  2.400E+9   2  ->  1.200E+9
+divx603 divide  2.4000E+9  2  ->  1.2000E+9
+divx604 divide  24E+8      2  ->  1.2E+9
+divx605 divide  240E+7     2  ->  1.20E+9
+divx606 divide  2400E+6    2  ->  1.200E+9
+divx607 divide  24000E+5   2  ->  1.2000E+9
+
+divx731 divide 5.00 1E-3    -> 5.00E+3
+
+divx768 divide  1    -0.0   -> -Infinity Division_by_zero
+
+divx771 divide  0.0  -1.0   -> -0
+divx772 divide -0.0  -1.0   ->  0
+divx773 divide  0.0   1.0   ->  0
+divx774 divide -0.0   1.0   -> -0
+divx775 divide -1.0   0.0   -> -Infinity Division_by_zero
+divx776 divide -1.0  -0.0   ->  Infinity Division_by_zero
+divx777 divide  1.0   0.0   ->  Infinity Division_by_zero
+divx778 divide  1.0  -0.0   -> -Infinity Division_by_zero
+
+divx1021  divide 1E0          1E0 -> 1
+divx1022  divide 1E0          2E0 -> 0.5
+divx1024  divide 100E-2   1000E-3 -> 1
+divx1025  divide 24E-1        2E0 -> 1.2
+divx1026  divide 2400E-3      2E0 -> 1.200
+divx1027  divide 5E0          2E0 -> 2.5
+divx1028  divide 5E0        20E-1 -> 2.5
+divx1029  divide 5E0      2000E-3 -> 2.5
+divx1030  divide 5E0         2E-1 -> 25
+divx1031  divide 5E0        20E-2 -> 25
+divx1032  divide 480E-2       3E0 -> 1.60
+divx1033  divide 47E-1        2E0 -> 2.35
+
+precision:   MAX_PREC
+rounding:    floor
+maxExponent: MAX_EMAX
+minexponent: MIN_EMIN
+
+covx10101 divide 99960 -8.4E+2 -> -119.0

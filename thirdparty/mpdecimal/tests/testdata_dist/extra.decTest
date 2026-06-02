@@ -1,0 +1,10 @@
+-- Selected test cases to reduce both the archive size and runtime.  For the
+-- large test suite, download the separate mpdecimal-testdata distribution and
+-- replace the testdata_dist directory.
+
+precision: 28
+maxexponent: 384
+minexponent: -384
+rounding: half_even
+
+mulx11337 multiply 88888444448888880000000000000000000000000000000000 0.0000000000000000000000000000000000000005 -> 44444222224.44444000000000000 Rounded

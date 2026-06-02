@@ -1,0 +1,31 @@
+
+-- Additional Tests
+
+Dectest: ./testdata/baseconv.decTest
+
+Dectest: ./testdata/binop_eq.decTest
+
+Dectest: ./testdata/divmod.decTest
+Dectest: ./testdata/divmod_eq.decTest
+
+Dectest: ./testdata/fma_eq.decTest
+
+Dectest: ./testdata/format.decTest
+
+Dectest: ./testdata/invroot.decTest
+
+Dectest: ./testdata/largeint.decTest
+
+Dectest: ./testdata/powmod.decTest
+Dectest: ./testdata/powmod_eq.decTest
+
+Dectest: ./testdata/shiftlr.decTest
+
+Dectest: ./testdata/getint.decTest
+
+Dectest: ./testdata/cov.decTest
+Dectest: ./testdata/extra.decTest
+
+Dectest: ./testdata/maxprec.decTest
+
+

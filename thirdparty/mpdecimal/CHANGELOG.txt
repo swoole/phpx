@@ -1,0 +1,502 @@
+
+
+Changelog
+=========
+
+Version 4.0.1
+-------------
+
+build/install
+~~~~~~~~~~~~~
+
+    **features**
+
+    - Add Cygwin support.
+
+    - Update config.guess and config.sub to the latest versions.
+
+    **build fixes**
+
+    - Fix pkg-config files for custom paths.
+
+    - Set LD/LDXX unconditionally to CC/CXX, since LDFLAGS/LDXXFLAGS from
+      ./configure rely on it.
+
+    - macOS: use libdir instead of RPATH for the install_name.
+
+
+Version 4.0.0
+-------------
+
+general
+~~~~~~~
+
+    **sync soversion and major_version**
+
+    - The added number formatting feature requires an ABI change, hence the
+      increase to SOVERSION=4.
+
+    - Packagers outside of the Linux distributions sometimes use the major
+      version number as the equivalent of SOVERSION on their platforms and
+      have an incorrect SOVERSION for 2.5.1, which requires SOVERSION=3.
+
+    - While SOVERSION is not required to match the major version number
+      (example: glibc), mpdecimal will from now on take the path of least
+      resistance and always use SOVERSION=MPD_MAJOR_VERSION.
+
+    - The jump to 4.0.0 should also remind users that a C++ library is
+      available.
+
+build/install
+~~~~~~~~~~~~~
+
+    **features**
+
+    - Support for out-of-tree build.
+
+    - Support for pkg-config.
+
+    - Unix: support for Loongson.
+
+    - Unix: support for CheriBSD.
+
+    - Compilers: support for icx, icpx, ibm-clang_r, ibm-clang++_r, CompCert,
+      clang-cl and emscripten.
+
+    - Windows: support for MSYS2/MinGW.
+
+    - MSVC: the build now uses /O2 /DNDEBUG.
+
+    - MSVC: new arm64/arm32 cross build scripts.
+
+    - AIX: the shared libraries are now installed as versioned objects, e.g.,
+      shr4.o, shr4_64.o.
+
+    - New ``./configure`` switches:
+
+      ``--enable-static``: enable/disable the build of the static libraries
+      (default: enabled).
+
+      ``--enable-pc``: enable/disable the install of the pkgconfig files
+      (default: enabled).
+
+      ``--enable-doc``: enable/disable the install of the documentation
+      (default: enabled).
+
+    - New ``./configure`` behavior:
+
+      On multilib platforms like AIX that default to 32-bit the 64-bit build can
+      be forced with a single ``./configure MACHINE=uint128`` (ibm-clang, gcc)
+      or ``./configure MACHINE=ansi64`` (xlc) rather than explicitly setting
+      ``CFLAGS``, ``LDFLAGS``, ``CXXFLAGS`` and ``LDXXFLAGS``.
+
+      Note that on most other (multilib) platforms the default is 64-bit and the
+      optimal configuration is chosen by just using ``./configure``.
+
+    - New man pages direct users to the mpdecimal-doc package or the online
+      HTML documentation.
+
+    **tests**
+
+    - The C++ tests now automatically skip a small number of bignum tests if
+      the std::thread stack size (which cannot be altered) is less than 512K.
+
+      For all other tests a thread stack size of roughly 50K is sufficient.
+
+    - Files in the tests/testdata_dist directory have been significantly
+      abbreviated in order to facilitate testing on slower platforms. The
+      tests take 5s on a modern x86_64 platform.
+
+      The previous tests have been moved to the separate mpdecimal-testdata
+      package (replace tests/testdata_dist with the renamed mpdecimal-testdata
+      directory).
+
+    **toolchain issues**
+
+    - AIX: The preferred C/C++ compilers are ibm-clang_r and ibm-clang_r++.
+      g++ has sporadic C++11 threading issues that only show up in long running
+      programs (or short ones with a sufficient number of repetitions):
+
+         https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98390
+
+      If you only use libmpdec (``--disable-cxx``), gcc and xlc are very stable.
+
+    **changed**
+
+    - The ``--enable-profile`` configure option has been removed due to fragile
+      integration with a sequence like ``make && make install``. The new method
+      is ``make profile && make install``.
+
+    **removed**
+
+    - The prebuilt HTML documentation is now in the separate mpdecimal-doc
+      package, which gives distributions that reject prebuilt documentation
+      the option to disregard it and use the new man pages.
+
+libmpdec
+~~~~~~~~
+
+    **features**
+
+    - Add the "z" format specifier (coerce negative zeros to positive).
+
+    - In extremely rare cases the transcendental functions (exp, ln, log10) did
+      not set the Subnormal/Underflow flags. The reason is that in the case of
+      an exponent boundary the Ziv correction loop for correct rounding requires
+      very few iterations to arrive at the correctly rounded result, but may
+      need many more iterations to arrive at the correct flags.
+
+      In these cases, Subnormal/Underflow is not very informative, so the status
+      quo was to skip the extra iterations.
+
+      Version 4.0.0 now specializes exponent boundary cases and uses up to five
+      additional iterations to set Subnormal/Underflow. The refactored code has
+      no speed penalty on average;  in fact, in the deccheck tests (random tests
+      with a bias towards corner cases) it is slightly faster.
+
+      No cases have been found where more than two additional iterations are
+      required, but they may exist.
+
+    **reliability fixes**
+
+    - mpd_qset_string_exact(), mpd_qset_i64_exact() and mpd_qset_u64_exact()
+      can now be called with a nonzero status.  Previously, the functions
+      could return NaN/Invalid_operation in that case.
+
+      This is listed under "reliability fixes" since there is no possible
+      scenario under which these functions would legitimately be called with
+      a nonzero status.
+
+libmpdec++
+~~~~~~~~~~
+
+    **features**
+
+    - Add input validation for Decimal.shiftl(), Decimal.shiftr() and
+      Decimal::ln10().
+
+
+Version 2.5.1
+-------------
+
+libmpdec
+~~~~~~~~
+
+    **features**
+
+    - New functions for conversion between mpd_t and a decimal triple
+      with a split uint128_t coefficient.
+
+    - All symbols in the header files now have an MPD_* or mpd_* prefix.
+
+    - libmpdec/.objs/symbols64.exp and libmpdec/.objs/symbols32.exp contain
+      all symbols of the exported API.  The files are almost identical, but
+      mpd_qsset_i64, mpd_sset_i64, mpd_qsset_u64 and mpd_sset_u64 are only
+      available in the 64-bit build.
+
+      libmpdec/.objs/libmpdec.imp is the unified 64/32-bit import file
+      for AIX.
+
+    - The new test target *make check_local* does not attempt to download
+      dectest.zip.  This is useful for packagers whose infrastructure does
+      not allow downloading during the testing phase.
+
+      *make check* is still preferable because it runs all tests.
+
+    **style fixes**
+
+    - Apply several clang-tidy suggestions (high diagnostic level).
+
+    **build features**
+
+    - AIX: full support for xlc/gcc builds in ./configure.
+    - full support for AIX-style shared libraries.
+    - full support for AIX multilib header.
+
+    **build fixes**
+
+    - Update config.guess and config.sub in order to support IBM Power
+      architectures.
+
+    - Fix false positive _FORTIFY_SOURCE warning on Fedora.
+
+libmpdec++
+~~~~~~~~~~
+
+    **features**
+
+    - New methods for conversion between Decimal and a decimal triple
+      with a split uint128_t coefficient.
+
+    - decimal::Context now uses default constructors wherever possible.
+
+    - AIX: The tests now have a --pthread option. The default thread stack
+      size on AIX (96K) makes std::thread unusable for runtest.cc, which needs
+      around 300K.
+
+    - Windows: The DLL can now be built. Since DLLs do not support the
+      C++11 extern thread_local context, each translation unit gets its
+      own static reference to the thread_local context.  This should
+      preserve the semantics at the expense of clarity.
+
+      Note that this scheme is specific to the DLL build; the static
+      library build on Windows as well as all other operating systems
+      (except for OpenBSD and Solaris) use the C++11 extern thread_local
+      context.
+
+    - OpenBSD, Solaris: The shared library now works using the above scheme.
+      For simplicity, both the shared and static libraries use the workaround.
+
+    **style fixes**
+
+    - Apply several clang-tidy suggestions (high diagnostic level).
+
+    **bug fixes**
+
+    - DecimalException now inherits from std::runtime_error instead
+      of std::exception.  This automatically provides a nothrow copy
+      constructor.
+
+    - Use mpd_free() instead of free(). This only affects applications using
+      the libmpdec custom allocators.
+
+    **build fixes**
+
+    - Undefine some additional math.h macros for non-compliant C++11
+      implementations.
+
+    - libmpdec++ is now linked against libmpdec.
+
+
+Version 2.5.0
+-------------
+
+    **New: libmpdec++**
+
+       libmpdec++ is a new C++ library around libmpdec. It frees users from
+       manual memory management and allows cleaner code using inline operators.
+
+       libmpdec++ has a thread local context, so inline operators work
+       seamlessly with threaded code.
+
+    **features**
+
+    1) New functions *mpd_qset_string_exact*, *mpd_qset_i64_exact* and
+       *mpd_qset_u64_exact*.
+
+    2) For very large precisions like *MPD_MAX_PREC* libmpdec failed with
+       *MPD_Malloc_error* even when the result was exact and required far
+       fewer digits.
+
+       Now libmpdec retries the operation with the smallest possible
+       precision for exact results.
+
+    3) ./configure now has the *--enable-profile* option for easier profile
+       guided optimization builds.  Using PGO, recent compilers produce
+       better optimized libraries with speedups in the order of 20%.
+
+    4) C++ use: All headers now assume at least C++11, so a couple of hacks
+       have been removed from the headers.  C++ compatibility is fully
+       tested in libmpdec++.
+
+    **behavior changes**
+
+    1) The functions *mpd_ceil*, *mpd_floor* and *mpd_trunc* now set
+       *MPD_Invalid_operation* when the input is *NaN* or *Infinity*.
+
+       Previously they returned special values unchanged. That behavior was
+       inspired by the similar *to_integral* function from the specification,
+       but does not seem useful for the above functions.
+
+    **build fixes**
+
+    1) OS X: Linking has been completely reworked and now uses .dylib.
+
+    2) Windows: vcstdint.h has been removed, Windows now supports stdint.h.
+
+    **bug fixes**
+
+    1) A couple of quiet functions have been made resilient against being
+       called with a "dirty" status. Note that it is not recommended in
+       general to call quiet functions with any status other than 0.
+
+    2) In runtest.c, fma_eq.decTest and powmod_eq.decTest operands were
+       accidentally reversed for the *op_eq_eq* tests.
+
+       Since both the code and the tests assumed reversed operands, the tests
+       were correct.  However, for readability this situation has been fixed.
+
+
+Version 2.4.2
+-------------
+
+    **build fixes**
+
+    1) ICC/Windows: the optimized x86 build requires -fp-model=precise.
+
+    2) OS X: the linker requires -dynamiclib and -install_name for building
+       a shared library.
+
+
+Version 2.4.1
+-------------
+
+    **build fixes**
+
+    1) The __uint128_t detection in ./configure has been fixed .  Failure to
+       detect the option resulted in building the significantly slower ANSI
+       target on non-x86/amd64 platforms.
+
+    2) Use -fPIC instead of -fpic to fix a build failure on SPARC platforms.
+
+    3) Split the tests into a faster "make check" and a slower "make check_alloc".
+       The latter tests allocation failures but is too slow on older machines.
+
+    4) Generate detailed test output for better feedback on slower machines.
+
+    5) The static library is now built without -fPIC, which is significantly
+       faster at least on x86.  Both the static and the shared library are
+       now tested separately.
+
+    **bug fixes**
+
+    1) PEP 3101 formatting:  With the '%' format type, a trailing percent sign
+       is now also added for infinities and NaNs.
+
+
+Version 2.4.0
+-------------
+
+    **features**
+
+    1) Faster integer to string conversion.
+
+    2) mpd_qln(), mpd_qlog10() and mpd_pow() are now thread-safe.
+
+    3) All functions that take or return C integers are now available in
+       both the 64-bit and the 32-bit builds.
+
+    4) Support for cross-compiling.
+
+    5) Scripts for Visual Studio builds.
+
+    **code improvements**
+
+    1) This version is exactly the same as the version shipped with Python-3.3+.
+       Large portions of the code have been refactored in order to facilitate
+       proofs.  Many ACL2 proofs have been added.
+
+    **removed**
+
+    1) The Python module has been removed from mpdecimal, since both libmpdec
+       and cdecimal are included in Python-3.3+.
+
+    2) The large test suite against decNumber as well as the multi-precision
+       tests against gmp have been removed, but will be available in a separate
+       package.  Naturally these tests are still run as part of the release
+       process.
+
+
+Version 2.3
+-----------
+
+    **features**
+
+    1) New test suite with comprehensive tests against decNumber.
+
+    2) Full support for compilers without uint64_t (tested with CompCert).
+
+    **bug fixes**
+
+    1) If ROUND_FLOOR is set and the operand is zero, the functions
+       mpd_plus() and mpd_minus() have special cases for the sign of
+       the result.
+
+
+Version 2.2
+-----------
+
+    **build process**
+
+    1) configure: append CFLAGS to CONFIG flags.
+
+    2) Makefile: use includedir, libdir, datarootdir, datadir, docdir, DESTDIR.
+
+    **workarounds for toolchain bugs**
+
+    1) Enable workaround for a gcc miscompilation. See:
+
+           `http://gcc.gnu.org/bugzilla/show_bug.cgi?id=46491 <http://gcc.gnu.org/bugzilla/show_bug.cgi?id=46491>`_
+
+    2) Enable workaround for the glibc _FORTIFY_SOURCE/memmove bug, which is
+       exposed by gcc-4.6. See:
+
+           `http://sourceware.org/ml/libc-alpha/2010-12/msg00009.html <http://sourceware.org/ml/libc-alpha/2010-12/msg00009.html>`_
+
+    **features**
+
+    1) Make PPRO inline assembly PIC-compliant (for the dynamic library).
+
+
+Version 2.1
+-----------
+
+Version 2.1 was never released, but escaped into the wild via the Makefile
+and setup.py in cdecimal-1.97-rc2.tar.gz. Both files already had that version
+number.
+
+    **features**
+
+    1) Code coverage increased to 100%. This includes every possible
+       allocation failure.
+
+    2) Switch build process to ./configure.
+
+    3) Makefile targets for creating coverage reports.
+
+    **bug fixes**
+
+    1) mpd_qget_uint, mpd_qget_u64, mpd_qget_u32 did not raise for
+       negative input.
+
+    2) Handle allocation failures in _mpd_fntmul under extreme conditions.
+
+
+
+Version 1.2.1
+-------------
+
+    **bug fixes**
+
+    1) With MACHINE=ansi64, the macros BSR and BSF used x86 assembly.
+       This caused compilation to fail on non-x64 platforms.
+
+
+Version 1.2
+-----------
+
+    **features**
+
+    1) Support for compilers with __uint128_t
+       (option MACHINE=ansi64).
+
+    2) Support for other 64-bit compilers
+       (option MACHINE=ansi64c32).
+
+    3) Support for legacy compilers without uint64_t
+       (option MACHINE=ansi-legacy).
+
+    4) Slightly different build process (please read INSTALL.txt).
+
+    5) If clamp=1, the maximum payload length of a NaN is prec-1.
+
+    **bug fixes**
+
+    1) Fix for mpd_qround_to_int, which did not handle digits
+       exceeding the context precision correctly in all cases.
+
+    2) In rare corner cases Underflow was not set in
+       transcendental functions.
+
+
+

@@ -1,0 +1,99 @@
+
+# ======================================================================
+#                Visual C (nmake) Makefile for libmpdec++
+# ======================================================================
+
+SRCDIR = ..\libmpdec
+
+LIBSTATIC = libmpdec-4.0.1.lib
+LIBIMPORT = libmpdec-4.0.1.dll.lib
+LIBSHARED = libmpdec-4.0.1.dll
+
+LIBSTATIC_CXX = libmpdec++-4.0.1.lib
+LIBIMPORT_CXX = libmpdec++-4.0.1.dll.lib
+LIBSHARED_CXX = libmpdec++-4.0.1.dll
+
+!if "$(DEBUG)" == "1"
+OPT = /MTd /Od /Zi /EHsc
+OPT_SHARED = /MDd /Od /Zi /EHsc
+!else
+OPT = /MT /O2 /GS /EHsc /DNDEBUG
+OPT_SHARED = /MD /O2 /GS /EHsc /DNDEBUG
+!endif
+
+!if "$(CC)" == "clang-cl"
+WARN = /W4 -Wno-undefined-inline
+!else
+WARN = /W4
+!endif
+
+MPD_CXXFLAGS = $(WARN) /nologo $(OPT)
+MPD_CXXFLAGS_SHARED = /DBUILD_LIBMPDECXX $(WARN) /nologo $(OPT_SHARED) $(PGOFLAGS)
+MPD_BIN_CXXFLAGS_SHARED = $(WARN) /nologo $(OPT_SHARED) $(PGOFLAGS)
+
+MPD_LDXXFLAGS= /DLL /MANIFEST $(LDXXFLAGS)
+
+
+default: $(LIBSTATIC_CXX) $(LIBSHARED_CXX)
+
+
+OBJS = decimal.obj
+
+SHARED_OBJS = .objs\decimal.obj
+
+
+$(LIBSTATIC_CXX): Makefile $(OBJS)
+	-@if exist $@ del $(LIBSTATIC_CXX)
+	lib /out:$(LIBSTATIC_CXX) $(OBJS)
+
+$(LIBSHARED_CXX): Makefile $(SHARED_OBJS)
+	-@if exist $@ del $(LIBSHARED_CXX)
+	link $(MPD_LDXXFLAGS) /out:$(LIBSHARED_CXX) /implib:$(LIBIMPORT_CXX) /LIBPATH:$(SRCDIR) $(SHARED_OBJS) $(LIBIMPORT)
+	mt -manifest $(LIBSHARED_CXX).manifest -outputresource:$(LIBSHARED_CXX);2
+
+
+decimal.obj:\
+Makefile decimal.cc ..\libmpdec\mpdecimal.h decimal.hh
+	$(CXX) "-I." "-I$(SRCDIR)" $(MPD_CXXFLAGS) -c decimal.cc
+
+.objs\decimal.obj:\
+Makefile decimal.cc ..\libmpdec\mpdecimal.h decimal.hh
+	$(CXX) "-I." "-I$(SRCDIR)" $(MPD_CXXFLAGS_SHARED) -c decimal.cc /Fo.objs\decimal.obj
+
+
+FORCE:
+
+bench: FORCE
+	$(CXX) "-I." "-I$(SRCDIR)" $(MPD_CXXFLAGS) /O2 /EHsc /Fo:bench bench.cc $(LIBSTATIC_CXX) $(SRCDIR)\$(LIBSTATIC)
+
+bench_shared: FORCE
+	$(CXX) "-I." "-I$(SRCDIR)" $(MPD_BIN_CXXFLAGS_SHARED) /O2 /EHsc /Fo:bench_shared bench.cc $(LIBIMPORT_CXX) $(SRCDIR)\$(LIBIMPORT)
+
+examples: FORCE
+	$(CXX) "-I." "-I$(SRCDIR)" $(MPD_CXXFLAGS) /O2 /EHsc /Fo:factorial examples/factorial.cc $(LIBSTATIC_CXX) $(SRCDIR)\$(LIBSTATIC)
+	$(CXX) "-I." "-I$(SRCDIR)" $(MPD_CXXFLAGS) /O2 /EHsc /Fo:pi examples/pi.cc $(LIBSTATIC_CXX) $(SRCDIR)\$(LIBSTATIC)
+
+
+clean: FORCE
+	-@if exist *.obj del *.obj
+	-@cd .objs
+	-@if exist *.obj del *.obj
+	-@cd ..
+	-@if exist *.dll del *.dll
+	-@if exist *.exp del *.exp
+	-@if exist *.lib del *.lib
+	-@if exist *.ilk del *.ilk
+	-@if exist *.pdb del *.pdb
+	-@if exist *.pgc del *.pgc
+	-@if exist *.pgd del *.pgd
+	-@if exist *.manifest del *.manifest
+	-@if exist *.exe del *.exe
+	-@cd ..\tests++
+	-@if exist Makefile nmake clean
+
+distclean: FORCE
+	nmake clean
+	-@if exist Makefile del Makefile
+	-@cd ..\tests
+	-@if exist Makefile nmake distclean
+

@@ -1,0 +1,116 @@
+-- Selected test cases to reduce both the archive size and runtime.  For the
+-- large test suite, download the separate mpdecimal-testdata distribution and
+-- replace the testdata_dist directory.
+
+-- Quis custodiet ipsos custodes?
+-- Small sanity check that failures are indeed reported.
+
+Precision: 100
+maxExponent: 100000
+minExponent: -100000
+
+rt_should_fail000   tosci  918231.131  ->  8123813091.1
+rt_should_fail001   apply  0.0391301  ->  10E+2387432
+rt_should_fail002   toeng  1.1111e22  ->  433
+rt_should_fail003   class  NaN  ->  +Infinity
+
+rt_should_fail004   abs  -99  -> -99
+rt_should_fail005   copy  2  ->  3
+rt_should_fail006   copyabs  -2  ->  -2
+rt_should_fail007   copynegate  -2  ->  -2
+rt_should_fail008   exp  5  ->  101
+rt_should_fail009   invert  0101  ->  1111
+rt_should_fail010   invroot  35  ->  47
+rt_should_fail011   ln  101  ->  5
+rt_should_fail012   log10  200  ->  137
+rt_should_fail013   logb  1000  ->  440
+rt_should_fail014   minus  22  -> 222
+rt_should_fail015   nextminus  12838  -> 213123
+rt_should_fail016   nextplus  23132  ->  3223
+rt_should_fail017   plus  102  ->  110
+rt_should_fail018   reduce  0.21321  ->  213213892
+rt_should_fail019   squareroot  1281  ->  7
+rt_should_fail020   tointegral  1281.444  ->  1781
+rt_should_fail021   tointegralx  1281.444  ->  1783
+
+rt_should_fail022   samequantum  88 99  ->  -1
+rt_should_fail023   samequantum_eq  88  ->  -1
+
+rt_should_fail024   add  0.111 0.222  ->  -133.1381
+rt_should_fail025   and  1010101 111  ->  100000000
+rt_should_fail026   copysign  -2  3  ->  1000
+rt_should_fail027   divide  22 0.001 ->  27
+rt_should_fail028   divideint  11 22  -> 11
+rt_should_fail029   max  231 13221  -> 12312
+rt_should_fail030   maxmag  320193 12312  ->  322
+rt_should_fail031   min  1029 322323 -> 3322
+rt_should_fail032   minmag 23232 1230921  -> 1232131
+rt_should_fail033   multiply  25 25  ->  25
+rt_should_fail034   nexttoward  3893792  0.2  ->  0.21
+rt_should_fail035   or  1010101 111  ->  100000000
+rt_should_fail036   power  0.444 0.554  ->  244
+rt_should_fail037   quantize  234 22  ->  0.2342
+rt_should_fail038   remainder  0  1   -> 2
+rt_should_fail039   remaindernear  4  1   -> 774
+rt_should_fail040   rotate  2  2  ->  1000
+rt_should_fail041   scaleb  111  20  -> 22
+rt_should_fail042   shift  10  -1  -> 100
+rt_should_fail043   subtract  0.444 0.123  ->  0E-11
+rt_should_fail044   xor 11111111111 0000011  ->  10101
+
+rt_should_fail045   add_eq  0.111  ->  -133.1381
+rt_should_fail046   and_eq  1010101  ->  100000000
+rt_should_fail047   copysign_eq  -2  ->  1000
+rt_should_fail048   divide_eq  22 ->  27
+rt_should_fail049   divideint_eq  11  ->  11
+rt_should_fail050   max_eq  231  ->  12312
+rt_should_fail051   maxmag_eq  320193  ->  322
+rt_should_fail052   min_eq  1029  -> 3322
+rt_should_fail053   minmag_eq 23232  -> 1232131
+rt_should_fail054   multiply_eq  25  ->  25
+rt_should_fail055   nexttoward_eq  3893792  ->  0.21
+rt_should_fail056   or_eq  1010101  ->  100000000
+rt_should_fail057   power_eq  0.444  ->  244
+rt_should_fail058   quantize_eq  234  ->  0.2342
+rt_should_fail059   remainder_eq  5  ->  2
+rt_should_fail060   remaindernear_eq  4  ->  774
+rt_should_fail061   rotate_eq  2  ->  1000
+rt_should_fail062   scaleb_eq  111  ->  22
+rt_should_fail063   shift_eq  10  -> 100
+rt_should_fail064   subtract_eq  0.444  ->  345
+rt_should_fail065   xor_eq 11111111  ->  1111
+
+rt_should_fail066   divmod  22 8  ->  27  28
+rt_should_fail067   divmod_eq  22  ->  27  28
+
+rt_should_fail068   fma  22 11 377  ->  551
+rt_should_fail069   powmod  12 11 10  ->  27
+
+rt_should_fail070   fma_eq_eq_op  11 377  ->  551
+rt_should_fail071   powmod_eq_eq_op  11 10  ->  27
+
+rt_should_fail072   fma_op_eq_eq  11 377  ->  551
+rt_should_fail073   powmod_op_eq_eq  11 10  ->  27
+
+rt_should_fail074   fma_eq_eq_eq  11  ->  551
+rt_should_fail075   powmod_eq_eq_eq  11  ->  27
+
+rt_should_fail076   compare  102938 012938  ->  0 
+rt_should_fail077   comparesig  102938 012938  ->  0 
+rt_should_fail078   comparetotal  1239210  -2103  ->  -1
+rt_should_fail079   comparetotmag  1239210  -2103  ->  -1
+
+rt_should_fail080   compare_eq  102938  ->  1 
+rt_should_fail081   comparesig_eq  102938  ->  1 
+rt_should_fail082   comparetotal_eq  1239210  ->  -1
+rt_should_fail083   comparetotmag_eq  1239210  ->  -1
+
+rt_should_fail084   shiftleft  10239  5  ->  129
+rt_should_fail085   shiftright  1029  3  ->  32
+rt_should_fail086   baseconv  2130  ->  3432
+  
+-- status test
+
+rt_should_fail087   divide  10  0  ->  NaN
+rt_should_fail088   power  1E44  1E444444  ->  Infinity
+rt_should_fail089   remaindernear 10 6  ->  -2  Clamped Conversion_syntax Division_by_zero Division_impossible Division_undefined Fpu_error Inexact Invalid_context Invalid_operation Malloc_error Not_implemented Overflow Rounded Subnormal Underflow

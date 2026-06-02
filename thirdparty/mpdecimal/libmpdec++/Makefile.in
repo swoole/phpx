@@ -1,0 +1,185 @@
+
+# ==============================================================================
+#                          Unix Makefile for libmpdec++
+# ==============================================================================
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+libdir = @libdir@
+
+ENABLE_STATIC = @ENABLE_STATIC@
+ENABLE_SHARED = @ENABLE_SHARED@
+ENABLE_MINGW = @ENABLE_MINGW@
+
+FPIC = @FPIC@
+LIBSTATIC = @LIBSTATIC@
+LIBNAME = @LIBNAME@
+LIBSONAME = @LIBSONAME@
+LIBSHARED = @LIBSHARED@
+LIBIMPORT = @LIBIMPORT@
+
+LIBSTATIC_CXX = @LIBSTATIC_CXX@
+LIBNAME_CXX = @LIBNAME_CXX@
+LIBSONAME_CXX = @LIBSONAME_CXX@
+LIBSHARED_CXX = @LIBSHARED_CXX@
+LIBIMPORT_CXX = @LIBIMPORT_CXX@
+LIBSHARED_USE_AR = @LIBSHARED_USE_AR@
+LINK_STATIC = @LINK_STATIC@
+LINK_DYNAMIC = @LINK_DYNAMIC@
+
+OBJECT_SUFFIX = @OBJECT_SUFFIX@
+COPY = @cp -f $1 $2
+
+CXX = @CXX@
+LDXX = @LDXX@
+AR = @AR@
+RANLIB = @RANLIB@
+MPD_PTHREAD = @MPD_PTHREAD@
+MPD_PGEN = @MPD_PGEN@
+MPD_PUSE = @MPD_PUSE@
+MPD_PREC = @MPD_PREC@
+
+MPD_CXX = $(strip $(CXX) $(MPD_PTHREAD))
+MPD_LDXX = $(strip $(LDXX) $(MPD_PTHREAD))
+
+FILTER_FOR_STATIC = @FILTER_FOR_STATIC@
+
+CONFIGURE_CXXFLAGS = @CONFIGURE_CXXFLAGS@
+MPD_CXXFLAGS_COMMON = $(strip $(filter-out $(CXXFLAGS),$(CONFIGURE_CXXFLAGS)) $(CXXFLAGS))
+MPD_CXXFLAGS_SHARED = $(strip $(filter-out $(FPIC),$(MPD_CXXFLAGS_COMMON)) $(FPIC))
+MPD_CXXFLAGS = $(strip $(filter-out $(FILTER_FOR_STATIC),$(MPD_CXXFLAGS_COMMON)))
+
+CONFIGURE_LDXXFLAGS = @CONFIGURE_LDXXFLAGS@
+MPD_LDXXFLAGS = $(strip $(filter-out $(LDXXFLAGS),$(CONFIGURE_LDXXFLAGS)) $(LDXXFLAGS))
+
+LINK_LIBSTATIC = $(strip $(LINK_STATIC) $(LIBSTATIC_CXX) ../libmpdec/$(LIBSTATIC) $(LINK_DYNAMIC))
+
+ifeq ($(MAKECMDGOALS), profile_gen)
+  MPD_CXXFLAGS_COMMON += $(MPD_PGEN)
+  MPD_LDXXFLAGS += $(MPD_PGEN)
+endif
+ifeq ($(MAKECMDGOALS), profile_use)
+  MPD_CXXFLAGS_COMMON += $(MPD_PUSE)
+  MPD_LDXXFLAGS += $(MPD_PUSE)
+endif
+
+
+MPD_TARGETS =
+ifeq ($(ENABLE_STATIC), yes)
+    MPD_TARGETS += $(LIBSTATIC_CXX)
+endif
+ifeq ($(ENABLE_SHARED), yes)
+    MPD_TARGETS += $(LIBSHARED_CXX)
+endif
+
+
+default: $(MPD_TARGETS)
+
+
+OBJS := decimal.o
+SHARED_OBJS := .objs/decimal.o
+
+
+ifeq ($(LIBSHARED_USE_AR), yes)
+AR_STATIC_OBJS := $(OBJS:.o=$(OBJECT_SUFFIX))
+AR_SHARED_OBJS := $(LIBSHARED:.o=$(OBJECT_SUFFIX))
+%$(OBJECT_SUFFIX): %.o
+	$(call COPY,$<,$@)
+
+# Disabled: C++ symbol extraction is not reliable.
+$(LIBSHARED_CXX):
+
+$(LIBSTATIC_CXX): Makefile $(AR_STATIC_OBJS)
+	$(AR) rc $(LIBSTATIC_CXX) $(AR_STATIC_OBJS)
+	$(RANLIB) $(LIBSTATIC_CXX)
+else
+$(LIBSTATIC_CXX): Makefile $(OBJS)
+	$(AR) rc $(LIBSTATIC_CXX) $(OBJS)
+	$(RANLIB) $(LIBSTATIC_CXX)
+
+$(LIBSHARED_CXX): Makefile $(SHARED_OBJS)
+ifeq ($(ENABLE_MINGW), yes)
+	$(LDXX) $(MPD_LDXXFLAGS) -o $(LIBSHARED_CXX) $(SHARED_OBJS) ../libmpdec/$(LIBIMPORT) -lm
+else
+	$(MPD_LDXX) -L../libmpdec $(MPD_LDXXFLAGS) -o $(LIBSHARED_CXX) $(SHARED_OBJS) -lmpdec -lm
+	ln -sf $(LIBSHARED_CXX) $(LIBNAME_CXX)
+	ln -sf $(LIBSHARED_CXX) $(LIBSONAME_CXX)
+endif
+endif
+
+
+decimal.o:\
+Makefile decimal.cc ../libmpdec/mpdecimal.h decimal.hh
+	$(MPD_CXX) -I. -I../libmpdec $(MPD_CXXFLAGS) -c decimal.cc
+
+.objs/decimal.o:\
+Makefile decimal.cc ../libmpdec/mpdecimal.h decimal.hh
+	$(MPD_CXX) -I. -I../libmpdec $(MPD_CXXFLAGS_SHARED) -c decimal.cc -o .objs/decimal.o
+
+
+bench: Makefile bench.cc ../libmpdec/mpdecimal.h decimal.hh $(LIBSTATIC_CXX)
+	$(MPD_CXX) -I. -I../libmpdec $(MPD_CXXFLAGS) -o bench bench.cc $(LINK_LIBSTATIC) -lm
+
+bench_full: Makefile bench_full.cc ../libmpdec/mpdecimal.h decimal.hh $(LIBSTATIC_CXX)
+	$(MPD_CXX) -I. -I../libmpdec $(MPD_CXXFLAGS) -o bench_full bench_full.cc $(LINK_LIBSTATIC) -lm
+
+bench_shared: Makefile bench.cc ../libmpdec/mpdecimal.h decimal.hh $(LIBSHARED_CXX)
+	$(MPD_CXX) -I. -I../libmpdec -L. -L../libmpdec $(MPD_CXXFLAGS_COMMON) -o bench_shared bench.cc -lm -lmpdec++ -lmpdec
+
+bench_full_shared: Makefile bench_full.cc ../libmpdec/mpdecimal.h decimal.hh $(LIBSHARED_CXX)
+	$(MPD_CXX) -I. -I../libmpdec -L. -L../libmpdec $(MPD_CXXFLAGS_COMMON) -o bench_full_shared bench_full.cc -lm -lmpdec++ -lmpdec
+
+
+factorial: Makefile examples/factorial.cc $(LIBSTATIC_CXX)
+	$(MPD_CXX) -I. -I../libmpdec $(MPD_CXXFLAGS) -o factorial examples/factorial.cc $(LINK_LIBSTATIC) -lm
+
+pi: Makefile examples/pi.cc $(LIBSTATIC_CXX)
+	$(MPD_CXX) -I. -I../libmpdec $(MPD_CXXFLAGS) -o pi examples/pi.cc $(LINK_LIBSTATIC) -lm
+
+examples: factorial pi
+
+
+GEN_TARGETS =
+ifeq ($(ENABLE_STATIC), yes)
+GEN_TARGETS += bench_full
+endif
+ifeq ($(ENABLE_SHARED), yes)
+GEN_TARGETS += bench_shared
+endif
+
+profile_gen: $(GEN_TARGETS)
+	./.profile/train.sh $(MPD_PREC)
+
+profile_clean:
+	rm -f *.o *.so *.gch
+	rm -f bench bench_shared bench_full bench_full_shared factorial pi
+	rm -f $(LIBSTATIC_CXX) $(LIBNAME_CXX) $(LIBSONAME_CXX) $(LIBSHARED_CXX) $(LIBIMPORT_CXX)
+	cd .objs && rm -f *.o *.so *.gch
+
+profile_use: default
+
+profile:
+	$(MAKE) clean
+	$(MAKE) profile_gen
+	$(MAKE) profile_clean
+	$(MAKE) profile_use
+
+
+check: default
+	cd ../tests++ && $(MAKE) && ./runshort.sh
+
+check_local: default
+	cd ../tests++ && $(MAKE) && ./runshort.sh --local
+
+check_alloc: default
+	cd ../tests++ && $(MAKE) && ./runshort_alloc.sh
+
+
+clean:
+	rm -f *.o *.so *.gch *.gcda *.gcno *.gcov *.dyn *.dpi *.lock
+	rm -f bench bench_shared bench_full bench_full_shared factorial pi
+	rm -f $(LIBSTATIC_CXX) $(LIBNAME_CXX) $(LIBSONAME_CXX) $(LIBSHARED_CXX) $(LIBIMPORT_CXX)
+	cd .objs && rm -f *.o *.so *.gch *.gcda *.gcno *.gcov *.dyn *.dpi *.lock
+
+distclean: clean
+	rm -f Makefile .pc/libmpdec++.pc

@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libmpdec++
+Description: C++ library for decimal floating point arithmetic
+Version: 4.0.1
+URL: https://www.bytereef.org
+Requires: libmpdec = 4.0.1
+Cflags: -I${includedir}
+Libs: -L${libdir} -lmpdec++ -pthread

@@ -1,0 +1,163 @@
+
+-- All tests from the dectest directory. Tests that are skipped are
+-- commented out.
+
+Dectest: ./testdata/abs.decTest
+Dectest: ./testdata/add.decTest
+Dectest: ./testdata/and.decTest
+Dectest: ./testdata/base.decTest
+Dectest: ./testdata/clamp.decTest
+Dectest: ./testdata/class.decTest
+Dectest: ./testdata/compare.decTest
+Dectest: ./testdata/comparetotal.decTest
+Dectest: ./testdata/comparetotmag.decTest
+Dectest: ./testdata/copyabs.decTest
+Dectest: ./testdata/copy.decTest
+Dectest: ./testdata/copynegate.decTest
+Dectest: ./testdata/copysign.decTest
+Dectest: ./testdata/ddAbs.decTest
+Dectest: ./testdata/ddAdd.decTest
+Dectest: ./testdata/ddAnd.decTest
+Dectest: ./testdata/ddBase.decTest
+-- Dectest: ./testdata/ddCanonical.decTest
+Dectest: ./testdata/ddClass.decTest
+Dectest: ./testdata/ddCompare.decTest
+Dectest: ./testdata/ddCompareSig.decTest
+Dectest: ./testdata/ddCompareTotal.decTest
+Dectest: ./testdata/ddCompareTotalMag.decTest
+Dectest: ./testdata/ddCopyAbs.decTest
+Dectest: ./testdata/ddCopy.decTest
+Dectest: ./testdata/ddCopyNegate.decTest
+Dectest: ./testdata/ddCopySign.decTest
+Dectest: ./testdata/ddDivide.decTest
+Dectest: ./testdata/ddDivideInt.decTest
+-- Dectest: ./testdata/ddEncode.decTest
+Dectest: ./testdata/ddFMA.decTest
+Dectest: ./testdata/ddInvert.decTest
+Dectest: ./testdata/ddLogB.decTest
+Dectest: ./testdata/ddMax.decTest
+Dectest: ./testdata/ddMaxMag.decTest
+Dectest: ./testdata/ddMin.decTest
+Dectest: ./testdata/ddMinMag.decTest
+Dectest: ./testdata/ddMinus.decTest
+Dectest: ./testdata/ddMultiply.decTest
+Dectest: ./testdata/ddNextMinus.decTest
+Dectest: ./testdata/ddNextPlus.decTest
+Dectest: ./testdata/ddNextToward.decTest
+Dectest: ./testdata/ddOr.decTest
+Dectest: ./testdata/ddPlus.decTest
+Dectest: ./testdata/ddQuantize.decTest
+Dectest: ./testdata/ddReduce.decTest
+Dectest: ./testdata/ddRemainder.decTest
+Dectest: ./testdata/ddRemainderNear.decTest
+Dectest: ./testdata/ddRotate.decTest
+Dectest: ./testdata/ddSameQuantum.decTest
+Dectest: ./testdata/ddScaleB.decTest
+Dectest: ./testdata/ddShift.decTest
+Dectest: ./testdata/ddSubtract.decTest
+Dectest: ./testdata/ddToIntegral.decTest
+Dectest: ./testdata/ddXor.decTest
+-- Dectest: ./testdata/decDouble.decTest
+-- Dectest: ./testdata/decQuad.decTest
+-- Dectest: ./testdata/decSingle.decTest
+Dectest: ./testdata/divide.decTest
+Dectest: ./testdata/divideint.decTest
+Dectest: ./testdata/dqAbs.decTest
+Dectest: ./testdata/dqAdd.decTest
+Dectest: ./testdata/dqAnd.decTest
+Dectest: ./testdata/dqBase.decTest
+-- Dectest: ./testdata/dqCanonical.decTest
+Dectest: ./testdata/dqClass.decTest
+Dectest: ./testdata/dqCompare.decTest
+Dectest: ./testdata/dqCompareSig.decTest
+Dectest: ./testdata/dqCompareTotal.decTest
+Dectest: ./testdata/dqCompareTotalMag.decTest
+Dectest: ./testdata/dqCopyAbs.decTest
+Dectest: ./testdata/dqCopy.decTest
+Dectest: ./testdata/dqCopyNegate.decTest
+Dectest: ./testdata/dqCopySign.decTest
+Dectest: ./testdata/dqDivide.decTest
+Dectest: ./testdata/dqDivideInt.decTest
+-- Dectest: ./testdata/dqEncode.decTest
+Dectest: ./testdata/dqFMA.decTest
+Dectest: ./testdata/dqInvert.decTest
+Dectest: ./testdata/dqLogB.decTest
+Dectest: ./testdata/dqMax.decTest
+Dectest: ./testdata/dqMaxMag.decTest
+Dectest: ./testdata/dqMin.decTest
+Dectest: ./testdata/dqMinMag.decTest
+Dectest: ./testdata/dqMinus.decTest
+Dectest: ./testdata/dqMultiply.decTest
+Dectest: ./testdata/dqNextMinus.decTest
+Dectest: ./testdata/dqNextPlus.decTest
+Dectest: ./testdata/dqNextToward.decTest
+Dectest: ./testdata/dqOr.decTest
+Dectest: ./testdata/dqPlus.decTest
+Dectest: ./testdata/dqQuantize.decTest
+Dectest: ./testdata/dqReduce.decTest
+Dectest: ./testdata/dqRemainder.decTest
+Dectest: ./testdata/dqRemainderNear.decTest
+Dectest: ./testdata/dqRotate.decTest
+Dectest: ./testdata/dqSameQuantum.decTest
+Dectest: ./testdata/dqScaleB.decTest
+Dectest: ./testdata/dqShift.decTest
+Dectest: ./testdata/dqSubtract.decTest
+Dectest: ./testdata/dqToIntegral.decTest
+Dectest: ./testdata/dqXor.decTest
+Dectest: ./testdata/dsBase.decTest
+-- Dectest: ./testdata/dsEncode.decTest
+Dectest: ./testdata/exp.decTest
+Dectest: ./testdata/fma.decTest
+Dectest: ./testdata/inexact.decTest
+Dectest: ./testdata/invert.decTest
+Dectest: ./testdata/ln.decTest
+Dectest: ./testdata/log10.decTest
+Dectest: ./testdata/logb.decTest
+Dectest: ./testdata/max.decTest
+Dectest: ./testdata/maxmag.decTest
+Dectest: ./testdata/min.decTest
+Dectest: ./testdata/minmag.decTest
+Dectest: ./testdata/minus.decTest
+Dectest: ./testdata/multiply.decTest
+Dectest: ./testdata/nextminus.decTest
+Dectest: ./testdata/nextplus.decTest
+Dectest: ./testdata/nexttoward.decTest
+Dectest: ./testdata/or.decTest
+Dectest: ./testdata/plus.decTest
+Dectest: ./testdata/power.decTest
+Dectest: ./testdata/powersqrt.decTest
+Dectest: ./testdata/quantize.decTest
+Dectest: ./testdata/randombound32.decTest
+Dectest: ./testdata/randoms.decTest
+Dectest: ./testdata/reduce.decTest
+Dectest: ./testdata/remainder.decTest
+Dectest: ./testdata/remaindernear.decTest
+Dectest: ./testdata/rescale.decTest
+Dectest: ./testdata/rotate.decTest
+Dectest: ./testdata/rounding.decTest
+Dectest: ./testdata/samequantum.decTest
+Dectest: ./testdata/scaleb.decTest
+Dectest: ./testdata/shift.decTest
+Dectest: ./testdata/squareroot.decTest
+Dectest: ./testdata/subtract.decTest
+-- Dectest: ./testdata/testall.decTest
+Dectest: ./testdata/tointegral.decTest
+Dectest: ./testdata/tointegralx.decTest
+-- Dectest: ./testdata/trim.decTest
+Dectest: ./testdata/xor.decTest
+
+
+-- Summary of functions that are not implemented or do not need testing:
+
+-- Dectest: ./testdata/ddCanonical.decTest  ==>  same as copy()
+-- Dectest: ./testdata/ddEncode.decTest
+-- Dectest: ./testdata/decDouble.decTest
+-- Dectest: ./testdata/decQuad.decTest
+-- Dectest: ./testdata/decSingle.decTest
+-- Dectest: ./testdata/dqCanonical.decTest  ==> same as copy()
+-- Dectest: ./testdata/dqEncode.decTest
+-- Dectest: ./testdata/dsEncode.decTest
+-- Dectest: ./testdata/testall.decTest
+-- Dectest: ./testdata/trim.decTest
+
+

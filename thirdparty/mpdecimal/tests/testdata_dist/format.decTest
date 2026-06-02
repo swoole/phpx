@@ -1,0 +1,133 @@
+-- Selected test cases to reduce both the archive size and runtime.  For the
+-- large test suite, download the separate mpdecimal-testdata distribution and
+-- replace the testdata_dist directory.
+
+rounding: half_even
+xfmt1  format  .12345  '\xe6\xae\x8d<50.23'  ->  '0.12345\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d\xe6\xae\x8d'
+xfmt4  format  -2815980E0  ','  ->  '-2,815,980'
+
+-- alignment of specials
+xfmt12201  format  sNaN '+10.10'  ->  '     +sNaN'
+xfmt12202  format  Inf  ' 10.10'  ->  '  Infinity'
+xfmt12203  format  Inf  ' 10.10'  ->  '  Infinity'
+
+-- zero padding of specials
+xfmt12204  format  NaN  '010'  ->  '       NaN'
+
+-- zero padding conflicts with alignment specifier
+xfmt12205  format  999  '<010'  ->   NULL  Invalid_operation
+
+-- zero minimum width
+xfmt12206  format  999  '00.10'  ->   NULL  Invalid_operation
+
+-- excessive minimum width
+xfmt12207  format  999  '18446744073709551616.10'  ->   NULL  Invalid_operation
+
+-- invalid fraction digits
+xfmt12207  format  999  '100.-10'  ->   NULL  Invalid_operation
+
+-- excessive number of fraction digits
+xfmt12207  format  999  '100.18446744073709551616'  ->   NULL  Invalid_operation
+
+-- trailing garbage
+xfmt12208  format  999  '10x'  ->   NULL  Invalid_operation
+
+-- excess precision after rescale
+xfmt12209  format  999999999e20  '.7e'  ->  1.0000000e+29 
+
+-- illegal UTF-8 sequences (see http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt)
+xfmt12211  format  Inf  '\xfe=10.10'              ->  NULL  Invalid_operation
+xfmt12212  format  Inf  '\xff=10.10'              ->  NULL  Invalid_operation
+xfmt12213  format  Inf  '\xfe\xfe\xff\xff=10.10'  ->  NULL  Invalid_operation
+xfmt12214  format  Inf  '\xc0\xaf=10.10'          ->  NULL  Invalid_operation
+xfmt12215  format  Inf  '\xe0\x80\xaf=10.10'      ->  NULL  Invalid_operation
+xfmt12216  format  Inf  '\xf0\x80\x80\xaf<10.10'  ->  NULL  Invalid_operation
+xfmt12217  format  Inf  '\xc1\xbf>10.10'          ->  NULL  Invalid_operation
+xfmt12218  format  Inf  '\xe0\x9f\xbf^10.10'      ->  NULL  Invalid_operation
+xfmt12219  format  Inf  '\xf0\x8f\xbf\xbf=10.10'  ->  NULL  Invalid_operation
+xfmt12220  format  Inf  '\xed\xa0\x80=10.10'      ->  NULL  Invalid_operation
+xfmt12221  format  Inf  '\xf4\x90\x80\x80=10.10'  ->  NULL  Invalid_operation
+
+-- more illegal UTF-8 sequences
+xfmt12222  format  Inf  '\xf1\xf1\xf1\xf1=10.10'  ->  NULL  Invalid_operation
+
+
+-- power of 10 boundaries
+xfmt12224  format  99999  'g'    ->  99999
+xfmt12225  format  99999  '.6g'  ->  99999
+xfmt12226  format  99999  '.5g'  ->  99999
+xfmt12227  format  99999  '.4g'  ->  1.000e+5
+xfmt12228  format  99999  '.3g'  ->  1.00e+5
+xfmt12229  format  99999  '.2g'  ->  1.0e+5
+xfmt12230  format  99999  '.1g'  ->  1e+5
+xfmt12231  format  99999  '.0g'  ->  1e+5
+
+xfmt12232  format  99999  'e'    ->  9.9999e+4
+xfmt12233  format  99999  '.6e'  ->  9.999900e+4
+xfmt12234  format  99999  '.5e'  ->  9.99990e+4
+xfmt12235  format  99999  '.4e'  ->  9.9999e+4
+xfmt12236  format  99999  '.3e'  ->  1.000e+5
+xfmt12237  format  99999  '.2e'  ->  1.00e+5
+xfmt12238  format  99999  '.1e'  ->  1.0e+5
+xfmt12239  format  99999  '.0e'  ->  1e+5
+
+xfmt12240  format  9.9999  'f'    ->  9.9999
+xfmt12241  format  9.9999  '.6f'  ->  9.999900
+xfmt12242  format  9.9999  '.5f'  ->  9.99990
+xfmt12243  format  9.9999  '.4f'  ->  9.9999
+xfmt12244  format  9.9999  '.3f'  ->  10.000
+xfmt12245  format  9.9999  '.2f'  ->  10.00
+xfmt12246  format  9.9999  '.1f'  ->  10.0
+xfmt12247  format  9.9999  '.0f'  ->  10
+
+xfmt12248  format  9.99e425000000  'g'    ->  9.99e+425000000
+xfmt12249  format  9.99e425000000  '.3g'  ->  9.99e+425000000
+xfmt12250  format  9.99e425000000  '.2g'  ->  1.0e+425000001
+xfmt12251  format  9.99e425000000  '.1g'  ->  1e+425000001
+xfmt12252  format  9.99e425000000  '.0g'  ->  1e+425000001
+
+xfmt12253  format  9.99e425000000  'e'    ->  9.99e+425000000
+xfmt12254  format  9.99e425000000  '.3e'  ->  9.990e+425000000
+xfmt12255  format  9.99e425000000  '.2e'  ->  9.99e+425000000
+xfmt12256  format  9.99e425000000  '.1e'  ->  1.0e+425000001
+xfmt12257  format  9.99e425000000  '.0e'  ->  1e+425000001
+
+
+-- target exponent less than min_etiny
+xfmt12258  format  1e-849999999  '.10e'  ->  1.0000000000e-849999999
+
+
+-- '%' formatting: add trailing percent sign for special values.
+xfmt12259  format  NaN123  '%'        ->  'NaN123%'
+xfmt12260  format  sNaN    '+10.10%'  ->  '    +sNaN%'
+xfmt12261  format  Inf     ' 10.10%'  ->  ' Infinity%'
+
+-- 'z' formatting: coerce to positive zero
+xfmt12300  format  '-.508e+412'  'D=-z,.44%'  ->  '-508,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000,000.00000000000000000000000000000000000000000000%'
+
+xfmt12301  format  '0.00000000000000000000E9227'  'Q>-z,.440%'  ->  '0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000%'
+
+xfmt12302  format  '-0.00000000000000000000E9227'  'Q>-z,.440%'  ->  '0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000%'
+
+
+-- 64-bit only
+cov64x00001  format  9.99e999999999999999999  'g'    ->  9.99e+999999999999999999
+cov64x00002  format  9.99e999999999999999999  '.3g'  ->  9.99e+999999999999999999
+cov64x00003  format  9.99e999999999999999999  '.2g'  ->  1.0e+1000000000000000000
+cov64x00004  format  9.99e999999999999999999  '.1g'  ->  1e+1000000000000000000
+cov64x00005  format  9.99e999999999999999999  '.0g'  ->  1e+1000000000000000000
+
+cov64x00006  format  9.99e999999999999999999  'e'    ->  9.99e+999999999999999999
+cov64x00007  format  9.99e999999999999999999  '.3e'  ->  9.990e+999999999999999999
+cov64x00008  format  9.99e999999999999999999  '.2e'  ->  9.99e+999999999999999999
+cov64x00009  format  9.99e999999999999999999  '.1e'  ->  1.0e+1000000000000000000
+cov64x00010  format  9.99e999999999999999999  '.0e'  ->  1e+1000000000000000000
+
+-- target exponent less than min_etiny
+cov64x00011  format  1e-1999999999999999997  '.10e'  ->  1.0000000000e-1999999999999999997
+
+
+-- 32-bit only: result has too many digits for 'f' specifier.
+-- This test can legitimately fail with MPD_Malloc_error, thus it can produce
+-- a false positive.
+-- cov32x00012  format  1e-849999999 ',f'  ->  NULL  Invalid_operation

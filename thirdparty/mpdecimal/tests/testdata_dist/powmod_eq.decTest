@@ -1,0 +1,15 @@
+-- Selected test cases to reduce both the archive size and runtime.  For the
+-- large test suite, download the separate mpdecimal-testdata distribution and
+-- replace the testdata_dist directory.
+
+rounding: half_even
+minExponent: -999999999
+maxExponent: 999999999
+
+precision: 241
+powmod_eq_eq_op0  powmod_eq_eq_op  5172935023082998  61096828599662907  ->  39312309313006360 
+precision: 154
+powmod_eq_eq_op1  powmod_eq_eq_op  501984777  951714845  ->  361293017 
+precision: 53
+powmod_eq_eq_op2  powmod_eq_eq_op  271669153387921210695131  564448204364277556933406  ->  194556909709302006741699 
+

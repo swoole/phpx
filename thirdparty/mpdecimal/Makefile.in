@@ -1,0 +1,161 @@
+
+# ==============================================================================
+#                      Unix Makefile for libmpdec/libmpdec++
+# ==============================================================================
+
+PACKAGE_TARNAME = @PACKAGE_TARNAME@
+INSTALL = @INSTALL@
+
+ENABLE_CXX = @ENABLE_CXX@
+ENABLE_STATIC = @ENABLE_STATIC@
+ENABLE_SHARED = @ENABLE_SHARED@
+ENABLE_PC = @ENABLE_PC@
+ENABLE_DOC = @ENABLE_DOC@
+ENABLE_MINGW = @ENABLE_MINGW@
+PROFILE =
+
+LIBSTATIC = @LIBSTATIC@
+LIBNAME = @LIBNAME@
+LIBSONAME = @LIBSONAME@
+LIBSHARED = @LIBSHARED@
+LIBIMPORT = @LIBIMPORT@
+
+LIBSTATIC_CXX = @LIBSTATIC_CXX@
+LIBNAME_CXX = @LIBNAME_CXX@
+LIBSONAME_CXX = @LIBSONAME_CXX@
+LIBSHARED_CXX = @LIBSHARED_CXX@
+LIBIMPORT_CXX = @LIBIMPORT_CXX@
+
+LIBSHARED_USE_AR = @LIBSHARED_USE_AR@
+
+srcdir = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+includedir = @includedir@
+libdir = @libdir@
+datarootdir = @datarootdir@
+docdir = @docdir@
+mandir = @mandir@
+
+
+ifeq ($(ENABLE_CXX), yes)
+default: libcxx
+
+check:
+	cd libmpdec && $(MAKE) check
+	cd libmpdec++ && $(MAKE) check
+
+check_local:
+	cd libmpdec && $(MAKE) check_local
+	cd libmpdec++ && $(MAKE) check_local
+
+check_alloc:
+	cd libmpdec && $(MAKE) check_alloc
+	cd libmpdec++ && $(MAKE) check_alloc
+else
+default: lib
+
+check:
+	cd libmpdec && $(MAKE) check
+
+check_local:
+	cd libmpdec && $(MAKE) check_local
+
+check_alloc:
+	cd libmpdec && $(MAKE) check_alloc
+endif
+
+
+lib:
+	cd libmpdec && $(MAKE) $(PROFILE)
+
+libcxx: lib
+	cd libmpdec++ && $(MAKE) $(PROFILE)
+
+
+install: install_dirs install_files
+
+install_dirs: default
+ifeq ($(ENABLE_MINGW), yes)
+	$(INSTALL) -d -m 755 $(DESTDIR)$(bindir)
+endif
+	$(INSTALL) -d -m 755 $(DESTDIR)$(includedir)
+	$(INSTALL) -d -m 755 $(DESTDIR)$(libdir)
+	$(INSTALL) -d -m 755 $(DESTDIR)$(docdir)
+ifeq ($(ENABLE_PC), yes)
+	$(INSTALL) -d -m 755 $(DESTDIR)$(libdir)/pkgconfig
+endif
+ifeq ($(ENABLE_DOC), yes)
+	$(INSTALL) -d -m 755 $(DESTDIR)$(mandir)/man3
+endif
+
+install_files: install_dirs
+	$(INSTALL) -m 644 libmpdec/mpdecimal.h $(DESTDIR)$(includedir)
+ifeq ($(ENABLE_STATIC), yes)
+	$(INSTALL) -m 644 libmpdec/$(LIBSTATIC) $(DESTDIR)$(libdir)
+endif
+ifeq ($(ENABLE_SHARED), yes)
+ifeq ($(ENABLE_MINGW), yes)
+	$(INSTALL) -m 644 libmpdec/$(LIBIMPORT) $(DESTDIR)$(libdir)
+	$(INSTALL) -m 755 libmpdec/$(LIBSHARED) $(DESTDIR)$(bindir)
+else
+ifeq ($(LIBSHARED_USE_AR), no)
+	$(INSTALL) -m 755 libmpdec/$(LIBSHARED) $(DESTDIR)$(libdir)
+	cd $(DESTDIR)$(libdir) && ln -sf $(LIBSHARED) $(LIBSONAME) && ln -sf $(LIBSHARED) $(LIBNAME)
+endif
+endif
+endif
+
+ifeq ($(ENABLE_CXX), yes)
+	$(INSTALL) -m 644 libmpdec++/decimal.hh $(DESTDIR)$(includedir)
+ifeq ($(ENABLE_STATIC), yes)
+	$(INSTALL) -m 644 libmpdec++/$(LIBSTATIC_CXX) $(DESTDIR)$(libdir)
+endif
+ifeq ($(ENABLE_SHARED), yes)
+ifeq ($(ENABLE_MINGW), yes)
+	$(INSTALL) -m 644 libmpdec++/$(LIBIMPORT_CXX) $(DESTDIR)$(libdir)
+	$(INSTALL) -m 755 libmpdec++/$(LIBSHARED_CXX) $(DESTDIR)$(bindir)
+else
+ifeq ($(LIBSHARED_USE_AR), no)
+	$(INSTALL) -m 755 libmpdec++/$(LIBSHARED_CXX) $(DESTDIR)$(libdir)
+	cd $(DESTDIR)$(libdir) && ln -sf $(LIBSHARED_CXX) $(LIBSONAME_CXX) && ln -sf $(LIBSHARED_CXX) $(LIBNAME_CXX)
+endif
+endif
+endif
+endif
+
+ifeq ($(ENABLE_PC), yes)
+	$(INSTALL) -m 644 libmpdec/.pc/libmpdec.pc $(DESTDIR)$(libdir)/pkgconfig
+ifeq ($(ENABLE_CXX), yes)
+	$(INSTALL) -m 644 libmpdec++/.pc/libmpdec++.pc $(DESTDIR)$(libdir)/pkgconfig
+endif
+endif
+
+	$(INSTALL) -m 644 doc/COPYRIGHT.txt $(DESTDIR)$(docdir)
+ifeq ($(ENABLE_DOC), yes)
+	$(INSTALL) -m 644 doc/mpdecimal.3 $(DESTDIR)$(mandir)/man3
+	$(INSTALL) -m 644 doc/libmpdec.3 $(DESTDIR)$(mandir)/man3
+ifeq ($(ENABLE_CXX), yes)
+	$(INSTALL) -m 644 doc/libmpdec++.3 $(DESTDIR)$(mandir)/man3
+endif
+endif
+
+
+profile: PROFILE := profile
+profile: default
+
+
+clean:
+	cd libmpdec && if [ -f Makefile ]; then $(MAKE) clean; else exit 0; fi
+	cd libmpdec++ && if [ -f Makefile ]; then $(MAKE) clean; else exit 0; fi
+	cd tests && if [ -f Makefile ]; then $(MAKE) clean; else exit 0; fi
+	cd tests++ && if [ -f Makefile ]; then $(MAKE) clean; else exit 0; fi
+
+distclean:
+	cd libmpdec && if [ -f Makefile ]; then $(MAKE) distclean; else exit 0; fi
+	cd libmpdec++ && if [ -f Makefile ]; then $(MAKE) distclean; else exit 0; fi
+	cd tests && if [ -f Makefile ]; then $(MAKE) distclean; else exit 0; fi
+	cd tests++ && if [ -f Makefile ]; then $(MAKE) distclean; else exit 0; fi
+	rm -f config.h config.log config.status Makefile
+	rm -rf autom4te.cache

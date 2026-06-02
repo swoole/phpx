@@ -1,0 +1,120 @@
+-- Selected test cases to reduce both the archive size and runtime.  For the
+-- large test suite, download the separate mpdecimal-testdata distribution and
+-- replace the testdata_dist directory.
+
+rounding: half_even
+minExponent: -425000000
+maxExponent: 425000000
+
+precision: 27
+add_eq1  add_eq  +926069853  ->  1852139706  
+precision: 104
+add_eq2  add_eq  -Infinity  ->  -Infinity  
+
+precision: 100
+compare_eq1  compare_eq  +5916794372888113130055019620156129327439018422817  ->  0  
+precision: 199
+compare_eq2  compare_eq  -6385564075788557361489053622233363254132221134310928544266570524036736301587945295E-378058779  ->  0  
+
+precision: 255
+comparesig_eq1  comparesig_eq  37997421400698793468295234499258938258888893937595659697398091686412465480  ->  0  
+precision: 103
+comparesig_eq2  comparesig_eq  +Inf  ->  0  
+
+precision: 112
+comparetotal_eq0  comparetotal_eq  +5246899448694934.76746583E7239466  ->  0  
+precision: 79
+comparetotal_eq1  comparetotal_eq  -461866196766787289755310460813711109452546567.23424500338922  ->  0  
+precision: 40
+comparetotal_eq2  comparetotal_eq  40559967.8048E-198120324  ->  0  
+
+precision: 111
+comparetotmag_eq1  comparetotmag_eq  -.9680035  ->  0  
+precision: 280
+comparetotmag_eq2  comparetotmag_eq  -2978664146700401661050144467205502091778945285794943.5248293726490459289168834361170650892056840210562147124621253082638290597E+7322343  ->  0  
+
+precision: 241
+copysign_eq0  copysign_eq  +912849910816424783962776495925326137570904169012007696206741038734E-113244462  ->  9.12849910816424783962776495925326137570904169012007696206741038734E-113244397  
+precision: 120
+copysign_eq2  copysign_eq  -Inf  ->  -Infinity  
+
+precision: 101
+divide_eq0  divide_eq  -Infinity  ->  NaN  Invalid_operation 
+precision: 245
+divide_eq1  divide_eq  Inf  ->  NaN  Invalid_operation 
+precision: 110
+divide_eq2  divide_eq  -.1476808094725729904095250393485863450763071588976156608004151488204454583149499119086353485308969531e-190874140  ->  1  
+
+precision: 146
+divideint_eq1  divideint_eq  -1256574716053067901997983102369440625154437304394877782  ->  1  
+precision: 48
+divideint_eq2  divideint_eq  -.548918  ->  1  
+
+precision: 107
+max_eq1  max_eq  -958729752001  ->  -958729752001  
+
+precision: 125
+maxmag_eq1  maxmag_eq  .867049357676692568304662108070292464722909902766555830155  ->  0.867049357676692568304662108070292464722909902766555830155  
+precision: 135
+maxmag_eq2  maxmag_eq  NaN6070908532835254314072874  ->  NaN6070908532835254314072874  
+
+precision: 16
+min_eq0  min_eq  7097E334037297  ->  7.097E+334037300  
+precision: 41
+min_eq1  min_eq  .6441974486  ->  0.6441974486  
+
+precision: 90
+minmag_eq0  minmag_eq  +619334386544815.606216e+357209456  ->  6.19334386544815606216E+357209470  
+precision: 161
+minmag_eq1  minmag_eq  -25.  ->  -25  
+
+precision: 267
+multiply_eq0  multiply_eq  +16419229917556917718044035  ->  269591111085596147004142137735461565267426199081225  
+precision: 21
+multiply_eq1  multiply_eq  +5.27711105277744423e-348158313  ->  0E-425000020  Underflow Rounded Subnormal Clamped Inexact 
+
+precision: 34
+nexttoward_eq0  nexttoward_eq  -78134744367691536194708531  ->  -78134744367691536194708531  
+precision: 200
+nexttoward_eq2  nexttoward_eq  -.8537008685979470753640770866065301180915124288689  ->  -0.8537008685979470753640770866065301180915124288689  
+
+precision: 36
+power_eq0  power_eq  -362429158631567479322670636751195  ->  -0E-425000035  Underflow Rounded Subnormal Clamped Inexact 
+precision: 182
+power_eq1  power_eq  Inf  ->  Infinity  
+precision: 24
+power_eq2  power_eq  336328251898.680440  ->  Infinity  Overflow Rounded Inexact 
+
+precision: 91
+quantize_eq0  quantize_eq  290548.8E-1423999  ->  2.905488E-1423994  
+precision: 44
+quantize_eq1  quantize_eq  +448658.9  ->  448658.9  
+precision: 172
+quantize_eq2  quantize_eq  -817350403193055  ->  -817350403193055  
+
+precision: 110
+remainder_eq0  remainder_eq  -Inf  ->  NaN  Invalid_operation 
+precision: 57
+remainder_eq2  remainder_eq  -975534984681769723475932500908516678693056e-17495830  ->  -0E-17495830  
+
+precision: 222
+remaindernear_eq0  remaindernear_eq  +606302560422303238839300023784949387340467879977016801015961108154411606509462813597451715049853691310868412854381471077355940382201615032  ->  0  
+precision: 70
+remaindernear_eq1  remaindernear_eq  -NaN  ->  -NaN  
+precision: 125
+remaindernear_eq2  remaindernear_eq  -2353922789310.187  ->  -0.000  
+
+precision: 33
+shift_eq0  shift_eq  +64  ->  NaN  Invalid_operation 
+precision: 64
+shift_eq2  shift_eq  .1064629116843833794591007955659963903297906158674535586  ->  NaN  Invalid_operation 
+
+precision: 259
+subtract_eq0  subtract_eq  -.784626254375705635359421742211628372073214972658015192255951E-322501478  ->  0E-322501538  
+precision: 43
+subtract_eq1  subtract_eq  +89690.7376661374  ->  0E-10  
+precision: 233
+subtract_eq2  subtract_eq  +Infinity  ->  NaN  Invalid_operation 
+
+precision: 116
+samequantum_eq2  samequantum_eq  +.956099822146866314870e+96185702  ->  1  

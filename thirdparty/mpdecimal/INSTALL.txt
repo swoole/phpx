@@ -1,0 +1,95 @@
+
+# ==============================================================================
+#                       Unix: library install instructions
+# ==============================================================================
+
+# NONGNU: gmake required!
+
+# This automatically selects the optimal build on all architectures except
+# for multilib systems that default to 32-bit builds (AIX, Solaris):
+./configure
+make
+
+# The default tests suite attempts to download the official tests cases:
+make check
+
+# Alternatively, if wget is not installed or no network is available, run:
+make check_local
+
+# Install:
+make install
+
+# On some systems it is necessary to run ``ldconfig'', so the newly installed
+# library is found by the system linker.  The Makefile does not run `ldconfig''
+# because it is not portable:
+ldconfig
+
+
+# ==============================================================================
+#                                  Custom build
+# ==============================================================================
+
+#
+# MACHINE variable:
+#
+# If ./configure fails to detect the optimal configuration, a specific
+# configuration can be enforced by providing the MACHINE variable.  This
+# should only be necessary on AIX, Solaris or for a MacOS universal build.
+#
+# Example:
+#
+#   ./configure MACHINE=x64
+#
+# Possible values (in decreasing order of preference):
+#
+#    1. x64         - 64-bit OS with x86_64 processor (AMD, Intel)
+#
+#    2. uint128     - 64-bit OS, compiler provides __uint128_t (gcc)
+#
+#    3. ansi64      - 64-bit OS, ANSI C
+#
+#    4. ppro        - 32-bit OS, x86 CPU, PentiumPro or later
+#
+#    5. ansi32      - 32-bit OS, ANSI C
+#
+#    6. ansi-legacy - 32-bit OS, compiler without uint64_t
+#
+# Multilib builds (Darwin and AIX):
+#
+#    7. universal   - builds a 64-bit or a 32-bit library according to the
+#                     compiler ABI settings:
+#
+#                        Darwin:    -m64 or -m32
+#                        AIX (gcc): -maix64 or -maix32
+#                        AIX (xlc): -q64 or -q32
+#
+#                     The generated header file is suitable for both 64-bit
+#                     and 32-bit installs.
+#
+
+#
+# CFLAGS, LDFLAGS, CXXFLAGS, LDXXFLAGS:
+#
+# If CFLAGS or LDFLAGS (or the C++ counterparts) are passed to ./configure,
+# they are appended to the minimal libmpdec (or libmpdec++) configuration:
+#
+#   ./configure CFLAGS="-m32 -march=i586 -O3" LDFLAGS="-m32"
+#
+#      ==> -DCONFIG_32 -DPPRO -DASM -O2 -fpic -m32 -march=i586 -O3
+#
+# Both MACHINE and CFLAGS can be specified, making it possible to have a
+# complete custom configuration:
+#
+#   ./configure MACHINE=ansi32 CFLAGS="-Wall -W -O3 -g"
+#
+#      ==> -DCONFIG_32 -DANSI -Wall -W -O3 -g
+#
+
+# ======================================================================
+#                   Windows: library install instructions
+# ======================================================================
+
+Build scripts for Visual Studio are in the vcbuild directory.
+
+
+

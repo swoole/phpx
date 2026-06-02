@@ -1,0 +1,59 @@
+
+SRCDIR = ..\libmpdec
+LIBSTATIC = libmpdec-4.0.1.lib
+LIBSHARED = libmpdec-4.0.1.dll
+LIBIMPORT = libmpdec-4.0.1.dll.lib
+
+!if "$(DEBUG)" == "1"
+OPT = /MTd /Od /Zi /EHsc
+OPT_SHARED = /MDd /Od /Zi /EHsc
+!else
+OPT = /MT /O2 /GS /EHsc /DNDEBUG
+OPT_SHARED = /MD /O2 /GS /EHsc /DNDEBUG
+!endif
+
+!if "$(CC)" == "clang-cl"
+WARN = /W4 /wd4200 /wd4204 /wd4221 -Wno-undefined-inline /D_CRT_SECURE_NO_WARNINGS
+!else
+WARN = /W4 /wd4200 /wd4204 /wd4221 /D_CRT_SECURE_NO_WARNINGS
+!endif
+
+MPD_CFLAGS = $(WARN) /nologo $(OPT)
+MPD_CFLAGS_SHARED = $(WARN) /nologo $(OPT_SHARED)
+
+
+default: runtest runtest_shared copy_dll
+
+
+runtest:\
+Makefile runtest.c test.c $(SRCDIR)\io.h $(SRCDIR)\mpdecimal.h $(SRCDIR)\mpalloc.h test.h vctest.h \
+$(SRCDIR)\$(LIBSTATIC)
+	$(CC) -I$(SRCDIR) $(MPD_CFLAGS) /Fe:runtest runtest.c test.c $(SRCDIR)\$(LIBSTATIC)
+
+runtest_shared:\
+Makefile runtest.c test.c $(SRCDIR)/io.h $(SRCDIR)/mpdecimal.h $(SRCDIR)/mpalloc.h test.h vctest.h \
+$(SRCDIR)/$(LIBSHARED) $(SRCDIR)/$(LIBIMPORT)
+	$(CC) -I$(SRCDIR) $(MPD_CFLAGS_SHARED) /Fe:runtest_shared runtest.c test.c $(SRCDIR)\$(LIBIMPORT)
+
+FORCE:
+
+copy_dll:
+	copy /y $(SRCDIR)\$(LIBSHARED) .
+
+clean: FORCE
+	-@if exist *.obj del *.obj
+	-@if exist *.dll del *.dll
+	-@if exist *.exp del *.exp
+	-@if exist *.lib del *.lib
+	-@if exist *.ilk del *.ilk
+	-@if exist *.pdb del *.pdb
+	-@if exist *.pgc del *.pgc
+	-@if exist *.pgd del *.pgd
+	-@if exist *.manifest del *.manifest
+	-@if exist *.exe del *.exe
+
+distclean: FORCE
+	nmake clean
+	-@if exist dectest.zip del dectest.zip
+	-@if exist testdata rd /q /s testdata
+	-@if exist Makefile del Makefile
