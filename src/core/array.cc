@@ -333,6 +333,9 @@ ArrayItem &ArrayItem::operator=(const Variant &v) {
     return *this;
 }
 
+static String to_array{ZEND_STRL("toArray"), true};
+static String to_array_lower{ZEND_STRL("toarray"), true};
+
 Array toArray(const Variant &v) {
     zval result;
     zval *expr = NO_CONST_V(v);
@@ -353,9 +356,9 @@ Array toArray(const Variant &v) {
         } else {
             ZVAL_EMPTY_ARRAY(&result);
         }
-    } else if (zend_hash_str_find_ptr(&Z_OBJCE_P(expr)->function_table, ZEND_STRL("toarray"))) {
+    } else if (zend_hash_find_ptr(&Z_OBJCE_P(expr)->function_table, to_array_lower.str())) {
         Variant obj(expr);
-        Variant ret = obj.call("toArray");
+        Variant ret = obj.call(to_array);
         if (!ret.isArray()) {
             throwError("toArray() method must return an array, got %s", ret.typeStr());
         }
