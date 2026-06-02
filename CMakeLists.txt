@@ -273,6 +273,28 @@ elseif(IS_WINDOWS)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
+# ============ 内置 mpdecimal（Linux / macOS）============
+if (NOT IS_WINDOWS)
+    set(MPDECIMAL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mpdecimal)
+    set(MPD_HEADER_CONFIG "
+#define MPD_CONFIG_64 1
+")
+    configure_file(
+        ${MPDECIMAL_DIR}/libmpdec/mpdecimal.h.in
+        ${CMAKE_CURRENT_BINARY_DIR}/mpdecimal/mpdecimal.h
+        @ONLY
+    )
+    file(GLOB MPDEC_C_SOURCES ${MPDECIMAL_DIR}/libmpdec/*.c)
+    add_library(mpdecimal STATIC ${MPDEC_C_SOURCES} ${MPDECIMAL_DIR}/libmpdec++/decimal.cc)
+    target_include_directories(mpdecimal PUBLIC
+        ${CMAKE_CURRENT_BINARY_DIR}/mpdecimal
+        ${MPDECIMAL_DIR}/libmpdec++
+    )
+    target_compile_definitions(mpdecimal PRIVATE CONFIG_64 ANSI HAVE_UINT128_T)
+    target_compile_options(mpdecimal PRIVATE -fPIC)
+    set_target_properties(mpdecimal PROPERTIES C_STANDARD 99 POSITION_INDEPENDENT_CODE ON)
+endif()
+
 file(GLOB_RECURSE SRC_FILES src/core/*.cc src/func/*.cc src/class/*.cc src/const/*.cc)
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 
@@ -315,7 +337,8 @@ if (IS_WINDOWS)
         gmp gmpxx libmpdec libmpdec++ mpfr
     )
 else()
-    target_link_libraries(phpx PUBLIC gmp gmpxx mpdec++ mpfr)
+    target_link_libraries(phpx PUBLIC gmp gmpxx mpfr)
+    target_link_libraries(phpx PUBLIC mpdecimal)
 endif()
 
 if (CODE_COVERAGE AND NOT IS_WINDOWS)
@@ -369,8 +392,9 @@ if(BUILD_TESTS)
                     ${PHP_LIBS}
                     ${PHP_LDFLAGS}
                     ${GTEST_BOTH_LIBRARIES}
-                    gmp gmpxx mpdec mpdec++ mpfr
+                    gmp gmpxx mpfr
             )
+            target_link_libraries(phpx-tests PRIVATE mpdecimal)
         endif()
     endif()
 endif()
