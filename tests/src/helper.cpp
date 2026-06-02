@@ -59,8 +59,8 @@ TEST(helper, math) {
     var d = 4;
     ASSERT_EQ(php::math::pow(e, d).toInt(), std::pow(3, 4));
 
-    ASSERT_EQ(php::math::abs(-100L), 100L);
-    ASSERT_EQ(php::math::abs(100L), 100L);
+    ASSERT_EQ(php::math::abs(-100LL), 100LL);
+    ASSERT_EQ(php::math::abs(100LL), 100LL);
 
     ASSERT_EQ(php::math::abs(-100.09), 100.09);
     ASSERT_EQ(php::math::abs(100.09), 100.09);
@@ -92,8 +92,8 @@ TEST(helper, func) {
 }
 
 TEST(helper, same) {
-    ASSERT_TRUE(php::same(2.0, 2L));
-    ASSERT_TRUE(php::same(3L, 3.0));
+    ASSERT_TRUE(php::same(2.0, 2LL));
+    ASSERT_TRUE(php::same(3LL, 3.0));
 }
 
 TEST(helper, clone) {

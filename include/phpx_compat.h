@@ -48,6 +48,18 @@
 #undef getuid
 #endif
 
+#ifdef ERROR
+#undef ERROR
+#endif
+
+#ifdef CAL_GREGORIAN
+#undef CAL_GREGORIAN
+#endif
+
+#endif
+
+#if defined(WIN32) || defined(__MACH__)
+
 #ifdef MSG_OOB
 #undef MSG_OOB
 #endif
@@ -74,14 +86,6 @@
 
 #ifdef SHUT_WR
 #undef SHUT_WR
-#endif
-
-#ifdef ERROR
-#undef ERROR
-#endif
-
-#ifdef CAL_GREGORIAN
-#undef CAL_GREGORIAN
 #endif
 
 #endif

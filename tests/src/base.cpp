@@ -52,7 +52,7 @@ TEST(base, echo) {
     var b = 2026;
     echo(b);
     echo("\n");
-    echo(1987L);
+    echo(1987LL);
     echo("\n");
     echo(3.1415926);
     echo("\n");
