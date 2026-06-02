@@ -16,21 +16,13 @@ struct Scope {
     zend_class_entry *ce;
     zend_execute_data *frame;
 };
-
-static inline Var toStream(Var &var) {
-    if (UNEXPECTED(!var.isResource())) {
-        php::throwException(zend_ce_type_error, "Invalid stream resource");
-        return php::null;
-    }
-    return var;
-}
 };  // namespace php
 
 template <typename T>
 static inline T &php_unsafe_cast(php::Var &var, uint32_t type_id) {
     auto *box = var.toBox<php::StdContainerBox<T>>();
     if (UNEXPECTED(box->getTypeInfo() != type_id)) {
-        php::throwException(zend_ce_type_error, "std::unsafe_cast(): std container type mismatch");
+        php::throwException(zend_ce_type_error, "std container type mismatch");
     }
     return box->container;
 }

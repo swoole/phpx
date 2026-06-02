@@ -144,6 +144,14 @@ static inline String toString(const Variant &v) {
     return v.toString();
 }
 
+static inline Variant toStream(const Variant &v) {
+    if (UNEXPECTED(!v.isResource())) {
+        php::throwException(zend_ce_type_error, "Invalid stream resource");
+        return php::null;
+    }
+    return v;
+}
+
 static inline void echo(int val) {
     echo((Int) val);
 }
