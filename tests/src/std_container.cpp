@@ -207,11 +207,11 @@ TEST(std_container_box, stdunordered_map_unset) {
     ASSERT_EQ(map.offsetGet(2), 20);
 }
 
-// ============ php_std_container_cast ============
+// ============ php::toStdContainer ============
 
 TEST(std_container_cast, vector_int) {
     Var v = Var(new StdContainerBox<StdVector<Int>>(42, std::initializer_list<Int>{1, 2, 3, 4, 5}));
-    auto &vec = php_std_container_cast<StdVector<Int>>(v, 42);
+    auto &vec = php::toStdContainer<StdVector<Int>>(v, 42);
 
     ASSERT_EQ(vec.size(), 5u);
     ASSERT_EQ(vec[0], 1);
@@ -220,7 +220,7 @@ TEST(std_container_cast, vector_int) {
 
 TEST(std_container_cast, vector_modify) {
     Var v = Var(new StdContainerBox<StdVector<Int>>(100));
-    auto &vec = php_std_container_cast<StdVector<Int>>(v, 100);
+    auto &vec = php::toStdContainer<StdVector<Int>>(v, 100);
 
     vec.push_back(42);
     ASSERT_EQ(vec.size(), 1u);
@@ -231,14 +231,14 @@ TEST(std_container_cast, type_mismatch_throws) {
     try_call(
         []() {
             Var v = Var(new StdContainerBox<StdVector<Int>>(1));
-            php_std_container_cast<StdVector<Int>>(v, 999);  // wrong type_id
+            php::toStdContainer<StdVector<Int>>(v, 999);  // wrong type_id
         },
         "type mismatch");
 }
 
 TEST(std_container_cast, array_type) {
     Var v = Var(new StdContainerBox<StdArray<Int, 3>>(7, std::initializer_list<Int>{10, 20, 30}));
-    auto &arr = php_std_container_cast<StdArray<Int, 3>>(v, 7);
+    auto &arr = php::toStdContainer<StdArray<Int, 3>>(v, 7);
 
     ASSERT_EQ(arr.size(), 3u);
     ASSERT_EQ(arr[0], 10);
@@ -248,7 +248,7 @@ TEST(std_container_cast, array_type) {
 
 TEST(std_container_cast, map_type) {
     Var v = Var(new StdContainerBox<StdMap<Int, String>>(5));
-    auto &map = php_std_container_cast<StdMap<Int, String>>(v, 5);
+    auto &map = php::toStdContainer<StdMap<Int, String>>(v, 5);
 
     map.offsetSet(1, String("alpha"));
     ASSERT_STREQ(map.offsetGet(1).toCString(), "alpha");

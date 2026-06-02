@@ -16,16 +16,15 @@ struct Scope {
     zend_class_entry *ce;
     zend_execute_data *frame;
 };
-};  // namespace php
-
-template <typename T>
-static inline T &php_std_container_cast(php::Var &var, uint32_t type_id) {
-    auto *box = var.toBox<php::StdContainerBox<T>>();
-    if (UNEXPECTED(box->getTypeInfo() != type_id)) {
-        php::throwException(zend_ce_type_error, "std container type mismatch");
+    template <typename T>
+    static inline T &toStdContainer(Var &var, uint32_t type_id) {
+        auto *box = var.toBox<StdContainerBox<T>>();
+        if (UNEXPECTED(box->getTypeInfo() != type_id)) {
+            throwException(zend_ce_type_error, "std container type mismatch");
+        }
+        return box->container;
     }
-    return box->container;
-}
+};  // namespace php
 
 extern const char *php_get_called_class(php::Object &this_);
 extern zend_class_entry *php_get_called_ce(php::Object &this_);
