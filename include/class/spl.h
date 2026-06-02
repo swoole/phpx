@@ -127,10 +127,10 @@ class RecursiveIteratorIterator {
     Object getObject() const {
         return this_;
     }
-    static constexpr int LEAVES_ONLY = 0;
-    static constexpr int SELF_FIRST = 1;
-    static constexpr int CHILD_FIRST = 2;
-    static constexpr int CATCH_GET_CHILD = 16;
+    static constexpr zend_long LEAVES_ONLY = 0;
+    static constexpr zend_long SELF_FIRST = 1;
+    static constexpr zend_long CHILD_FIRST = 2;
+    static constexpr zend_long CATCH_GET_CHILD = 16;
 
     RecursiveIteratorIterator(const Variant &iterator, const Variant &mode = 0, const Variant &flags = 0);
     Variant rewind();
@@ -238,12 +238,12 @@ class CachingIterator : public IteratorIterator {
     CachingIterator() = default;
 
   public:
-    static constexpr int CALL_TOSTRING = 1;
-    static constexpr int CATCH_GET_CHILD = 16;
-    static constexpr int TOSTRING_USE_KEY = 2;
-    static constexpr int TOSTRING_USE_CURRENT = 4;
-    static constexpr int TOSTRING_USE_INNER = 8;
-    static constexpr int FULL_CACHE = 256;
+    static constexpr zend_long CALL_TOSTRING = 1;
+    static constexpr zend_long CATCH_GET_CHILD = 16;
+    static constexpr zend_long TOSTRING_USE_KEY = 2;
+    static constexpr zend_long TOSTRING_USE_CURRENT = 4;
+    static constexpr zend_long TOSTRING_USE_INNER = 8;
+    static constexpr zend_long FULL_CACHE = 256;
 
     CachingIterator(const Variant &iterator, const Variant &flags = 1);
     Variant rewind();
@@ -302,13 +302,13 @@ class RegexIterator {
     Object getObject() const {
         return this_;
     }
-    static constexpr int USE_KEY = 1;
-    static constexpr int INVERT_MATCH = 2;
-    static constexpr int MATCH = 0;
-    static constexpr int GET_MATCH = 1;
-    static constexpr int ALL_MATCHES = 2;
-    static constexpr int SPLIT = 3;
-    static constexpr int REPLACE = 4;
+    static constexpr zend_long USE_KEY = 1;
+    static constexpr zend_long INVERT_MATCH = 2;
+    static constexpr zend_long MATCH = 0;
+    static constexpr zend_long GET_MATCH = 1;
+    static constexpr zend_long ALL_MATCHES = 2;
+    static constexpr zend_long SPLIT = 3;
+    static constexpr zend_long REPLACE = 4;
 
     RegexIterator(const Variant &iterator,
                   const Variant &pattern,
@@ -368,14 +368,14 @@ class RecursiveTreeIterator : public RecursiveIteratorIterator {
     RecursiveTreeIterator() = default;
 
   public:
-    static constexpr int BYPASS_CURRENT = 4;
-    static constexpr int BYPASS_KEY = 8;
-    static constexpr int PREFIX_LEFT = 0;
-    static constexpr int PREFIX_MID_HAS_NEXT = 1;
-    static constexpr int PREFIX_MID_LAST = 2;
-    static constexpr int PREFIX_END_HAS_NEXT = 3;
-    static constexpr int PREFIX_END_LAST = 4;
-    static constexpr int PREFIX_RIGHT = 5;
+    static constexpr zend_long BYPASS_CURRENT = 4;
+    static constexpr zend_long BYPASS_KEY = 8;
+    static constexpr zend_long PREFIX_LEFT = 0;
+    static constexpr zend_long PREFIX_MID_HAS_NEXT = 1;
+    static constexpr zend_long PREFIX_MID_LAST = 2;
+    static constexpr zend_long PREFIX_END_HAS_NEXT = 3;
+    static constexpr zend_long PREFIX_END_LAST = 4;
+    static constexpr zend_long PREFIX_RIGHT = 5;
 
     RecursiveTreeIterator(const Variant &iterator,
                           const Variant &flags = 8,
@@ -398,8 +398,8 @@ class ArrayObject {
     Object getObject() const {
         return this_;
     }
-    static constexpr int STD_PROP_LIST = 1;
-    static constexpr int ARRAY_AS_PROPS = 2;
+    static constexpr zend_long STD_PROP_LIST = 1;
+    static constexpr zend_long ARRAY_AS_PROPS = 2;
 
     ArrayObject(const Variant &array = Array{},
                 const Variant &flags = 0,
@@ -438,8 +438,8 @@ class ArrayIterator_ {
     Object getObject() const {
         return this_;
     }
-    static constexpr int STD_PROP_LIST = 1;
-    static constexpr int ARRAY_AS_PROPS = 2;
+    static constexpr zend_long STD_PROP_LIST = 1;
+    static constexpr zend_long ARRAY_AS_PROPS = 2;
 
     ArrayIterator_(const Variant &array = Array{}, const Variant &flags = 0);
     Variant offsetExists(const Variant &key);
@@ -484,7 +484,7 @@ class AppendIterator : public IteratorIterator {
 
 class RecursiveArrayIterator : public ArrayIterator_ {
   public:
-    static constexpr int CHILD_ARRAYS_ONLY = 4;
+    static constexpr zend_long CHILD_ARRAYS_ONLY = 4;
 
     Variant hasChildren();
     Variant getChildren();
@@ -500,10 +500,10 @@ class SplDoublyLinkedList {
         return this_;
     }
     explicit SplDoublyLinkedList(const Object &obj) : this_(obj) {}
-    static constexpr int IT_MODE_LIFO = 2;
-    static constexpr int IT_MODE_FIFO = 0;
-    static constexpr int IT_MODE_DELETE = 1;
-    static constexpr int IT_MODE_KEEP = 0;
+    static constexpr zend_long IT_MODE_LIFO = 2;
+    static constexpr zend_long IT_MODE_FIFO = 0;
+    static constexpr zend_long IT_MODE_DELETE = 1;
+    static constexpr zend_long IT_MODE_KEEP = 0;
 
     SplDoublyLinkedList();
     Variant add(const Variant &index, const Variant &value);
@@ -607,9 +607,9 @@ class SplPriorityQueue {
         return this_;
     }
     explicit SplPriorityQueue(const Object &obj) : this_(obj) {}
-    static constexpr int EXTR_BOTH = 3;
-    static constexpr int EXTR_PRIORITY = 2;
-    static constexpr int EXTR_DATA = 1;
+    static constexpr zend_long EXTR_BOTH = 3;
+    static constexpr zend_long EXTR_PRIORITY = 2;
+    static constexpr zend_long EXTR_DATA = 1;
 
     SplPriorityQueue();
     Variant compare(const Variant &priority1, const Variant &priority2);
@@ -703,10 +703,10 @@ class MultipleIterator {
     Object getObject() const {
         return this_;
     }
-    static constexpr int MIT_NEED_ANY = 0;
-    static constexpr int MIT_NEED_ALL = 1;
-    static constexpr int MIT_KEYS_NUMERIC = 0;
-    static constexpr int MIT_KEYS_ASSOC = 2;
+    static constexpr zend_long MIT_NEED_ANY = 0;
+    static constexpr zend_long MIT_NEED_ALL = 1;
+    static constexpr zend_long MIT_KEYS_NUMERIC = 0;
+    static constexpr zend_long MIT_KEYS_ASSOC = 2;
 
     MultipleIterator(const Variant &flags = 1);
     Variant getFlags();
@@ -772,10 +772,10 @@ class SplFileObject : public SplFileInfo {
     SplFileObject() = default;
 
   public:
-    static constexpr int DROP_NEW_LINE = 1;
-    static constexpr int READ_AHEAD = 2;
-    static constexpr int SKIP_EMPTY = 4;
-    static constexpr int READ_CSV = 8;
+    static constexpr zend_long DROP_NEW_LINE = 1;
+    static constexpr zend_long READ_AHEAD = 2;
+    static constexpr zend_long SKIP_EMPTY = 4;
+    static constexpr zend_long READ_CSV = 8;
 
     SplFileObject(const Variant &filename,
                   const Variant &mode = "r",
@@ -851,18 +851,18 @@ class FilesystemIterator : public DirectoryIterator {
     FilesystemIterator() = default;
 
   public:
-    static constexpr int CURRENT_MODE_MASK = 240;
-    static constexpr int CURRENT_AS_PATHNAME = 32;
-    static constexpr int CURRENT_AS_FILEINFO = 0;
-    static constexpr int CURRENT_AS_SELF = 16;
-    static constexpr int KEY_MODE_MASK = 3840;
-    static constexpr int KEY_AS_PATHNAME = 0;
-    static constexpr int FOLLOW_SYMLINKS = 16384;
-    static constexpr int KEY_AS_FILENAME = 256;
-    static constexpr int NEW_CURRENT_AND_KEY = 256;
-    static constexpr int OTHER_MODE_MASK = 28672;
-    static constexpr int SKIP_DOTS = 4096;
-    static constexpr int UNIX_PATHS = 8192;
+    static constexpr zend_long CURRENT_MODE_MASK = 240;
+    static constexpr zend_long CURRENT_AS_PATHNAME = 32;
+    static constexpr zend_long CURRENT_AS_FILEINFO = 0;
+    static constexpr zend_long CURRENT_AS_SELF = 16;
+    static constexpr zend_long KEY_MODE_MASK = 3840;
+    static constexpr zend_long KEY_AS_PATHNAME = 0;
+    static constexpr zend_long FOLLOW_SYMLINKS = 16384;
+    static constexpr zend_long KEY_AS_FILENAME = 256;
+    static constexpr zend_long NEW_CURRENT_AND_KEY = 256;
+    static constexpr zend_long OTHER_MODE_MASK = 28672;
+    static constexpr zend_long SKIP_DOTS = 4096;
+    static constexpr zend_long UNIX_PATHS = 8192;
 
     FilesystemIterator(const Variant &directory, const Variant &flags = 4096);
     Variant rewind();

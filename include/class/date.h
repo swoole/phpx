@@ -29,20 +29,20 @@ class DateTimeZone {
     Object getObject() const {
         return this_;
     }
-    static constexpr int AFRICA = 1;
-    static constexpr int AMERICA = 2;
-    static constexpr int ANTARCTICA = 4;
-    static constexpr int ARCTIC = 8;
-    static constexpr int ASIA = 16;
-    static constexpr int ATLANTIC = 32;
-    static constexpr int AUSTRALIA = 64;
-    static constexpr int EUROPE = 128;
-    static constexpr int INDIAN = 256;
-    static constexpr int PACIFIC = 512;
-    static constexpr int UTC = 1024;
-    static constexpr int ALL = 2047;
-    static constexpr int ALL_WITH_BC = 4095;
-    static constexpr int PER_COUNTRY = 4096;
+    static constexpr zend_long AFRICA = 1;
+    static constexpr zend_long AMERICA = 2;
+    static constexpr zend_long ANTARCTICA = 4;
+    static constexpr zend_long ARCTIC = 8;
+    static constexpr zend_long ASIA = 16;
+    static constexpr zend_long ATLANTIC = 32;
+    static constexpr zend_long AUSTRALIA = 64;
+    static constexpr zend_long EUROPE = 128;
+    static constexpr zend_long INDIAN = 256;
+    static constexpr zend_long PACIFIC = 512;
+    static constexpr zend_long UTC = 1024;
+    static constexpr zend_long ALL = 2047;
+    static constexpr zend_long ALL_WITH_BC = 4095;
+    static constexpr zend_long PER_COUNTRY = 4096;
 
     DateTimeZone(const Variant &timezone);
     Variant getName();
@@ -84,8 +84,8 @@ class DatePeriod {
     Object getObject() const {
         return this_;
     }
-    static constexpr int EXCLUDE_START_DATE = 1;
-    static constexpr int INCLUDE_END_DATE = 2;
+    static constexpr zend_long EXCLUDE_START_DATE = 1;
+    static constexpr zend_long INCLUDE_END_DATE = 2;
 
     static Variant createFromISO8601String(const Variant &specification, const Variant &options = 0);
     DatePeriod(const Variant &start,

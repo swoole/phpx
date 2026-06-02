@@ -232,14 +232,14 @@ class Attribute {
     Object getObject() const {
         return this_;
     }
-    static constexpr int TARGET_CLASS_ = 1;
-    static constexpr int TARGET_FUNCTION_ = 2;
-    static constexpr int TARGET_METHOD_ = 4;
-    static constexpr int TARGET_PROPERTY_ = 8;
-    static constexpr int TARGET_CLASS_CONSTANT_ = 16;
-    static constexpr int TARGET_PARAMETER_ = 32;
-    static constexpr int TARGET_ALL_ = 63;
-    static constexpr int IS_REPEATABLE_ = 64;
+    static constexpr zend_long TARGET_CLASS_ = 1;
+    static constexpr zend_long TARGET_FUNCTION_ = 2;
+    static constexpr zend_long TARGET_METHOD_ = 4;
+    static constexpr zend_long TARGET_PROPERTY_ = 8;
+    static constexpr zend_long TARGET_CLASS_CONSTANT_ = 16;
+    static constexpr zend_long TARGET_PARAMETER_ = 32;
+    static constexpr zend_long TARGET_ALL_ = 63;
+    static constexpr zend_long IS_REPEATABLE_ = 64;
 
     Attribute(const Variant &flags = 63);
 };

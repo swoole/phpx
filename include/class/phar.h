@@ -42,22 +42,22 @@ class Phar : public RecursiveDirectoryIterator {
     Phar() = default;
 
   public:
-    static constexpr int BZ2 = 8192;
-    static constexpr int GZ = 4096;
-    static constexpr int NONE = 0;
-    static constexpr int PHAR = 1;
-    static constexpr int TAR = 2;
-    static constexpr int ZIP = 3;
-    static constexpr int COMPRESSED = 61440;
-    static constexpr int PHP = 0;
-    static constexpr int PHPS = 1;
-    static constexpr int MD5 = 1;
-    static constexpr int OPENSSL = 16;
-    static constexpr int OPENSSL_SHA256 = 17;
-    static constexpr int OPENSSL_SHA512 = 18;
-    static constexpr int SHA1 = 2;
-    static constexpr int SHA256 = 3;
-    static constexpr int SHA512 = 4;
+    static constexpr zend_long BZ2 = 8192;
+    static constexpr zend_long GZ = 4096;
+    static constexpr zend_long NONE = 0;
+    static constexpr zend_long PHAR = 1;
+    static constexpr zend_long TAR = 2;
+    static constexpr zend_long ZIP = 3;
+    static constexpr zend_long COMPRESSED = 61440;
+    static constexpr zend_long PHP = 0;
+    static constexpr zend_long PHPS = 1;
+    static constexpr zend_long MD5 = 1;
+    static constexpr zend_long OPENSSL = 16;
+    static constexpr zend_long OPENSSL_SHA256 = 17;
+    static constexpr zend_long OPENSSL_SHA512 = 18;
+    static constexpr zend_long SHA1 = 2;
+    static constexpr zend_long SHA256 = 3;
+    static constexpr zend_long SHA512 = 4;
 
     Phar(const Variant &filename, const Variant &flags = 12288, const Variant &alias = nullptr);
     Variant addEmptyDir(const Variant &directory);

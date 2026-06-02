@@ -1360,7 +1360,7 @@ class Generator
                 } elseif (is_float($val)) {
                     $classConstants[$name] = ['repr' => $repr, 'type' => 'double'];
                 } else {
-                    $classConstants[$name] = ['repr' => $repr, 'type' => 'int'];
+                    $classConstants[$name] = ['repr' => $repr, 'type' => 'zend_long'];
                 }
             }
 

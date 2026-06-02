@@ -167,9 +167,9 @@ class Lock {
     Object getObject() const {
         return this_;
     }
-    static constexpr int MUTEX = 3;
-    static constexpr int RWLOCK = 1;
-    static constexpr int SPINLOCK = 5;
+    static constexpr zend_long MUTEX = 3;
+    static constexpr zend_long RWLOCK = 1;
+    static constexpr zend_long SPINLOCK = 5;
 
     Lock(const Variant &type = 3);
     Variant lock(const Variant &operation = 2, const Variant &timeout = -1);
@@ -185,9 +185,9 @@ class Table {
     Object getObject() const {
         return this_;
     }
-    static constexpr int TYPE_INT = 1;
-    static constexpr int TYPE_STRING = 3;
-    static constexpr int TYPE_FLOAT = 2;
+    static constexpr zend_long TYPE_INT = 1;
+    static constexpr zend_long TYPE_STRING = 3;
+    static constexpr zend_long TYPE_FLOAT = 2;
 
     Table(const Variant &table_size, const Variant &conflict_proportion = 0.20000000000000001);
     Variant column(const Variant &name, const Variant &type, const Variant &size = 0);
@@ -261,14 +261,14 @@ class Process_ {
     Object getObject() const {
         return this_;
     }
-    static constexpr int IPC_NOWAIT = 256;
-    static constexpr int PIPE_MASTER = 1;
-    static constexpr int PIPE_WORKER = 2;
-    static constexpr int PIPE_READ = 3;
-    static constexpr int PIPE_WRITE = 4;
-    static constexpr int PIPE_TYPE_NONE = 0;
-    static constexpr int PIPE_TYPE_STREAM = 1;
-    static constexpr int PIPE_TYPE_DGRAM = 2;
+    static constexpr zend_long IPC_NOWAIT = 256;
+    static constexpr zend_long PIPE_MASTER = 1;
+    static constexpr zend_long PIPE_WORKER = 2;
+    static constexpr zend_long PIPE_READ = 3;
+    static constexpr zend_long PIPE_WRITE = 4;
+    static constexpr zend_long PIPE_TYPE_NONE = 0;
+    static constexpr zend_long PIPE_TYPE_STREAM = 1;
+    static constexpr zend_long PIPE_TYPE_DGRAM = 2;
 
     Process_(const Variant &callback,
              const Variant &redirect_stdin_and_stdout = false,
@@ -405,13 +405,13 @@ class Client_ {
     Object getObject() const {
         return this_;
     }
-    static constexpr int MSG_OOB = 1;
-    static constexpr int MSG_PEEK = 2;
-    static constexpr int MSG_DONTWAIT = 64;
-    static constexpr int MSG_WAITALL = 256;
-    static constexpr int SHUT_RDWR = 2;
-    static constexpr int SHUT_RD = 0;
-    static constexpr int SHUT_WR = 1;
+    static constexpr zend_long MSG_OOB = 1;
+    static constexpr zend_long MSG_PEEK = 2;
+    static constexpr zend_long MSG_DONTWAIT = 64;
+    static constexpr zend_long MSG_WAITALL = 256;
+    static constexpr zend_long SHUT_RDWR = 2;
+    static constexpr zend_long SHUT_RD = 0;
+    static constexpr zend_long SHUT_WR = 1;
 
     Client_(const Variant &type, const Variant &async = false, const Variant &id = "");
     Variant set(const Variant &settings);
@@ -508,15 +508,15 @@ class Thread_ {
     Object getObject() const {
         return this_;
     }
-    static constexpr int HARDWARE_CONCURRENCY = 12;
+    static constexpr zend_long HARDWARE_CONCURRENCY = 12;
     static inline const Variant API_NAME{ZEND_STRL("POSIX Threads"), true};
-    static constexpr int SCHED_OTHER_ = 0;
-    static constexpr int SCHED_FIFO_ = 1;
-    static constexpr int SCHED_RR_ = 2;
-    static constexpr int SCHED_BATCH_ = 3;
-    static constexpr int SCHED_ISO_ = 4;
-    static constexpr int SCHED_IDLE_ = 5;
-    static constexpr int SCHED_DEADLINE_ = 6;
+    static constexpr zend_long SCHED_OTHER_ = 0;
+    static constexpr zend_long SCHED_FIFO_ = 1;
+    static constexpr zend_long SCHED_RR_ = 2;
+    static constexpr zend_long SCHED_BATCH_ = 3;
+    static constexpr zend_long SCHED_ISO_ = 4;
+    static constexpr zend_long SCHED_IDLE_ = 5;
+    static constexpr zend_long SCHED_DEADLINE_ = 6;
 
     template <typename... Args>
     Thread_(const Variant &script_file, const Args &...args) {
@@ -690,10 +690,10 @@ class Client {
     Object getObject() const {
         return this_;
     }
-    static constexpr int MSG_OOB = 1;
-    static constexpr int MSG_PEEK = 2;
-    static constexpr int MSG_DONTWAIT = 64;
-    static constexpr int MSG_WAITALL = 256;
+    static constexpr zend_long MSG_OOB = 1;
+    static constexpr zend_long MSG_PEEK = 2;
+    static constexpr zend_long MSG_DONTWAIT = 64;
+    static constexpr zend_long MSG_WAITALL = 256;
 
     Client(const Variant &type);
     Variant set(const Variant &settings);
@@ -1179,13 +1179,13 @@ namespace Swoole::Redis {
 
 class Server : public Swoole::Server_ {
   public:
-    static constexpr int NIL = 1;
-    static constexpr int ERROR = 0;
-    static constexpr int STATUS = 2;
-    static constexpr int INT = 3;
-    static constexpr int STRING = 4;
-    static constexpr int SET = 5;
-    static constexpr int MAP = 6;
+    static constexpr zend_long NIL = 1;
+    static constexpr zend_long ERROR = 0;
+    static constexpr zend_long STATUS = 2;
+    static constexpr zend_long INT = 3;
+    static constexpr zend_long STRING = 4;
+    static constexpr zend_long SET = 5;
+    static constexpr zend_long MAP = 6;
 
     Variant setHandler(const Variant &command, const Variant &callback);
     Variant getHandler(const Variant &command);
@@ -1300,9 +1300,9 @@ class Lock {
     Object getObject() const {
         return this_;
     }
-    static constexpr int MUTEX = 3;
-    static constexpr int RWLOCK = 1;
-    static constexpr int SPINLOCK = 5;
+    static constexpr zend_long MUTEX = 3;
+    static constexpr zend_long RWLOCK = 1;
+    static constexpr zend_long SPINLOCK = 5;
 
     Lock(const Variant &type = 3);
     Variant lock(const Variant &operation = 2, const Variant &timeout = -1);
@@ -1330,8 +1330,8 @@ class Queue {
     Object getObject() const {
         return this_;
     }
-    static constexpr int NOTIFY_ONE = 1;
-    static constexpr int NOTIFY_ALL = 2;
+    static constexpr zend_long NOTIFY_ONE = 1;
+    static constexpr zend_long NOTIFY_ALL = 2;
 
     Queue();
     Variant push(const Variant &value, const Variant &notify_which = 0);

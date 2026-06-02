@@ -20,49 +20,49 @@ class Redis {
     Object getObject() const {
         return this_;
     }
-    static constexpr int REDIS_NOT_FOUND = 0;
-    static constexpr int REDIS_STRING = 1;
-    static constexpr int REDIS_SET = 2;
-    static constexpr int REDIS_LIST = 3;
-    static constexpr int REDIS_ZSET = 4;
-    static constexpr int REDIS_HASH = 5;
-    static constexpr int REDIS_STREAM = 6;
-    static constexpr int ATOMIC = 0;
-    static constexpr int MULTI = 1;
-    static constexpr int PIPELINE = 2;
-    static constexpr int OPT_SERIALIZER = 1;
-    static constexpr int OPT_PREFIX = 2;
-    static constexpr int OPT_READ_TIMEOUT = 3;
-    static constexpr int OPT_TCP_KEEPALIVE = 6;
-    static constexpr int OPT_COMPRESSION = 7;
-    static constexpr int OPT_REPLY_LITERAL = 8;
-    static constexpr int OPT_COMPRESSION_LEVEL = 9;
-    static constexpr int OPT_NULL_MULTIBULK_AS_NULL = 10;
-    static constexpr int OPT_PACK_IGNORE_NUMBERS = 15;
-    static constexpr int SERIALIZER_NONE = 0;
-    static constexpr int SERIALIZER_PHP = 1;
-    static constexpr int SERIALIZER_JSON = 4;
-    static constexpr int COMPRESSION_NONE = 0;
-    static constexpr int OPT_SCAN = 4;
-    static constexpr int SCAN_RETRY = 1;
-    static constexpr int SCAN_NORETRY = 0;
-    static constexpr int SCAN_PREFIX = 2;
-    static constexpr int SCAN_NOPREFIX = 3;
+    static constexpr zend_long REDIS_NOT_FOUND = 0;
+    static constexpr zend_long REDIS_STRING = 1;
+    static constexpr zend_long REDIS_SET = 2;
+    static constexpr zend_long REDIS_LIST = 3;
+    static constexpr zend_long REDIS_ZSET = 4;
+    static constexpr zend_long REDIS_HASH = 5;
+    static constexpr zend_long REDIS_STREAM = 6;
+    static constexpr zend_long ATOMIC = 0;
+    static constexpr zend_long MULTI = 1;
+    static constexpr zend_long PIPELINE = 2;
+    static constexpr zend_long OPT_SERIALIZER = 1;
+    static constexpr zend_long OPT_PREFIX = 2;
+    static constexpr zend_long OPT_READ_TIMEOUT = 3;
+    static constexpr zend_long OPT_TCP_KEEPALIVE = 6;
+    static constexpr zend_long OPT_COMPRESSION = 7;
+    static constexpr zend_long OPT_REPLY_LITERAL = 8;
+    static constexpr zend_long OPT_COMPRESSION_LEVEL = 9;
+    static constexpr zend_long OPT_NULL_MULTIBULK_AS_NULL = 10;
+    static constexpr zend_long OPT_PACK_IGNORE_NUMBERS = 15;
+    static constexpr zend_long SERIALIZER_NONE = 0;
+    static constexpr zend_long SERIALIZER_PHP = 1;
+    static constexpr zend_long SERIALIZER_JSON = 4;
+    static constexpr zend_long COMPRESSION_NONE = 0;
+    static constexpr zend_long OPT_SCAN = 4;
+    static constexpr zend_long SCAN_RETRY = 1;
+    static constexpr zend_long SCAN_NORETRY = 0;
+    static constexpr zend_long SCAN_PREFIX = 2;
+    static constexpr zend_long SCAN_NOPREFIX = 3;
     static inline const Variant BEFORE{ZEND_STRL("before"), true};
     static inline const Variant AFTER{ZEND_STRL("after"), true};
     static inline const Variant LEFT{ZEND_STRL("left"), true};
     static inline const Variant RIGHT{ZEND_STRL("right"), true};
-    static constexpr int OPT_MAX_RETRIES = 11;
-    static constexpr int OPT_BACKOFF_ALGORITHM = 12;
-    static constexpr int BACKOFF_ALGORITHM_DEFAULT = 0;
-    static constexpr int BACKOFF_ALGORITHM_CONSTANT = 6;
-    static constexpr int BACKOFF_ALGORITHM_UNIFORM = 5;
-    static constexpr int BACKOFF_ALGORITHM_EXPONENTIAL = 4;
-    static constexpr int BACKOFF_ALGORITHM_FULL_JITTER = 2;
-    static constexpr int BACKOFF_ALGORITHM_EQUAL_JITTER = 3;
-    static constexpr int BACKOFF_ALGORITHM_DECORRELATED_JITTER = 1;
-    static constexpr int OPT_BACKOFF_BASE = 13;
-    static constexpr int OPT_BACKOFF_CAP = 14;
+    static constexpr zend_long OPT_MAX_RETRIES = 11;
+    static constexpr zend_long OPT_BACKOFF_ALGORITHM = 12;
+    static constexpr zend_long BACKOFF_ALGORITHM_DEFAULT = 0;
+    static constexpr zend_long BACKOFF_ALGORITHM_CONSTANT = 6;
+    static constexpr zend_long BACKOFF_ALGORITHM_UNIFORM = 5;
+    static constexpr zend_long BACKOFF_ALGORITHM_EXPONENTIAL = 4;
+    static constexpr zend_long BACKOFF_ALGORITHM_FULL_JITTER = 2;
+    static constexpr zend_long BACKOFF_ALGORITHM_EQUAL_JITTER = 3;
+    static constexpr zend_long BACKOFF_ALGORITHM_DECORRELATED_JITTER = 1;
+    static constexpr zend_long OPT_BACKOFF_BASE = 13;
+    static constexpr zend_long OPT_BACKOFF_CAP = 14;
 
     Redis(const Variant &options = nullptr);
     Variant _compress(const Variant &value);
@@ -827,11 +827,11 @@ class RedisCluster {
     Object getObject() const {
         return this_;
     }
-    static constexpr int OPT_SLAVE_FAILOVER = 5;
-    static constexpr int FAILOVER_NONE = 0;
-    static constexpr int FAILOVER_ERROR = 1;
-    static constexpr int FAILOVER_DISTRIBUTE = 2;
-    static constexpr int FAILOVER_DISTRIBUTE_SLAVES = 3;
+    static constexpr zend_long OPT_SLAVE_FAILOVER = 5;
+    static constexpr zend_long FAILOVER_NONE = 0;
+    static constexpr zend_long FAILOVER_ERROR = 1;
+    static constexpr zend_long FAILOVER_DISTRIBUTE = 2;
+    static constexpr zend_long FAILOVER_DISTRIBUTE_SLAVES = 3;
 
     RedisCluster(const Variant &name,
                  const Variant &seeds = nullptr,

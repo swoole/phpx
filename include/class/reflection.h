@@ -174,7 +174,7 @@ class ReflectionAttribute {
     Object getObject() const {
         return this_;
     }
-    static constexpr int IS_INSTANCEOF = 2;
+    static constexpr zend_long IS_INSTANCEOF = 2;
 
     Variant getName();
     Variant getTarget();
@@ -243,7 +243,7 @@ class ReflectionFunction {
     Object getObject() const {
         return this_;
     }
-    static constexpr int IS_DEPRECATED = 2048;
+    static constexpr zend_long IS_DEPRECATED = 2048;
 
     ReflectionFunction(const Variant &function);
     Variant __toString();
@@ -334,12 +334,12 @@ class ReflectionMethod {
     Object getObject() const {
         return this_;
     }
-    static constexpr int IS_STATIC_ = 16;
-    static constexpr int IS_PUBLIC = 1;
-    static constexpr int IS_PROTECTED = 2;
-    static constexpr int IS_PRIVATE = 4;
-    static constexpr int IS_ABSTRACT = 64;
-    static constexpr int IS_FINAL = 32;
+    static constexpr zend_long IS_STATIC_ = 16;
+    static constexpr zend_long IS_PUBLIC = 1;
+    static constexpr zend_long IS_PROTECTED = 2;
+    static constexpr zend_long IS_PRIVATE = 4;
+    static constexpr zend_long IS_ABSTRACT = 64;
+    static constexpr zend_long IS_FINAL = 32;
 
     ReflectionMethod(const Variant &object_or_method, const Variant &method = nullptr);
     static Variant createFromMethodName(const Variant &method);
@@ -408,16 +408,16 @@ class ReflectionProperty {
     Object getObject() const {
         return this_;
     }
-    static constexpr int IS_STATIC_ = 16;
-    static constexpr int IS_READONLY = 128;
-    static constexpr int IS_PUBLIC = 1;
-    static constexpr int IS_PROTECTED = 2;
-    static constexpr int IS_PRIVATE = 4;
-    static constexpr int IS_ABSTRACT = 64;
-    static constexpr int IS_PROTECTED_SET = 2048;
-    static constexpr int IS_PRIVATE_SET = 4096;
-    static constexpr int IS_VIRTUAL = 512;
-    static constexpr int IS_FINAL = 32;
+    static constexpr zend_long IS_STATIC_ = 16;
+    static constexpr zend_long IS_READONLY = 128;
+    static constexpr zend_long IS_PUBLIC = 1;
+    static constexpr zend_long IS_PROTECTED = 2;
+    static constexpr zend_long IS_PRIVATE = 4;
+    static constexpr zend_long IS_ABSTRACT = 64;
+    static constexpr zend_long IS_PROTECTED_SET = 2048;
+    static constexpr zend_long IS_PRIVATE_SET = 4096;
+    static constexpr zend_long IS_VIRTUAL = 512;
+    static constexpr zend_long IS_FINAL = 32;
 
     ReflectionProperty(const Variant &class_, const Variant &property);
     Variant __toString();
@@ -470,12 +470,12 @@ class ReflectionClass {
     Object getObject() const {
         return this_;
     }
-    static constexpr int IS_IMPLICIT_ABSTRACT = 16;
-    static constexpr int IS_EXPLICIT_ABSTRACT = 64;
-    static constexpr int IS_FINAL = 32;
-    static constexpr int IS_READONLY = 65536;
-    static constexpr int SKIP_INITIALIZATION_ON_SERIALIZE = 8;
-    static constexpr int SKIP_DESTRUCTOR = 16;
+    static constexpr zend_long IS_IMPLICIT_ABSTRACT = 16;
+    static constexpr zend_long IS_EXPLICIT_ABSTRACT = 64;
+    static constexpr zend_long IS_FINAL = 32;
+    static constexpr zend_long IS_READONLY = 65536;
+    static constexpr zend_long SKIP_INITIALIZATION_ON_SERIALIZE = 8;
+    static constexpr zend_long SKIP_DESTRUCTOR = 16;
 
     ReflectionClass(const Variant &object_or_class);
     Variant __toString();
@@ -558,10 +558,10 @@ class ReflectionClassConstant {
     Object getObject() const {
         return this_;
     }
-    static constexpr int IS_PUBLIC = 1;
-    static constexpr int IS_PROTECTED = 2;
-    static constexpr int IS_PRIVATE = 4;
-    static constexpr int IS_FINAL = 32;
+    static constexpr zend_long IS_PUBLIC = 1;
+    static constexpr zend_long IS_PROTECTED = 2;
+    static constexpr zend_long IS_PRIVATE = 4;
+    static constexpr zend_long IS_FINAL = 32;
 
     ReflectionClassConstant(const Variant &class_, const Variant &constant);
     Variant __toString();

@@ -16,13 +16,13 @@ class Sqlite : public PDO {
     Sqlite() = default;
 
   public:
-    static constexpr int DETERMINISTIC = 2048;
-    static constexpr int OPEN_READONLY = 1;
-    static constexpr int OPEN_READWRITE = 2;
-    static constexpr int OPEN_CREATE = 4;
-    static constexpr int ATTR_OPEN_FLAGS = 1000;
-    static constexpr int ATTR_READONLY_STATEMENT = 1001;
-    static constexpr int ATTR_EXTENDED_RESULT_CODES = 1002;
+    static constexpr zend_long DETERMINISTIC = 2048;
+    static constexpr zend_long OPEN_READONLY = 1;
+    static constexpr zend_long OPEN_READWRITE = 2;
+    static constexpr zend_long OPEN_CREATE = 4;
+    static constexpr zend_long ATTR_OPEN_FLAGS = 1000;
+    static constexpr zend_long ATTR_READONLY_STATEMENT = 1001;
+    static constexpr zend_long ATTR_EXTENDED_RESULT_CODES = 1002;
 
     Variant createAggregate(const Variant &name,
                             const Variant &step,
