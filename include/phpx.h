@@ -586,6 +586,12 @@ class Variant {
          */
         if (persistent) {
             addRef();
+            /**
+             * Persistent string must have its hash value precomputed. This string may be used for hash lookups in a
+             * multi-threaded environment. If the hash value is null and requires calculation, it may lead to
+             * multi-thread contention.
+             */
+            zend_string_hash_val(Z_STR(val));
         }
     }
     Variant(const std::string &str) {
