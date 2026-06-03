@@ -128,7 +128,7 @@ int main(int cpp_argc, char **cpp_argv) {
 
     int rc = 0;
 #ifdef PPROF_ON
-    ProfilerStart("profile.out");
+    ProfilerStart(PROF_OUTPUT_FILE);
 #endif
     zend_first_try {
         try {

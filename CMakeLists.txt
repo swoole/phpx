@@ -273,22 +273,31 @@ elseif(IS_WINDOWS)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
-# ============ 内置 mpdecimal（全平台）============
+# ============ mpdecimal ============
 set(MPDECIMAL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mpdecimal)
 
-# 收集 C 源文件，排除 bench 工具
-file(GLOB MPDEC_C_SOURCES ${MPDECIMAL_DIR}/libmpdec/*.c)
-list(FILTER MPDEC_C_SOURCES EXCLUDE REGEX "bench")
-
 if (IS_WINDOWS)
-    message(STATUS "Using bundled mpdecimal with MASM")
-    enable_language(ASM_MASM)
-    set(MPDECIMAL_HEADER_DIR ${MPDECIMAL_DIR}/libmpdec)
-    set(MPDECIMAL_SOURCES ${MPDEC_C_SOURCES} ${MPDECIMAL_DIR}/libmpdec/vcdiv64.asm)
-    set(MPDECIMAL_DEFINES CONFIG_64 MASM)
-    set(MPDECIMAL_C_STANDARD 90)
+    # Windows: 使用外部独立编译的 DLL 和 LIB 文件，不再使用内置版本
+    set(MPDECIMAL_INCLUDE_DIR "" CACHE PATH "mpdecimal include directory")
+    set(MPDECIMAL_LIBRARY "" CACHE FILEPATH "mpdecimal import library (.lib)")
+
+    if (NOT MPDECIMAL_INCLUDE_DIR)
+        message(FATAL_ERROR "On Windows, MPDECIMAL_INCLUDE_DIR must be set. "
+            "Use -DMPDECIMAL_INCLUDE_DIR=<path> -DMPDECIMAL_LIBRARY=<path>")
+    endif()
+
+    add_library(mpdecimal UNKNOWN IMPORTED)
+    set_target_properties(mpdecimal PROPERTIES
+        IMPORTED_LOCATION "${MPDECIMAL_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${MPDECIMAL_INCLUDE_DIR};${MPDECIMAL_DIR}/libmpdec++"
+    )
 else()
+    # Linux/macOS: 内置编译 mpdecimal + libmpdec++
     message(STATUS "Using bundled mpdecimal with uint128")
+
+    file(GLOB MPDEC_C_SOURCES ${MPDECIMAL_DIR}/libmpdec/*.c)
+    list(FILTER MPDEC_C_SOURCES EXCLUDE REGEX "bench")
+
     set(MPD_HEADER_CONFIG "
 #define MPD_CONFIG_64 1
 ")
@@ -298,26 +307,22 @@ else()
         @ONLY
     )
     set(MPDECIMAL_HEADER_DIR ${CMAKE_CURRENT_BINARY_DIR}/mpdecimal)
-    set(MPDECIMAL_SOURCES ${MPDEC_C_SOURCES})
     set(MPDECIMAL_DEFINES CONFIG_64 ANSI HAVE_UINT128_T)
-    set(MPDECIMAL_C_STANDARD 99)
-endif()
+    set(MPDECIMAL_SOURCES ${MPDEC_C_SOURCES})
 
-add_library(mpdecimal STATIC
-    ${MPDECIMAL_SOURCES}
-    ${MPDECIMAL_DIR}/libmpdec++/decimal.cc
-)
-target_include_directories(mpdecimal PUBLIC
-    ${MPDECIMAL_HEADER_DIR}
-    ${MPDECIMAL_DIR}/libmpdec++
-)
-target_compile_definitions(mpdecimal PRIVATE ${MPDECIMAL_DEFINES})
-set_target_properties(mpdecimal PROPERTIES
-    C_STANDARD ${MPDECIMAL_C_STANDARD}
-    POSITION_INDEPENDENT_CODE ON
-)
-
-if (NOT IS_WINDOWS)
+    add_library(mpdecimal STATIC
+        ${MPDECIMAL_SOURCES}
+        ${MPDECIMAL_DIR}/libmpdec++/decimal.cc
+    )
+    target_include_directories(mpdecimal PUBLIC
+        ${MPDECIMAL_HEADER_DIR}
+        ${MPDECIMAL_DIR}/libmpdec++
+    )
+    target_compile_definitions(mpdecimal PRIVATE ${MPDECIMAL_DEFINES})
+    set_target_properties(mpdecimal PROPERTIES
+        C_STANDARD 99
+        POSITION_INDEPENDENT_CODE ON
+    )
     target_compile_options(mpdecimal PRIVATE -fPIC)
 endif()
 
