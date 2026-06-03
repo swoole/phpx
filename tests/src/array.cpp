@@ -508,3 +508,16 @@ TEST(array, reverse_iteration) {
     }
     ASSERT_EQ(count, 3);
 }
+
+TEST(array, float_str_key) {
+	Array arr;
+	arr.set("0.1", 2025);
+	arr.set("0.2", 1002);
+	arr.set("0.3", 1999);
+
+    ASSERT_EQ(arr.count(), 3);
+
+    ASSERT_EQ(arr.item("0.1").toInt(), 2025);
+    ASSERT_EQ(arr.item("0.2").toInt(), 1002);
+    ASSERT_EQ(arr.item("0.3").toInt(), 1999);
+}
