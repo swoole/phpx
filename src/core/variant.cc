@@ -271,7 +271,7 @@ bool Variant::offsetExists(const Variant &key) const {
         return tmp.offset(key.toInt()) != -1;
     } else if (zval_is_array(zvar)) {
         auto skey = key.toString();
-        return zend_hash_exists(Z_ARRVAL_P(zvar), skey.str());
+        return zend_symtable_exists(Z_ARRVAL_P(zvar), skey.str());
     } else if (zval_is_object(zvar)) {
         Object tmp(zvar);
         return tmp.offsetExists(key);

@@ -1486,7 +1486,7 @@ class Array : public Variant {
         return zend_hash_index_exists(array(), index);
     }
     bool exists(const String &key) const {
-        return zend_hash_exists(array(), key.str());
+        return zend_symtable_exists(array(), key.str());
     }
     ArrayIterator begin() const {
         return {array(), 0};
