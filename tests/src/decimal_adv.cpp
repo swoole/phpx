@@ -128,6 +128,43 @@ TEST(decimal_adv, ceil_near_zero_negative) {
     ASSERT_EQ(Decimal::toInt(r).toInt(), 0);
 }
 
+// ============ pow ============
+
+TEST(decimal_adv, pow_basic) {
+    auto r = Decimal::pow(dc("2.0"), dc("10.0"));
+    ASSERT_NEAR(Decimal::toFloat(r).toFloat(), 1024.0, 0.1);
+}
+
+TEST(decimal_adv, pow_zero_exponent) {
+    auto r = Decimal::pow(dc("999.0"), dc("0.0"));
+    ASSERT_NEAR(Decimal::toFloat(r).toFloat(), 1.0, 0.001);
+}
+
+TEST(decimal_adv, pow_one_exponent) {
+    auto r = Decimal::pow(dc("123.456"), dc("1.0"));
+    ASSERT_NEAR(Decimal::toFloat(r).toFloat(), 123.456, 0.001);
+}
+
+TEST(decimal_adv, pow_negative_exponent) {
+    auto r = Decimal::pow(dc("2.0"), dc("-3.0"));
+    ASSERT_NEAR(Decimal::toFloat(r).toFloat(), 0.125, 0.0001);
+}
+
+TEST(decimal_adv, pow_fractional_exponent) {
+    auto r = Decimal::pow(dc("4.0"), dc("0.5"));
+    ASSERT_NEAR(Decimal::toFloat(r).toFloat(), 2.0, 0.001);
+}
+
+TEST(decimal_adv, pow_zero_base_positive_exp) {
+    auto r = Decimal::pow(dc("0.0"), dc("5.0"));
+    ASSERT_NEAR(Decimal::toFloat(r).toFloat(), 0.0, 0.001);
+}
+
+TEST(decimal_adv, pow_one_base) {
+    auto r = Decimal::pow(dc("1.0"), dc("1000.0"));
+    ASSERT_NEAR(Decimal::toFloat(r).toFloat(), 1.0, 0.001);
+}
+
 // ============ divmod ============
 
 TEST(decimal_adv, divmod_basic) {

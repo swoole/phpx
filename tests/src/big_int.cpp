@@ -283,6 +283,134 @@ TEST(bigint, abs_zero) {
     ASSERT_EQ(bi_ptr->data->value, 0);
 }
 
+// ============ divmod ============
+
+TEST(bigint, divmod_basic) {
+    auto a = bi(10);
+    auto b = bi(3);
+    auto r = BigInt::divmod(a, b);
+    ASSERT_TRUE(r.isArray());
+    auto arr = r.toArray();
+    ASSERT_EQ(BigInt::toInt(arr[0]).toInt(), 3);
+    ASSERT_EQ(BigInt::toInt(arr[1]).toInt(), 1);
+}
+
+TEST(bigint, divmod_exact) {
+    auto a = bi(100);
+    auto b = bi(25);
+    auto r = BigInt::divmod(a, b);
+    auto arr = r.toArray();
+    ASSERT_EQ(BigInt::toInt(arr[0]).toInt(), 4);
+    ASSERT_EQ(BigInt::toInt(arr[1]).toInt(), 0);
+}
+
+TEST(bigint, divmod_negative_dividend) {
+    auto a = bi(-10);
+    auto b = bi(3);
+    auto r = BigInt::divmod(a, b);
+    auto arr = r.toArray();
+    ASSERT_EQ(BigInt::toInt(arr[0]).toInt(), -3);
+    ASSERT_EQ(BigInt::toInt(arr[1]).toInt(), -1);
+}
+
+TEST(bigint, divmod_negative_divisor) {
+    auto a = bi(10);
+    auto b = bi(-3);
+    auto r = BigInt::divmod(a, b);
+    auto arr = r.toArray();
+    ASSERT_EQ(BigInt::toInt(arr[0]).toInt(), -3);
+    ASSERT_EQ(BigInt::toInt(arr[1]).toInt(), 1);
+}
+
+TEST(bigint, divmod_large) {
+    auto a = bi("99999999999999999999");
+    auto b = bi("77777777777777777777");
+    auto r = BigInt::divmod(a, b);
+    auto arr = r.toArray();
+    ASSERT_EQ(BigInt::toInt(arr[0]).toInt(), 1);
+    auto rem = BigInt::toString(arr[1]);
+    ASSERT_STREQ(rem.toCString(), "22222222222222222222");
+}
+
+TEST(bigint, divmod_by_zero) {
+    try_call([]() { BigInt::divmod(bi(100), bi((php::Int) 0)); }, "Division by zero");
+}
+
+// ============ powmod ============
+
+TEST(bigint, powmod_basic) {
+    auto r = BigInt::powmod(bi(2), bi(10), bi(1000));
+    ASSERT_EQ(BigInt::toInt(r).toInt(), 24);
+}
+
+TEST(bigint, powmod_identity) {
+    auto r = BigInt::powmod(bi(7), bi(1), bi(100));
+    ASSERT_EQ(BigInt::toInt(r).toInt(), 7);
+}
+
+TEST(bigint, powmod_large) {
+    auto r = BigInt::powmod(bi(3), bi(20), bi(100000));
+    ASSERT_EQ(BigInt::toInt(r).toInt(), 84401);
+}
+
+TEST(bigint, powmod_zero_exponent) {
+    auto r = BigInt::powmod(bi(999), bi((php::Int) 0), bi(100));
+    ASSERT_EQ(BigInt::toInt(r).toInt(), 1);
+}
+
+TEST(bigint, powmod_mod_one) {
+    auto r = BigInt::powmod(bi(12345), bi(100), bi(1));
+    ASSERT_EQ(BigInt::toInt(r).toInt(), 0);
+}
+
+TEST(bigint, powmod_mod_by_zero) {
+    try_call([]() { BigInt::powmod(bi(2), bi(10), bi((php::Int) 0)); }, "Modulo by zero in powmod");
+}
+
+TEST(bigint, powmod_negative_exponent) {
+    try_call([]() { BigInt::powmod(bi(2), bi(-1), bi(100)); }, "Negative exponent not supported in powmod");
+}
+
+// ============ sqrt ============
+
+TEST(bigint, sqrt_perfect_square) {
+    auto r = BigInt::sqrt(bi(144));
+    ASSERT_EQ(BigInt::toInt(r).toInt(), 12);
+}
+
+TEST(bigint, sqrt_non_perfect) {
+    auto r = BigInt::sqrt(bi(2));
+    ASSERT_EQ(BigInt::toInt(r).toInt(), 1);
+}
+
+TEST(bigint, sqrt_zero) {
+    auto r = BigInt::sqrt(bi((php::Int) 0));
+    ASSERT_EQ(BigInt::toInt(r).toInt(), 0);
+}
+
+TEST(bigint, sqrt_one) {
+    auto r = BigInt::sqrt(bi(1));
+    ASSERT_EQ(BigInt::toInt(r).toInt(), 1);
+}
+
+TEST(bigint, sqrt_large) {
+    auto a = bi("1000000000000000000000000000000");
+    auto r = BigInt::sqrt(a);
+    auto s = BigInt::toString(r);
+    ASSERT_STREQ(s.toCString(), "1000000000000000");
+}
+
+TEST(bigint, sqrt_large_non_perfect) {
+    auto a = bi("1000000000000000000000000000002");
+    auto r = BigInt::sqrt(a);
+    auto s = BigInt::toString(r);
+    ASSERT_STREQ(s.toCString(), "1000000000000000");
+}
+
+TEST(bigint, sqrt_negative) {
+    try_call([]() { BigInt::sqrt(bi(-1)); }, "Cannot compute square root of negative BigInt");
+}
+
 TEST(bigint, gcd) {
     auto a = bi(48);
     auto b = bi(18);
