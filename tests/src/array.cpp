@@ -510,10 +510,10 @@ TEST(array, reverse_iteration) {
 }
 
 TEST(array, float_str_key) {
-	Array arr;
-	arr.set("0.1", 2025);
-	arr.set("0.2", 1002);
-	arr.set("0.3", 1999);
+    Array arr;
+    arr.set("0.1", 2025);
+    arr.set("0.2", 1002);
+    arr.set("0.3", 1999);
 
     ASSERT_EQ(arr.count(), 3);
 

@@ -218,13 +218,20 @@ Variant constant(zend_class_entry *ce, const String &name) {
 
     auto constant_name = name.str();
     zval *ret_constant = NULL;
-    auto c = (zend_class_constant *) zend_hash_find_ptr(CE_CONSTANTS_TABLE(ce), constant_name);
-    if (c == NULL) {
-        ret_constant = NULL;
-    } else {
-        ret_constant = &c->value;
+    while (1) {
+        auto c = (zend_class_constant *) zend_hash_find_ptr(CE_CONSTANTS_TABLE(ce), constant_name);
+        if (c == NULL) {
+            if (ce->parent) {
+                ce = ce->parent;
+                continue;
+            } else {
+                break;
+            }
+        } else {
+            return &c->value;
+        }
     }
-    return ret_constant;
+    return NULL;
 }
 
 bool updateConstant(const String &cls, const String &name, const Variant &data) {
