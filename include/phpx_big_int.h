@@ -6,6 +6,7 @@ namespace php {
 
 class BigInt : public Box {
     struct Data;
+
   public:
     Data *data = nullptr;
     BigInt();

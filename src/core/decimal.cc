@@ -15,7 +15,9 @@ struct Decimal::Data {
 Decimal::Decimal() : data(new Data()) {}
 Decimal::Decimal(const String &s) : data(new Data(s.data())) {}
 Decimal::Decimal(php::Int v) : data(new Data(v)) {}
-Decimal::~Decimal() { delete data; }
+Decimal::~Decimal() {
+    delete data;
+}
 
 static inline Decimal *newDecimalImpl(const decimal::Decimal &v) {
     auto *d = new Decimal();

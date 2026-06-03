@@ -6,6 +6,7 @@ namespace php {
 
 class BigFloat : public Box {
     struct Data;
+
   public:
     Data *data = nullptr;
     BigFloat();

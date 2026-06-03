@@ -13,7 +13,9 @@ struct BigInt::Data {
 BigInt::BigInt() : data(new Data()) {}
 BigInt::BigInt(const String &s) : data(new Data(s.data())) {}
 BigInt::BigInt(php::Int v) : data(new Data(v)) {}
-BigInt::~BigInt() { delete data; }
+BigInt::~BigInt() {
+    delete data;
+}
 
 static inline BigInt *newBigIntImpl(const mpz_class &v) {
     auto *bi = new BigInt();

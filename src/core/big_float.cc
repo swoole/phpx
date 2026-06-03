@@ -6,12 +6,16 @@ namespace php {
 
 struct BigFloat::Data {
     mpfr_t value;
-    Data() { mpfr_init(value); }
+    Data() {
+        mpfr_init(value);
+    }
     Data(const Data &other) {
         mpfr_init(value);
         mpfr_set(value, other.value, MPFR_RNDN);
     }
-    ~Data() { mpfr_clear(value); }
+    ~Data() {
+        mpfr_clear(value);
+    }
 };
 
 BigFloat::BigFloat() : data(new Data()) {}
@@ -28,7 +32,9 @@ BigFloat::BigFloat(php::Float v) : data(new Data()) {
     mpfr_set_d(data->value, v, MPFR_RNDN);
 }
 BigFloat::BigFloat(const BigFloat &other) : data(new Data(*other.data)) {}
-BigFloat::~BigFloat() { delete data; }
+BigFloat::~BigFloat() {
+    delete data;
+}
 
 static inline BigFloat *newBigFloatImpl() {
     return new BigFloat();

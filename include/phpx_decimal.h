@@ -6,6 +6,7 @@ namespace php {
 
 class Decimal : public Box {
     struct Data;
+
   public:
     Data *data = nullptr;
     Decimal();
