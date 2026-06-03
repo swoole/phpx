@@ -151,13 +151,13 @@ void Object::updateArrayProperty(const String &name, const Variant &key, const V
     Z_TRY_ADDREF_P(zv);
     SEPARATE_ARRAY(member_p);
 
-    if (key.isInt() || key.isFloat() || key.isNumeric()) {
+    if (key.isInt() || key.isFloat()) {
         zend_hash_index_update(Z_ARRVAL_P(member_p), key.toInt(), zv);
     } else if (key.isNull()) {
         zend_hash_next_index_insert(Z_ARRVAL_P(member_p), zv);
     } else {
         auto skey = key.toString();
-        zend_hash_update(Z_ARRVAL_P(member_p), skey.str(), zv);
+        zend_symtable_update(Z_ARRVAL_P(member_p), skey.str(), zv);
     }
 }
 

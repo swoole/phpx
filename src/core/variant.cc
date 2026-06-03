@@ -224,7 +224,7 @@ Variant Variant::offsetGet(zend_long offset) const {
 }
 
 Variant Variant::offsetGet(const Variant &key) const {
-    if (key.isInt() || key.isFloat() || key.isNumeric()) {
+    if (key.isInt()) {
         return offsetGet(key.toInt());
     }
 
@@ -261,7 +261,7 @@ bool Variant::offsetExists(zend_long offset) const {
 }
 
 bool Variant::offsetExists(const Variant &key) const {
-    if (key.isInt() || key.isFloat() || key.isNumeric()) {
+    if (key.isInt() || key.isFloat()) {
         return offsetExists(key.toInt());
     }
 
@@ -711,7 +711,7 @@ Variant Variant::item(const Variant &key, bool update) {
     zval *retval;
     zval rv;
 
-    if (key.isInt() || key.isFloat() || key.isNumeric() || zval_is_string(zvar)) {
+    if (key.isInt() || key.isFloat() || zval_is_string(zvar)) {
         return item(key.toInt(), update);
     }
 
@@ -720,10 +720,10 @@ Variant Variant::item(const Variant &key, bool update) {
         if (update) {
             SEPARATE_ARRAY(zvar);
         }
-        retval = zend_hash_find(Z_ARRVAL_P(zvar), skey.str());
+        retval = zend_symtable_find(Z_ARRVAL_P(zvar), skey.str());
         if (retval == nullptr) {
             if (update) {
-                retval = zend_hash_update(Z_ARRVAL_P(zvar), skey.str(), undef());
+                retval = zend_symtable_update(Z_ARRVAL_P(zvar), skey.str(), undef());
             } else {
                 return Variant{undef()};
             }
