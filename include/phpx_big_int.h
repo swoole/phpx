@@ -1,18 +1,16 @@
 #pragma once
 
 #include "phpx.h"
+#include <gmpxx.h>
 
 namespace php {
 
 class BigInt : public Box {
-    struct Data;
-
   public:
-    Data *data = nullptr;
-    BigInt();
-    explicit BigInt(const String &s);
-    explicit BigInt(php::Int v);
-    ~BigInt() override;
+    mpz_class value;
+    BigInt() = default;
+    explicit BigInt(const String &s) : value(s.data()) {}
+    explicit BigInt(php::Int v) : value((signed long) v) {}
 
     static Variant newInstance(Variant s);
     static Variant add(Variant a, Variant b);

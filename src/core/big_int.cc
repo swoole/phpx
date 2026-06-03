@@ -1,33 +1,18 @@
 #include "phpx_big_int.h"
-#include <gmpxx.h>
 
 namespace php {
 
-struct BigInt::Data {
-    mpz_class value;
-    Data() = default;
-    explicit Data(const char *s, int base = 0) : value(s, base) {}
-    explicit Data(php::Int v) : value((signed long) v) {}
-};
-
-BigInt::BigInt() : data(new Data()) {}
-BigInt::BigInt(const String &s) : data(new Data(s.data())) {}
-BigInt::BigInt(php::Int v) : data(new Data(v)) {}
-BigInt::~BigInt() {
-    delete data;
-}
-
 static inline BigInt *newBigIntImpl(const mpz_class &v) {
     auto *bi = new BigInt();
-    bi->data->value = v;
+    bi->value = v;
     return bi;
 }
 
 static inline bool extractBigInt(Variant &v, mpz_class &out) {
     if (v.isResource()) {
         auto *bi = v.toBox<BigInt>();
-        if (bi && bi->data) {
-            out = bi->data->value;
+        if (bi) {
+            out = bi->value;
             return true;
         }
     }
@@ -150,29 +135,29 @@ Variant BigInt::gcd(Variant a, Variant b) {
 
 Variant BigInt::toString(Variant a) {
     auto *bi_a = a.toBox<BigInt>();
-    if (UNEXPECTED(!bi_a || !bi_a->data)) {
+    if (UNEXPECTED(!bi_a)) {
         throwException(zend_ce_type_error, "BigInt::toString expects BigInt argument");
         return nullptr;
     }
-    return Variant(bi_a->data->value.get_str());
+    return Variant(bi_a->value.get_str());
 }
 
 Variant BigInt::toInt(Variant a) {
     auto *bi_a = a.toBox<BigInt>();
-    if (UNEXPECTED(!bi_a || !bi_a->data)) {
+    if (UNEXPECTED(!bi_a)) {
         throwException(zend_ce_type_error, "BigInt::toInt expects BigInt argument");
         return nullptr;
     }
-    return Variant((php::Int) bi_a->data->value.get_si());
+    return Variant((php::Int) bi_a->value.get_si());
 }
 
 Variant BigInt::toFloat(Variant a) {
     auto *bi_a = a.toBox<BigInt>();
-    if (UNEXPECTED(!bi_a || !bi_a->data)) {
+    if (UNEXPECTED(!bi_a)) {
         throwException(zend_ce_type_error, "BigInt::toFloat expects BigInt argument");
         return nullptr;
     }
-    return Variant(bi_a->data->value.get_d());
+    return Variant(bi_a->value.get_d());
 }
 
 Variant BigInt::divmod(Variant a, Variant b) {
@@ -315,7 +300,6 @@ Variant BigInt::bitShiftRight(Variant a, Variant n) {
 }
 
 Variant BigInt::toBigDecimal(Variant a) {
-    // Placeholder — will be implemented when BigDecimal is added
     return a;
 }
 

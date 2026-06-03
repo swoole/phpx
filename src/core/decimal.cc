@@ -1,35 +1,18 @@
 #include "phpx_decimal.h"
-#include <decimal.hh>
-#include <string>
 
 namespace php {
 
-struct Decimal::Data {
-    decimal::Decimal value;
-    Data() = default;
-    explicit Data(const char *s) : value(s) {}
-    explicit Data(const decimal::Decimal &v) : value(v) {}
-    explicit Data(php::Int v) : value((int64_t) v) {}
-};
-
-Decimal::Decimal() : data(new Data()) {}
-Decimal::Decimal(const String &s) : data(new Data(s.data())) {}
-Decimal::Decimal(php::Int v) : data(new Data(v)) {}
-Decimal::~Decimal() {
-    delete data;
-}
-
 static inline Decimal *newDecimalImpl(const decimal::Decimal &v) {
     auto *d = new Decimal();
-    d->data->value = v;
+    d->value = v;
     return d;
 }
 
 static inline bool extractDecimal(Variant &v, decimal::Decimal &out) {
     if (v.isResource()) {
         auto *d = v.toBox<Decimal>();
-        if (d && d->data) {
-            out = d->data->value;
+        if (d) {
+            out = d->value;
             return true;
         }
     }
@@ -126,22 +109,22 @@ Variant Decimal::abs(Variant a) {
 
 Variant Decimal::toString(Variant a) {
     auto *d = a.toBox<Decimal>();
-    if (UNEXPECTED(!d || !d->data)) {
+    if (UNEXPECTED(!d)) {
         throwException(zend_ce_type_error, "expects Decimal argument");
         return nullptr;
     }
-    return Variant(d->data->value.to_sci());
+    return Variant(d->value.to_sci());
 }
 
 Variant Decimal::toInt(Variant a) {
     auto *d = a.toBox<Decimal>();
-    if (UNEXPECTED(!d || !d->data)) {
+    if (UNEXPECTED(!d)) {
         throwException(zend_ce_type_error, "expects Decimal argument");
         return nullptr;
     }
     decimal::Context ctx = decimal::context;
     ctx.clear_traps();
-    decimal::Decimal truncated = d->data->value.trunc(ctx);
+    decimal::Decimal truncated = d->value.trunc(ctx);
 
     uint32_t status = 0;
     int64_t val = mpd_qget_i64(truncated.getconst(), &status);
@@ -154,11 +137,11 @@ Variant Decimal::toInt(Variant a) {
 
 Variant Decimal::toFloat(Variant a) {
     auto *d = a.toBox<Decimal>();
-    if (UNEXPECTED(!d || !d->data)) {
+    if (UNEXPECTED(!d)) {
         throwException(zend_ce_type_error, "expects Decimal argument");
         return nullptr;
     }
-    return Variant((php::Float) std::stod(d->data->value.to_sci()));
+    return Variant((php::Float) std::stod(d->value.to_sci()));
 }
 
 Variant Decimal::pow(Variant base, Variant exp) {
@@ -261,7 +244,6 @@ Variant Decimal::round(Variant a, Variant precision) {
 }
 
 Variant Decimal::toBigInt(Variant a) {
-    // Placeholder — will be implemented when BigInt<->Decimal conversion is needed
     return a;
 }
 

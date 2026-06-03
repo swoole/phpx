@@ -1,7 +1,6 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
 #include "phpx_big_int.h"
-#include "bigint_test_data.h"
 
 #include <cstring>
 
@@ -23,7 +22,7 @@ TEST(bigint_bit, and_basic) {
     auto r = BigInt::bitAnd(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 8);  // 0b1000
+    ASSERT_EQ(bi_ptr->value, 8);  // 0b1000
 }
 
 TEST(bigint_bit, and_large) {
@@ -55,7 +54,7 @@ TEST(bigint_bit, or_basic) {
     auto r = BigInt::bitOr(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 15);  // 0b1111
+    ASSERT_EQ(bi_ptr->value, 15);  // 0b1111
 }
 
 TEST(bigint_bit, or_large) {
@@ -81,7 +80,7 @@ TEST(bigint_bit, xor_basic) {
     auto r = BigInt::bitXor(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 5);  // 0b0101
+    ASSERT_EQ(bi_ptr->value, 5);  // 0b0101
 }
 
 TEST(bigint_bit, xor_self_is_zero) {
@@ -104,7 +103,7 @@ TEST(bigint_bit, not_basic) {
     auto r = BigInt::bitNot(a);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, -1);
+    ASSERT_EQ(bi_ptr->value, -1);
 }
 
 TEST(bigint_bit, not_double_not) {
@@ -189,7 +188,7 @@ TEST(bigint_bit, shift_left_basic) {
     auto r = BigInt::bitShiftLeft(a, Variant((php::Int) 10));
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 1024);  // 2^10
+    ASSERT_EQ(bi_ptr->value, 1024);  // 2^10
 }
 
 TEST(bigint_bit, shift_left_by_zero) {
@@ -203,7 +202,7 @@ TEST(bigint_bit, shift_left_large) {
     auto r = BigInt::bitShiftLeft(a, Variant((php::Int) 100));
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, mpz_class(1) << 100);
+    ASSERT_EQ(bi_ptr->value, mpz_class(1) << 100);
 }
 
 TEST(bigint_bit, shift_left_multi_step) {
@@ -221,7 +220,7 @@ TEST(bigint_bit, shift_right_basic) {
     auto r = BigInt::bitShiftRight(a, Variant((php::Int) 10));
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 1);
+    ASSERT_EQ(bi_ptr->value, 1);
 }
 
 TEST(bigint_bit, shift_right_by_zero) {

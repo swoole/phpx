@@ -1,18 +1,16 @@
 #pragma once
 
 #include "phpx.h"
+#include <decimal.hh>
 
 namespace php {
 
 class Decimal : public Box {
-    struct Data;
-
   public:
-    Data *data = nullptr;
-    Decimal();
-    explicit Decimal(const String &s);
-    explicit Decimal(php::Int v);
-    ~Decimal() override;
+    decimal::Decimal value;
+    Decimal() = default;
+    explicit Decimal(const String &s) : value(s.data()) {}
+    explicit Decimal(php::Int v) : value((int64_t) v) {}
 
     static Variant newInstance(Variant s);
     static Variant add(Variant a, Variant b);

@@ -1,21 +1,41 @@
 #pragma once
 
 #include "phpx.h"
+#include <mpfr.h>
+#include <string>
 
 namespace php {
 
 class BigFloat : public Box {
-    struct Data;
-
   public:
-    Data *data = nullptr;
-    BigFloat();
-    explicit BigFloat(const String &s);
-    explicit BigFloat(const char *s);
-    explicit BigFloat(php::Int v);
-    explicit BigFloat(php::Float v);
-    BigFloat(const BigFloat &other);
-    ~BigFloat() override;
+    mpfr_t value;
+
+    BigFloat() {
+        mpfr_init(value);
+    }
+    explicit BigFloat(const String &s) {
+        mpfr_init(value);
+        mpfr_set_str(value, s.data(), 10, MPFR_RNDN);
+    }
+    explicit BigFloat(const char *s) {
+        mpfr_init(value);
+        mpfr_set_str(value, s, 10, MPFR_RNDN);
+    }
+    explicit BigFloat(php::Int v) {
+        mpfr_init(value);
+        mpfr_set_sj(value, v, MPFR_RNDN);
+    }
+    explicit BigFloat(php::Float v) {
+        mpfr_init(value);
+        mpfr_set_d(value, v, MPFR_RNDN);
+    }
+    BigFloat(const BigFloat &other) {
+        mpfr_init(value);
+        mpfr_set(value, other.value, MPFR_RNDN);
+    }
+    ~BigFloat() override {
+        mpfr_clear(value);
+    }
 
     static Variant newInstance(Variant s);
     static Variant add(Variant a, Variant b);

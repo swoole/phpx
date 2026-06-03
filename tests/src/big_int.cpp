@@ -1,7 +1,6 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
 #include "phpx_big_int.h"
-#include "bigint_test_data.h"
 
 #include <cstring>
 
@@ -22,28 +21,28 @@ TEST(bigint, construct_from_string) {
     auto a = bi("12345678901234567890");
     auto *bi_ptr = a.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_STREQ(bi_ptr->data->value.get_str().c_str(), "12345678901234567890");
+    ASSERT_STREQ(bi_ptr->value.get_str().c_str(), "12345678901234567890");
 }
 
 TEST(bigint, construct_from_int) {
     auto a = php::toBigInt((php::Int) 42);
     auto *bi_ptr = a.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value.get_si(), 42);
+    ASSERT_EQ(bi_ptr->value.get_si(), 42);
 }
 
 TEST(bigint, construct_negative) {
     auto a = bi("-9999999999999999999");
     auto *bi_ptr = a.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_STREQ(bi_ptr->data->value.get_str().c_str(), "-9999999999999999999");
+    ASSERT_STREQ(bi_ptr->value.get_str().c_str(), "-9999999999999999999");
 }
 
 TEST(bigint, construct_zero) {
     auto a = bi("0");
     auto *bi_ptr = a.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 0);
+    ASSERT_EQ(bi_ptr->value, 0);
 }
 
 TEST(bigint, newInstance_from_string) {
@@ -51,7 +50,7 @@ TEST(bigint, newInstance_from_string) {
     auto v = BigInt::newInstance(s);
     auto *bi_ptr = v.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_STREQ(bi_ptr->data->value.get_str().c_str(), "999888777666555444333222111000");
+    ASSERT_STREQ(bi_ptr->value.get_str().c_str(), "999888777666555444333222111000");
 }
 
 TEST(bigint, newInstance_from_int) {
@@ -59,7 +58,7 @@ TEST(bigint, newInstance_from_int) {
     auto v = BigInt::newInstance(s);
     auto *bi_ptr = v.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 12345);
+    ASSERT_EQ(bi_ptr->value, 12345);
 }
 
 // ============ Arithmetic ============
@@ -70,7 +69,7 @@ TEST(bigint, add) {
     auto r = BigInt::add(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 300);
+    ASSERT_EQ(bi_ptr->value, 300);
 }
 
 TEST(bigint, add_int_promotion) {
@@ -79,7 +78,7 @@ TEST(bigint, add_int_promotion) {
     auto r = BigInt::add(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 300);
+    ASSERT_EQ(bi_ptr->value, 300);
 }
 
 TEST(bigint, add_large_numbers) {
@@ -96,7 +95,7 @@ TEST(bigint, add_negative) {
     auto r = BigInt::add(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 70);
+    ASSERT_EQ(bi_ptr->value, 70);
 }
 
 TEST(bigint, sub) {
@@ -105,7 +104,7 @@ TEST(bigint, sub) {
     auto r = BigInt::sub(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 70);
+    ASSERT_EQ(bi_ptr->value, 70);
 }
 
 TEST(bigint, sub_negative_result) {
@@ -114,7 +113,7 @@ TEST(bigint, sub_negative_result) {
     auto r = BigInt::sub(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, -70);
+    ASSERT_EQ(bi_ptr->value, -70);
 }
 
 TEST(bigint, mul) {
@@ -123,7 +122,7 @@ TEST(bigint, mul) {
     auto r = BigInt::mul(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 500);
+    ASSERT_EQ(bi_ptr->value, 500);
 }
 
 TEST(bigint, mul_large) {
@@ -140,7 +139,7 @@ TEST(bigint, mul_zero) {
     auto r = BigInt::mul(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 0);
+    ASSERT_EQ(bi_ptr->value, 0);
 }
 
 TEST(bigint, div) {
@@ -149,7 +148,7 @@ TEST(bigint, div) {
     auto r = BigInt::div(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 33);
+    ASSERT_EQ(bi_ptr->value, 33);
 }
 
 TEST(bigint, div_exact) {
@@ -158,7 +157,7 @@ TEST(bigint, div_exact) {
     auto r = BigInt::div(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 20);
+    ASSERT_EQ(bi_ptr->value, 20);
 }
 
 TEST(bigint, div_negative) {
@@ -167,7 +166,7 @@ TEST(bigint, div_negative) {
     auto r = BigInt::div(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, -33);
+    ASSERT_EQ(bi_ptr->value, -33);
 }
 
 TEST(bigint, div_by_zero) {
@@ -180,7 +179,7 @@ TEST(bigint, mod) {
     auto r = BigInt::mod(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 2);
+    ASSERT_EQ(bi_ptr->value, 2);
 }
 
 TEST(bigint, mod_exact) {
@@ -189,7 +188,7 @@ TEST(bigint, mod_exact) {
     auto r = BigInt::mod(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 0);
+    ASSERT_EQ(bi_ptr->value, 0);
 }
 
 TEST(bigint, mod_by_zero) {
@@ -201,7 +200,7 @@ TEST(bigint, neg) {
     auto r = BigInt::neg(a);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, -100);
+    ASSERT_EQ(bi_ptr->value, -100);
 }
 
 TEST(bigint, neg_negative) {
@@ -209,7 +208,7 @@ TEST(bigint, neg_negative) {
     auto r = BigInt::neg(a);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 50);
+    ASSERT_EQ(bi_ptr->value, 50);
 }
 
 TEST(bigint, neg_zero) {
@@ -217,7 +216,7 @@ TEST(bigint, neg_zero) {
     auto r = BigInt::neg(a);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 0);
+    ASSERT_EQ(bi_ptr->value, 0);
 }
 
 TEST(bigint, pow_small) {
@@ -226,7 +225,7 @@ TEST(bigint, pow_small) {
     auto r = BigInt::pow(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 1024);
+    ASSERT_EQ(bi_ptr->value, 1024);
 }
 
 TEST(bigint, pow_zero) {
@@ -235,7 +234,7 @@ TEST(bigint, pow_zero) {
     auto r = BigInt::pow(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 1);
+    ASSERT_EQ(bi_ptr->value, 1);
 }
 
 TEST(bigint, pow_one) {
@@ -244,7 +243,7 @@ TEST(bigint, pow_one) {
     auto r = BigInt::pow(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 12345);
+    ASSERT_EQ(bi_ptr->value, 12345);
 }
 
 TEST(bigint, pow_negative_exponent) {
@@ -264,7 +263,7 @@ TEST(bigint, abs_positive) {
     auto r = BigInt::abs(a);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 100);
+    ASSERT_EQ(bi_ptr->value, 100);
 }
 
 TEST(bigint, abs_negative) {
@@ -272,7 +271,7 @@ TEST(bigint, abs_negative) {
     auto r = BigInt::abs(a);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 100);
+    ASSERT_EQ(bi_ptr->value, 100);
 }
 
 TEST(bigint, abs_zero) {
@@ -280,7 +279,7 @@ TEST(bigint, abs_zero) {
     auto r = BigInt::abs(a);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 0);
+    ASSERT_EQ(bi_ptr->value, 0);
 }
 
 // ============ divmod ============
@@ -417,7 +416,7 @@ TEST(bigint, gcd) {
     auto r = BigInt::gcd(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 6);
+    ASSERT_EQ(bi_ptr->value, 6);
 }
 
 TEST(bigint, gcd_coprime) {
@@ -426,7 +425,7 @@ TEST(bigint, gcd_coprime) {
     auto r = BigInt::gcd(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 1);
+    ASSERT_EQ(bi_ptr->value, 1);
 }
 
 TEST(bigint, gcd_one_zero) {
@@ -435,7 +434,7 @@ TEST(bigint, gcd_one_zero) {
     auto r = BigInt::gcd(a, b);
     auto *bi_ptr = r.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 42);
+    ASSERT_EQ(bi_ptr->value, 42);
 }
 
 // ============ Comparison ============
@@ -521,5 +520,5 @@ TEST(bigint, chained_operations) {
     auto result = BigInt::div(diff, bi(17));
     auto *bi_ptr = result.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
-    ASSERT_EQ(bi_ptr->data->value, 50);
+    ASSERT_EQ(bi_ptr->value, 50);
 }
