@@ -1,12 +1,31 @@
 #include "phpx_big_int.h"
+#include <gmpxx.h>
 
 namespace php {
+
+struct BigInt::Data {
+    mpz_class value;
+    Data() = default;
+    explicit Data(const char *s, int base = 0) : value(s, base) {}
+    explicit Data(php::Int v) : value((signed long) v) {}
+};
+
+BigInt::BigInt() : data(new Data()) {}
+BigInt::BigInt(const String &s) : data(new Data(s.data())) {}
+BigInt::BigInt(php::Int v) : data(new Data(v)) {}
+BigInt::~BigInt() { delete data; }
+
+static inline BigInt *newBigIntImpl(const mpz_class &v) {
+    auto *bi = new BigInt();
+    bi->data->value = v;
+    return bi;
+}
 
 static inline bool extractBigInt(Variant &v, mpz_class &out) {
     if (v.isResource()) {
         auto *bi = v.toBox<BigInt>();
-        if (bi) {
-            out = bi->value;
+        if (bi && bi->data) {
+            out = bi->data->value;
             return true;
         }
     }
@@ -34,7 +53,7 @@ Variant BigInt::add(Variant a, Variant b) {
     if (UNEXPECTED(!extractBigInt(a, va) || !extractBigInt(b, vb))) {
         return nullptr;
     }
-    return Variant(new BigInt(va + vb));
+    return Variant(newBigIntImpl(va + vb));
 }
 
 Variant BigInt::sub(Variant a, Variant b) {
@@ -42,7 +61,7 @@ Variant BigInt::sub(Variant a, Variant b) {
     if (UNEXPECTED(!extractBigInt(a, va) || !extractBigInt(b, vb))) {
         return nullptr;
     }
-    return Variant(new BigInt(va - vb));
+    return Variant(newBigIntImpl(va - vb));
 }
 
 Variant BigInt::mul(Variant a, Variant b) {
@@ -50,7 +69,7 @@ Variant BigInt::mul(Variant a, Variant b) {
     if (UNEXPECTED(!extractBigInt(a, va) || !extractBigInt(b, vb))) {
         return nullptr;
     }
-    return Variant(new BigInt(va * vb));
+    return Variant(newBigIntImpl(va * vb));
 }
 
 Variant BigInt::div(Variant a, Variant b) {
@@ -62,7 +81,7 @@ Variant BigInt::div(Variant a, Variant b) {
         throwException(zend_ce_type_error, "Division by zero");
         return nullptr;
     }
-    return Variant(new BigInt(va / vb));
+    return Variant(newBigIntImpl(va / vb));
 }
 
 Variant BigInt::mod(Variant a, Variant b) {
@@ -74,7 +93,7 @@ Variant BigInt::mod(Variant a, Variant b) {
         throwException(zend_ce_type_error, "Division by zero");
         return nullptr;
     }
-    return Variant(new BigInt(va % vb));
+    return Variant(newBigIntImpl(va % vb));
 }
 
 Variant BigInt::pow(Variant a, Variant b) {
@@ -88,7 +107,7 @@ Variant BigInt::pow(Variant a, Variant b) {
     }
     mpz_class result;
     mpz_pow_ui(result.get_mpz_t(), va.get_mpz_t(), vb.get_ui());
-    return Variant(new BigInt(result));
+    return Variant(newBigIntImpl(result));
 }
 
 Variant BigInt::neg(Variant a) {
@@ -96,7 +115,7 @@ Variant BigInt::neg(Variant a) {
     if (UNEXPECTED(!extractBigInt(a, va))) {
         return nullptr;
     }
-    return Variant(new BigInt(-va));
+    return Variant(newBigIntImpl(-va));
 }
 
 Variant BigInt::cmp(Variant a, Variant b) {
@@ -114,7 +133,7 @@ Variant BigInt::abs(Variant a) {
     }
     mpz_class r;
     mpz_abs(r.get_mpz_t(), va.get_mpz_t());
-    return Variant(new BigInt(r));
+    return Variant(newBigIntImpl(r));
 }
 
 Variant BigInt::gcd(Variant a, Variant b) {
@@ -124,34 +143,34 @@ Variant BigInt::gcd(Variant a, Variant b) {
     }
     mpz_class result;
     mpz_gcd(result.get_mpz_t(), va.get_mpz_t(), vb.get_mpz_t());
-    return Variant(new BigInt(result));
+    return Variant(newBigIntImpl(result));
 }
 
 Variant BigInt::toString(Variant a) {
     auto *bi_a = a.toBox<BigInt>();
-    if (UNEXPECTED(!bi_a)) {
+    if (UNEXPECTED(!bi_a || !bi_a->data)) {
         throwException(zend_ce_type_error, "BigInt::toString expects BigInt argument");
         return nullptr;
     }
-    return Variant(bi_a->value.get_str());
+    return Variant(bi_a->data->value.get_str());
 }
 
 Variant BigInt::toInt(Variant a) {
     auto *bi_a = a.toBox<BigInt>();
-    if (UNEXPECTED(!bi_a)) {
+    if (UNEXPECTED(!bi_a || !bi_a->data)) {
         throwException(zend_ce_type_error, "BigInt::toInt expects BigInt argument");
         return nullptr;
     }
-    return Variant((php::Int) bi_a->value.get_si());
+    return Variant((php::Int) bi_a->data->value.get_si());
 }
 
 Variant BigInt::toFloat(Variant a) {
     auto *bi_a = a.toBox<BigInt>();
-    if (UNEXPECTED(!bi_a)) {
+    if (UNEXPECTED(!bi_a || !bi_a->data)) {
         throwException(zend_ce_type_error, "BigInt::toFloat expects BigInt argument");
         return nullptr;
     }
-    return Variant(bi_a->value.get_d());
+    return Variant(bi_a->data->value.get_d());
 }
 
 Variant BigInt::divmod(Variant a, Variant b) {
@@ -166,8 +185,8 @@ Variant BigInt::divmod(Variant a, Variant b) {
     mpz_class q, r;
     mpz_tdiv_qr(q.get_mpz_t(), r.get_mpz_t(), va.get_mpz_t(), vb.get_mpz_t());
     Array result(2);
-    result.append(Variant(new BigInt(q)));
-    result.append(Variant(new BigInt(r)));
+    result.append(Variant(newBigIntImpl(q)));
+    result.append(Variant(newBigIntImpl(r)));
     return result;
 }
 
@@ -186,7 +205,7 @@ Variant BigInt::powmod(Variant base, Variant exp, Variant mod) {
     }
     mpz_class result;
     mpz_powm(result.get_mpz_t(), vb.get_mpz_t(), ve.get_mpz_t(), vm.get_mpz_t());
-    return Variant(new BigInt(result));
+    return Variant(newBigIntImpl(result));
 }
 
 Variant BigInt::sqrt(Variant a) {
@@ -200,7 +219,7 @@ Variant BigInt::sqrt(Variant a) {
     }
     mpz_class result;
     mpz_sqrt(result.get_mpz_t(), va.get_mpz_t());
-    return Variant(new BigInt(result));
+    return Variant(newBigIntImpl(result));
 }
 
 Variant BigInt::bitAnd(Variant a, Variant b) {
@@ -208,7 +227,7 @@ Variant BigInt::bitAnd(Variant a, Variant b) {
     if (UNEXPECTED(!extractBigInt(a, va) || !extractBigInt(b, vb))) {
         return nullptr;
     }
-    return Variant(new BigInt(va & vb));
+    return Variant(newBigIntImpl(va & vb));
 }
 
 Variant BigInt::bitOr(Variant a, Variant b) {
@@ -216,7 +235,7 @@ Variant BigInt::bitOr(Variant a, Variant b) {
     if (UNEXPECTED(!extractBigInt(a, va) || !extractBigInt(b, vb))) {
         return nullptr;
     }
-    return Variant(new BigInt(va | vb));
+    return Variant(newBigIntImpl(va | vb));
 }
 
 Variant BigInt::bitXor(Variant a, Variant b) {
@@ -224,7 +243,7 @@ Variant BigInt::bitXor(Variant a, Variant b) {
     if (UNEXPECTED(!extractBigInt(a, va) || !extractBigInt(b, vb))) {
         return nullptr;
     }
-    return Variant(new BigInt(va ^ vb));
+    return Variant(newBigIntImpl(va ^ vb));
 }
 
 Variant BigInt::bitNot(Variant a) {
@@ -232,7 +251,7 @@ Variant BigInt::bitNot(Variant a) {
     if (UNEXPECTED(!extractBigInt(a, va))) {
         return nullptr;
     }
-    return Variant(new BigInt(~va));
+    return Variant(newBigIntImpl(~va));
 }
 
 Variant BigInt::testBit(Variant a, Variant index) {
@@ -271,7 +290,7 @@ Variant BigInt::bitShiftLeft(Variant a, Variant n) {
     }
     mpz_class result;
     mpz_mul_2exp(result.get_mpz_t(), va.get_mpz_t(), (mp_bitcnt_t) shift);
-    return Variant(new BigInt(result));
+    return Variant(newBigIntImpl(result));
 }
 
 Variant BigInt::bitShiftRight(Variant a, Variant n) {
@@ -290,7 +309,7 @@ Variant BigInt::bitShiftRight(Variant a, Variant n) {
     }
     mpz_class result;
     mpz_tdiv_q_2exp(result.get_mpz_t(), va.get_mpz_t(), (mp_bitcnt_t) shift);
-    return Variant(new BigInt(result));
+    return Variant(newBigIntImpl(result));
 }
 
 Variant BigInt::toBigDecimal(Variant a) {

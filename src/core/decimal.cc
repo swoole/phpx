@@ -1,13 +1,33 @@
 #include "phpx_decimal.h"
+#include <decimal.hh>
 #include <string>
 
 namespace php {
 
+struct Decimal::Data {
+    decimal::Decimal value;
+    Data() = default;
+    explicit Data(const char *s) : value(s) {}
+    explicit Data(const decimal::Decimal &v) : value(v) {}
+    explicit Data(php::Int v) : value((int64_t) v) {}
+};
+
+Decimal::Decimal() : data(new Data()) {}
+Decimal::Decimal(const String &s) : data(new Data(s.data())) {}
+Decimal::Decimal(php::Int v) : data(new Data(v)) {}
+Decimal::~Decimal() { delete data; }
+
+static inline Decimal *newDecimalImpl(const decimal::Decimal &v) {
+    auto *d = new Decimal();
+    d->data->value = v;
+    return d;
+}
+
 static inline bool extractDecimal(Variant &v, decimal::Decimal &out) {
     if (v.isResource()) {
         auto *d = v.toBox<Decimal>();
-        if (d) {
-            out = d->value;
+        if (d && d->data) {
+            out = d->data->value;
             return true;
         }
     }
@@ -41,7 +61,7 @@ Variant Decimal::add(Variant a, Variant b) {
     if (UNEXPECTED(!extractDecimal(a, va) || !extractDecimal(b, vb))) {
         return nullptr;
     }
-    return Variant(new Decimal(va + vb));
+    return Variant(newDecimalImpl(va + vb));
 }
 
 Variant Decimal::sub(Variant a, Variant b) {
@@ -49,7 +69,7 @@ Variant Decimal::sub(Variant a, Variant b) {
     if (UNEXPECTED(!extractDecimal(a, va) || !extractDecimal(b, vb))) {
         return nullptr;
     }
-    return Variant(new Decimal(va - vb));
+    return Variant(newDecimalImpl(va - vb));
 }
 
 Variant Decimal::mul(Variant a, Variant b) {
@@ -57,7 +77,7 @@ Variant Decimal::mul(Variant a, Variant b) {
     if (UNEXPECTED(!extractDecimal(a, va) || !extractDecimal(b, vb))) {
         return nullptr;
     }
-    return Variant(new Decimal(va * vb));
+    return Variant(newDecimalImpl(va * vb));
 }
 
 Variant Decimal::div(Variant a, Variant b) {
@@ -65,7 +85,7 @@ Variant Decimal::div(Variant a, Variant b) {
     if (UNEXPECTED(!extractDecimal(a, va) || !extractDecimal(b, vb))) {
         return nullptr;
     }
-    return Variant(new Decimal(va / vb));
+    return Variant(newDecimalImpl(va / vb));
 }
 
 Variant Decimal::mod(Variant a, Variant b) {
@@ -73,7 +93,7 @@ Variant Decimal::mod(Variant a, Variant b) {
     if (UNEXPECTED(!extractDecimal(a, va) || !extractDecimal(b, vb))) {
         return nullptr;
     }
-    return Variant(new Decimal(va % vb));
+    return Variant(newDecimalImpl(va % vb));
 }
 
 Variant Decimal::neg(Variant a) {
@@ -81,7 +101,7 @@ Variant Decimal::neg(Variant a) {
     if (UNEXPECTED(!extractDecimal(a, va))) {
         return nullptr;
     }
-    return Variant(new Decimal(-va));
+    return Variant(newDecimalImpl(-va));
 }
 
 Variant Decimal::cmp(Variant a, Variant b) {
@@ -99,28 +119,27 @@ Variant Decimal::abs(Variant a) {
     if (UNEXPECTED(!extractDecimal(a, va))) {
         return nullptr;
     }
-    return Variant(new Decimal(va.sign() < 0 ? -va : va));
+    return Variant(newDecimalImpl(va.sign() < 0 ? -va : va));
 }
 
 Variant Decimal::toString(Variant a) {
     auto *d = a.toBox<Decimal>();
-    if (UNEXPECTED(!d)) {
+    if (UNEXPECTED(!d || !d->data)) {
         throwException(zend_ce_type_error, "expects Decimal argument");
         return nullptr;
     }
-    return Variant(d->value.to_sci());
+    return Variant(d->data->value.to_sci());
 }
 
 Variant Decimal::toInt(Variant a) {
     auto *d = a.toBox<Decimal>();
-    if (UNEXPECTED(!d)) {
+    if (UNEXPECTED(!d || !d->data)) {
         throwException(zend_ce_type_error, "expects Decimal argument");
         return nullptr;
     }
-    // Truncate toward zero with traps disabled (truncation sets Inexact flag)
     decimal::Context ctx = decimal::context;
     ctx.clear_traps();
-    decimal::Decimal truncated = d->value.trunc(ctx);
+    decimal::Decimal truncated = d->data->value.trunc(ctx);
 
     uint32_t status = 0;
     int64_t val = mpd_qget_i64(truncated.getconst(), &status);
@@ -133,11 +152,11 @@ Variant Decimal::toInt(Variant a) {
 
 Variant Decimal::toFloat(Variant a) {
     auto *d = a.toBox<Decimal>();
-    if (UNEXPECTED(!d)) {
+    if (UNEXPECTED(!d || !d->data)) {
         throwException(zend_ce_type_error, "expects Decimal argument");
         return nullptr;
     }
-    return Variant((php::Float) std::stod(d->value.to_sci()));
+    return Variant((php::Float) std::stod(d->data->value.to_sci()));
 }
 
 Variant Decimal::pow(Variant base, Variant exp) {
@@ -152,7 +171,7 @@ Variant Decimal::pow(Variant base, Variant exp) {
         throwException(zend_ce_type_error, "Decimal::pow: invalid operation");
         return nullptr;
     }
-    return Variant(new Decimal(result));
+    return Variant(newDecimalImpl(result));
 }
 
 Variant Decimal::divmod(Variant a, Variant b) {
@@ -168,8 +187,8 @@ Variant Decimal::divmod(Variant a, Variant b) {
         return nullptr;
     }
     Array result(2);
-    result.append(Variant(new Decimal(q)));
-    result.append(Variant(new Decimal(r)));
+    result.append(Variant(newDecimalImpl(q)));
+    result.append(Variant(newDecimalImpl(r)));
     return result;
 }
 
@@ -185,7 +204,7 @@ Variant Decimal::powmod(Variant base, Variant exp, Variant mod) {
         throwException(zend_ce_type_error, "Decimal::powmod: invalid operation");
         return nullptr;
     }
-    return Variant(new Decimal(result));
+    return Variant(newDecimalImpl(result));
 }
 
 Variant Decimal::sqrt(Variant a) {
@@ -200,7 +219,7 @@ Variant Decimal::sqrt(Variant a) {
         throwException(zend_ce_type_error, "Decimal::sqrt: invalid operation (negative number?)");
         return nullptr;
     }
-    return Variant(new Decimal(result));
+    return Variant(newDecimalImpl(result));
 }
 
 Variant Decimal::floor(Variant a) {
@@ -208,7 +227,7 @@ Variant Decimal::floor(Variant a) {
     if (UNEXPECTED(!extractDecimal(a, va))) {
         return nullptr;
     }
-    return Variant(new Decimal(va.floor()));
+    return Variant(newDecimalImpl(va.floor()));
 }
 
 Variant Decimal::ceil(Variant a) {
@@ -216,7 +235,7 @@ Variant Decimal::ceil(Variant a) {
     if (UNEXPECTED(!extractDecimal(a, va))) {
         return nullptr;
     }
-    return Variant(new Decimal(va.ceil()));
+    return Variant(newDecimalImpl(va.ceil()));
 }
 
 Variant Decimal::round(Variant a, Variant precision) {
@@ -226,7 +245,7 @@ Variant Decimal::round(Variant a, Variant precision) {
     }
     php::Int prec = precision.toInt();
     if (prec == 0) {
-        return Variant(new Decimal(va.to_integral()));
+        return Variant(newDecimalImpl(va.to_integral()));
     }
     decimal::Decimal result;
     uint32_t status = 0;
@@ -236,7 +255,7 @@ Variant Decimal::round(Variant a, Variant precision) {
         throwException(zend_ce_type_error, "Decimal::round: invalid operation");
         return nullptr;
     }
-    return Variant(new Decimal(result));
+    return Variant(newDecimalImpl(result));
 }
 
 Variant Decimal::toBigInt(Variant a) {

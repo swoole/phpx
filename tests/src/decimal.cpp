@@ -9,7 +9,7 @@ using namespace php;
 // ============ Construction ============
 
 TEST(decimal, construct_from_string) {
-    auto a = php::newDecimal("123.456");
+    auto a = php::toDecimal("123.456");
     auto *d = a.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
     auto str = Decimal::toString(a);
@@ -18,14 +18,14 @@ TEST(decimal, construct_from_string) {
 }
 
 TEST(decimal, construct_from_int) {
-    auto a = php::newDecimal((php::Int) 42);
+    auto a = php::toDecimal((php::Int) 42);
     auto *d = a.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
     ASSERT_EQ(Decimal::toInt(a).toInt(), 42);
 }
 
 TEST(decimal, construct_negative) {
-    auto a = php::newDecimal("-99.99");
+    auto a = php::toDecimal("-99.99");
     auto *d = a.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
     auto str = Decimal::toString(a);
@@ -34,7 +34,7 @@ TEST(decimal, construct_negative) {
 }
 
 TEST(decimal, construct_zero) {
-    auto a = php::newDecimal("0");
+    auto a = php::toDecimal("0");
     auto *d = a.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
     ASSERT_EQ(Decimal::toInt(a).toInt(), 0);
@@ -61,8 +61,8 @@ TEST(decimal, newInstance_from_int) {
 // ============ Arithmetic ============
 
 TEST(decimal, add) {
-    auto a = php::newDecimal("100.50");
-    auto b = php::newDecimal("200.25");
+    auto a = php::toDecimal("100.50");
+    auto b = php::toDecimal("200.25");
     auto r = Decimal::add(a, b);
     auto *d = r.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
@@ -70,7 +70,7 @@ TEST(decimal, add) {
 }
 
 TEST(decimal, add_int_promotion) {
-    auto a = php::newDecimal("50.25");
+    auto a = php::toDecimal("50.25");
     Variant b(100);
     auto r = Decimal::add(a, b);
     auto *d = r.toBox<Decimal>();
@@ -79,7 +79,7 @@ TEST(decimal, add_int_promotion) {
 }
 
 TEST(decimal, add_string_promotion) {
-    auto a = php::newDecimal("100.0");
+    auto a = php::toDecimal("100.0");
     Variant b("0.5");
     auto r = Decimal::add(a, b);
     auto *d = r.toBox<Decimal>();
@@ -88,8 +88,8 @@ TEST(decimal, add_string_promotion) {
 }
 
 TEST(decimal, sub) {
-    auto a = php::newDecimal("100.50");
-    auto b = php::newDecimal("30.25");
+    auto a = php::toDecimal("100.50");
+    auto b = php::toDecimal("30.25");
     auto r = Decimal::sub(a, b);
     auto *d = r.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
@@ -97,8 +97,8 @@ TEST(decimal, sub) {
 }
 
 TEST(decimal, sub_negative_result) {
-    auto a = php::newDecimal("10.00");
-    auto b = php::newDecimal("50.00");
+    auto a = php::toDecimal("10.00");
+    auto b = php::toDecimal("50.00");
     auto r = Decimal::sub(a, b);
     auto tmp = Decimal::toString(r);
     auto str = tmp.toCString();
@@ -107,8 +107,8 @@ TEST(decimal, sub_negative_result) {
 }
 
 TEST(decimal, mul) {
-    auto a = php::newDecimal("3.5");
-    auto b = php::newDecimal("2.0");
+    auto a = php::toDecimal("3.5");
+    auto b = php::toDecimal("2.0");
     auto r = Decimal::mul(a, b);
     auto *d = r.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
@@ -116,8 +116,8 @@ TEST(decimal, mul) {
 }
 
 TEST(decimal, mul_int) {
-    auto a = php::newDecimal("6.25");
-    auto b = php::newDecimal((php::Int) 4);
+    auto a = php::toDecimal("6.25");
+    auto b = php::toDecimal((php::Int) 4);
     auto r = Decimal::mul(a, b);
     auto *d = r.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
@@ -125,15 +125,15 @@ TEST(decimal, mul_int) {
 }
 
 TEST(decimal, mul_zero) {
-    auto a = php::newDecimal("123.456");
-    auto b = php::newDecimal("0");
+    auto a = php::toDecimal("123.456");
+    auto b = php::toDecimal("0");
     auto r = Decimal::mul(a, b);
     ASSERT_EQ(Decimal::toInt(r).toInt(), 0);
 }
 
 TEST(decimal, div) {
-    auto a = php::newDecimal("100.0");
-    auto b = php::newDecimal("4.0");
+    auto a = php::toDecimal("100.0");
+    auto b = php::toDecimal("4.0");
     auto r = Decimal::div(a, b);
     auto *d = r.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
@@ -141,8 +141,8 @@ TEST(decimal, div) {
 }
 
 TEST(decimal, div_non_integer) {
-    auto a = php::newDecimal("10.0");
-    auto b = php::newDecimal("3.0");
+    auto a = php::toDecimal("10.0");
+    auto b = php::toDecimal("3.0");
     auto r = Decimal::div(a, b);
     auto *d = r.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
@@ -150,8 +150,8 @@ TEST(decimal, div_non_integer) {
 }
 
 TEST(decimal, mod) {
-    auto a = php::newDecimal("100.0");
-    auto b = php::newDecimal("3.0");
+    auto a = php::toDecimal("100.0");
+    auto b = php::toDecimal("3.0");
     auto r = Decimal::mod(a, b);
     auto *d = r.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
@@ -159,8 +159,8 @@ TEST(decimal, mod) {
 }
 
 TEST(decimal, mod_exact) {
-    auto a = php::newDecimal("100.0");
-    auto b = php::newDecimal("20.0");
+    auto a = php::toDecimal("100.0");
+    auto b = php::toDecimal("20.0");
     auto r = Decimal::mod(a, b);
     auto *d = r.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
@@ -168,7 +168,7 @@ TEST(decimal, mod_exact) {
 }
 
 TEST(decimal, neg) {
-    auto a = php::newDecimal("100.50");
+    auto a = php::toDecimal("100.50");
     auto r = Decimal::neg(a);
     auto *d = r.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
@@ -176,7 +176,7 @@ TEST(decimal, neg) {
 }
 
 TEST(decimal, neg_negative) {
-    auto a = php::newDecimal("-50.25");
+    auto a = php::toDecimal("-50.25");
     auto r = Decimal::neg(a);
     auto *d = r.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
@@ -184,7 +184,7 @@ TEST(decimal, neg_negative) {
 }
 
 TEST(decimal, abs_positive) {
-    auto a = php::newDecimal("123.456");
+    auto a = php::toDecimal("123.456");
     auto r = Decimal::abs(a);
     auto *d = r.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
@@ -192,7 +192,7 @@ TEST(decimal, abs_positive) {
 }
 
 TEST(decimal, abs_negative) {
-    auto a = php::newDecimal("-123.456");
+    auto a = php::toDecimal("-123.456");
     auto r = Decimal::abs(a);
     auto *d = r.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
@@ -200,7 +200,7 @@ TEST(decimal, abs_negative) {
 }
 
 TEST(decimal, abs_zero) {
-    auto a = php::newDecimal("0");
+    auto a = php::toDecimal("0");
     auto r = Decimal::abs(a);
     ASSERT_EQ(Decimal::toInt(r).toInt(), 0);
 }
@@ -208,36 +208,36 @@ TEST(decimal, abs_zero) {
 // ============ Comparison ============
 
 TEST(decimal, cmp_greater) {
-    auto a = php::newDecimal("200.50");
-    auto b = php::newDecimal("100.25");
+    auto a = php::toDecimal("200.50");
+    auto b = php::toDecimal("100.25");
     auto r = Decimal::cmp(a, b);
     ASSERT_GT(r.toInt(), 0);
 }
 
 TEST(decimal, cmp_less) {
-    auto a = php::newDecimal("100.00");
-    auto b = php::newDecimal("200.00");
+    auto a = php::toDecimal("100.00");
+    auto b = php::toDecimal("200.00");
     auto r = Decimal::cmp(a, b);
     ASSERT_LT(r.toInt(), 0);
 }
 
 TEST(decimal, cmp_equal) {
-    auto a = php::newDecimal("100.50");
-    auto b = php::newDecimal("100.50");
+    auto a = php::toDecimal("100.50");
+    auto b = php::toDecimal("100.50");
     auto r = Decimal::cmp(a, b);
     ASSERT_EQ(r.toInt(), 0);
 }
 
 TEST(decimal, cmp_negative_vs_positive) {
-    auto a = php::newDecimal("-10.0");
-    auto b = php::newDecimal("10.0");
+    auto a = php::toDecimal("-10.0");
+    auto b = php::toDecimal("10.0");
     auto r = Decimal::cmp(a, b);
     ASSERT_LT(r.toInt(), 0);
 }
 
 TEST(decimal, cmp_both_negative) {
-    auto a = php::newDecimal("-10.0");
-    auto b = php::newDecimal("-50.0");
+    auto a = php::toDecimal("-10.0");
+    auto b = php::toDecimal("-50.0");
     auto r = Decimal::cmp(a, b);
     ASSERT_GT(r.toInt(), 0);
 }
@@ -245,34 +245,34 @@ TEST(decimal, cmp_both_negative) {
 // ============ Conversion ============
 
 TEST(decimal, toString) {
-    auto a = php::newDecimal("123.456");
+    auto a = php::toDecimal("123.456");
     auto r = Decimal::toString(a);
     ASSERT_TRUE(r.isString());
     ASSERT_TRUE(std::strstr(r.toCString(), "123.456") != nullptr);
 }
 
 TEST(decimal, toString_integer) {
-    auto a = php::newDecimal("42.00");
+    auto a = php::toDecimal("42.00");
     auto r = Decimal::toString(a);
     ASSERT_TRUE(r.isString());
     ASSERT_GT(r.length(), 0u);
 }
 
 TEST(decimal, toInt) {
-    auto a = php::newDecimal("3.14");
+    auto a = php::toDecimal("3.14");
     auto r = Decimal::toInt(a);
     ASSERT_TRUE(r.isInt());
     ASSERT_EQ(r.toInt(), 3);
 }
 
 TEST(decimal, toInt_negative) {
-    auto a = php::newDecimal("-3.14");
+    auto a = php::toDecimal("-3.14");
     auto r = Decimal::toInt(a);
     ASSERT_EQ(r.toInt(), -3);
 }
 
 TEST(decimal, toFloat) {
-    auto a = php::newDecimal("3.14");
+    auto a = php::toDecimal("3.14");
     auto r = Decimal::toFloat(a);
     ASSERT_NEAR(r.toFloat(), 3.14, 0.001);
 }
@@ -280,14 +280,14 @@ TEST(decimal, toFloat) {
 // ============ Edge cases ============
 
 TEST(decimal, high_precision_string) {
-    auto a = php::newDecimal("123.45678901234567890");
+    auto a = php::toDecimal("123.45678901234567890");
     auto tmp = Decimal::toString(a);
     auto s = tmp.toCString();
     ASSERT_TRUE(std::strstr(s, "123.45678901234567890") != nullptr);
 }
 
 TEST(decimal, string_promotion) {
-    auto a = php::newDecimal("100.50");
+    auto a = php::toDecimal("100.50");
     Variant b("50.25");
     auto r = Decimal::add(a, b);
     auto *d = r.toBox<Decimal>();
@@ -296,12 +296,12 @@ TEST(decimal, string_promotion) {
 }
 
 TEST(decimal, chained_operations) {
-    auto a = php::newDecimal("100.0");
-    auto b = php::newDecimal("50.0");
+    auto a = php::toDecimal("100.0");
+    auto b = php::toDecimal("50.0");
     auto sum = Decimal::add(a, b);
-    auto prod = Decimal::mul(sum, php::newDecimal("2.0"));
-    auto diff = Decimal::sub(prod, php::newDecimal("20.0"));
-    auto result = Decimal::div(diff, php::newDecimal("5.0"));
+    auto prod = Decimal::mul(sum, php::toDecimal("2.0"));
+    auto diff = Decimal::sub(prod, php::toDecimal("20.0"));
+    auto result = Decimal::div(diff, php::toDecimal("5.0"));
     auto *d = result.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
     ASSERT_NEAR(Decimal::toFloat(result).toFloat(), 56.0, 0.01);

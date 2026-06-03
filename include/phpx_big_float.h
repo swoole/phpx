@@ -1,38 +1,20 @@
 #pragma once
 
 #include "phpx.h"
-#include <mpfr.h>
-#include <string>
 
 namespace php {
 
 class BigFloat : public Box {
+    struct Data;
   public:
-    mpfr_t value;
-
-    BigFloat() {
-        mpfr_init(value);
-    }
-    BigFloat(const String &s) : BigFloat(s.data()) {}
-    BigFloat(const char *s) {
-        mpfr_init(value);
-        mpfr_set_str(value, s, 10, MPFR_RNDN);
-    }
-    BigFloat(php::Int v) {
-        mpfr_init(value);
-        mpfr_set_sj(value, v, MPFR_RNDN);
-    }
-    BigFloat(php::Float v) {
-        mpfr_init(value);
-        mpfr_set_d(value, v, MPFR_RNDN);
-    }
-    BigFloat(const BigFloat &other) {
-        mpfr_init(value);
-        mpfr_set(value, other.value, MPFR_RNDN);
-    }
-    ~BigFloat() override {
-        mpfr_clear(value);
-    }
+    Data *data = nullptr;
+    BigFloat();
+    explicit BigFloat(const String &s);
+    explicit BigFloat(const char *s);
+    explicit BigFloat(php::Int v);
+    explicit BigFloat(php::Float v);
+    BigFloat(const BigFloat &other);
+    ~BigFloat() override;
 
     static Variant newInstance(Variant s);
     static Variant add(Variant a, Variant b);
@@ -48,15 +30,15 @@ class BigFloat : public Box {
     static Variant toFloat(Variant a);
 };
 
-static inline Variant newBigFloat(const String &s) {
+static inline Variant toBigFloat(const String &s) {
     return Variant(new BigFloat(s));
 }
 
-static inline Variant newBigFloat(php::Int v) {
+static inline Variant toBigFloat(php::Int v) {
     return Variant(new BigFloat(v));
 }
 
-static inline Variant newBigFloat(php::Float v) {
+static inline Variant toBigFloat(php::Float v) {
     return Variant(new BigFloat(v));
 }
 

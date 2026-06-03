@@ -1,18 +1,17 @@
 #pragma once
 
 #include "phpx.h"
-#include <gmpxx.h>
 
 namespace php {
 
 class BigInt : public Box {
+    struct Data;
   public:
-    mpz_class value;
-
-    BigInt() = default;
-    BigInt(const char *s, int base = 0) : value(s, base) {}
-    BigInt(const mpz_class &v) : value(v) {}
-    BigInt(php::Int v) : value((signed long) v) {}
+    Data *data = nullptr;
+    BigInt();
+    explicit BigInt(const String &s);
+    explicit BigInt(php::Int v);
+    ~BigInt() override;
 
     static Variant newInstance(Variant s);
     static Variant add(Variant a, Variant b);
@@ -43,12 +42,12 @@ class BigInt : public Box {
     static Variant toBigDecimal(Variant a);
 };
 
-static inline Variant newBigInt(php::Int v) {
+static inline Variant toBigInt(php::Int v) {
     return Variant(new BigInt(v));
 }
 
-static inline Variant newBigInt(const String &s) {
-    return Variant(new BigInt(s.data()));
+static inline Variant toBigInt(const String &s) {
+    return Variant(new BigInt(s));
 }
 
 }  // namespace php

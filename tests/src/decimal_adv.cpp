@@ -7,11 +7,11 @@
 using namespace php;
 
 static inline Variant dc(const char *s) {
-    return php::newDecimal(s);
+    return php::toDecimal(s);
 }
 
 static inline Variant dc(php::Int v) {
-    return php::newDecimal(v);
+    return php::toDecimal(v);
 }
 
 // ============ round ============

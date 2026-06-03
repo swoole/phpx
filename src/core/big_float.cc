@@ -1,13 +1,49 @@
 #include "phpx_big_float.h"
+#include <mpfr.h>
 #include <string>
 
 namespace php {
 
+struct BigFloat::Data {
+    mpfr_t value;
+    Data() { mpfr_init(value); }
+    Data(const Data &other) {
+        mpfr_init(value);
+        mpfr_set(value, other.value, MPFR_RNDN);
+    }
+    ~Data() { mpfr_clear(value); }
+};
+
+BigFloat::BigFloat() : data(new Data()) {}
+BigFloat::BigFloat(const String &s) : data(new Data()) {
+    mpfr_set_str(data->value, s.data(), 10, MPFR_RNDN);
+}
+BigFloat::BigFloat(const char *s) : data(new Data()) {
+    mpfr_set_str(data->value, s, 10, MPFR_RNDN);
+}
+BigFloat::BigFloat(php::Int v) : data(new Data()) {
+    mpfr_set_sj(data->value, v, MPFR_RNDN);
+}
+BigFloat::BigFloat(php::Float v) : data(new Data()) {
+    mpfr_set_d(data->value, v, MPFR_RNDN);
+}
+BigFloat::BigFloat(const BigFloat &other) : data(new Data(*other.data)) {}
+BigFloat::~BigFloat() { delete data; }
+
+static inline BigFloat *newBigFloatImpl() {
+    return new BigFloat();
+}
+static inline BigFloat *newBigFloatImplCopy(mpfr_t src) {
+    auto *bf = new BigFloat();
+    mpfr_set(bf->data->value, src, MPFR_RNDN);
+    return bf;
+}
+
 static inline bool extractBigFloat(Variant &v, mpfr_t &out) {
     if (v.isResource()) {
         auto *bf = v.toBox<BigFloat>();
-        if (bf) {
-            mpfr_set(out, bf->value, MPFR_RNDN);
+        if (bf && bf->data) {
+            mpfr_set(out, bf->data->value, MPFR_RNDN);
             return true;
         }
     }
@@ -43,8 +79,7 @@ Variant BigFloat::add(Variant a, Variant b) {
         return nullptr;
     }
     mpfr_add(vr, va, vb, MPFR_RNDN);
-    auto *result = new BigFloat();
-    mpfr_set(result->value, vr, MPFR_RNDN);
+    auto *result = newBigFloatImplCopy(vr);
     mpfr_clears(va, vb, vr, (mpfr_ptr) nullptr);
     return Variant(result);
 }
@@ -57,8 +92,7 @@ Variant BigFloat::sub(Variant a, Variant b) {
         return nullptr;
     }
     mpfr_sub(vr, va, vb, MPFR_RNDN);
-    auto *result = new BigFloat();
-    mpfr_set(result->value, vr, MPFR_RNDN);
+    auto *result = newBigFloatImplCopy(vr);
     mpfr_clears(va, vb, vr, (mpfr_ptr) nullptr);
     return Variant(result);
 }
@@ -71,8 +105,7 @@ Variant BigFloat::mul(Variant a, Variant b) {
         return nullptr;
     }
     mpfr_mul(vr, va, vb, MPFR_RNDN);
-    auto *result = new BigFloat();
-    mpfr_set(result->value, vr, MPFR_RNDN);
+    auto *result = newBigFloatImplCopy(vr);
     mpfr_clears(va, vb, vr, (mpfr_ptr) nullptr);
     return Variant(result);
 }
@@ -85,8 +118,7 @@ Variant BigFloat::div(Variant a, Variant b) {
         return nullptr;
     }
     mpfr_div(vr, va, vb, MPFR_RNDN);
-    auto *result = new BigFloat();
-    mpfr_set(result->value, vr, MPFR_RNDN);
+    auto *result = newBigFloatImplCopy(vr);
     mpfr_clears(va, vb, vr, (mpfr_ptr) nullptr);
     return Variant(result);
 }
@@ -98,8 +130,8 @@ Variant BigFloat::neg(Variant a) {
         mpfr_clear(va);
         return nullptr;
     }
-    auto *result = new BigFloat();
-    mpfr_neg(result->value, va, MPFR_RNDN);
+    auto *result = newBigFloatImpl();
+    mpfr_neg(result->data->value, va, MPFR_RNDN);
     mpfr_clear(va);
     return Variant(result);
 }
@@ -123,20 +155,20 @@ Variant BigFloat::abs(Variant a) {
         mpfr_clear(va);
         return nullptr;
     }
-    auto *result = new BigFloat();
-    mpfr_abs(result->value, va, MPFR_RNDN);
+    auto *result = newBigFloatImpl();
+    mpfr_abs(result->data->value, va, MPFR_RNDN);
     mpfr_clear(va);
     return Variant(result);
 }
 
 Variant BigFloat::toString(Variant a) {
     auto *bf = a.toBox<BigFloat>();
-    if (UNEXPECTED(!bf)) {
+    if (UNEXPECTED(!bf || !bf->data)) {
         throwException(zend_ce_type_error, "expects BigFloat argument");
         return nullptr;
     }
     mpfr_exp_t exp;
-    char *str = mpfr_get_str(nullptr, &exp, 10, 0, bf->value, MPFR_RNDN);
+    char *str = mpfr_get_str(nullptr, &exp, 10, 0, bf->data->value, MPFR_RNDN);
     if (!str) {
         return Variant("0");
     }
@@ -156,7 +188,6 @@ Variant BigFloat::toString(Variant a) {
     }
     if (negative) result = "-" + result;
     mpfr_free_str(str);
-    // Strip trailing zeros after decimal point
     auto dotPos = result.find('.');
     if (dotPos != std::string::npos) {
         while (result.size() > dotPos + 1 && result.back() == '0') {
@@ -171,20 +202,20 @@ Variant BigFloat::toString(Variant a) {
 
 Variant BigFloat::toInt(Variant a) {
     auto *bf = a.toBox<BigFloat>();
-    if (UNEXPECTED(!bf)) {
+    if (UNEXPECTED(!bf || !bf->data)) {
         throwException(zend_ce_type_error, "expects BigFloat argument");
         return nullptr;
     }
-    return Variant((php::Int) mpfr_get_sj(bf->value, MPFR_RNDZ));
+    return Variant((php::Int) mpfr_get_sj(bf->data->value, MPFR_RNDZ));
 }
 
 Variant BigFloat::toFloat(Variant a) {
     auto *bf = a.toBox<BigFloat>();
-    if (UNEXPECTED(!bf)) {
+    if (UNEXPECTED(!bf || !bf->data)) {
         throwException(zend_ce_type_error, "expects BigFloat argument");
         return nullptr;
     }
-    return Variant((php::Float) mpfr_get_d(bf->value, MPFR_RNDN));
+    return Variant((php::Float) mpfr_get_d(bf->data->value, MPFR_RNDN));
 }
 
 }  // namespace php

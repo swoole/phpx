@@ -273,9 +273,22 @@ elseif(IS_WINDOWS)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
-# ============ 内置 mpdecimal（Linux / macOS）============
-if (NOT IS_WINDOWS)
-    set(MPDECIMAL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mpdecimal)
+# ============ 内置 mpdecimal（全平台）============
+set(MPDECIMAL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mpdecimal)
+
+# 收集 C 源文件，排除 bench 工具
+file(GLOB MPDEC_C_SOURCES ${MPDECIMAL_DIR}/libmpdec/*.c)
+list(FILTER MPDEC_C_SOURCES EXCLUDE REGEX "bench")
+
+if (IS_WINDOWS)
+    message(STATUS "Using bundled mpdecimal with MASM")
+    enable_language(ASM_MASM)
+    set(MPDECIMAL_HEADER_DIR ${MPDECIMAL_DIR}/libmpdec)
+    set(MPDECIMAL_SOURCES ${MPDEC_C_SOURCES} ${MPDECIMAL_DIR}/libmpdec/vcdiv64.asm)
+    set(MPDECIMAL_DEFINES CONFIG_64 MASM)
+    set(MPDECIMAL_C_STANDARD 90)
+else()
+    message(STATUS "Using bundled mpdecimal with uint128")
     set(MPD_HEADER_CONFIG "
 #define MPD_CONFIG_64 1
 ")
@@ -284,15 +297,28 @@ if (NOT IS_WINDOWS)
         ${CMAKE_CURRENT_BINARY_DIR}/mpdecimal/mpdecimal.h
         @ONLY
     )
-    file(GLOB MPDEC_C_SOURCES ${MPDECIMAL_DIR}/libmpdec/*.c)
-    add_library(mpdecimal STATIC ${MPDEC_C_SOURCES} ${MPDECIMAL_DIR}/libmpdec++/decimal.cc)
-    target_include_directories(mpdecimal PUBLIC
-        ${CMAKE_CURRENT_BINARY_DIR}/mpdecimal
-        ${MPDECIMAL_DIR}/libmpdec++
-    )
-    target_compile_definitions(mpdecimal PRIVATE CONFIG_64 ANSI HAVE_UINT128_T)
+    set(MPDECIMAL_HEADER_DIR ${CMAKE_CURRENT_BINARY_DIR}/mpdecimal)
+    set(MPDECIMAL_SOURCES ${MPDEC_C_SOURCES})
+    set(MPDECIMAL_DEFINES CONFIG_64 ANSI HAVE_UINT128_T)
+    set(MPDECIMAL_C_STANDARD 99)
+endif()
+
+add_library(mpdecimal STATIC
+    ${MPDECIMAL_SOURCES}
+    ${MPDECIMAL_DIR}/libmpdec++/decimal.cc
+)
+target_include_directories(mpdecimal PUBLIC
+    ${MPDECIMAL_HEADER_DIR}
+    ${MPDECIMAL_DIR}/libmpdec++
+)
+target_compile_definitions(mpdecimal PRIVATE ${MPDECIMAL_DEFINES})
+set_target_properties(mpdecimal PROPERTIES
+    C_STANDARD ${MPDECIMAL_C_STANDARD}
+    POSITION_INDEPENDENT_CODE ON
+)
+
+if (NOT IS_WINDOWS)
     target_compile_options(mpdecimal PRIVATE -fPIC)
-    set_target_properties(mpdecimal PROPERTIES C_STANDARD 99 POSITION_INDEPENDENT_CODE ON)
 endif()
 
 file(GLOB_RECURSE SRC_FILES src/core/*.cc src/func/*.cc src/class/*.cc src/const/*.cc)
@@ -334,7 +360,8 @@ endif()
 if (IS_WINDOWS)
     target_link_libraries(phpx PRIVATE
         ${PHP_LIBRARY}
-        gmp gmpxx libmpdec libmpdec++ mpfr
+        gmp gmpxx mpfr
+        mpdecimal
     )
 else()
     target_link_libraries(phpx PUBLIC gmp gmpxx mpfr)
@@ -365,7 +392,8 @@ if(BUILD_TESTS)
                     ${PHP_LIBRARY}
                     phpx
                     ${GTEST_BOTH_LIBRARIES}
-                    gmp gmpxx libmpdec libmpdec++ mpfr
+                    gmp gmpxx mpfr
+                    mpdecimal
             )
 
             # 复制 DLL 到测试可执行文件目录
@@ -393,8 +421,8 @@ if(BUILD_TESTS)
                     ${PHP_LDFLAGS}
                     ${GTEST_BOTH_LIBRARIES}
                     gmp gmpxx mpfr
+                    mpdecimal
             )
-            target_link_libraries(phpx-tests PRIVATE mpdecimal)
         endif()
     endif()
 endif()

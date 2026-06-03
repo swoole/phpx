@@ -1,18 +1,17 @@
 #pragma once
 
 #include "phpx.h"
-#include <decimal.hh>
 
 namespace php {
 
 class Decimal : public Box {
+    struct Data;
   public:
-    decimal::Decimal value;
-
-    Decimal() = default;
-    Decimal(const String &s) : value(s.data()) {}
-    Decimal(const decimal::Decimal &v) : value(v) {}
-    Decimal(php::Int v) : value((int64_t) v) {}
+    Data *data = nullptr;
+    Decimal();
+    explicit Decimal(const String &s);
+    explicit Decimal(php::Int v);
+    ~Decimal() override;
 
     static Variant newInstance(Variant s);
     static Variant add(Variant a, Variant b);
@@ -37,11 +36,11 @@ class Decimal : public Box {
     static Variant toBigInt(Variant a);
 };
 
-static inline Variant newDecimal(const String &s) {
+static inline Variant toDecimal(const String &s) {
     return Variant(new Decimal(s));
 }
 
-static inline Variant newDecimal(php::Int v) {
+static inline Variant toDecimal(php::Int v) {
     return Variant(new Decimal(v));
 }
 
