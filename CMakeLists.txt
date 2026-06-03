@@ -11,7 +11,7 @@ endif ()
 # ============ 调试配置 ============
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "Building in Debug mode with debug symbols")
-    if(IS_WINDOWS)
+    if(WIN32)
         # Windows Debug 模式：添加调试信息和详细输出
         add_compile_options(
             /Zi          # 生成调试信息
@@ -277,20 +277,37 @@ endif()
 set(MPDECIMAL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mpdecimal)
 
 if (IS_WINDOWS)
-    # Windows: 使用外部独立编译的 DLL 和 LIB 文件，不再使用内置版本
-    set(MPDECIMAL_INCLUDE_DIR "" CACHE PATH "mpdecimal include directory")
-    set(MPDECIMAL_LIBRARY "" CACHE FILEPATH "mpdecimal import library (.lib)")
+    # Windows: 使用 PHP SDK 中预置的 mpdecimal DLL 导入库
+    find_library(MPDECIMAL_LIBRARY
+        NAMES mpdec-4.0.1
+        PATHS ${PHP_LIBRARY_DIR}
+        NO_DEFAULT_PATH
+    )
+    find_library(MPDECIMALXX_LIBRARY
+        NAMES mpdec++-4.0.1
+        PATHS ${PHP_LIBRARY_DIR}
+        NO_DEFAULT_PATH
+    )
 
-    if (NOT MPDECIMAL_INCLUDE_DIR)
-        message(FATAL_ERROR "On Windows, MPDECIMAL_INCLUDE_DIR must be set. "
-            "Use -DMPDECIMAL_INCLUDE_DIR=<path> -DMPDECIMAL_LIBRARY=<path>")
+    if (NOT MPDECIMAL_LIBRARY OR NOT MPDECIMALXX_LIBRARY)
+        message(FATAL_ERROR "libmpdec-4.0.1.dll.lib / libmpdec++-4.0.1.dll.lib not found in ${PHP_LIBRARY_DIR}")
     endif()
 
     add_library(mpdecimal UNKNOWN IMPORTED)
     set_target_properties(mpdecimal PROPERTIES
-        IMPORTED_LOCATION "${MPDECIMAL_LIBRARY}"
-        INTERFACE_INCLUDE_DIRECTORIES "${MPDECIMAL_INCLUDE_DIR};${MPDECIMAL_DIR}/libmpdec++"
+        IMPORTED_LOCATION "${MPDECIMALXX_LIBRARY}"
+        INTERFACE_LINK_LIBRARIES "${MPDECIMAL_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${PHP_SDK_DIR}/include;${MPDECIMAL_DIR}/libmpdec++"
     )
+
+    # 复制 DLL 到输出目录
+    file(GLOB MPDEC_DLLS "${PHP_LIBRARY_DIR}/libmpdec-4.0.1.dll" "${PHP_LIBRARY_DIR}/libmpdec++-4.0.1.dll")
+    foreach(_dll ${MPDEC_DLLS})
+        add_custom_command(TARGET phpx POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_dll}" $<TARGET_FILE_DIR:phpx>
+            COMMENT "Copying ${_dll} to output"
+        )
+    endforeach()
 else()
     # Linux/macOS: 内置编译 mpdecimal + libmpdec++
     message(STATUS "Using bundled mpdecimal with uint128")

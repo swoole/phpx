@@ -36,6 +36,10 @@
 #undef IGNORE
 #endif
 
+#ifdef free
+#undef free
+#endif
+
 #ifdef DELETE
 #undef DELETE
 #endif
