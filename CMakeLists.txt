@@ -320,10 +320,10 @@ else()
 ")
     configure_file(
         ${MPDECIMAL_DIR}/libmpdec/mpdecimal.h.in
-        ${CMAKE_CURRENT_BINARY_DIR}/mpdecimal/mpdecimal.h
+        ${MPDECIMAL_DIR}/libmpdec/mpdecimal.h
         @ONLY
     )
-    set(MPDECIMAL_HEADER_DIR ${CMAKE_CURRENT_BINARY_DIR}/mpdecimal)
+    set(MPDECIMAL_HEADER_DIR ${MPDECIMAL_DIR}/libmpdec)
     set(MPDECIMAL_DEFINES CONFIG_64 ANSI HAVE_UINT128_T)
     set(MPDECIMAL_SOURCES ${MPDEC_C_SOURCES})
 
