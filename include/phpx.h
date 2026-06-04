@@ -567,10 +567,10 @@ class Variant {
         ZVAL_BOOL(&val, v);
     }
     Variant(const char *str) {
-        ZVAL_STRING(&val, str);
+        ZVAL_NEW_STR(&val, zend_string_init_fast(str, strlen(str)));
     }
     Variant(const char *str, size_t len) {
-        ZVAL_STRINGL(&val, str, len);
+        ZVAL_NEW_STR(&val, zend_string_init_fast(str, len));
     }
     /**
      * !!! [UNSAFE] `persistent` argument
@@ -578,13 +578,13 @@ class Variant {
      * Please note that this approach is intended solely for global constant objects.
      */
     Variant(const char *str, size_t len, bool persistent) {
-        ZVAL_NEW_STR(&val, zend_string_init(str, len, persistent));
-        /**
-         * There is a flaw in PHP's design: persistent strings cause assertion failures upon destruction.
-         * By incrementing the reference count once, these strings are never released,
-         * and are instead reclaimed automatically by the operating system when the process terminates.
-         */
         if (persistent) {
+            ZVAL_NEW_STR(&val, zend_string_init(str, len, persistent));
+            /**
+             * There is a flaw in PHP's design: persistent strings cause assertion failures upon destruction.
+             * By incrementing the reference count once, these strings are never released,
+             * and are instead reclaimed automatically by the operating system when the process terminates.
+             */
             addRef();
             /**
              * Persistent string must have its hash value precomputed. This string may be used for hash lookups in a
@@ -592,10 +592,12 @@ class Variant {
              * multi-thread contention.
              */
             zend_string_hash_val(Z_STR(val));
+        } else {
+            ZVAL_NEW_STR(&val, zend_string_init_fast(str, len));
         }
     }
     Variant(const std::string &str) {
-        ZVAL_STRINGL(&val, str.c_str(), str.length());
+        ZVAL_NEW_STR(&val, zend_string_init_fast(str.c_str(), str.length()));
     }
     Variant(const zval *v, Ctor method = Ctor::Copy) noexcept {
         /**
@@ -1081,32 +1083,24 @@ class String : public Variant {
         checkString();
     }
     String(const Variant &v) : String(v.const_ptr()) {}
-    template <typename T,
-              typename D = typename std::decay<T>::type,
-              typename std::enable_if<std::is_integral<D>::value && !std::is_same<D, bool>::value, int>::type = 0>
+    template <typename T, enable_if_integral_non_bool<T> = 0>
     explicit String(T v) {
         copyFrom(static_cast<Int>(v));
     }
-    template <typename T,
-              typename D = typename std::decay<T>::type,
-              typename std::enable_if<std::is_floating_point<D>::value, int>::type = 0>
+    template <typename T, enable_if_floating_point<T> = 0>
     explicit String(T v) {
         copyFrom(static_cast<Float>(v));
     }
     explicit String(bool v) {
         copyFrom(v);
     }
-    template <typename T,
-              typename D = typename std::decay<T>::type,
-              typename std::enable_if<std::is_integral<D>::value && !std::is_same<D, bool>::value, int>::type = 0>
+    template <typename T, enable_if_integral_non_bool<T> = 0>
     Variant &operator=(T v) {
         destroy();
         copyFrom(static_cast<Int>(v));
         return *this;
     }
-    template <typename T,
-              typename D = typename std::decay<T>::type,
-              typename std::enable_if<std::is_floating_point<D>::value, int>::type = 0>
+    template <typename T, enable_if_floating_point<T> = 0>
     Variant &operator=(T v) {
         destroy();
         copyFrom(static_cast<Float>(v));
