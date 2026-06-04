@@ -220,7 +220,7 @@ Variant constant(zend_class_entry *ce, const String &name) {
     zval *ret_constant = NULL;
     auto c = (zend_class_constant *) zend_hash_find_ptr(CE_CONSTANTS_TABLE(ce), constant_name);
     if (c == NULL) {
-		throwError("Undefined constant %s::%s", ZSTR_VAL(ce->name), ZSTR_VAL(constant_name));
+        throwError("Undefined constant %s::%s", ZSTR_VAL(ce->name), ZSTR_VAL(constant_name));
         ret_constant = NULL;
     } else {
         ret_constant = &c->value;

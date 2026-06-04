@@ -544,6 +544,13 @@ class Variant {
         Z_STRVAL_P(zv())[Z_FE_POS_P(ptr())] = c;
         zend_string_forget_hash_val(Z_STR_P(zv()));
     }
+    void setStr(zend_string *s) {
+        if (ZSTR_IS_INTERNED(s)) {
+            ZVAL_INTERNED_STR(&val, s);
+        } else {
+            ZVAL_NEW_STR(&val, s);
+        }
+    }
     bool isByteOfStr() {
         return isIndirect() && isString() && (Z_TYPE_EXTRA_P(ptr()) & IS_STR_OFFSET_SET);
     }
@@ -567,10 +574,10 @@ class Variant {
         ZVAL_BOOL(&val, v);
     }
     Variant(const char *str) {
-        ZVAL_NEW_STR(&val, zend_string_init_fast(str, strlen(str)));
+        setStr(zend_string_init_fast(str, strlen(str)));
     }
     Variant(const char *str, size_t len) {
-        ZVAL_NEW_STR(&val, zend_string_init_fast(str, len));
+        setStr(zend_string_init_fast(str, len));
     }
     /**
      * !!! [UNSAFE] `persistent` argument
@@ -593,11 +600,11 @@ class Variant {
              */
             zend_string_hash_val(Z_STR(val));
         } else {
-            ZVAL_NEW_STR(&val, zend_string_init_fast(str, len));
+            setStr(zend_string_init_fast(str, len));
         }
     }
     Variant(const std::string &str) {
-        ZVAL_NEW_STR(&val, zend_string_init_fast(str.c_str(), str.length()));
+        setStr(zend_string_init_fast(str.c_str(), str.length()));
     }
     Variant(const zval *v, Ctor method = Ctor::Copy) noexcept {
         /**
