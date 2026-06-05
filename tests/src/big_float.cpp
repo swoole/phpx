@@ -194,6 +194,26 @@ TEST(bigfloat, abs_zero) {
     ASSERT_EQ(BigFloat::toInt(r).toInt(), 0);
 }
 
+// ============ Sqrt ============
+
+TEST(bigfloat, sqrt_perfect_square) {
+    auto a = php::toBigFloat(4.0);
+    auto r = BigFloat::sqrt(a);
+    ASSERT_EQ(BigFloat::toString(r).toString(), "2");
+}
+
+TEST(bigfloat, sqrt_fractional) {
+    auto a = php::toBigFloat(2.25);
+    auto r = BigFloat::sqrt(a);
+    ASSERT_EQ(BigFloat::toString(r).toString(), "1.5");
+}
+
+TEST(bigfloat, sqrt_zero) {
+    auto a = php::toBigFloat((php::Int) 0);
+    auto r = BigFloat::sqrt(a);
+    ASSERT_EQ(BigFloat::toString(r).toString(), "0");
+}
+
 // ============ Comparison ============
 
 TEST(bigfloat, cmp_greater) {

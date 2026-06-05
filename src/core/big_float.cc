@@ -132,6 +132,24 @@ Variant BigFloat::abs(Variant a) {
     return Variant(result);
 }
 
+Variant BigFloat::sqrt(Variant a) {
+    mpfr_t va;
+    mpfr_init(va);
+    if (UNEXPECTED(!extractBigFloat(a, va))) {
+        mpfr_clear(va);
+        return nullptr;
+    }
+    if (mpfr_sgn(va) < 0) {
+        mpfr_clear(va);
+        throwException(zend_ce_type_error, "BigFloat::sqrt: cannot compute square root of negative number");
+        return nullptr;
+    }
+    auto *result = newBigFloatImpl();
+    mpfr_sqrt(result->value, va, MPFR_RNDN);
+    mpfr_clear(va);
+    return Variant(result);
+}
+
 Variant BigFloat::toString(Variant a) {
     auto *bf = a.toBox<BigFloat>();
     if (UNEXPECTED(!bf)) {

@@ -46,6 +46,7 @@ class BigFloat : public Box {
     static Variant cmp(Variant a, Variant b);
     static Variant abs(Variant a);
 
+    static Variant sqrt(Variant a);
     static Variant toString(Variant a);
     static Variant toInt(Variant a);
     static Variant toFloat(Variant a);
