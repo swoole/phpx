@@ -441,6 +441,63 @@ Variant Variant::serialize() {
     return retval;
 }
 
+// Fast integer arithmetic with overflow detection.
+// GCC/Clang: __builtin_*_overflow — compile to single add+jo / sub+jo / mul+jo.
+// MSVC:      _addcarry_u64 / _subborrow_u64 from <intrin.h>; manual mul check.
+// Others:    portable manual overflow checks.
+#if defined(__GNUC__) || defined(__clang__)
+#define PHPX_HAS_BUILTIN_OVERFLOW 1
+#elif defined(_MSC_VER)
+#include <intrin.h>
+#endif
+
+static inline bool fast_add_overflow(zend_long a, zend_long b, zend_long *result) {
+#if PHPX_HAS_BUILTIN_OVERFLOW
+    return __builtin_add_overflow(a, b, result);
+#elif defined(_MSC_VER)
+    unsigned char carry = _addcarry_u64(0, (unsigned __int64) a, (unsigned __int64) b, (unsigned __int64 *) result);
+    return carry != 0;
+#else
+    if ((b > 0) && (a > ZEND_LONG_MAX - b)) return true;
+    if ((b < 0) && (a < ZEND_LONG_MIN - b)) return true;
+    *result = a + b;
+    return false;
+#endif
+}
+
+static inline bool fast_sub_overflow(zend_long a, zend_long b, zend_long *result) {
+#if PHPX_HAS_BUILTIN_OVERFLOW
+    return __builtin_sub_overflow(a, b, result);
+#elif defined(_MSC_VER)
+    unsigned char borrow = _subborrow_u64(0, (unsigned __int64) a, (unsigned __int64) b, (unsigned __int64 *) result);
+    return borrow != 0;
+#else
+    if ((b < 0) && (a > ZEND_LONG_MAX + b)) return true;
+    if ((b > 0) && (a < ZEND_LONG_MIN + b)) return true;
+    *result = a - b;
+    return false;
+#endif
+}
+
+static inline bool fast_mul_overflow(zend_long a, zend_long b, zend_long *result) {
+#if PHPX_HAS_BUILTIN_OVERFLOW
+    return __builtin_mul_overflow(a, b, result);
+#else
+    // MSVC _mul128 is x64-only; portable division-based check is fine for mul.
+    if (a == ZEND_LONG_MIN && b == -1) return true;
+    if (b == ZEND_LONG_MIN && a == -1) return true;
+    if (a > 0) {
+        if (b > 0 && a > ZEND_LONG_MAX / b) return true;
+        if (b < 0 && b < ZEND_LONG_MIN / a) return true;
+    } else if (a < 0) {
+        if (b > 0 && a < ZEND_LONG_MIN / b) return true;
+        if (b < 0 && a < ZEND_LONG_MAX / b) return true;
+    }
+    *result = a * b;
+    return false;
+#endif
+}
+
 Variant &Variant::operator++() {
     increment_function(unwrap_ptr());
     throwErrorIfOccurred();
@@ -468,30 +525,95 @@ Variant Variant::operator--(int) {
 }
 
 Variant &Variant::operator+=(const Variant &v) {
+    if (isInt() && v.isInt()) {
+        zend_long a = Z_LVAL_P(unwrap_ptr());
+        zend_long b = Z_LVAL_P(v.unwrap_ptr());
+        zend_long result;
+        if (fast_add_overflow(a, b, &result)) {
+            ZVAL_DOUBLE(unwrap_ptr(), (double) a + (double) b);
+        } else {
+            ZVAL_LONG(unwrap_ptr(), result);
+        }
+        return *this;
+    }
     add_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
     throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator-=(const Variant &v) {
+    if (isInt() && v.isInt()) {
+        zend_long a = Z_LVAL_P(unwrap_ptr());
+        zend_long b = Z_LVAL_P(v.unwrap_ptr());
+        zend_long result;
+        if (fast_sub_overflow(a, b, &result)) {
+            ZVAL_DOUBLE(unwrap_ptr(), (double) a - (double) b);
+        } else {
+            ZVAL_LONG(unwrap_ptr(), result);
+        }
+        return *this;
+    }
     sub_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
     throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator/=(const Variant &v) {
+    if (isInt() && v.isInt()) {
+        zend_long a = Z_LVAL_P(unwrap_ptr());
+        zend_long b = Z_LVAL_P(v.unwrap_ptr());
+        if (UNEXPECTED(b == 0)) {
+            div_function(ptr(), unwrap_ptr(), NO_CONST_V(v));
+            throwErrorIfOccurred();
+            return *this;
+        }
+        if (UNEXPECTED(a == ZEND_LONG_MIN && b == -1)) {
+            ZVAL_DOUBLE(unwrap_ptr(), (double) a / (double) b);
+        } else if (a % b == 0) {
+            ZVAL_LONG(unwrap_ptr(), a / b);
+        } else {
+            ZVAL_DOUBLE(unwrap_ptr(), (double) a / (double) b);
+        }
+        return *this;
+    }
     div_function(ptr(), unwrap_ptr(), NO_CONST_V(v));
     throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator*=(const Variant &v) {
+    if (isInt() && v.isInt()) {
+        zend_long a = Z_LVAL_P(unwrap_ptr());
+        zend_long b = Z_LVAL_P(v.unwrap_ptr());
+        zend_long result;
+        if (fast_mul_overflow(a, b, &result)) {
+            ZVAL_DOUBLE(unwrap_ptr(), (double) a * (double) b);
+        } else {
+            ZVAL_LONG(unwrap_ptr(), result);
+        }
+        return *this;
+    }
     mul_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
     throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator%=(const Variant &v) {
+    if (isInt() && v.isInt()) {
+        zend_long a = Z_LVAL_P(unwrap_ptr());
+        zend_long b = Z_LVAL_P(v.unwrap_ptr());
+        if (UNEXPECTED(b == 0)) {
+            mod_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
+            throwErrorIfOccurred();
+            return *this;
+        }
+        if (UNEXPECTED(a == ZEND_LONG_MIN && b == -1)) {
+            ZVAL_LONG(unwrap_ptr(), 0);
+            return *this;
+        }
+        ZVAL_LONG(unwrap_ptr(), a % b);
+        return *this;
+    }
     mod_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
     throwErrorIfOccurred();
     return *this;
@@ -528,22 +650,75 @@ Variant &Variant::operator^=(const Variant &v) {
 }
 
 Variant Variant::operator+(const Variant &v) const {
+    if (isInt() && v.isInt()) {
+        zend_long a = Z_LVAL_P(unwrap_ptr());
+        zend_long b = Z_LVAL_P(v.unwrap_ptr());
+        zend_long result;
+        if (fast_add_overflow(a, b, &result)) {
+            return Variant((double) a + (double) b);
+        }
+        return Variant(result);
+    }
     return calc_op(add_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator-(const Variant &v) const {
+    if (isInt() && v.isInt()) {
+        zend_long a = Z_LVAL_P(unwrap_ptr());
+        zend_long b = Z_LVAL_P(v.unwrap_ptr());
+        zend_long result;
+        if (fast_sub_overflow(a, b, &result)) {
+            return Variant((double) a - (double) b);
+        }
+        return Variant(result);
+    }
     return calc_op(sub_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator*(const Variant &v) const {
+    if (isInt() && v.isInt()) {
+        zend_long a = Z_LVAL_P(unwrap_ptr());
+        zend_long b = Z_LVAL_P(v.unwrap_ptr());
+        zend_long result;
+        if (fast_mul_overflow(a, b, &result)) {
+            return Variant((double) a * (double) b);
+        }
+        return Variant(result);
+    }
     return calc_op(mul_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator/(const Variant &v) const {
+    if (isInt() && v.isInt()) {
+        zend_long a = Z_LVAL_P(unwrap_ptr());
+        zend_long b = Z_LVAL_P(v.unwrap_ptr());
+        if (UNEXPECTED(b == 0)) {
+            return calc_op(div_function, const_ptr(), v.const_ptr());
+        }
+        if (UNEXPECTED(a == ZEND_LONG_MIN && b == -1)) {
+            return Variant((double) a / (double) b);
+        }
+        if (a % b == 0) {
+            // Exact division — return int (PHP 8.0+)
+            return Variant(a / b);
+        }
+        return Variant((double) a / (double) b);
+    }
     return calc_op(div_function, const_ptr(), v.const_ptr());
 }
 
 Variant Variant::operator%(const Variant &v) const {
+    if (isInt() && v.isInt()) {
+        zend_long a = Z_LVAL_P(unwrap_ptr());
+        zend_long b = Z_LVAL_P(v.unwrap_ptr());
+        if (UNEXPECTED(b == 0)) {
+            return calc_op(mod_function, const_ptr(), v.const_ptr());
+        }
+        if (UNEXPECTED(a == ZEND_LONG_MIN && b == -1)) {
+            return Variant((zend_long) 0);
+        }
+        return Variant(a % b);
+    }
     return calc_op(mod_function, const_ptr(), v.const_ptr());
 }
 
