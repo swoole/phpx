@@ -31,6 +31,10 @@ extern zend_class_entry *php_get_called_ce(php::Object &this_);
 extern php::Scope php_switch_scope(php::Object &this_);
 extern void php_restore_scope(php::Scope &ori_scope);
 
+extern inline php::Var php_deindirect(const php::Var &var) {
+    return php::Var{var.const_ptr(), php::Ctor::CopyRef};
+}
+
 static inline auto php_std_create_object(zend_class_entry *ce) {
     auto obj = zend_objects_new(ce);
     object_properties_init(obj, ce);
