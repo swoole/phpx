@@ -9,6 +9,11 @@ using namespace php;
 
 constexpr double PI = 3.1415926;
 
+static int append_by_value_and_return_refcount(Reference ref) {
+    ref.append(2L);
+    return ref.getRefCount();
+}
+
 TEST(variant, zend_string_constructor) {
     // Test Variant(zend_string *s, Ctor method = Ctor::Copy) constructor
 
@@ -554,6 +559,19 @@ TEST(variant, ref4) {
 
     array_push(ref, "php", "java", "go");
     ASSERT_EQ(ref.length(), 3);
+}
+
+TEST(variant, ref_temporary_by_value) {
+    Array arr;
+    arr.append(1L);
+
+    int refcount_during_call = append_by_value_and_return_refcount(arr.toReference());
+
+    ASSERT_TRUE(arr.isReference());
+    ASSERT_TRUE(arr.isArray());
+    ASSERT_EQ(arr.length(), 2);
+    ASSERT_EQ(refcount_during_call, 2);
+    ASSERT_EQ(arr.getRefCount(), 1);
 }
 
 TEST(variant, ref5) {

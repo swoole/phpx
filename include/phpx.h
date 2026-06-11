@@ -671,7 +671,7 @@ class Variant {
         }
         v.val = {};
     }
-    Variant(Variant *v) {
+    Variant(Variant *v) : Variant() {
         copyRef(v);
     }
     Variant(const Reference *ref);
