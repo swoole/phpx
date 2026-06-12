@@ -15,6 +15,7 @@ extern "C" {
 #include "zend_interfaces.h"
 #include "zend_exceptions.h"
 #include "Zend/zend_smart_str.h"
+#include "ext/standard/base64.h"
 #include "ext/standard/crc32.h"
 #include "ext/standard/url.h"
 #include "ext/standard/md5.h"
@@ -56,6 +57,86 @@ Variant sha1(const String &s, bool raw_output = false);
 // hash(string $algo, string $data, bool $binary = false): string
 // ========================
 Variant hash(const String &algo, const String &data, bool raw_output = false);
+
+// ========================
+// base64_encode(string $string): string
+// ========================
+
+inline String base64_encode(const String &data) {
+    zend_string *result = php_base64_encode((const unsigned char *) data.data(), data.length());
+    if (!result) {
+        return String();
+    }
+    return String(result, Ctor::Move);
+}
+
+// ========================
+// base64_decode(string $string, bool $strict = false): string|false
+// ========================
+
+inline Variant base64_decode(const String &data, bool strict = false) {
+    zend_string *result = php_base64_decode_ex((const unsigned char *) data.data(), data.length(), strict);
+    if (!result) {
+        return Variant(false);
+    }
+    return Variant(String(result, Ctor::Move));
+}
+
+// ========================
+// urlencode(string $string): string
+// ========================
+
+inline String urlencode(const String &data) {
+    zend_string *result = php_url_encode(data.data(), data.length());
+    if (!result) {
+        return String();
+    }
+    return String(result, Ctor::Move);
+}
+
+// ========================
+// urldecode(string $string): string
+// ========================
+
+inline String urldecode(const String &data) {
+    if (data.empty()) {
+        return String();
+    }
+    size_t len = data.length();
+    zend_string *buf = zend_string_init(data.data(), len, 0);
+    size_t new_len = php_url_decode(ZSTR_VAL(buf), len);
+    ZSTR_VAL(buf)[new_len] = '\0';
+    ZSTR_LEN(buf) = new_len;
+    return String(buf, Ctor::Move);
+}
+
+// ========================
+// rawurlencode(string $string): string
+// ========================
+
+inline String rawurlencode(const String &data) {
+    zend_string *result = php_raw_url_encode(data.data(), data.length());
+    if (!result) {
+        return String();
+    }
+    return String(result, Ctor::Move);
+}
+
+// ========================
+// rawurldecode(string $string): string
+// ========================
+
+inline String rawurldecode(const String &data) {
+    if (data.empty()) {
+        return String();
+    }
+    size_t len = data.length();
+    zend_string *buf = zend_string_init(data.data(), len, 0);
+    size_t new_len = php_raw_url_decode(ZSTR_VAL(buf), len);
+    ZSTR_VAL(buf)[new_len] = '\0';
+    ZSTR_LEN(buf) = new_len;
+    return String(buf, Ctor::Move);
+}
 
 // ========================
 // random_int(int $min, int $max): int
