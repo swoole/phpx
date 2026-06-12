@@ -27,6 +27,10 @@ Bool is_file(const String &filename) {
     return _fs_stat(filename, FS_IS_FILE);
 }
 
+Bool file_exists(const String &filename) {
+    return _fs_stat(filename, FS_EXISTS);
+}
+
 Variant realpath(const String &path) {
     char resolved[PATH_MAX];
     if (!expand_filepath(path.data(), resolved)) {

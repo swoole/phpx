@@ -21,8 +21,7 @@ static Bool _class_exists(const String &name, bool autoload, int match_flags, in
     if (ZSTR_HAS_CE_CACHE(name.str())) {
         ce = ZSTR_GET_CE_CACHE(name.str());
         if (ce) {
-            return (ce->ce_flags & match_flags) == match_flags
-                && !(ce->ce_flags & skip_flags);
+            return (ce->ce_flags & match_flags) == match_flags && !(ce->ce_flags & skip_flags);
         }
     }
 
@@ -40,15 +39,13 @@ static Bool _class_exists(const String &name, bool autoload, int match_flags, in
     }
 
     if (ce) {
-        return (ce->ce_flags & match_flags) == match_flags
-            && !(ce->ce_flags & skip_flags);
+        return (ce->ce_flags & match_flags) == match_flags && !(ce->ce_flags & skip_flags);
     }
     return false;
 }
 
 Bool class_exists(const String &name, bool autoload) {
-    return _class_exists(name, autoload, ZEND_ACC_LINKED,
-        ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT);
+    return _class_exists(name, autoload, ZEND_ACC_LINKED, ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT);
 }
 
 Bool interface_exists(const String &name, bool autoload) {
@@ -98,7 +95,7 @@ Bool method_exists(const Variant &obj_or_class, const String &method) {
         }
     } else {
         php::throwException(zend_ce_type_error,
-            "method_exists(): Argument #1 ($object_or_class) must be of type object|string");
+                            "method_exists(): Argument #1 ($object_or_class) must be of type object|string");
         return false;
     }
 
@@ -119,8 +116,8 @@ Bool method_exists(const Variant &obj_or_class, const String &method) {
         func = Z_OBJ_HT_P(this_)->get_method(&obj, method.str(), nullptr);
         if (func != nullptr) {
             if (func->common.fn_flags & ZEND_ACC_CALL_VIA_TRAMPOLINE) {
-                bool result = (func->common.scope == zend_ce_closure
-                    && zend_string_equals_literal_ci(method.str(), ZEND_INVOKE_FUNC_NAME));
+                bool result = (func->common.scope == zend_ce_closure &&
+                               zend_string_equals_literal_ci(method.str(), ZEND_INVOKE_FUNC_NAME));
                 zend_string_release_ex(func->common.function_name, 0);
                 zend_free_trampoline(func);
                 return result;
@@ -128,8 +125,7 @@ Bool method_exists(const Variant &obj_or_class, const String &method) {
             return true;
         }
     } else {
-        if (ce == zend_ce_closure
-            && zend_string_equals_literal_ci(method.str(), ZEND_INVOKE_FUNC_NAME)) {
+        if (ce == zend_ce_closure && zend_string_equals_literal_ci(method.str(), ZEND_INVOKE_FUNC_NAME)) {
             return true;
         }
     }
@@ -152,24 +148,19 @@ Bool property_exists(const Variant &obj_or_class, const String &property) {
         }
     } else {
         php::throwException(zend_ce_type_error,
-            "property_exists(): Argument #1 ($object_or_class) must be of type object|string");
+                            "property_exists(): Argument #1 ($object_or_class) must be of type object|string");
         return false;
     }
 
-    zend_property_info *prop_info = static_cast<zend_property_info *>(zend_hash_find_ptr(
-        &ce->properties_info, property.str()));
-    if (prop_info != nullptr
-        && (!(prop_info->flags & ZEND_ACC_PRIVATE) || prop_info->ce == ce)) {
+    zend_property_info *prop_info =
+        static_cast<zend_property_info *>(zend_hash_find_ptr(&ce->properties_info, property.str()));
+    if (prop_info != nullptr && (!(prop_info->flags & ZEND_ACC_PRIVATE) || prop_info->ce == ce)) {
         return true;
     }
 
     if (obj_or_class.isObject()) {
-        return Z_OBJ_HANDLER_P(
-            NO_CONST_V(obj_or_class), has_property)(
-            Z_OBJ_P(NO_CONST_V(obj_or_class)),
-            property.str(),
-            ZEND_PROPERTY_EXISTS,
-            nullptr) != 0;
+        return Z_OBJ_HANDLER_P(NO_CONST_V(obj_or_class), has_property)(
+                   Z_OBJ_P(NO_CONST_V(obj_or_class)), property.str(), ZEND_PROPERTY_EXISTS, nullptr) != 0;
     }
     return false;
 }
@@ -239,8 +230,7 @@ Bool is_subclass_of(const Variant &obj, const String &class_name, bool allow_str
 // ========================
 
 Bool defined(const String &name) {
-    return zend_get_constant_ex(name.str(), zend_get_executed_scope(),
-        ZEND_FETCH_CLASS_SILENT) != nullptr;
+    return zend_get_constant_ex(name.str(), zend_get_executed_scope(), ZEND_FETCH_CLASS_SILENT) != nullptr;
 }
 
 // ========================
@@ -264,7 +254,8 @@ static bool _validate_constant_array(HashTable *ht, int arg_num) {
                 break;
             }
         }
-    } ZEND_HASH_FOREACH_END();
+    }
+    ZEND_HASH_FOREACH_END();
     GC_UNPROTECT_RECURSION(ht);
     return ret;
 }
@@ -289,22 +280,22 @@ static void _copy_constant_array(zval *dst, zval *src) {
         } else {
             Z_TRY_ADDREF_P(val);
         }
-    } ZEND_HASH_FOREACH_END();
+    }
+    ZEND_HASH_FOREACH_END();
 }
 
 Bool define(const String &name, const Variant &value, bool case_insensitive) {
     zend_string *zname = name.str();
 
-    if (zend_memnstr(ZSTR_VAL(zname), "::", sizeof("::") - 1,
-                     ZSTR_VAL(zname) + ZSTR_LEN(zname))) {
+    if (zend_memnstr(ZSTR_VAL(zname), "::", sizeof("::") - 1, ZSTR_VAL(zname) + ZSTR_LEN(zname))) {
         zend_argument_value_error(1, "cannot be a class constant");
         return false;
     }
 
     if (case_insensitive) {
         zend_error(E_WARNING,
-            "define(): Argument #3 ($case_insensitive) is ignored "
-            "since declaration of case-insensitive constants is no longer supported");
+                   "define(): Argument #3 ($case_insensitive) is ignored "
+                   "since declaration of case-insensitive constants is no longer supported");
     }
 
     zend_constant c;
@@ -350,7 +341,7 @@ Variant get_parent_class(const Variant &obj_or_class) {
         }
     } else {
         php::throwException(zend_ce_type_error,
-            "get_parent_class(): Argument #1 ($object_or_class) must be of type object|string");
+                            "get_parent_class(): Argument #1 ($object_or_class) must be of type object|string");
         return Variant(false);
     }
 

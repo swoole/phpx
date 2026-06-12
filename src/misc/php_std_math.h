@@ -19,6 +19,15 @@ namespace php::std {
 // round(mixed $num, int $precision = 0, int $mode = PHP_ROUND_HALF_UP): float
 Float round(const Variant &value, Int precision = 0, Int mode = PHP_ROUND_HALF_UP);
 
+// abs(mixed $value): int|float
+inline Variant abs(const Variant &value) {
+    if (value.isInt()) {
+        Int v = value.toInt();
+        return Variant(v >= 0 ? v : -v);
+    }
+    return Variant(std::abs(value.toFloat()));
+}
+
 // floor(float $num): float
 inline Float floor(const Variant &value) {
     return static_cast<Float>(::floor(value.toFloat()));
@@ -28,11 +37,5 @@ inline Float floor(const Variant &value) {
 inline Float ceil(const Variant &value) {
     return static_cast<Float>(::ceil(value.toFloat()));
 }
-
-// max(mixed $value, mixed ...$values): mixed
-Variant max(const Variant &arg);
-
-// min(mixed $value, mixed ...$values): mixed
-Variant min(const Variant &arg);
 
 }  // namespace php::std

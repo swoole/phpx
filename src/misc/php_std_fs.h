@@ -18,6 +18,7 @@ namespace php::std {
 
 Bool is_dir(const String &filename);
 Bool is_file(const String &filename);
+Bool file_exists(const String &filename);
 Variant realpath(const String &path);
 
 }  // namespace php::std

@@ -14,10 +14,8 @@ extern "C" {
 #include "zend_API.h"
 #include "zend_interfaces.h"
 #include "zend_exceptions.h"
-#include "zend_hrtime.h"
 #include "ext/standard/crc32.h"
 #include "ext/standard/url.h"
-#include "ext/standard/html.h"
 #include "ext/standard/md5.h"
 #include "ext/standard/php_versioning.h"
 #include "ext/standard/php_standard.h"
@@ -34,48 +32,10 @@ namespace php::std {
 // ========================
 
 inline Int crc32(const String &s) {
-    uint32_t init = 0;
-    uint32_t crc = php_crc32_bulk_update(init, s.data(), s.length());
-    return static_cast<Int>(crc ^ 0xFFFFFFFF);
+    uint32_t crc = php_crc32_bulk_init();
+    crc = php_crc32_bulk_update(crc, s.data(), s.length());
+    return php_crc32_bulk_end(crc);
 }
-
-// ========================
-// microtime (needs gettimeofday, implemented in .cpp)
-// ========================
-
-Variant microtime(bool as_float = false);
-
-// ========================
-// hrtime (needs clock_gettime via zend_hrtime, implemented in .cpp)
-// ========================
-
-Variant hrtime(bool as_number = false);
-
-// ========================
-// pack / unpack (complex, implemented in .cpp)
-// ========================
-
-Variant pack(const String &format, const Variant &values);
-Variant unpack(const String &format, const String &data, Int offset = 0);
-
-// ========================
-// HTML entity functions (implemented in .cpp)
-// ========================
-
-String htmlspecialchars(const String &s, Int flags = ENT_QUOTES | ENT_SUBSTITUTE,
-                        const Variant &encoding = Variant(nullptr),
-                        bool double_encode = true);
-
-String htmlentities(const String &s, Int flags = ENT_QUOTES | ENT_SUBSTITUTE,
-                    const Variant &encoding = Variant(nullptr),
-                    bool double_encode = true);
-
-String htmlspecialchars_decode(const String &s, Int flags = ENT_QUOTES | ENT_SUBSTITUTE);
-
-String html_entity_decode(const String &s, Int flags = ENT_QUOTES | ENT_SUBSTITUTE,
-                          const Variant &encoding = Variant(nullptr));
-
-String strip_tags(const String &s, const Variant &allowed_tags = Variant(nullptr));
 
 // ========================
 // md5(string $string, bool $binary = false): string

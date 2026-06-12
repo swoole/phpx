@@ -32,9 +32,10 @@ inline Bool str_ends_with(const String &haystack, const String &needle) {
 // str_contains(string $haystack, string $needle): bool
 // ========================
 inline Bool str_contains(const String &haystack, const String &needle) {
-    const char *found = (const char *)php_memnstr(
-        ZSTR_VAL(haystack.str()), ZSTR_VAL(needle.str()),
-        ZSTR_LEN(needle.str()), ZSTR_VAL(haystack.str()) + ZSTR_LEN(haystack.str()));
+    const char *found = (const char *) php_memnstr(ZSTR_VAL(haystack.str()),
+                                                   ZSTR_VAL(needle.str()),
+                                                   ZSTR_LEN(needle.str()),
+                                                   ZSTR_VAL(haystack.str()) + ZSTR_LEN(haystack.str()));
     return found != nullptr;
 }
 
@@ -49,7 +50,7 @@ inline String lcfirst(const String &s) {
     ZSTR_VAL(result)[s.length()] = '\0';
     memcpy(ZSTR_VAL(result), s.data(), s.length());
     if (ZSTR_VAL(result)[0] >= 'A' && ZSTR_VAL(result)[0] <= 'Z') {
-        ZSTR_VAL(result)[0] = (char)(ZSTR_VAL(result)[0] + 32);
+        ZSTR_VAL(result)[0] = (char) (ZSTR_VAL(result)[0] + 32);
     }
     return String(result, Ctor::Move);
 }
@@ -69,18 +70,11 @@ inline String join(const String &glue, const Array &pieces) {
 }
 
 // ========================
-// str_replace(mixed $search, mixed $replace, mixed $subject): string|array
-// Uses php_str_to_str() for the string-only fast path.
-// ========================
-Variant str_replace(const Variant &search, const Variant &replace, const Variant &subject);
-
-// ========================
 // strpos / stripos / strrpos / strripos
 // ========================
 Variant strpos(const String &haystack, const String &needle, Int offset = 0);
 Variant stripos(const String &haystack, const String &needle, Int offset = 0);
 Variant strrpos(const String &haystack, const String &needle, Int offset = 0);
-Variant strripos(const String &haystack, const String &needle, Int offset = 0);
 
 // ========================
 // strstr / stristr
@@ -117,19 +111,16 @@ inline String strtolower(const String &s) {
     if (slen == 0) {
         return String();
     }
-    zend_string *result = zend_string_alloc(slen, 0);
-    zend_str_tolower_copy(ZSTR_VAL(result), s.data(), slen);
-    ZSTR_VAL(result)[slen] = '\0';
+    auto result = zend_string_tolower(s.str());
     return String(result, Ctor::Move);
 }
+
 inline String strtoupper(const String &s) {
     size_t slen = s.length();
     if (slen == 0) {
         return String();
     }
-    zend_string *result = zend_string_alloc(slen, 0);
-    zend_str_toupper_copy(ZSTR_VAL(result), s.data(), slen);
-    ZSTR_VAL(result)[slen] = '\0';
+    auto result = zend_string_toupper(s.str());
     return String(result, Ctor::Move);
 }
 
@@ -141,19 +132,14 @@ inline String str_repeat(const String &s, Int times) {
         return String();
     }
     size_t slen = s.length();
-    zend_string *result = zend_string_safe_alloc((size_t)times, slen, 0, 0);
+    zend_string *result = zend_string_safe_alloc((size_t) times, slen, 0, 0);
     char *p = ZSTR_VAL(result);
     for (Int i = 0; i < times; i++) {
-        memcpy(p + (size_t)i * slen, s.data(), slen);
+        memcpy(p + (size_t) i * slen, s.data(), slen);
     }
-    ZSTR_VAL(result)[(size_t)times * slen] = '\0';
+    ZSTR_VAL(result)[(size_t) times * slen] = '\0';
     return String(result, Ctor::Move);
 }
-
-// ========================
-// str_pad(string $s, int $length, string $pad = " ", int $pad_type = STR_PAD_RIGHT): string
-// ========================
-String str_pad(const String &s, Int length, const String &pad = String(" "), int pad_type = PHP_STR_PAD_RIGHT);
 
 // ========================
 // dirname / basename
@@ -176,7 +162,7 @@ inline String ucfirst(const String &s) {
     ZSTR_VAL(result)[s.length()] = '\0';
     memcpy(ZSTR_VAL(result), s.data(), s.length());
     if (ZSTR_VAL(result)[0] >= 'a' && ZSTR_VAL(result)[0] <= 'z') {
-        ZSTR_VAL(result)[0] = (char)(ZSTR_VAL(result)[0] - 32);
+        ZSTR_VAL(result)[0] = (char) (ZSTR_VAL(result)[0] - 32);
     }
     return String(result, Ctor::Move);
 }

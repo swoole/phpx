@@ -45,7 +45,8 @@ inline Int strcasecmp(const String &s1, const String &s2) {
 
 inline Int strncasecmp(const String &s1, const String &s2, Int len) {
     if (UNEXPECTED(len < 0)) {
-        php::throwException(zend_ce_value_error, "strncasecmp(): Argument #3 ($length) must be greater than or equal to 0");
+        php::throwException(zend_ce_value_error,
+                            "strncasecmp(): Argument #3 ($length) must be greater than or equal to 0");
     }
     return zend_binary_strncasecmp(s1.data(), s1.length(), s2.data(), s2.length(), len);
 }
@@ -70,7 +71,6 @@ Bool is_a(const Variant &obj, const String &class_name, bool allow_string = fals
 Bool is_subclass_of(const Variant &obj, const String &class_name, bool allow_string = true);
 Bool defined(const String &name);
 Bool define(const String &name, const Variant &value, bool case_insensitive = false);
-
 
 // ========================
 // Type checking functions (inline, direct Z_TYPE_P checks)
@@ -107,19 +107,23 @@ inline Bool is_resource(const Variant &value) {
 
 inline Bool is_scalar(const Variant &value) {
     switch (Z_TYPE_P(value.unwrap_ptr())) {
-        case IS_FALSE:
-        case IS_TRUE:
-        case IS_DOUBLE:
-        case IS_LONG:
-        case IS_STRING:
-            return true;
-        default:
-            return false;
+    case IS_FALSE:
+    case IS_TRUE:
+    case IS_DOUBLE:
+    case IS_LONG:
+    case IS_STRING:
+        return true;
+    default:
+        return false;
     }
 }
 
 inline Bool is_countable(const Variant &value) {
     return zend_is_countable(NO_CONST_V(value));
+}
+
+inline Bool is_null(const Variant &value) {
+    return value.isNull();
 }
 
 inline Bool is_iterable(const Variant &value) {
@@ -129,15 +133,15 @@ inline Bool is_iterable(const Variant &value) {
 inline Bool is_numeric(const Variant &value) {
     int type = Z_TYPE_P(value.unwrap_ptr());
     switch (type) {
-        case IS_LONG:
-        case IS_DOUBLE:
-            return true;
-        case IS_STRING: {
-            const zval *zv = value.unwrap_ptr();
-            return is_numeric_string(Z_STRVAL_P(zv), Z_STRLEN_P(zv), nullptr, nullptr, 0) != 0;
-        }
-        default:
-            return false;
+    case IS_LONG:
+    case IS_DOUBLE:
+        return true;
+    case IS_STRING: {
+        const zval *zv = value.unwrap_ptr();
+        return is_numeric_string(Z_STRVAL_P(zv), Z_STRLEN_P(zv), nullptr, nullptr, 0) != 0;
+    }
+    default:
+        return false;
     }
 }
 
@@ -162,18 +166,8 @@ Variant get_parent_class(const Variant &obj_or_class);
 
 // gettype(mixed $value): string
 inline String gettype(const Variant &value) {
-    switch (Z_TYPE_P(value.unwrap_ptr())) {
-        case IS_NULL:     return String("NULL");
-        case IS_FALSE:
-        case IS_TRUE:     return String("boolean");
-        case IS_LONG:     return String("integer");
-        case IS_DOUBLE:   return String("double");
-        case IS_STRING:   return String("string");
-        case IS_ARRAY:    return String("array");
-        case IS_OBJECT:   return String("object");
-        case IS_RESOURCE: return String("resource");
-        default:          return String("unknown type");
-    }
+    zend_string *s = zend_zval_get_legacy_type(value.unwrap_ptr());
+    return String(s, php::Ctor::Move);
 }
 
 }  // namespace php::std
