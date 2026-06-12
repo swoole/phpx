@@ -40,6 +40,63 @@ Variant md5(const String &s, bool raw_output) {
 }
 
 // ========================
+// sha1
+// ========================
+
+Variant sha1(const String &s, bool raw_output) {
+    PHP_SHA1_CTX context;
+    unsigned char digest[20];
+
+    PHP_SHA1Init(&context);
+    PHP_SHA1Update(&context, (const unsigned char *) s.data(), s.length());
+    PHP_SHA1Final(digest, &context);
+
+    if (raw_output) {
+        return Variant(String((char *) digest, 20));
+    }
+
+    char hex[41];
+    make_sha1_digest(hex, digest);
+    return Variant(String(hex, 40));
+}
+
+// ========================
+// hash
+// ========================
+
+Variant hash(const String &algo, const String &data, bool raw_output) {
+    const php_hash_ops *ops = php_hash_fetch_ops(algo.str());
+    if (!ops) {
+        php_error_docref(nullptr, E_WARNING, "Unknown hashing algorithm: %s", algo.data());
+        return Variant(false);
+    }
+
+    void *context = php_hash_alloc_context(ops);
+    ops->hash_init(context, nullptr);
+    ops->hash_update(context, (const unsigned char *) data.data(), data.length());
+
+    auto *digest = (unsigned char *) emalloc(ops->digest_size);
+    ops->hash_final(digest, context);
+    efree(context);
+
+    if (raw_output) {
+        String result((char *) digest, ops->digest_size);
+        efree(digest);
+        return Variant(result);
+    }
+
+    size_t hex_len = ops->digest_size * 2;
+    auto *hex = (char *) emalloc(hex_len + 1);
+    php_hash_bin2hex(hex, digest, ops->digest_size);
+    hex[hex_len] = '\0';
+    efree(digest);
+
+    String result(hex, hex_len);
+    efree(hex);
+    return Variant(result);
+}
+
+// ========================
 // version_compare
 // ========================
 
