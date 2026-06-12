@@ -750,4 +750,37 @@ Array parse_str(const String &str) {
     return retval;
 }
 
+// ========================
+// shell_exec
+// ========================
+
+Variant shell_exec(const String &command) {
+    if (command.length() == 0) {
+        zend_argument_must_not_be_empty_error(1);
+        return Variant(nullptr);
+    }
+
+#ifdef PHP_WIN32
+    FILE *in = VCWD_POPEN(command.data(), "rt");
+#else
+    FILE *in = VCWD_POPEN(command.data(), "r");
+#endif
+    if (!in) {
+        php_error_docref(nullptr, E_WARNING, "Unable to execute '%s'", command.data());
+        return Variant(false);
+    }
+
+    php_stream *stream = php_stream_fopen_from_pipe(in, "rb");
+    zend_string *ret = php_stream_copy_to_mem(stream, PHP_STREAM_COPY_ALL, 0);
+    php_stream_close(stream);
+
+    if (ret && ZSTR_LEN(ret) > 0) {
+        return Variant(String(ret, php::Ctor::Move));
+    }
+    if (ret) {
+        zend_string_release(ret);
+    }
+    return Variant(nullptr);
+}
+
 }  // namespace php::std

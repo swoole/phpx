@@ -98,4 +98,7 @@ String uniqid(const String &prefix = String(), bool more_entropy = false);
 // parse_str(string $string): array
 Array parse_str(const String &str);
 
+// shell_exec(string $command): string|false|null
+Variant shell_exec(const String &command);
+
 }  // namespace php::std

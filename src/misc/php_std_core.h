@@ -69,6 +69,7 @@ Bool property_exists(const Variant &obj_or_class, const String &property);
 Bool is_a(const Variant &obj, const String &class_name, bool allow_string = false);
 Bool is_subclass_of(const Variant &obj, const String &class_name, bool allow_string = true);
 Bool defined(const String &name);
+Bool define(const String &name, const Variant &value, bool case_insensitive = false);
 
 
 // ========================

@@ -244,6 +244,97 @@ Bool defined(const String &name) {
 }
 
 // ========================
+// define
+// ========================
+
+static bool _validate_constant_array(HashTable *ht, int arg_num) {
+    bool ret = 1;
+    zval *val;
+
+    GC_PROTECT_RECURSION(ht);
+    ZEND_HASH_FOREACH_VAL(ht, val) {
+        ZVAL_DEREF(val);
+        if (Z_TYPE_P(val) == IS_ARRAY && Z_REFCOUNTED_P(val)) {
+            if (Z_IS_RECURSIVE_P(val)) {
+                zend_argument_value_error(arg_num, "cannot be a recursive array");
+                ret = 0;
+                break;
+            } else if (!_validate_constant_array(Z_ARRVAL_P(val), arg_num)) {
+                ret = 0;
+                break;
+            }
+        }
+    } ZEND_HASH_FOREACH_END();
+    GC_UNPROTECT_RECURSION(ht);
+    return ret;
+}
+
+static void _copy_constant_array(zval *dst, zval *src) {
+    zend_string *key;
+    zend_ulong idx;
+    zval *new_val, *val;
+
+    array_init_size(dst, zend_hash_num_elements(Z_ARRVAL_P(src)));
+    ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(src), idx, key, val) {
+        ZVAL_DEREF(val);
+        if (key) {
+            new_val = zend_hash_add_new(Z_ARRVAL_P(dst), key, val);
+        } else {
+            new_val = zend_hash_index_add_new(Z_ARRVAL_P(dst), idx, val);
+        }
+        if (Z_TYPE_P(val) == IS_ARRAY) {
+            if (Z_REFCOUNTED_P(val)) {
+                _copy_constant_array(new_val, val);
+            }
+        } else {
+            Z_TRY_ADDREF_P(val);
+        }
+    } ZEND_HASH_FOREACH_END();
+}
+
+Bool define(const String &name, const Variant &value, bool case_insensitive) {
+    zend_string *zname = name.str();
+
+    if (zend_memnstr(ZSTR_VAL(zname), "::", sizeof("::") - 1,
+                     ZSTR_VAL(zname) + ZSTR_LEN(zname))) {
+        zend_argument_value_error(1, "cannot be a class constant");
+        return false;
+    }
+
+    if (case_insensitive) {
+        zend_error(E_WARNING,
+            "define(): Argument #3 ($case_insensitive) is ignored "
+            "since declaration of case-insensitive constants is no longer supported");
+    }
+
+    zend_constant c;
+    zval val_free;
+    ZVAL_UNDEF(&val_free);
+
+    zval *val = NO_CONST_V(value);
+    if (Z_TYPE_P(val) == IS_ARRAY) {
+        if (Z_REFCOUNTED_P(val)) {
+            if (!_validate_constant_array(Z_ARRVAL_P(val), 2)) {
+                return false;
+            }
+            _copy_constant_array(&c.value, val);
+            goto register_constant;
+        }
+    }
+
+    ZVAL_COPY(&c.value, val);
+    zval_ptr_dtor(&val_free);
+
+register_constant:
+    ZEND_CONSTANT_SET_FLAGS(&c, 0, PHP_USER_CONSTANT);
+    c.name = zend_string_copy(zname);
+    if (zend_register_constant(&c) == SUCCESS) {
+        return true;
+    }
+    return false;
+}
+
+// ========================
 // get_parent_class
 // ========================
 
