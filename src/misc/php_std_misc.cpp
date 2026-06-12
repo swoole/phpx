@@ -100,8 +100,33 @@ Variant hash(const String &algo, const String &data, bool raw_output) {
 // version_compare
 // ========================
 
-Int version_compare(const String &v1, const String &v2) {
-    return static_cast<Int>(php_version_compare(v1.data(), v2.data()));
+Variant version_compare(const String &v1, const String &v2, const String &op) {
+    int result = php_version_compare(v1.data(), v2.data());
+    if (op.length() == 0) {
+        return Variant(static_cast<Int>(result));
+    }
+
+    if (zend_string_equals_literal(op.str(), "<") || zend_string_equals_literal(op.str(), "lt")) {
+        return Variant(result == -1);
+    }
+    if (zend_string_equals_literal(op.str(), "<=") || zend_string_equals_literal(op.str(), "le")) {
+        return Variant(result != 1);
+    }
+    if (zend_string_equals_literal(op.str(), ">") || zend_string_equals_literal(op.str(), "gt")) {
+        return Variant(result == 1);
+    }
+    if (zend_string_equals_literal(op.str(), ">=") || zend_string_equals_literal(op.str(), "ge")) {
+        return Variant(result != -1);
+    }
+    if (zend_string_equals_literal(op.str(), "==") || zend_string_equals_literal(op.str(), "=") || zend_string_equals_literal(op.str(), "eq")) {
+        return Variant(result == 0);
+    }
+    if (zend_string_equals_literal(op.str(), "!=") || zend_string_equals_literal(op.str(), "<>") || zend_string_equals_literal(op.str(), "ne")) {
+        return Variant(result != 0);
+    }
+
+    php::throwException(zend_ce_value_error, "version_compare(): Argument #3 ($operator) must be a valid comparison operator");
+    return Variant(false);
 }
 
 // ========================
@@ -157,10 +182,15 @@ String uniqid(const String &prefix, bool more_entropy) {
 // ========================
 
 Array parse_str(const String &str) {
-    Array retval;
+    Array result;
     auto res = estrndup(str.data(), str.length());
-    sapi_module.treat_data(PARSE_STRING, res, retval.ptr());
-    return retval;
+    sapi_module.treat_data(PARSE_STRING, res, result.ptr());
+    return result;
+}
+
+void parse_str(const String &str, Array &result) {
+    auto res = estrndup(str.data(), str.length());
+    sapi_module.treat_data(PARSE_STRING, res, result.ptr());
 }
 
 // ========================

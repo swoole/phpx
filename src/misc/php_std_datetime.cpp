@@ -33,7 +33,7 @@ Variant strtotime(const String &datetime, const Variant &baseTimestamp) {
         return Variant(static_cast<Int>(result));
     }
     zend_long result = php_parse_date(datetime.data(), nullptr);
-    if (result <= 0) {
+    if (result == -1) {
         return Variant(false);
     }
     return Variant(static_cast<Int>(result));

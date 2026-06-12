@@ -128,7 +128,11 @@ inline String strtoupper(const String &s) {
 // str_repeat(string $s, int $times): string
 // ========================
 inline String str_repeat(const String &s, Int times) {
-    if (times <= 0) {
+    if (times < 0) {
+        php::throwException(zend_ce_value_error, "str_repeat(): Argument #2 ($times) must be greater than or equal to 0");
+        return String();
+    }
+    if (times == 0) {
         return String();
     }
     size_t slen = s.length();
@@ -146,12 +150,6 @@ inline String str_repeat(const String &s, Int times) {
 // ========================
 String dirname(const String &path, int levels = 1);
 String basename(const String &path, const String &suffix = String());
-
-// ========================
-// strtr(string $str, string $from, string $to): string
-// Uses php_strtr() for the simple 3-arg fast path.
-// ========================
-String strtr(const String &str, const String &from, const String &to);
 
 // ucfirst(string $s): string
 inline String ucfirst(const String &s) {

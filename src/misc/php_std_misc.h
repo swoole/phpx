@@ -182,9 +182,9 @@ inline Variant unserialize(const String &data, const Array &options = Array()) {
 }
 
 // ========================
-// version_compare(string $v1, string $v2): int
+// version_compare(string $v1, string $v2, ?string $operator = null): int|bool
 // ========================
-Int version_compare(const String &v1, const String &v2);
+Variant version_compare(const String &v1, const String &v2, const String &op = String());
 
 // ========================
 // print_r(mixed $value, bool $return = false): string|bool
@@ -194,8 +194,9 @@ Variant print_r(const Variant &value, bool do_return = false);
 // uniqid(string $prefix = "", bool $more_entropy = false): string
 String uniqid(const String &prefix = String(), bool more_entropy = false);
 
-// parse_str(string $string): array
+// parse_str(string $string, &$array = null): void
 Array parse_str(const String &str);
+void parse_str(const String &str, Array &result);
 
 // shell_exec(string $command): string|false|null
 Variant shell_exec(const String &command);

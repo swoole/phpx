@@ -247,9 +247,10 @@ Variant array_search(const Variant &needle, const Array &haystack, bool strict) 
 // 21. reset
 // ========================
 
-Variant reset(Variant &arg) {
-    zval *zv = arg.unwrap_ptr();
+Variant reset(const Variant &arg) {
+    zval *zv = NO_CONST_V(arg);
     if (!zval_is_array(zv)) {
+        php::throwException(zend_ce_type_error, "reset(): Argument #1 ($array) must be of type array");
         return Variant(false);
     }
     zend_array *ht = Z_ARRVAL_P(zv);
@@ -268,9 +269,10 @@ Variant reset(Variant &arg) {
 // 22. end
 // ========================
 
-Variant end(Variant &arg) {
-    zval *zv = arg.unwrap_ptr();
+Variant end(const Variant &arg) {
+    zval *zv = NO_CONST_V(arg);
     if (!zval_is_array(zv)) {
+        php::throwException(zend_ce_type_error, "end(): Argument #1 ($array) must be of type array");
         return Variant(false);
     }
     zend_array *ht = Z_ARRVAL_P(zv);

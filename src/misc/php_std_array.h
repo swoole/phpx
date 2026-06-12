@@ -91,10 +91,8 @@ inline Int count(const Variant &value, Int mode = 0) {
         }
         return 1;
     }
-    if (value.isNull()) {
-        return 0;
-    }
-    return 1;
+    php::throwException(zend_ce_type_error, "count(): Argument #1 ($value) must be of type Countable|array");
+    return 0;
 }
 
 // ========================
@@ -124,10 +122,10 @@ inline Int array_push(Variant &arg, const First &first, const Rest &...rest) {
 }
 
 // reset(array &$array): mixed
-Variant reset(Variant &arg);
+Variant reset(const Variant &arg);
 
 // end(array &$array): mixed
-Variant end(Variant &arg);
+Variant end(const Variant &arg);
 
 // ========================
 // Array construction

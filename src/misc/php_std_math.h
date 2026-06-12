@@ -23,10 +23,12 @@ Float round(const Variant &value, Int precision = 0, Int mode = PHP_ROUND_HALF_U
 inline Variant abs(const Variant &value) {
     if (value.isInt()) {
         Int v = value.toInt();
+        if (v == ZEND_LONG_MIN) {
+            return Variant(static_cast<Float>(-static_cast<double>(ZEND_LONG_MIN)));
+        }
         return Variant(v >= 0 ? v : -v);
     }
-    double v = value.toFloat();
-    return Variant(v >= 0 ? v : -v);
+    return Variant(static_cast<Float>(::fabs(value.toFloat())));
 }
 
 // floor(float $num): float
@@ -257,12 +259,12 @@ inline Variant octdec(const String &s) {
 inline String base_convert(const String &number, Int frombase, Int tobase) {
     if (frombase < 2 || frombase > 36) {
         php::throwException(zend_ce_value_error,
-                            "base_convert(): Argument #2 ($frombase) must be between 2 and 36 (inclusive)");
+                            "base_convert(): Argument #2 ($from_base) must be between 2 and 36 (inclusive)");
         return String();
     }
     if (tobase < 2 || tobase > 36) {
         php::throwException(zend_ce_value_error,
-                            "base_convert(): Argument #3 ($tobase) must be between 2 and 36 (inclusive)");
+                            "base_convert(): Argument #3 ($to_base) must be between 2 and 36 (inclusive)");
         return String();
     }
     zval temp;

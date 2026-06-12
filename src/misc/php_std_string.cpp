@@ -22,7 +22,7 @@ namespace php::std {
 
 Array explode(const String &delimiter, const String &string, Int limit) {
     if (UNEXPECTED(delimiter.empty())) {
-        php::throwException(zend_ce_value_error, "explode(): Argument #1 ($separator) cannot be empty");
+        php::throwException(zend_ce_value_error, "explode(): Argument #1 ($separator) must not be empty");
         return Array();
     }
 
@@ -298,25 +298,6 @@ String basename(const String &path, const String &suffix) {
         return String();
     }
     return String(result, Ctor::Move);
-}
-
-// ========================
-// strtr
-// ========================
-
-String strtr(const String &str, const String &from, const String &to) {
-    size_t len = str.length();
-    if (len == 0) {
-        return String();
-    }
-    char *buf = (char *) emalloc(len + 1);
-    memcpy(buf, str.data(), len);
-    buf[len] = '\0';
-    size_t trlen = from.length() < to.length() ? from.length() : to.length();
-    php_strtr(buf, len, from.data(), to.data(), trlen);
-    String result(buf, len);
-    efree(buf);
-    return result;
 }
 
 }  // namespace php::std
