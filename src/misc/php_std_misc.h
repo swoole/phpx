@@ -76,8 +76,7 @@ inline Int random_int(Int min, Int max) {
 
 inline String random_bytes(Int length) {
     if (UNEXPECTED(length < 1)) {
-        php::throwException(zend_ce_value_error,
-                            "random_bytes(): Argument #1 ($length) must be greater than 0");
+        php::throwException(zend_ce_value_error, "random_bytes(): Argument #1 ($length) must be greater than 0");
         return String();
     }
     zend_string *bytes = zend_string_alloc(length, 0);
@@ -142,8 +141,8 @@ inline Variant json_encode(const Variant &value, int options = 0, int depth = 51
 inline Variant json_decode(const String &json, bool assoc = false, int depth = 512, int options = 0) {
     zval retval;
     ZVAL_NULL(&retval);
-    if (php_json_decode_ex(&retval, json.data(), json.length(),
-                           options | (assoc ? PHP_JSON_OBJECT_AS_ARRAY : 0), depth) != SUCCESS) {
+    if (php_json_decode_ex(
+            &retval, json.data(), json.length(), options | (assoc ? PHP_JSON_OBJECT_AS_ARRAY : 0), depth) != SUCCESS) {
         return Variant(nullptr);
     }
     return Variant(&retval, Ctor::Move);
@@ -174,9 +173,11 @@ inline String serialize(const Variant &value) {
 inline Variant unserialize(const String &data, const Array &options = Array()) {
     zval retval;
     ZVAL_NULL(&retval);
-    php_unserialize_with_options(&retval, data.data(), data.length(),
-                                  options.count() > 0 ? const_cast<zend_array *>(options.array()) : nullptr,
-                                  "unserialize");
+    php_unserialize_with_options(&retval,
+                                 data.data(),
+                                 data.length(),
+                                 options.count() > 0 ? const_cast<zend_array *>(options.array()) : nullptr,
+                                 "unserialize");
     return Variant(&retval, Ctor::Move);
 }
 

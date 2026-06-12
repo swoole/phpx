@@ -304,10 +304,7 @@ Variant throwException(const String &class_name, const char *message, int code) 
 
 Variant throwException(zend_class_entry *ce, const char *message, int code) {
     zend_throw_exception(ce, message, code);
-    augmentException();
-    if (throw_impl) {
-        throw_impl(EG(exception));
-    }
+    throwErrorIfOccurred();
     return {};
 }
 
@@ -315,10 +312,7 @@ Variant throwException(const Object &e) {
     auto zv = NO_CONST_V(e);
     zval_add_ref(zv);
     EG(exception) = Z_OBJ_P(zv);
-    augmentException();
-    if (throw_impl) {
-        throw_impl(EG(exception));
-    }
+    throwErrorIfOccurred();
     return {};
 }
 

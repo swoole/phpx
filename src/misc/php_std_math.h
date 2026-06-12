@@ -134,8 +134,7 @@ inline Float log(const Variant &num, Float base) {
         return NAN;
     }
     if (base <= 0.0) {
-        php::throwException(zend_ce_value_error,
-                            "log(): Argument #2 ($base) must be greater than 0");
+        php::throwException(zend_ce_value_error, "log(): Argument #2 ($base) must be greater than 0");
         return 0.0;
     }
     return static_cast<Float>(::log(num.toFloat()) / ::log(base));
@@ -189,6 +188,20 @@ inline Variant pow(const Variant &base, const Variant &exp) {
 
 inline Float fpow(const Variant &base, const Variant &exponent) {
     return static_cast<Float>(::pow(base.toFloat(), exponent.toFloat()));
+}
+
+inline Int intdiv(const Variant &dividend, const Variant &divisor) {
+    zend_long d1 = dividend.toInt();
+    zend_long d2 = divisor.toInt();
+    if (d2 == 0) {
+        throwExceptionEx(zend_ce_division_by_zero_error, 0, "Division by zero");
+        return 0;
+    }
+    if (d2 == -1 && d1 == ZEND_LONG_MIN) {
+        throwExceptionEx(zend_ce_arithmetic_error, 0, "Division of PHP_INT_MIN by -1 is not an integer");
+        return 0;
+    }
+    return static_cast<Int>(d1 / d2);
 }
 
 // ========================
@@ -262,12 +275,16 @@ inline String base_convert(const String &number, Int frombase, Int tobase) {
 }
 
 // number_format
-inline String number_format(const Variant &num, Int decimals = 0,
-                             const String &dec_point = String(".", 1),
-                             const String &thousand_sep = String(",", 1)) {
-    zend_string *result = _php_math_number_format_ex(num.toFloat(), (int) decimals,
-                                                      dec_point.data(), dec_point.length(),
-                                                      thousand_sep.data(), thousand_sep.length());
+inline String number_format(const Variant &num,
+                            Int decimals = 0,
+                            const String &dec_point = String(".", 1),
+                            const String &thousand_sep = String(",", 1)) {
+    zend_string *result = _php_math_number_format_ex(num.toFloat(),
+                                                     (int) decimals,
+                                                     dec_point.data(),
+                                                     dec_point.length(),
+                                                     thousand_sep.data(),
+                                                     thousand_sep.length());
     return String(result, Ctor::Move);
 }
 

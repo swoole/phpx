@@ -127,22 +127,36 @@ PHPX_API void enableDebugInfo(bool enable = true);
 
 void augmentException();
 
-#define throwError(format, ...)                                                                                        \
-    do {                                                                                                               \
-        zend_throw_error(NULL, format, ##__VA_ARGS__);                                                                 \
-        php::augmentException();                                                                                       \
-        if (php::throw_impl) {                                                                                         \
-            php::throw_impl(EG(exception));                                                                            \
-        }                                                                                                              \
-    } while (0)
+extern PHPX_API std::function<void(zend_object *)> throw_impl;
 
-#define throwErrorIfOccurred()                                                                                         \
-    do {                                                                                                               \
-        if (UNEXPECTED(EG(exception) != nullptr && php::throw_impl != nullptr)) {                                      \
-            php::augmentException();                                                                                   \
-            php::throw_impl(EG(exception));                                                                            \
-        }                                                                                                              \
-    } while (0)
+inline void throwErrorIfOccurred() {
+    if (UNEXPECTED(EG(exception) != nullptr && throw_impl != nullptr)) {
+        augmentException();
+        throw_impl(EG(exception));
+    }
+}
+
+inline void throwError(const char *format) {
+    zend_throw_error(NULL, "%s", format);
+    throwErrorIfOccurred();
+}
+
+template <typename... Args>
+inline void throwError(const char *format, Args &&...args) {
+    zend_throw_error(NULL, format, std::forward<Args>(args)...);
+    throwErrorIfOccurred();
+}
+
+inline void throwExceptionEx(zend_class_entry *ce, int code, const char *format) {
+    zend_throw_exception_ex(ce, code, "%s", format);
+    throwErrorIfOccurred();
+}
+
+template <typename... Args>
+inline void throwExceptionEx(zend_class_entry *ce, int code, const char *format, Args &&...args) {
+    zend_throw_exception_ex(ce, code, format, std::forward<Args>(args)...);
+    throwErrorIfOccurred();
+}
 
 PHPX_API Object catchException();
 PHPX_API Variant concat(const Variant &a, const Variant &b);
@@ -180,7 +194,6 @@ Variant call_impl(const zval *object, const zval *func);
 #define THREAD_LOCAL
 #endif
 
-extern PHPX_API std::function<void(zend_object *)> throw_impl;
 extern PHPX_API const char *box_res_name;
 
 PHPX_API int getBoxResourceId();
