@@ -716,19 +716,21 @@ Variant print_r(const Variant &value, bool do_return) {
 
 static zend_string *_uniqid_hash(const String &prefix, bool more_entropy) {
     char uniqid_buf[128];
-    zend_ulong sec = static_cast<zend_ulong>(::time(nullptr));
-    double usec = php_combined_lcg() * 1000000.0;
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    zend_ulong sec = static_cast<zend_ulong>(tv.tv_sec);
+    int usec = static_cast<int>(tv.tv_usec % 0x100000);
 
     if (more_entropy) {
         int len = snprintf(uniqid_buf, sizeof(uniqid_buf),
-                           "%s%08lx%05.0f%.8F",
+                           "%s%08lx%05x%.8F",
                            prefix.length() > 0 ? prefix.data() : "",
                            sec, usec, php_combined_lcg() * 10);
         return zend_string_init(uniqid_buf, len, 0);
     }
 
     int len = snprintf(uniqid_buf, sizeof(uniqid_buf),
-                       "%s%08lx%05.0f",
+                       "%s%08lx%05x",
                        prefix.length() > 0 ? prefix.data() : "",
                        sec, usec);
     return zend_string_init(uniqid_buf, len, 0);
@@ -756,7 +758,7 @@ Array parse_str(const String &str) {
 
 Variant shell_exec(const String &command) {
     if (command.length() == 0) {
-        zend_argument_must_not_be_empty_error(1);
+    	zend_argument_value_error(1, "cannot be empty");
         return Variant(nullptr);
     }
 
