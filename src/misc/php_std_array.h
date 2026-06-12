@@ -14,7 +14,8 @@ extern "C" {
 #include "ext/standard/php_array.h"
 }
 
-#include <initializer_list>
+#include <cstddef>
+#include <type_traits>
 
 namespace php::std {
 
@@ -55,8 +56,29 @@ Variant array_key_last(const Array &array);
 // Array merge operations
 // ========================
 
-Array array_merge(::std::initializer_list<Array> arrays);
-Array array_merge_recursive(::std::initializer_list<Array> arrays);
+Array array_merge(const Array &array);
+Array array_merge(const Array &array, const Array &other);
+
+template <typename... Rest>
+inline Array array_merge(const Array &array, const Array &other, const Rest &...arrays) {
+    static_assert((::std::is_same_v<Array, ::std::decay_t<Rest>> && ...),
+                  "array_merge only accepts Array arguments");
+    Array result = array_merge(array, other);
+    ((result = array_merge(result, arrays)), ...);
+    return result;
+}
+
+Array array_merge_recursive(const Array &array);
+Array array_merge_recursive(const Array &array, const Array &other);
+
+template <typename... Rest>
+inline Array array_merge_recursive(const Array &array, const Array &other, const Rest &...arrays) {
+    static_assert((::std::is_same_v<Array, ::std::decay_t<Rest>> && ...),
+                  "array_merge_recursive only accepts Array arguments");
+    Array result = array_merge_recursive(array, other);
+    ((result = array_merge_recursive(result, arrays)), ...);
+    return result;
+}
 
 // ========================
 // Array transformation
@@ -137,10 +159,33 @@ inline Bool rsort(Variant &arg, Int flags = 0) {
 inline Bool arsort(Variant &arg, Int flags = 0) {
     return asort(arg, static_cast<Int>(static_cast<int>(flags) | AOT_SORT_REVERSE));
 }
-Int array_push(Variant &arg, ::std::initializer_list<Variant> values);
+namespace detail {
+Int array_push_impl(Variant &arg, const Variant *values, ::std::size_t value_count);
+Int array_unshift_impl(Variant &arg, const Variant *values, ::std::size_t value_count);
+}
+
+inline Int array_push(Variant &arg) {
+    return detail::array_push_impl(arg, nullptr, 0);
+}
+
+template <typename First, typename... Rest>
+inline Int array_push(Variant &arg, const First &first, const Rest &...rest) {
+    Variant values[] = {Variant(first), Variant(rest)...};
+    return detail::array_push_impl(arg, values, sizeof...(Rest) + 1);
+}
+
 Variant array_pop(Variant &arg);
 Variant array_shift(Variant &arg);
-Int array_unshift(Variant &arg, ::std::initializer_list<Variant> values);
+
+inline Int array_unshift(Variant &arg) {
+    return detail::array_unshift_impl(arg, nullptr, 0);
+}
+
+template <typename First, typename... Rest>
+inline Int array_unshift(Variant &arg, const First &first, const Rest &...rest) {
+    Variant values[] = {Variant(first), Variant(rest)...};
+    return detail::array_unshift_impl(arg, values, sizeof...(Rest) + 1);
+}
 
 // reset(array &$array): mixed
 Variant reset(Variant &arg);
@@ -156,6 +201,15 @@ Array array_reverse(const Array &array, bool preserve_keys = false);
 
 // array_diff(array $array, array ...$arrays): array
 Array array_diff(const Array &array, const Array &others);
+
+template <typename... Rest>
+inline Array array_diff(const Array &array, const Array &other, const Rest &...arrays) {
+    static_assert((::std::is_same_v<Array, ::std::decay_t<Rest>> && ...),
+                  "array_diff only accepts Array arguments");
+    Array result = array_diff(array, other);
+    ((result = array_diff(result, arrays)), ...);
+    return result;
+}
 
 // ========================
 // Array math operations
@@ -177,5 +231,14 @@ Array array_flip(const Array &array);
 // ========================
 
 Array array_intersect(const Array &array, const Array &others);
+
+template <typename... Rest>
+inline Array array_intersect(const Array &array, const Array &other, const Rest &...arrays) {
+    static_assert((::std::is_same_v<Array, ::std::decay_t<Rest>> && ...),
+                  "array_intersect only accepts Array arguments");
+    Array result = array_intersect(array, other);
+    ((result = array_intersect(result, arrays)), ...);
+    return result;
+}
 
 }  // namespace php::std

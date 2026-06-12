@@ -191,24 +191,14 @@ Array array_values(const Array &array) {
 // 5. array_merge
 // ========================
 
-Array array_merge(::std::initializer_list<Array> arrays) {
-    if (arrays.size() == 0) {
-        return Array();
-    }
+Array array_merge(const Array &array) {
+    return Array(array);
+}
 
-    Array result;
-    bool first = true;
-
-    for (const auto &arr : arrays) {
-        if (first) {
-            result = arr;
-            first = false;
-        } else {
-            SEPARATE_ARRAY(result.ptr());
-            php_array_merge(result.array(), arr.array());
-        }
-    }
-
+Array array_merge(const Array &array, const Array &other) {
+    Array result(array);
+    SEPARATE_ARRAY(result.ptr());
+    php_array_merge(result.array(), other.array());
     return result;
 }
 
@@ -216,24 +206,14 @@ Array array_merge(::std::initializer_list<Array> arrays) {
 // 6. array_merge_recursive
 // ========================
 
-Array array_merge_recursive(::std::initializer_list<Array> arrays) {
-    if (arrays.size() == 0) {
-        return Array();
-    }
+Array array_merge_recursive(const Array &array) {
+    return Array(array);
+}
 
-    Array result;
-    bool first = true;
-
-    for (const auto &arr : arrays) {
-        if (first) {
-            result = arr;
-            first = false;
-        } else {
-            SEPARATE_ARRAY(result.ptr());
-            php_array_merge_recursive(result.array(), arr.array());
-        }
-    }
-
+Array array_merge_recursive(const Array &array, const Array &other) {
+    Array result(array);
+    SEPARATE_ARRAY(result.ptr());
+    php_array_merge_recursive(result.array(), other.array());
     return result;
 }
 
@@ -859,6 +839,10 @@ static int _sort_regular(Bucket *a, Bucket *b) {
     return array_data_compare(a, b);
 }
 
+static int _sort_regular_desc(Bucket *a, Bucket *b) {
+    return array_data_compare(b, a);
+}
+
 static int _sort_numeric(Bucket *a, Bucket *b) {
     double d1 = zval_get_double(&a->val);
     double d2 = zval_get_double(&b->val);
@@ -932,7 +916,7 @@ Bool sort(Variant &arg, Int flags) {
         break;
     case PHP_SORT_REGULAR:
     default:
-        cmp = _sort_regular;
+        cmp = descending ? _sort_regular_desc : _sort_regular;
         break;
     }
 
@@ -977,7 +961,7 @@ Bool asort(Variant &arg, Int flags) {
         break;
     case PHP_SORT_REGULAR:
     default:
-        cmp = _sort_regular;
+        cmp = descending ? _sort_regular_desc : _sort_regular;
         break;
     }
 
@@ -989,7 +973,7 @@ Bool asort(Variant &arg, Int flags) {
 // 16. array_push (in-place)
 // ========================
 
-Int array_push(Variant &arg, ::std::initializer_list<Variant> values) {
+Int detail::array_push_impl(Variant &arg, const Variant *values, ::std::size_t value_count) {
     zval *zv = arg.unwrap_ptr();
     if (!zval_is_array(zv)) {
         php::throwException(zend_ce_type_error, "array_push(): Argument #1 ($array) must be of type array");
@@ -997,7 +981,8 @@ Int array_push(Variant &arg, ::std::initializer_list<Variant> values) {
     }
     SEPARATE_ARRAY(zv);
 
-    for (const auto &val : values) {
+    for (::std::size_t i = 0; i < value_count; i++) {
+        const Variant &val = values[i];
         zval *v = NO_CONST_V(val);
         Z_TRY_ADDREF_P(v);
         if (zend_hash_next_index_insert(Z_ARRVAL_P(zv), v) == nullptr) {
@@ -1234,14 +1219,14 @@ Variant array_shift(Variant &arg) {
 // 19. array_unshift (in-place)
 // ========================
 
-Int array_unshift(Variant &arg, ::std::initializer_list<Variant> values) {
+Int detail::array_unshift_impl(Variant &arg, const Variant *values, ::std::size_t value_count) {
     zval *zv = arg.unwrap_ptr();
     if (!zval_is_array(zv)) {
         php::throwException(zend_ce_type_error, "array_unshift(): Argument #1 ($array) must be of type array");
         return 0;
     }
 
-    if (values.size() == 0) {
+    if (value_count == 0) {
         return static_cast<Int>(zend_hash_num_elements(Z_ARRVAL_P(zv)));
     }
 
@@ -1249,10 +1234,11 @@ Int array_unshift(Variant &arg, ::std::initializer_list<Variant> values) {
     zend_array *old_ht = Z_ARRVAL_P(zv);
 
     HashTable new_hash;
-    zend_hash_init(&new_hash, zend_hash_num_elements(old_ht) + values.size(), NULL, ZVAL_PTR_DTOR, 0);
+    zend_hash_init(&new_hash, zend_hash_num_elements(old_ht) + value_count, NULL, ZVAL_PTR_DTOR, 0);
 
     // Add new elements at the beginning
-    for (const auto &val : values) {
+    for (::std::size_t i = 0; i < value_count; i++) {
+        const Variant &val = values[i];
         zval *v = NO_CONST_V(val);
         Z_TRY_ADDREF_P(v);
         zend_hash_next_index_insert_new(&new_hash, v);
@@ -1273,7 +1259,7 @@ Int array_unshift(Variant &arg, ::std::initializer_list<Variant> values) {
 
     // Handle iterators
     if (UNEXPECTED(HT_HAS_ITERATORS(old_ht))) {
-        zend_hash_iterators_advance(old_ht, values.size());
+        zend_hash_iterators_advance(old_ht, static_cast<uint32_t>(value_count));
         HT_SET_ITERATORS_COUNT(&new_hash, HT_ITERATORS_COUNT(old_ht));
         HT_SET_ITERATORS_COUNT(old_ht, 0);
     }
@@ -1486,9 +1472,6 @@ Array array_reverse(const Array &array, bool preserve_keys) {
         }
     }
 
-    for (uint32_t i = 0; i < num; i++) {
-        zval_ptr_dtor(&entries[i]);
-    }
     efree(entries);
     efree(nums);
     efree(strs);
