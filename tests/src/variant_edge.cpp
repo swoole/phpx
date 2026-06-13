@@ -421,3 +421,144 @@ TEST(variant_edge, offsetExists_object_long) {
 
     ASSERT_FALSE(o.offsetExists(999));
 }
+
+// Test getProperty triggering __get magic (rv path with Ctor::Move)
+TEST(variant_edge, getProperty_magic_get) {
+    php::eval(R"(
+        class GetPropertyTest {
+            private $data = [];
+
+            public function __construct() {
+                $this->data = ['stored' => 'direct_value'];
+            }
+
+            public function __get($name) {
+                if (isset($this->data[$name])) {
+                    return $this->data[$name];
+                }
+                return "computed:" . $name;
+            }
+        }
+    )");
+    auto obj = php::eval("return new GetPropertyTest();");
+
+    // Existing property accessed directly (non-rv path, Ctor::Indirect)
+    auto v1 = obj.getProperty("stored");
+    ASSERT_TRUE(v1.isString());
+    ASSERT_STREQ(v1.toCString(), "direct_value");
+
+    // Non-existent property triggers __get (rv path, Ctor::Move)
+    auto v2 = obj.getProperty("dynamic_prop");
+    ASSERT_TRUE(v2.isString());
+    ASSERT_STREQ(v2.toCString(), "computed:dynamic_prop");
+}
+
+// Test attr triggering __get magic (rv path with Ctor::Move)
+TEST(variant_edge, attr_magic_get) {
+    php::eval(R"(
+        class AttrTest {
+            private $data = [];
+
+            public function __construct() {
+                $this->data['existing'] = new stdClass();
+                $this->data['existing']->value = 100;
+            }
+
+            public function __get($name) {
+                if (isset($this->data[$name])) {
+                    return $this->data[$name];
+                }
+                $obj = new stdClass();
+                $obj->name = $name;
+                return $obj;
+            }
+        }
+    )");
+    auto obj = php::eval("return new AttrTest();");
+
+    // Existing property accessed directly (non-rv path)
+    auto v1 = obj.attr("existing");
+    ASSERT_TRUE(v1.isObject());
+
+    // Non-existent property triggers __get (rv path, Ctor::Move)
+    auto v2 = obj.attr("dynamic_one");
+    ASSERT_TRUE(v2.isObject());
+    auto v2name = v2.attr("name");
+    ASSERT_STREQ(v2name.toCString(), "dynamic_one");
+}
+
+// Test chained attr().attr() through __get (nested rv path, no leak)
+TEST(variant_edge, attr_chain_magic_get) {
+    php::eval(R"(
+        class ChainTest {
+            private $items = [];
+
+            public function __set($name, $val) {
+                $this->items[$name] = $val;
+            }
+
+            public function __get($name) {
+                if (isset($this->items[$name])) {
+                    return $this->items[$name];
+                }
+                return null;
+            }
+        }
+    )");
+    auto foo = php::eval("return new ChainTest();");
+    auto bar = php::eval("return new ChainTest();");
+    bar.setProperty("baz", "Check");
+
+    foo.setProperty("bar", bar);
+
+    // foo->bar->baz: each attr() call may trigger __get -> rv path
+    auto barObj = foo.attr("bar");
+    ASSERT_TRUE(barObj.isObject());
+    auto bazVal = barObj.attr("baz");
+    ASSERT_TRUE(bazVal.isString());
+    ASSERT_STREQ(bazVal.toCString(), "Check");
+}
+
+// Test getProperty with string name and object return via __get
+TEST(variant_edge, getProperty_magic_get_returns_object) {
+    php::eval(R"(
+        class GetPropObjTest {
+            public function __get($name) {
+                $obj = new stdClass();
+                $obj->prop = $name;
+                return $obj;
+            }
+        }
+    )");
+    auto obj = php::eval("return new GetPropObjTest();");
+
+    auto result = obj.getProperty("test_key");
+    ASSERT_TRUE(result.isObject());
+    ASSERT_STREQ(result.getProperty("prop").toCString(), "test_key");
+}
+
+// Test getProperty on non-object with string prop_name
+TEST(variant_edge, getProperty_string_name_non_object) {
+    php::eval(R"(
+        class PropHolder {
+            public $visible = "public_val";
+            protected $hidden = "protected_val";
+        }
+    )");
+    auto obj = php::eval("return new PropHolder();");
+
+    // Direct property (non-rv, Ctor::Indirect)
+    auto v1 = obj.getProperty("visible");
+    ASSERT_TRUE(v1.isString());
+    ASSERT_STREQ(v1.toCString(), "public_val");
+
+    // Protected property — zend_read_property_ex returns the value regardless
+    // of visibility at the C API level (visibility is enforced at PHP compile time)
+    auto v2 = obj.getProperty("hidden");
+    ASSERT_TRUE(v2.isString());
+    ASSERT_STREQ(v2.toCString(), "protected_val");
+
+    // Non-existent property without __get returns null via rv (uninitialized)
+    auto v3 = obj.getProperty("nonexistent");
+    ASSERT_TRUE(v3.isNull());
+}

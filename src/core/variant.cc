@@ -355,8 +355,11 @@ void Variant::offsetUnset(const Variant &key) {
 Variant Variant::getProperty(zend_string *prop_name) const {
     zval rv;
     zval *member_p = zend_read_property_ex(ce(), object(), prop_name, false, &rv);
-    member_p = unwrap_zval(member_p);
-    return {member_p};
+    if (member_p == &rv) {
+        return Variant{member_p, Ctor::Move};
+    } else {
+        return Variant{member_p, zval_wrap(member_p)};
+    }
 }
 
 void Variant::setProperty(zend_string *prop_name, const Variant &value) const {
@@ -988,7 +991,7 @@ Variant Variant::attr(const Variant &name, bool update) const {
     }
 
     if (member_p == &rv) {
-        return Variant{member_p};
+        return Variant{member_p, Ctor::Move};
     } else {
         return Variant{member_p, zval_wrap(member_p)};
     }
