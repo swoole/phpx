@@ -268,7 +268,7 @@ bool Variant::offsetExists(const Variant &key) const {
     auto zvar = unwrap_ptr();
     if (zval_is_string(zvar)) {
         if (!key.isBool() && !key.isNumeric()) {
-			return false;
+            return false;
         }
         String tmp(zvar, Ctor::Indirect);
         return tmp.offset(key.toInt()) != -1;

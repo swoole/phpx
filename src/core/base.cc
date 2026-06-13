@@ -599,14 +599,15 @@ bool empty(const Variant &v, const OperationChain &list, Variant &tmp) {
     tmp = v;
     for (const auto &expr : list) {
         if (expr.first == ArrayDimFetch) {
-            if (!tmp.isArray() && !tmp.isObject() && !tmp.isString()) {
+            if (tmp.isString()) {
+                if (!tmp.offsetExists(expr.second)) {
+                    tmp = Variant();
+                    return true;
+                }
+            } else if (!tmp.isArray() && !tmp.isObject()) {
                 return true;
-            } else if (tmp.isString() && !tmp.offsetExists(expr.second)) {
-                tmp = Variant();
-                return true;
-            } else {
-                tmp = tmp.item(expr.second);
             }
+            tmp = tmp.item(expr.second);
         } else if (expr.first == PropertyFetch) {
             if (!tmp.isObject()) {
                 return true;
@@ -637,16 +638,17 @@ bool exists(const Variant &v, const OperationChain &list, Variant &tmp) {
 
     for (const auto &expr : list) {
         if (expr.first == ArrayDimFetch) {
-            if (!tmp.isArray() && !tmp.isObject() && !tmp.isString()) {
-                return false;
-            } else if (tmp.isString() && !tmp.offsetExists(expr.second)) {
-                tmp = Variant();
-                return false;
-            } else {
-                tmp = tmp.item(expr.second);
-                if (tmp.isNull()) {
+            if (tmp.isString()) {
+                if (!tmp.offsetExists(expr.second)) {
+                    tmp = Variant();
                     return false;
                 }
+            } else if (!tmp.isArray() && !tmp.isObject()) {
+                return false;
+            }
+            tmp = tmp.item(expr.second);
+            if (tmp.isNull()) {
+                return false;
             }
         } else if (expr.first == PropertyFetch) {
             if (!tmp.isObject()) {
