@@ -28,14 +28,14 @@ using namespace std;
 PHPX_FUNCTION(cpp_ext_test) {
     auto argc = args.count();
     for (int i = 0; i < argc; i++) {
-        cout << args[i].type() << endl;
+        php::echo("%d\n", args[i].type());
     }
     return 1234;
 }
 
 PHPX_FUNCTION(cpp_ext_test2) {
     for (int i = 0; i < args.count(); i++) {
-        cout << args[i].type() << endl;
+        php::echo("%d\n", args[i].type());
     }
     auto v1 = args[0];
     Array arr(v1);
@@ -58,26 +58,30 @@ PHPX_FUNCTION(phpx_test3) {
 
 PHPX_FUNCTION(phpx_test4) {
     auto id = args[0].toInt();
+    Variant retval;
     zend_try {
         switch (id) {
         case 0:
-            return include(args[1].toString());
+            retval = include(args[1].toString());
+            break;
         case 1:
-            return include(args[1].toString(), INCLUDE_ONCE);
+            retval = include(args[1].toString(), INCLUDE_ONCE);
+            break;
         case 2:
-            return include(args[1].toString(), REQUIRE);
+            retval = include(args[1].toString(), REQUIRE);
+            break;
         case 3:
-            return include(args[1].toString(), REQUIRE_ONCE);
+            retval = include(args[1].toString(), REQUIRE_ONCE);
+            break;
         default:
             break;
         }
     }
     zend_catch {
-        auto e = catchException();
-        return e;
+        retval = catchException();
     }
     zend_end_try();
-    return {};
+    return retval;
 }
 
 PHPX_FUNCTION(phpx_add) {
@@ -85,20 +89,20 @@ PHPX_FUNCTION(phpx_add) {
 }
 
 PHPX_METHOD(MyClass, test) {
-    cout << "MyClass::test" << endl;
+    php::echo("MyClass::test\n");
     return 1234.56;
 }
 
 PHPX_METHOD(MyClass, pget) {
     String *str = _this.oGet<String>("resource", "ResourceString");
-    cout << "[GET] ResourceString: " << str->length() << endl;
+    php::echo("[GET] ResourceString: %d\n", str->length());
     return "hello xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 }
 
 PHPX_METHOD(MyClass, pset) {
     String *str = new String("hello world");
     _this.oSet("resource", "ResourceString", str);
-    cout << "[SET] ResourceString: " << str->length() << endl;
+    php::echo("[SET] ResourceString: %d\n", str->length());
     return {};
 }
 
@@ -203,9 +207,9 @@ PHPX_EXTENSION() {
         extension->printInfo();
     };
 
-    extension->onShutdown = [extension]() noexcept { cout << extension->name << "shutdown" << endl; };
-    extension->onBeforeRequest = [extension]() noexcept { cout << extension->name << "beforeRequest" << endl; };
-    extension->onAfterRequest = [extension]() noexcept { cout << extension->name << "afterRequest" << endl; };
+    extension->onShutdown = [extension]() noexcept { php::echo("%s shutdown\n", extension->name.c_str()); };
+    extension->onBeforeRequest = [extension]() noexcept { php::echo("%s beforeRequest\n", extension->name.c_str()); };
+    extension->onAfterRequest = [extension]() noexcept { php::echo("%s afterRequest\n", extension->name.c_str()); };
 
     extension->addIniEntry("phpx.test_val", "9999", PHP_INI_ALL);
     extension->registerFunctions(ext_functions);

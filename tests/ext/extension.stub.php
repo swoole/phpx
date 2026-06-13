@@ -15,7 +15,7 @@ function phpx_test3(): void
 {
 }
 
-function phpx_test4(): bool
+function phpx_test4(int $id, string $file): bool
 {
 }
 
