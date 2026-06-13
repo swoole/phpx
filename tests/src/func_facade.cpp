@@ -1281,26 +1281,17 @@ TEST(func_facade, array_change_key_case) {
     ASSERT_STREQ(result2.get("NAME").toCString(), "John");
 }
 
-// ==================== end / reset / current / key ====================
+// ==================== current / key ====================
 
 TEST(func_facade, array_pointer_functions) {
     Array arr;
     arr.set("a", 1);
     arr.set("b", 2);
     arr.set("c", 3);
-    auto ref = arr.toReference();
 
     auto cur = current(arr);
     ASSERT_TRUE(cur.isInt());
 
     auto k = key(arr);
     ASSERT_TRUE(k.isString() || k.isNull());
-
-    auto e = end(ref);
-    ASSERT_EQ(e.toInt(), 3);
-
-    reset(ref);
-    auto first = current(arr);
-    // After reset, pointer is at first element
-    ASSERT_TRUE(first.isInt());
 }

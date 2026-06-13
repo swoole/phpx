@@ -122,12 +122,6 @@ inline Int array_push(Variant &arg, const First &first, const Rest &...rest) {
     return detail::array_push_impl(arg, values, sizeof...(Rest) + 1);
 }
 
-// reset(array &$array): mixed
-Variant reset(const Variant &arg);
-
-// end(array &$array): mixed
-Variant end(const Variant &arg);
-
 // ========================
 // Array construction
 // ========================

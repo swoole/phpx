@@ -248,50 +248,6 @@ Variant array_search(const Variant &needle, const Array &haystack, bool strict) 
 }
 
 // ========================
-// 21. reset
-// ========================
-
-Variant reset(const Variant &arg) {
-    zval *zv = NO_CONST_V(arg);
-    if (!zval_is_array(zv)) {
-        php::throwException(zend_ce_type_error, "reset(): Argument #1 ($array) must be of type array");
-        return Variant(false);
-    }
-    zend_array *ht = Z_ARRVAL_P(zv);
-    zend_hash_internal_pointer_reset(ht);
-    zval *entry = zend_hash_get_current_data(ht);
-    if (entry) {
-        ZVAL_DEREF(entry);
-        Variant result;
-        ZVAL_COPY(result.unwrap_ptr(), entry);
-        return result;
-    }
-    return Variant(false);
-}
-
-// ========================
-// 22. end
-// ========================
-
-Variant end(const Variant &arg) {
-    zval *zv = NO_CONST_V(arg);
-    if (!zval_is_array(zv)) {
-        php::throwException(zend_ce_type_error, "end(): Argument #1 ($array) must be of type array");
-        return Variant(false);
-    }
-    zend_array *ht = Z_ARRVAL_P(zv);
-    zend_hash_internal_pointer_end(ht);
-    zval *entry = zend_hash_get_current_data(ht);
-    if (entry) {
-        ZVAL_DEREF(entry);
-        Variant result;
-        ZVAL_COPY(result.unwrap_ptr(), entry);
-        return result;
-    }
-    return Variant(false);
-}
-
-// ========================
 // array_key_first
 // ========================
 
