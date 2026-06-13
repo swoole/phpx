@@ -896,7 +896,7 @@ class Variant {
         if (_c == nullptr) {
             return nullptr;
         }
-        if ((_ptr = zend_fetch_resource(Z_RES_P(ptr()), name, _c->type)) == nullptr) {
+        if ((_ptr = zend_fetch_resource(Z_RES_P(unwrap_ptr()), name, _c->type)) == nullptr) {
             throwError("The `%s` type of resource is undefined.", name);
             return nullptr;
         }
