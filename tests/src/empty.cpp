@@ -118,8 +118,8 @@ TEST(empty, mixed_operations) {
     ASSERT_FALSE(empty(arr, {{ArrayDimFetch, "object_key"}, {PropertyFetch, "obj_prop"}}));
 
     auto debug_val = arr.item("regular_key");
-    std::cout << "regular_key value: '" << debug_val.toStdString() << "' isNull: " << debug_val.isNull()
-              << " isEmpty: " << !debug_val.toBool() << std::endl;
+    php::echo("regular_key value: '%s' isNull: %d isEmpty: %d\n",
+              debug_val.toStdString().c_str(), debug_val.isNull(), !debug_val.toBool());
 }
 
 TEST(empty, edge_cases) {

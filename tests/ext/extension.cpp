@@ -59,6 +59,12 @@ PHPX_FUNCTION(phpx_test3) {
 PHPX_FUNCTION(phpx_test4) {
     auto id = args[0].toInt();
     Variant retval;
+
+    /**
+     * !!! The return in zend_try must not be allowed.
+     * Zend_catch must be executed. Otherwise, EG (bailout) will be destroyed.
+     * When an error occurs, zend_bailout will longjmp to the wrong address.
+     */
     zend_try {
         switch (id) {
         case 0:

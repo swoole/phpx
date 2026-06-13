@@ -753,11 +753,11 @@ uint32_t getPropertyOffset(zend_class_entry *ce, const String &prop) {
     auto prev_scope = EG(fake_scope);
     EG(fake_scope) = ce;
     auto prop_info = zend_get_property_info(ce, prop.str(), 1);
+    EG(fake_scope) = prev_scope;
     if (UNEXPECTED(!prop_info)) {
         throwError("property '%s::%s' is undefined.", ce->name->val, prop.toCString());
         return 0;
     }
-    EG(fake_scope) = prev_scope;
     return prop_info->offset;
 }
 }  // namespace php
