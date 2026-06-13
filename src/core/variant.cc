@@ -122,13 +122,23 @@ size_t Variant::length() const {
 }
 
 void Variant::unset() {
+    zend_object *catched_exception = nullptr;
+    try {
+        if (isIndirect()) {
+            zval_ptr_dtor(Z_INDIRECT(val));
+        } else {
+            zval_ptr_dtor(&val);
+        }
+    } catch (zend_object *exception) {
+        catched_exception = exception;
+    }
     if (isIndirect()) {
-        zval_ptr_dtor(Z_INDIRECT(val));
         *Z_INDIRECT(val) = {};
-    } else {
-        zval_ptr_dtor(&val);
     }
     val = {};
+    if (catched_exception) {
+        throw catched_exception;
+    }
 }
 
 bool Variant::isNumeric() const {

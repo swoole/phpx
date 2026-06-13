@@ -119,7 +119,9 @@ TEST(empty, mixed_operations) {
 
     auto debug_val = arr.item("regular_key");
     php::echo("regular_key value: '%s' isNull: %d isEmpty: %d\n",
-              debug_val.toStdString().c_str(), debug_val.isNull(), !debug_val.toBool());
+              debug_val.toStdString().c_str(),
+              debug_val.isNull(),
+              !debug_val.toBool());
 }
 
 TEST(empty, edge_cases) {
