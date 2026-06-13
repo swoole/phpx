@@ -56,6 +56,7 @@ Variant array_key_last(const Array &array);
 // Array merge operations
 // ========================
 
+Array array_merge();
 Array array_merge(const Array &array);
 Array array_merge(const Array &array, const Array &other);
 

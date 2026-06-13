@@ -197,6 +197,10 @@ Array array_values(const Array &array) {
 // 5. array_merge
 // ========================
 
+Array array_merge() {
+    return Array();
+}
+
 Array array_merge(const Array &array) {
     return Array(array);
 }
