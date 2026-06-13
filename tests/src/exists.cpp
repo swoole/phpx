@@ -306,10 +306,50 @@ TEST(exists, comparison_with_empty) {
 TEST(exists, string_offset_access) {
     var v = "hello";
 
-    ASSERT_FALSE(exists(v, {{ArrayDimFetch, 0}}));
-    ASSERT_FALSE(exists(v, {{ArrayDimFetch, 4}}));
-    ASSERT_FALSE(exists(v, {{ArrayDimFetch, -1}}));
+    ASSERT_TRUE(exists(v, {{ArrayDimFetch, 0}}));
+    ASSERT_TRUE(exists(v, {{ArrayDimFetch, 4}}));
+    ASSERT_TRUE(exists(v, {{ArrayDimFetch, -1}}));
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, 100}}));
+
+    // Empty string
+    var empty_str = "";
+    ASSERT_FALSE(exists(empty_str, {{ArrayDimFetch, 0}}));
+
+    // Single char
+    var single = "X";
+    ASSERT_TRUE(exists(single, {{ArrayDimFetch, 0}}));
+    ASSERT_FALSE(exists(single, {{ArrayDimFetch, 1}}));
+
+    // Boundary: offset equals length
+    var five = "12345";
+    ASSERT_TRUE(exists(five, {{ArrayDimFetch, 4}}));
+    ASSERT_FALSE(exists(five, {{ArrayDimFetch, 5}}));
+
+    // Numeric string keys work, non-numeric don't
+    ASSERT_TRUE(exists(v, {{ArrayDimFetch, "0"}}));
+    ASSERT_TRUE(exists(v, {{ArrayDimFetch, "1"}}));
+    ASSERT_FALSE(exists(v, {{ArrayDimFetch, "key"}}));
+    ASSERT_FALSE(exists(v, {{ArrayDimFetch, "any"}}));
+
+    // Negative as string
+    ASSERT_TRUE(exists(v, {{ArrayDimFetch, "-1"}}));
+
+    // Float-type key: converted to int (1.5 → 1)
+    ASSERT_TRUE(exists(v, {{ArrayDimFetch, 1.5}}));
+    // Float-like string key: converted to int ("1.5" → 1)
+    ASSERT_TRUE(exists(v, {{ArrayDimFetch, "1.5"}}));
+
+    // Nested access: string offset then array access should fail
+    // (string char is a string type, not an array)
+    ASSERT_FALSE(exists(v, {{ArrayDimFetch, 0}, {ArrayDimFetch, "sub"}}));
+
+    // Non-string types still don't support ArrayDimFetch
+    var int_val = 42;
+    ASSERT_FALSE(exists(int_val, {{ArrayDimFetch, 0}}));
+    var bool_val = true;
+    ASSERT_FALSE(exists(bool_val, {{ArrayDimFetch, "key"}}));
+    var null_val = nullptr;
+    ASSERT_FALSE(exists(null_val, {{ArrayDimFetch, 0}}));
 }
 
 TEST(exists, special_key_names) {

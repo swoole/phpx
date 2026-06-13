@@ -599,7 +599,10 @@ bool empty(const Variant &v, const OperationChain &list, Variant &tmp) {
     tmp = v;
     for (const auto &expr : list) {
         if (expr.first == ArrayDimFetch) {
-            if (!tmp.isArray() && !tmp.isObject()) {
+            if (!tmp.isArray() && !tmp.isObject() && !tmp.isString()) {
+                return true;
+            } else if (tmp.isString() && !tmp.offsetExists(expr.second)) {
+                tmp = Variant();
                 return true;
             } else {
                 tmp = tmp.item(expr.second);
@@ -634,12 +637,12 @@ bool exists(const Variant &v, const OperationChain &list, Variant &tmp) {
 
     for (const auto &expr : list) {
         if (expr.first == ArrayDimFetch) {
-            if (!tmp.isArray() && !tmp.isObject()) {
+            if (!tmp.isArray() && !tmp.isObject() && !tmp.isString()) {
+                return false;
+            } else if (tmp.isString() && !tmp.offsetExists(expr.second)) {
+                tmp = Variant();
                 return false;
             } else {
-                if (!tmp.offsetExists(expr.second)) {
-                    return false;
-                }
                 tmp = tmp.item(expr.second);
                 if (tmp.isNull()) {
                     return false;
