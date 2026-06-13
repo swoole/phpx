@@ -129,7 +129,8 @@ inline String strtoupper(const String &s) {
 // ========================
 inline String str_repeat(const String &s, Int times) {
     if (times < 0) {
-        php::throwException(zend_ce_value_error, "str_repeat(): Argument #2 ($times) must be greater than or equal to 0");
+        php::throwException(zend_ce_value_error,
+                            "str_repeat(): Argument #2 ($times) must be greater than or equal to 0");
         return String();
     }
     if (times == 0) {

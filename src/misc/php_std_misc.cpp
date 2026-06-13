@@ -118,14 +118,17 @@ Variant version_compare(const String &v1, const String &v2, const String &op) {
     if (zend_string_equals_literal(op.str(), ">=") || zend_string_equals_literal(op.str(), "ge")) {
         return Variant(result != -1);
     }
-    if (zend_string_equals_literal(op.str(), "==") || zend_string_equals_literal(op.str(), "=") || zend_string_equals_literal(op.str(), "eq")) {
+    if (zend_string_equals_literal(op.str(), "==") || zend_string_equals_literal(op.str(), "=") ||
+        zend_string_equals_literal(op.str(), "eq")) {
         return Variant(result == 0);
     }
-    if (zend_string_equals_literal(op.str(), "!=") || zend_string_equals_literal(op.str(), "<>") || zend_string_equals_literal(op.str(), "ne")) {
+    if (zend_string_equals_literal(op.str(), "!=") || zend_string_equals_literal(op.str(), "<>") ||
+        zend_string_equals_literal(op.str(), "ne")) {
         return Variant(result != 0);
     }
 
-    php::throwException(zend_ce_value_error, "version_compare(): Argument #3 ($operator) must be a valid comparison operator");
+    php::throwException(zend_ce_value_error,
+                        "version_compare(): Argument #3 ($operator) must be a valid comparison operator");
     return Variant(false);
 }
 

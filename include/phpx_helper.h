@@ -153,8 +153,8 @@ static inline Variant toStream(const Variant &v) {
 }
 
 static inline Int print(const Variant &v) {
-	echo(v);
-	return 1;
+    echo(v);
+    return 1;
 }
 
 static inline void echo(int val) {
