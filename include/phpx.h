@@ -540,11 +540,13 @@ using enable_if_floating_point = std::enable_if_t<is_floating_point_v<T>, Ret>;
 template <typename T, typename Ret = int>
 using enable_if_arithmetic_non_bool = std::enable_if_t<is_arithmetic_non_bool_v<T>, Ret>;
 
+zend_object *zval_ptr_dtor_safe(zval *zv);
+
 class Variant {
   protected:
     zval val;
     void destroy() {
-        zval_ptr_dtor(unwrap_ptr());
+        zval_ptr_dtor_safe(unwrap_ptr());
     }
     void addRef() {
         Z_TRY_ADDREF_P(&val);
@@ -701,13 +703,7 @@ class Variant {
     Variant(zend_resource *res) {
         ZVAL_RES(ptr(), res);
     }
-    ~Variant() {
-        if (isReference()) {
-            zval_ptr_dtor(&val);
-        } else if (!isIndirect()) {
-            destroy();
-        }
-    }
+    ~Variant();
     template <typename T, enable_if_integral_non_bool<T> = 0>
     Variant &operator=(T v) {
         destroy();

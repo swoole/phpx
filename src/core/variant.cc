@@ -16,6 +16,10 @@
 
 #include "phpx.h"
 
+#if PHP_VERSION_ID < 80400
+#include "zend_fibers.h"
+#endif
+
 BEGIN_EXTERN_C()
 #include "zend_smart_str.h"
 #include <ext/spl/php_spl.h>
@@ -121,23 +125,47 @@ size_t Variant::length() const {
     }
 }
 
+zend_object *zval_ptr_dtor_safe(zval *zv) {
+    zend_object *obj = nullptr;
+    auto target = zv;
+    if (Z_TYPE_P(target) == IS_REFERENCE) {
+        target = Z_REFVAL_P(target);
+    }
+    if (Z_TYPE_P(target) == IS_OBJECT) {
+        obj = Z_OBJ_P(target);
+    }
+    try {
+        zval_ptr_dtor(zv);
+    } catch (zend_object *exception) {
+        if (obj) {
+            GC_DELREF(obj);
+#if PHP_VERSION_ID < 80400
+            zend_fiber_switch_unblock();
+#endif
+            zend_object_release(obj);
+        }
+        return exception;
+    }
+    return nullptr;
+}
+
 void Variant::unset() {
     zend_object *catched_exception = nullptr;
-    try {
-        if (isIndirect()) {
-            zval_ptr_dtor(Z_INDIRECT(val));
-        } else {
-            zval_ptr_dtor(&val);
-        }
-    } catch (zend_object *exception) {
-        catched_exception = exception;
-    }
     if (isIndirect()) {
+        catched_exception = zval_ptr_dtor_safe(Z_INDIRECT(val));
         *Z_INDIRECT(val) = {};
+    } else {
+        catched_exception = zval_ptr_dtor_safe(&val);
     }
     val = {};
     if (catched_exception) {
         throw catched_exception;
+    }
+}
+
+Variant::~Variant() {
+    if (!isIndirect()) {
+        zval_ptr_dtor_safe(&val);
     }
 }
 
