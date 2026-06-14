@@ -50,7 +50,7 @@ void Variant::copyFrom(const zval *src) {
         auto zv = unwrap_ptr();
         zval tmp = *zv;
         zval_copy(zv, src);
-        zval_ptr_dtor(&tmp);
+        zval_ptr_dtor_safe(&tmp);
     }
 }
 
@@ -1107,14 +1107,14 @@ Variant Variant::call(zend_function *fn, const ArgList &args, zend_array *named_
 }
 
 void Reference::copyRef(const zval *zv) {
-    zval_ptr_dtor(&val);
+    zval_ptr_dtor_safe(&val);
     zval_copy_value(&val, zv);
     zval_try_add_ref(&val);
 }
 
 Reference &Reference::operator=(const Reference &v) {
     if (&v != this) {
-        zval_ptr_dtor(&val);
+        zval_ptr_dtor_safe(&val);
         zval_copy(&val, v.const_ptr());
     }
     return *this;

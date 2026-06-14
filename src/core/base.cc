@@ -241,7 +241,7 @@ bool updateConstant(zend_class_entry *ce, const String &name, const Variant &dat
     zval *ret_constant = NULL;
     auto c = (zend_class_constant *) zend_hash_find_ptr(CE_CONSTANTS_TABLE(ce), constant_name);
     if (c != NULL) {
-        zval_ptr_dtor(&c->value);
+        zval_ptr_dtor_safe(&c->value);
         ZVAL_COPY(&c->value, data.const_ptr());
         return true;
     } else {

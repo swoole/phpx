@@ -314,7 +314,7 @@ Bool define(const String &name, const Variant &value, bool case_insensitive) {
     }
 
     ZVAL_COPY(&c.value, val);
-    zval_ptr_dtor(&val_free);
+    zval_ptr_dtor_safe(&val_free);
 
 register_constant:
     ZEND_CONSTANT_SET_FLAGS(&c, 0, PHP_USER_CONSTANT);
