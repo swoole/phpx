@@ -192,7 +192,12 @@ Object newObject(zend_class_entry *ce) {
         auto this_ = object.object();
         auto ctor = ce->constructor;
         if (ctor) {
-            zend_call_known_function(ctor, this_, ce, nullptr, 0, nullptr, nullptr);
+            try {
+                zend_call_known_function(ctor, this_, ce, nullptr, 0, nullptr, nullptr);
+            } catch (...) {
+                zend_object_store_ctor_failed(this_);
+                throw;
+            }
         }
     }
     throwErrorIfOccurred();
@@ -208,7 +213,12 @@ Object newObject(zend_class_entry *ce, Args &args, zend_array *named_args) {
         auto this_ = object.object();
         auto ctor = ce->constructor;
         if (ctor) {
-            zend_call_known_function(ctor, this_, ce, nullptr, args.count(), args.ptr(), named_args);
+            try {
+                zend_call_known_function(ctor, this_, ce, nullptr, args.count(), args.ptr(), named_args);
+            } catch (...) {
+                zend_object_store_ctor_failed(this_);
+                throw;
+            }
         }
     }
     throwErrorIfOccurred();
