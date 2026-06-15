@@ -14,7 +14,7 @@
 #include <cstdint>
 #include <climits>
 #include <cerrno>
-#include <sys/time.h>
+#include <chrono>
 
 namespace php::fn {
 
@@ -154,10 +154,12 @@ Variant print_r(const Variant &value, bool do_return) {
 
 static zend_string *_uniqid_hash(const String &prefix, bool more_entropy) {
     char uniqid_buf[128];
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    zend_ulong sec = static_cast<zend_ulong>(tv.tv_sec);
-    int usec = static_cast<int>(tv.tv_usec % 0x100000);
+    auto now = std::chrono::system_clock::now();
+    auto duration = now.time_since_epoch();
+    auto sec_dur = std::chrono::duration_cast<std::chrono::seconds>(duration);
+    auto usec_dur = std::chrono::duration_cast<std::chrono::microseconds>(duration - sec_dur);
+    zend_ulong sec = static_cast<zend_ulong>(sec_dur.count());
+    int usec = static_cast<int>(usec_dur.count() % 0x100000);
 
     if (more_entropy) {
         int len = snprintf(uniqid_buf,

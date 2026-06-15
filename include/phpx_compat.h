@@ -1,5 +1,7 @@
 #ifdef WIN32
 
+#define PATH_MAX _MAX_PATH
+
 #ifdef min
 #undef min
 #endif
