@@ -4,11 +4,11 @@
   +----------------------------------------------------------------------+
 */
 
-#include "php_std_math.h"
+#include "std/math.h"
 
 #include <cmath>
 
-namespace php::std {
+namespace php::fn {
 
 Float round(const Variant &value, Int precision, Int mode) {
     double val;
@@ -21,4 +21,4 @@ Float round(const Variant &value, Int precision, Int mode) {
     return static_cast<Float>(_php_math_round(val, static_cast<int>(precision), static_cast<int>(mode)));
 }
 
-}  // namespace php::std
+}  // namespace php::fn

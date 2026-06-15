@@ -17,6 +17,13 @@
 #pragma once
 
 #include "phpx.h"
+#include "std/core.h"
+#include "std/array.h"
+#include "std/string.h"
+#include "std/fs.h"
+#include "std/math.h"
+#include "std/datetime.h"
+#include "std/misc.h"
 
 namespace php {
 namespace fn {

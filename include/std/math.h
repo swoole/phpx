@@ -14,7 +14,7 @@ extern "C" {
 #include "ext/standard/php_math.h"
 }
 
-namespace php::std {
+namespace php::fn {
 
 // round(mixed $num, int $precision = 0, int $mode = PHP_ROUND_HALF_UP): float
 Float round(const Variant &value, Int precision = 0, Int mode = PHP_ROUND_HALF_UP);
@@ -290,4 +290,4 @@ inline String number_format(const Variant &num,
     return String(result, Ctor::Move);
 }
 
-}  // namespace php::std
+}  // namespace php::fn

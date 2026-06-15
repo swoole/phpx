@@ -14,11 +14,11 @@ extern "C" {
 #include "ext/standard/php_filestat.h"
 }
 
-namespace php::std {
+namespace php::fn {
 
 Bool is_dir(const String &filename);
 Bool is_file(const String &filename);
 Bool file_exists(const String &filename);
 Variant realpath(const String &path);
 
-}  // namespace php::std
+}  // namespace php::fn

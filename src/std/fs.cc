@@ -4,11 +4,11 @@
   +----------------------------------------------------------------------+
 */
 
-#include "php_std_fs.h"
+#include "std/fs.h"
 
 #include <climits>
 
-namespace php::std {
+namespace php::fn {
 
 static Bool _fs_stat(const String &filename, int type) {
     zval retval;
@@ -39,4 +39,4 @@ Variant realpath(const String &path) {
     return Variant(String(resolved));
 }
 
-}  // namespace php::std
+}  // namespace php::fn

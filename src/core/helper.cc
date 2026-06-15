@@ -16,10 +16,10 @@
 
 #include "phpx.h"
 #include "phpx_helper.h"
-#include "phpx_func.h"
-#include "zend_operators.h"
+#include "std/math.h"
 
 extern "C" {
+#include "zend_operators.h"
 #include "php_variables.h"
 }
 
@@ -32,7 +32,7 @@ Variant abs(const Variant &v) {
     case IS_DOUBLE:
         return std::fabs(v.toFloat());
     default:
-        return php::abs({v});
+        return php::std::abs(v);
     }
 }
 }  // namespace math

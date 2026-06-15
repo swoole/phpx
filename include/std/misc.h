@@ -31,7 +31,7 @@ extern "C" {
 
 #include "phpx.h"
 
-namespace php::std {
+namespace php::fn {
 
 // ========================
 // crc32 (inline, simple call to php_crc32_bulk_update)
@@ -282,4 +282,4 @@ void parse_str(const String &str, Array &result);
 // shell_exec(string $command): string|false|null
 Variant shell_exec(const String &command);
 
-}  // namespace php::std
+}  // namespace php::fn

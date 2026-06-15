@@ -18,7 +18,7 @@ extern "C" {
 
 #include "phpx.h"
 
-namespace php::std {
+namespace php::fn {
 
 // ========================
 // P0: Pure string operations (inline)
@@ -170,4 +170,4 @@ inline String gettype(const Variant &value) {
     return String(s, php::Ctor::Move);
 }
 
-}  // namespace php::std
+}  // namespace php::fn

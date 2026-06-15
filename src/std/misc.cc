@@ -7,7 +7,7 @@
   +----------------------------------------------------------------------+
 */
 
-#include "php_std_misc.h"
+#include "std/misc.h"
 
 #include <cstring>
 #include <cstdlib>
@@ -16,7 +16,7 @@
 #include <cerrno>
 #include <sys/time.h>
 
-namespace php::std {
+namespace php::fn {
 
 // ========================
 // md5
@@ -229,4 +229,4 @@ Variant shell_exec(const String &command) {
     return Variant(nullptr);
 }
 
-}  // namespace php::std
+}  // namespace php::fn

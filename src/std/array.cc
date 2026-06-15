@@ -6,9 +6,9 @@
   +----------------------------------------------------------------------+
 */
 
-#include "php_std_array.h"
+#include "std/array.h"
 
-namespace php::std {
+namespace php::fn {
 
 // ========================
 // Internal comparison helpers
@@ -323,4 +323,4 @@ Array array_fill(Int start_index, Int count, const Variant &value) {
     return result;
 }
 
-}  // namespace php::std
+}  // namespace php::fn

@@ -343,7 +343,7 @@ else()
     target_compile_options(mpdecimal PRIVATE -fPIC)
 endif()
 
-file(GLOB_RECURSE SRC_FILES src/core/*.cc src/func/*.cc src/class/*.cc src/const/*.cc)
+file(GLOB_RECURSE SRC_FILES src/core/*.cc src/std/*.cc src/func/*.cc src/class/*.cc src/const/*.cc)
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 
 add_library(phpx SHARED ${SRC_FILES})

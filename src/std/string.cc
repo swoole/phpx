@@ -6,7 +6,7 @@
   +----------------------------------------------------------------------+
 */
 
-#include "php_std_string.h"
+#include "std/string.h"
 #include <vector>
 
 extern "C" {
@@ -14,7 +14,7 @@ extern "C" {
 PHPAPI void php_explode_negative_limit(const zend_string *delim, zend_string *str, zval *return_value, zend_long limit);
 }
 
-namespace php::std {
+namespace php::fn {
 
 // ========================
 // explode
@@ -300,4 +300,4 @@ String basename(const String &path, const String &suffix) {
     return String(result, Ctor::Move);
 }
 
-}  // namespace php::std
+}  // namespace php::fn

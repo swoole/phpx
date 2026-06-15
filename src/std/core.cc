@@ -6,9 +6,9 @@
   +----------------------------------------------------------------------+
 */
 
-#include "php_std_core.h"
+#include "std/core.h"
 
-namespace php::std {
+namespace php::fn {
 
 // ========================
 // _class_exists core
@@ -351,4 +351,4 @@ Variant get_parent_class(const Variant &obj_or_class) {
     return Variant(false);
 }
 
-}  // namespace php::std
+}  // namespace php::fn

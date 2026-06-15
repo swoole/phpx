@@ -4,9 +4,9 @@
   +----------------------------------------------------------------------+
 */
 
-#include "php_std_datetime.h"
+#include "std/datetime.h"
 
-namespace php::std {
+namespace php::fn {
 
 String date(const String &format, const Variant &timestamp) {
     time_t ts;
@@ -39,4 +39,4 @@ Variant strtotime(const String &datetime, const Variant &baseTimestamp) {
     return Variant(static_cast<Int>(result));
 }
 
-}  // namespace php::std
+}  // namespace php::fn

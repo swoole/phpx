@@ -14,7 +14,7 @@ extern "C" {
 #include "ext/date/php_date.h"
 }
 
-namespace php::std {
+namespace php::fn {
 
 // time(): int — current Unix timestamp
 inline Int time() {
@@ -27,4 +27,4 @@ String date(const String &format, const Variant &timestamp = Variant());
 // strtotime(string $datetime, ?int $baseTimestamp = null): int|false
 Variant strtotime(const String &datetime, const Variant &baseTimestamp = Variant());
 
-}  // namespace php::std
+}  // namespace php::fn

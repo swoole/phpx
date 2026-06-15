@@ -10,7 +10,7 @@
 
 #include "phpx.h"
 
-namespace php::std {
+namespace php::fn {
 
 // ========================
 // str_starts_with(string $haystack, string $needle): bool
@@ -183,4 +183,4 @@ inline String chr(Int c) {
     return String(zend_one_char_string[static_cast<unsigned char>(c)], Ctor::Copy);
 }
 
-}  // namespace php::std
+}  // namespace php::fn

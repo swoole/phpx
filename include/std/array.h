@@ -17,7 +17,7 @@ extern "C" {
 #include <cstddef>
 #include <type_traits>
 
-namespace php::std {
+namespace php::fn {
 
 // ========================
 // Array existence / search
@@ -128,4 +128,4 @@ inline Int array_push(Variant &arg, const First &first, const Rest &...rest) {
 
 Array array_fill(Int start_index, Int count, const Variant &value);
 
-}  // namespace php::std
+}  // namespace php::fn
