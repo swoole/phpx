@@ -319,7 +319,11 @@ Bool define(const String &name, const Variant &value, bool case_insensitive) {
 register_constant:
     ZEND_CONSTANT_SET_FLAGS(&c, 0, PHP_USER_CONSTANT);
     c.name = zend_string_copy(zname);
+#if PHP_VERSION_ID >= 80500
+    if (zend_register_constant(&c) != nullptr) {
+#else
     if (zend_register_constant(&c) == SUCCESS) {
+#endif
         return true;
     }
     return false;
