@@ -1,6 +1,7 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
 #include "phpx_helper.h"
+#include "phpx_std.h"
 
 using namespace php;
 
@@ -47,27 +48,27 @@ TEST(helper, instanceOf) {
 
 TEST(helper, math) {
     var a = "-10";
-    ASSERT_EQ(php::math::abs(a).toInt(), 10);
+    ASSERT_EQ(php::fn::abs(a).toInt(), 10);
 
     var b = -3.1415;
-    ASSERT_EQ(php::math::abs(b).toFloat(), 3.1415);
+    ASSERT_EQ(php::fn::abs(b).toFloat(), 3.1415);
 
     var c = 199;
-    ASSERT_EQ(php::math::abs(c).toInt(), 199);
+    ASSERT_EQ(php::fn::abs(c).toInt(), 199);
 
     var e = 3;
     var d = 4;
-    ASSERT_EQ(php::math::pow(e, d).toInt(), std::pow(3, 4));
+    ASSERT_EQ(php::fn::pow(e, d).toInt(), std::pow(3, 4));
 
-    ASSERT_EQ(php::math::abs(-100L), 100L);
-    ASSERT_EQ(php::math::abs(100L), 100L);
+    ASSERT_EQ(php::fn::abs(-100L), 100L);
+    ASSERT_EQ(php::fn::abs(100L), 100L);
 
-    ASSERT_EQ(php::math::abs(-100.09), 100.09);
-    ASSERT_EQ(php::math::abs(100.09), 100.09);
+    ASSERT_EQ(php::fn::abs(-100.09), 100.09);
+    ASSERT_EQ(php::fn::abs(100.09), 100.09);
 
     var f = 13;
     var h = 3;
-    ASSERT_EQ(php::math::mod(f, h).toInt(), 1);
+    ASSERT_EQ(php::fn::mod(f, h).toInt(), 1);
 }
 
 TEST(helper, function_exists) {

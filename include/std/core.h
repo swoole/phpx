@@ -61,6 +61,14 @@ Bool trait_exists(const String &name, bool autoload = true);
 Bool enum_exists(const String &name, bool autoload = true);
 Bool function_exists(const String &name);
 
+// formatted=true skips leading-backslash removal and case-folding
+inline Bool function_exists(const String &name, bool formatted) {
+    if (formatted) {
+        return zend_hash_exists(EG(function_table), name.str());
+    }
+    return function_exists(name);
+}
+
 // ========================
 // P0: Method/property/constant instance checks
 // ========================

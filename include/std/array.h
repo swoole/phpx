@@ -62,7 +62,7 @@ Array array_merge(const Array &array, const Array &other);
 
 template <typename... Rest>
 inline Array array_merge(const Array &array, const Array &other, const Rest &...arrays) {
-    static_assert((::std::is_same_v<Array, ::std::decay_t<Rest>> && ...), "array_merge only accepts Array arguments");
+    static_assert((std::is_same_v<Array, std::decay_t<Rest>> && ...), "array_merge only accepts Array arguments");
     Array result = array_merge(array, other);
     ((result = array_merge(result, arrays)), ...);
     return result;
@@ -109,7 +109,7 @@ inline Bool array_is_list(const Array &array) {
 // ========================
 
 namespace detail {
-Int array_push_impl(Variant &arg, const Variant *values, ::std::size_t value_count);
+Int array_push_impl(Variant &arg, const Variant *values, std::size_t value_count);
 }  // namespace detail
 
 inline Int array_push(Variant &arg) {

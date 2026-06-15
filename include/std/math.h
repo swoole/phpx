@@ -16,6 +16,15 @@ extern "C" {
 
 namespace php::fn {
 
+// Scalar overloads (dispatch before the Variant overload)
+inline Int abs(Int v) {
+    return std::abs(v);
+}
+
+inline Float abs(Float v) {
+    return std::fabs(v);
+}
+
 // round(mixed $num, int $precision = 0, int $mode = PHP_ROUND_HALF_UP): float
 Float round(const Variant &value, Int precision = 0, Int mode = PHP_ROUND_HALF_UP);
 
@@ -176,6 +185,10 @@ inline Float rad2deg(const Variant &value) {
 
 inline Float fmod(const Variant &num1, const Variant &num2) {
     return static_cast<Float>(::fmod(num1.toFloat(), num2.toFloat()));
+}
+
+inline Variant mod(const Variant &a, const Variant &b) {
+    return a % b;
 }
 
 inline Float fdiv(const Variant &dividend, const Variant &divisor) {

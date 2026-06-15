@@ -25,15 +25,3 @@
 #include "std/datetime.h"
 #include "std/misc.h"
 
-namespace php {
-namespace fn {
-bool function_exists(const String &fname, bool formatted = false);
-static inline String get_class(const Object &o) {
-    return o.ce()->name;
-}
-Int strlen(const Variant &v);
-Int ord(const Variant &v);
-String chr(Int c);
-Array parse_str(const String &str);
-}  // namespace fn
-}  // namespace php

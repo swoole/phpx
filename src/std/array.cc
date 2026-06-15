@@ -216,7 +216,7 @@ Array array_merge(const Array &array, const Array &other) {
 // 16. array_push (in-place)
 // ========================
 
-Int detail::array_push_impl(Variant &arg, const Variant *values, ::std::size_t value_count) {
+Int detail::array_push_impl(Variant &arg, const Variant *values, std::size_t value_count) {
     zval *zv = arg.unwrap_ptr();
     if (!zval_is_array(zv)) {
         php::throwException(zend_ce_type_error, "array_push(): Argument #1 ($array) must be of type array");
@@ -224,7 +224,7 @@ Int detail::array_push_impl(Variant &arg, const Variant *values, ::std::size_t v
     }
     SEPARATE_ARRAY(zv);
 
-    for (::std::size_t i = 0; i < value_count; i++) {
+    for (std::size_t i = 0; i < value_count; i++) {
         const Variant &val = values[i];
         zval *v = NO_CONST_V(val);
         Z_TRY_ADDREF_P(v);
