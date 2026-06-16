@@ -103,6 +103,21 @@ TEST(std_core, define) {
     ASSERT_TRUE(fn::defined("MY_TEST_CONSTANT_123"));
 }
 
+TEST(std_core, define_array) {
+    // Simple array constant (exercises _validate_constant_array and _copy_constant_array)
+    Array arr;
+    arr.set(Variant(0), "a");
+    arr.set(Variant(1), "b");
+    ASSERT_TRUE(fn::define("MY_TEST_ARR_1", arr));
+    ASSERT_TRUE(fn::defined("MY_TEST_ARR_1"));
+
+    // Nested array constant
+    Array nested;
+    nested.set(Variant(0), arr);
+    ASSERT_TRUE(fn::define("MY_TEST_ARR_2", nested));
+    ASSERT_TRUE(fn::defined("MY_TEST_ARR_2"));
+}
+
 TEST(std_core, gettype) {
     auto t1 = fn::gettype(42);
     ASSERT_STREQ(t1.toCString(), "integer");
@@ -215,4 +230,35 @@ TEST(std_core, get_class_fn) {
     Object obj = newObject("ArrayObject");
     auto cls = fn::get_class(obj);
     ASSERT_STREQ(cls.toCString(), "ArrayObject");
+}
+
+TEST(std_core, enum_exists) {
+    // Non-enum classes
+    ASSERT_FALSE(fn::enum_exists("ArrayObject"));
+    ASSERT_FALSE(fn::enum_exists("stdClass"));
+    // Non-existent name
+    ASSERT_FALSE(fn::enum_exists("NoSuchEnum"));
+    // Without autoload
+    ASSERT_FALSE(fn::enum_exists("NoSuchEnum", false));
+}
+
+TEST(std_core, get_parent_class) {
+    // String class name: class with parent
+    auto parent1 = fn::get_parent_class("RuntimeException");
+    ASSERT_TRUE(parent1.isString());
+    ASSERT_STREQ(parent1.toString().toCString(), "Exception");
+
+    // String class name: class without parent
+    auto parent2 = fn::get_parent_class("Exception");
+    ASSERT_TRUE(parent2.isFalse());
+
+    // Object
+    Object obj = newObject("RuntimeException");
+    auto parent3 = fn::get_parent_class(obj);
+    ASSERT_TRUE(parent3.isString());
+    ASSERT_STREQ(parent3.toString().toCString(), "Exception");
+
+    // Class without parent via string
+    auto parent4 = fn::get_parent_class("stdClass");
+    ASSERT_TRUE(parent4.isFalse());
 }

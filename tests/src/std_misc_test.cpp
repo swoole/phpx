@@ -275,6 +275,12 @@ TEST(std_misc, strtotime_func) {
 
     auto ts2 = fn::strtotime("not a valid date string!!!");
     ASSERT_TRUE(ts2.isFalse());
+
+    // second parameter: base timestamp
+    Variant baseTs(static_cast<Int>(100000));
+    auto ts3 = fn::strtotime("+1 day", baseTs);
+    ASSERT_TRUE(ts3.isInt());
+    ASSERT_NE(ts3.toInt(), -1);  // not a parse failure
 }
 
 // ========================
@@ -295,4 +301,29 @@ TEST(std_misc, is_dir_func) {
 TEST(std_misc, is_file_func) {
     ASSERT_TRUE(fn::is_file("/etc/passwd"));
     ASSERT_FALSE(fn::is_file("/etc"));
+}
+
+TEST(std_misc, parse_str_two_args) {
+    Array result;
+    fn::parse_str("a=1&b=2&c=3", result);
+    ASSERT_EQ(result.length(), 3);
+    ASSERT_STREQ(result.get("a").toString().toCString(), "1");
+    ASSERT_STREQ(result.get("b").toString().toCString(), "2");
+    ASSERT_STREQ(result.get("c").toString().toCString(), "3");
+}
+
+TEST(std_misc, shell_exec) {
+    auto out = fn::shell_exec("echo hello");
+    ASSERT_TRUE(out.isString());
+    ASSERT_STREQ(out.toString().toCString(), "hello\n");
+}
+
+TEST(std_misc, realpath) {
+    auto path = fn::realpath("/tmp");
+    ASSERT_TRUE(path.isString());
+    ASSERT_STREQ(path.toString().toCString(), "/tmp");
+
+    // expand_filepath resolves the path syntactically but does NOT verify existence
+    auto resolved = fn::realpath("/no/such/path/xyz");
+    ASSERT_TRUE(resolved.isString());
 }

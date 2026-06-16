@@ -189,3 +189,30 @@ TEST(std_array, array_fill) {
     auto c = fn::array_fill(0, 0, "z");
     ASSERT_EQ(c.length(), 0);
 }
+
+TEST(std_array, array_keys_filter) {
+    Array a;
+    a.set(String("a"), 1);
+    a.set(String("b"), 2);
+    a.set(String("c"), 2);
+    a.set(String("d"), 3);
+
+    // non-strict: find all keys with value 2
+    auto keys = fn::array_keys_filter(a, 2);
+    ASSERT_EQ(keys.length(), 2);
+    ASSERT_STREQ(keys.get(0).toString().toCString(), "b");
+    ASSERT_STREQ(keys.get(1).toString().toCString(), "c");
+
+    // strict: "2" != int(2)
+    auto strict = fn::array_keys_filter(a, Variant("2"), true);
+    ASSERT_EQ(strict.length(), 0);
+
+    // no matches
+    auto none = fn::array_keys_filter(a, 999);
+    ASSERT_EQ(none.length(), 0);
+
+    // empty array
+    Array empty;
+    auto emptyKeys = fn::array_keys_filter(empty, 1);
+    ASSERT_EQ(emptyKeys.length(), 0);
+}
