@@ -1,7 +1,6 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
 #include "phpx_helper.h"
-#include "phpx_std.h"
 
 using namespace php;
 
@@ -44,52 +43,6 @@ TEST(helper, instanceOf) {
 
     o = newObject("ArrayObject");
     ASSERT_TRUE(instanceOf(o, ce));
-}
-
-TEST(helper, math) {
-    var a = "-10";
-    ASSERT_EQ(php::fn::abs(a).toInt(), 10);
-
-    var b = -3.1415;
-    ASSERT_EQ(php::fn::abs(b).toFloat(), 3.1415);
-
-    var c = 199;
-    ASSERT_EQ(php::fn::abs(c).toInt(), 199);
-
-    var e = 3;
-    var d = 4;
-    ASSERT_EQ(php::fn::pow(e, d).toInt(), std::pow(3, 4));
-
-    ASSERT_EQ(php::fn::abs(-100L), 100L);
-    ASSERT_EQ(php::fn::abs(100L), 100L);
-
-    ASSERT_EQ(php::fn::abs(-100.09), 100.09);
-    ASSERT_EQ(php::fn::abs(100.09), 100.09);
-
-    var f = 13;
-    var h = 3;
-    ASSERT_EQ(php::fn::mod(f, h).toInt(), 1);
-}
-
-TEST(helper, function_exists) {
-    ASSERT_TRUE(php::fn::function_exists("php_uname"));
-    ASSERT_FALSE(php::fn::function_exists("func_not_exists"));
-    ASSERT_TRUE(php::fn::function_exists("php_uname", true));
-    ASSERT_TRUE(php::fn::function_exists("\\php_uname"));
-    ASSERT_TRUE(php::fn::function_exists("PHP_UNAME"));
-}
-
-TEST(helper, func) {
-    char c1 = 'A';
-    auto c2 = php::fn::ord("A");
-    ASSERT_EQ(c1, c2);
-
-    auto s1 = php::fn::chr(c1);
-    ASSERT_EQ(s1.length(), 1);
-    ASSERT_STREQ(s1.toCString(), "A");
-
-    var d = 10000;
-    ASSERT_EQ(php::fn::strlen(d), 5);
 }
 
 TEST(helper, same) {

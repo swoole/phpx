@@ -92,7 +92,7 @@ inline Int count(const Variant &value, Int mode = 0) {
         }
         return 1;
     }
-    php::throwException(zend_ce_type_error, "count(): Argument #1 ($value) must be of type Countable|array");
+    throwException(zend_ce_type_error, "count(): Argument #1 ($value) must be of type Countable|array");
     return 0;
 }
 
