@@ -68,8 +68,7 @@ Variant strpos(const String &haystack, const String &needle, Int offset) {
     size_t needle_len = needle.length();
 
     if (needle_len == 0) {
-        php::throwException(zend_ce_value_error, "strpos(): Argument #2 ($needle) must not be empty");
-        return Variant();
+        return Variant(Int(0));
     }
 
     if (offset < 0) {
@@ -99,8 +98,7 @@ Variant stripos(const String &haystack, const String &needle, Int offset) {
     size_t needle_len = needle.length();
 
     if (needle_len == 0) {
-        php::throwException(zend_ce_value_error, "stripos(): Argument #2 ($needle) must not be empty");
-        return Variant();
+        return Variant(Int(0));
     }
 
     if (offset < 0) {
@@ -130,8 +128,8 @@ Variant strrpos(const String &haystack, const String &needle, Int offset) {
     size_t needle_len = needle.length();
 
     if (needle_len == 0) {
-        php::throwException(zend_ce_value_error, "strrpos(): Argument #2 ($needle) must not be empty");
-        return Variant();
+        // Empty needle matches at the end of the string (PHP 8.x behavior)
+        return Variant((Int) haystack_len);
     }
 
     const char *p, *e;
@@ -174,8 +172,11 @@ Variant strstr(const String &haystack, const String &needle, bool before_needle)
     size_t needle_len = needle.length();
 
     if (needle_len == 0) {
-        php::throwException(zend_ce_value_error, "strstr(): Argument #2 ($needle) must not be empty");
-        return Variant();
+        // Empty needle matches from the start (PHP 8.x behavior)
+        if (before_needle) {
+            return Variant(String());
+        }
+        return Variant(haystack);
     }
 
     const char *found =
@@ -203,8 +204,10 @@ Variant stristr(const String &haystack, const String &needle, bool before_needle
     size_t needle_len = needle.length();
 
     if (needle_len == 0) {
-        php::throwException(zend_ce_value_error, "stristr(): Argument #2 ($needle) must not be empty");
-        return Variant();
+        if (before_needle) {
+            return Variant(String());
+        }
+        return Variant(haystack);
     }
 
     // php_stristr is PHPAPI — returns pointer to first occurrence
