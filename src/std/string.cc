@@ -231,7 +231,7 @@ Variant stristr(const String &haystack, const String &needle, bool before_needle
 // substr
 // ========================
 
-String substr(const String &s, Int offset, Int length) {
+String substr(const String &s, Int offset, const Variant &length) {
     size_t slen = s.length();
 
     // Handle negative offset
@@ -248,20 +248,23 @@ String substr(const String &s, Int offset, Int length) {
     }
 
     size_t result_len;
-    if (length == ZEND_LONG_MAX) {
+    if (length.isNull()) {
         // No length specified — take rest of string
         result_len = slen - (size_t) offset;
-    } else if (length < 0) {
-        // Negative length means omit that many characters from the end
-        Int end = (Int) slen + length;
-        if (end <= offset) {
-            return String();
-        }
-        result_len = (size_t) (end - offset);
     } else {
-        result_len = (size_t) length;
-        if ((size_t) (offset + (Int) result_len) > slen) {
-            result_len = slen - (size_t) offset;
+        Int length_int = length.toInt();
+        if (length_int < 0) {
+            // Negative length means omit that many characters from the end
+            Int end = (Int) slen + length_int;
+            if (end <= offset) {
+                return String();
+            }
+            result_len = (size_t) (end - offset);
+        } else {
+            result_len = (size_t) length_int;
+            if ((size_t) (offset + (Int) result_len) > slen) {
+                result_len = slen - (size_t) offset;
+            }
         }
     }
 

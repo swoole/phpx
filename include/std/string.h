@@ -84,9 +84,8 @@ Variant stristr(const String &haystack, const String &needle, bool before_needle
 
 // ========================
 // substr(string $s, int $offset, ?int $length = null): string
-// Pass ZEND_LONG_MAX as length to omit (same as null in PHP).
 // ========================
-String substr(const String &s, Int offset, Int length = ZEND_LONG_MAX);
+String substr(const String &s, Int offset, const Variant &length = Variant());
 
 // ========================
 // trim / ltrim / rtrim

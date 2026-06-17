@@ -219,11 +219,12 @@ inline Variant json_encode(const Variant &value, int options = 0, int depth = 51
 // json_decode(string $json, ?bool $assoc = null, int $depth = 512, int $flags = 0): mixed
 // ========================
 
-inline Variant json_decode(const String &json, bool assoc = false, int depth = 512, int options = 0) {
+inline Variant json_decode(const String &json, const Variant &assoc = Variant(), int depth = 512, int options = 0) {
     zval retval;
     ZVAL_NULL(&retval);
+    bool assoc_bool = assoc.isNull() ? false : assoc.toBool();
     if (php_json_decode_ex(
-            &retval, json.data(), json.length(), options | (assoc ? PHP_JSON_OBJECT_AS_ARRAY : 0), depth) != SUCCESS) {
+            &retval, json.data(), json.length(), options | (assoc_bool ? PHP_JSON_OBJECT_AS_ARRAY : 0), depth) != SUCCESS) {
         return Variant(nullptr);
     }
     return Variant(&retval, Ctor::Move);
@@ -265,7 +266,7 @@ inline Variant unserialize(const String &data, const Array &options = Array()) {
 // ========================
 // version_compare(string $v1, string $v2, ?string $operator = null): int|bool
 // ========================
-Variant version_compare(const String &v1, const String &v2, const String &op = String());
+Variant version_compare(const String &v1, const String &v2, const Variant &op = Variant());
 
 // ========================
 // print_r(mixed $value, bool $return = false): string|bool

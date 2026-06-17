@@ -100,30 +100,31 @@ Variant hash(const String &algo, const String &data, bool raw_output) {
 // version_compare
 // ========================
 
-Variant version_compare(const String &v1, const String &v2, const String &op) {
+Variant version_compare(const String &v1, const String &v2, const Variant &op) {
     int result = php_version_compare(v1.data(), v2.data());
-    if (op.length() == 0) {
+    if (op.isNull() || op.toString().empty()) {
         return Variant(static_cast<Int>(result));
     }
 
-    if (zend_string_equals_literal(op.str(), "<") || zend_string_equals_literal(op.str(), "lt")) {
+    String op_str = op.toString();
+    if (zend_string_equals_literal(op_str.str(), "<") || zend_string_equals_literal(op_str.str(), "lt")) {
         return Variant(result == -1);
     }
-    if (zend_string_equals_literal(op.str(), "<=") || zend_string_equals_literal(op.str(), "le")) {
+    if (zend_string_equals_literal(op_str.str(), "<=") || zend_string_equals_literal(op_str.str(), "le")) {
         return Variant(result != 1);
     }
-    if (zend_string_equals_literal(op.str(), ">") || zend_string_equals_literal(op.str(), "gt")) {
+    if (zend_string_equals_literal(op_str.str(), ">") || zend_string_equals_literal(op_str.str(), "gt")) {
         return Variant(result == 1);
     }
-    if (zend_string_equals_literal(op.str(), ">=") || zend_string_equals_literal(op.str(), "ge")) {
+    if (zend_string_equals_literal(op_str.str(), ">=") || zend_string_equals_literal(op_str.str(), "ge")) {
         return Variant(result != -1);
     }
-    if (zend_string_equals_literal(op.str(), "==") || zend_string_equals_literal(op.str(), "=") ||
-        zend_string_equals_literal(op.str(), "eq")) {
+    if (zend_string_equals_literal(op_str.str(), "==") || zend_string_equals_literal(op_str.str(), "=") ||
+        zend_string_equals_literal(op_str.str(), "eq")) {
         return Variant(result == 0);
     }
-    if (zend_string_equals_literal(op.str(), "!=") || zend_string_equals_literal(op.str(), "<>") ||
-        zend_string_equals_literal(op.str(), "ne")) {
+    if (zend_string_equals_literal(op_str.str(), "!=") || zend_string_equals_literal(op_str.str(), "<>") ||
+        zend_string_equals_literal(op_str.str(), "ne")) {
         return Variant(result != 0);
     }
 
