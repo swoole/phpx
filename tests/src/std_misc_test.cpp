@@ -40,8 +40,7 @@ TEST(std_misc, hash) {
     ASSERT_STREQ(r1.toString().toCString(), "5d41402abc4b2a76b9719d911017c592");
 
     auto r2 = fn::hash("sha256", "hello");
-    ASSERT_STREQ(r2.toString().toCString(),
-                 "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824");
+    ASSERT_STREQ(r2.toString().toCString(), "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824");
 
     // raw output
     auto r3 = fn::hash("md5", "hello", true);
@@ -111,10 +110,8 @@ TEST(std_misc, random_bytes) {
 }
 
 TEST(std_misc, random_bytes_exception) {
-    try_call([]() { fn::random_bytes(0); },
-             "random_bytes(): Argument #1 ($length) must be greater than 0");
-    try_call([]() { fn::random_bytes(-1); },
-             "random_bytes(): Argument #1 ($length) must be greater than 0");
+    try_call([]() { fn::random_bytes(0); }, "random_bytes(): Argument #1 ($length) must be greater than 0");
+    try_call([]() { fn::random_bytes(-1); }, "random_bytes(): Argument #1 ($length) must be greater than 0");
 }
 
 TEST(std_misc, mt_rand) {

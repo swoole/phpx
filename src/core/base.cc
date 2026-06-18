@@ -678,6 +678,10 @@ Reference toReference(const Variant &v, const OperationChain &list) {
     size_t total = list.size();
     size_t count = 0;
 
+    if (total == 0) {
+        return tmp.toReference();
+    }
+
     for (const auto &expr : list) {
         if (count == total - 1) {
             if (expr.first == ArrayDimFetch) {

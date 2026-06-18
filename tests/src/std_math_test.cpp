@@ -192,10 +192,12 @@ TEST(std_math, float_ops) {
 
 TEST(std_math, intdiv_exceptions) {
     try_call([]() { fn::intdiv(1, 0); }, "Division by zero");
-    try_call([]() {
-        auto min = std::numeric_limits<zend_long>::min();
-        fn::intdiv(min, -1);
-    }, "Division of PHP_INT_MIN by -1 is not an integer");
+    try_call(
+        []() {
+            auto min = std::numeric_limits<zend_long>::min();
+            fn::intdiv(min, -1);
+        },
+        "Division of PHP_INT_MIN by -1 is not an integer");
 }
 
 TEST(std_math, log_exceptions) {

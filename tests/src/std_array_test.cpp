@@ -141,8 +141,7 @@ TEST(std_array, count) {
 }
 
 TEST(std_array, count_exception) {
-    try_call([]() { fn::count(12345); },
-             "count(): Argument #1 ($value) must be of type Countable|array");
+    try_call([]() { fn::count(12345); }, "count(): Argument #1 ($value) must be of type Countable|array");
 }
 
 TEST(std_array, array_is_list) {

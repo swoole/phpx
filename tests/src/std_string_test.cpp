@@ -6,7 +6,7 @@ using namespace php;
 TEST(std_string, ord) {
     ASSERT_EQ(fn::ord("A"), 65);
     ASSERT_EQ(fn::ord(""), 0);
-    ASSERT_EQ(fn::ord("hello"), 104); // 'h' = 104
+    ASSERT_EQ(fn::ord("hello"), 104);  // 'h' = 104
 }
 
 TEST(std_string, chr) {
