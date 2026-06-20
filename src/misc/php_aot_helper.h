@@ -54,4 +54,10 @@ static inline auto php_get_create_object_fn(zend_class_entry *ce) {
     return ce->create_object ? ce->create_object : php_std_create_object;
 }
 
-extern ZEND_API zend_object_handlers php_aot_object_handlers;
+/**
+ * Custom unset_property handler that resets typed properties to their
+ * type-appropriate default values instead of making them uninitialized.
+ * Only simple scalar/array types (int, float, bool, string, array) and
+ * object types are handled; union types fall through to std behavior.
+ */
+extern void php_aot_unset_typed_property(zend_object *object, zend_string *member, void **cache_slot);
