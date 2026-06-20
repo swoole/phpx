@@ -11,6 +11,15 @@ extern zend_function *php_get_method(int func_id,
                                      const php::Str &class_name);
 extern uint32_t php_get_prop(int prop_id, const php::Str &prop_name, int class_id, const php::Str &class_name);
 
+/**
+ * Create a deep copy from $GLOBALS. $GLOBALS is a special INDIRECT zval
+ * pointing to &EG(symbol_table), whose refcount MUST NOT be directly
+ * manipulated. Use zend_array_dup to create a proper separated copy.
+ */
+static inline php::Var php_globals_array() {
+    return php::Var(zend_array_dup(&EG(symbol_table)), php::Ctor::Move);
+}
+
 namespace php {
 struct Scope {
     zend_class_entry *ce;
@@ -44,3 +53,10 @@ static inline auto php_std_create_object(zend_class_entry *ce) {
 static inline auto php_get_create_object_fn(zend_class_entry *ce) {
     return ce->create_object ? ce->create_object : php_std_create_object;
 }
+
+/**
+ * Custom unset_property handler that resets typed properties to their
+ * type-appropriate default values instead of making them uninitialized.
+ */
+void php_aot_unset_typed_property(zend_object *object, zend_string *member, void **cache_slot);
+void php_aot_init_object_handlers(zend_object_handlers *handlers);

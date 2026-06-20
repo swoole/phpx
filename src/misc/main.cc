@@ -115,6 +115,72 @@ void module_shutdown(zend_module_entry *module) {
     zend_hash_del(&module_registry, lcname);
 }
 
+/**
+ * Custom unset_property handler that resets typed properties to their
+ * type-appropriate default values instead of making them uninitialized.
+ * Only simple scalar/array types (int, float, bool, string, array) and
+ * object types are handled; union types fall through to std behavior.
+ */
+void php_aot_unset_typed_property(zend_object *object, zend_string *member, void **cache_slot) {
+    zend_class_entry *ce = object->ce;
+    zend_property_info *property_info = zend_get_property_info(ce, member, 1);
+
+    if (property_info != NULL && ZEND_TYPE_IS_SET(property_info->type)) {
+        if (property_info->flags & ZEND_ACC_STATIC) {
+            goto _std_unset;
+        }
+
+        zend_uchar pure_mask = ZEND_TYPE_PURE_MASK(property_info->type);
+
+        /* Object/class type properties default to null */
+        if (ZEND_TYPE_HAS_NAME(property_info->type)) {
+            zval *member_p = OBJ_PROP(object, property_info->offset);
+            zval_ptr_dtor(member_p);
+            ZVAL_NULL(member_p);
+            return;
+        }
+
+        /* Simple typed properties: reset to type default */
+        zval *member_p = OBJ_PROP(object, property_info->offset);
+        zend_uchar type_mask = pure_mask & (zend_uchar) ~MAY_BE_NULL;
+
+        switch (type_mask) {
+        case MAY_BE_LONG:
+            zval_ptr_dtor(member_p);
+            ZVAL_LONG(member_p, 0);
+            return;
+        case MAY_BE_DOUBLE:
+            zval_ptr_dtor(member_p);
+            ZVAL_DOUBLE(member_p, 0.0);
+            return;
+        case MAY_BE_BOOL:
+            zval_ptr_dtor(member_p);
+            ZVAL_FALSE(member_p);
+            return;
+        case MAY_BE_STRING:
+            zval_ptr_dtor(member_p);
+            ZVAL_EMPTY_STRING(member_p);
+            return;
+        case MAY_BE_ARRAY: {
+            zend_array *arr = zend_new_array(0);
+            zval_ptr_dtor(member_p);
+            ZVAL_ARR(member_p, arr);
+            return;
+        }
+        default:
+            break;
+        }
+    }
+
+_std_unset:
+    zend_std_unset_property(object, member, cache_slot);
+}
+
+void php_aot_init_object_handlers(zend_object_handlers *handlers) {
+    memcpy(handlers, &std_object_handlers, sizeof(zend_object_handlers));
+    handlers->unset_property = php_aot_unset_typed_property;
+}
+
 int main(int cpp_argc, char **cpp_argv) {
     php_embed_init(cpp_argc, cpp_argv);
     php::throw_impl = [](zend_object *ex) { throw ex; };
