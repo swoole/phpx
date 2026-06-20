@@ -131,27 +131,37 @@ void php_aot_unset_typed_property(zend_object *object, zend_string *member, void
             goto _std_unset;
         }
 
-        /* Simple typed properties: reset to type default */
+        /* Simple typed properties: reset to type default.
+         *
+         * The property slot may already be IS_REFERENCE if user code has taken
+         * &$object->prop. In that case preserve the reference container and
+         * reset its inner value, otherwise existing references would detach from
+         * the object property.
+         */
         zval *member_p = OBJ_PROP(object, property_info->offset);
+        zval *value_p = Z_ISREF_P(member_p) ? Z_REFVAL_P(member_p) : member_p;
         zend_uchar type_mask = pure_mask & (zend_uchar) ~MAY_BE_NULL;
 
         switch (type_mask) {
         case MAY_BE_LONG:
-            ZVAL_LONG(member_p, 0);
+            zval_ptr_dtor(value_p);
+            ZVAL_LONG(value_p, 0);
             return;
         case MAY_BE_DOUBLE:
-            ZVAL_DOUBLE(member_p, 0.0);
+            zval_ptr_dtor(value_p);
+            ZVAL_DOUBLE(value_p, 0.0);
             return;
         case MAY_BE_BOOL:
-            ZVAL_FALSE(member_p);
+            zval_ptr_dtor(value_p);
+            ZVAL_FALSE(value_p);
             return;
         case MAY_BE_STRING:
-            zval_ptr_dtor(member_p);
-            ZVAL_EMPTY_STRING(member_p);
+            zval_ptr_dtor(value_p);
+            ZVAL_EMPTY_STRING(value_p);
             return;
         case MAY_BE_ARRAY: {
-            zval_ptr_dtor(member_p);
-            ZVAL_EMPTY_ARRAY(member_p);
+            zval_ptr_dtor(value_p);
+            ZVAL_EMPTY_ARRAY(value_p);
             return;
         }
         default:

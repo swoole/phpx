@@ -58,6 +58,8 @@ static inline auto php_get_create_object_fn(zend_class_entry *ce) {
  * Custom unset_property handler that resets typed properties to their
  * type-appropriate default values instead of making them uninitialized.
  * Only simple scalar/array types (int, float, bool, string, array) and
- * object types are handled; union types fall through to std behavior.
+ * direct object property slots are handled; union/object types and static
+ * properties fall through to std behavior. Existing reference containers are
+ * preserved by resetting their inner value.
  */
 extern void php_aot_unset_typed_property(zend_object *object, zend_string *member, void **cache_slot);
