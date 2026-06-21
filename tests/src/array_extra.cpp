@@ -238,9 +238,9 @@ TEST(array_extra, from_std_vector) {
     ASSERT_EQ(arr[2].toInt(), 30);
 }
 
-// Test toArray with StdMap
+// Test toArray with StdOrderedMap
 TEST(array_extra, from_std_map) {
-    StdMap<std::string, int> m;
+    StdOrderedMap<std::string, int> m;
     m["a"] = 1;
     m["b"] = 2;
     Array arr(m);
@@ -264,7 +264,7 @@ TEST(array_extra, toArray_from_types) {
     Array arr = php::toArray(vec);
     ASSERT_EQ(arr.count(), 3);
 
-    StdMap<std::string, int> m;
+    StdOrderedMap<std::string, int> m;
     m["x"] = 10;
     m["y"] = 20;
     Array arr2 = php::toArray(m);
