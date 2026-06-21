@@ -63,3 +63,17 @@ static inline auto php_get_create_object_fn(zend_class_entry *ce) {
  * preserved by resetting their inner value.
  */
 extern void php_aot_unset_typed_property(zend_object *object, zend_string *member, void **cache_slot);
+
+/**
+ * Return a typed C++ reference into a static-property (or object-property) zval's
+ * value slot, used by the AOT local-ref hoisting optimizer. If the slot was
+ * turned into a PHP reference (IS_REFERENCE), alias the referenced value so the
+ * hoisted local keeps pointing at the live storage.
+ */
+static inline php::Int &php_aot_static_int_ref(zval *slot) {
+    return Z_LVAL_P(Z_ISREF_P(slot) ? Z_REFVAL_P(slot) : slot);
+}
+
+static inline php::Float &php_aot_static_float_ref(zval *slot) {
+    return Z_DVAL_P(Z_ISREF_P(slot) ? Z_REFVAL_P(slot) : slot);
+}
