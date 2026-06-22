@@ -19,6 +19,9 @@
 #include "zend_closures.h"
 
 namespace php {
+
+static Variant propBox = {ZEND_STRL("box"), true};
+
 class ClosureBox : public Box {
     ~ClosureBox() override {
         efree(zf_);
@@ -44,7 +47,7 @@ Object newClosure(const ClosureFn &fn, const ArgList &uses, const Object &_this)
     func->type = ZEND_INTERNAL_FUNCTION;
     func->internal_function.handler = [](INTERNAL_FUNCTION_PARAMETERS) {
         Object this_(ZEND_THIS);
-        auto box = this_.get("box").toBox<ClosureBox>();
+        auto box = this_.getProperty(propBox).toBox<ClosureBox>();
         auto rv = box->fn_(INTERNAL_FUNCTION_PARAM_PASSTHRU, box->this_, box->vars_);
         rv.moveTo(return_value);
     };
@@ -53,7 +56,7 @@ Object newClosure(const ClosureFn &fn, const ArgList &uses, const Object &_this)
 
     Variant box(box_ptr);
     Object obj = newObject(zend_standard_class_def);
-    obj.setProperty("box", box);
+    obj.setProperty(propBox, box);
 
     zval closure;
     zend_create_fake_closure(&closure, func, zend_standard_class_def, NULL, obj.ptr());
