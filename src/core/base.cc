@@ -68,19 +68,38 @@ Variant concat(const Variant &a, const Variant &b) {
 }
 
 Variant concat(const ArgList &args) {
-    if (args.size() == 0) {
+    size_t count = args.size();
+    if (count == 0) {
         return Variant();
     }
 
-    auto it = args.begin();
-    Variant result = it->toString();
-    ++it;
-
-    for (; it != args.end(); ++it) {
-        result.append(*it);
+    if (count == 1) {
+        auto item = *args.begin();
+        return item.toString();
     }
 
-    return result;
+    std::vector<zend_string *> items(count);
+    size_t total_len = 0;
+    size_t index = 0;
+
+    for (auto const &item : args) {
+        auto str = zval_get_string(NO_CONST_V(item));
+        items[index++] = str;
+        total_len += ZSTR_LEN(str);
+    }
+
+    zend_string *result_str = zend_string_alloc(total_len, 0);
+    char *dst = ZSTR_VAL(result_str);
+
+    for (auto part : items) {
+        size_t len = ZSTR_LEN(part);
+        memcpy(dst, ZSTR_VAL(part), len);
+        dst += len;
+        zend_string_release(part);
+    }
+    *dst = '\0';
+
+    return Variant{result_str, Ctor::Move};
 }
 
 Variant global(const String &name) {
