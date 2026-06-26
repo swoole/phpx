@@ -718,7 +718,7 @@ Reference toReference(const Variant &v, const OperationChain &list) {
 }
 
 Variant getStaticProperty(const Object &object, const String &prop) {
-    return getStaticProperty(object.ce(), prop);
+    return {zend_read_static_property_ex(object.ce(), prop.str(), true), Ctor::Indirect};
 }
 
 Variant getStaticProperty(const String &class_name, const String &prop) {
@@ -731,19 +731,14 @@ Variant getStaticProperty(const String &class_name, const String &prop) {
 }
 
 Variant getStaticProperty(zend_class_entry *ce, const String &prop) {
-    auto rv = zend_read_static_property_ex(ce, prop.str(), true);
-    if (rv == nullptr) {
-    	return {};
-    }
-    return {rv, zval_wrap(rv)};
+    return {zend_read_static_property_ex(ce, prop.str(), true), Ctor::Indirect};
 }
 
 Variant getStaticProperty(zend_class_entry *ce, uint32_t offset) {
     if (UNEXPECTED(CE_STATIC_MEMBERS(ce) == NULL)) {
         zend_class_init_statics(ce);
     }
-    auto rv = CE_STATIC_MEMBERS(ce) + offset;
-    return Variant{rv, zval_wrap(rv)};
+    return Variant{CE_STATIC_MEMBERS(ce) + offset, Ctor::Indirect};
 }
 
 bool hasStaticProperty(const String &class_name, const String &prop) {
