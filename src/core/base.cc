@@ -732,6 +732,9 @@ Variant getStaticProperty(const String &class_name, const String &prop) {
 
 Variant getStaticProperty(zend_class_entry *ce, const String &prop) {
     auto rv = zend_read_static_property_ex(ce, prop.str(), true);
+    if (rv == nullptr) {
+    	return {};
+    }
     return {rv, zval_wrap(rv)};
 }
 
