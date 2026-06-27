@@ -161,7 +161,7 @@ inline void throwExceptionEx(zend_class_entry *ce, int code, const char *format,
 PHPX_API Object catchException();
 PHPX_API Variant concat(const Variant &a, const Variant &b);
 PHPX_API Variant concat(const ArgList &args);
-PHPX_API void exit(const Variant &status);
+PHPX_API bool exit(const Variant &status);
 PHPX_API bool same(const Variant &a, const Variant &b);
 PHPX_API bool equals(const Variant &a, const Variant &b);
 PHPX_API int compare(const Variant &a, const Variant &b);

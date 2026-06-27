@@ -268,7 +268,12 @@ bool updateConstant(zend_class_entry *ce, const String &name, const Variant &dat
     }
 }
 
-void exit(const Variant &status) {
+/**
+ * In TypePHP, there is no way to compile something like true && exit() because exit does not have a return value at
+ * that point and cannot be converted to a boolean. Therefore, we need to add a return value to exit here in order
+ * to support the && syntax.
+ */
+bool exit(const Variant &status) {
     if (status.isInt()) {
         EG(exit_status) = status.toInt();
     } else {
@@ -280,6 +285,7 @@ void exit(const Variant &status) {
     if (throw_impl) {
         throw_impl(EG(exception));
     }
+    return true;
 }
 
 static void box_dtor(zend_resource *res) {
