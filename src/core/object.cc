@@ -29,7 +29,9 @@ String Object::hash() const {
 zend_long Object::count() {
     if (object()->handlers->count_elements) {
         zend_long rv;
-        return object()->handlers->count_elements(object(), &rv) == SUCCESS ? rv : 0;
+        auto rc = object()->handlers->count_elements(object(), &rv);
+        throwErrorIfOccurred();
+        return rc == SUCCESS ? rv : 0;
     } else {
         return 0;
     }
@@ -48,6 +50,7 @@ bool Object::propertyExists(const String &name, PropertyOperation op) const {
     bool rs = object()->handlers->has_property(object(), name.str(), op, NULL);
 
     EG(fake_scope) = ori_scope;
+    throwErrorIfOccurred();
     return rs;
 }
 

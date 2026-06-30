@@ -142,6 +142,14 @@ TEST(std_array, count) {
 
 TEST(std_array, count_exception) {
     try_call([]() { fn::count(12345); }, "count(): Argument #1 ($value) must be of type Countable|array");
+
+    eval(R"(
+        class PhpxStdArrayThrowingCountable implements Countable {
+            public function count(): int { throw new RuntimeException('std count failed'); }
+        }
+    )");
+    var obj = eval("return new PhpxStdArrayThrowingCountable();");
+    try_call([&obj]() { fn::count(obj); }, "std count failed");
 }
 
 TEST(std_array, array_is_list) {

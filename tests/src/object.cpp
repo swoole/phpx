@@ -147,6 +147,36 @@ TEST(object, static_property_write_1) {
     ASSERT_EQ(getStaticProperty("TestClass", "propInt").toInt(), 12009);
 }
 
+TEST(object, static_property_write_exception) {
+    eval("class PhpxStaticTypedPropertyHolder { public static int|string $value; }");
+
+    try {
+        setStaticProperty("PhpxStaticTypedPropertyHolder", "value", null);
+        FAIL() << "setStaticProperty should throw zend_object* when Zend raises a typed static property error";
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto s = e.call("getMessage");
+        ASSERT_TRUE(str_contains(s, "Cannot assign null to property PhpxStaticTypedPropertyHolder::$value").toBool());
+    }
+}
+
+TEST(object, offset_handlers_throw_exceptions) {
+    eval(R"(
+        class PhpxThrowingArrayAccess implements ArrayAccess {
+            public function offsetExists(mixed $offset): bool { throw new RuntimeException('offsetExists failed'); }
+            public function offsetGet(mixed $offset): mixed { throw new RuntimeException('offsetGet failed'); }
+            public function offsetSet(mixed $offset, mixed $value): void { throw new RuntimeException('offsetSet failed'); }
+            public function offsetUnset(mixed $offset): void { throw new RuntimeException('offsetUnset failed'); }
+        }
+    )");
+    Object object = eval("return new PhpxThrowingArrayAccess();");
+
+    try_call([&object]() { object.offsetExists("k"); }, "offsetExists failed");
+    try_call([&object]() { object.offsetGet("k"); }, "offsetGet failed");
+    try_call([&object]() { object.offsetSet("k", 1); }, "offsetSet failed");
+    try_call([&object]() { object.offsetUnset("k"); }, "offsetUnset failed");
+}
+
 TEST(object, mixed) {
     include(get_include_dir() + "/library.php", INCLUDE_ONCE);
 

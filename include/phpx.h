@@ -1628,38 +1628,50 @@ class Object : public Variant {
     void updateArrayProperty(const String &name, const Variant &key, const Variant &value);
 
     bool offsetExists(const Variant &offset) const {
-        return object()->handlers->has_dimension(object(), NO_CONST_V(offset), 0) != 0;
+        auto result = object()->handlers->has_dimension(object(), NO_CONST_V(offset), 0) != 0;
+        throwErrorIfOccurred();
+        return result;
     }
     bool offsetExists(zend_long offset) {
         zval tmp;
         ZVAL_LONG(&tmp, offset);
-        return object()->handlers->has_dimension(object(), &tmp, 0) != 0;
+        auto result = object()->handlers->has_dimension(object(), &tmp, 0) != 0;
+        throwErrorIfOccurred();
+        return result;
     }
     Variant offsetGet(const Variant &offset, int type = BP_VAR_R) {
         zval rv;
-        return Variant{object()->handlers->read_dimension(object(), NO_CONST_V(offset), type, &rv)};
+        auto result = object()->handlers->read_dimension(object(), NO_CONST_V(offset), type, &rv);
+        throwErrorIfOccurred();
+        return Variant{result};
     }
     Variant offsetGet(zend_long offset, int type = BP_VAR_R) {
         zval tmp;
         ZVAL_LONG(&tmp, offset);
         zval rv;
-        return Variant{object()->handlers->read_dimension(object(), &tmp, type, &rv)};
+        auto result = object()->handlers->read_dimension(object(), &tmp, type, &rv);
+        throwErrorIfOccurred();
+        return Variant{result};
     }
     void offsetSet(const Variant &offset, const Variant &value) {
         object()->handlers->write_dimension(object(), NO_CONST_V(offset), NO_CONST_V(value));
+        throwErrorIfOccurred();
     }
     void offsetSet(zend_long offset, const Variant &value) {
         zval tmp;
         ZVAL_LONG(&tmp, offset);
         object()->handlers->write_dimension(object(), &tmp, NO_CONST_V(value));
+        throwErrorIfOccurred();
     }
     void offsetUnset(const Variant &offset) {
         object()->handlers->unset_dimension(object(), NO_CONST_V(offset));
+        throwErrorIfOccurred();
     }
     void offsetUnset(zend_long offset) {
         zval tmp;
         ZVAL_LONG(&tmp, offset);
         object()->handlers->unset_dimension(object(), &tmp);
+        throwErrorIfOccurred();
     }
     Variant get(const String &name) const;
     void set(const String &name, const Variant &v) const {

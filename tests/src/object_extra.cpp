@@ -35,6 +35,28 @@ TEST(object_extra, count) {
     ASSERT_EQ(obj2.count(), 0);
 }
 
+TEST(object_extra, count_exception) {
+    eval(R"(
+        class PhpxThrowingCountable implements Countable {
+            public function count(): int { throw new RuntimeException('count failed'); }
+        }
+    )");
+    Object obj = eval("return new PhpxThrowingCountable();");
+
+    try_call([&obj]() { obj.count(); }, "count failed");
+}
+
+TEST(object_extra, property_exists_exception) {
+    eval(R"(
+        class PhpxThrowingIsset {
+            public function __isset(string $name): bool { throw new RuntimeException('__isset failed'); }
+        }
+    )");
+    Object obj = eval("return new PhpxThrowingIsset();");
+
+    try_call([&obj]() { obj.propertyExists("value", PROP_ISSET); }, "__isset failed");
+}
+
 // Test getId() returns object handle
 TEST(object_extra, getId) {
     auto o1 = newObject("stdClass");

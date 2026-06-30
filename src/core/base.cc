@@ -732,6 +732,7 @@ Variant getStaticProperty(const String &class_name, const String &prop) {
 
 Variant getStaticProperty(zend_class_entry *ce, const String &prop) {
     auto rv = zend_read_static_property_ex(ce, prop.str(), true);
+    throwErrorIfOccurred();
     if (rv == nullptr) {
     	return {};
     }
@@ -761,7 +762,9 @@ bool setStaticProperty(const String &class_name, const String &prop, const Varia
         throwError("class '%s' is undefined.", class_name.toCString());
         return {};
     }
-    return zend_update_static_property_ex(ce, prop.str(), NO_CONST_V(v)) == SUCCESS;
+    auto rc = zend_update_static_property_ex(ce, prop.str(), NO_CONST_V(v));
+    throwErrorIfOccurred();
+    return rc == SUCCESS;
 }
 
 uint32_t getPropertyOffset(const String &class_name, const String &prop) {

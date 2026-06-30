@@ -83,7 +83,9 @@ inline Int count(const Variant &value, Int mode = 0) {
         zend_object *zobj = Z_OBJ_P(value.unwrap_ptr());
         if (zobj->handlers->count_elements) {
             zend_long cnt = 1;
-            if (SUCCESS == zobj->handlers->count_elements(zobj, &cnt)) {
+            auto rc = zobj->handlers->count_elements(zobj, &cnt);
+            throwErrorIfOccurred();
+            if (SUCCESS == rc) {
                 return static_cast<Int>(cnt);
             }
         }
