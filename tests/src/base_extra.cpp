@@ -297,6 +297,24 @@ TEST(base_extra, call_with_named_args) {
     ASSERT_STREQ(rs.item("city").toCString(), "beijing");
 }
 
+TEST(base_extra, call_variant_with_array_and_named_args) {
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
+
+    Array args;
+    args.append("Elaine");
+    args.append(31);
+
+    Array named_args;
+    named_args.set("city", "shanghai");
+    named_args.set("vip", true);
+
+    auto rs = call(Variant("createUser"), args, named_args.array());
+    ASSERT_STREQ(rs.item("name").toCString(), "Elaine");
+    ASSERT_EQ(rs.item("age").toInt(), 31);
+    ASSERT_STREQ(rs.item("city").toCString(), "shanghai");
+    ASSERT_TRUE(rs.item("vip").toBool());
+}
+
 // Test throwErrorIfOccurred (no exception case)
 TEST(base_extra, throwErrorIfOccurred_none) {
     // Should not throw since EG(exception) is null

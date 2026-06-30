@@ -52,3 +52,20 @@ function createUser(
 {
     return ['name' => $name, 'age' => $age, 'city' => $city, 'vip' => $vip];
 }
+
+class TestNamedArgs
+{
+    public function __construct(
+        public string $name,
+        public int $age,
+        public string $city = 'Beijing',
+        public bool $vip = false,
+    ) {
+    }
+
+    public function describe(string $prefix, string $suffix = '', bool $upper = false): string
+    {
+        $text = $prefix . ':' . $this->name . ':' . $suffix;
+        return $upper ? strtoupper($text) : $text;
+    }
+}

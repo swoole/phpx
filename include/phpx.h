@@ -103,8 +103,8 @@ PHPX_API void unsetGlobal(const String &name);
 PHPX_API Variant include(const String &file, IncludeType type = INCLUDE);
 PHPX_API Variant eval(const String &script);
 PHPX_API Variant call(const Variant &func, Args &args);
-PHPX_API Variant call(const Variant &func, Array &args);
-PHPX_API Variant call(const Variant &func, const ArgList &args);
+PHPX_API Variant call(const Variant &func, Array &args, zend_array *named_args = nullptr);
+PHPX_API Variant call(const Variant &func, const ArgList &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, Args &_args, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, Array &args, zend_array *named_args = nullptr);
@@ -974,11 +974,11 @@ class Variant {
     Variant call(const Variant &fn, Args &args) {
         return call_impl(ptr(), fn.unwrap_ptr(), args);
     }
-    Variant call(const Variant &fn, Array &args);
+    Variant call(const Variant &fn, Array &args, zend_array *named_args = nullptr);
     Variant call(const Variant &fn, const ArgList &args, zend_array *named_args = nullptr);
     Variant call(zend_function *fn);
     Variant call(zend_function *fn, Args &args, zend_array *named_args = nullptr);
-    Variant call(zend_function *fn, Array &args);
+    Variant call(zend_function *fn, Array &args, zend_array *named_args = nullptr);
     Variant call(zend_function *fn, const ArgList &args, zend_array *named_args = nullptr);
 
     bool operator==(const Variant &v) const {
@@ -1847,6 +1847,10 @@ static inline Object newObject(const String &name) {
 }
 
 static inline Object newObject(const String &name, const ArgList &args, zend_array *named_args = nullptr) {
+    return newObject(getClassEntrySafe(name), args, named_args);
+}
+
+static inline Object newObject(const String &name, Array &args, zend_array *named_args = nullptr) {
     return newObject(getClassEntrySafe(name), args, named_args);
 }
 

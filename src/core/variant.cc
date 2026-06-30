@@ -1077,9 +1077,9 @@ Variant Variant::call(const Variant &fn, const ArgList &args, zend_array *named_
     return call_impl(unwrap_ptr(), fn.unwrap_ptr(), _args, named_args);
 }
 
-Variant Variant::call(const Variant &fn, Array &args) {
+Variant Variant::call(const Variant &fn, Array &args, zend_array *named_args) {
     Args _args(args);
-    return call(fn, _args);
+    return call_impl(unwrap_ptr(), fn.unwrap_ptr(), _args, named_args);
 }
 
 Variant Variant::call(zend_function *fn) {
@@ -1096,9 +1096,9 @@ Variant Variant::call(zend_function *fn, Args &_args, zend_array *named_args) {
     return retval;
 }
 
-Variant Variant::call(zend_function *fn, Array &args) {
+Variant Variant::call(zend_function *fn, Array &args, zend_array *named_args) {
     Args _args(args);
-    return call(fn, _args);
+    return call(fn, _args, named_args);
 }
 
 Variant Variant::call(zend_function *fn, const ArgList &args, zend_array *named_args) {

@@ -462,21 +462,21 @@ Variant call_impl(const zval *object, const zval *func) {
     return retval;
 }
 
-Variant call(const Variant &func, Array &args) {
+Variant call(const Variant &func, Array &args, zend_array *named_args) {
     Args _args(args.count());
     for (size_t i = 0; i < args.count(); i++) {
         _args.append(args[i]);
     }
-    return call_impl(nullptr, func.unwrap_ptr(), _args);
+    return call_impl(nullptr, func.unwrap_ptr(), _args, named_args);
 }
 
 Variant call(const Variant &func, Args &args) {
     return call_impl(nullptr, func.unwrap_ptr(), args);
 }
 
-Variant call(const Variant &func, const ArgList &args) {
+Variant call(const Variant &func, const ArgList &args, zend_array *named_args) {
     Args _args(args);
-    return call_impl(nullptr, func.unwrap_ptr(), _args);
+    return call_impl(nullptr, func.unwrap_ptr(), _args, named_args);
 }
 
 Variant call(zend_function *func, zend_array *named_args) {

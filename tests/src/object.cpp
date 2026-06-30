@@ -75,12 +75,46 @@ TEST(object, ctor) {
     ASSERT_EQ(o3.attr("golang").toInt(), 4);
 }
 
+TEST(object, ctor_string_with_array_and_named_args) {
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
+
+    Array args;
+    args.append("Frank");
+    args.append(42);
+
+    Array named_args;
+    named_args.set("city", "shenzhen");
+    named_args.set("vip", true);
+
+    auto object = newObject("TestNamedArgs", args, named_args.array());
+    ASSERT_STREQ(object.attr("name").toCString(), "Frank");
+    ASSERT_EQ(object.attr("age").toInt(), 42);
+    ASSERT_STREQ(object.attr("city").toCString(), "shenzhen");
+    ASSERT_TRUE(object.attr("vip").toBool());
+}
+
 TEST(object, method) {
     auto obj = newObject("DateTimeImmutable");
     ASSERT_TRUE(obj.isObject());
     auto str = obj.call("format", {"Y-m-d H:i:s"});
     ASSERT_TRUE(str.isString());
     ASSERT_GT(str.length(), 0);
+}
+
+TEST(object, method_with_array_and_named_args) {
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
+
+    auto object = newObject("TestNamedArgs", {"Grace", 28});
+
+    Array args;
+    args.append("user");
+
+    Array named_args;
+    named_args.set("suffix", "ok");
+    named_args.set("upper", true);
+
+    auto rs = object.call("describe", args, named_args.array());
+    ASSERT_STREQ(rs.toCString(), "USER:GRACE:OK");
 }
 
 TEST(object, static_property) {
