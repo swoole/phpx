@@ -91,6 +91,7 @@ void Object::appendArrayProperty(const String &name, const Variant &value) {
     zval rv;
     Variant retval;
     zval *member_p = zend_read_property_ex(ce(), object(), name.str(), true, &rv);
+    throwErrorIfOccurred();
 
     if (UNEXPECTED(ZVAL_IS_NULL(member_p))) {
         throwError("property `%s` is undefined", name.data());
@@ -113,6 +114,7 @@ void Object::updateArrayProperty(const String &name, zend_long offset, const Var
     zval rv;
     Variant retval;
     zval *member_p = zend_read_property_ex(ce(), object(), name.str(), true, &rv);
+    throwErrorIfOccurred();
 
     if (UNEXPECTED(ZVAL_IS_NULL(member_p))) {
         throwError("property `%s` is undefined", name.data());
@@ -135,6 +137,7 @@ void Object::updateArrayProperty(const String &name, const Variant &key, const V
     zval rv;
     Variant retval;
     zval *member_p = zend_read_property_ex(ce(), object(), name.str(), true, &rv);
+    throwErrorIfOccurred();
 
     if (UNEXPECTED(ZVAL_IS_NULL(member_p))) {
         throwError("property `%s` is undefined", name.data());

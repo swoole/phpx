@@ -979,6 +979,48 @@ TEST(variant, setProperty) {
     ASSERT_EQ(v.toInt(), 1987);
 }
 
+TEST(variant, setPropertyThrowsZendException) {
+    eval("class PhpxTypedPropertyHolder { public int|string $value; }");
+    auto o = eval("return new PhpxTypedPropertyHolder();");
+
+    try {
+        o.setProperty("value", null);
+        FAIL() << "setProperty should throw zend_object* when Zend raises a typed property error";
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto msg = e.call("getMessage");
+        ASSERT_TRUE(str_contains(msg, "Cannot assign null to property PhpxTypedPropertyHolder::$value").toBool());
+    }
+}
+
+TEST(variant, getPropertyThrowsZendException) {
+    eval("class PhpxUninitializedPropertyHolder { public int $value; }");
+    auto o = eval("return new PhpxUninitializedPropertyHolder();");
+
+    try {
+        o.getProperty("value");
+        FAIL() << "getProperty should throw zend_object* when Zend raises an uninitialized typed property error";
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto msg = e.call("getMessage");
+        ASSERT_TRUE(str_contains(msg, "Typed property PhpxUninitializedPropertyHolder::$value").toBool());
+    }
+}
+
+TEST(variant, unsetPropertyThrowsZendException) {
+    eval("class PhpxReadonlyPropertyHolder { public readonly int $value; public function __construct() { $this->value = 1; } }");
+    auto o = eval("return new PhpxReadonlyPropertyHolder();");
+
+    try {
+        o.unsetProperty("value");
+        FAIL() << "unsetProperty should throw zend_object* when Zend raises a readonly property error";
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto msg = e.call("getMessage");
+        ASSERT_TRUE(str_contains(msg, "Cannot unset readonly property PhpxReadonlyPropertyHolder::$value").toBool());
+    }
+}
+
 TEST(variant, unsetProperty) {
     var sk = "hello";
     auto o = newObject("ArrayObject");

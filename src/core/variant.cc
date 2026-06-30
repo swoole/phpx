@@ -393,6 +393,7 @@ void Variant::offsetUnset(const Variant &key) {
 Variant Variant::getProperty(zend_string *prop_name) const {
     zval rv;
     zval *member_p = zend_read_property_ex(ce(), object(), prop_name, false, &rv);
+    throwErrorIfOccurred();
     if (member_p == &rv) {
         return Variant{member_p, Ctor::Move};
     } else {
@@ -402,6 +403,7 @@ Variant Variant::getProperty(zend_string *prop_name) const {
 
 void Variant::setProperty(zend_string *prop_name, const Variant &value) const {
     zend_update_property_ex(ce(), object(), prop_name, NO_CONST_V(value));
+    throwErrorIfOccurred();
 }
 
 Variant Variant::getProperty(const Variant &name) const {
@@ -410,7 +412,13 @@ Variant Variant::getProperty(const Variant &name) const {
     }
     auto zk = NO_CONST_V(name);
     auto prop_name = zval_get_string(zk);
-    auto prop_value = getProperty(prop_name);
+    Variant prop_value;
+    try {
+        prop_value = getProperty(prop_name);
+    } catch (...) {
+        zend_string_release(prop_name);
+        throw;
+    }
     zend_string_release(prop_name);
     return prop_value;
 }
@@ -418,7 +426,12 @@ Variant Variant::getProperty(const Variant &name) const {
 void Variant::setProperty(const Variant &name, const Variant &value) const {
     auto zk = NO_CONST_V(name);
     auto prop_name = zval_get_string(zk);
-    setProperty(prop_name, value);
+    try {
+        setProperty(prop_name, value);
+    } catch (...) {
+        zend_string_release(prop_name);
+        throw;
+    }
     zend_string_release(prop_name);
 }
 
@@ -427,12 +440,18 @@ void Variant::unsetProperty(zend_string *prop_name) {
     EG(fake_scope) = ce();
     object()->handlers->unset_property(object(), prop_name, 0);
     EG(fake_scope) = old_scope;
+    throwErrorIfOccurred();
 }
 
 void Variant::unsetProperty(const Variant &name) {
     auto zk = NO_CONST_V(name);
     auto prop_name = zval_get_string(zk);
-    unsetProperty(prop_name);
+    try {
+        unsetProperty(prop_name);
+    } catch (...) {
+        zend_string_release(prop_name);
+        throw;
+    }
     zend_string_release(prop_name);
 }
 
@@ -1016,12 +1035,14 @@ Variant Variant::attr(const Variant &name, bool update) const {
     auto prop_name = name.toString();
     zval rv;
     auto member_p = zend_read_property_ex(ce(), object(), prop_name.str(), true, &rv);
+    throwErrorIfOccurred();
 
     if (zval_is_null(member_p) && update) {
         auto old_scope = EG(fake_scope);
         EG(fake_scope) = ce();
         member_p = object()->handlers->write_property(object(), prop_name.str(), undef(), NULL);
         EG(fake_scope) = old_scope;
+        throwErrorIfOccurred();
 
         if (member_p == undef()) {
             throwError("Dynamic property `%s` assignment is not supported", name.toCString());
