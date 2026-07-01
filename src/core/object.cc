@@ -85,6 +85,7 @@ Variant Object::callParentMethod(const String &func, const ArgList &args) {
                    ZSTR_VAL(fn->common.function_name));
     } else {
         zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), nullptr);
+        throwErrorIfOccurred();
     }
 
     return retval;

@@ -326,6 +326,20 @@ TEST(object, call_parent_method_error) {
     }
 }
 
+TEST(object, call_parent_method_exception) {
+    eval(R"(
+        class PhpxThrowingParentMethodParent {
+            public function run(): void { throw new RuntimeException('parent method failed'); }
+        }
+        class PhpxThrowingParentMethodChild extends PhpxThrowingParentMethodParent {
+            public function run(): void {}
+        }
+    )");
+    auto obj = newObject("PhpxThrowingParentMethodChild");
+
+    try_call([&obj]() { obj.callParentMethod("run", {}); }, "parent method failed");
+}
+
 TEST(object, static_property_error1) {
     try {
         getStaticProperty("TestClassNotFound", "propInt");
