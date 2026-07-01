@@ -218,6 +218,12 @@ TEST(base, exception3) {
     try_call([]() { throwException("TestClassNotExists", "test"); }, "class 'TestClassNotExists' is undefined");
 }
 
+TEST(base, throw_non_throwable_object) {
+    auto object = newObject("stdClass");
+
+    try_call([&object]() { throwException(object); }, "Cannot throw objects that do not implement Throwable");
+}
+
 TEST(base, toSize) {
     auto i1 = php::toSize("hello");
     ASSERT_EQ(i1, 0);

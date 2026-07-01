@@ -328,6 +328,11 @@ Variant throwException(zend_class_entry *ce, const char *message, int code) {
 }
 
 Variant throwException(const Object &e) {
+    if (UNEXPECTED(!instanceof_function(e.ce(), zend_ce_throwable))) {
+        zend_throw_error(NULL, "Cannot throw objects that do not implement Throwable");
+        throwErrorIfOccurred();
+        return {};
+    }
     auto zv = NO_CONST_V(e);
     zval_add_ref(zv);
     EG(exception) = Z_OBJ_P(zv);
