@@ -36,4 +36,43 @@ TEST(closure, ref) {
     _f();
     ASSERT_EQ(v.toInt(), 1000);
 }
+
+TEST(closure, return_reference_capture_as_value) {
+    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &vars_) -> Variant {
+        return vars_.get(0);
+    };
+
+    var v("captured");
+    auto f = newClosure(fn, {v.toReference()});
+    auto rv = f();
+    ASSERT_TRUE(rv.isString());
+    ASSERT_STREQ(rv.toCString(), "captured");
+
+    rv = "changed";
+    ASSERT_STREQ(v.toCString(), "captured");
+}
+
+TEST(closure, use_value_and_reference_capture) {
+    ClosureFn by_value = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &vars_) -> Variant {
+        auto v = vars_.get(0);
+        v = 1000;
+        return v;
+    };
+
+    var copied(2020);
+    auto f1 = newClosure(by_value, {copied});
+    ASSERT_EQ(f1().toInt(), 1000);
+    ASSERT_EQ(copied.toInt(), 2020);
+
+    ClosureFn by_ref = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &vars_) -> Variant {
+        auto v = vars_.get(0);
+        v = 3000;
+        return null;
+    };
+
+    var referenced(2020);
+    auto f2 = newClosure(by_ref, {referenced.toReference()});
+    f2();
+    ASSERT_EQ(referenced.toInt(), 3000);
+}
 #endif

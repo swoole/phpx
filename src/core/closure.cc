@@ -49,7 +49,12 @@ Object newClosure(const ClosureFn &fn, const ArgList &uses, const Object &_this)
         Object this_(ZEND_THIS);
         auto box = this_.getProperty(propBox).toBox<ClosureBox>();
         auto rv = box->fn_(INTERNAL_FUNCTION_PARAM_PASSTHRU, box->this_, box->vars_);
-        rv.moveTo(return_value);
+        zval *retval = rv.direct_ptr();
+        if (Z_ISREF_P(retval) && !(EX(func)->common.fn_flags & ZEND_ACC_RETURN_REFERENCE)) {
+            ZVAL_COPY_DEREF(return_value, retval);
+        } else {
+            rv.moveTo(return_value);
+        }
     };
     func->internal_function.function_name = fnName.str();
     func->common.scope = zend_standard_class_def;
