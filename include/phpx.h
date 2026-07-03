@@ -164,7 +164,7 @@ PHPX_API Variant concat(const ArgList &args);
 PHPX_API void exit(const Variant &status);
 PHPX_API bool same(const Variant &a, const Variant &b);
 PHPX_API bool equals(const Variant &a, const Variant &b);
-PHPX_API int compare(const Variant &a, const Variant &b);
+PHPX_API Int compare(const Variant &a, const Variant &b);
 PHPX_API Variant getStaticProperty(const Object &object, const String &prop);
 PHPX_API Variant getStaticProperty(const String &class_name, const String &prop);
 PHPX_API Variant getStaticProperty(zend_class_entry *ce, uint32_t offset);

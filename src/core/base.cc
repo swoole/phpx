@@ -615,7 +615,7 @@ bool same(const Variant &a, const Variant &b) {
     return zend_is_identical(NO_CONST_V(a), NO_CONST_V(b));
 }
 
-int compare(const Variant &a, const Variant &b) {
+Int compare(const Variant &a, const Variant &b) {
     return zend_compare(NO_CONST_V(a), NO_CONST_V(b));
 }
 
