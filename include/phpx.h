@@ -1623,10 +1623,6 @@ class Object : public Variant {
     }
     Variant callParentMethod(const String &func, const ArgList &args);
 
-    void appendArrayProperty(const String &name, const Variant &value);
-    void updateArrayProperty(const String &name, zend_long offset, const Variant &value);
-    void updateArrayProperty(const String &name, const Variant &key, const Variant &value);
-
     bool offsetExists(const Variant &offset) const {
         auto result = object()->handlers->has_dimension(object(), NO_CONST_V(offset), 0) != 0;
         throwErrorIfOccurred();

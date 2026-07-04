@@ -446,47 +446,32 @@ TEST(object, attr) {
     ASSERT_EQ(o1.getProperty("prop2").toInt(), 9898);
 }
 
-TEST(object, ArrayProperty) {
+TEST(object, array_property_via_attr) {
     auto o1 = newObject("stdClass");
     o1.set("prop", create_list());
     o1.set("propInt", 999);
-    o1.appendArrayProperty("prop", 1899);
-
-    try_call([&]() { o1.appendArrayProperty("propInt", 1899); }, "property `propInt` must be `array`");
-
-    try_call([&]() { o1.appendArrayProperty("propNotExists", 1899); }, "property `propNotExists` is undefined");
+    o1.attr("prop", true).newItem() = 1899;
 
     auto prop1 = o1.get("prop");
     ASSERT_EQ(prop1.offsetGet(5).toInt(), 1899);
 
-    o1.updateArrayProperty("prop", 5, 2026);
+    o1.attr("prop", true).item(5, true) = 2026;
 
     auto prop2 = o1.get("prop");
     ASSERT_EQ(prop2.offsetGet(5).toInt(), 2026);
 
-    try_call([&]() { o1.updateArrayProperty("propNotExists", 5, 2026); }, "property `propNotExists` is undefined");
-
-    o1.set("prop2", false);
-    try_call([&]() { o1.updateArrayProperty("prop2", 5, 2026); }, "property `prop2` must be `array`");
-
-    o1.updateArrayProperty("prop", "6", "erlang");
+    o1.attr("prop", true).item("6", true) = "erlang";
     auto prop3 = o1.get("prop");
     ASSERT_STREQ(prop3.offsetGet(6).toCString(), "erlang");
 
-    o1.updateArrayProperty("prop", null, "rust");
-    auto prop4 = o1.get("prop");
-    ASSERT_STREQ(prop4.offsetGet(7).toCString(), "rust");
+    try_call([&]() { o1.attr("propInt", true).newItem() = 1899; }, "Only array/object support the newItem() method");
 }
 
-TEST(object, ArrayProperty2) {
+TEST(object, array_property_map_via_attr) {
     auto o1 = newObject("stdClass");
     o1.set("prop", create_map());
     o1.set("propInt", 999);
-    o1.updateArrayProperty("prop", "php", 2999);
-
-    try_call([&]() { o1.updateArrayProperty("propInt", "key", 1899); }, "property `propInt` must be `array`");
-
-    try_call([&]() { o1.updateArrayProperty("propNotExists", "key", 1899); }, "property `propNotExists` is undefined");
+    o1.attr("prop", true).item("php", true) = 2999;
 
     auto prop1 = o1.get("prop");
     ASSERT_EQ(prop1.offsetGet("php").toInt(), 2999);

@@ -343,12 +343,12 @@ TEST(object_extra, offsetExists_array_object) {
     ASSERT_FALSE(obj.offsetExists("nonexistent"));
 }
 
-// Test appendArrayProperty with array property
-TEST(object_extra, appendArrayProperty_empty) {
+// Test appending to an array property through the generic Variant path.
+TEST(object_extra, attr_newItem_empty_array_property) {
     auto obj = newObject("stdClass");
     Array inner;
     obj.set("emptylist", inner);
-    obj.appendArrayProperty("emptylist", "first");
+    obj.attr("emptylist", true).newItem() = "first";
     auto prop = obj.get("emptylist");
     ASSERT_TRUE(prop.isArray());
     Array inner_arr(prop);
