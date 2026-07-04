@@ -196,8 +196,10 @@ int main(int cpp_argc, char **cpp_argv) {
             module->request_startup_func(module->type, module->module_number);
         } catch (zend_object *e) {
             rc = EG(exit_status);
-            CG(unclean_shutdown) = 1;
-            zend_exception_error(e, E_ERROR);
+            if (!zend_is_graceful_exit(e)) {
+                CG(unclean_shutdown) = 1;
+                zend_exception_error(e, E_ERROR);
+            }
         }
     }
     zend_end_try();

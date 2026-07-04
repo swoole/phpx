@@ -315,6 +315,22 @@ TEST(object_extra, from_null_variant) {
 TEST(object_extra, default_ctor) {
     Object o;
     ASSERT_TRUE(o.isUndef() || o.isNull());
+    ASSERT_FALSE(static_cast<bool>(o));
+}
+
+TEST(object_extra, null_and_unset_are_false) {
+    Object o = newObject("stdClass");
+    ASSERT_TRUE(static_cast<bool>(o));
+
+    o = php::null;
+    ASSERT_TRUE(o.isNull());
+    ASSERT_FALSE(static_cast<bool>(o));
+
+    o = newObject("stdClass");
+    ASSERT_TRUE(static_cast<bool>(o));
+    o.unset();
+    ASSERT_TRUE(o.isUndef());
+    ASSERT_FALSE(static_cast<bool>(o));
 }
 
 // Test offsetGet with non-existent key on ArrayObject returns null

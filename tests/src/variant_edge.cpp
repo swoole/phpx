@@ -294,6 +294,20 @@ TEST(variant_edge, unset_then_type) {
     v.unset();
     ASSERT_TRUE(v.isUndef());
     ASSERT_TRUE(v.type() == IS_UNDEF);
+    ASSERT_FALSE(static_cast<bool>(v));
+}
+
+TEST(variant_edge, null_and_unset_are_false) {
+    var v("hello");
+    v = php::null;
+    ASSERT_TRUE(v.isNull());
+    ASSERT_FALSE(static_cast<bool>(v));
+
+    v = "world";
+    ASSERT_TRUE(static_cast<bool>(v));
+    v.unset();
+    ASSERT_TRUE(v.isUndef());
+    ASSERT_FALSE(static_cast<bool>(v));
 }
 
 // Test isFalse/isTrue
