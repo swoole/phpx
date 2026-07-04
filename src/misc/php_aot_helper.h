@@ -2,6 +2,7 @@
 #include <phpx_helper.h>
 
 #include <zend_attributes.h>
+#include <cstdlib>
 
 extern zend_class_entry *php_get_class(int class_id, const php::Str &class_name);
 extern zend_function *php_get_func(int func_id, const php::Str &func_name);
@@ -32,6 +33,43 @@ static inline T &toStdContainer(Var &var, uint32_t type_id) {
         throwException(zend_ce_type_error, "std container type mismatch");
     }
     return box->container;
+}
+
+static inline Variant aotExit() {
+    std::exit(0);
+    return null;
+}
+
+static inline Variant aotExit(const Variant &status) {
+    if (status.isInt()) {
+        std::exit(status.toInt());
+    }
+    echo(toString(status));
+    std::exit(0);
+    return null;
+}
+
+static inline Variant throwValue(const Variant &e) {
+    if (!e.isObject()) {
+        throwError("Can only throw objects");
+        return null;
+    }
+    return throwException(Object(e));
+}
+
+static inline void appendCallExtraNamedArgs(Array &args) {
+    zend_array *named_args = getCallExtraNamedArgs();
+    if (named_args == nullptr) {
+        return;
+    }
+    zend_string *key;
+    zval *value;
+    ZEND_HASH_MAP_FOREACH_STR_KEY_VAL(named_args, key, value) {
+        if (key) {
+            args.set(key, Variant(value, Ctor::CopyRef));
+        }
+    }
+    ZEND_HASH_FOREACH_END();
 }
 };  // namespace php
 

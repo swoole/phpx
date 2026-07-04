@@ -265,6 +265,14 @@ static inline uint32_t getCallArgNum() {
     return ZEND_CALL_NUM_ARGS(EG(current_execute_data));
 }
 
+static inline zend_array *getCallExtraNamedArgs() {
+    auto execute_data = EG(current_execute_data);
+    if (UNEXPECTED(ZEND_CALL_INFO(execute_data) & ZEND_CALL_HAS_EXTRA_NAMED_PARAMS)) {
+        return execute_data->extra_named_params;
+    }
+    return nullptr;
+}
+
 static inline Variant getCallArg(uint32_t i, const Variant &defaultValue) {
     if (i >= getCallArgNum()) {
         return defaultValue;
