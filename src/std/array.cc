@@ -10,6 +10,8 @@
 
 namespace php::fn {
 
+static String count_method{ZEND_STRL("count"), true};
+
 // ========================
 // Internal comparison helpers
 // ========================
@@ -67,6 +69,35 @@ static Variant _search_array(const Variant &needle, zend_array *ht, bool strict,
 Bool in_array(const Variant &needle, const Array &haystack, bool strict) {
     Variant result = _search_array(needle, haystack.array(), strict, 0);
     return result.toBool();
+}
+
+// ========================
+// 2. count
+// ========================
+
+Int count(const Variant &value, Int mode) {
+    if (value.isArray()) {
+        if (mode == 1) {
+            return php_count_recursive(value.array());
+        }
+        return static_cast<Int>(zend_hash_num_elements(value.array()));
+    }
+    if (value.isObject()) {
+        zend_object *zobj = Z_OBJ_P(value.unwrap_ptr());
+        if (zobj->handlers->count_elements) {
+            zend_long cnt = 1;
+            auto rc = zobj->handlers->count_elements(zobj, &cnt);
+            throwErrorIfOccurred();
+            if (SUCCESS == rc) {
+                return static_cast<Int>(cnt);
+            }
+        }
+        if (instanceof_function(zobj->ce, zend_ce_countable)) {
+            return Object(value).call(count_method).toInt();
+        }
+    }
+    throwException(zend_ce_type_error, "count(): Argument #1 ($value) must be of type Countable|array");
+    return 0;
 }
 
 // ========================

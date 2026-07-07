@@ -135,6 +135,16 @@ TEST(std_array, count) {
     obj.offsetSet(null, 20);
     ASSERT_EQ(fn::count(obj), 2);
 
+    eval(R"(
+        class PhpxStdArrayCountable implements Countable {
+            public function __construct(private array $items) {}
+            public function count(): int { return count($this->items); }
+        }
+    )");
+    var countable = eval("return new PhpxStdArrayCountable([1, 2, 3, 4]);");
+    ASSERT_EQ(fn::count(countable), 4);
+    ASSERT_EQ(fn::count(countable, 1), 4);
+
     // Var argument
     var v = Array{10, 20, 30};
     ASSERT_EQ(fn::count(v), 3);
@@ -142,6 +152,8 @@ TEST(std_array, count) {
 
 TEST(std_array, count_exception) {
     try_call([]() { fn::count(12345); }, "count(): Argument #1 ($value) must be of type Countable|array");
+    auto plain_object = newObject("stdClass");
+    try_call([&plain_object]() { fn::count(plain_object); }, "count(): Argument #1 ($value) must be of type Countable|array");
 
     eval(R"(
         class PhpxStdArrayThrowingCountable implements Countable {
