@@ -14,6 +14,10 @@ static int append_by_value_and_return_refcount(Reference ref) {
     return ref.getRefCount();
 }
 
+static bool ffi_cdata_is_available() {
+    return eval("return extension_loaded('ffi') && ini_get('ffi.enable') === '1';").toBool();
+}
+
 TEST(variant, zend_string_constructor) {
     // Test Variant(zend_string *s, Ctor method = Ctor::Copy) constructor
 
@@ -1337,6 +1341,10 @@ TEST(variant, item6) {
 }
 
 TEST(variant, item_ffi_cdata_array_scalar_read) {
+    if (!ffi_cdata_is_available()) {
+        GTEST_SKIP() << "FFI extension is not available or ffi.enable is disabled";
+    }
+
     auto cdata = eval(R"(
         $array = FFI::new("int[2]");
         $array[0] = 10;

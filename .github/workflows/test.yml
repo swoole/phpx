@@ -14,7 +14,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "${{ matrix.php }}"
-          extensions: embed, curl, redis, json
+          extensions: embed, curl, redis, json, ffi
+          ini-values: ffi.enable=1
       - name: Install dependencies
         run: sudo apt update -y && sudo apt install -y googletest libgtest-dev libsodium-dev libkrb5-dev libargon2-dev redis-server libgmp-dev libmpfr-dev
       - name: Show machine information
