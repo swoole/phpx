@@ -1336,6 +1336,23 @@ TEST(variant, item6) {
     try_call([&]() { s2.item(5, true) = "-----"; }, "Can only be assigned a single-byte string to a string offset");
 }
 
+TEST(variant, item_ffi_cdata_array_scalar_read) {
+    auto cdata = eval(R"(
+        $array = FFI::new("int[2]");
+        $array[0] = 10;
+        $array[1] = 20;
+        return $array;
+    )");
+
+    auto first = cdata.item(0);
+    auto second = cdata.item(1);
+
+    ASSERT_TRUE(first.isInt());
+    ASSERT_TRUE(second.isInt());
+    ASSERT_EQ(first.toInt(), 10);
+    ASSERT_EQ(second.toInt(), 20);
+}
+
 TEST(variant, itemRef1) {
     auto a = create_list();
     auto ref = a.itemRef(2);

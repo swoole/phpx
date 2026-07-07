@@ -913,7 +913,7 @@ Variant Variant::item(zend_long offset, bool update) {
         auto obj = object();
         zval dim;
         ZVAL_LONG(&dim, offset);
-        retval = obj->handlers->read_dimension(obj, &dim, BP_VAR_RW, &rv);
+        retval = obj->handlers->read_dimension(obj, &dim, update ? BP_VAR_RW : BP_VAR_R, &rv);
         if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
             throwErrorIfOccurred();
             return Variant{retval};
@@ -969,7 +969,7 @@ Variant Variant::item(const Variant &key, bool update) {
     } else if (zval_is_object(zvar)) {
         auto obj = object();
         auto dim = NO_CONST_V(key);
-        retval = obj->handlers->read_dimension(obj, dim, BP_VAR_RW, &rv);
+        retval = obj->handlers->read_dimension(obj, dim, update ? BP_VAR_RW : BP_VAR_R, &rv);
         if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
             throwErrorIfOccurred();
             return Variant{retval};
