@@ -1401,7 +1401,7 @@ class Array : public Variant {
         array_init(&val);
     }
     explicit Array(size_t N) {
-        array_init_size(&val, N);
+        array_init_size(&val, (uint32_t) N);
     }
     Array(const zval *v, Ctor method = Ctor::Copy) : Variant(v, method) {
         checkArray();
