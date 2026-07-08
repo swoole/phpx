@@ -1828,13 +1828,12 @@ static inline Array toArray(const StdMap<T, K> &map) {
     return result;
 }
 
-static inline Object toObject(const Variant &v, zend_class_entry *ce, bool strict = false) {
+static inline Object toObject(const Variant &v, zend_class_entry *ce) {
     if (UNEXPECTED(!v.isObject())) {
         throwError("The parameter `object` must be `object`, got `%s`", v.typeStr());
         return {};
     }
-    bool typeof_ce = strict ? v.ce() != ce : !instanceof_function(v.ce(), ce);
-    if (UNEXPECTED(typeof_ce)) {
+    if (UNEXPECTED(!instanceof_function(v.ce(), ce))) {
         throwError("The parameter `object` must be instance of class `%s`, object of `%s` given",
                    ZSTR_VAL(ce->name),
                    ZSTR_VAL(v.ce()->name));

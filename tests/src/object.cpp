@@ -538,6 +538,14 @@ TEST(object, toObject2) {
     ASSERT_GE(ts.toInt(), 10000000);
 }
 
+TEST(object, toObject_accepts_child_as_parent) {
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
+
+    auto v = newObject("TestClass2");
+    auto o = toObject(v, "TestClass");
+    ASSERT_STREQ(o.call("test").toCString(), "child test");
+}
+
 TEST(object, unsetAttr) {
     auto o1 = newObject("stdClass");
     o1.set("prop1", 1990);
