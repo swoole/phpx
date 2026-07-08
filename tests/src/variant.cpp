@@ -1713,6 +1713,26 @@ TEST(variant, assign_ref6) {
     ASSERT_EQ(b.length(), 4);
 }
 
+TEST(variant, assign_ref_after_unset) {
+    Var a = 1L;
+    Ref b;
+    Ref tmp_var_0;
+
+    tmp_var_0 = a.toReference();
+    b = &tmp_var_0;
+    b = Var(2L);
+    ASSERT_EQ(a.toInt(), 2);
+    ASSERT_EQ(b.toInt(), 2);
+
+    b.unset();
+    ASSERT_FALSE(exists(b));
+    ASSERT_EQ(a.toInt(), 2);
+
+    b = Var(1L);
+    ASSERT_EQ(b.toInt(), 1);
+    ASSERT_EQ(a.toInt(), 2);
+}
+
 TEST(variant, deref) {
     auto arr = create_map();
     Ref ref1 = arr.toReference();

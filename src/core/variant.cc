@@ -1154,7 +1154,12 @@ Reference &Reference::operator=(const Variant &v) {
         if (v.isReference()) {
             copyRef(v.direct_ptr());
         } else {
-            zval_copy(refval(), v.direct_ptr());
+            // An unset reference degenerates to a normal variable on reassignment.
+            if (UNEXPECTED(!isReference())) {
+                zval_copy(ptr(), v.direct_ptr());
+            } else {
+                zval_copy(refval(), v.direct_ptr());
+            }
         }
     }
     return *this;
