@@ -162,10 +162,7 @@ Object newObject(zend_class_entry *ce, const ArgList &args, zend_array *named_ar
 }
 
 Object newObject(zend_class_entry *ce, Array &args, zend_array *named_args) {
-    Args _args(args.count());
-    for (size_t i = 0; i < args.count(); i++) {
-        _args.append(args[i]);
-    }
+    Args _args(args);
     return newObject(ce, _args, named_args);
 }
 

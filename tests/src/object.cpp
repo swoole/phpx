@@ -93,6 +93,60 @@ TEST(object, ctor_string_with_array_and_named_args) {
     ASSERT_TRUE(object.attr("vip").toBool());
 }
 
+TEST(object, ctor_with_array_args_after_unset) {
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
+
+    Array args;
+    args.append("drop");
+    args.append("Heidi");
+    args.append(35);
+    args.offsetUnset(0);
+
+    auto object = newObject(getClassEntry("TestNamedArgs"), args);
+    ASSERT_STREQ(object.attr("name").toCString(), "Heidi");
+    ASSERT_EQ(object.attr("age").toInt(), 35);
+}
+
+TEST(object, args_append_unpacked_for_ctor_and_method) {
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
+
+    Array ctor_source;
+    ctor_source.append("drop");
+    ctor_source.append("Ivan");
+    ctor_source.append(36);
+    ctor_source.offsetUnset(0);
+
+    Args ctor_args;
+    ctor_args.appendUnpacked(ctor_source);
+    auto object = newObject(getClassEntry("TestNamedArgs"), ctor_args);
+    ASSERT_STREQ(object.attr("name").toCString(), "Ivan");
+    ASSERT_EQ(object.attr("age").toInt(), 36);
+
+    Array named_args;
+    named_args.set("city", "hangzhou");
+    named_args.set("vip", true);
+
+    Variant dynamic_class{"TestNamedArgs"};
+    Args dynamic_args;
+    dynamic_args.appendUnpacked(ctor_source);
+    auto dynamic_object = newObject(dynamic_class, dynamic_args, named_args.array());
+    ASSERT_STREQ(dynamic_object.attr("name").toCString(), "Ivan");
+    ASSERT_EQ(dynamic_object.attr("age").toInt(), 36);
+    ASSERT_STREQ(dynamic_object.attr("city").toCString(), "hangzhou");
+    ASSERT_TRUE(dynamic_object.attr("vip").toBool());
+
+    Array method_source;
+    method_source.append("role");
+    method_source.offsetUnset(0);
+    method_source.append("admin");
+
+    Args method_args;
+    method_args.append("user");
+    method_args.appendUnpacked(method_source);
+    auto rs = object.call("describe", method_args);
+    ASSERT_STREQ(rs.toCString(), "user:Ivan:admin");
+}
+
 TEST(object, method) {
     auto obj = newObject("DateTimeImmutable");
     ASSERT_TRUE(obj.isObject());

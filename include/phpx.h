@@ -102,7 +102,7 @@ PHPX_API void initGlobal(const String &name, Variant &var);
 PHPX_API void unsetGlobal(const String &name);
 PHPX_API Variant include(const String &file, IncludeType type = INCLUDE);
 PHPX_API Variant eval(const String &script);
-PHPX_API Variant call(const Variant &func, Args &args);
+PHPX_API Variant call(const Variant &func, Args &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &func, Array &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &func, const ArgList &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, zend_array *named_args = nullptr);
@@ -110,6 +110,7 @@ PHPX_API Variant call(zend_function *func, Args &_args, zend_array *named_args =
 PHPX_API Variant call(zend_function *func, Array &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, const ArgList &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_class_entry *ce, zend_function *func, zend_array *named_args = nullptr);
+PHPX_API Variant call(zend_class_entry *ce, zend_function *func, Args &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_class_entry *ce, zend_function *func, const ArgList &args, zend_array *named_args = nullptr);
 PHPX_API Variant throwException(const String &class_name, const char *message, int code = 0);
 PHPX_API Variant throwException(zend_class_entry *ce, const char *message, int code = 0);
@@ -971,8 +972,8 @@ class Variant {
         }
         return call_impl(unwrap_ptr(), fn.unwrap_ptr());
     }
-    Variant call(const Variant &fn, Args &args) {
-        return call_impl(ptr(), fn.unwrap_ptr(), args);
+    Variant call(const Variant &fn, Args &args, zend_array *named_args = nullptr) {
+        return call_impl(ptr(), fn.unwrap_ptr(), args, named_args);
     }
     Variant call(const Variant &fn, Array &args, zend_array *named_args = nullptr);
     Variant call(const Variant &fn, const ArgList &args, zend_array *named_args = nullptr);
@@ -1551,6 +1552,11 @@ class Args {
             append(arg.value.const_ptr());
         }
     }
+    void appendUnpacked(const Array &args) {
+        for (const auto &arg : args) {
+            append(arg.value.const_ptr());
+        }
+    }
     void append(const zval *zv) {
         params.emplace_back(zv, Ctor::CopyRef);
     }
@@ -1858,8 +1864,16 @@ static inline Object newObject(const String &name, const ArgList &args, zend_arr
     return newObject(getClassEntrySafe(name), args, named_args);
 }
 
+static inline Object newObject(const String &name, Args &args, zend_array *named_args = nullptr) {
+    return newObject(getClassEntrySafe(name), args, named_args);
+}
+
 static inline Object newObject(const String &name, Array &args, zend_array *named_args = nullptr) {
     return newObject(getClassEntrySafe(name), args, named_args);
+}
+
+static inline Object newObject(const Variant &name, Args &args, zend_array *named_args = nullptr) {
+    return newObject(name.toString(), args, named_args);
 }
 
 static inline Object getEnumCase(zend_class_entry *ce, const String &name) {
