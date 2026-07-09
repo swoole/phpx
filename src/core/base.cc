@@ -622,14 +622,27 @@ Int compare(const Variant &a, const Variant &b) {
 
 bool empty(const Variant &v, const OperationChain &list, Variant &tmp) {
     tmp = v;
+    size_t index = 0;
+    const size_t total = list.size();
     for (const auto &expr : list) {
+        const bool is_last = ++index == total;
         if (expr.first == ArrayDimFetch) {
             if (tmp.isString()) {
                 if (!tmp.offsetExists(expr.second)) {
                     tmp = Variant();
                     return true;
                 }
-            } else if (!tmp.isArray() && !tmp.isObject()) {
+            } else if (tmp.isObject()) {
+                Object object(tmp);
+                if (is_last) {
+                    return !object.offsetExists(expr.second, 1);
+                }
+                tmp = object.offsetGet(expr.second, BP_VAR_IS);
+                if (tmp.isNull() || tmp.isUndef()) {
+                    return true;
+                }
+                continue;
+            } else if (!tmp.isArray()) {
                 return true;
             }
             tmp = tmp.item(expr.second);
@@ -661,14 +674,27 @@ bool exists(const Variant &v, const OperationChain &list, Variant &tmp) {
         return false;
     }
 
+    size_t index = 0;
+    const size_t total = list.size();
     for (const auto &expr : list) {
+        const bool is_last = ++index == total;
         if (expr.first == ArrayDimFetch) {
             if (tmp.isString()) {
                 if (!tmp.offsetExists(expr.second)) {
                     tmp = Variant();
                     return false;
                 }
-            } else if (!tmp.isArray() && !tmp.isObject()) {
+            } else if (tmp.isObject()) {
+                Object object(tmp);
+                if (is_last) {
+                    return object.offsetExists(expr.second);
+                }
+                tmp = object.offsetGet(expr.second, BP_VAR_IS);
+                if (tmp.isNull() || tmp.isUndef()) {
+                    return false;
+                }
+                continue;
+            } else if (!tmp.isArray()) {
                 return false;
             }
             tmp = tmp.item(expr.second);

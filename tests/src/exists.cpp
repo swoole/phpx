@@ -1,4 +1,5 @@
 #include "phpx_test.h"
+#include "phpx_class.h"
 #include "phpx_func.h"
 #include "phpx_helper.h"
 
@@ -34,6 +35,18 @@ TEST(exists, basic_array_access) {
 
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, "email"}}));
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, "phone"}}));
+}
+
+TEST(exists, object_array_access_uses_offset_exists_before_read) {
+    WeakMap map;
+    auto source = newObject("stdClass");
+    auto missing = newObject("stdClass");
+    map.offsetSet(source, "cached");
+
+    Variant v = map.getObject();
+
+    ASSERT_TRUE(exists(v, {{ArrayDimFetch, source}}));
+    ASSERT_FALSE(exists(v, {{ArrayDimFetch, missing}}));
 }
 
 TEST(exists, basic_object_property) {

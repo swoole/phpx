@@ -1,5 +1,6 @@
 #include "phpx_test.h"
 #include "phpx_test.h"
+#include "phpx_class.h"
 #include "phpx_func.h"
 #include "phpx_helper.h"
 #include <iostream>
@@ -39,6 +40,18 @@ TEST(empty, array_dim_fetch_basic) {
     var result;
     ASSERT_TRUE(notEmpty(v, {{ArrayDimFetch, "key1"}}, result));
     ASSERT_STREQ(result.toCString(), "value1");
+}
+
+TEST(empty, object_array_access_uses_offset_exists_before_read) {
+    WeakMap map;
+    auto source = newObject("stdClass");
+    auto missing = newObject("stdClass");
+    map.offsetSet(source, "cached");
+
+    Variant v = map.getObject();
+
+    ASSERT_FALSE(empty(v, {{ArrayDimFetch, source}}));
+    ASSERT_TRUE(empty(v, {{ArrayDimFetch, missing}}));
 }
 
 TEST(empty, array_dim_fetch_nested) {

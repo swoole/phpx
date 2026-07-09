@@ -1629,15 +1629,15 @@ class Object : public Variant {
     }
     Variant callParentMethod(const String &func, const ArgList &args);
 
-    bool offsetExists(const Variant &offset) const {
-        auto result = object()->handlers->has_dimension(object(), NO_CONST_V(offset), 0) != 0;
+    bool offsetExists(const Variant &offset, int check_empty = 0) const {
+        auto result = object()->handlers->has_dimension(object(), NO_CONST_V(offset), check_empty) != 0;
         throwErrorIfOccurred();
         return result;
     }
-    bool offsetExists(zend_long offset) {
+    bool offsetExists(zend_long offset, int check_empty = 0) {
         zval tmp;
         ZVAL_LONG(&tmp, offset);
-        auto result = object()->handlers->has_dimension(object(), &tmp, 0) != 0;
+        auto result = object()->handlers->has_dimension(object(), &tmp, check_empty) != 0;
         throwErrorIfOccurred();
         return result;
     }
