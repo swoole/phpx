@@ -771,6 +771,16 @@ TEST(object, call) {
     ASSERT_STREQ(rs.toCString(), "2000-01-01 00:00:00");
 }
 
+TEST(object, call_args_on_indirect_property_object) {
+    auto holder = newObject("stdClass");
+    holder.attr("inner", true) = newObject("DateTime", {"2000-01-01"});
+
+    Args args;
+    args.append("Y-m-d H:i:s");
+    auto rs = holder.attr("inner").call("format", args);
+    ASSERT_STREQ(rs.toCString(), "2000-01-01 00:00:00");
+}
+
 TEST(object, call_array) {
     auto obj = newObject("DateTime", {"2000-01-01"});
     auto fn = getMethod(obj.ce(), "setTime");

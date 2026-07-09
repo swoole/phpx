@@ -973,7 +973,11 @@ class Variant {
         return call_impl(unwrap_ptr(), fn.unwrap_ptr());
     }
     Variant call(const Variant &fn, Args &args, zend_array *named_args = nullptr) {
-        return call_impl(ptr(), fn.unwrap_ptr(), args, named_args);
+        if (UNEXPECTED(!isObject())) {
+            throwError("call method `%s` on %s", fn.toCString(), typeStr());
+            return {};
+        }
+        return call_impl(unwrap_ptr(), fn.unwrap_ptr(), args, named_args);
     }
     Variant call(const Variant &fn, Array &args, zend_array *named_args = nullptr);
     Variant call(const Variant &fn, const ArgList &args, zend_array *named_args = nullptr);
