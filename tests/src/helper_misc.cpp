@@ -139,6 +139,39 @@ TEST(helper_toBool, variant_toBool) {
     ASSERT_FALSE(php::toBool(v6));
 }
 
+TEST(helper_exact_type_check, scalar_values) {
+    Variant int_value(42);
+    Variant float_value(3.5);
+    Variant bool_value(true);
+
+    ASSERT_EQ(php::toIntExact(int_value, "Test::$intValue"), 42);
+    ASSERT_EQ(php::toFloatExact(float_value, "Test::$floatValue"), 3.5);
+    ASSERT_EQ(php::toFloatExact(int_value, "Test::$floatValue"), 42.0);
+    ASSERT_TRUE(php::toBoolExact(bool_value, "Test::$boolValue"));
+}
+
+TEST(helper_exact_type_check, scalar_type_error) {
+    Variant string_value("42");
+
+    try {
+        php::toIntExact(string_value, "Test::$intValue");
+        FAIL() << "toIntExact should throw for string";
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto msg = e.call("getMessage");
+        ASSERT_TRUE(str_contains(msg, "Cannot assign string to property Test::$intValue of type int").toBool());
+    }
+
+    try {
+        php::toBoolExact(Variant(1), "Test::$boolValue");
+        FAIL() << "toBoolExact should throw for int";
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        auto msg = e.call("getMessage");
+        ASSERT_TRUE(str_contains(msg, "Cannot assign int to property Test::$boolValue of type bool").toBool());
+    }
+}
+
 TEST(helper_toBool, zval_toBool) {
     zval zv1;
     ZVAL_TRUE(&zv1);

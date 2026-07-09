@@ -150,6 +150,55 @@ static inline Variant toStream(const Variant &v) {
     return v;
 }
 
+static inline void throwExactTypeError(const Variant &v, const char *expected, const char *property = nullptr) {
+    if (property) {
+        throwExceptionEx(
+            zend_ce_type_error,
+            0,
+            "Cannot assign %s to property %s of type %s",
+            v.typeStr(),
+            property,
+            expected);
+    } else {
+        throwExceptionEx(
+            zend_ce_type_error,
+            0,
+            "Expected value of type %s, %s given",
+            expected,
+            v.typeStr());
+    }
+}
+
+static inline Int toIntExact(const Variant &v, const char *property = nullptr) {
+    const zval *zv = v.unwrap_ptr();
+    if (UNEXPECTED(Z_TYPE_P(zv) != IS_LONG)) {
+        throwExactTypeError(v, "int", property);
+        return 0;
+    }
+    return Z_LVAL_P(zv);
+}
+
+static inline Float toFloatExact(const Variant &v, const char *property = nullptr) {
+    const zval *zv = v.unwrap_ptr();
+    if (Z_TYPE_P(zv) == IS_DOUBLE) {
+        return Z_DVAL_P(zv);
+    }
+    if (Z_TYPE_P(zv) == IS_LONG) {
+        return static_cast<Float>(Z_LVAL_P(zv));
+    }
+    throwExactTypeError(v, "float", property);
+    return 0;
+}
+
+static inline Bool toBoolExact(const Variant &v, const char *property = nullptr) {
+    const zval *zv = v.unwrap_ptr();
+    if (UNEXPECTED(Z_TYPE_P(zv) != IS_TRUE && Z_TYPE_P(zv) != IS_FALSE)) {
+        throwExactTypeError(v, "bool", property);
+        return false;
+    }
+    return Z_TYPE_P(zv) == IS_TRUE;
+}
+
 static inline Int print(const Variant &v) {
     echo(v);
     return 1;
