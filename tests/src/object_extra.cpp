@@ -343,6 +343,49 @@ TEST(object_extra, offsetGet_nonexistent_key) {
     ASSERT_TRUE(rs2.isNull());
 }
 
+TEST(object_extra, temporary_dimension_result_is_released) {
+    eval(R"PHP(
+        $GLOBALS['phpx_dimension_result_destructed'] = 0;
+        class PhpxDimensionResult {
+            public function __destruct() {
+                ++$GLOBALS['phpx_dimension_result_destructed'];
+            }
+        }
+        class PhpxTemporaryArrayAccess implements ArrayAccess {
+            public function offsetExists(mixed $offset): bool { return true; }
+            public function offsetGet(mixed $offset): mixed { return new PhpxDimensionResult(); }
+            public function offsetSet(mixed $offset, mixed $value): void {}
+            public function offsetUnset(mixed $offset): void {}
+        }
+    )PHP");
+
+    auto object = newObject("PhpxTemporaryArrayAccess");
+    {
+        auto result = object.offsetGet("object-api");
+        ASSERT_TRUE(result.isObject());
+    }
+    ASSERT_EQ(global("phpx_dimension_result_destructed").toInt(), 1);
+
+    var value = object;
+    {
+        auto result = value.item("variant-api", false);
+        ASSERT_TRUE(result.isObject());
+    }
+    ASSERT_EQ(global("phpx_dimension_result_destructed").toInt(), 2);
+
+    {
+        auto result = value.item(1, false);
+        ASSERT_TRUE(result.isObject());
+    }
+    ASSERT_EQ(global("phpx_dimension_result_destructed").toInt(), 3);
+
+    {
+        auto result = value.newItem();
+        ASSERT_TRUE(result.isObject());
+    }
+    ASSERT_EQ(global("phpx_dimension_result_destructed").toInt(), 4);
+}
+
 // Test offsetSet on stdClass (not ArrayAccess)
 // Test offsetSet on ArrayObject (implements ArrayAccess)
 TEST(object_extra, offsetSet_array_object) {

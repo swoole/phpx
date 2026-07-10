@@ -1078,6 +1078,11 @@ class String : public Variant {
         if (!isString()) {
             auto zv = unwrap_ptr();
             auto new_str = zval_get_string(zv);
+            if (UNEXPECTED(EG(exception) != nullptr)) {
+                zend_string_release(new_str);
+                throwErrorIfOccurred();
+                return;
+            }
             destroy();
             ZVAL_STR(zv, new_str);
         }
@@ -1648,16 +1653,36 @@ class Object : public Variant {
     }
     Variant offsetGet(const Variant &offset, int type = BP_VAR_R) {
         zval rv;
+        ZVAL_UNDEF(&rv);
         auto result = object()->handlers->read_dimension(object(), NO_CONST_V(offset), type, &rv);
-        throwErrorIfOccurred();
+        if (UNEXPECTED(EG(exception) != nullptr)) {
+            if (!Z_ISUNDEF(rv)) {
+                zval_ptr_dtor(&rv);
+            }
+            throwErrorIfOccurred();
+            return {};
+        }
+        if (result == &rv) {
+            return Variant{result, Ctor::Move};
+        }
         return Variant{result};
     }
     Variant offsetGet(zend_long offset, int type = BP_VAR_R) {
         zval tmp;
         ZVAL_LONG(&tmp, offset);
         zval rv;
+        ZVAL_UNDEF(&rv);
         auto result = object()->handlers->read_dimension(object(), &tmp, type, &rv);
-        throwErrorIfOccurred();
+        if (UNEXPECTED(EG(exception) != nullptr)) {
+            if (!Z_ISUNDEF(rv)) {
+                zval_ptr_dtor(&rv);
+            }
+            throwErrorIfOccurred();
+            return {};
+        }
+        if (result == &rv) {
+            return Variant{result, Ctor::Move};
+        }
         return Variant{result};
     }
     void offsetSet(const Variant &offset, const Variant &value) {

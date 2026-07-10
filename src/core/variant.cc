@@ -85,13 +85,24 @@ Variant &Variant::operator=(Variant *v) {
 
 std::string Variant::toStdString() const {
     zend_string *str = zval_get_string(NO_CONST_Z(unwrap_ptr()));
+    if (UNEXPECTED(EG(exception) != nullptr)) {
+        zend_string_release(str);
+        throwErrorIfOccurred();
+        return {};
+    }
     auto retval = std::string(ZSTR_VAL(str), ZSTR_LEN(str));
     zend_string_release(str);
     return retval;
 }
 
 String Variant::toString() const {
-    return String(zval_get_string(NO_CONST_Z(unwrap_ptr())), Ctor::Move);
+    zend_string *str = zval_get_string(NO_CONST_Z(unwrap_ptr()));
+    if (UNEXPECTED(EG(exception) != nullptr)) {
+        zend_string_release(str);
+        throwErrorIfOccurred();
+        return {};
+    }
+    return String(str, Ctor::Move);
 }
 
 Reference Variant::toReference() {
@@ -637,7 +648,7 @@ Variant &Variant::operator/=(const Variant &v) {
         zend_long a = Z_LVAL_P(unwrap_ptr());
         zend_long b = Z_LVAL_P(v.unwrap_ptr());
         if (UNEXPECTED(b == 0)) {
-            div_function(ptr(), unwrap_ptr(), NO_CONST_V(v));
+            div_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
             throwErrorIfOccurred();
             return *this;
         }
@@ -650,7 +661,7 @@ Variant &Variant::operator/=(const Variant &v) {
         }
         return *this;
     }
-    div_function(ptr(), unwrap_ptr(), NO_CONST_V(v));
+    div_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
     throwErrorIfOccurred();
     return *this;
 }
@@ -919,6 +930,7 @@ Variant Variant::item(zend_long offset, bool update) {
     auto zvar = unwrap_zval(ptr());
     zval *retval;
     zval rv;
+    ZVAL_UNDEF(&rv);
 
     if (zval_is_array(zvar)) {
         if (update) {
@@ -937,8 +949,17 @@ Variant Variant::item(zend_long offset, bool update) {
         zval dim;
         ZVAL_LONG(&dim, offset);
         retval = obj->handlers->read_dimension(obj, &dim, update ? BP_VAR_RW : BP_VAR_R, &rv);
-        if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
+        if (UNEXPECTED(EG(exception) != nullptr)) {
+            if (!Z_ISUNDEF(rv)) {
+                zval_ptr_dtor(&rv);
+            }
             throwErrorIfOccurred();
+            return {};
+        }
+        if (UNEXPECTED(retval == &rv)) {
+            return Variant{retval, Ctor::Move};
+        }
+        if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval))) {
             return Variant{retval};
         }
     } else if (zval_is_string(zvar)) {
@@ -971,6 +992,7 @@ Variant Variant::item(const Variant &key, bool update) {
     auto zvar = unwrap_ptr();
     zval *retval;
     zval rv;
+    ZVAL_UNDEF(&rv);
 
     if (key.isInt() || key.isFloat() || zval_is_string(zvar)) {
         return item(key.toInt(), update);
@@ -993,8 +1015,17 @@ Variant Variant::item(const Variant &key, bool update) {
         auto obj = object();
         auto dim = NO_CONST_V(key);
         retval = obj->handlers->read_dimension(obj, dim, update ? BP_VAR_RW : BP_VAR_R, &rv);
-        if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
+        if (UNEXPECTED(EG(exception) != nullptr)) {
+            if (!Z_ISUNDEF(rv)) {
+                zval_ptr_dtor(&rv);
+            }
             throwErrorIfOccurred();
+            return {};
+        }
+        if (UNEXPECTED(retval == &rv)) {
+            return Variant{retval, Ctor::Move};
+        }
+        if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval))) {
             return Variant{retval};
         }
     } else {
@@ -1087,6 +1118,7 @@ Variant Variant::newItem() {
     auto zvar = unwrap_ptr();
     zval *retval;
     zval rv;
+    ZVAL_UNDEF(&rv);
 
     if (zval_is_undef(zvar) || zval_is_null(zvar)) {
         array_init(zvar);
@@ -1101,8 +1133,17 @@ Variant Variant::newItem() {
         ZVAL_LONG(&key, length());
         obj->handlers->write_dimension(obj, &key, undef());
         retval = obj->handlers->read_dimension(obj, &key, BP_VAR_RW, &rv);
-        if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval) || retval == &rv)) {
+        if (UNEXPECTED(EG(exception) != nullptr)) {
+            if (!Z_ISUNDEF(rv)) {
+                zval_ptr_dtor(&rv);
+            }
             throwErrorIfOccurred();
+            return {};
+        }
+        if (UNEXPECTED(retval == &rv)) {
+            return Variant{retval, Ctor::Move};
+        }
+        if (UNEXPECTED(retval == NULL || retval == &EG(uninitialized_zval))) {
             return Variant{retval};
         }
     } else if (zval_is_string(zvar)) {

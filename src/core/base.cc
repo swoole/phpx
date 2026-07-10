@@ -84,6 +84,14 @@ Variant concat(const ArgList &args) {
 
     for (auto const &item : args) {
         auto str = zval_get_string(NO_CONST_V(item));
+        if (UNEXPECTED(EG(exception) != nullptr)) {
+            zend_string_release(str);
+            for (size_t i = 0; i < index; ++i) {
+                zend_string_release(items[i]);
+            }
+            throwErrorIfOccurred();
+            return {};
+        }
         items[index++] = str;
         total_len += ZSTR_LEN(str);
     }

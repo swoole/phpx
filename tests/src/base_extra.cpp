@@ -616,3 +616,31 @@ TEST(base_extra, concat_single) {
     ASSERT_TRUE(r.isString());
     ASSERT_STREQ(r.toCString(), "single");
 }
+
+TEST(base_extra, concat_propagates_tostring_exception) {
+    eval(R"PHP(
+        class PhpxConcatStringValue {
+            public function __toString(): string { return 'prefix'; }
+        }
+        class PhpxConcatThrowingValue {
+            public function __toString(): string {
+                throw new RuntimeException('concat toString failed');
+            }
+        }
+    )PHP");
+
+    auto prefix = newObject("PhpxConcatStringValue");
+    auto throwing = newObject("PhpxConcatThrowingValue");
+    bool thrown = false;
+    try {
+        concat({prefix, throwing, "suffix"});
+    } catch (zend_object *) {
+        thrown = true;
+        auto exception = catchException();
+        ASSERT_TRUE(str_contains(exception.call("getMessage"), "concat toString failed").toBool());
+    }
+    if (!thrown && EG(exception)) {
+        catchException();
+    }
+    ASSERT_TRUE(thrown);
+}

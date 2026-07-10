@@ -255,6 +255,47 @@ TEST(variant_edge, serialize_roundtrip) {
     ASSERT_STREQ(u3.toCString(), "hello");
 }
 
+TEST(variant_edge, divide_assign_preserves_reference) {
+    var value(9.0);
+    auto ref = value.toReference();
+
+    ref /= 2.0;
+
+    ASSERT_TRUE(ref.isReference());
+    ASSERT_DOUBLE_EQ(ref.toFloat(), 4.5);
+    ASSERT_DOUBLE_EQ(value.toFloat(), 4.5);
+}
+
+TEST(variant_edge, string_conversion_propagates_tostring_exception) {
+    eval(R"PHP(
+        class PhpxThrowingToString {
+            public function __toString(): string {
+                throw new RuntimeException('toString failed');
+            }
+        }
+    )PHP");
+
+    auto object = newObject("PhpxThrowingToString");
+    auto expect_exception = [](const std::function<void()> &fn) {
+        bool thrown = false;
+        try {
+            fn();
+        } catch (zend_object *) {
+            thrown = true;
+            auto exception = catchException();
+            ASSERT_TRUE(str_contains(exception.call("getMessage"), "toString failed").toBool());
+        }
+        if (!thrown && EG(exception)) {
+            catchException();
+        }
+        ASSERT_TRUE(thrown);
+    };
+
+    expect_exception([&object]() { object.toStdString(); });
+    expect_exception([&object]() { object.toString(); });
+    expect_exception([&object]() { String converted(object); });
+}
+
 TEST(variant_edge, unserialize_rejects_non_string) {
     try_call([]() { var(42).unserialize(); }, "unserialize() expects a string");
 }
