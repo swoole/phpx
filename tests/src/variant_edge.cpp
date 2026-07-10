@@ -272,6 +272,19 @@ TEST(variant_edge, serialize_propagates_magic_method_exception) {
     try_call([&object]() { object.serialize(); }, "serialize failed");
 }
 
+TEST(variant_edge, unserialize_propagates_magic_method_exception) {
+    eval(R"PHP(
+        class PhpxThrowingUnserialize {
+            public function __unserialize(array $data): void {
+                throw new RuntimeException('unserialize failed');
+            }
+        }
+    )PHP");
+
+    var serialized(R"(O:23:"PhpxThrowingUnserialize":0:{})");
+    try_call([&serialized]() { serialized.unserialize(); }, "unserialize failed");
+}
+
 // Test call on non-object throws
 TEST(variant_edge, call_on_non_object) {
     try_call(
