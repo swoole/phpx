@@ -249,25 +249,27 @@ TEST(object, offset_handlers_throw_exceptions) {
 }
 
 TEST(object, property_exists_restores_fake_scope_after_cpp_exception) {
-    eval(R"PHP(
-        class PhpxScopeRestoreHolder {
-            public mixed $callback;
-            public function __isset(string $name): bool {
-                ($this->callback)();
-                return false;
-            }
-        }
-    )PHP");
-
-    auto callback = newClosure([](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &) -> Variant {
+    auto object = newObject("stdClass");
+    auto original_handlers = object.object()->handlers;
+    zend_object_handlers throwing_handlers = *original_handlers;
+    throwing_handlers.has_property = [](zend_object *, zend_string *, int, void **) -> int {
         throwException("RuntimeException", "scope restore failed");
-        return {};
-    });
-    auto object = newObject("PhpxScopeRestoreHolder");
-    object.set("callback", callback);
+        return 0;
+    };
+    object.object()->handlers = &throwing_handlers;
 
     auto original_scope = EG(fake_scope);
-    try_call([&object]() { object.propertyExists("missing", PROP_ISSET); }, "scope restore failed");
+    bool thrown = false;
+    try {
+        object.propertyExists("missing", PROP_ISSET);
+    } catch (zend_object *) {
+        thrown = true;
+        object.object()->handlers = original_handlers;
+        catchException();
+    }
+    object.object()->handlers = original_handlers;
+
+    ASSERT_TRUE(thrown);
     ASSERT_EQ(EG(fake_scope), original_scope);
 }
 
