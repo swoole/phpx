@@ -431,7 +431,7 @@ ZEND_METHOD(TypePHP_FiberGenerator, send) {
     }
     typephp_fiber_generator_advance(this_, &value);
     auto retval = this_.get(typephp_fiber_str_current());
-    ZVAL_COPY_DEREF(return_value, retval.ptr());
+    ZVAL_COPY_DEREF(return_value, retval.direct_ptr());
 }
 
 ZEND_METHOD(TypePHP_FiberGenerator, throw) {
@@ -448,7 +448,7 @@ ZEND_METHOD(TypePHP_FiberGenerator, throw) {
     }
     typephp_fiber_generator_advance(this_, nullptr, &exception);
     auto retval = this_.get(typephp_fiber_str_current());
-    ZVAL_COPY_DEREF(return_value, retval.ptr());
+    ZVAL_COPY_DEREF(return_value, retval.direct_ptr());
 }
 
 ZEND_METHOD(TypePHP_FiberGenerator, getReturn) {
@@ -459,7 +459,7 @@ ZEND_METHOD(TypePHP_FiberGenerator, getReturn) {
     }
     php::Object fiber = this_.get(typephp_fiber_str_fiber());
     auto retval = fiber.call(typephp_fiber_str_get_return());
-    ZVAL_COPY_DEREF(return_value, retval.ptr());
+    ZVAL_COPY_DEREF(return_value, retval.direct_ptr());
 }
 
 ZEND_METHOD(TypePHP_FiberGenerator, valid) {
@@ -468,7 +468,7 @@ ZEND_METHOD(TypePHP_FiberGenerator, valid) {
         typephp_fiber_generator_advance(this_);
     }
     auto retval = this_.get(typephp_fiber_str_valid());
-    ZVAL_COPY_DEREF(return_value, retval.ptr());
+    ZVAL_COPY_DEREF(return_value, retval.direct_ptr());
 }
 
 ZEND_METHOD(TypePHP_FiberGenerator, current) {
@@ -477,7 +477,7 @@ ZEND_METHOD(TypePHP_FiberGenerator, current) {
         typephp_fiber_generator_advance(this_);
     }
     auto retval = this_.get(typephp_fiber_str_current());
-    ZVAL_COPY_DEREF(return_value, retval.ptr());
+    ZVAL_COPY_DEREF(return_value, retval.direct_ptr());
 }
 
 ZEND_METHOD(TypePHP_FiberGenerator, key) {
@@ -486,21 +486,27 @@ ZEND_METHOD(TypePHP_FiberGenerator, key) {
         typephp_fiber_generator_advance(this_);
     }
     auto retval = this_.get(typephp_fiber_str_key());
-    ZVAL_COPY_DEREF(return_value, retval.ptr());
+    ZVAL_COPY_DEREF(return_value, retval.direct_ptr());
 }
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_typephp_fiber_generator_void, 0, 0, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_typephp_fiber_generator_void, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_typephp_fiber_generator_bool, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_typephp_fiber_generator_mixed, 0, 0, IS_MIXED, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_typephp_fiber_generator_construct, 0, 0, 1)
     ZEND_ARG_INFO(0, callback)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_typephp_fiber_generator_send, 0, 0, 1)
-    ZEND_ARG_INFO(0, value)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_typephp_fiber_generator_send, 0, 1, IS_MIXED, 0)
+    ZEND_ARG_TYPE_INFO(0, value, IS_MIXED, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_typephp_fiber_generator_throw, 0, 0, 1)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_typephp_fiber_generator_throw, 0, 1, IS_MIXED, 0)
     ZEND_ARG_OBJ_INFO(0, exception, Throwable, 0)
 ZEND_END_ARG_INFO()
 
@@ -508,12 +514,12 @@ static const zend_function_entry typephp_fiber_generator_methods[] = {
     ZEND_ME(TypePHP_FiberGenerator, __construct, arginfo_typephp_fiber_generator_construct, ZEND_ACC_PUBLIC)
     ZEND_ME(TypePHP_FiberGenerator, rewind, arginfo_typephp_fiber_generator_void, ZEND_ACC_PUBLIC)
     ZEND_ME(TypePHP_FiberGenerator, next, arginfo_typephp_fiber_generator_void, ZEND_ACC_PUBLIC)
-    ZEND_ME(TypePHP_FiberGenerator, valid, arginfo_typephp_fiber_generator_void, ZEND_ACC_PUBLIC)
-    ZEND_ME(TypePHP_FiberGenerator, current, arginfo_typephp_fiber_generator_void, ZEND_ACC_PUBLIC)
-    ZEND_ME(TypePHP_FiberGenerator, key, arginfo_typephp_fiber_generator_void, ZEND_ACC_PUBLIC)
+    ZEND_ME(TypePHP_FiberGenerator, valid, arginfo_typephp_fiber_generator_bool, ZEND_ACC_PUBLIC)
+    ZEND_ME(TypePHP_FiberGenerator, current, arginfo_typephp_fiber_generator_mixed, ZEND_ACC_PUBLIC)
+    ZEND_ME(TypePHP_FiberGenerator, key, arginfo_typephp_fiber_generator_mixed, ZEND_ACC_PUBLIC)
     ZEND_ME(TypePHP_FiberGenerator, send, arginfo_typephp_fiber_generator_send, ZEND_ACC_PUBLIC)
     ZEND_ME(TypePHP_FiberGenerator, throw, arginfo_typephp_fiber_generator_throw, ZEND_ACC_PUBLIC)
-    ZEND_ME(TypePHP_FiberGenerator, getReturn, arginfo_typephp_fiber_generator_void, ZEND_ACC_PUBLIC)
+    ZEND_ME(TypePHP_FiberGenerator, getReturn, arginfo_typephp_fiber_generator_mixed, ZEND_ACC_PUBLIC)
     ZEND_FE_END
 };
 
