@@ -3,7 +3,7 @@
 #endif
 
 #include <phpx.h>
-#include <php_aot_helper.h>
+#include <typephp_helper.h>
 BEGIN_EXTERN_C()
 #include "sapi/embed/php_embed.h"
 #include "ps_title.h"
@@ -115,7 +115,7 @@ void module_shutdown(zend_module_entry *module) {
     zend_hash_del(&module_registry, lcname);
 }
 
-void php_aot_unset_typed_property(zend_object *object, zend_string *member, void **cache_slot) {
+void typephp_unset_typed_property(zend_object *object, zend_string *member, void **cache_slot) {
     zend_class_entry *ce = object->ce;
     zend_property_info *property_info = zend_get_property_info(ce, member, 1);
 
@@ -174,24 +174,24 @@ _std_unset:
 }
 
 #ifdef _WIN32
-#define PHP_AOT_RUNTIME_API extern "C" __declspec(dllexport)
+#define TYPEPHP_RUNTIME_API extern "C" __declspec(dllexport)
 #else
-#define PHP_AOT_RUNTIME_API extern "C" __attribute__((visibility("default")))
+#define TYPEPHP_RUNTIME_API extern "C" __attribute__((visibility("default")))
 #endif
 
-static zend_module_entry *php_aot_runtime_module = nullptr;
-static bool php_aot_runtime_started = false;
+static zend_module_entry *typephp_runtime_module = nullptr;
+static bool typephp_runtime_started = false;
 
-PHP_AOT_RUNTIME_API int php_aot_runtime_init(int argc, char **argv) {
-    if (php_aot_runtime_started) {
+TYPEPHP_RUNTIME_API int typephp_runtime_init(int argc, char **argv) {
+    if (typephp_runtime_started) {
         return 0;
     }
 
     php_embed_init(argc, argv);
     php::throw_impl = [](zend_object *ex) { throw ex; };
 
-    php_aot_runtime_module = php_embed_get_module();
-    module_init(php_aot_runtime_module);
+    typephp_runtime_module = php_embed_get_module();
+    module_init(typephp_runtime_module);
 
 #ifndef PHP_WIN32
     save_ps_args(argc, argv);
@@ -203,9 +203,9 @@ PHP_AOT_RUNTIME_API int php_aot_runtime_init(int argc, char **argv) {
             char path_translated[] = "embed";
             cli_register_file_handles();
             SG(request_info).path_translated = path_translated;
-            php_aot_runtime_module->request_startup_func(
-                php_aot_runtime_module->type,
-                php_aot_runtime_module->module_number
+            typephp_runtime_module->request_startup_func(
+                typephp_runtime_module->type,
+                typephp_runtime_module->module_number
             );
         } catch (zend_object *e) {
             rc = EG(exit_status);
@@ -221,37 +221,37 @@ PHP_AOT_RUNTIME_API int php_aot_runtime_init(int argc, char **argv) {
         return rc;
     }
 
-    php_aot_runtime_started = true;
+    typephp_runtime_started = true;
     return 0;
 }
 
-PHP_AOT_RUNTIME_API void php_aot_runtime_shutdown() {
-    if (!php_aot_runtime_started) {
+TYPEPHP_RUNTIME_API void typephp_runtime_shutdown() {
+    if (!typephp_runtime_started) {
         return;
     }
 
-    php_aot_runtime_module->request_shutdown_func(
-        php_aot_runtime_module->type,
-        php_aot_runtime_module->module_number
+    typephp_runtime_module->request_shutdown_func(
+        typephp_runtime_module->type,
+        typephp_runtime_module->module_number
     );
-    module_shutdown(php_aot_runtime_module);
+    module_shutdown(typephp_runtime_module);
     php_embed_shutdown();
 
-    php_aot_runtime_module = nullptr;
-    php_aot_runtime_started = false;
+    typephp_runtime_module = nullptr;
+    typephp_runtime_started = false;
 }
 
-#ifndef PHPX_NO_MAIN
+#ifndef TYPEPHP_NO_MAIN
 int main(int cpp_argc, char **cpp_argv) {
     int rc = 0;
 #ifdef PPROF_ON
     ProfilerStart(PROF_OUTPUT_FILE);
 #endif
-    rc = php_aot_runtime_init(cpp_argc, cpp_argv);
+    rc = typephp_runtime_init(cpp_argc, cpp_argv);
 #ifdef PPROF_ON
     ProfilerStop();
 #endif
-    php_aot_runtime_shutdown();
+    typephp_runtime_shutdown();
     return rc;
 }
 #endif

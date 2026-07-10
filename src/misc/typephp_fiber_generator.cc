@@ -1,4 +1,4 @@
-#include "php_aot_fiber_generator.h"
+#include "typephp_fiber_generator.h"
 
 #include <phpx_helper.h>
 
