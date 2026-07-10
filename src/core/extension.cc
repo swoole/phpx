@@ -305,8 +305,9 @@ Resource *getResource(const std::string &name) {
 static ZEND_RESULT_CODE _check_args_num(const zend_execute_data *data, const int num_args) {
     const uint32_t min_num_args = data->func->common.required_num_args;
     const uint32_t max_num_args = data->func->common.num_args;
+    const bool variadic = data->func->common.fn_flags & ZEND_ACC_VARIADIC;
 
-    if (num_args < min_num_args || (num_args > max_num_args && max_num_args > 0)) {
+    if (num_args < min_num_args || (!variadic && num_args > max_num_args)) {
         zend_wrong_parameters_count_error(min_num_args, max_num_args);
         return FAILURE;
     }

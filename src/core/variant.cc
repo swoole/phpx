@@ -15,6 +15,7 @@
 */
 
 #include "phpx.h"
+#include "phpx_scope_guard.h"
 
 #if PHP_VERSION_ID < 80400
 #include "zend_fibers.h"
@@ -447,10 +448,12 @@ void Variant::setProperty(const Variant &name, const Variant &value) const {
 }
 
 void Variant::unsetProperty(zend_string *prop_name) {
-    auto old_scope = EG(fake_scope);
-    EG(fake_scope) = ce();
-    object()->handlers->unset_property(object(), prop_name, 0);
-    EG(fake_scope) = old_scope;
+    do {
+        auto old_scope = EG(fake_scope);
+        ON_SCOPE_EXIT(EG(fake_scope) = old_scope);
+        EG(fake_scope) = ce();
+        object()->handlers->unset_property(object(), prop_name, 0);
+    } while (0);
     throwErrorIfOccurred();
 }
 
@@ -859,6 +862,7 @@ void Variant::append(const Variant &v) {
         tmp.offsetSet(null, v);
     } else if (isString()) {
         concat_function(zresult, zresult, zvalue);
+        throwErrorIfOccurred();
     } else {
         throwError("Cannot append element to an `%s`", typeStr());
     }
@@ -1096,10 +1100,12 @@ Variant Variant::attr(const Variant &name, bool update) const {
     throwErrorIfOccurred();
 
     if (zval_is_null(member_p) && update) {
-        auto old_scope = EG(fake_scope);
-        EG(fake_scope) = ce();
-        member_p = object()->handlers->write_property(object(), prop_name.str(), undef(), NULL);
-        EG(fake_scope) = old_scope;
+        do {
+            auto old_scope = EG(fake_scope);
+            ON_SCOPE_EXIT(EG(fake_scope) = old_scope);
+            EG(fake_scope) = ce();
+            member_p = object()->handlers->write_property(object(), prop_name.str(), undef(), NULL);
+        } while (0);
         throwErrorIfOccurred();
 
         if (member_p == undef()) {
@@ -1132,6 +1138,7 @@ Variant Variant::newItem() {
         zval key;
         ZVAL_LONG(&key, length());
         obj->handlers->write_dimension(obj, &key, undef());
+        throwErrorIfOccurred();
         retval = obj->handlers->read_dimension(obj, &key, BP_VAR_RW, &rv);
         if (UNEXPECTED(EG(exception) != nullptr)) {
             if (!Z_ISUNDEF(rv)) {

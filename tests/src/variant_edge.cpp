@@ -296,6 +296,31 @@ TEST(variant_edge, string_conversion_propagates_tostring_exception) {
     expect_exception([&object]() { String converted(object); });
 }
 
+TEST(variant_edge, append_propagates_tostring_exception) {
+    eval(R"PHP(
+        class PhpxAppendThrowingValue {
+            public function __toString(): string {
+                throw new RuntimeException('append toString failed');
+            }
+        }
+    )PHP");
+
+    var value("prefix");
+    auto throwing = newObject("PhpxAppendThrowingValue");
+    bool thrown = false;
+    try {
+        value.append(throwing);
+    } catch (zend_object *) {
+        thrown = true;
+        auto exception = catchException();
+        ASSERT_TRUE(str_contains(exception.call("getMessage"), "append toString failed").toBool());
+    }
+    if (!thrown && EG(exception)) {
+        catchException();
+    }
+    ASSERT_TRUE(thrown);
+}
+
 TEST(variant_edge, unserialize_rejects_non_string) {
     try_call([]() { var(42).unserialize(); }, "unserialize() expects a string");
 }

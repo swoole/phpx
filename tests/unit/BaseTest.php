@@ -111,6 +111,12 @@ class BaseTest extends TestCase
         }
     }
 
+    public function testZeroArgumentFunctionRejectsExtraArguments()
+    {
+        $this->expectException(\ArgumentCountError::class);
+        phpx_test3('unexpected');
+    }
+
     public function testInclude() {
         $includeDir = realpath(__DIR__ . '/../include');
         $range = range(0, 3);

@@ -242,7 +242,15 @@ bool Array::contains(const Variant &_other_var, bool strict) const {
 
 String Array::join(const String &delim) {
     zval retval;
+    ZVAL_UNDEF(&retval);
     php_implode(delim.str(), HASH_OF(unwrap_ptr()), &retval);
+    if (UNEXPECTED(EG(exception) != nullptr)) {
+        if (!Z_ISUNDEF(retval)) {
+            zval_ptr_dtor(&retval);
+        }
+        throwErrorIfOccurred();
+        return {};
+    }
     return String(&retval, Ctor::Move);
 }
 

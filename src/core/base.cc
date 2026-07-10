@@ -15,6 +15,7 @@
 */
 
 #include "phpx.h"
+#include "phpx_scope_guard.h"
 
 namespace php {
 const char *box_res_name = "php::box";
@@ -182,6 +183,7 @@ void augmentException() {
     }
 
     auto prev_scope = EG(fake_scope);
+    ON_SCOPE_EXIT(EG(fake_scope) = prev_scope);
     EG(fake_scope) = EG(exception)->ce;
 
     // Set file/line from the innermost frame
@@ -223,7 +225,6 @@ void augmentException() {
 
     zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_TRACE), trace.ptr());
 
-    EG(fake_scope) = prev_scope;
 }
 
 Variant constant(const String &name) {
@@ -820,10 +821,13 @@ uint32_t getPropertyOffset(const String &class_name, const String &prop) {
 }
 
 uint32_t getPropertyOffset(zend_class_entry *ce, const String &prop) {
-    auto prev_scope = EG(fake_scope);
-    EG(fake_scope) = ce;
-    auto prop_info = zend_get_property_info(ce, prop.str(), 1);
-    EG(fake_scope) = prev_scope;
+    zend_property_info *prop_info;
+    do {
+        auto prev_scope = EG(fake_scope);
+        ON_SCOPE_EXIT(EG(fake_scope) = prev_scope);
+        EG(fake_scope) = ce;
+        prop_info = zend_get_property_info(ce, prop.str(), 1);
+    } while (0);
     if (UNEXPECTED(!prop_info)) {
         throwError("property '%s::%s' is undefined.", ce->name->val, prop.toCString());
         return 0;

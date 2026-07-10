@@ -386,6 +386,27 @@ TEST(object_extra, temporary_dimension_result_is_released) {
     ASSERT_EQ(global("phpx_dimension_result_destructed").toInt(), 4);
 }
 
+TEST(object_extra, new_item_stops_after_dimension_write_exception) {
+    eval(R"PHP(
+        $GLOBALS['phpx_new_item_reads'] = 0;
+        class PhpxThrowingDimensionWrite implements ArrayAccess {
+            public function offsetExists(mixed $offset): bool { return true; }
+            public function offsetGet(mixed $offset): mixed {
+                ++$GLOBALS['phpx_new_item_reads'];
+                return null;
+            }
+            public function offsetSet(mixed $offset, mixed $value): void {
+                throw new RuntimeException('dimension write failed');
+            }
+            public function offsetUnset(mixed $offset): void {}
+        }
+    )PHP");
+
+    var value = newObject("PhpxThrowingDimensionWrite");
+    try_call([&value]() { value.newItem(); }, "dimension write failed");
+    ASSERT_EQ(global("phpx_new_item_reads").toInt(), 0);
+}
+
 // Test offsetSet on stdClass (not ArrayAccess)
 // Test offsetSet on ArrayObject (implements ArrayAccess)
 TEST(object_extra, offsetSet_array_object) {

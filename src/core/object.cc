@@ -15,6 +15,7 @@
 */
 
 #include "phpx.h"
+#include "phpx_scope_guard.h"
 
 BEGIN_EXTERN_C()
 #include "zend_smart_str.h"
@@ -22,6 +23,71 @@ BEGIN_EXTERN_C()
 END_EXTERN_C()
 
 namespace php {
+bool Object::offsetExists(const Variant &offset, int check_empty) const {
+    auto result = object()->handlers->has_dimension(object(), NO_CONST_V(offset), check_empty) != 0;
+    throwErrorIfOccurred();
+    return result;
+}
+
+bool Object::offsetExists(zend_long offset, int check_empty) {
+    zval tmp;
+    ZVAL_LONG(&tmp, offset);
+    auto result = object()->handlers->has_dimension(object(), &tmp, check_empty) != 0;
+    throwErrorIfOccurred();
+    return result;
+}
+
+static Variant wrap_dimension_result(zval *result, zval *rv) {
+    if (UNEXPECTED(EG(exception) != nullptr)) {
+        if (!Z_ISUNDEF_P(rv)) {
+            zval_ptr_dtor(rv);
+        }
+        throwErrorIfOccurred();
+        return {};
+    }
+    return result == rv ? Variant{result, Ctor::Move} : Variant{result};
+}
+
+Variant Object::offsetGet(const Variant &offset, int type) {
+    zval rv;
+    ZVAL_UNDEF(&rv);
+    auto result = object()->handlers->read_dimension(object(), NO_CONST_V(offset), type, &rv);
+    return wrap_dimension_result(result, &rv);
+}
+
+Variant Object::offsetGet(zend_long offset, int type) {
+    zval tmp;
+    ZVAL_LONG(&tmp, offset);
+    zval rv;
+    ZVAL_UNDEF(&rv);
+    auto result = object()->handlers->read_dimension(object(), &tmp, type, &rv);
+    return wrap_dimension_result(result, &rv);
+}
+
+void Object::offsetSet(const Variant &offset, const Variant &value) {
+    object()->handlers->write_dimension(object(), NO_CONST_V(offset), NO_CONST_V(value));
+    throwErrorIfOccurred();
+}
+
+void Object::offsetSet(zend_long offset, const Variant &value) {
+    zval tmp;
+    ZVAL_LONG(&tmp, offset);
+    object()->handlers->write_dimension(object(), &tmp, NO_CONST_V(value));
+    throwErrorIfOccurred();
+}
+
+void Object::offsetUnset(const Variant &offset) {
+    object()->handlers->unset_dimension(object(), NO_CONST_V(offset));
+    throwErrorIfOccurred();
+}
+
+void Object::offsetUnset(zend_long offset) {
+    zval tmp;
+    ZVAL_LONG(&tmp, offset);
+    object()->handlers->unset_dimension(object(), &tmp);
+    throwErrorIfOccurred();
+}
+
 String Object::hash() const {
     return String(php_spl_object_hash(object()), Ctor::Move);
 }
@@ -45,11 +111,14 @@ bool Object::propertyExists(const String &name, PropertyOperation op) const {
         return true;
     }
 
-    auto ori_scope = EG(fake_scope);
-    EG(fake_scope) = ce();
-    bool rs = object()->handlers->has_property(object(), name.str(), op, NULL);
+    bool rs;
+    do {
+        auto ori_scope = EG(fake_scope);
+        ON_SCOPE_EXIT(EG(fake_scope) = ori_scope);
+        EG(fake_scope) = ce();
+        rs = object()->handlers->has_property(object(), name.str(), op, NULL);
+    } while (0);
 
-    EG(fake_scope) = ori_scope;
     throwErrorIfOccurred();
     return rs;
 }

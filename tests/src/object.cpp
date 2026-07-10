@@ -248,6 +248,29 @@ TEST(object, offset_handlers_throw_exceptions) {
     try_call([&object]() { object.offsetUnset("k"); }, "offsetUnset failed");
 }
 
+TEST(object, property_exists_restores_fake_scope_after_cpp_exception) {
+    eval(R"PHP(
+        class PhpxScopeRestoreHolder {
+            public mixed $callback;
+            public function __isset(string $name): bool {
+                ($this->callback)();
+                return false;
+            }
+        }
+    )PHP");
+
+    auto callback = newClosure([](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &) -> Variant {
+        throwException("RuntimeException", "scope restore failed");
+        return {};
+    });
+    auto object = newObject("PhpxScopeRestoreHolder");
+    object.set("callback", callback);
+
+    auto original_scope = EG(fake_scope);
+    try_call([&object]() { object.propertyExists("missing", PROP_ISSET); }, "scope restore failed");
+    ASSERT_EQ(EG(fake_scope), original_scope);
+}
+
 TEST(object, mixed) {
     include(get_include_dir() + "/library.php", INCLUDE_ONCE);
 

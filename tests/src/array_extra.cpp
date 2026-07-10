@@ -228,6 +228,30 @@ TEST(array_extra, join_empty) {
     ASSERT_EQ(s.length(), 0);
 }
 
+TEST(array_extra, join_propagates_tostring_exception) {
+    eval(R"PHP(
+        class PhpxJoinThrowingValue {
+            public function __toString(): string {
+                throw new RuntimeException('join toString failed');
+            }
+        }
+    )PHP");
+
+    Array values{"prefix", newObject("PhpxJoinThrowingValue")};
+    bool thrown = false;
+    try {
+        values.join(",");
+    } catch (zend_object *) {
+        thrown = true;
+        auto exception = catchException();
+        ASSERT_TRUE(str_contains(exception.call("getMessage"), "join toString failed").toBool());
+    }
+    if (!thrown && EG(exception)) {
+        catchException();
+    }
+    ASSERT_TRUE(thrown);
+}
+
 // Test toArray with StdVector
 TEST(array_extra, from_std_vector) {
     StdVector<int> vec{10, 20, 30};

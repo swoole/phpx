@@ -21,6 +21,22 @@ extern "C" {
 }
 
 namespace php {
+void String::checkString() {
+    if (EXPECTED(isString())) {
+        return;
+    }
+
+    auto zv = unwrap_ptr();
+    auto new_str = zval_get_string(zv);
+    if (UNEXPECTED(EG(exception) != nullptr)) {
+        zend_string_release(new_str);
+        throwErrorIfOccurred();
+        return;
+    }
+    destroy();
+    ZVAL_STR(zv, new_str);
+}
+
 String String::format(const char *format, ...) {
     va_list args;
     va_start(args, format);

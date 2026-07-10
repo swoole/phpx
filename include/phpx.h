@@ -1074,19 +1074,7 @@ Variant newResource(const char *name, T *v) {
 #endif
 
 class String : public Variant {
-    void checkString() {
-        if (!isString()) {
-            auto zv = unwrap_ptr();
-            auto new_str = zval_get_string(zv);
-            if (UNEXPECTED(EG(exception) != nullptr)) {
-                zend_string_release(new_str);
-                throwErrorIfOccurred();
-                return;
-            }
-            destroy();
-            ZVAL_STR(zv, new_str);
-        }
-    }
+    void checkString();
     void copyFrom(Int v) {
         ZVAL_STR(unwrap_ptr(), zend_long_to_str(v));
     }
@@ -1639,72 +1627,14 @@ class Object : public Variant {
     }
     Variant callParentMethod(const String &func, const ArgList &args);
 
-    bool offsetExists(const Variant &offset, int check_empty = 0) const {
-        auto result = object()->handlers->has_dimension(object(), NO_CONST_V(offset), check_empty) != 0;
-        throwErrorIfOccurred();
-        return result;
-    }
-    bool offsetExists(zend_long offset, int check_empty = 0) {
-        zval tmp;
-        ZVAL_LONG(&tmp, offset);
-        auto result = object()->handlers->has_dimension(object(), &tmp, check_empty) != 0;
-        throwErrorIfOccurred();
-        return result;
-    }
-    Variant offsetGet(const Variant &offset, int type = BP_VAR_R) {
-        zval rv;
-        ZVAL_UNDEF(&rv);
-        auto result = object()->handlers->read_dimension(object(), NO_CONST_V(offset), type, &rv);
-        if (UNEXPECTED(EG(exception) != nullptr)) {
-            if (!Z_ISUNDEF(rv)) {
-                zval_ptr_dtor(&rv);
-            }
-            throwErrorIfOccurred();
-            return {};
-        }
-        if (result == &rv) {
-            return Variant{result, Ctor::Move};
-        }
-        return Variant{result};
-    }
-    Variant offsetGet(zend_long offset, int type = BP_VAR_R) {
-        zval tmp;
-        ZVAL_LONG(&tmp, offset);
-        zval rv;
-        ZVAL_UNDEF(&rv);
-        auto result = object()->handlers->read_dimension(object(), &tmp, type, &rv);
-        if (UNEXPECTED(EG(exception) != nullptr)) {
-            if (!Z_ISUNDEF(rv)) {
-                zval_ptr_dtor(&rv);
-            }
-            throwErrorIfOccurred();
-            return {};
-        }
-        if (result == &rv) {
-            return Variant{result, Ctor::Move};
-        }
-        return Variant{result};
-    }
-    void offsetSet(const Variant &offset, const Variant &value) {
-        object()->handlers->write_dimension(object(), NO_CONST_V(offset), NO_CONST_V(value));
-        throwErrorIfOccurred();
-    }
-    void offsetSet(zend_long offset, const Variant &value) {
-        zval tmp;
-        ZVAL_LONG(&tmp, offset);
-        object()->handlers->write_dimension(object(), &tmp, NO_CONST_V(value));
-        throwErrorIfOccurred();
-    }
-    void offsetUnset(const Variant &offset) {
-        object()->handlers->unset_dimension(object(), NO_CONST_V(offset));
-        throwErrorIfOccurred();
-    }
-    void offsetUnset(zend_long offset) {
-        zval tmp;
-        ZVAL_LONG(&tmp, offset);
-        object()->handlers->unset_dimension(object(), &tmp);
-        throwErrorIfOccurred();
-    }
+    bool offsetExists(const Variant &offset, int check_empty = 0) const;
+    bool offsetExists(zend_long offset, int check_empty = 0);
+    Variant offsetGet(const Variant &offset, int type = BP_VAR_R);
+    Variant offsetGet(zend_long offset, int type = BP_VAR_R);
+    void offsetSet(const Variant &offset, const Variant &value);
+    void offsetSet(zend_long offset, const Variant &value);
+    void offsetUnset(const Variant &offset);
+    void offsetUnset(zend_long offset);
     Variant get(const String &name) const;
     void set(const String &name, const Variant &v) const {
         setProperty(name.str(), v);
