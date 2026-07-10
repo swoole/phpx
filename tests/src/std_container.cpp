@@ -1,6 +1,6 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
-#include "php_aot_helper.h"
+#include "typephp_helper.h"
 
 #include <cstring>
 
