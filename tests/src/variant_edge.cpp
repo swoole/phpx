@@ -255,6 +255,23 @@ TEST(variant_edge, serialize_roundtrip) {
     ASSERT_STREQ(u3.toCString(), "hello");
 }
 
+TEST(variant_edge, unserialize_rejects_non_string) {
+    try_call([]() { var(42).unserialize(); }, "unserialize() expects a string");
+}
+
+TEST(variant_edge, serialize_propagates_magic_method_exception) {
+    eval(R"PHP(
+        class PhpxThrowingSerialize {
+            public function __serialize(): array {
+                throw new RuntimeException('serialize failed');
+            }
+        }
+    )PHP");
+
+    auto object = newObject("PhpxThrowingSerialize");
+    try_call([&object]() { object.serialize(); }, "serialize failed");
+}
+
 // Test call on non-object throws
 TEST(variant_edge, call_on_non_object) {
     try_call(

@@ -499,6 +499,17 @@ Variant Variant::serialize() {
     PHP_VAR_SERIALIZE_INIT(var_hash);
     php_var_serialize(&serialized_data, unwrap_ptr(), &var_hash);
     PHP_VAR_SERIALIZE_DESTROY(var_hash);
+
+    if (UNEXPECTED(EG(exception) != nullptr)) {
+        smart_str_free(&serialized_data);
+        throwErrorIfOccurred();
+        return {};
+    }
+    if (UNEXPECTED(serialized_data.s == nullptr)) {
+        throwError("failed to serialize value");
+        return {};
+    }
+
     Variant retval(serialized_data.s->val, serialized_data.s->len);
     smart_str_free(&serialized_data);
     return retval;
@@ -875,11 +886,23 @@ Variant Variant::unserialize() {
     Variant retval;
     auto zv = unwrap_ptr();
 
+    if (UNEXPECTED(Z_TYPE_P(zv) != IS_STRING)) {
+        zend_type_error("php::Variant::unserialize() expects a string, %s given", zend_zval_value_name(zv));
+        throwErrorIfOccurred();
+        return {};
+    }
+
     PHP_VAR_UNSERIALIZE_INIT(var_hash);
-    char *data = Z_STRVAL_P(zv);
+    const unsigned char *data = reinterpret_cast<const unsigned char *>(Z_STRVAL_P(zv));
     size_t length = Z_STRLEN_P(zv);
-    auto rs = php_var_unserialize(retval.ptr(), (const uchar **) &data, (const uchar *) data + length, &var_hash);
+    const unsigned char *end = data + length;
+    auto rs = php_var_unserialize(retval.ptr(), &data, end, &var_hash);
     PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
+
+    if (UNEXPECTED(EG(exception) != nullptr)) {
+        throwErrorIfOccurred();
+        return {};
+    }
 
     if (rs) {
         return retval;

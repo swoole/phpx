@@ -75,6 +75,23 @@ TEST(object, ctor) {
     ASSERT_EQ(o3.attr("golang").toInt(), 4);
 }
 
+TEST(object, failed_constructor_does_not_run_destructor) {
+    eval(R"PHP(
+        $GLOBALS['phpx_failed_ctor_destructed'] = 0;
+        class PhpxFailedConstructor {
+            public function __construct() {
+                throw new RuntimeException('constructor failed');
+            }
+            public function __destruct() {
+                ++$GLOBALS['phpx_failed_ctor_destructed'];
+            }
+        }
+    )PHP");
+
+    try_call([]() { newObject("PhpxFailedConstructor"); }, "constructor failed");
+    ASSERT_EQ(global("phpx_failed_ctor_destructed").toInt(), 0);
+}
+
 TEST(object, ctor_string_with_array_and_named_args) {
     include(get_include_dir() + "/library.php", INCLUDE_ONCE);
 

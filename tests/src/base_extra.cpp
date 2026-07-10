@@ -357,6 +357,15 @@ TEST(base_extra, call_string_func) {
     ASSERT_STREQ(rs.toCString(), "x86_64");
 }
 
+TEST(base_extra, request_lifecycle_reinitializes_function_cache) {
+    ASSERT_EQ(call("strlen", {"first"}).toInt(), 5);
+
+    request_shutdown();
+    request_init();
+
+    ASSERT_EQ(call("strlen", {"second"}).toInt(), 6);
+}
+
 // Test throwException for class not found via class name
 TEST(base_extra, throwException_class_not_found) {
     try_call([]() { throwException("ClassDefinitelyNotExists", "test"); },

@@ -1172,11 +1172,12 @@ class String : public Variant {
         size_t len = length();
 
         if (_offset < 0) {
-            Int positive_offset = -_offset;
-            if (UNEXPECTED(static_cast<size_t>(positive_offset) > len)) {
+            // Avoid signed overflow for ZEND_LONG_MIN.
+            size_t distance = static_cast<size_t>(-(_offset + 1)) + 1;
+            if (UNEXPECTED(distance > len)) {
                 return -1;
             }
-            return static_cast<Int>(len) + _offset;
+            return static_cast<Int>(len - distance);
         } else {
             if (UNEXPECTED(static_cast<size_t>(_offset) >= len)) {
                 return -1;

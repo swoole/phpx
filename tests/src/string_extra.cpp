@@ -57,6 +57,10 @@ TEST(string_extra, offsetGet_negative) {
     ASSERT_STREQ(s.offsetGet(-6).toCString(), "");
     ASSERT_STREQ(s.offsetGet(5).toCString(), "");
     ASSERT_STREQ(s.offsetGet(10).toCString(), "");
+    ASSERT_STREQ(s.offsetGet(ZEND_LONG_MIN).toCString(), "");
+
+    s.offsetSet(ZEND_LONG_MIN, "X");
+    ASSERT_STREQ(s.toCString(), "hello");
 }
 
 // Test offsetGet with Variant key

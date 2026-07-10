@@ -287,34 +287,37 @@ static void box_dtor(zend_resource *res) {
     box->destroy();
 }
 
-THREAD_LOCAL static bool request_init_called = false;
-THREAD_LOCAL static bool request_shutdown_called = false;
-THREAD_LOCAL static int box_res_id;
+THREAD_LOCAL static bool request_active = false;
+THREAD_LOCAL static int box_res_id = 0;
 
 int getBoxResourceId() {
     return box_res_id;
 }
 
 void request_init() {
-    if (request_init_called) {
+    if (request_active) {
         return;
     }
-    request_init_called = true;
-    box_res_id = zend_register_list_destructors_ex(box_dtor, nullptr, box_res_name, 0);
-    if (box_res_id < 0) {
-        throwError("failed to register box resource");
+    request_active = true;
+    if (box_res_id == 0) {
+        box_res_id = zend_register_list_destructors_ex(box_dtor, nullptr, box_res_name, 0);
+        if (box_res_id < 0) {
+            request_active = false;
+            throwError("failed to register box resource");
+        }
     }
 }
 
 void request_shutdown() {
-    if (request_shutdown_called) {
+    if (!request_active) {
         return;
     }
-    request_shutdown_called = true;
     if (func_cache_map) {
         zend_hash_destroy(func_cache_map);
         pefree(func_cache_map, 1);
+        func_cache_map = nullptr;
     }
+    request_active = false;
 }
 
 Variant throwException(const String &class_name, const char *message, int code) {

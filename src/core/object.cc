@@ -124,6 +124,7 @@ Object newObject(zend_class_entry *ce) {
         if (ctor) {
             try {
                 zend_call_known_function(ctor, this_, ce, nullptr, 0, nullptr, nullptr);
+                throwErrorIfOccurred();
             } catch (...) {
                 zend_object_store_ctor_failed(this_);
                 throw;
@@ -145,6 +146,7 @@ Object newObject(zend_class_entry *ce, Args &args, zend_array *named_args) {
         if (ctor) {
             try {
                 zend_call_known_function(ctor, this_, ce, nullptr, args.count(), args.ptr(), named_args);
+                throwErrorIfOccurred();
             } catch (...) {
                 zend_object_store_ctor_failed(this_);
                 throw;

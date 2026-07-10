@@ -268,11 +268,11 @@ zend_result extension_before_request(int type, int module_number) {
 }
 
 zend_result extension_after_request(int type, int module_number) {
-    request_shutdown();
     auto extension = _module_number_to_extension[module_number];
     if (extension->onAfterRequest) {
         extension->onAfterRequest();
     }
+    request_shutdown();
     return SUCCESS;
 }
 
