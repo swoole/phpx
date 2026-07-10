@@ -199,6 +199,15 @@ static inline Bool toBoolExact(const Variant &v, const char *property = nullptr)
     return Z_TYPE_P(zv) == IS_TRUE;
 }
 
+static inline Reference toReferenceExact(const Variant &v, const char *property = nullptr) {
+    const zval *zv = v.direct_ptr();
+    if (UNEXPECTED(Z_TYPE_P(zv) != IS_REFERENCE)) {
+        throwExactTypeError(v, "reference", property);
+        return {};
+    }
+    return {zv, Ctor::CopyRef};
+}
+
 static inline Int print(const Variant &v) {
     echo(v);
     return 1;
