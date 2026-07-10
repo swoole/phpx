@@ -1,4 +1,4 @@
-#ifdef PPROF_ON
+﻿#ifdef PPROF_ON
 #include <gperftools/profiler.h>
 #endif
 
@@ -173,27 +173,40 @@ _std_unset:
     zend_std_unset_property(object, member, cache_slot);
 }
 
-int main(int cpp_argc, char **cpp_argv) {
-    php_embed_init(cpp_argc, cpp_argv);
+#ifdef _WIN32
+#define PHP_AOT_RUNTIME_API extern "C" __declspec(dllexport)
+#else
+#define PHP_AOT_RUNTIME_API extern "C" __attribute__((visibility("default")))
+#endif
+
+static zend_module_entry *php_aot_runtime_module = nullptr;
+static bool php_aot_runtime_started = false;
+
+PHP_AOT_RUNTIME_API int php_aot_runtime_init(int argc, char **argv) {
+    if (php_aot_runtime_started) {
+        return 0;
+    }
+
+    php_embed_init(argc, argv);
     php::throw_impl = [](zend_object *ex) { throw ex; };
 
-    zend_module_entry *module = php_embed_get_module();
-    module_init(module);
+    php_aot_runtime_module = php_embed_get_module();
+    module_init(php_aot_runtime_module);
 
 #ifndef PHP_WIN32
-    save_ps_args(cpp_argc, cpp_argv);
+    save_ps_args(argc, argv);
 #endif
 
     int rc = 0;
-#ifdef PPROF_ON
-    ProfilerStart(PROF_OUTPUT_FILE);
-#endif
     zend_first_try {
         try {
             char path_translated[] = "embed";
             cli_register_file_handles();
             SG(request_info).path_translated = path_translated;
-            module->request_startup_func(module->type, module->module_number);
+            php_aot_runtime_module->request_startup_func(
+                php_aot_runtime_module->type,
+                php_aot_runtime_module->module_number
+            );
         } catch (zend_object *e) {
             rc = EG(exit_status);
             if (!zend_is_graceful_exit(e)) {
@@ -203,13 +216,42 @@ int main(int cpp_argc, char **cpp_argv) {
         }
     }
     zend_end_try();
+
+    if (rc != 0) {
+        return rc;
+    }
+
+    php_aot_runtime_started = true;
+    return 0;
+}
+
+PHP_AOT_RUNTIME_API void php_aot_runtime_shutdown() {
+    if (!php_aot_runtime_started) {
+        return;
+    }
+
+    php_aot_runtime_module->request_shutdown_func(
+        php_aot_runtime_module->type,
+        php_aot_runtime_module->module_number
+    );
+    module_shutdown(php_aot_runtime_module);
+    php_embed_shutdown();
+
+    php_aot_runtime_module = nullptr;
+    php_aot_runtime_started = false;
+}
+
+#ifndef PHPX_NO_MAIN
+int main(int cpp_argc, char **cpp_argv) {
+    int rc = 0;
+#ifdef PPROF_ON
+    ProfilerStart(PROF_OUTPUT_FILE);
+#endif
+    rc = php_aot_runtime_init(cpp_argc, cpp_argv);
 #ifdef PPROF_ON
     ProfilerStop();
 #endif
-
-    module->request_shutdown_func(module->type, module->module_number);
-    module_shutdown(module);
-    php_embed_shutdown();
-
+    php_aot_runtime_shutdown();
     return rc;
 }
+#endif
