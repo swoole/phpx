@@ -1019,8 +1019,8 @@ Reference Variant::attrRef(const String &prop_name) {
     }
 
     auto ref = member.toReference();
-    auto prop_info = zend_get_property_info(ce(), prop_name.str(), 1);
-    if (prop_info) {
+    auto prop_info = zend_get_property_info_for_slot(object(), member.direct_ptr());
+    if (prop_info && ZEND_TYPE_IS_SET(prop_info->type)) {
         ZEND_REF_ADD_TYPE_SOURCE(ref.reference(), prop_info);
     }
     return ref;
