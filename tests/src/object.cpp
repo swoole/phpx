@@ -481,6 +481,32 @@ TEST(object, attrRef3) {
     ASSERT_EQ(o.get("propInt2"), 2026);
 }
 
+TEST(object, attrRef_dynamic_property_does_not_probe_declared_property_slot) {
+    auto result = run_in_child_capture_stdout([]() -> int {
+        auto object = newObject("stdClass");
+        object.set("dynamic", "old");
+        auto ref = object.attrRef("dynamic");
+        ref = "new";
+        return object.get("dynamic").equals("new") ? 0 : 1;
+    });
+
+    ASSERT_TRUE(result.exited) << result.output;
+    ASSERT_EQ(result.exit_code, 0) << result.output;
+}
+
+TEST(object, attrRef_typed_declared_property_keeps_reference_valid_until_dtor) {
+    auto result = run_in_child_capture_stdout([]() -> int {
+        eval("class PhpxAttrRefTypedHolder { public int $value = 1; }");
+        auto object = newObject("PhpxAttrRefTypedHolder");
+        auto ref = object.attrRef("value");
+        ref = 42;
+        return object.get("value").toInt() == 42 ? 0 : 1;
+    });
+
+    ASSERT_TRUE(result.exited) << result.output;
+    ASSERT_EQ(result.exit_code, 0) << result.output;
+}
+
 TEST(object, attr) {
     auto o1 = newObject("stdClass");
     o1.set("prop1", 1990);

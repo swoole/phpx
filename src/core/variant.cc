@@ -1019,9 +1019,13 @@ Reference Variant::attrRef(const String &prop_name) {
     }
 
     auto ref = member.toReference();
-    auto prop_info = zend_get_property_info_for_slot(object(), member.direct_ptr());
-    if (prop_info && ZEND_TYPE_IS_SET(prop_info->type)) {
-        ZEND_REF_ADD_TYPE_SOURCE(ref.reference(), prop_info);
+    auto obj = object();
+    auto slot = member.direct_ptr();
+    if (slot >= obj->properties_table && slot < obj->properties_table + obj->ce->default_properties_count) {
+        auto prop_info = zend_get_property_info_for_slot(obj, slot);
+        if (prop_info && ZEND_TYPE_IS_SET(prop_info->type)) {
+            ZEND_REF_ADD_TYPE_SOURCE(ref.reference(), prop_info);
+        }
     }
     return ref;
 }
