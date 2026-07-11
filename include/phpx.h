@@ -101,7 +101,7 @@ PHPX_API bool updateConstant(zend_class_entry *ce, const String &name, const Var
 PHPX_API void initGlobal(const String &name, Variant &var);
 PHPX_API void unsetGlobal(const String &name);
 PHPX_API Variant include(const String &file, IncludeType type = INCLUDE);
-PHPX_API Variant eval(const String &script);
+PHPX_API Variant eval(const String &script, const char *filename = nullptr);
 PHPX_API Variant call(const Variant &func, Args &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &func, Array &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &func, const ArgList &args, zend_array *named_args = nullptr);

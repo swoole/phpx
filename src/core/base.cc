@@ -538,7 +538,8 @@ Variant call(zend_class_entry *ce, zend_function *func, const ArgList &args, zen
 
 #define ZEND_FAKE_OP_ARRAY ((zend_op_array *) (intptr_t) -1)
 
-static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_string *inc_filename, const int type) {
+static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(
+    zend_string *inc_filename, const int type, const char *eval_filename = nullptr) {
     zend_op_array *new_op_array = nullptr;
     switch (type) {
     case ZEND_INCLUDE_ONCE:
@@ -577,9 +578,13 @@ static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_
         zend_string_release_ex(resolved_path, false);
     } break;
     case ZEND_EVAL: {
-        char *eval_desc = zend_make_compiled_string_description("eval()");
-        new_op_array = zend_compile_string(inc_filename, eval_desc, ZEND_COMPILE_POSITION_AFTER_OPEN_TAG);
-        efree(eval_desc);
+        if (eval_filename) {
+            new_op_array = zend_compile_string(inc_filename, eval_filename, ZEND_COMPILE_POSITION_AFTER_OPEN_TAG);
+        } else {
+            char *eval_desc = zend_make_compiled_string_description("eval()");
+            new_op_array = zend_compile_string(inc_filename, eval_desc, ZEND_COMPILE_POSITION_AFTER_OPEN_TAG);
+            efree(eval_desc);
+        }
     } break;
     case ZEND_INCLUDE:
     case ZEND_REQUIRE:
@@ -591,9 +596,9 @@ static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_
     return new_op_array;
 }
 
-static Variant include_impl(zend_string *filename, const int type) {
+static Variant include_impl(zend_string *filename, const int type, const char *eval_filename = nullptr) {
     Variant result;
-    zend_op_array *new_op_array = zend_include_or_eval(filename, type);
+    zend_op_array *new_op_array = zend_include_or_eval(filename, type, eval_filename);
 
     if (UNEXPECTED(new_op_array == ZEND_FAKE_OP_ARRAY)) {
         return true;
@@ -616,8 +621,8 @@ Variant include(const String &file, IncludeType type) {
     return include_impl(file.str(), type);
 }
 
-Variant eval(const String &script) {
-    return include_impl(script.str(), ZEND_EVAL);
+Variant eval(const String &script, const char *filename) {
+    return include_impl(script.str(), ZEND_EVAL, filename);
 }
 
 bool equals(const Variant &a, const Variant &b) {
