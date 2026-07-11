@@ -308,6 +308,17 @@ void typephp_write_property_scoped(const php::Variant &object,
         return;
     }
     php::String property_name = member.toString();
+    // Trait properties are inserted into the consuming class. A shared AOT
+    // trait body still carries the trait CE as its source scope, which Zend
+    // cannot use for protected/private visibility checks. Resolve that scope
+    // to the class that actually declares the property.
+    if (scope && (scope->ce_flags & ZEND_ACC_TRAIT)) {
+        auto *property_info = static_cast<zend_property_info *>(
+            zend_hash_find_ptr(&object.object()->ce->properties_info, property_name.str()));
+        if (property_info) {
+            scope = property_info->ce;
+        }
+    }
     zend_class_entry *old_scope = EG(fake_scope);
     EG(fake_scope) = scope;
     try {
