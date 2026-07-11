@@ -102,6 +102,18 @@ static inline auto php_get_create_object_fn(zend_class_entry *ce) {
  */
 extern void typephp_unset_typed_property(zend_object *object, zend_string *member, void **cache_slot);
 
+/** Install TypePHP's cross-version property hook and asymmetric-set handlers. */
+extern void typephp_install_property_handlers(zend_class_entry *class_entry, zend_object_handlers *handlers);
+
+/** Attach per-class handlers after create_object on PHP versions before 8.4. */
+extern zend_object *typephp_attach_property_handlers(zend_object *object, zend_object_handlers *handlers);
+
+/** Write a dynamic property while preserving the AOT source-level class scope. */
+extern void typephp_write_property_scoped(const php::Variant &object,
+                                          const php::Variant &member,
+                                          const php::Variant &value,
+                                          zend_class_entry *scope);
+
 /**
  * Return a typed C++ reference into a static-property (or object-property) zval's
  * value slot, used by the AOT local-ref hoisting optimizer. If the slot was
