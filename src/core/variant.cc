@@ -902,7 +902,7 @@ Variant Variant::unserialize() {
     auto zv = unwrap_ptr();
 
     if (UNEXPECTED(Z_TYPE_P(zv) != IS_STRING)) {
-        zend_type_error("php::Variant::unserialize() expects a string, %s given", zend_zval_value_name(zv));
+        zend_type_error("php::Variant::unserialize() expects a string, %s given", zend_zval_type_name(zv));
         throwErrorIfOccurred();
         return {};
     }
