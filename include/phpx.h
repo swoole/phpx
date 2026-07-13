@@ -755,7 +755,7 @@ class Variant {
     Variant &operator=(const zval *v);
     Variant &operator=(const Variant &v);
     Variant &operator=(Variant *v);
-    Variant &operator=(nullptr_t) {
+    Variant &operator=(std::nullptr_t) {
         destroy();
         ZVAL_NULL(unwrap_ptr());
         return *this;

@@ -18,6 +18,12 @@ static bool ffi_cdata_is_available() {
     return eval("return extension_loaded('ffi') && ini_get('ffi.enable') === '1';").toBool();
 }
 
+TEST(variant, nullptr_assignment) {
+    Variant value = 42;
+    value = nullptr;
+    ASSERT_TRUE(value.isNull());
+}
+
 TEST(variant, zend_string_constructor) {
     // Test Variant(zend_string *s, Ctor method = Ctor::Copy) constructor
 
