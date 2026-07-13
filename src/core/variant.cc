@@ -48,6 +48,14 @@ void Variant::copyFrom(const zval *src) {
             setByteOfStr(Z_STRVAL_P(src)[0]);
         }
     } else {
+        if (UNEXPECTED(isReference() && ZEND_REF_HAS_TYPE_SOURCES(Z_REF_P(ptr())))) {
+            zval value;
+            zval_copy(&value, src);
+            if (UNEXPECTED(zend_try_assign_typed_ref(Z_REF_P(ptr()), &value) == FAILURE)) {
+                throwErrorIfOccurred();
+            }
+            return;
+        }
         auto zv = unwrap_ptr();
         zval tmp = *zv;
         zval_copy(zv, src);
@@ -82,6 +90,21 @@ Variant &Variant::operator=(Variant *v) {
     destroy();
     copyRef(v);
     return *this;
+}
+
+void Variant::rebindReference(const Variant &reference) {
+    if (UNEXPECTED(!reference.isReference())) {
+        throwError("Expected a reference, got %s", reference.typeStr());
+        return;
+    }
+    if (UNEXPECTED(isIndirect())) {
+        throwError("Cannot rebind an indirect value");
+        return;
+    }
+
+    zval old = val;
+    zval_copy(&val, reference.const_ptr());
+    zval_ptr_dtor_safe(&old);
 }
 
 std::string Variant::toStdString() const {
@@ -1225,14 +1248,22 @@ Reference &Reference::operator=(Reference *v) {
 
 Reference &Reference::operator=(const Variant &v) {
     if (&v != this) {
-        destroy();
         if (v.isReference()) {
+            destroy();
             copyRef(v.direct_ptr());
         } else {
             // An unset reference degenerates to a normal variable on reassignment.
             if (UNEXPECTED(!isReference())) {
+                destroy();
                 zval_copy(ptr(), v.direct_ptr());
+            } else if (UNEXPECTED(ZEND_REF_HAS_TYPE_SOURCES(Z_REF_P(ptr())))) {
+                zval value;
+                zval_copy(&value, v.direct_ptr());
+                if (UNEXPECTED(zend_try_assign_typed_ref(Z_REF_P(ptr()), &value) == FAILURE)) {
+                    throwErrorIfOccurred();
+                }
             } else {
+                zval_ptr_dtor(refval());
                 zval_copy(refval(), v.direct_ptr());
             }
         }

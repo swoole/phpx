@@ -755,6 +755,7 @@ class Variant {
     Variant &operator=(const zval *v);
     Variant &operator=(const Variant &v);
     Variant &operator=(Variant *v);
+    void rebindReference(const Variant &reference);
     Variant &operator=(std::nullptr_t) {
         destroy();
         ZVAL_NULL(unwrap_ptr());
@@ -1234,6 +1235,13 @@ class ArrayKeyValue {
     ArrayKeyValue(Variant _key, Variant _value) : key(std::move(_key)), value(std::move(_value)) {}
 };
 
+/**
+ * A non-owning iterator over an Array HashTable.
+ *
+ * Like standard C++ container iterators, it must not outlive its Array and is
+ * invalidated by structural mutation. Use ForeachIterator when PHP foreach
+ * mutation and reference semantics are required.
+ */
 class ArrayIterator {
     zend_array *array_;
     zend_ulong idx_;
@@ -1718,31 +1726,42 @@ class Reference : public Variant {
  * A single-pass cursor over PHP arrays and objects.
  *
  * Traversable objects use their Zend iterator implementation. Plain objects
- * are traversed using the same visible-property snapshot as get_object_vars().
- * Calling next() advances the cursor and caches the current key and value.
+ * traverse their live property table with visibility evaluated in `scope`.
+ * Calling next() advances the cursor; keys are resolved lazily by key().
  */
 class ForeachIterator {
     enum class Mode : uint8_t {
         None,
-        Array,
-        Object,
+        ArraySnapshot,
+        HashTable,
+        ObjectIterator,
     };
 
     Variant iterable_;
     Variant array_;
     Variant key_;
     zend_object_iterator *object_iterator_ = nullptr;
+    HashTable *hash_table_ = nullptr;
+    zend_class_entry *scope_ = nullptr;
     zval *value_ = nullptr;
+    uint32_t hash_iterator_ = UINT32_MAX;
     zend_ulong position_ = 0;
+    zend_ulong current_position_ = 0;
     Mode mode_ = Mode::None;
     bool started_ = false;
     bool by_ref_ = false;
+    bool key_ready_ = false;
+    bool plain_object_ = false;
+    bool declared_property_ = false;
 
-    bool nextArray();
+    bool nextArraySnapshot();
+    bool nextHashTable();
     bool nextObject();
+    bool isPropertyVisible(const Bucket *bucket, const zval *value) const;
+    Variant getHashKey() const;
 
   public:
-    explicit ForeachIterator(const Variant &iterable, bool by_ref = false);
+    explicit ForeachIterator(const Variant &iterable, bool by_ref = false, zend_class_entry *scope = nullptr);
     ~ForeachIterator();
 
     ForeachIterator(const ForeachIterator &) = delete;
@@ -1751,9 +1770,10 @@ class ForeachIterator {
     ForeachIterator &operator=(ForeachIterator &&) = delete;
 
     bool next();
-    Variant key() const;
+    Variant key();
     Variant value() const;
     Reference valueRef();
+    void assignValueRef(Variant &target);
 };
 
 class Box {
