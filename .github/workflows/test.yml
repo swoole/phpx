@@ -65,23 +65,20 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
-          extensions: curl, redis, ffi
+          extensions: embed, curl, redis, ffi
           ini-values: ffi.enable=1
         env:
           fail-fast: true
       - name: Install build dependencies
         run: brew install googletest gmp mpfr redis
-      - name: Build PHP Embed library
+      - name: Locate PHP Embed library
         run: |
-          PHP_VERSION="$(php -r 'echo PHP_VERSION;')"
-          PHP_SOURCE="$RUNNER_TEMP/php-$PHP_VERSION"
-          curl -fsSL "https://www.php.net/distributions/php-$PHP_VERSION.tar.xz" \
-            | tar -xJ -C "$RUNNER_TEMP"
-          cd "$PHP_SOURCE"
-          eval "./configure $(php-config --configure-options) --enable-embed=shared"
-          make --jobs "$(sysctl -n hw.logicalcpu)" sapi/embed/libphp.la
-          test -f "$PHP_SOURCE/sapi/embed/.libs/libphp.dylib"
-          echo "PHP_EMBED_LIB_DIR=$PHP_SOURCE/sapi/embed/.libs" >> "$GITHUB_ENV"
+          PHP_PREFIX="$(php-config --prefix)"
+          PHP_EMBED_LIBRARY="$(find "$PHP_PREFIX" -name 'libphp.dylib' -print -quit)"
+          test -n "$PHP_EMBED_LIBRARY"
+          test -f "$PHP_EMBED_LIBRARY"
+          echo "PHP Embed library: $PHP_EMBED_LIBRARY"
+          echo "PHP_EMBED_LIB_DIR=$(dirname "$PHP_EMBED_LIBRARY")" >> "$GITHUB_ENV"
       - name: Show toolchain information
         run: |
           sw_vers
