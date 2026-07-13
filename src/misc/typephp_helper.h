@@ -1,3 +1,5 @@
+#pragma once
+
 #include <phpx.h>
 #include <phpx_helper.h>
 
