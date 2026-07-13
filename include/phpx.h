@@ -1714,6 +1714,48 @@ class Reference : public Variant {
     Reference &operator=(const Variant &v);
 };
 
+/**
+ * A single-pass cursor over PHP arrays and objects.
+ *
+ * Traversable objects use their Zend iterator implementation. Plain objects
+ * are traversed using the same visible-property snapshot as get_object_vars().
+ * Calling next() advances the cursor and caches the current key and value.
+ */
+class ForeachIterator {
+    enum class Mode : uint8_t {
+        None,
+        Array,
+        Object,
+    };
+
+    Variant iterable_;
+    Variant array_;
+    Variant key_;
+    zend_object_iterator *object_iterator_ = nullptr;
+    zval *value_ = nullptr;
+    zend_ulong position_ = 0;
+    Mode mode_ = Mode::None;
+    bool started_ = false;
+    bool by_ref_ = false;
+
+    bool nextArray();
+    bool nextObject();
+
+  public:
+    explicit ForeachIterator(const Variant &iterable, bool by_ref = false);
+    ~ForeachIterator();
+
+    ForeachIterator(const ForeachIterator &) = delete;
+    ForeachIterator &operator=(const ForeachIterator &) = delete;
+    ForeachIterator(ForeachIterator &&) = delete;
+    ForeachIterator &operator=(ForeachIterator &&) = delete;
+
+    bool next();
+    Variant key() const;
+    Variant value() const;
+    Reference valueRef();
+};
+
 class Box {
   public:
     Box() = default;
