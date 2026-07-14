@@ -1767,6 +1767,24 @@ class Reference : public Variant {
 };
 
 /**
+ * Consume an owned PHP value at a proven last-use site.
+ *
+ * Unlike Variant's move constructor, this helper preserves PHP value
+ * semantics for references and indirect zvals by routing through the safe
+ * move-assignment operator. It is intentionally unavailable for Reference:
+ * callers forwarding a PHP by-reference parameter must preserve its wrapper.
+ */
+template <typename T,
+          std::enable_if_t<std::is_same_v<T, Variant> || std::is_same_v<T, String> ||
+                               std::is_same_v<T, Array> || std::is_same_v<T, Object>,
+                           int> = 0>
+static inline T takeValue(T &source) {
+    T result;
+    static_cast<Variant &>(result) = std::move(static_cast<Variant &>(source));
+    return result;
+}
+
+/**
  * A single-pass cursor over PHP arrays and objects.
  *
  * Traversable objects use their Zend iterator implementation. Plain objects

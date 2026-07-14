@@ -805,6 +805,50 @@ TEST(variant, reference_move_assignment) {
     ASSERT_STREQ(destination.getRefValue().toCString(), "referenced");
 }
 
+TEST(variant, take_value_owned_wrappers) {
+    Variant source("variant value");
+    zend_string *source_string = Z_STR_P(source.unwrap_ptr());
+    Variant value = takeValue(source);
+    ASSERT_TRUE(source.isUndef());
+    ASSERT_EQ(Z_STR_P(value.unwrap_ptr()), source_string);
+    ASSERT_EQ(GC_REFCOUNT(source_string), 1);
+
+    String source_typed_string("string value");
+    zend_string *typed_string = source_typed_string.str();
+    String string_value = takeValue(source_typed_string);
+    ASSERT_TRUE(source_typed_string.isUndef());
+    ASSERT_EQ(string_value.str(), typed_string);
+
+    Array source_array{1, 2};
+    zend_array *array = source_array.array();
+    Array array_value = takeValue(source_array);
+    ASSERT_TRUE(source_array.isUndef());
+    ASSERT_EQ(array_value.array(), array);
+
+    Object source_object = newObject("stdClass");
+    zend_object *object = source_object.object();
+    Object object_value = takeValue(source_object);
+    ASSERT_TRUE(source_object.isUndef());
+    ASSERT_EQ(object_value.object(), object);
+}
+
+TEST(variant, take_value_materializes_reference_and_indirect) {
+    Variant referenced("reference value");
+    Variant reference(&referenced);
+    Variant reference_value = takeValue(reference);
+    ASSERT_TRUE(reference.isReference());
+    ASSERT_FALSE(reference_value.isReference());
+    ASSERT_STREQ(reference_value.toCString(), "reference value");
+
+    Array values{"indirect value"};
+    Variant indirect = values.item(0);
+    Variant indirect_value = takeValue(indirect);
+    ASSERT_TRUE(indirect.isIndirect());
+    ASSERT_FALSE(indirect_value.isIndirect());
+    ASSERT_STREQ(indirect_value.toCString(), "indirect value");
+    ASSERT_STREQ(values.get(0).toCString(), "indirect value");
+}
+
 TEST(variant, concat1) {
     var s("abc");
     // s2 and s point to the same zend_string object
