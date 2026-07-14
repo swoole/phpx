@@ -870,8 +870,8 @@ Variant Variant::pow(const Variant &v) const {
     return calc_op(pow_function, const_ptr(), v.const_ptr());
 }
 
-Variant Variant::concat(const Variant &v) const {
-    return calc_op(concat_function, const_ptr(), v.const_ptr());
+String Variant::concat(const Variant &v) const {
+    return String(calc_op(concat_function, const_ptr(), v.const_ptr()));
 }
 
 void Variant::append(const Variant &v) {

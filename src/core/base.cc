@@ -64,14 +64,14 @@ void echo(Float val) {
     echo("%f", val);
 }
 
-Variant concat(const Variant &a, const Variant &b) {
+String concat(const Variant &a, const Variant &b) {
     return a.concat(b);
 }
 
-Variant concat(const ArgList &args) {
+String concat(const ArgList &args) {
     size_t count = args.size();
     if (count == 0) {
-        return Variant();
+        return String();
     }
 
     if (count == 1) {
@@ -108,7 +108,7 @@ Variant concat(const ArgList &args) {
     }
     *dst = '\0';
 
-    return Variant{result_str, Ctor::Move};
+    return String{result_str, Ctor::Move};
 }
 
 Variant global(const String &name) {

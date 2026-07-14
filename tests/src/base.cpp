@@ -1,7 +1,13 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
 
+#include <type_traits>
+
 using namespace php;
+
+static_assert(std::is_same_v<decltype(concat(ArgList{})), String>);
+static_assert(std::is_same_v<decltype(concat(Variant{}, Variant{})), String>);
+static_assert(std::is_same_v<decltype(Variant{}.concat(Variant{})), String>);
 
 TEST(base, error) {
     error(E_WARNING, "php error: %s, ErrorCode: %d", "hello world", 1001);
@@ -244,13 +250,22 @@ TEST(base, concat) {
     var d = concat({a, " ", b, "\n"});
     ASSERT_STREQ(d.toCString(), "hello world\n");
 
-    var e = concat({});
-    ASSERT_TRUE(e.isNull());
+    auto e = concat(ArgList{});
+    ASSERT_TRUE(e.isString());
+    ASSERT_TRUE(e.empty());
+
+    auto single = concat(ArgList{42});
+    ASSERT_TRUE(single.isString());
+    ASSERT_STREQ(single.data(), "42");
 
     var i = 1990;
     var f = concat({i, " ", 4.04});
     ASSERT_STREQ(f.toCString(), "1990 4.04");
     ASSERT_TRUE(i.isInt());
+
+    auto member = Variant("member").concat(Variant(7));
+    ASSERT_TRUE(member.isString());
+    ASSERT_STREQ(member.data(), "member7");
 }
 
 TEST(base, compare) {

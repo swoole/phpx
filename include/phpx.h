@@ -160,8 +160,8 @@ inline void throwExceptionEx(zend_class_entry *ce, int code, const char *format,
 }
 
 PHPX_API Object catchException();
-PHPX_API Variant concat(const Variant &a, const Variant &b);
-PHPX_API Variant concat(const ArgList &args);
+PHPX_API String concat(const Variant &a, const Variant &b);
+PHPX_API String concat(const ArgList &args);
 PHPX_API void exit(const Variant &status);
 PHPX_API bool same(const Variant &a, const Variant &b);
 PHPX_API bool equals(const Variant &a, const Variant &b);
@@ -1045,7 +1045,7 @@ class Variant {
     // Exponential expression
     Variant pow(const Variant &) const;
     // Concatenates two strings, return new string.
-    Variant concat(const Variant &) const;
+    String concat(const Variant &) const;
     // String: Adding a substring to the end of a string,
     // Array: Appending elements to an array,
     // Object: If there is an offsetSet method, it indicates that elements are being appended.
