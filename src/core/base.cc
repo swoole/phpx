@@ -796,6 +796,48 @@ Variant getStaticProperty(zend_class_entry *ce, uint32_t offset) {
     return Variant{rv, zval_wrap(rv)};
 }
 
+Reference getStaticPropertyRef(const String &class_name, const String &prop) {
+    const auto ce = getClassEntry(class_name);
+    if (UNEXPECTED(!ce)) {
+        throwError("class '%s' is undefined.", class_name.toCString());
+        return {};
+    }
+    return getStaticPropertyRef(ce, prop);
+}
+
+Reference getStaticPropertyRef(zend_class_entry *ce, const String &prop) {
+    auto rv = zend_read_static_property_ex(ce, prop.str(), true);
+    throwErrorIfOccurred();
+    if (rv == nullptr) {
+        return {};
+    }
+    if (Z_TYPE_P(rv) == IS_REFERENCE) {
+        return Reference{rv};
+    }
+
+    Variant member{rv, zval_wrap(rv)};
+    auto ref = member.toReference();
+    auto prop_info = static_cast<zend_property_info *>(zend_hash_find_ptr(&ce->properties_info, prop.str()));
+    if (!prop_info || prop_info == ZEND_WRONG_PROPERTY_INFO) {
+        prop_info = nullptr;
+        void *candidate_ptr;
+        ZEND_HASH_FOREACH_PTR(&ce->properties_info, candidate_ptr) {
+            auto candidate = static_cast<zend_property_info *>(candidate_ptr);
+            if ((candidate->flags & ZEND_ACC_STATIC)
+                && candidate->offset < ce->default_static_members_count
+                && CE_STATIC_MEMBERS(ce) + candidate->offset == rv
+                && zend_string_equals(candidate->name, prop.str())) {
+                prop_info = candidate;
+                break;
+            }
+        } ZEND_HASH_FOREACH_END();
+    }
+    if (prop_info && ZEND_TYPE_IS_SET(prop_info->type)) {
+        ZEND_REF_ADD_TYPE_SOURCE(ref.reference(), prop_info);
+    }
+    return ref;
+}
+
 bool hasStaticProperty(const String &class_name, const String &prop) {
     const auto ce = getClassEntry(class_name);
     if (UNEXPECTED(!ce)) {

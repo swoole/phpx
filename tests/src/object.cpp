@@ -231,6 +231,23 @@ TEST(object, static_property_write_exception) {
     }
 }
 
+TEST(object, static_property_ref_preserves_type_source) {
+    eval("class PhpxStaticTypedRefHolder { public static int $value = 1; }");
+
+    auto ref = getStaticPropertyRef("PhpxStaticTypedRefHolder", "value");
+    ref = 42;
+    ASSERT_EQ(getStaticProperty("PhpxStaticTypedRefHolder", "value"), 42);
+
+    try_call([&ref]() { ref = "invalid"; },
+             "Cannot assign string to reference held by property PhpxStaticTypedRefHolder::$value of type int");
+    ASSERT_EQ(getStaticProperty("PhpxStaticTypedRefHolder", "value"), 42);
+
+    eval("class PhpxPrivateStaticTypedRefHolder { private static int $value = 1; }");
+    auto private_ref = getStaticPropertyRef("PhpxPrivateStaticTypedRefHolder", "value");
+    try_call([&private_ref]() { private_ref = "invalid"; },
+             "Cannot assign string to reference held by property PhpxPrivateStaticTypedRefHolder::$value of type int");
+}
+
 TEST(object, offset_handlers_throw_exceptions) {
     eval(R"(
         class PhpxThrowingArrayAccess implements ArrayAccess {
