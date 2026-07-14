@@ -42,8 +42,9 @@ TEST(base_extra, eval_return_value) {
 // Test concat edge cases
 TEST(base_extra, concat_edge) {
     // Empty list
-    var e = concat({});
-    ASSERT_TRUE(e.isNull());
+    auto e = concat(ArgList{});
+    ASSERT_TRUE(e.isString());
+    ASSERT_TRUE(e.empty());
 
     // Single element
     var s = concat({"hello"});
