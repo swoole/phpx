@@ -713,6 +713,98 @@ TEST(variant, move_ctor) {
     t.print();
 }
 
+TEST(variant, move_assign_owned_value) {
+    Variant source("a non-interned string");
+    zend_string *source_string = Z_STR_P(source.unwrap_ptr());
+    ASSERT_EQ(GC_REFCOUNT(source_string), 1);
+
+    Variant destination("old value");
+    destination = std::move(source);
+
+    ASSERT_TRUE(source.isUndef());
+    ASSERT_TRUE(destination.isString());
+    ASSERT_EQ(Z_STR_P(destination.unwrap_ptr()), source_string);
+    ASSERT_EQ(GC_REFCOUNT(source_string), 1);
+}
+
+TEST(variant, move_assign_self) {
+    Variant value("unchanged");
+    zend_string *string = Z_STR_P(value.unwrap_ptr());
+
+    value = std::move(value);
+
+    ASSERT_STREQ(value.toCString(), "unchanged");
+    ASSERT_EQ(Z_STR_P(value.unwrap_ptr()), string);
+    ASSERT_EQ(GC_REFCOUNT(string), 1);
+}
+
+TEST(variant, move_assign_preserves_indirect_semantics) {
+    Array values{"old"};
+    Variant target = values.item(0);
+    Variant source("new");
+
+    target = std::move(source);
+
+    ASSERT_STREQ(values.get(0).toCString(), "new");
+    ASSERT_STREQ(source.toCString(), "new");
+
+    Variant result;
+    result = std::move(target);
+    ASSERT_STREQ(result.toCString(), "new");
+    ASSERT_TRUE(target.isIndirect());
+    ASSERT_STREQ(values.get(0).toCString(), "new");
+}
+
+TEST(variant, move_assign_preserves_reference_semantics) {
+    Variant referenced("old");
+    Variant target(&referenced);
+    Variant source("new");
+
+    target = std::move(source);
+
+    ASSERT_TRUE(target.isReference());
+    ASSERT_STREQ(referenced.toCString(), "new");
+    ASSERT_STREQ(source.toCString(), "new");
+}
+
+TEST(variant, derived_move_assignment) {
+    String source_string("string value");
+    zend_string *string = source_string.str();
+    String destination_string("old");
+    destination_string = std::move(source_string);
+    ASSERT_TRUE(source_string.isUndef());
+    ASSERT_EQ(destination_string.str(), string);
+
+    Array source_array{1, 2};
+    zend_array *array = source_array.array();
+    Array destination_array{3};
+    destination_array = std::move(source_array);
+    ASSERT_TRUE(source_array.isUndef());
+    ASSERT_EQ(destination_array.array(), array);
+    ASSERT_EQ(destination_array.count(), 2);
+
+    Object source_object = newObject("stdClass");
+    zend_object *object = source_object.object();
+    Object destination_object = newObject("stdClass");
+    destination_object = std::move(source_object);
+    ASSERT_TRUE(source_object.isUndef());
+    ASSERT_EQ(destination_object.object(), object);
+}
+
+TEST(variant, reference_move_assignment) {
+    Variant value("referenced");
+    Reference source = value.toReference();
+    zend_reference *reference = Z_REF_P(source.const_ptr());
+    Reference destination;
+
+    destination = std::move(source);
+
+    ASSERT_TRUE(source.isUndef());
+    ASSERT_TRUE(destination.isReference());
+    ASSERT_EQ(Z_REF_P(destination.const_ptr()), reference);
+    ASSERT_STREQ(destination.getRefValue().toCString(), "referenced");
+}
+
 TEST(variant, concat1) {
     var s("abc");
     // s2 and s point to the same zend_string object
@@ -1018,7 +1110,8 @@ TEST(variant, getPropertyThrowsZendException) {
 }
 
 TEST(variant, unsetPropertyThrowsZendException) {
-    eval("class PhpxReadonlyPropertyHolder { public readonly int $value; public function __construct() { $this->value = 1; } }");
+    eval("class PhpxReadonlyPropertyHolder { public readonly int $value; public function __construct() { $this->value "
+         "= 1; } }");
     auto o = eval("return new PhpxReadonlyPropertyHolder();");
 
     try {

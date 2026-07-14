@@ -758,6 +758,7 @@ class Variant {
     void copyRef(Variant *v);
     Variant &operator=(const zval *v);
     Variant &operator=(const Variant &v);
+    Variant &operator=(Variant &&v);
     Variant &operator=(Variant *v);
     void rebindReference(const Variant &reference);
     Variant &operator=(std::nullptr_t) {
@@ -923,10 +924,12 @@ class Variant {
         return getRefValue();
     }
 
-    void moveTo(zval *dest) {
-        zval_copy_value(dest, &val);
-        val = {};
-    }
+    /**
+     * Transfers this value into unowned zval storage. The destination must not
+     * contain a live value. Indirect values are materialized so the destination
+     * never borrows an array element or object property address.
+     */
+    void moveTo(zval *dest);
 
     void deref() {
         php::deref(direct_ptr());
@@ -1758,6 +1761,7 @@ class Reference : public Variant {
         checkRef();
     }
     Reference &operator=(const Reference &v);
+    Reference &operator=(Reference &&v) noexcept;
     Reference &operator=(Reference *);
     Reference &operator=(const Variant &v);
 };

@@ -16,6 +16,75 @@ TEST(array, tuple_conversion) {
     ASSERT_DOUBLE_EQ(array.get(1).toFloat(), 3.5);
 }
 
+TEST(array, tuple_rvalue_consumes_owned_variants) {
+    auto values = std::make_tuple(Variant("moved"), Variant(42));
+    zend_string *string = Z_STR_P(std::get<0>(values).unwrap_ptr());
+
+    Array array(std::move(values));
+
+    ASSERT_TRUE(std::get<0>(values).isUndef());
+    ASSERT_TRUE(std::get<1>(values).isUndef());
+    ASSERT_EQ(Z_STR_P(array.get(0).unwrap_ptr()), string);
+    ASSERT_STREQ(array.get(0).toCString(), "moved");
+    ASSERT_EQ(array.get(1).toInt(), 42);
+}
+
+TEST(array, tuple_tie_move_assignment_transfers_owned_variants) {
+    auto values = std::make_tuple(Variant("moved"), Variant(42));
+    zend_string *string = Z_STR_P(std::get<0>(values).unwrap_ptr());
+    Variant first;
+    Variant second;
+
+    std::tie(first, second) = std::move(values);
+
+    ASSERT_TRUE(std::get<0>(values).isUndef());
+    ASSERT_TRUE(std::get<1>(values).isUndef());
+    ASSERT_EQ(Z_STR_P(first.unwrap_ptr()), string);
+    ASSERT_EQ(GC_REFCOUNT(string), 1);
+    ASSERT_STREQ(first.toCString(), "moved");
+    ASSERT_EQ(second.toInt(), 42);
+}
+
+TEST(array, tuple_tie_lvalue_assignment_keeps_copy_semantics) {
+    auto values = std::make_tuple(Variant("copied"), Variant(42));
+    zend_string *string = Z_STR_P(std::get<0>(values).unwrap_ptr());
+    Variant first;
+    Variant second;
+
+    std::tie(first, second) = values;
+
+    ASSERT_STREQ(std::get<0>(values).toCString(), "copied");
+    ASSERT_EQ(std::get<1>(values).toInt(), 42);
+    ASSERT_EQ(Z_STR_P(first.unwrap_ptr()), string);
+    ASSERT_EQ(GC_REFCOUNT(string), 2);
+    ASSERT_STREQ(first.toCString(), "copied");
+    ASSERT_EQ(second.toInt(), 42);
+}
+
+TEST(array, append_rvalue_indirect_materializes_value) {
+    Array array{"first"};
+
+    array.append(array.item(0));
+    array[0] = "changed";
+
+    ASSERT_EQ(array.count(), 2);
+    ASSERT_STREQ(array.get(0).toCString(), "changed");
+    ASSERT_STREQ(array.get(1).toCString(), "first");
+}
+
+TEST(array, append_self_creates_value_snapshot) {
+    Array array{1};
+
+    array.append(std::move(array));
+
+    ASSERT_EQ(array.count(), 2);
+    ASSERT_EQ(array.get(0).toInt(), 1);
+    ASSERT_TRUE(array.get(1).isArray());
+    Array snapshot = array.get(1).toArray();
+    ASSERT_EQ(snapshot.count(), 1);
+    ASSERT_EQ(snapshot.get(0).toInt(), 1);
+}
+
 TEST(array, list) {
     Array array;
     array.append(50);

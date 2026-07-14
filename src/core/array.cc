@@ -197,17 +197,26 @@ void Array::set(zend_ulong i, const Variant &v) {
 }
 
 void Array::append(const Variant &v) {
-    auto zv = NO_CONST_Z(v.direct_ptr());
-    Z_TRY_ADDREF_P(zv);
+    zval copied;
+    zval_copy(&copied, v.direct_ptr());
 
     auto zarr = unwrap_ptr();
     SEPARATE_ARRAY(zarr);
-    add_next_index_zval(zarr, zv);
+    add_next_index_zval(zarr, &copied);
 }
 
 void Array::append(Variant &&v) {
+    if (static_cast<Variant *>(this) == &v) {
+        append(static_cast<const Variant &>(v));
+        return;
+    }
+
+    // Moving an indirect wrapper verbatim would store a pointer to an array
+    // bucket or object property. The move constructor materializes such values
+    // before structural array mutation can invalidate the borrowed address.
+    Variant owned(std::move(v));
     zval moved;
-    v.moveTo(&moved);
+    owned.moveTo(&moved);
 
     auto zarr = unwrap_ptr();
     SEPARATE_ARRAY(zarr);

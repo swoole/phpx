@@ -86,10 +86,50 @@ Variant &Variant::operator=(const Variant &v) {
     return *this;
 }
 
+Variant &Variant::operator=(Variant &&v) {
+    if (&v == this) {
+        return *this;
+    }
+
+    // PHP assignment must update indirect values and references rather than
+    // rebind their wrappers. These cases deliberately retain copy semantics,
+    // including typed-reference validation performed by copyFrom().
+    if (isIndirect() || isReference() || v.isIndirect() || v.isReference()) {
+        copyFrom(v.unwrap_ptr());
+        return *this;
+    }
+
+    // Both wrappers own ordinary zvals, so ownership can be transferred
+    // without changing PHP reference semantics or touching refcounts.
+    zval old = val;
+    zval_copy_value(&val, &v.val);
+    ZVAL_UNDEF(&v.val);
+    zval_ptr_dtor_safe(&old);
+    return *this;
+}
+
 Variant &Variant::operator=(Variant *v) {
     destroy();
     copyRef(v);
     return *this;
+}
+
+void Variant::moveTo(zval *dest) {
+    if (dest == &val) {
+        return;
+    }
+
+    if (isIndirect()) {
+        zval *source = direct_ptr();
+        if (dest != source) {
+            zval_copy(dest, source);
+        }
+        ZVAL_UNDEF(&val);
+        return;
+    }
+
+    zval_copy_value(dest, &val);
+    ZVAL_UNDEF(&val);
 }
 
 void Variant::rebindReference(const Variant &reference) {
@@ -1235,6 +1275,16 @@ Reference &Reference::operator=(const Reference &v) {
     if (&v != this) {
         zval_ptr_dtor_safe(&val);
         zval_copy(&val, v.const_ptr());
+    }
+    return *this;
+}
+
+Reference &Reference::operator=(Reference &&v) noexcept {
+    if (&v != this) {
+        zval old = val;
+        zval_copy_value(&val, &v.val);
+        ZVAL_UNDEF(&v.val);
+        zval_ptr_dtor_safe(&old);
     }
     return *this;
 }

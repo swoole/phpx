@@ -512,9 +512,33 @@ TEST(variant_edge, moveTo) {
     var v("hello");
     zval dest;
     v.moveTo(&dest);
+    ASSERT_TRUE(v.isUndef());
     ASSERT_TRUE(Z_TYPE(dest) == IS_STRING);
     ASSERT_STREQ(Z_STRVAL(dest), "hello");
     zval_ptr_dtor(&dest);
+}
+
+TEST(variant_edge, moveTo_materializes_indirect_value) {
+    Array values{"stable"};
+    Variant item = values.item(0);
+    ASSERT_TRUE(item.isIndirect());
+
+    zval dest;
+    item.moveTo(&dest);
+    ASSERT_TRUE(item.isUndef());
+    ASSERT_FALSE(Z_TYPE(dest) == IS_INDIRECT);
+    ASSERT_TRUE(Z_TYPE(dest) == IS_STRING);
+    ASSERT_STREQ(Z_STRVAL(dest), "stable");
+
+    values[0] = "changed";
+    ASSERT_STREQ(Z_STRVAL(dest), "stable");
+    zval_ptr_dtor(&dest);
+}
+
+TEST(variant_edge, moveTo_same_storage_is_noop) {
+    Variant value("stable");
+    value.moveTo(value.ptr());
+    ASSERT_STREQ(value.toCString(), "stable");
 }
 
 // Test offsetExists on object (zend_long)

@@ -170,6 +170,17 @@ TEST(foreach_iterator, typed_property_reference_enforces_type_sources) {
 
     target = 3;
     ASSERT_EQ(iterable.getProperty("value").toInt(), 3);
+
+    Variant moved = 4;
+    target = std::move(moved);
+    ASSERT_EQ(iterable.getProperty("value").toInt(), 4);
+    ASSERT_EQ(moved.toInt(), 4);
+
+    Variant invalid_moved = nullptr;
+    try_call([&target, &invalid_moved]() { target = std::move(invalid_moved); },
+             "Cannot assign null to reference held by property");
+    ASSERT_EQ(iterable.getProperty("value").toInt(), 4);
+    ASSERT_TRUE(invalid_moved.isNull());
 }
 
 TEST(foreach_iterator, readonly_property_rejects_reference) {
