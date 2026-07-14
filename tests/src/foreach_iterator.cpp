@@ -113,8 +113,12 @@ TEST(foreach_iterator, plain_object_uses_live_properties) {
         String key = iterator.key().toString();
         seen.append(key);
         if (key == "a") {
-            iterable.unsetProperty("b");
+            // Append before deleting the pending property. PHP 8.2/8.3 move
+            // hash iterators past a deleted next slot, while PHP 8.4 reuses
+            // that slot. This order exercises live mutation consistently
+            // without depending on the engine's version-specific slot reuse.
             iterable.setProperty("c", 3);
+            iterable.unsetProperty("b");
         }
     }
 
