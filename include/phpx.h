@@ -47,6 +47,8 @@ extern "C" {
 #include <initializer_list>
 #include <stdexcept>
 #include <type_traits>
+#include <tuple>
+#include <utility>
 
 /**
  * All API names must be in lowercase camel case.
@@ -1390,6 +1392,15 @@ class Array : public Variant {
         }
     }
 
+    template <typename Tuple>
+    void copyFromTuple(Tuple &&values) {
+        std::apply(
+            [this](auto &&...value) {
+                (append(Variant(std::forward<decltype(value)>(value))), ...);
+            },
+            std::forward<Tuple>(values));
+    }
+
     void checkArray() {
         if (isNull() || isUndef()) {
             array_init(unwrap_ptr());
@@ -1445,6 +1456,18 @@ class Array : public Variant {
         copyFrom(map);
     }
 
+    template <typename... Ts>
+    Array(const std::tuple<Ts...> &values) {
+        array_init_size(&val, sizeof...(Ts));
+        copyFromTuple(values);
+    }
+
+    template <typename... Ts>
+    Array(std::tuple<Ts...> &&values) {
+        array_init_size(&val, sizeof...(Ts));
+        copyFromTuple(std::move(values));
+    }
+
     Array &operator=(const ArrayList &list);
     Array &operator=(const StrKeyMap &list);
     Array &operator=(const StdStrKeyMap &list);
@@ -1478,10 +1501,25 @@ class Array : public Variant {
         return *this;
     }
 
+    template <typename... Ts>
+    Array &operator=(const std::tuple<Ts...> &values) {
+        rebuild();
+        copyFromTuple(values);
+        return *this;
+    }
+
+    template <typename... Ts>
+    Array &operator=(std::tuple<Ts...> &&values) {
+        rebuild();
+        copyFromTuple(std::move(values));
+        return *this;
+    }
+
     void set(zend_ulong i, const Variant &v);
     void set(const Variant &key, const Variant &v);
     void set(zend_string *str_key, const Variant &v);
     void append(const Variant &v);
+    void append(Variant &&v);
     Variant get(const String &key) const {
         return {zend_hash_find(array(), key.str()), Ctor::CopyRef};
     }

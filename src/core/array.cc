@@ -205,6 +205,15 @@ void Array::append(const Variant &v) {
     add_next_index_zval(zarr, zv);
 }
 
+void Array::append(Variant &&v) {
+    zval moved;
+    v.moveTo(&moved);
+
+    auto zarr = unwrap_ptr();
+    SEPARATE_ARRAY(zarr);
+    add_next_index_zval(zarr, &moved);
+}
+
 bool Array::del(zend_ulong index) {
     auto zarr = unwrap_ptr();
     SEPARATE_ARRAY(zarr);

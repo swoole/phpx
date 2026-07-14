@@ -3,6 +3,19 @@
 
 using namespace php;
 
+TEST(array, tuple_conversion) {
+    auto values = std::make_tuple(42, String("hello"), true);
+    Array array(values);
+    ASSERT_EQ(array.get(0).toInt(), 42);
+    ASSERT_STREQ(array.get(1).toCString(), "hello");
+    ASSERT_TRUE(array.get(2).toBool());
+
+    array = std::make_tuple(String("updated"), 3.5);
+    ASSERT_EQ(array.count(), 2);
+    ASSERT_STREQ(array.get(0).toCString(), "updated");
+    ASSERT_DOUBLE_EQ(array.get(1).toFloat(), 3.5);
+}
+
 TEST(array, list) {
     Array array;
     array.append(50);
