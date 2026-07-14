@@ -13,47 +13,47 @@ extern "C" {
 zend_class_entry *typephp_fiber_generator_ce = nullptr;
 
 static const php::Str &typephp_fiber_str_callback() {
-    static const php::Str name{ZEND_STRL("__typephp_callback"), true};
+    static const php::Str name{ZEND_STRL("callback"), true};
     return name;
 }
 
 static const php::Str &typephp_fiber_str_fiber() {
-    static const php::Str name{ZEND_STRL("__typephp_fiber"), true};
+    static const php::Str name{ZEND_STRL("fiber"), true};
     return name;
 }
 
 static const php::Str &typephp_fiber_str_current() {
-    static const php::Str name{ZEND_STRL("__typephp_current"), true};
+    static const php::Str name{ZEND_STRL("current"), true};
     return name;
 }
 
 static const php::Str &typephp_fiber_str_key() {
-    static const php::Str name{ZEND_STRL("__typephp_key"), true};
+    static const php::Str name{ZEND_STRL("key"), true};
     return name;
 }
 
 static const php::Str &typephp_fiber_str_valid() {
-    static const php::Str name{ZEND_STRL("__typephp_valid"), true};
+    static const php::Str name{ZEND_STRL("valid"), true};
     return name;
 }
 
 static const php::Str &typephp_fiber_str_state() {
-    static const php::Str name{ZEND_STRL("__typephp_state"), true};
+    static const php::Str name{ZEND_STRL("state"), true};
     return name;
 }
 
 static const php::Str &typephp_fiber_str_yield_count() {
-    static const php::Str name{ZEND_STRL("__typephp_yield_count"), true};
+    static const php::Str name{ZEND_STRL("yield_count"), true};
     return name;
 }
 
 static const php::Str &typephp_fiber_str_next_index() {
-    static const php::Str name{ZEND_STRL("__typephp_next_index"), true};
+    static const php::Str name{ZEND_STRL("next_index"), true};
     return name;
 }
 
 static const php::Str &typephp_fiber_str_return_value() {
-    static const php::Str name{ZEND_STRL("__typephp_return_value"), true};
+    static const php::Str name{ZEND_STRL("return_value"), true};
     return name;
 }
 
@@ -582,13 +582,13 @@ void typephp_register_fiber_generator_class() {
     object_handlers.clone_obj = nullptr;
     typephp_fiber_generator_ce->default_object_handlers = &object_handlers;
     zend_class_implements(typephp_fiber_generator_ce, 1, zend_ce_iterator);
-    zend_declare_property_null(typephp_fiber_generator_ce, ZEND_STRL("__typephp_callback"), ZEND_ACC_PRIVATE);
-    zend_declare_property_null(typephp_fiber_generator_ce, ZEND_STRL("__typephp_fiber"), ZEND_ACC_PRIVATE);
-    zend_declare_property_null(typephp_fiber_generator_ce, ZEND_STRL("__typephp_current"), ZEND_ACC_PRIVATE);
-    zend_declare_property_null(typephp_fiber_generator_ce, ZEND_STRL("__typephp_key"), ZEND_ACC_PRIVATE);
-    zend_declare_property_bool(typephp_fiber_generator_ce, ZEND_STRL("__typephp_valid"), false, ZEND_ACC_PRIVATE);
-    zend_declare_property_long(typephp_fiber_generator_ce, ZEND_STRL("__typephp_state"), TYPEPHP_FIBER_GENERATOR_NEW, ZEND_ACC_PRIVATE);
-    zend_declare_property_long(typephp_fiber_generator_ce, ZEND_STRL("__typephp_yield_count"), 0, ZEND_ACC_PRIVATE);
-    zend_declare_property_long(typephp_fiber_generator_ce, ZEND_STRL("__typephp_next_index"), 0, ZEND_ACC_PRIVATE);
-    zend_declare_property_null(typephp_fiber_generator_ce, ZEND_STRL("__typephp_return_value"), ZEND_ACC_PRIVATE);
+    zend_declare_property_null(typephp_fiber_generator_ce, ZEND_STRL("callback"), ZEND_ACC_PRIVATE);
+    zend_declare_property_null(typephp_fiber_generator_ce, ZEND_STRL("fiber"), ZEND_ACC_PRIVATE);
+    zend_declare_property_null(typephp_fiber_generator_ce, ZEND_STRL("current"), ZEND_ACC_PRIVATE);
+    zend_declare_property_null(typephp_fiber_generator_ce, ZEND_STRL("key"), ZEND_ACC_PRIVATE);
+    zend_declare_property_bool(typephp_fiber_generator_ce, ZEND_STRL("valid"), false, ZEND_ACC_PRIVATE);
+    zend_declare_property_long(typephp_fiber_generator_ce, ZEND_STRL("state"), TYPEPHP_FIBER_GENERATOR_NEW, ZEND_ACC_PRIVATE);
+    zend_declare_property_long(typephp_fiber_generator_ce, ZEND_STRL("yield_count"), 0, ZEND_ACC_PRIVATE);
+    zend_declare_property_long(typephp_fiber_generator_ce, ZEND_STRL("next_index"), 0, ZEND_ACC_PRIVATE);
+    zend_declare_property_null(typephp_fiber_generator_ce, ZEND_STRL("return_value"), ZEND_ACC_PRIVATE);
 }
