@@ -52,6 +52,11 @@ static const php::Str &typephp_fiber_str_next_index() {
     return name;
 }
 
+static const php::Str &typephp_fiber_str_return_value() {
+    static const php::Str name{ZEND_STRL("__typephp_return_value"), true};
+    return name;
+}
+
 static const php::Str &typephp_fiber_str_fiber_class() {
     static const php::Str name{ZEND_STRL("Fiber"), true};
     return name;
@@ -257,8 +262,8 @@ php::Var typephp_fiber_yield_from(const php::Var &iterable, bool *closed) {
     bool is_generator = iterator.instanceOf(typephp_fiber_generator_ce) || iterator.instanceOf(zend_ce_generator);
     iterator.call(typephp_fiber_str_rewind());
     while (iterator.call(typephp_fiber_str_valid_method()).toBool()) {
-        php::Var key = iterator.call(typephp_fiber_str_key_method());
         php::Var value = iterator.call(typephp_fiber_str_current_method());
+        php::Var key = iterator.call(typephp_fiber_str_key_method());
         php::Var resume_value;
         bool delegated_throw = false;
         try {
@@ -294,9 +299,33 @@ php::Var typephp_fiber_yield_from(const php::Var &iterable, bool *closed) {
 enum TypephpFiberGeneratorState : zend_long {
     TYPEPHP_FIBER_GENERATOR_NEW = 0,
     TYPEPHP_FIBER_GENERATOR_SUSPENDED = 1,
-    TYPEPHP_FIBER_GENERATOR_CLOSED_RETURNED = 2,
-    TYPEPHP_FIBER_GENERATOR_CLOSED_FAILED = 3,
+    TYPEPHP_FIBER_GENERATOR_RUNNING = 2,
+    TYPEPHP_FIBER_GENERATOR_CLOSED_RETURNED = 3,
+    TYPEPHP_FIBER_GENERATOR_CLOSED_FAILED = 4,
 };
+
+static void typephp_fiber_generator_initialize(php::Object &this_, const php::Var &callback) {
+    this_.set(typephp_fiber_str_callback(), callback);
+    this_.set(typephp_fiber_str_fiber(), nullptr);
+    this_.set(typephp_fiber_str_current(), nullptr);
+    this_.set(typephp_fiber_str_key(), nullptr);
+    this_.set(typephp_fiber_str_valid(), false);
+    this_.set(typephp_fiber_str_state(), static_cast<zend_long>(TYPEPHP_FIBER_GENERATOR_NEW));
+    this_.set(typephp_fiber_str_yield_count(), 0);
+    this_.set(typephp_fiber_str_next_index(), 0);
+    this_.set(typephp_fiber_str_return_value(), nullptr);
+}
+
+php::Object typephp_new_fiber_generator(const php::Var &callback) {
+    php::Object object;
+    if (UNEXPECTED(object_init_ex(object.ptr(), typephp_fiber_generator_ce) != SUCCESS)) {
+        php::throwErrorIfOccurred();
+        return {};
+    }
+    php::throwErrorIfOccurred();
+    typephp_fiber_generator_initialize(object, callback);
+    return object;
+}
 
 static TypephpFiberGeneratorState typephp_fiber_generator_state(const php::Object &this_) {
     return static_cast<TypephpFiberGeneratorState>(this_.get(typephp_fiber_str_state()).toInt());
@@ -308,6 +337,14 @@ static bool typephp_fiber_generator_is_closed(TypephpFiberGeneratorState state) 
 }
 
 static void typephp_fiber_generator_close(php::Object &this_, bool returned) {
+    php::Var return_value;
+    if (returned) {
+        php::Var fiber_value = this_.get(typephp_fiber_str_fiber());
+        if (fiber_value.isObject()) {
+            php::Object fiber = fiber_value;
+            return_value = fiber.call(typephp_fiber_str_get_return());
+        }
+    }
     TypephpFiberGeneratorState state = returned
         ? TYPEPHP_FIBER_GENERATOR_CLOSED_RETURNED
         : TYPEPHP_FIBER_GENERATOR_CLOSED_FAILED;
@@ -315,6 +352,11 @@ static void typephp_fiber_generator_close(php::Object &this_, bool returned) {
     this_.set(typephp_fiber_str_valid(), false);
     this_.set(typephp_fiber_str_current(), nullptr);
     this_.set(typephp_fiber_str_key(), nullptr);
+    this_.set(typephp_fiber_str_return_value(), return_value);
+    // A terminated Fiber retains its callback and captured arguments. Cache
+    // the return value above, then release the execution context immediately.
+    this_.set(typephp_fiber_str_callback(), nullptr);
+    this_.set(typephp_fiber_str_fiber(), nullptr);
 }
 
 static zend_long typephp_fiber_generator_next_index(zend_long key) {
@@ -351,21 +393,29 @@ static void typephp_fiber_generator_advance(
     if (typephp_fiber_generator_is_closed(state)) {
         return;
     }
+    if (UNEXPECTED(state == TYPEPHP_FIBER_GENERATOR_RUNNING)) {
+        php::throwException(zend_ce_error, "Cannot resume an already running generator");
+        return;
+    }
 
     php::Var result;
     try {
         if (state == TYPEPHP_FIBER_GENERATOR_NEW) {
             php::Object fiber = php::newObject(typephp_fiber_str_fiber_class(), {this_.get(typephp_fiber_str_callback())});
             this_.set(typephp_fiber_str_fiber(), fiber);
+            this_.set(typephp_fiber_str_state(), static_cast<zend_long>(TYPEPHP_FIBER_GENERATOR_RUNNING));
             result = fiber.call(typephp_fiber_str_start());
         } else if (throw_value != nullptr) {
             php::Object fiber = this_.get(typephp_fiber_str_fiber());
+            this_.set(typephp_fiber_str_state(), static_cast<zend_long>(TYPEPHP_FIBER_GENERATOR_RUNNING));
             result = fiber.call(typephp_fiber_str_throw(), php::ArgList{*throw_value});
         } else if (send_value != nullptr) {
             php::Object fiber = this_.get(typephp_fiber_str_fiber());
+            this_.set(typephp_fiber_str_state(), static_cast<zend_long>(TYPEPHP_FIBER_GENERATOR_RUNNING));
             result = fiber.call(typephp_fiber_str_resume(), php::ArgList{*send_value});
         } else {
             php::Object fiber = this_.get(typephp_fiber_str_fiber());
+            this_.set(typephp_fiber_str_state(), static_cast<zend_long>(TYPEPHP_FIBER_GENERATOR_RUNNING));
             result = fiber.call(typephp_fiber_str_resume());
         }
     } catch (zend_object *) {
@@ -389,19 +439,11 @@ static void typephp_fiber_generator_advance(
     this_.set(typephp_fiber_str_yield_count(), this_.get(typephp_fiber_str_yield_count()).toInt() + 1);
 }
 
-ZEND_METHOD(TypePHP_FiberGenerator, __construct) {
-    php::Object this_(&execute_data->This);
-    this_.set(typephp_fiber_str_callback(), php::getCallArg(0));
-    this_.set(typephp_fiber_str_fiber(), nullptr);
-    this_.set(typephp_fiber_str_current(), nullptr);
-    this_.set(typephp_fiber_str_key(), nullptr);
-    this_.set(typephp_fiber_str_valid(), false);
-    this_.set(typephp_fiber_str_state(), static_cast<zend_long>(TYPEPHP_FIBER_GENERATOR_NEW));
-    this_.set(typephp_fiber_str_yield_count(), 0);
-    this_.set(typephp_fiber_str_next_index(), 0);
+ZEND_METHOD(FiberGenerator, __construct) {
+    php::throwException(zend_ce_error, "FiberGenerator cannot be directly constructed");
 }
 
-ZEND_METHOD(TypePHP_FiberGenerator, rewind) {
+ZEND_METHOD(FiberGenerator, rewind) {
     php::Object this_(&execute_data->This);
     TypephpFiberGeneratorState state = typephp_fiber_generator_state(this_);
     if (state == TYPEPHP_FIBER_GENERATOR_NEW) {
@@ -414,7 +456,7 @@ ZEND_METHOD(TypePHP_FiberGenerator, rewind) {
     }
 }
 
-ZEND_METHOD(TypePHP_FiberGenerator, next) {
+ZEND_METHOD(FiberGenerator, next) {
     php::Object this_(&execute_data->This);
     bool was_new = typephp_fiber_generator_state(this_) == TYPEPHP_FIBER_GENERATOR_NEW;
     typephp_fiber_generator_advance(this_);
@@ -423,7 +465,7 @@ ZEND_METHOD(TypePHP_FiberGenerator, next) {
     }
 }
 
-ZEND_METHOD(TypePHP_FiberGenerator, send) {
+ZEND_METHOD(FiberGenerator, send) {
     php::Object this_(&execute_data->This);
     php::Var value = php::getCallArg(0, php::null);
     if (typephp_fiber_generator_state(this_) == TYPEPHP_FIBER_GENERATOR_NEW) {
@@ -434,7 +476,7 @@ ZEND_METHOD(TypePHP_FiberGenerator, send) {
     ZVAL_COPY_DEREF(return_value, retval.direct_ptr());
 }
 
-ZEND_METHOD(TypePHP_FiberGenerator, throw) {
+ZEND_METHOD(FiberGenerator, throw) {
     php::Object this_(&execute_data->This);
     if (typephp_fiber_generator_is_closed(typephp_fiber_generator_state(this_))) {
         zval *exception = ZEND_CALL_ARG(execute_data, 1);
@@ -445,24 +487,29 @@ ZEND_METHOD(TypePHP_FiberGenerator, throw) {
     php::Var exception(ZEND_CALL_ARG(execute_data, 1), php::Ctor::Indirect);
     if (typephp_fiber_generator_state(this_) == TYPEPHP_FIBER_GENERATOR_NEW) {
         typephp_fiber_generator_advance(this_);
+        if (typephp_fiber_generator_state(this_) == TYPEPHP_FIBER_GENERATOR_CLOSED_RETURNED) {
+            zval *throwable = ZEND_CALL_ARG(execute_data, 1);
+            Z_TRY_ADDREF_P(throwable);
+            zend_throw_exception_object(throwable);
+            return;
+        }
     }
     typephp_fiber_generator_advance(this_, nullptr, &exception);
     auto retval = this_.get(typephp_fiber_str_current());
     ZVAL_COPY_DEREF(return_value, retval.direct_ptr());
 }
 
-ZEND_METHOD(TypePHP_FiberGenerator, getReturn) {
+ZEND_METHOD(FiberGenerator, getReturn) {
     php::Object this_(&execute_data->This);
     if (typephp_fiber_generator_state(this_) != TYPEPHP_FIBER_GENERATOR_CLOSED_RETURNED) {
         php::throwException(zend_ce_exception, "Cannot get return value of a generator that hasn't returned");
         return;
     }
-    php::Object fiber = this_.get(typephp_fiber_str_fiber());
-    auto retval = fiber.call(typephp_fiber_str_get_return());
+    auto retval = this_.get(typephp_fiber_str_return_value());
     ZVAL_COPY_DEREF(return_value, retval.direct_ptr());
 }
 
-ZEND_METHOD(TypePHP_FiberGenerator, valid) {
+ZEND_METHOD(FiberGenerator, valid) {
     php::Object this_(&execute_data->This);
     if (typephp_fiber_generator_state(this_) == TYPEPHP_FIBER_GENERATOR_NEW) {
         typephp_fiber_generator_advance(this_);
@@ -471,7 +518,7 @@ ZEND_METHOD(TypePHP_FiberGenerator, valid) {
     ZVAL_COPY_DEREF(return_value, retval.direct_ptr());
 }
 
-ZEND_METHOD(TypePHP_FiberGenerator, current) {
+ZEND_METHOD(FiberGenerator, current) {
     php::Object this_(&execute_data->This);
     if (typephp_fiber_generator_state(this_) == TYPEPHP_FIBER_GENERATOR_NEW) {
         typephp_fiber_generator_advance(this_);
@@ -480,7 +527,7 @@ ZEND_METHOD(TypePHP_FiberGenerator, current) {
     ZVAL_COPY_DEREF(return_value, retval.direct_ptr());
 }
 
-ZEND_METHOD(TypePHP_FiberGenerator, key) {
+ZEND_METHOD(FiberGenerator, key) {
     php::Object this_(&execute_data->This);
     if (typephp_fiber_generator_state(this_) == TYPEPHP_FIBER_GENERATOR_NEW) {
         typephp_fiber_generator_advance(this_);
@@ -511,22 +558,29 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_typephp_fiber_generator_throw, 0
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry typephp_fiber_generator_methods[] = {
-    ZEND_ME(TypePHP_FiberGenerator, __construct, arginfo_typephp_fiber_generator_construct, ZEND_ACC_PUBLIC)
-    ZEND_ME(TypePHP_FiberGenerator, rewind, arginfo_typephp_fiber_generator_void, ZEND_ACC_PUBLIC)
-    ZEND_ME(TypePHP_FiberGenerator, next, arginfo_typephp_fiber_generator_void, ZEND_ACC_PUBLIC)
-    ZEND_ME(TypePHP_FiberGenerator, valid, arginfo_typephp_fiber_generator_bool, ZEND_ACC_PUBLIC)
-    ZEND_ME(TypePHP_FiberGenerator, current, arginfo_typephp_fiber_generator_mixed, ZEND_ACC_PUBLIC)
-    ZEND_ME(TypePHP_FiberGenerator, key, arginfo_typephp_fiber_generator_mixed, ZEND_ACC_PUBLIC)
-    ZEND_ME(TypePHP_FiberGenerator, send, arginfo_typephp_fiber_generator_send, ZEND_ACC_PUBLIC)
-    ZEND_ME(TypePHP_FiberGenerator, throw, arginfo_typephp_fiber_generator_throw, ZEND_ACC_PUBLIC)
-    ZEND_ME(TypePHP_FiberGenerator, getReturn, arginfo_typephp_fiber_generator_mixed, ZEND_ACC_PUBLIC)
+    ZEND_ME(FiberGenerator, __construct, arginfo_typephp_fiber_generator_construct, ZEND_ACC_PRIVATE)
+    ZEND_ME(FiberGenerator, rewind, arginfo_typephp_fiber_generator_void, ZEND_ACC_PUBLIC)
+    ZEND_ME(FiberGenerator, next, arginfo_typephp_fiber_generator_void, ZEND_ACC_PUBLIC)
+    ZEND_ME(FiberGenerator, valid, arginfo_typephp_fiber_generator_bool, ZEND_ACC_PUBLIC)
+    ZEND_ME(FiberGenerator, current, arginfo_typephp_fiber_generator_mixed, ZEND_ACC_PUBLIC)
+    ZEND_ME(FiberGenerator, key, arginfo_typephp_fiber_generator_mixed, ZEND_ACC_PUBLIC)
+    ZEND_ME(FiberGenerator, send, arginfo_typephp_fiber_generator_send, ZEND_ACC_PUBLIC)
+    ZEND_ME(FiberGenerator, throw, arginfo_typephp_fiber_generator_throw, ZEND_ACC_PUBLIC)
+    ZEND_ME(FiberGenerator, getReturn, arginfo_typephp_fiber_generator_mixed, ZEND_ACC_PUBLIC)
     ZEND_FE_END
 };
 
 void typephp_register_fiber_generator_class() {
+    static zend_object_handlers object_handlers;
     zend_class_entry ce;
-    INIT_CLASS_ENTRY(ce, "TypePHP\\FiberGenerator", typephp_fiber_generator_methods);
-    typephp_fiber_generator_ce = zend_register_internal_class(&ce);
+    INIT_CLASS_ENTRY(ce, "FiberGenerator", typephp_fiber_generator_methods);
+    typephp_fiber_generator_ce = zend_register_internal_class_with_flags(
+        &ce,
+        nullptr,
+        ZEND_ACC_FINAL | ZEND_ACC_NO_DYNAMIC_PROPERTIES | ZEND_ACC_NOT_SERIALIZABLE);
+    object_handlers = *zend_get_std_object_handlers();
+    object_handlers.clone_obj = nullptr;
+    typephp_fiber_generator_ce->default_object_handlers = &object_handlers;
     zend_class_implements(typephp_fiber_generator_ce, 1, zend_ce_iterator);
     zend_declare_property_null(typephp_fiber_generator_ce, ZEND_STRL("__typephp_callback"), ZEND_ACC_PRIVATE);
     zend_declare_property_null(typephp_fiber_generator_ce, ZEND_STRL("__typephp_fiber"), ZEND_ACC_PRIVATE);
@@ -536,4 +590,5 @@ void typephp_register_fiber_generator_class() {
     zend_declare_property_long(typephp_fiber_generator_ce, ZEND_STRL("__typephp_state"), TYPEPHP_FIBER_GENERATOR_NEW, ZEND_ACC_PRIVATE);
     zend_declare_property_long(typephp_fiber_generator_ce, ZEND_STRL("__typephp_yield_count"), 0, ZEND_ACC_PRIVATE);
     zend_declare_property_long(typephp_fiber_generator_ce, ZEND_STRL("__typephp_next_index"), 0, ZEND_ACC_PRIVATE);
+    zend_declare_property_null(typephp_fiber_generator_ce, ZEND_STRL("__typephp_return_value"), ZEND_ACC_PRIVATE);
 }
