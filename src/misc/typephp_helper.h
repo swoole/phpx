@@ -110,6 +110,58 @@ extern void typephp_install_property_handlers(zend_class_entry *class_entry, zen
 /** Attach per-class handlers after create_object on PHP versions before 8.4. */
 extern zend_object *typephp_attach_property_handlers(zend_object *object, zend_object_handlers *handlers);
 
+/**
+ * Create an AOT object and initialize its runtime property defaults without
+ * exposing PHP-version-specific handler ordering to generated code.
+ *
+ * On PHP < 8.4 the saved allocator must always be used, then the per-class
+ * handlers are attached before initialization. On PHP >= 8.4 a class may use
+ * the standard allocator directly, but must delegate to the saved allocator
+ * when an ancestor owns runtime initialization or custom object storage.
+ */
+template <typename Initializer>
+static inline zend_object *typephp_create_object_with_defaults(
+    zend_class_entry *class_type,
+    zend_object *(*base_create_object)(zend_class_entry *),
+    zend_object_handlers *handlers,
+    bool delegate_to_base_on_php84,
+    Initializer &&initializer) {
+#if PHP_VERSION_ID < 80400
+    (void) delegate_to_base_on_php84;
+    auto *object = base_create_object(class_type);
+    typephp_attach_property_handlers(object, handlers);
+
+    zend_class_entry *saved_fake_scope = EG(fake_scope);
+    EG(fake_scope) = object->ce;
+    try {
+        initializer(object);
+    } catch (...) {
+        EG(fake_scope) = saved_fake_scope;
+        throw;
+    }
+    EG(fake_scope) = saved_fake_scope;
+    return object;
+#else
+    zend_object *object;
+    if (delegate_to_base_on_php84) {
+        object = base_create_object(class_type);
+    } else {
+        object = zend_objects_new(class_type);
+        object_properties_init(object, class_type);
+    }
+
+    object->handlers = const_cast<zend_object_handlers *>(zend_get_std_object_handlers());
+    try {
+        initializer(object);
+    } catch (...) {
+        object->handlers = handlers;
+        throw;
+    }
+    object->handlers = handlers;
+    return object;
+#endif
+}
+
 /** Write a dynamic property while preserving the AOT source-level class scope. */
 extern void typephp_write_property_scoped(const php::Variant &object,
                                           const php::Variant &member,
