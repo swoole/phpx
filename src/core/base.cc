@@ -224,7 +224,6 @@ void augmentException() {
     }
 
     zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_TRACE), trace.ptr());
-
 }
 
 Variant constant(const String &name) {
@@ -538,8 +537,9 @@ Variant call(zend_class_entry *ce, zend_function *func, const ArgList &args, zen
 
 #define ZEND_FAKE_OP_ARRAY ((zend_op_array *) (intptr_t) -1)
 
-static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(
-    zend_string *inc_filename, const int type, const char *eval_filename = nullptr) {
+static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_string *inc_filename,
+                                                                           const int type,
+                                                                           const char *eval_filename = nullptr) {
     zend_op_array *new_op_array = nullptr;
     switch (type) {
     case ZEND_INCLUDE_ONCE:
@@ -783,7 +783,7 @@ Variant getStaticProperty(zend_class_entry *ce, const String &prop) {
     auto rv = zend_read_static_property_ex(ce, prop.str(), true);
     throwErrorIfOccurred();
     if (rv == nullptr) {
-    	return {};
+        return {};
     }
     return {rv, zval_wrap(rv)};
 }
@@ -823,14 +823,13 @@ Reference getStaticPropertyRef(zend_class_entry *ce, const String &prop) {
         void *candidate_ptr;
         ZEND_HASH_FOREACH_PTR(&ce->properties_info, candidate_ptr) {
             auto candidate = static_cast<zend_property_info *>(candidate_ptr);
-            if ((candidate->flags & ZEND_ACC_STATIC)
-                && candidate->offset < ce->default_static_members_count
-                && CE_STATIC_MEMBERS(ce) + candidate->offset == rv
-                && zend_string_equals(candidate->name, prop.str())) {
+            if ((candidate->flags & ZEND_ACC_STATIC) && candidate->offset < ce->default_static_members_count &&
+                CE_STATIC_MEMBERS(ce) + candidate->offset == rv && zend_string_equals(candidate->name, prop.str())) {
                 prop_info = candidate;
                 break;
             }
-        } ZEND_HASH_FOREACH_END();
+        }
+        ZEND_HASH_FOREACH_END();
     }
     if (prop_info && ZEND_TYPE_IS_SET(prop_info->type)) {
         ZEND_REF_ADD_TYPE_SOURCE(ref.reference(), prop_info);

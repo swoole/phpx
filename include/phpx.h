@@ -1397,11 +1397,8 @@ class Array : public Variant {
 
     template <typename Tuple>
     void copyFromTuple(Tuple &&values) {
-        std::apply(
-            [this](auto &&...value) {
-                (append(Variant(std::forward<decltype(value)>(value))), ...);
-            },
-            std::forward<Tuple>(values));
+        std::apply([this](auto &&...value) { (append(Variant(std::forward<decltype(value)>(value))), ...); },
+                   std::forward<Tuple>(values));
     }
 
     void checkArray() {
@@ -1775,8 +1772,8 @@ class Reference : public Variant {
  * callers forwarding a PHP by-reference parameter must preserve its wrapper.
  */
 template <typename T,
-          std::enable_if_t<std::is_same_v<T, Variant> || std::is_same_v<T, String> ||
-                               std::is_same_v<T, Array> || std::is_same_v<T, Object>,
+          std::enable_if_t<std::is_same_v<T, Variant> || std::is_same_v<T, String> || std::is_same_v<T, Array> ||
+                               std::is_same_v<T, Object>,
                            int> = 0>
 static inline T takeValue(T &source) {
     T result;

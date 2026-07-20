@@ -153,19 +153,9 @@ static inline Variant toStream(const Variant &v) {
 static inline void throwExactTypeError(const Variant &v, const char *expected, const char *property = nullptr) {
     if (property) {
         throwExceptionEx(
-            zend_ce_type_error,
-            0,
-            "Cannot assign %s to property %s of type %s",
-            v.typeStr(),
-            property,
-            expected);
+            zend_ce_type_error, 0, "Cannot assign %s to property %s of type %s", v.typeStr(), property, expected);
     } else {
-        throwExceptionEx(
-            zend_ce_type_error,
-            0,
-            "Expected value of type %s, %s given",
-            expected,
-            v.typeStr());
+        throwExceptionEx(zend_ce_type_error, 0, "Expected value of type %s, %s given", expected, v.typeStr());
     }
 }
 

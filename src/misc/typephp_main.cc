@@ -362,10 +362,8 @@ TYPEPHP_RUNTIME_API int typephp_runtime_init(int argc, char **argv) {
             char path_translated[] = "embed";
             cli_register_file_handles();
             SG(request_info).path_translated = path_translated;
-            typephp_runtime_module->request_startup_func(
-                typephp_runtime_module->type,
-                typephp_runtime_module->module_number
-            );
+            typephp_runtime_module->request_startup_func(typephp_runtime_module->type,
+                                                         typephp_runtime_module->module_number);
         } catch (zend_object *e) {
             rc = EG(exit_status);
             if (!zend_is_graceful_exit(e)) {
@@ -389,10 +387,7 @@ TYPEPHP_RUNTIME_API void typephp_runtime_shutdown() {
         return;
     }
 
-    typephp_runtime_module->request_shutdown_func(
-        typephp_runtime_module->type,
-        typephp_runtime_module->module_number
-    );
+    typephp_runtime_module->request_shutdown_func(typephp_runtime_module->type, typephp_runtime_module->module_number);
     module_shutdown(typephp_runtime_module);
     php_embed_shutdown();
 

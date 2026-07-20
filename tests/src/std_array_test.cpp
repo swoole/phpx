@@ -153,7 +153,8 @@ TEST(std_array, count) {
 TEST(std_array, count_exception) {
     try_call([]() { fn::count(12345); }, "count(): Argument #1 ($value) must be of type Countable|array");
     auto plain_object = newObject("stdClass");
-    try_call([&plain_object]() { fn::count(plain_object); }, "count(): Argument #1 ($value) must be of type Countable|array");
+    try_call([&plain_object]() { fn::count(plain_object); },
+             "count(): Argument #1 ($value) must be of type Countable|array");
 
     eval(R"(
         class PhpxStdArrayThrowingCountable implements Countable {

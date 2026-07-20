@@ -38,9 +38,7 @@ TEST(closure, ref) {
 }
 
 TEST(closure, return_reference_capture_as_value) {
-    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &vars_) -> Variant {
-        return vars_.get(0);
-    };
+    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &vars_) -> Variant { return vars_.get(0); };
 
     var v("captured");
     auto f = newClosure(fn, {v.toReference()});

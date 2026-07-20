@@ -120,12 +120,11 @@ extern zend_object *typephp_attach_property_handlers(zend_object *object, zend_o
  * when an ancestor owns runtime initialization or custom object storage.
  */
 template <typename Initializer>
-static inline zend_object *typephp_create_object_with_defaults(
-    zend_class_entry *class_type,
-    zend_object *(*base_create_object)(zend_class_entry *),
-    zend_object_handlers *handlers,
-    bool delegate_to_base_on_php84,
-    Initializer &&initializer) {
+static inline zend_object *typephp_create_object_with_defaults(zend_class_entry *class_type,
+                                                               zend_object *(*base_create_object)(zend_class_entry *),
+                                                               zend_object_handlers *handlers,
+                                                               bool delegate_to_base_on_php84,
+                                                               Initializer &&initializer) {
 #if PHP_VERSION_ID < 80400
     (void) delegate_to_base_on_php84;
     auto *object = base_create_object(class_type);

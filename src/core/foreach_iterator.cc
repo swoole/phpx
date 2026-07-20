@@ -63,10 +63,8 @@ ForeachIterator::ForeachIterator(const Variant &iterable, bool by_ref, zend_clas
                 object_iterator_ = nullptr;
             }
             if (!EG(exception)) {
-                throwExceptionEx(zend_ce_exception,
-                                 0,
-                                 "Object of type %s did not create an Iterator",
-                                 ZSTR_VAL(ce->name));
+                throwExceptionEx(
+                    zend_ce_exception, 0, "Object of type %s did not create an Iterator", ZSTR_VAL(ce->name));
             } else {
                 throwErrorIfOccurred();
             }
