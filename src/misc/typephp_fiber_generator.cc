@@ -554,17 +554,20 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_typephp_fiber_generator_throw, 0
 ZEND_ARG_OBJ_INFO(0, exception, Throwable, 0)
 ZEND_END_ARG_INFO()
 
+// clang-format off
 static const zend_function_entry typephp_fiber_generator_methods[] = {
     ZEND_ME(FiberGenerator, __construct, arginfo_typephp_fiber_generator_construct, ZEND_ACC_PRIVATE)
-        ZEND_ME(FiberGenerator, rewind, arginfo_typephp_fiber_generator_void, ZEND_ACC_PUBLIC)
-            ZEND_ME(FiberGenerator, next, arginfo_typephp_fiber_generator_void, ZEND_ACC_PUBLIC)
-                ZEND_ME(FiberGenerator, valid, arginfo_typephp_fiber_generator_bool, ZEND_ACC_PUBLIC)
-                    ZEND_ME(FiberGenerator, current, arginfo_typephp_fiber_generator_mixed, ZEND_ACC_PUBLIC) ZEND_ME(
-                        FiberGenerator, key, arginfo_typephp_fiber_generator_mixed, ZEND_ACC_PUBLIC)
-                        ZEND_ME(FiberGenerator, send, arginfo_typephp_fiber_generator_send, ZEND_ACC_PUBLIC) ZEND_ME(
-                            FiberGenerator, throw, arginfo_typephp_fiber_generator_throw, ZEND_ACC_PUBLIC)
-                            ZEND_ME(FiberGenerator, getReturn, arginfo_typephp_fiber_generator_mixed, ZEND_ACC_PUBLIC)
-                                ZEND_FE_END};
+    ZEND_ME(FiberGenerator, rewind, arginfo_typephp_fiber_generator_void, ZEND_ACC_PUBLIC)
+    ZEND_ME(FiberGenerator, next, arginfo_typephp_fiber_generator_void, ZEND_ACC_PUBLIC)
+    ZEND_ME(FiberGenerator, valid, arginfo_typephp_fiber_generator_bool, ZEND_ACC_PUBLIC)
+    ZEND_ME(FiberGenerator, current, arginfo_typephp_fiber_generator_mixed, ZEND_ACC_PUBLIC)
+	ZEND_ME(FiberGenerator, key, arginfo_typephp_fiber_generator_mixed, ZEND_ACC_PUBLIC)
+    ZEND_ME(FiberGenerator, send, arginfo_typephp_fiber_generator_send, ZEND_ACC_PUBLIC)
+	ZEND_ME(FiberGenerator, throw, arginfo_typephp_fiber_generator_throw, ZEND_ACC_PUBLIC)
+    ZEND_ME(FiberGenerator, getReturn, arginfo_typephp_fiber_generator_mixed, ZEND_ACC_PUBLIC)
+    ZEND_FE_END
+};
+// clang-format on
 
 void typephp_register_fiber_generator_class() {
     static zend_object_handlers object_handlers;
