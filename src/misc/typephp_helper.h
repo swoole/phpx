@@ -6,6 +6,25 @@
 #include <zend_attributes.h>
 #include <cstdlib>
 
+#if defined(_WIN32)
+#define TYPEPHP_SYMBOL_EXPORT __declspec(dllexport)
+#define TYPEPHP_SYMBOL_IMPORT __declspec(dllimport)
+#elif defined(__GNUC__) && __GNUC__ >= 4
+#define TYPEPHP_SYMBOL_EXPORT __attribute__((visibility("default")))
+#define TYPEPHP_SYMBOL_IMPORT __attribute__((visibility("default")))
+#else
+#define TYPEPHP_SYMBOL_EXPORT
+#define TYPEPHP_SYMBOL_IMPORT
+#endif
+
+#if defined(__GNUC__) || defined(__clang__)
+#define TYPEPHP_HOT_ATTRIBUTE __attribute__((hot))
+#define TYPEPHP_COLD_ATTRIBUTE __attribute__((cold))
+#else
+#define TYPEPHP_HOT_ATTRIBUTE
+#define TYPEPHP_COLD_ATTRIBUTE
+#endif
+
 extern zend_class_entry *php_get_class(int class_id, const php::Str &class_name);
 extern zend_function *php_get_func(int func_id, const php::Str &func_name);
 extern zend_function *php_get_method(int func_id,
