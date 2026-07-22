@@ -19,7 +19,7 @@
 #define TYPEPHP_SYMBOL_IMPORT
 #endif
 
-using typephp_attribute_value_factory = php::Var (*)();
+using typephp_attribute_value_factory = php::Var (*)(php::Bool describe);
 
 /** Mark one persistent attribute argument for request-time value materialization. */
 void typephp_attribute_set_lazy_value_argument(zend_attribute *attribute,

@@ -42,7 +42,7 @@ static bool materialize_lazy_arguments(zval *arguments) {
 
         typephp_attribute_value_factory factory = get_lazy_factory(value);
         ZEND_ASSERT(factory != nullptr);
-        php::Var materialized = factory();
+        php::Var materialized = factory(false);
         if (UNEXPECTED(EG(exception))) {
             return changed;
         }
@@ -231,6 +231,15 @@ static zend_result instantiate_attribute(zend_class_entry *class_entry,
 }
 
 static zend_result format_attribute_value(smart_str *buffer, zval *value) {
+    if (is_lazy_value_argument(value)) {
+        typephp_attribute_value_factory factory = get_lazy_factory(value);
+        php::Var description = factory(true);
+        if (UNEXPECTED(EG(exception)) || !description.isString()) {
+            return FAILURE;
+        }
+        smart_str_append(buffer, Z_STR_P(description.ptr()));
+        return SUCCESS;
+    }
     if (smart_str_append_zval(buffer, value, SIZE_MAX) == SUCCESS) {
         return SUCCESS;
     }
@@ -349,10 +358,20 @@ static void typephp_reflection_to_string(INTERNAL_FUNCTION_PARAMETERS) {
     }
 
     zval arguments;
-    bool had_lazy_value = false;
-    if (!get_materialized_arguments(Z_OBJ_P(ZEND_THIS), &arguments, &had_lazy_value)) {
+    ZVAL_UNDEF(&arguments);
+    original_get_arguments(execute_data, &arguments);
+    if (EG(exception) || Z_TYPE(arguments) != IS_ARRAY) {
         RETURN_THROWS();
     }
+    bool had_lazy_value = false;
+    zval *argument_value;
+    ZEND_HASH_FOREACH_VAL(Z_ARRVAL(arguments), argument_value) {
+        if (is_lazy_value_argument(argument_value)) {
+            had_lazy_value = true;
+            break;
+        }
+    }
+    ZEND_HASH_FOREACH_END();
     if (!had_lazy_value) {
         zval_ptr_dtor(&arguments);
         original_to_string(INTERNAL_FUNCTION_PARAM_PASSTHRU);
