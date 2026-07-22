@@ -4,6 +4,8 @@
 #include <phpx_helper.h>
 
 #include <zend_attributes.h>
+#include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 
 #if defined(_WIN32)
@@ -16,6 +18,17 @@
 #define TYPEPHP_SYMBOL_EXPORT
 #define TYPEPHP_SYMBOL_IMPORT
 #endif
+
+using typephp_attribute_value_factory = php::Var (*)();
+
+/** Mark one persistent attribute argument for request-time value materialization. */
+void typephp_attribute_set_lazy_value_argument(zend_attribute *attribute,
+                                               uint32_t argument_index,
+                                               typephp_attribute_value_factory factory);
+
+/** Install/uninstall TypePHP's ReflectionAttribute lazy-argument handlers. */
+zend_result typephp_install_reflection_attribute_handlers();
+void typephp_uninstall_reflection_attribute_handlers();
 
 #if defined(__GNUC__) || defined(__clang__)
 #define TYPEPHP_HOT_ATTRIBUTE __attribute__((hot))
