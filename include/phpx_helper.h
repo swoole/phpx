@@ -60,6 +60,10 @@ static inline bool equals(Int a, Float b) {
     return equals(static_cast<Float>(a), b);
 }
 
+static inline bool equals(Bool a, Bool b) {
+    return a == b;
+}
+
 static inline Int toInt(Int v) {
     return v;
 }
