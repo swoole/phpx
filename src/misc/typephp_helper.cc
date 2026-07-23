@@ -470,9 +470,9 @@ zend_result typephp_install_reflection_attribute_handlers() {
     original_new_instance = reflection_new_instance->handler;
     original_to_string = reflection_to_string->handler;
 
-    reflection_get_arguments->handler = typephp_reflection_get_arguments;
-    reflection_new_instance->handler = typephp_reflection_new_instance;
-    reflection_to_string->handler = typephp_reflection_to_string;
+    reflection_get_arguments->handler = reinterpret_cast<zif_handler>(typephp_reflection_get_arguments);
+    reflection_new_instance->handler = reinterpret_cast<zif_handler>(typephp_reflection_new_instance);
+    reflection_to_string->handler = reinterpret_cast<zif_handler>(typephp_reflection_to_string);
     return SUCCESS;
 }
 
@@ -481,13 +481,16 @@ void typephp_uninstall_reflection_attribute_handlers() {
         return;
     }
 
-    if (reflection_get_arguments != nullptr && reflection_get_arguments->handler == typephp_reflection_get_arguments) {
+    if (reflection_get_arguments != nullptr &&
+        reflection_get_arguments->handler == reinterpret_cast<zif_handler>(typephp_reflection_get_arguments)) {
         reflection_get_arguments->handler = original_get_arguments;
     }
-    if (reflection_new_instance != nullptr && reflection_new_instance->handler == typephp_reflection_new_instance) {
+    if (reflection_new_instance != nullptr &&
+        reflection_new_instance->handler == reinterpret_cast<zif_handler>(typephp_reflection_new_instance)) {
         reflection_new_instance->handler = original_new_instance;
     }
-    if (reflection_to_string != nullptr && reflection_to_string->handler == typephp_reflection_to_string) {
+    if (reflection_to_string != nullptr &&
+        reflection_to_string->handler == reinterpret_cast<zif_handler>(typephp_reflection_to_string)) {
         reflection_to_string->handler = original_to_string;
     }
 
