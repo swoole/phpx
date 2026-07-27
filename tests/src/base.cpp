@@ -49,6 +49,22 @@ TEST(base, constant2) {
     ASSERT_TRUE(c8.isNull());
 }
 
+TEST(base, constant_namespace_fallback) {
+    define("PHPX_GLOBAL_FALLBACK_ONLY", "global");
+    define("PhpX\\Runtime\\PHPX_NAMESPACE_VALUE", "namespaced");
+    define("PHPX_NAMESPACE_VALUE", "wrong-global");
+
+    auto global = constant(
+        "PhpX\\Runtime\\PHPX_GLOBAL_FALLBACK_ONLY",
+        ConstantLookup::UnqualifiedInNamespace);
+    ASSERT_STREQ(global.toCString(), "global");
+
+    auto namespaced = constant(
+        "PhpX\\Runtime\\PHPX_NAMESPACE_VALUE",
+        ConstantLookup::UnqualifiedInNamespace);
+    ASSERT_STREQ(namespaced.toCString(), "namespaced");
+}
+
 TEST(base, echo) {
     echo("php error: %s, ErrorCode: %d\n", "hello world", 1001);
 

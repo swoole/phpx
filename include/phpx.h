@@ -95,7 +95,11 @@ PHPX_API void echo(const Variant &val);
 PHPX_API void echo(Int val);
 PHPX_API void echo(Float val);
 PHPX_API Variant global(const String &name);
+enum class ConstantLookup {
+    UnqualifiedInNamespace,
+};
 PHPX_API Variant constant(const String &name);
+PHPX_API Variant constant(const String &name, ConstantLookup lookup);
 PHPX_API Variant constant(const String &cls, const String &name);
 PHPX_API Variant constant(zend_class_entry *ce, const String &name);
 PHPX_API bool updateConstant(const String &cls, const String &name, const Variant &data);

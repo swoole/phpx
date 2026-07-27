@@ -232,6 +232,19 @@ Variant constant(const String &name) {
     return Variant{c};
 }
 
+Variant constant(const String &name, ConstantLookup lookup) {
+    uint32_t flags = ZEND_FETCH_CLASS_EXCEPTION;
+    if (lookup == ConstantLookup::UnqualifiedInNamespace) {
+        flags |= IS_CONSTANT_UNQUALIFIED_IN_NAMESPACE;
+    }
+    auto c = zend_get_constant_ex(
+        name.str(),
+        zend_get_executed_scope(),
+        flags);
+    throwErrorIfOccurred();
+    return Variant{c};
+}
+
 Variant constant(const String &cls, const String &name) {
     auto c = zend_get_class_constant_ex(cls.str(), name.str(), getClassEntrySafe(cls), ZEND_FETCH_CLASS_SILENT);
     throwErrorIfOccurred();
