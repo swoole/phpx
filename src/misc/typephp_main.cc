@@ -366,10 +366,16 @@ TYPEPHP_RUNTIME_API int typephp_runtime_init(int argc, char **argv) {
                                                          typephp_runtime_module->module_number);
         } catch (zend_object *e) {
             rc = EG(exit_status);
-            if (!zend_is_graceful_exit(e)) {
-                CG(unclean_shutdown) = 1;
+            if (Z_TYPE(EG(user_exception_handler)) != IS_UNDEF && !zend_is_unwind_exit(e) &&
+                !zend_is_graceful_exit(e)) {
+                zend_user_exception_handler();
+                if (EG(exception)) {
+                    zend_exception_error(e, E_ERROR);
+                }
+            } else {
                 zend_exception_error(e, E_ERROR);
             }
+            CG(unclean_shutdown) = 1;
         }
     }
     zend_end_try();
