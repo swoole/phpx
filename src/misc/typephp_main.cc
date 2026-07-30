@@ -10,6 +10,8 @@ BEGIN_EXTERN_C()
 #include "ps_title.h"
 END_EXTERN_C()
 
+#include "class/swoole.h"
+
 extern zend_module_entry *php_embed_get_module();
 
 void module_init(zend_module_entry *module) {
@@ -347,7 +349,27 @@ TYPEPHP_RUNTIME_API int typephp_runtime_init(int argc, char **argv) {
     }
 
     php_embed_init(argc, argv);
-    php::throw_impl = [](zend_object *ex) { throw ex; };
+    php::throw_impl = [](zend_object *ex) {
+        EG(exception) = nullptr;
+        /**
+         * It is necessary to detect whether the execution is occurring within a coroutine context.
+         * In such cases, because the C stack has already been switched, the exception cannot be
+         * captured by the surrounding try...catch block. Consequently, the exception should not be
+         * thrown directly; rather, it should be delegated to the Zend VM for proper handling.
+         */
+        long env_swoole = php::Swoole::Coroutine_::getCid().toInt();
+        if (env_swoole > 0) {
+            EG(exception) = ex;
+            return;
+        }
+
+        // Clear any exception that getCid() may have produced
+        if (UNEXPECTED(EG(exception))) {
+            OBJ_RELEASE(EG(exception));
+            EG(exception) = ex;
+        }
+        throw ex;
+    };
 
     typephp_runtime_module = php_embed_get_module();
     module_init(typephp_runtime_module);
