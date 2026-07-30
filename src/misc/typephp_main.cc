@@ -213,7 +213,7 @@ static bool reject_asymmetric_property_write(zend_object *object, zend_string *m
     static const char private_prefix[] = "__typephp_property_private_set_";
     static const char protected_prefix[] = "__typephp_property_protected_set_";
     zend_function *visibility = find_property_helper(object, member, private_prefix, sizeof(private_prefix) - 1);
-    const zend_class_entry *scope = EG(fake_scope);
+    auto *scope = EG(fake_scope);
     if (visibility != nullptr && scope != visibility->common.scope) {
         zend_throw_error(nullptr,
                          "Cannot modify private(set) property %s::$%s",
@@ -319,7 +319,7 @@ void typephp_write_property_scoped(const php::Variant &object,
             scope = property_info->ce;
         }
     }
-    const zend_class_entry *old_scope = EG(fake_scope);
+    auto *old_scope = EG(fake_scope);
     EG(fake_scope) = scope;
     try {
         object.object()->handlers->write_property(
