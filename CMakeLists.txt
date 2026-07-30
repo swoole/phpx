@@ -360,6 +360,7 @@ if (IS_WINDOWS)
         PHP_EXPORTS
         ZEND_WIN32
         PHP_WIN32
+        ENABLE_INTSAFE_SIGNED_FUNCTIONS
         ZEND_DEBUG=0
         $<$<BOOL:${ZTS_ENABLED}>:ZTS>
     )
