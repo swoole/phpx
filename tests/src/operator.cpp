@@ -2,6 +2,8 @@
 #include "phpx_func.h"
 #include "phpx_helper.h"
 
+#include <type_traits>
+
 using namespace php;
 
 // Test all arithmetic operators (+, -, *, /, %)
@@ -274,20 +276,25 @@ TEST(operator_comparison, all_operators) {
     // Equal operator test
     {
         Variant v1(10);
-        ASSERT_FALSE((5 == v1).toBool());
-        ASSERT_TRUE((10 == v1).toBool());
-        ASSERT_FALSE((15 == v1).toBool());
+        static_assert(std::is_same_v<decltype(10 == v1), bool>);
+        static_assert(std::is_same_v<decltype(v1 == 10), bool>);
+        ASSERT_FALSE(5 == v1);
+        ASSERT_TRUE(10 == v1);
+        ASSERT_FALSE(15 == v1);
+        ASSERT_FALSE(v1 == 5);
+        ASSERT_TRUE(v1 == 10);
+        ASSERT_FALSE(v1 == 15);
 
         // Test different type comparison
         Variant v2("10");
-        ASSERT_TRUE((10 == v2).toBool());
-        ASSERT_TRUE(("10" == v2).toBool());
-        ASSERT_FALSE((11 == v2).toBool());
+        ASSERT_TRUE(10 == v2);
+        ASSERT_TRUE("10" == v2);
+        ASSERT_FALSE(11 == v2);
 
         // Test floating point equality
         Variant v3(3.14);
-        ASSERT_TRUE((3.14 == v3).toBool());
-        ASSERT_FALSE((3.15 == v3).toBool());
+        ASSERT_TRUE(3.14 == v3);
+        ASSERT_FALSE(3.15 == v3);
     }
 }
 

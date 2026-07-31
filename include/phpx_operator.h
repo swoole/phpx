@@ -94,7 +94,7 @@ static inline Variant operator>(T a, const Variant &b) {
 }
 
 template <typename T>
-static inline Variant operator==(T a, const Variant &b) {
+static inline bool operator==(T a, const Variant &b) {
     return Variant(a) == b;
 }
 }  // namespace php
