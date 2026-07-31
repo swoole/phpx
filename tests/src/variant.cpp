@@ -1672,14 +1672,14 @@ TEST(variant, operator_comparison) {
     // Test equality operator
     {
         Variant v1(10);
-        ASSERT_FALSE((5 == v1).toBool());
-        ASSERT_TRUE((10 == v1).toBool());
-        ASSERT_FALSE((15 == v1).toBool());
+        ASSERT_FALSE(5 == v1);
+        ASSERT_TRUE(10 == v1);
+        ASSERT_FALSE(15 == v1);
 
         // Test with different types
         Variant v2("10");
-        ASSERT_TRUE((10 == v2).toBool());
-        ASSERT_TRUE(("10" == v2).toBool());
+        ASSERT_TRUE(10 == v2);
+        ASSERT_TRUE("10" == v2);
     }
 }
 
