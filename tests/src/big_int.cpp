@@ -31,6 +31,16 @@ TEST(bigint, construct_from_int) {
     ASSERT_EQ(bi_ptr->value.get_si(), 42);
 }
 
+TEST(bigint, construct_from_php_int_boundaries_without_string_conversion) {
+    auto minimum = php::toBigInt(ZEND_LONG_MIN);
+    auto maximum = php::toBigInt(ZEND_LONG_MAX);
+
+    ASSERT_EQ(BigInt::toString(minimum).toString(), std::to_string(ZEND_LONG_MIN));
+    ASSERT_EQ(BigInt::toString(maximum).toString(), std::to_string(ZEND_LONG_MAX));
+    ASSERT_EQ(BigInt::toInt(minimum).toInt(), ZEND_LONG_MIN);
+    ASSERT_EQ(BigInt::toInt(maximum).toInt(), ZEND_LONG_MAX);
+}
+
 TEST(bigint, construct_negative) {
     auto a = bi("-9999999999999999999");
     auto *bi_ptr = a.toBox<BigInt>();
@@ -521,4 +531,48 @@ TEST(bigint, chained_operations) {
     auto *bi_ptr = result.toBox<BigInt>();
     ASSERT_NE(bi_ptr, nullptr);
     ASSERT_EQ(bi_ptr->value, 50);
+}
+
+TEST(bigint, conversions_check_numeric_value_and_range) {
+    auto zero = php::toBigInt((php::Int) 0);
+    auto one = php::toBigInt((php::Int) 1);
+    ASSERT_FALSE(BigInt::toBool(zero).toBool());
+    ASSERT_TRUE(BigInt::toBool(one).toBool());
+
+    auto tooLarge = BigInt::newInstance(Variant("9223372036854775808"));
+    bool exception_caught = false;
+    try {
+        (void) BigInt::toInt(tooLarge);
+    } catch (zend_object *ex) {
+        exception_caught = true;
+        auto exception = catchException();
+        ASSERT_TRUE(exception.instanceOf(zend_ce_arithmetic_error));
+    }
+    ASSERT_TRUE(exception_caught);
+}
+
+TEST(bigint, rejects_exponent_outside_unsigned_long_range) {
+    auto base = php::toBigInt((php::Int) 2);
+    auto exponent = BigInt::newInstance(Variant("18446744073709551616"));
+    bool exception_caught = false;
+    try {
+        (void) BigInt::pow(base, exponent);
+    } catch (zend_object *ex) {
+        exception_caught = true;
+        auto exception = catchException();
+        ASSERT_TRUE(exception.instanceOf(zend_ce_value_error));
+    }
+    ASSERT_TRUE(exception_caught);
+}
+
+TEST(bigint, invalid_numeric_string_throws_value_error) {
+    bool exception_caught = false;
+    try {
+        (void) BigInt::newInstance(Variant("not-an-integer"));
+    } catch (zend_object *ex) {
+        exception_caught = true;
+        auto exception = catchException();
+        ASSERT_TRUE(exception.instanceOf(zend_ce_value_error));
+    }
+    ASSERT_TRUE(exception_caught);
 }

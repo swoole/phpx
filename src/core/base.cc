@@ -18,6 +18,8 @@
 #include "phpx_scope_guard.h"
 
 namespace php {
+void initDecimalContext();
+
 const char *box_res_name = "php::box";
 DebugInfo debug_info{
     false,
@@ -319,6 +321,7 @@ void request_init() {
     if (request_active) {
         return;
     }
+    initDecimalContext();
     request_active = true;
     if (box_res_id == 0) {
         box_res_id = zend_register_list_destructors_ex(box_dtor, nullptr, box_res_name, 0);

@@ -311,3 +311,60 @@ TEST(bigfloat, chained_operations) {
     ASSERT_NE(bf, nullptr);
     ASSERT_NEAR(BigFloat::toFloat(result).toFloat(), 56.0, 0.01);
 }
+
+TEST(bigfloat, preserves_precision_beyond_double) {
+    auto large = BigFloat::newInstance(Variant("1000000000000000000000000000000"));
+    auto one = BigFloat::newInstance(Variant("1"));
+    auto sum = BigFloat::add(large, one);
+    auto result = BigFloat::sub(sum, large);
+
+    ASSERT_EQ(BigFloat::toString(result).toString(), "1");
+    ASSERT_GE(mpfr_get_prec(result.toBox<BigFloat>()->value), 256);
+}
+
+TEST(bigfloat, invalid_numeric_string_throws_value_error) {
+    bool exception_caught = false;
+    try {
+        (void) BigFloat::newInstance(Variant("not-a-number"));
+    } catch (zend_object *ex) {
+        exception_caught = true;
+        auto exception = catchException();
+        ASSERT_TRUE(exception.instanceOf(zend_ce_value_error));
+    }
+    ASSERT_TRUE(exception_caught);
+}
+
+TEST(bigfloat, conversions_and_division_check_boundaries) {
+    auto zero = BigFloat::newInstance(Variant("0"));
+    auto one = BigFloat::newInstance(Variant("1"));
+    ASSERT_FALSE(BigFloat::toBool(zero).toBool());
+    ASSERT_TRUE(BigFloat::toBool(one).toBool());
+
+    bool division_exception = false;
+    try {
+        (void) BigFloat::div(one, zero);
+    } catch (zend_object *ex) {
+        division_exception = true;
+        auto exception = catchException();
+        ASSERT_TRUE(exception.instanceOf(zend_ce_division_by_zero_error));
+    }
+    ASSERT_TRUE(division_exception);
+
+    auto tooLarge = BigFloat::newInstance(Variant("1e100"));
+    bool range_exception = false;
+    try {
+        (void) BigFloat::toInt(tooLarge);
+    } catch (zend_object *ex) {
+        range_exception = true;
+        auto exception = catchException();
+        ASSERT_TRUE(exception.instanceOf(zend_ce_arithmetic_error));
+    }
+    ASSERT_TRUE(range_exception);
+}
+
+TEST(bigfloat, huge_exponent_uses_bounded_scientific_notation) {
+    auto huge = BigFloat::newInstance(Variant("1e1000001"));
+    auto output = BigFloat::toString(huge).toString();
+    ASSERT_LT(output.length(), 100u);
+    ASSERT_NE(std::strstr(output.data(), "E1000001"), nullptr);
+}

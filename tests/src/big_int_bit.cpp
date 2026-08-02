@@ -277,3 +277,33 @@ TEST(bigint_bit, is_power_of_two) {
     auto result = BigInt::bitAnd(pow, pow_minus_1);
     ASSERT_EQ(BigInt::toInt(result).toInt(), 0);
 }
+
+TEST(bigint_bit, shift_right_negative_odd_value_uses_arithmetic_shift) {
+    auto value = bi(-3);
+    auto result = BigInt::bitShiftRight(value, Variant((php::Int) 1));
+    ASSERT_EQ(BigInt::toInt(result).toInt(), -2);
+}
+
+TEST(bigint_bit, negative_bit_index_and_popcount_throw) {
+    auto positive = bi(1);
+    bool index_exception = false;
+    try {
+        (void) BigInt::testBit(positive, Variant((php::Int) -1));
+    } catch (zend_object *ex) {
+        index_exception = true;
+        auto exception = catchException();
+        ASSERT_TRUE(exception.instanceOf(zend_ce_value_error));
+    }
+    ASSERT_TRUE(index_exception);
+
+    auto negative = bi(-1);
+    bool popcount_exception = false;
+    try {
+        (void) BigInt::popCount(negative);
+    } catch (zend_object *ex) {
+        popcount_exception = true;
+        auto exception = catchException();
+        ASSERT_TRUE(exception.instanceOf(zend_ce_value_error));
+    }
+    ASSERT_TRUE(popcount_exception);
+}

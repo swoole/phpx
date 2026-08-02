@@ -32,6 +32,7 @@ class Decimal : public Box {
     static Variant toString(Variant a);
     static Variant toInt(Variant a);
     static Variant toFloat(Variant a);
+    static Variant toBool(Variant a);
     static Variant toBigInt(Variant a);
 };
 

@@ -910,18 +910,7 @@ class Variant {
         return static_cast<T *>(_ptr);
     }
     template <class T>
-    T *toBox() {
-        if (UNEXPECTED(!isResource())) {
-            throwError("This variant is not a resource type.");
-            return nullptr;
-        }
-        auto res = Z_RES_P(unwrap_ptr());
-        if (UNEXPECTED(res->type != getBoxResourceId())) {
-            throwError("This resource is not type of `%s`.", box_res_name);
-            return nullptr;
-        }
-        return static_cast<T *>(res->ptr);
-    }
+    T *toBox();
     Reference toReference();
     Variant getRefValue() const;
     Variant operator*() const {
@@ -1857,6 +1846,26 @@ class Box {
     uint32_t extra_info = 0;
     virtual ~Box() = default;
 };
+
+template <class T>
+T *Variant::toBox() {
+    static_assert(std::is_base_of_v<Box, T>, "T must derive from php::Box");
+    if (UNEXPECTED(!isResource())) {
+        throwError("This variant is not a resource type.");
+        return nullptr;
+    }
+    auto res = Z_RES_P(unwrap_ptr());
+    if (UNEXPECTED(res->type != getBoxResourceId())) {
+        throwError("This resource is not type of `%s`.", box_res_name);
+        return nullptr;
+    }
+    auto *typed_box = dynamic_cast<T *>(static_cast<Box *>(res->ptr));
+    if (UNEXPECTED(typed_box == nullptr)) {
+        throwError("This box resource has an unexpected concrete type.");
+        return nullptr;
+    }
+    return typed_box;
+}
 
 template <typename ContainerType>
 class StdContainerBox : public Box {

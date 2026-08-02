@@ -1,5 +1,7 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
+#include "phpx_big_int.h"
+#include "phpx_decimal.h"
 
 using namespace php;
 
@@ -43,4 +45,22 @@ TEST(box, create) {
         catchException();
     }
     ASSERT_EQ(box3, nullptr);
+}
+
+TEST(box, rejects_wrong_concrete_box_type) {
+    auto bigint = php::toBigInt((php::Int) 42);
+    Decimal *decimal = nullptr;
+    bool exception_caught = false;
+
+    try {
+        decimal = bigint.toBox<Decimal>();
+    } catch (zend_object *ex) {
+        exception_caught = true;
+        auto exception = catchException();
+        ASSERT_TRUE(exception.instanceOf(zend_ce_error));
+    }
+
+    ASSERT_EQ(decimal, nullptr);
+    ASSERT_TRUE(exception_caught);
+    ASSERT_EQ(bigint.toBox<BigInt>()->value, 42);
 }

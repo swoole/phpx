@@ -58,6 +58,19 @@ TEST(decimal, newInstance_from_int) {
     ASSERT_EQ(Decimal::toInt(v).toInt(), 100);
 }
 
+TEST(decimal, request_init_restores_default_precision) {
+    decimal::context.prec(7);
+    request_shutdown();
+    request_init();
+
+    ASSERT_EQ(decimal::context.prec(), 50);
+
+    auto one = Decimal::newInstance(Variant(1));
+    auto seven = Decimal::newInstance(Variant(7));
+    auto result = Decimal::div(one, seven);
+    ASSERT_EQ(Decimal::toString(result).toString(), "0.14285714285714285714285714285714285714285714285714");
+}
+
 // ============ Arithmetic ============
 
 TEST(decimal, add) {
@@ -305,4 +318,43 @@ TEST(decimal, chained_operations) {
     auto *d = result.toBox<Decimal>();
     ASSERT_NE(d, nullptr);
     ASSERT_NEAR(Decimal::toFloat(result).toFloat(), 56.0, 0.01);
+}
+
+TEST(decimal, arithmetic_preserves_fifty_digits) {
+    auto a = Decimal::newInstance(Variant("1234567890123456789012345678901234567890123456789"));
+    auto result = Decimal::add(a, Variant(1));
+
+    ASSERT_EQ(Decimal::toString(result).toString(), "1234567890123456789012345678901234567890123456790");
+}
+
+TEST(decimal, exceptions_do_not_escape_cpp_boundary) {
+    auto one = Decimal::newInstance(Variant(1));
+    auto zero = Decimal::newInstance(Variant(0));
+    bool division_by_zero_caught = false;
+
+    try {
+        (void) Decimal::div(one, zero);
+    } catch (zend_object *ex) {
+        division_by_zero_caught = true;
+        auto exception = catchException();
+        ASSERT_TRUE(exception.instanceOf(zend_ce_division_by_zero_error));
+    }
+    ASSERT_TRUE(division_by_zero_caught);
+
+    bool invalid_value_caught = false;
+    try {
+        (void) Decimal::newInstance(Variant("not-a-decimal"));
+    } catch (zend_object *ex) {
+        invalid_value_caught = true;
+        auto exception = catchException();
+        ASSERT_TRUE(exception.instanceOf(zend_ce_value_error));
+    }
+    ASSERT_TRUE(invalid_value_caught);
+}
+
+TEST(decimal, boolean_conversion_uses_numeric_value) {
+    auto zero = Decimal::newInstance(Variant("0.00"));
+    auto nonzero = Decimal::newInstance(Variant("-0.01"));
+    ASSERT_FALSE(Decimal::toBool(zero).toBool());
+    ASSERT_TRUE(Decimal::toBool(nonzero).toBool());
 }

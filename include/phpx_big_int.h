@@ -5,12 +5,34 @@
 
 namespace php {
 
+namespace detail {
+
+static inline void setBigIntFromPhpInt(mpz_class &result, php::Int value) noexcept {
+    using UnsignedInt = std::make_unsigned_t<php::Int>;
+
+    const bool negative = value < 0;
+    const UnsignedInt magnitude = negative ? UnsignedInt(-(value + 1)) + UnsignedInt(1) : UnsignedInt(value);
+
+    mpz_import(result.get_mpz_t(), 1, 1, sizeof(magnitude), 0, 0, &magnitude);
+    if (negative) {
+        mpz_neg(result.get_mpz_t(), result.get_mpz_t());
+    }
+}
+
+}  // namespace detail
+
 class BigInt : public Box {
   public:
     mpz_class value;
     BigInt() = default;
-    explicit BigInt(const String &s) : value(s.data()) {}
-    explicit BigInt(php::Int v) : value((signed long) v) {}
+    explicit BigInt(const String &s) {
+        if (UNEXPECTED(value.set_str(s.data(), 0) != 0)) {
+            throwException(zend_ce_value_error, "Invalid BigInt numeric string");
+        }
+    }
+    explicit BigInt(php::Int v) {
+        detail::setBigIntFromPhpInt(value, v);
+    }
 
     static Variant newInstance(Variant s);
     static Variant add(Variant a, Variant b);
@@ -38,6 +60,7 @@ class BigInt : public Box {
     static Variant toString(Variant a);
     static Variant toInt(Variant a);
     static Variant toFloat(Variant a);
+    static Variant toBool(Variant a);
     static Variant toBigDecimal(Variant a);
 };
 
