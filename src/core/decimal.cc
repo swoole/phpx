@@ -137,6 +137,10 @@ Variant Decimal::mod(Variant a, Variant b) {
         if (UNEXPECTED(!extractDecimal(a, va) || !extractDecimal(b, vb))) {
             return nullptr;
         }
+        if (vb.value->iszero()) {
+            throwException(zend_ce_division_by_zero_error, "Modulo by zero");
+            return nullptr;
+        }
         auto result = std::make_unique<Decimal>();
         uint32_t status = 0;
         mpd_qrem(result->value.get(), va.value->getconst(), vb.value->getconst(), decimal::context.getconst(), &status);

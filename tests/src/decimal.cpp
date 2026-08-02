@@ -171,6 +171,21 @@ TEST(decimal, mod) {
     ASSERT_NEAR(Decimal::toFloat(r).toFloat(), 1.0, 0.01);
 }
 
+TEST(decimal, mod_by_zero_throws_division_by_zero_error) {
+    auto one = php::toDecimal((php::Int) 1);
+    auto zero = php::toDecimal((php::Int) 0);
+    bool caught = false;
+
+    try {
+        (void) Decimal::mod(one, zero);
+    } catch (zend_object *ex) {
+        caught = true;
+        auto exception = catchException();
+        ASSERT_TRUE(exception.instanceOf(zend_ce_division_by_zero_error));
+    }
+    ASSERT_TRUE(caught);
+}
+
 TEST(decimal, mod_exact) {
     auto a = php::toDecimal("100.0");
     auto b = php::toDecimal("20.0");
