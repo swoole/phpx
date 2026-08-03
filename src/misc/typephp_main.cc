@@ -365,14 +365,20 @@ TYPEPHP_RUNTIME_API int typephp_runtime_init(int argc, char **argv) {
             typephp_runtime_module->request_startup_func(typephp_runtime_module->type,
                                                          typephp_runtime_module->module_number);
         } catch (zend_object *e) {
-            rc = EG(exit_status);
             if (!zend_is_graceful_exit(e)) {
                 CG(unclean_shutdown) = 1;
                 zend_exception_error(e, E_ERROR);
             }
+            rc = EG(exit_status);
         }
     }
     zend_end_try();
+
+    if (rc == 0) {
+        // A fatal error bails out (longjmp) and bypasses the C++ catch above,
+        // so the exit status recorded by the error handler is the fallback.
+        rc = EG(exit_status);
+    }
 
     if (rc != 0) {
         return rc;
