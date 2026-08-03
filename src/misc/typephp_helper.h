@@ -115,7 +115,7 @@ static inline void appendCallExtraNamedArgs(Array &args) {
 }
 };  // namespace php
 
-extern const char *php_get_called_class(php::Object &this_);
+extern php::Str php_get_called_class(php::Object &this_);
 extern zend_class_entry *php_get_called_ce(php::Object &this_);
 extern php::Scope php_switch_scope(php::Object &this_);
 extern void php_restore_scope(php::Scope &ori_scope);

@@ -27,12 +27,12 @@ void module_init(zend_module_entry *module) {
     }
 }
 
-const char *php_get_called_class(php::Object &this_) {
+php::Str php_get_called_class(php::Object &this_) {
     auto ce = php_get_called_ce(this_);
     if (ce) {
-        return ce->name->val;
+        return php::Str(ce->name);
     } else {
-        return "";
+        return php::Str("");
     }
 }
 
