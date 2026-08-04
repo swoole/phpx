@@ -42,6 +42,12 @@ enum Operation {
     PropertyFetch,
 };
 
+enum class AttrMode {
+    Update,  // read in a write/indirect-modification context
+    Get,     // plain property read (invokes __get)
+    Isset,   // isset()/empty() semantics (invokes __isset)
+};
+
 enum ZvalType {
     TYPE_UNDEF = IS_UNDEF,
     TYPE_NULL = IS_NULL,

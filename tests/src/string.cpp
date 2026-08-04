@@ -222,7 +222,7 @@ TEST(string, update) {
 
 TEST(string, assign) {
     String s;
-    s = php::toInt(100L);
+    s = php::toInt((php::Int) 100L);
     ASSERT_STREQ(s.toCString(), "100");
 
     s = 3.0;

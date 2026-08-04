@@ -684,7 +684,7 @@ bool empty(const Variant &v, const OperationChain &list, Variant &tmp) {
                 return true;
             } else {
                 Object o(tmp);
-                tmp = o.attr(expr.second);
+                tmp = o.attr(expr.second, AttrMode::Isset);
             }
         } else {
             abort();
@@ -739,7 +739,7 @@ bool exists(const Variant &v, const OperationChain &list, Variant &tmp) {
                 return false;
             } else {
                 Object o(tmp);
-                tmp = o.attr(expr.second);
+                tmp = o.attr(expr.second, AttrMode::Isset);
                 if (tmp.isNull() || tmp.isUndef()) {
                     return false;
                 }

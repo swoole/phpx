@@ -4,18 +4,18 @@
 
 TEST(same, int_comparison) {
     // Test same integers
-    ASSERT_TRUE(php::same(5L, 5L));
-    ASSERT_TRUE(php::same(-10L, -10L));
-    ASSERT_TRUE(php::same(0L, 0L));
+    ASSERT_TRUE(php::same((php::Int) 5L, (php::Int) 5L));
+    ASSERT_TRUE(php::same((php::Int) -10L, (php::Int) -10L));
+    ASSERT_TRUE(php::same((php::Int) 0L, (php::Int) 0L));
     ASSERT_TRUE(php::same((php::Int) LONG_MAX, (php::Int) LONG_MAX));
     ASSERT_TRUE(php::same((php::Int) LONG_MIN, (php::Int) LONG_MIN));
 
     // Test different integers
-    ASSERT_FALSE(php::same(5L, 10L));
-    ASSERT_FALSE(php::same(-5L, 5L));
-    ASSERT_FALSE(php::same(0L, 1L));
+    ASSERT_FALSE(php::same((php::Int) 5L, (php::Int) 10L));
+    ASSERT_FALSE(php::same((php::Int) -5L, (php::Int) 5L));
+    ASSERT_FALSE(php::same((php::Int) 0L, (php::Int) 1L));
     ASSERT_FALSE(php::same((php::Int) LONG_MAX, (php::Int) LONG_MIN));
-    ASSERT_FALSE(php::same(100L, -100L));
+    ASSERT_FALSE(php::same((php::Int) 100L, (php::Int) -100L));
 }
 
 TEST(same, float_comparison) {
@@ -97,7 +97,7 @@ TEST(same, edge_cases) {
     ASSERT_FALSE(php::same(DBL_MAX, -DBL_MAX));
 
     // Various representations of zero
-    ASSERT_TRUE(php::same(0L, 0L));
+    ASSERT_TRUE(php::same((php::Int) 0L, (php::Int) 0L));
     ASSERT_TRUE(php::same(0.0, 0.0));
     ASSERT_TRUE(php::same(-0.0, -0.0));
     ASSERT_TRUE(php::same(-0.0, 0.0));  // In IEEE 754, -0.0 == 0.0

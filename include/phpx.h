@@ -958,8 +958,8 @@ class Variant {
     Reference itemRef(const Variant &key);
     Variant newItem();
     Reference attrRef(const String &name);
-    Variant attr(const Variant &name, bool update = false) const;
-    Variant attr(uintptr_t offset, bool update = false) const {
+    Variant attr(const Variant &name, AttrMode mode = AttrMode::Get) const;
+    Variant attr(uintptr_t offset, AttrMode mode = AttrMode::Get) const {
         auto member_p = OBJ_PROP(object(), offset);
         return Variant{member_p, zval_wrap(member_p)};
     }

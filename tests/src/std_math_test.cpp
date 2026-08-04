@@ -13,8 +13,8 @@ TEST(std_math, abs) {
     var c = 199;
     ASSERT_EQ(fn::abs(c).toInt(), 199);
 
-    ASSERT_EQ(fn::abs(-100L), 100L);
-    ASSERT_EQ(fn::abs(100L), 100L);
+    ASSERT_EQ(fn::abs((php::Int) -100L), (php::Int) 100L);
+    ASSERT_EQ(fn::abs((php::Int) 100L), (php::Int) 100L);
 
     ASSERT_EQ(fn::abs(-100.09), 100.09);
     ASSERT_EQ(fn::abs(100.09), 100.09);

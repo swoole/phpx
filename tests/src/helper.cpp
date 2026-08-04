@@ -46,8 +46,8 @@ TEST(helper, instanceOf) {
 }
 
 TEST(helper, same) {
-    ASSERT_TRUE(php::same(2.0, 2L));
-    ASSERT_TRUE(php::same(3L, 3.0));
+    ASSERT_TRUE(php::same(2.0, static_cast<Int>(2L)));
+    ASSERT_TRUE(php::same(static_cast<Int>(3L), 3.0));
 }
 
 TEST(helper, clone) {

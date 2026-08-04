@@ -6,7 +6,7 @@
 using namespace php;
 
 TEST(exists, basic) {
-    ASSERT_TRUE(exists(100L));
+    ASSERT_TRUE(exists((Int) 100L));
     ASSERT_TRUE(exists(100.1002));
     ASSERT_TRUE(exists(true));
     ASSERT_TRUE(exists(false));

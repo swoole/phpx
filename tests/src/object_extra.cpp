@@ -428,7 +428,7 @@ TEST(object_extra, attr_newItem_empty_array_property) {
     auto obj = newObject("stdClass");
     Array inner;
     obj.set("emptylist", inner);
-    obj.attr("emptylist", true).newItem() = "first";
+    obj.attr("emptylist", AttrMode::Update).newItem() = "first";
     auto prop = obj.get("emptylist");
     ASSERT_TRUE(prop.isArray());
     Array inner_arr(prop);

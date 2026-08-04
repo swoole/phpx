@@ -579,7 +579,7 @@ TEST(object, attr) {
     prop1 = arr;
     ASSERT_TRUE(o1.getProperty("prop1").isArray());
 
-    auto prop2 = o1.attr("prop2", true);
+    auto prop2 = o1.attr("prop2", AttrMode::Update);
     prop2 = 9898;
 
     ASSERT_EQ(o1.getProperty("prop2").toInt(), 9898);
@@ -589,28 +589,28 @@ TEST(object, array_property_via_attr) {
     auto o1 = newObject("stdClass");
     o1.set("prop", create_list());
     o1.set("propInt", 999);
-    o1.attr("prop", true).newItem() = 1899;
+    o1.attr("prop", AttrMode::Update).newItem() = 1899;
 
     auto prop1 = o1.get("prop");
     ASSERT_EQ(prop1.offsetGet(5).toInt(), 1899);
 
-    o1.attr("prop", true).item(5, true) = 2026;
+    o1.attr("prop", AttrMode::Update).item(5, true) = 2026;
 
     auto prop2 = o1.get("prop");
     ASSERT_EQ(prop2.offsetGet(5).toInt(), 2026);
 
-    o1.attr("prop", true).item("6", true) = "erlang";
+    o1.attr("prop", AttrMode::Update).item("6", true) = "erlang";
     auto prop3 = o1.get("prop");
     ASSERT_STREQ(prop3.offsetGet(6).toCString(), "erlang");
 
-    try_call([&]() { o1.attr("propInt", true).newItem() = 1899; }, "Only array/object support the newItem() method");
+    try_call([&]() { o1.attr("propInt", AttrMode::Update).newItem() = 1899; }, "Only array/object support the newItem() method");
 }
 
 TEST(object, array_property_map_via_attr) {
     auto o1 = newObject("stdClass");
     o1.set("prop", create_map());
     o1.set("propInt", 999);
-    o1.attr("prop", true).item("php", true) = 2999;
+    o1.attr("prop", AttrMode::Update).item("php", true) = 2999;
 
     auto prop1 = o1.get("prop");
     ASSERT_EQ(prop1.offsetGet("php").toInt(), 2999);
@@ -678,7 +678,7 @@ TEST(object, non_existent_attr_operations) {
     ASSERT_TRUE(nonExistentAttr2.isNull());
 
     // Test attr() with update=true for non-existent properties
-    auto newAttr1 = obj.attr("new_prop", true);
+    auto newAttr1 = obj.attr("new_prop", AttrMode::Update);
     newAttr1 = 2003;
     ASSERT_EQ(obj.get("new_prop").toInt(), 2003);
 
@@ -760,7 +760,7 @@ TEST(object, custom_class_non_existent_operations) {
 
     // Test with update on custom class
     try {
-        auto newAttr = obj.attr("dynamically_added_prop", true);
+        auto newAttr = obj.attr("dynamically_added_prop", AttrMode::Update);
         ASSERT_TRUE(newAttr.isNull() || newAttr.isUndef() || newAttr.isReference());
     } catch (...) {
         SUCCEED() << "Custom class attr with update threw exception";
@@ -812,7 +812,7 @@ TEST(object, move_ctor) {
     Object obj(tmp.value.obj, Ctor::Move);
     ASSERT_TRUE(obj.isObject());
 
-    obj.attr("test", true) = 2025;
+    obj.attr("test", AttrMode::Update) = 2025;
     ASSERT_EQ(obj.get("test").toInt(), 2025);
 }
 
@@ -821,7 +821,7 @@ TEST(object, copy_ctor) {
     ASSERT_TRUE(o1.isObject());
 
     Object o2(o1.object(), Ctor::Copy);
-    o2.attr("test", true) = 2025;
+    o2.attr("test", AttrMode::Update) = 2025;
 
     ASSERT_EQ(o1.get("test").toInt(), 2025);
     ASSERT_EQ(o2.get("test").toInt(), 2025);
@@ -858,7 +858,7 @@ TEST(object, call) {
 
 TEST(object, call_args_on_indirect_property_object) {
     auto holder = newObject("stdClass");
-    holder.attr("inner", true) = newObject("DateTime", {"2000-01-01"});
+    holder.attr("inner", AttrMode::Update) = newObject("DateTime", {"2000-01-01"});
 
     Args args;
     args.append("Y-m-d H:i:s");

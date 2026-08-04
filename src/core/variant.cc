@@ -1132,7 +1132,7 @@ Reference Variant::itemRef(const Variant &key) {
 }
 
 Reference Variant::attrRef(const String &prop_name) {
-    auto member = attr(prop_name, true);
+    auto member = attr(prop_name, AttrMode::Update);
     if (zval_is_ref(member.const_ptr())) {
         return Reference(member.const_ptr());
     } else if (!member.isIndirect()) {
@@ -1151,7 +1151,7 @@ Reference Variant::attrRef(const String &prop_name) {
     return ref;
 }
 
-Variant Variant::attr(const Variant &name, bool update) const {
+Variant Variant::attr(const Variant &name, AttrMode mode) const {
     if (UNEXPECTED(!isObject())) {
         throwError("Attempt to read property `%s` on %s", name.toCString(), typeStr());
         return {};
@@ -1159,10 +1159,14 @@ Variant Variant::attr(const Variant &name, bool update) const {
 
     auto prop_name = name.toString();
     zval rv;
-    auto member_p = zend_read_property_ex(ce(), object(), prop_name.str(), true, &rv);
+    // Get uses BP_VAR_R (silent=false): a plain read invokes __get directly
+    // and never __isset. Update/Isset use BP_VAR_IS (silent=true), matching
+    // isset()/empty() semantics where __isset is consulted first.
+    bool silent = (mode != AttrMode::Get);
+    auto member_p = zend_read_property_ex(ce(), object(), prop_name.str(), silent, &rv);
     throwErrorIfOccurred();
 
-    if (zval_is_null(member_p) && update) {
+    if (zval_is_null(member_p) && mode == AttrMode::Update) {
         do {
             auto old_scope = EG(fake_scope);
             ON_SCOPE_EXIT(EG(fake_scope) = old_scope);
