@@ -174,6 +174,7 @@ TEST(object_extra, propertyExists_modes) {
     ASSERT_TRUE(obj.propertyExists("name", PROP_ISSET));
     ASSERT_TRUE(obj.propertyExists("empty_str", PROP_ISSET));
     ASSERT_TRUE(obj.propertyExists("zero", PROP_ISSET));
+    ASSERT_FALSE(obj.propertyExists("null_val", PROP_ISSET));
 
     // PROP_EMPTY - property is not empty (truthy)
     ASSERT_FALSE(obj.propertyExists("null_val", PROP_EMPTY));

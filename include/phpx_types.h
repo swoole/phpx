@@ -45,7 +45,7 @@ enum Operation {
 enum class AttrMode {
     Update,  // read in a write/indirect-modification context
     Get,     // plain property read (invokes __get)
-    Isset,   // isset()/empty() semantics (invokes __isset)
+    Isset,   // BP_VAR_IS read for empty() and intermediate isset() traversal
 };
 
 enum ZvalType {

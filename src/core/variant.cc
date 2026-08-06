@@ -1110,7 +1110,7 @@ Variant Variant::item(const Variant &key, bool update) {
 }
 
 Reference Variant::itemRef(zend_long offset) {
-    auto v = item(offset);
+    auto v = item(offset, true);
     if (zval_is_ref(v.const_ptr())) {
         return Reference(v.const_ptr());
     } else if (!v.isIndirect()) {
@@ -1121,7 +1121,7 @@ Reference Variant::itemRef(zend_long offset) {
 }
 
 Reference Variant::itemRef(const Variant &key) {
-    auto v = item(key);
+    auto v = item(key, true);
     if (zval_is_ref(v.const_ptr())) {
         return Reference(v.const_ptr());
     } else if (!v.isIndirect()) {
@@ -1159,11 +1159,22 @@ Variant Variant::attr(const Variant &name, AttrMode mode) const {
 
     auto prop_name = name.toString();
     zval rv;
-    // Get uses BP_VAR_R (silent=false): a plain read invokes __get directly
-    // and never __isset. Update/Isset use BP_VAR_IS (silent=true), matching
-    // isset()/empty() semantics where __isset is consulted first.
-    bool silent = (mode != AttrMode::Get);
-    auto member_p = zend_read_property_ex(ce(), object(), prop_name.str(), silent, &rv);
+    zval *member_p;
+    if (mode == AttrMode::Update) {
+        // zend_read_property_ex() only exposes BP_VAR_R and BP_VAR_IS. Indirect
+        // modification must use BP_VAR_RW so overloaded properties invoke
+        // __get() directly and can return a writable reference.
+        do {
+            auto old_scope = EG(fake_scope);
+            ON_SCOPE_EXIT(EG(fake_scope) = old_scope);
+            EG(fake_scope) = ce();
+            member_p = object()->handlers->read_property(object(), prop_name.str(), BP_VAR_RW, nullptr, &rv);
+        } while (0);
+    } else {
+        // BP_VAR_IS is needed by empty() and by intermediate property reads in
+        // an isset() chain. A final isset() uses has_property() instead.
+        member_p = zend_read_property_ex(ce(), object(), prop_name.str(), mode == AttrMode::Isset, &rv);
+    }
     throwErrorIfOccurred();
 
     if (zval_is_null(member_p) && mode == AttrMode::Update) {

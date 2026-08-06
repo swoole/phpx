@@ -606,6 +606,37 @@ TEST(object, array_property_via_attr) {
     try_call([&]() { o1.attr("propInt", AttrMode::Update).newItem() = 1899; }, "Only array/object support the newItem() method");
 }
 
+TEST(object, update_magic_property_uses_read_write_context) {
+    eval(R"PHP(
+        class PhpxUpdateMagicProbe {
+            private array $values = [];
+            public int $issetCalls = 0;
+            public int $getCalls = 0;
+
+            public function __isset(string $name): bool {
+                ++$this->issetCalls;
+                return false;
+            }
+            public function &__get(string $name): mixed {
+                ++$this->getCalls;
+                return $this->values[$name];
+            }
+            public function value(string $name): mixed {
+                return $this->values[$name] ?? null;
+            }
+        }
+    )PHP");
+
+    auto probe = newObject("PhpxUpdateMagicProbe");
+    probe.attr("value", AttrMode::Update).newItem() = 42;
+
+    ASSERT_EQ(probe.attr("issetCalls").toInt(), 0);
+    ASSERT_EQ(probe.attr("getCalls").toInt(), 1);
+    auto value = probe.call("value", {"value"});
+    ASSERT_TRUE(value.isArray());
+    ASSERT_EQ(value.offsetGet(0).toInt(), 42);
+}
+
 TEST(object, array_property_map_via_attr) {
     auto o1 = newObject("stdClass");
     o1.set("prop", create_map());

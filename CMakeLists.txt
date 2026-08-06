@@ -269,15 +269,23 @@ if (APPLE)
     SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
     message(STATUS "macOS linker flags: ${CMAKE_SHARED_LINKER_FLAGS}")
 
-    # Homebrew library paths (Apple Silicon: /opt/homebrew, Intel: /usr/local)
-    if(EXISTS "/opt/homebrew")
-        link_directories(/opt/homebrew/lib)
-        include_directories(/opt/homebrew/include)
-        message(STATUS "Using Homebrew (Apple Silicon): /opt/homebrew")
-    elseif(EXISTS "/usr/local/opt")
-        link_directories(/usr/local/lib)
-        include_directories(/usr/local/include)
-        message(STATUS "Using Homebrew (Intel): /usr/local")
+    # Query the brew selected by PATH so native, Rosetta and custom-prefix
+    # installations use libraries for the active toolchain.
+    find_program(HOMEBREW_EXECUTABLE brew)
+    if(HOMEBREW_EXECUTABLE)
+        execute_process(
+            COMMAND ${HOMEBREW_EXECUTABLE} --prefix
+            RESULT_VARIABLE HOMEBREW_RESULT
+            OUTPUT_VARIABLE HOMEBREW_PREFIX
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        if(HOMEBREW_RESULT EQUAL 0 AND IS_DIRECTORY "${HOMEBREW_PREFIX}")
+            link_directories("${HOMEBREW_PREFIX}/lib")
+            include_directories("${HOMEBREW_PREFIX}/include")
+            message(STATUS "Using Homebrew: ${HOMEBREW_PREFIX}")
+        else()
+            message(WARNING "Unable to determine Homebrew prefix")
+        endif()
     endif()
 elseif(IS_WINDOWS)
     # Windows 下需要导出符号

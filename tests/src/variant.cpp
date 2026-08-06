@@ -1525,6 +1525,15 @@ TEST(variant, itemRef2) {
     ASSERT_EQ(ref2.toInt(), 2000);
 }
 
+TEST(variant, itemRef_missing_element_is_created) {
+    Array array;
+    auto ref = array.itemRef("created");
+    ref = 42;
+
+    ASSERT_TRUE(array.exists("created"));
+    ASSERT_EQ(array.offsetGet("created").toInt(), 42);
+}
+
 TEST(variant, operator_arithmetic) {
     // Test addition operator
     {

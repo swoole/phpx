@@ -495,6 +495,20 @@ TEST(base, toReference2) {
     ASSERT_EQ(v2.toInt(), 2026);
 }
 
+TEST(base, toReference_creates_missing_array_element) {
+    auto object = newObject("stdClass");
+    object.set("values", Array{});
+
+    auto ref = toReference(object,
+                           {
+                               {PropertyFetch, "values"},
+                               {ArrayDimFetch, "created"},
+                           });
+    ref = 42;
+
+    ASSERT_EQ(object.attr("values").offsetGet("created").toInt(), 42);
+}
+
 TEST(base, named_args) {
     include(get_include_dir() + "/library.php", INCLUDE_ONCE);
     Array name_args;

@@ -104,13 +104,6 @@ zend_long Object::count() {
 }
 
 bool Object::propertyExists(const String &name, PropertyOperation op) const {
-    zend_string *property = name.str();
-
-    auto property_info = (zend_property_info *) zend_hash_find_ptr(&ce()->properties_info, property);
-    if (property_info != NULL && (!(property_info->flags & ZEND_ACC_PRIVATE) || property_info->ce == ce())) {
-        return true;
-    }
-
     bool rs;
     do {
         auto ori_scope = EG(fake_scope);

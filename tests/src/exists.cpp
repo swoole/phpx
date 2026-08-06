@@ -67,6 +67,29 @@ TEST(exists, basic_object_property) {
     ASSERT_FALSE(exists(v, {{PropertyFetch, "nonexistent"}}));
 }
 
+TEST(exists, magic_isset_does_not_invoke_get) {
+    eval(R"PHP(
+        $GLOBALS['phpx_exists_magic_calls'] = [];
+        class PhpxExistsMagicProbe {
+            public function __isset(string $name): bool {
+                $GLOBALS['phpx_exists_magic_calls'][] = "isset:$name";
+                return true;
+            }
+            public function __get(string $name): mixed {
+                $GLOBALS['phpx_exists_magic_calls'][] = "get:$name";
+                return null;
+            }
+        }
+    )PHP");
+
+    Variant probe = newObject("PhpxExistsMagicProbe");
+    ASSERT_TRUE(exists(probe, {{PropertyFetch, "value"}}));
+
+    Array calls(global("phpx_exists_magic_calls"));
+    ASSERT_EQ(calls.count(), 1);
+    ASSERT_STREQ(calls.offsetGet(0).toCString(), "isset:value");
+}
+
 TEST(exists, array_dim_fetch_basic) {
     Array arr;
     arr.set("key1", "value1");

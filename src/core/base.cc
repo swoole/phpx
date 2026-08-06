@@ -739,6 +739,9 @@ bool exists(const Variant &v, const OperationChain &list, Variant &tmp) {
                 return false;
             } else {
                 Object o(tmp);
+                if (is_last) {
+                    return o.propertyExists(expr.second.toString(), PROP_ISSET);
+                }
                 tmp = o.attr(expr.second, AttrMode::Isset);
                 if (tmp.isNull() || tmp.isUndef()) {
                     return false;
@@ -758,11 +761,18 @@ bool exists(const Variant &v, const OperationChain &list) {
 }
 
 Reference toReference(const Variant &v, const OperationChain &list) {
-    Variant tmp = v;
-    size_t total = list.size();
+    std::vector<Variant> path;
+    path.reserve(list.size());
+    // Keep the root and every direct array/property access bound to the
+    // original zval. Variant's regular copy/move operations intentionally
+    // apply PHP value-assignment semantics and would detach these wrappers.
+    path.emplace_back(v.direct_ptr(), Ctor::Indirect);
+
+    const size_t total = list.size();
     size_t count = 0;
 
     for (const auto &expr : list) {
+        auto &tmp = path.back();
         if (count == total - 1) {
             if (expr.first == ArrayDimFetch) {
                 return tmp.itemRef(expr.second);
@@ -770,10 +780,12 @@ Reference toReference(const Variant &v, const OperationChain &list) {
                 return tmp.attrRef(expr.second);
             }
         } else {
-            if (expr.first == ArrayDimFetch) {
-                tmp = tmp.item(expr.second);
+            Variant next = expr.first == ArrayDimFetch ? tmp.item(expr.second, true)
+                                                       : tmp.attr(expr.second, AttrMode::Update);
+            if (next.isIndirect()) {
+                path.emplace_back(next.direct_ptr(), Ctor::Indirect);
             } else {
-                tmp = tmp.attr(expr.second);
+                path.emplace_back(std::move(next));
             }
             count++;
         }
