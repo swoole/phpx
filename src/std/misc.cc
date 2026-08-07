@@ -15,6 +15,7 @@
 #include <climits>
 #include <cerrno>
 #include <chrono>
+#include <cinttypes>
 
 namespace php::fn {
 
@@ -165,16 +166,20 @@ static zend_string *_uniqid_hash(const String &prefix, bool more_entropy) {
     if (more_entropy) {
         int len = snprintf(uniqid_buf,
                            sizeof(uniqid_buf),
-                           "%s%08lx%05x%.8F",
+                           "%s%08" PRIx64 "%05x%.8F",
                            prefix.length() > 0 ? prefix.data() : "",
-                           sec,
+                           static_cast<std::uint64_t>(sec),
                            usec,
                            php_combined_lcg() * 10);
         return zend_string_init(uniqid_buf, len, 0);
     }
 
-    int len =
-        snprintf(uniqid_buf, sizeof(uniqid_buf), "%s%08lx%05x", prefix.length() > 0 ? prefix.data() : "", sec, usec);
+    int len = snprintf(uniqid_buf,
+                       sizeof(uniqid_buf),
+                       "%s%08" PRIx64 "%05x",
+                       prefix.length() > 0 ? prefix.data() : "",
+                       static_cast<std::uint64_t>(sec),
+                       usec);
     return zend_string_init(uniqid_buf, len, 0);
 }
 
