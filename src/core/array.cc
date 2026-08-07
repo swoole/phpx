@@ -16,7 +16,6 @@
 
 #include "phpx.h"
 
-#include "phpx_func.h"
 #include "zend_closures.h"
 
 namespace php {

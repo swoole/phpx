@@ -69,4 +69,5 @@ bin/phpx
 /examples/embed/CMakeCache.txt
 /test_output.xml
 /test_results.xml
+/wasm/wasm32-wasip2/
 /phpx.sln
