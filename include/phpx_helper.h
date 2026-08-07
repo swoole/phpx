@@ -17,6 +17,7 @@
 #pragma once
 
 #include "phpx.h"
+#include "phpx_fake_scope_guard.h"
 #include "phpx_scope_guard.h"
 #include "phpx_operator.h"
 

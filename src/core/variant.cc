@@ -15,7 +15,7 @@
 */
 
 #include "phpx.h"
-#include "phpx_scope_guard.h"
+#include "phpx_fake_scope_guard.h"
 
 #if PHP_VERSION_ID < 80400
 #include "zend_fibers.h"
@@ -512,9 +512,7 @@ void Variant::setProperty(const Variant &name, const Variant &value) const {
 
 void Variant::unsetProperty(zend_string *prop_name) {
     do {
-        auto old_scope = EG(fake_scope);
-        ON_SCOPE_EXIT(EG(fake_scope) = old_scope);
-        EG(fake_scope) = ce();
+        FakeScopeGuard fake_scope_guard{ce()};
         object()->handlers->unset_property(object(), prop_name, 0);
     } while (0);
     throwErrorIfOccurred();
@@ -1165,9 +1163,7 @@ Variant Variant::attr(const Variant &name, AttrMode mode) const {
         // modification must use BP_VAR_RW so overloaded properties invoke
         // __get() directly and can return a writable reference.
         do {
-            auto old_scope = EG(fake_scope);
-            ON_SCOPE_EXIT(EG(fake_scope) = old_scope);
-            EG(fake_scope) = ce();
+            FakeScopeGuard fake_scope_guard{ce()};
             member_p = object()->handlers->read_property(object(), prop_name.str(), BP_VAR_RW, nullptr, &rv);
         } while (0);
     } else {
@@ -1179,9 +1175,7 @@ Variant Variant::attr(const Variant &name, AttrMode mode) const {
 
     if (zval_is_null(member_p) && mode == AttrMode::Update) {
         do {
-            auto old_scope = EG(fake_scope);
-            ON_SCOPE_EXIT(EG(fake_scope) = old_scope);
-            EG(fake_scope) = ce();
+            FakeScopeGuard fake_scope_guard{ce()};
             member_p = object()->handlers->write_property(object(), prop_name.str(), undef(), NULL);
         } while (0);
         throwErrorIfOccurred();

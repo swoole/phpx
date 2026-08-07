@@ -15,7 +15,7 @@
 */
 
 #include "phpx.h"
-#include "phpx_scope_guard.h"
+#include "phpx_fake_scope_guard.h"
 
 BEGIN_EXTERN_C()
 #include "zend_smart_str.h"
@@ -106,9 +106,7 @@ zend_long Object::count() {
 bool Object::propertyExists(const String &name, PropertyOperation op) const {
     bool rs;
     do {
-        auto ori_scope = EG(fake_scope);
-        ON_SCOPE_EXIT(EG(fake_scope) = ori_scope);
-        EG(fake_scope) = ce();
+        FakeScopeGuard fake_scope_guard{ce()};
         rs = object()->handlers->has_property(object(), name.str(), op, NULL);
     } while (0);
 

@@ -1,5 +1,6 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
+#include "phpx_fake_scope_guard.h"
 #include <thread>
 #include <atomic>
 
@@ -275,7 +276,7 @@ TEST(object, property_exists_restores_fake_scope_after_cpp_exception) {
     };
     object.object()->handlers = &throwing_handlers;
 
-    auto original_scope = EG(fake_scope);
+    auto original_scope = FakeScopeGuard::current();
     bool thrown = false;
     try {
         object.propertyExists("missing", PROP_ISSET);
@@ -287,7 +288,7 @@ TEST(object, property_exists_restores_fake_scope_after_cpp_exception) {
     object.object()->handlers = original_handlers;
 
     ASSERT_TRUE(thrown);
-    ASSERT_EQ(EG(fake_scope), original_scope);
+    ASSERT_EQ(FakeScopeGuard::current(), original_scope);
 }
 
 TEST(object, mixed) {

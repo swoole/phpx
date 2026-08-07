@@ -15,7 +15,7 @@
 */
 
 #include "phpx.h"
-#include "phpx_scope_guard.h"
+#include "phpx_fake_scope_guard.h"
 
 namespace php {
 void initDecimalContext();
@@ -184,9 +184,7 @@ void augmentException() {
         return;
     }
 
-    auto prev_scope = EG(fake_scope);
-    ON_SCOPE_EXIT(EG(fake_scope) = prev_scope);
-    EG(fake_scope) = EG(exception)->ce;
+    FakeScopeGuard fake_scope_guard{EG(exception)->ce};
 
     // Set file/line from the innermost frame
     auto &top = debug_info.frames[debug_info.depth - 1];
@@ -897,9 +895,7 @@ uint32_t getPropertyOffset(const String &class_name, const String &prop) {
 uint32_t getPropertyOffset(zend_class_entry *ce, const String &prop) {
     zend_property_info *prop_info;
     do {
-        auto prev_scope = EG(fake_scope);
-        ON_SCOPE_EXIT(EG(fake_scope) = prev_scope);
-        EG(fake_scope) = ce;
+        FakeScopeGuard fake_scope_guard{ce};
         prop_info = zend_get_property_info(ce, prop.str(), 1);
     } while (0);
     if (UNEXPECTED(!prop_info)) {

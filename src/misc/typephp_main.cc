@@ -213,7 +213,7 @@ static bool reject_asymmetric_property_write(zend_object *object, zend_string *m
     static const char private_prefix[] = "__typephp_property_private_set_";
     static const char protected_prefix[] = "__typephp_property_protected_set_";
     zend_function *visibility = find_property_helper(object, member, private_prefix, sizeof(private_prefix) - 1);
-    auto *scope = EG(fake_scope);
+    auto *scope = php::FakeScopeGuard::current();
     if (visibility != nullptr && scope != visibility->common.scope) {
         zend_throw_error(nullptr,
                          "Cannot modify private(set) property %s::$%s",
@@ -299,6 +299,44 @@ zend_object *typephp_attach_property_handlers(zend_object *object, zend_object_h
     return object;
 }
 
+php::Variant typephp_read_property_scoped(const php::Variant &object,
+                                          const php::Variant &member,
+                                          zend_class_entry *scope,
+                                          php::AttrMode mode) {
+    if (UNEXPECTED(!object.isObject())) {
+        php::throwError("Attempt to read property `%s` on %s", member.toCString(), object.typeStr());
+        return {};
+    }
+
+    php::String property_name = member.toString();
+    zval rv;
+    zval *member_p;
+    {
+        php::FakeScopeGuard fake_scope_guard{scope};
+        member_p = object.object()->handlers->read_property(
+            object.object(),
+            property_name.str(),
+            mode == php::AttrMode::Update ? BP_VAR_RW : (mode == php::AttrMode::Isset ? BP_VAR_IS : BP_VAR_R),
+            nullptr,
+            &rv);
+        php::throwErrorIfOccurred();
+
+        if (php::zval_is_null(member_p) && mode == php::AttrMode::Update) {
+            member_p =
+                object.object()->handlers->write_property(object.object(), property_name.str(), php::undef(), nullptr);
+            php::throwErrorIfOccurred();
+            if (member_p == php::undef()) {
+                php::throwError("Dynamic property `%s` assignment is not supported", member.toCString());
+            }
+        }
+    }
+
+    if (member_p == &rv) {
+        return php::Variant{member_p, php::Ctor::Move};
+    }
+    return php::Variant{member_p, php::zval_wrap(member_p)};
+}
+
 void typephp_write_property_scoped(const php::Variant &object,
                                    const php::Variant &member,
                                    const php::Variant &value,
@@ -319,16 +357,11 @@ void typephp_write_property_scoped(const php::Variant &object,
             scope = property_info->ce;
         }
     }
-    auto *old_scope = EG(fake_scope);
-    EG(fake_scope) = scope;
-    try {
+    {
+        php::FakeScopeGuard fake_scope_guard{scope};
         object.object()->handlers->write_property(
             object.object(), property_name.str(), const_cast<zval *>(value.const_ptr()), nullptr);
-    } catch (...) {
-        EG(fake_scope) = old_scope;
-        throw;
     }
-    EG(fake_scope) = old_scope;
     php::throwErrorIfOccurred();
 }
 

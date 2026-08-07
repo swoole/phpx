@@ -170,15 +170,8 @@ static inline zend_object *typephp_create_object_with_defaults(zend_class_entry 
     auto *object = base_create_object(class_type);
     typephp_attach_property_handlers(object, handlers);
 
-    zend_class_entry *saved_fake_scope = EG(fake_scope);
-    EG(fake_scope) = object->ce;
-    try {
-        initializer(object);
-    } catch (...) {
-        EG(fake_scope) = saved_fake_scope;
-        throw;
-    }
-    EG(fake_scope) = saved_fake_scope;
+    php::FakeScopeGuard fake_scope_guard{object->ce};
+    initializer(object);
     return object;
 #else
     zend_object *object;
@@ -206,6 +199,12 @@ extern void typephp_write_property_scoped(const php::Variant &object,
                                           const php::Variant &member,
                                           const php::Variant &value,
                                           zend_class_entry *scope);
+
+/** Read a dynamic property using the lexical scope supplied by an AOT trait wrapper. */
+extern php::Variant typephp_read_property_scoped(const php::Variant &object,
+                                                 const php::Variant &member,
+                                                 zend_class_entry *scope,
+                                                 php::AttrMode mode);
 
 /**
  * Return a typed C++ reference into a static-property (or object-property) zval's
