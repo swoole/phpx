@@ -86,6 +86,10 @@ TEST(std_container_box, stdarray_partial_initializer_value_initializes_tail) {
     ASSERT_EQ(arr.offsetGet(3), 0);
 }
 
+TEST(std_container_box, stdarray_rejects_too_many_initializers) {
+    try_call([]() { (void) StdArray<Int, 1>{1, 2}; }, "Too many initializers");
+}
+
 // ============ StdVector via StdContainerBox ============
 
 TEST(std_container_box, stdvector_push_back) {
@@ -236,6 +240,22 @@ TEST(std_container_box, stdmap_missing_read_does_not_insert) {
     StdMap<Int, Int> map;
     try_call([&map]() { (void) map.offsetGet(42); }, "Undefined std container key");
     ASSERT_EQ(map.size(), 0u);
+}
+
+TEST(std_container_box, stdmap_lazy_default_only_runs_for_missing_key) {
+    StdMap<Int, Int> map;
+    map.offsetSet(1, 10);
+    int factory_calls = 0;
+    ASSERT_EQ(map.offsetGetForUpdateLazy(1, [&factory_calls]() {
+        ++factory_calls;
+        return 20;
+    }), 10);
+    ASSERT_EQ(factory_calls, 0);
+    ASSERT_EQ(map.offsetGetForUpdateLazy(2, [&factory_calls]() {
+        ++factory_calls;
+        return 30;
+    }), 30);
+    ASSERT_EQ(factory_calls, 1);
 }
 
 TEST(std_container_box, stdvector_iteration_guard) {

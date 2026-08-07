@@ -334,7 +334,8 @@ class StdArray {
     StdArray() = default;
     StdArray(std::initializer_list<T> init) : data_{} {
         if (UNEXPECTED(init.size() > N)) {
-            throw std::out_of_range("too many initializers");
+            throwError("Too many initializers for std array");
+            std::abort();
         }
         std::copy(init.begin(), init.end(), data_.begin());
     }
@@ -415,6 +416,7 @@ class StdContainerIterationState {
     void assertStructureMutable() const {
         if (UNEXPECTED(active_iterators_ != 0)) {
             throwError("Cannot structurally modify std container during foreach");
+            std::abort();
         }
     }
 
@@ -443,7 +445,10 @@ class StdVector : public StdContainerIterationState {
     explicit StdVector(std::size_t size) : data_(size) {}
     StdVector(std::initializer_list<T> init) : data_(init) {}
     StdVector(const StdVector &other) : data_(other.data_) {}
-    StdVector(StdVector &&other) noexcept : data_(std::move(other.data_)) {}
+    StdVector(StdVector &&other) {
+        other.assertStructureMutable();
+        data_ = std::move(other.data_);
+    }
     StdVector &operator=(const StdVector &other) {
         assertStructureMutable();
         data_ = other.data_;
@@ -451,6 +456,7 @@ class StdVector : public StdContainerIterationState {
     }
     StdVector &operator=(StdVector &&other) {
         assertStructureMutable();
+        other.assertStructureMutable();
         data_ = std::move(other.data_);
         return *this;
     }
@@ -524,7 +530,10 @@ class StdOrderedMap : public StdContainerIterationState {
   public:
     StdOrderedMap() = default;
     StdOrderedMap(const StdOrderedMap &other) : data_(other.data_) {}
-    StdOrderedMap(StdOrderedMap &&other) noexcept : data_(std::move(other.data_)) {}
+    StdOrderedMap(StdOrderedMap &&other) {
+        other.assertStructureMutable();
+        data_ = std::move(other.data_);
+    }
     StdOrderedMap &operator=(const StdOrderedMap &other) {
         assertStructureMutable();
         data_ = other.data_;
@@ -532,6 +541,7 @@ class StdOrderedMap : public StdContainerIterationState {
     }
     StdOrderedMap &operator=(StdOrderedMap &&other) {
         assertStructureMutable();
+        other.assertStructureMutable();
         data_ = std::move(other.data_);
         return *this;
     }
@@ -575,6 +585,15 @@ class StdOrderedMap : public StdContainerIterationState {
         assertStructureMutable();
         return data_.emplace(key, default_value).first->second;
     }
+    template <typename Factory>
+    T &offsetGetForUpdateLazy(const K &key, Factory &&factory) {
+        auto iterator = data_.find(key);
+        if (iterator != data_.end()) {
+            return iterator->second;
+        }
+        assertStructureMutable();
+        return data_.emplace(key, std::forward<Factory>(factory)()).first->second;
+    }
     void offsetUnset(const K &key) {
         auto iterator = data_.find(key);
         if (iterator != data_.end()) {
@@ -615,7 +634,10 @@ class StdMap : public StdContainerIterationState {
   public:
     StdMap() = default;
     StdMap(const StdMap &other) : data_(other.data_) {}
-    StdMap(StdMap &&other) noexcept : data_(std::move(other.data_)) {}
+    StdMap(StdMap &&other) {
+        other.assertStructureMutable();
+        data_ = std::move(other.data_);
+    }
     StdMap &operator=(const StdMap &other) {
         assertStructureMutable();
         data_ = other.data_;
@@ -623,6 +645,7 @@ class StdMap : public StdContainerIterationState {
     }
     StdMap &operator=(StdMap &&other) {
         assertStructureMutable();
+        other.assertStructureMutable();
         data_ = std::move(other.data_);
         return *this;
     }
@@ -665,6 +688,15 @@ class StdMap : public StdContainerIterationState {
         }
         assertStructureMutable();
         return data_.emplace(key, default_value).first->second;
+    }
+    template <typename Factory>
+    T &offsetGetForUpdateLazy(const K &key, Factory &&factory) {
+        auto iterator = data_.find(key);
+        if (iterator != data_.end()) {
+            return iterator->second;
+        }
+        assertStructureMutable();
+        return data_.emplace(key, std::forward<Factory>(factory)()).first->second;
     }
     void offsetUnset(const K &key) {
         auto iterator = data_.find(key);
