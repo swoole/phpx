@@ -699,7 +699,7 @@ bool empty(const Variant &v, const OperationChain &list) {
     return empty(v, list, tmp);
 }
 
-bool exists(const Variant &v, const OperationChain &list, Variant &tmp) {
+static bool exists_impl(const Variant &v, const OperationChain &list, Variant &tmp, bool fetch_last_value) {
     tmp = v;
     if (tmp.isNull() || tmp.isUndef()) {
         return false;
@@ -718,7 +718,15 @@ bool exists(const Variant &v, const OperationChain &list, Variant &tmp) {
             } else if (tmp.isObject()) {
                 Object object(tmp);
                 if (is_last) {
-                    return object.offsetExists(expr.second);
+                    if (!object.offsetExists(expr.second)) {
+                        tmp = Variant();
+                        return false;
+                    }
+                    if (!fetch_last_value) {
+                        return true;
+                    }
+                    tmp = object.offsetGet(expr.second, BP_VAR_IS);
+                    return !tmp.isNull() && !tmp.isUndef();
                 }
                 tmp = object.offsetGet(expr.second, BP_VAR_IS);
                 if (tmp.isNull() || tmp.isUndef()) {
@@ -738,7 +746,15 @@ bool exists(const Variant &v, const OperationChain &list, Variant &tmp) {
             } else {
                 Object o(tmp);
                 if (is_last) {
-                    return o.propertyExists(expr.second.toString(), PROP_ISSET);
+                    if (!o.propertyExists(expr.second.toString(), PROP_ISSET)) {
+                        tmp = Variant();
+                        return false;
+                    }
+                    if (!fetch_last_value) {
+                        return true;
+                    }
+                    tmp = o.attr(expr.second, AttrMode::Get);
+                    return !tmp.isNull() && !tmp.isUndef();
                 }
                 tmp = o.attr(expr.second, AttrMode::Isset);
                 if (tmp.isNull() || tmp.isUndef()) {
@@ -753,9 +769,13 @@ bool exists(const Variant &v, const OperationChain &list, Variant &tmp) {
     return true;
 }
 
+bool exists(const Variant &v, const OperationChain &list, Variant &tmp) {
+    return exists_impl(v, list, tmp, true);
+}
+
 bool exists(const Variant &v, const OperationChain &list) {
     Variant tmp;
-    return exists(v, list, tmp);
+    return exists_impl(v, list, tmp, false);
 }
 
 Reference toReference(const Variant &v, const OperationChain &list) {

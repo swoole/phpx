@@ -77,7 +77,7 @@ TEST(exists, magic_isset_does_not_invoke_get) {
             }
             public function __get(string $name): mixed {
                 $GLOBALS['phpx_exists_magic_calls'][] = "get:$name";
-                return null;
+                return $name === 'present' ? 42 : null;
             }
         }
     )PHP");
@@ -88,6 +88,38 @@ TEST(exists, magic_isset_does_not_invoke_get) {
     Array calls(global("phpx_exists_magic_calls"));
     ASSERT_EQ(calls.count(), 1);
     ASSERT_STREQ(calls.offsetGet(0).toCString(), "isset:value");
+}
+
+TEST(exists, result_fetches_final_magic_property_after_isset) {
+    eval(R"PHP(
+        $GLOBALS['phpx_exists_result_calls'] = [];
+        class PhpxExistsResultProbe {
+            public function __isset(string $name): bool {
+                $GLOBALS['phpx_exists_result_calls'][] = "isset:$name";
+                return true;
+            }
+            public function __get(string $name): mixed {
+                $GLOBALS['phpx_exists_result_calls'][] = "get:$name";
+                return $name === 'present' ? 42 : null;
+            }
+        }
+    )PHP");
+
+    Variant probe = newObject("PhpxExistsResultProbe");
+    Variant result;
+
+    ASSERT_TRUE(exists(probe, {{PropertyFetch, "present"}}, result));
+    ASSERT_EQ(result.toInt(), 42);
+
+    ASSERT_FALSE(exists(probe, {{PropertyFetch, "missing"}}, result));
+    ASSERT_TRUE(result.isNull());
+
+    Array calls(global("phpx_exists_result_calls"));
+    ASSERT_EQ(calls.count(), 4);
+    ASSERT_STREQ(calls.offsetGet(0).toCString(), "isset:present");
+    ASSERT_STREQ(calls.offsetGet(1).toCString(), "get:present");
+    ASSERT_STREQ(calls.offsetGet(2).toCString(), "isset:missing");
+    ASSERT_STREQ(calls.offsetGet(3).toCString(), "get:missing");
 }
 
 TEST(exists, array_dim_fetch_basic) {
