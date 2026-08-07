@@ -1942,7 +1942,10 @@ extern PHPX_API Int zero;
 extern PHPX_API Variant true_;
 extern PHPX_API Variant false_;
 
-extern Object newClosure(const ClosureFn &fn, const ArgList &uses = {}, const Object &_this = {});
+extern Object newClosure(const ClosureFn &fn,
+                         const ArgList &uses = {},
+                         const Object &_this = {},
+                         zend_class_entry *scope = nullptr);
 
 extern Object newObject(zend_class_entry *ce);
 extern Object newObject(zend_class_entry *ce, Args &args, zend_array *named_args = nullptr);

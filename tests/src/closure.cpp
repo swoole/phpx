@@ -73,4 +73,20 @@ TEST(closure, use_value_and_reference_capture) {
     f2();
     ASSERT_EQ(referenced.toInt(), 3000);
 }
+
+TEST(closure, preserves_lexical_scope) {
+    eval(R"PHP(
+        class PhpxClosureScopeParent {}
+        class PhpxClosureScopeChild extends PhpxClosureScopeParent {}
+    )PHP");
+
+    auto *lexical_scope = getClassEntrySafe("PhpxClosureScopeParent");
+    auto object = newObject("PhpxClosureScopeChild");
+    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &) -> Variant {
+        return String{zend_get_executed_scope()->name};
+    };
+
+    auto closure = newClosure(fn, {}, object, lexical_scope);
+    ASSERT_STREQ(closure().toCString(), "PhpxClosureScopeParent");
+}
 #endif

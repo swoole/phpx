@@ -18,37 +18,85 @@
 
 #include "zend_closures.h"
 
+#include <new>
+
 namespace php {
 
-static Variant propBox = {ZEND_STRL("box"), true};
-
-class ClosureBox : public Box {
-    ~ClosureBox() override {
-        efree(zf_);
-    }
-
-  public:
+struct ClosureState {
     Object this_;
     ClosureFn fn_;
     Args vars_;
     zend_function *zf_;
 
-    ClosureBox(const ClosureFn &fn, const Object &_this, const ArgList &uses, zend_function *zf)
-        : fn_(fn), this_(_this), vars_(uses), zf_(zf) {}
+    ClosureState(const ClosureFn &fn, const Object &_this, const ArgList &uses, zend_function *zf)
+        : this_(_this), fn_(fn), vars_(uses), zf_(zf) {}
+
+    ~ClosureState() {
+        efree(zf_);
+    }
 };
 
-Object newClosure(const ClosureFn &fn, const ArgList &uses, const Object &_this) {
+struct ClosureCarrier {
+    alignas(ClosureState) unsigned char state_storage[sizeof(ClosureState)];
+    zend_object std;
+
+    ClosureState *state() {
+        return std::launder(reinterpret_cast<ClosureState *>(state_storage));
+    }
+};
+
+static_assert(std::is_standard_layout_v<ClosureCarrier>);
+
+static zend_object_handlers closure_carrier_handlers;
+static bool closure_carrier_handlers_initialized = false;
+
+static inline ClosureCarrier *closure_carrier_from_obj(zend_object *object) {
+    return reinterpret_cast<ClosureCarrier *>(
+        reinterpret_cast<char *>(object) - XtOffsetOf(ClosureCarrier, std));
+}
+
+static void closure_carrier_free(zend_object *object) {
+    auto *carrier = closure_carrier_from_obj(object);
+    zend_object_std_dtor(&carrier->std);
+    carrier->state()->~ClosureState();
+}
+
+static zend_object *newClosureCarrier(const ClosureFn &fn,
+                                      const Object &_this,
+                                      const ArgList &uses,
+                                      zend_function *zf) {
+    if (UNEXPECTED(!closure_carrier_handlers_initialized)) {
+        memcpy(&closure_carrier_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+        closure_carrier_handlers.offset = XtOffsetOf(ClosureCarrier, std);
+        closure_carrier_handlers.free_obj = closure_carrier_free;
+        closure_carrier_handlers.clone_obj = nullptr;
+        closure_carrier_handlers_initialized = true;
+    }
+
+    auto *carrier = static_cast<ClosureCarrier *>(
+        zend_object_alloc(sizeof(ClosureCarrier), zend_standard_class_def));
+    try {
+        new (carrier->state_storage) ClosureState(fn, _this, uses, zf);
+    } catch (...) {
+        efree(carrier);
+        efree(zf);
+        throw;
+    }
+    zend_object_std_init(&carrier->std, zend_standard_class_def);
+    object_properties_init(&carrier->std, zend_standard_class_def);
+    carrier->std.handlers = &closure_carrier_handlers;
+    return &carrier->std;
+}
+
+Object newClosure(const ClosureFn &fn, const ArgList &uses, const Object &_this, zend_class_entry *scope) {
     auto func = (zend_function *) emalloc(sizeof(zend_internal_function));
     memset(func, 0, sizeof(zend_internal_function));
 
     String fnName("{closure}");
-    auto box_ptr = new ClosureBox(fn, _this, uses, func);
-
     func->type = ZEND_INTERNAL_FUNCTION;
     func->internal_function.handler = [](INTERNAL_FUNCTION_PARAMETERS) {
-        Object this_(ZEND_THIS);
-        auto box = this_.getProperty(propBox).toBox<ClosureBox>();
-        auto rv = box->fn_(INTERNAL_FUNCTION_PARAM_PASSTHRU, box->this_, box->vars_);
+        auto *state = closure_carrier_from_obj(Z_OBJ_P(ZEND_THIS))->state();
+        auto rv = state->fn_(INTERNAL_FUNCTION_PARAM_PASSTHRU, state->this_, state->vars_);
         zval *retval = rv.direct_ptr();
         if (Z_ISREF_P(retval) && !(EX(func)->common.fn_flags & ZEND_ACC_RETURN_REFERENCE)) {
             ZVAL_COPY_DEREF(return_value, retval);
@@ -57,14 +105,19 @@ Object newClosure(const ClosureFn &fn, const ArgList &uses, const Object &_this)
         }
     };
     func->internal_function.function_name = fnName.str();
-    func->common.scope = zend_standard_class_def;
+    // The carrier is only an implementation detail used to keep the C++
+    // callback state alive. Visibility and self:: resolution must use the
+    // lexical PHP class in which the closure was declared.
+    auto *lexical_scope = scope ? scope : zend_standard_class_def;
+    auto *called_scope = _this.isNull() ? scope : _this.ce();
+    func->common.scope = lexical_scope;
 
-    Variant box(box_ptr);
-    Object obj = newObject(zend_standard_class_def);
-    obj.setProperty(propBox, box);
+    zval carrier;
+    ZVAL_OBJ(&carrier, newClosureCarrier(fn, _this, uses, func));
 
     zval closure;
-    zend_create_fake_closure(&closure, func, zend_standard_class_def, NULL, obj.ptr());
+    zend_create_fake_closure(&closure, func, lexical_scope, called_scope, &carrier);
+    zval_ptr_dtor(&carrier);
 
     return {&closure, Ctor::Move};
 }
