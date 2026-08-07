@@ -328,26 +328,29 @@ static inline Int safeIndex(Int index, Int size) {
 template <typename T, std::size_t N>
 class StdArray {
   private:
-    std::array<T, N> data_;
+    std::array<T, N> data_{};
 
   public:
     StdArray() = default;
-    StdArray(std::initializer_list<T> init) {
+    StdArray(std::initializer_list<T> init) : data_{} {
         if (UNEXPECTED(init.size() > N)) {
             throw std::out_of_range("too many initializers");
         }
         std::copy(init.begin(), init.end(), data_.begin());
     }
-    void offsetSet(std::size_t index, const T &value) {
+    void offsetSet(Int index, const T &value) {
         data_[safeIndex(index, N)] = value;
     }
-    const T &offsetGet(std::size_t index) const {
+    void offsetSet(Int index, T &&value) {
+        data_[safeIndex(index, N)] = std::move(value);
+    }
+    const T &offsetGet(Int index) const {
         return data_[safeIndex(index, N)];
     }
-    T &offsetGet(std::size_t index) {
+    T &offsetGet(Int index) {
         return data_[safeIndex(index, N)];
     }
-    void offsetUnset(std::size_t index) {
+    void offsetUnset(Int index) {
         data_[safeIndex(index, N)] = T{};
     }
     constexpr std::size_t size() const noexcept {
@@ -359,11 +362,20 @@ class StdArray {
     const T &operator[](std::size_t index) const {
         return data_[index];
     }
-    T &at(std::size_t index) {
+    T &at(Int index) {
         return offsetGet(index);
     }
-    const T &at(std::size_t index) const {
+    const T &at(Int index) const {
         return offsetGet(index);
+    }
+    void fill(const T &value) {
+        data_.fill(value);
+    }
+    auto begin() noexcept {
+        return data_.begin();
+    }
+    auto end() noexcept {
+        return data_.end();
     }
     auto begin() const noexcept {
         return data_.begin();
@@ -373,8 +385,56 @@ class StdArray {
     }
 };
 
+class StdContainerIterationState {
+  public:
+    class Guard {
+      private:
+        std::size_t *active_iterators_;
+
+      public:
+        explicit Guard(std::size_t &active_iterators) noexcept : active_iterators_(&active_iterators) {
+            ++*active_iterators_;
+        }
+        Guard(const Guard &) = delete;
+        Guard &operator=(const Guard &) = delete;
+        Guard(Guard &&other) noexcept : active_iterators_(other.active_iterators_) {
+            other.active_iterators_ = nullptr;
+        }
+        Guard &operator=(Guard &&) = delete;
+        ~Guard() {
+            if (active_iterators_ != nullptr) {
+                --*active_iterators_;
+            }
+        }
+    };
+
+  private:
+    mutable std::size_t active_iterators_ = 0;
+
+  protected:
+    void assertStructureMutable() const {
+        if (UNEXPECTED(active_iterators_ != 0)) {
+            throwError("Cannot structurally modify std container during foreach");
+        }
+    }
+
+  public:
+    StdContainerIterationState() = default;
+    StdContainerIterationState(const StdContainerIterationState &) noexcept {}
+    StdContainerIterationState(StdContainerIterationState &&) noexcept {}
+    StdContainerIterationState &operator=(const StdContainerIterationState &) noexcept {
+        return *this;
+    }
+    StdContainerIterationState &operator=(StdContainerIterationState &&) noexcept {
+        return *this;
+    }
+    Guard iterationGuard() const noexcept {
+        return Guard(active_iterators_);
+    }
+};
+
 template <typename T>
-class StdVector {
+class StdVector : public StdContainerIterationState {
   private:
     std::vector<T> data_;
 
@@ -382,11 +442,31 @@ class StdVector {
     StdVector() = default;
     explicit StdVector(std::size_t size) : data_(size) {}
     StdVector(std::initializer_list<T> init) : data_(init) {}
+    StdVector(const StdVector &other) : data_(other.data_) {}
+    StdVector(StdVector &&other) noexcept : data_(std::move(other.data_)) {}
+    StdVector &operator=(const StdVector &other) {
+        assertStructureMutable();
+        data_ = other.data_;
+        return *this;
+    }
+    StdVector &operator=(StdVector &&other) {
+        assertStructureMutable();
+        data_ = std::move(other.data_);
+        return *this;
+    }
     void push_back(const T &value) {
+        assertStructureMutable();
         data_.push_back(value);
+    }
+    void push_back(T &&value) {
+        assertStructureMutable();
+        data_.push_back(std::move(value));
     }
     void offsetSet(Int index, const T &value) {
         data_[safeIndex(index, data_.size())] = value;
+    }
+    void offsetSet(Int index, T &&value) {
+        data_[safeIndex(index, data_.size())] = std::move(value);
     }
     const T &offsetGet(Int index) const {
         return data_[safeIndex(index, data_.size())];
@@ -394,7 +474,7 @@ class StdVector {
     T &offsetGet(Int index) {
         return data_[safeIndex(index, data_.size())];
     }
-    void offsetUnset(std::size_t index) {
+    void offsetUnset(Int index) {
         data_[safeIndex(index, data_.size())] = T{};
     }
     std::size_t size() const noexcept {
@@ -405,6 +485,15 @@ class StdVector {
     }
     const T &operator[](Int index) const {
         return offsetGet(index);
+    }
+    void fill(const T &value) {
+        std::fill(data_.begin(), data_.end(), value);
+    }
+    auto begin() noexcept {
+        return data_.begin();
+    }
+    auto end() noexcept {
+        return data_.end();
     }
     auto begin() const noexcept {
         return data_.begin();
@@ -427,33 +516,86 @@ struct StdStringEqual {
 };
 
 template <typename K, typename T>
-class StdOrderedMap {
+class StdOrderedMap : public StdContainerIterationState {
   private:
     using Compare = typename std::conditional<std::is_same<K, String>::value, StdStringLess, std::less<K>>::type;
     std::map<K, T, Compare> data_;
 
   public:
     StdOrderedMap() = default;
+    StdOrderedMap(const StdOrderedMap &other) : data_(other.data_) {}
+    StdOrderedMap(StdOrderedMap &&other) noexcept : data_(std::move(other.data_)) {}
+    StdOrderedMap &operator=(const StdOrderedMap &other) {
+        assertStructureMutable();
+        data_ = other.data_;
+        return *this;
+    }
+    StdOrderedMap &operator=(StdOrderedMap &&other) {
+        assertStructureMutable();
+        data_ = std::move(other.data_);
+        return *this;
+    }
     void offsetSet(const K &key, const T &value) {
-        data_[key] = value;
+        auto iterator = data_.find(key);
+        if (iterator != data_.end()) {
+            iterator->second = value;
+            return;
+        }
+        assertStructureMutable();
+        data_.emplace(key, value);
+    }
+    void offsetSet(const K &key, T &&value) {
+        auto iterator = data_.find(key);
+        if (iterator != data_.end()) {
+            iterator->second = std::move(value);
+            return;
+        }
+        assertStructureMutable();
+        data_.emplace(key, std::move(value));
     }
     const T &offsetGet(const K &key) const {
-        return data_.at(key);
+        auto iterator = data_.find(key);
+        if (UNEXPECTED(iterator == data_.end())) {
+            throwError("Undefined std container key");
+            std::abort();
+        }
+        return iterator->second;
     }
     T &offsetGet(const K &key) {
-        return data_[key];
+        return const_cast<T &>(static_cast<const StdOrderedMap &>(*this).offsetGet(key));
+    }
+    T &offsetGetForUpdate(const K &key) {
+        return offsetGetForUpdate(key, T{});
+    }
+    T &offsetGetForUpdate(const K &key, const T &default_value) {
+        auto iterator = data_.find(key);
+        if (iterator != data_.end()) {
+            return iterator->second;
+        }
+        assertStructureMutable();
+        return data_.emplace(key, default_value).first->second;
     }
     void offsetUnset(const K &key) {
-        data_.erase(key);
+        auto iterator = data_.find(key);
+        if (iterator != data_.end()) {
+            assertStructureMutable();
+            data_.erase(iterator);
+        }
     }
     std::size_t size() const noexcept {
         return data_.size();
     }
     T &operator[](const K &key) {
-        return offsetGet(key);
+        return offsetGetForUpdate(key);
     }
     const T &operator[](const K &key) const {
         return offsetGet(key);
+    }
+    auto begin() noexcept {
+        return data_.begin();
+    }
+    auto end() noexcept {
+        return data_.end();
     }
     auto begin() const noexcept {
         return data_.begin();
@@ -464,7 +606,7 @@ class StdOrderedMap {
 };
 
 template <typename K, typename T>
-class StdMap {
+class StdMap : public StdContainerIterationState {
   private:
     using Hash = typename std::conditional<std::is_same<K, String>::value, StdStringHash, std::hash<K>>::type;
     using Equal = typename std::conditional<std::is_same<K, String>::value, StdStringEqual, std::equal_to<K>>::type;
@@ -472,26 +614,79 @@ class StdMap {
 
   public:
     StdMap() = default;
+    StdMap(const StdMap &other) : data_(other.data_) {}
+    StdMap(StdMap &&other) noexcept : data_(std::move(other.data_)) {}
+    StdMap &operator=(const StdMap &other) {
+        assertStructureMutable();
+        data_ = other.data_;
+        return *this;
+    }
+    StdMap &operator=(StdMap &&other) {
+        assertStructureMutable();
+        data_ = std::move(other.data_);
+        return *this;
+    }
     void offsetSet(const K &key, const T &value) {
-        data_[key] = value;
+        auto iterator = data_.find(key);
+        if (iterator != data_.end()) {
+            iterator->second = value;
+            return;
+        }
+        assertStructureMutable();
+        data_.emplace(key, value);
+    }
+    void offsetSet(const K &key, T &&value) {
+        auto iterator = data_.find(key);
+        if (iterator != data_.end()) {
+            iterator->second = std::move(value);
+            return;
+        }
+        assertStructureMutable();
+        data_.emplace(key, std::move(value));
     }
     const T &offsetGet(const K &key) const {
-        return data_.at(key);
+        auto iterator = data_.find(key);
+        if (UNEXPECTED(iterator == data_.end())) {
+            throwError("Undefined std container key");
+            std::abort();
+        }
+        return iterator->second;
     }
     T &offsetGet(const K &key) {
-        return data_[key];
+        return const_cast<T &>(static_cast<const StdMap &>(*this).offsetGet(key));
+    }
+    T &offsetGetForUpdate(const K &key) {
+        return offsetGetForUpdate(key, T{});
+    }
+    T &offsetGetForUpdate(const K &key, const T &default_value) {
+        auto iterator = data_.find(key);
+        if (iterator != data_.end()) {
+            return iterator->second;
+        }
+        assertStructureMutable();
+        return data_.emplace(key, default_value).first->second;
     }
     void offsetUnset(const K &key) {
-        data_.erase(key);
+        auto iterator = data_.find(key);
+        if (iterator != data_.end()) {
+            assertStructureMutable();
+            data_.erase(iterator);
+        }
     }
     std::size_t size() const noexcept {
         return data_.size();
     }
     T &operator[](const K &key) {
-        return offsetGet(key);
+        return offsetGetForUpdate(key);
     }
     const T &operator[](const K &key) const {
         return offsetGet(key);
+    }
+    auto begin() noexcept {
+        return data_.begin();
+    }
+    auto end() noexcept {
+        return data_.end();
     }
     auto begin() const noexcept {
         return data_.begin();
@@ -516,19 +711,35 @@ struct is_std_vector<StdVector<T>> : std::true_type {};
 template <typename T>
 struct is_std_ordered_map : std::false_type {};
 
-template <typename T, typename K>
-struct is_std_ordered_map<StdOrderedMap<T, K>> : std::true_type {};
+template <typename K, typename T>
+struct is_std_ordered_map<StdOrderedMap<K, T>> : std::true_type {};
 
 template <typename T>
 struct is_std_map : std::false_type {};
 
-template <typename T, typename K>
-struct is_std_map<StdMap<T, K>> : std::true_type {};
+template <typename K, typename T>
+struct is_std_map<StdMap<K, T>> : std::true_type {};
 
 template <typename T>
 struct is_std_container : std::integral_constant<bool,
                                                  is_std_array<T>::value || is_std_vector<T>::value ||
                                                      is_std_ordered_map<T>::value || is_std_map<T>::value> {};
+
+template <typename T, std::size_t N, typename U>
+static inline void initializeStdContainer(StdArray<T, N> &container, const U &value) {
+    if constexpr (is_std_array<T>::value) {
+        for (auto &item : container) {
+            initializeStdContainer(item, value);
+        }
+    } else {
+        container.fill(value);
+    }
+}
+
+template <typename T, typename U>
+static inline void initializeStdContainer(StdVector<T> &container, const U &value) {
+    container.fill(value);
+}
 
 template <typename T>
 inline constexpr bool is_integral_non_bool_v =
@@ -1366,8 +1577,8 @@ class Array : public Variant {
         }
     }
 
-    template <typename T, typename K>
-    void copyFrom(const StdOrderedMap<T, K> &map) {
+    template <typename K, typename T>
+    void copyFrom(const StdOrderedMap<K, T> &map) {
         for (const auto &item : map) {
             if constexpr (is_std_container<T>::value) {
                 set(Variant(item.first), Array(item.second));
@@ -1377,8 +1588,8 @@ class Array : public Variant {
         }
     }
 
-    template <typename T, typename K>
-    void copyFrom(const StdMap<T, K> &map) {
+    template <typename K, typename T>
+    void copyFrom(const StdMap<K, T> &map) {
         for (const auto &item : map) {
             if constexpr (is_std_container<T>::value) {
                 set(Variant(item.first), Array(item.second));
@@ -1402,10 +1613,10 @@ class Array : public Variant {
         }
     }
 
-    void rebuild() {
+    void rebuild(size_t size = 0) {
         destroy();
         auto zarr = unwrap_ptr();
-        array_init(zarr);
+        array_init_size(zarr, (uint32_t) size);
     }
 
   public:
@@ -1427,25 +1638,25 @@ class Array : public Variant {
 
     template <typename T, std::size_t N>
     Array(const StdArray<T, N> &arr) {
-        array_init(&val);
+        array_init_size(&val, (uint32_t) N);
         copyFrom(arr);
     }
 
     template <typename T>
     Array(const StdVector<T> &arr) {
-        array_init(&val);
+        array_init_size(&val, (uint32_t) arr.size());
         copyFrom(arr);
     }
 
-    template <typename T, typename K>
-    Array(const StdOrderedMap<T, K> &map) {
-        array_init(&val);
+    template <typename K, typename T>
+    Array(const StdOrderedMap<K, T> &map) {
+        array_init_size(&val, (uint32_t) map.size());
         copyFrom(map);
     }
 
-    template <typename T, typename K>
-    Array(const StdMap<T, K> &map) {
-        array_init(&val);
+    template <typename K, typename T>
+    Array(const StdMap<K, T> &map) {
+        array_init_size(&val, (uint32_t) map.size());
         copyFrom(map);
     }
 
@@ -1468,28 +1679,28 @@ class Array : public Variant {
 
     template <typename T, std::size_t N>
     Array &operator=(const StdArray<T, N> &arr) {
-        rebuild();
+        rebuild(N);
         copyFrom(arr);
         return *this;
     }
 
     template <typename T>
     Array &operator=(const StdVector<T> &arr) {
-        rebuild();
+        rebuild(arr.size());
         copyFrom(arr);
         return *this;
     }
 
-    template <typename T, typename K>
-    Array &operator=(const StdOrderedMap<T, K> &map) {
-        rebuild();
+    template <typename K, typename T>
+    Array &operator=(const StdOrderedMap<K, T> &map) {
+        rebuild(map.size());
         copyFrom(map);
         return *this;
     }
 
-    template <typename T, typename K>
-    Array &operator=(const StdMap<T, K> &map) {
-        rebuild();
+    template <typename K, typename T>
+    Array &operator=(const StdMap<K, T> &map) {
+        rebuild(map.size());
         copyFrom(map);
         return *this;
     }
@@ -1910,14 +2121,14 @@ static inline Array toArray(const StdVector<T> &arr) {
     return result;
 }
 
-template <typename T, typename K>
-static inline Array toArray(const StdOrderedMap<T, K> &map) {
+template <typename K, typename T>
+static inline Array toArray(const StdOrderedMap<K, T> &map) {
     Array result(map);
     return result;
 }
 
-template <typename T, typename K>
-static inline Array toArray(const StdMap<T, K> &map) {
+template <typename K, typename T>
+static inline Array toArray(const StdMap<K, T> &map) {
     Array result(map);
     return result;
 }

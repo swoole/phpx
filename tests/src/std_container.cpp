@@ -78,6 +78,14 @@ TEST(std_container_box, stdarray_unset) {
     ASSERT_EQ(arr.offsetGet(0), 0);
 }
 
+TEST(std_container_box, stdarray_partial_initializer_value_initializes_tail) {
+    StdArray<Int, 4> arr{10, 20};
+    ASSERT_EQ(arr.offsetGet(0), 10);
+    ASSERT_EQ(arr.offsetGet(1), 20);
+    ASSERT_EQ(arr.offsetGet(2), 0);
+    ASSERT_EQ(arr.offsetGet(3), 0);
+}
+
 // ============ StdVector via StdContainerBox ============
 
 TEST(std_container_box, stdvector_push_back) {
@@ -167,6 +175,23 @@ TEST(std_container_box, stdordered_map_string_keys) {
     ASSERT_EQ(map.offsetGet(String("bbb")), 200);
 }
 
+TEST(std_container_box, stdordered_map_missing_read_does_not_insert) {
+    StdOrderedMap<Int, Int> map;
+    try_call([&map]() { (void) map.offsetGet(42); }, "Undefined std container key");
+    ASSERT_EQ(map.size(), 0u);
+}
+
+TEST(std_container_box, stdordered_map_iteration_guard) {
+    StdOrderedMap<Int, Int> map;
+    map.offsetSet(1, 10);
+    auto guard = map.iterationGuard();
+    map.offsetSet(1, 20);
+    ASSERT_EQ(map.offsetGet(1), 20);
+    try_call([&map]() { map.offsetSet(2, 30); }, "structurally modify");
+    try_call([&map]() { map.offsetUnset(1); }, "structurally modify");
+    ASSERT_EQ(map.size(), 1u);
+}
+
 // ============ StdMap via StdContainerBox ============
 
 TEST(std_container_box, stdordered_map__TMP__set_get) {
@@ -205,6 +230,21 @@ TEST(std_container_box, stdordered_map__TMP__unset) {
 
     ASSERT_EQ(map.size(), 1u);
     ASSERT_EQ(map.offsetGet(2), 20);
+}
+
+TEST(std_container_box, stdmap_missing_read_does_not_insert) {
+    StdMap<Int, Int> map;
+    try_call([&map]() { (void) map.offsetGet(42); }, "Undefined std container key");
+    ASSERT_EQ(map.size(), 0u);
+}
+
+TEST(std_container_box, stdvector_iteration_guard) {
+    StdVector<Int> vector{1, 2, 3};
+    auto guard = vector.iterationGuard();
+    vector.offsetSet(0, 10);
+    ASSERT_EQ(vector.offsetGet(0), 10);
+    try_call([&vector]() { vector.push_back(4); }, "structurally modify");
+    ASSERT_EQ(vector.size(), 3u);
 }
 
 // ============ php::toStdContainer ============
