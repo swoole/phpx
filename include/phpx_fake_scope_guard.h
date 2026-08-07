@@ -25,7 +25,12 @@ namespace php {
  */
 class FakeScopeGuard final {
   public:
-    explicit FakeScopeGuard(zend_class_entry *scope) noexcept : previous_(current()) {
+    // PHP 8.5 made EG(fake_scope) a pointer-to-const. Derive the exact
+    // pointer type from Zend so the guard remains source-compatible with
+    // both the mutable PHP 8.4 field and the const-qualified PHP 8.5 field.
+    using Scope = std::remove_reference_t<decltype(EG(fake_scope))>;
+
+    explicit FakeScopeGuard(Scope scope) noexcept : previous_(current()) {
         EG(fake_scope) = scope;
     }
 
@@ -38,7 +43,7 @@ class FakeScopeGuard final {
         restore();
     }
 
-    static zend_class_entry *current() noexcept {
+    static Scope current() noexcept {
         return EG(fake_scope);
     }
 
@@ -50,7 +55,7 @@ class FakeScopeGuard final {
     }
 
   private:
-    zend_class_entry *previous_;
+    Scope previous_;
     bool active_ = true;
 };
 

@@ -2,6 +2,50 @@
 
 #include <phpx_helper.h>
 
+#ifdef __wasi__
+
+zend_class_entry *typephp_fiber_generator_ce = nullptr;
+
+namespace {
+void typephp_wasi_fiber_error() {
+    php::throwError("Fiber and TypePHP Generator are not supported by the WASI target");
+}
+}  // namespace
+
+php::Object typephp_new_fiber_generator(const php::Var &) {
+    typephp_wasi_fiber_error();
+    return {};
+}
+
+php::Var typephp_fiber_suspend(const php::Var &, bool *closed) {
+    if (closed != nullptr) {
+        *closed = true;
+    }
+    typephp_wasi_fiber_error();
+    return {};
+}
+
+bool typephp_fiber_yield(const php::Var &) {
+    typephp_wasi_fiber_error();
+    return false;
+}
+
+php::Var typephp_fiber_yield_from(const php::Var &, bool *closed) {
+    if (closed != nullptr) {
+        *closed = true;
+    }
+    typephp_wasi_fiber_error();
+    return {};
+}
+
+void typephp_fiber_rethrow(const php::Var &) {
+    typephp_wasi_fiber_error();
+}
+
+void typephp_register_fiber_generator_class() {}
+
+#else
+
 #include <limits>
 #include <unordered_set>
 
@@ -590,3 +634,5 @@ void typephp_register_fiber_generator_class() {
     zend_declare_property_long(typephp_fiber_generator_ce, ZEND_STRL("next_index"), 0, ZEND_ACC_PRIVATE);
     zend_declare_property_null(typephp_fiber_generator_ce, ZEND_STRL("return_value"), ZEND_ACC_PRIVATE);
 }
+
+#endif

@@ -4,10 +4,14 @@
 
 #include <phpx.h>
 #include <typephp_helper.h>
+#if PHP_VERSION_ID < 80400
 #include <mutex>
+#endif
 BEGIN_EXTERN_C()
 #include "sapi/embed/php_embed.h"
+#if !defined(PHP_WIN32) && !defined(__wasi__)
 #include "ps_title.h"
+#endif
 END_EXTERN_C()
 
 extern zend_module_entry *php_embed_get_module();
@@ -264,7 +268,9 @@ static zval *write_hook_property(zend_object *object, zend_string *member, zval 
     return OBJ_PROP(object, property_info->offset);
 }
 
+#if PHP_VERSION_ID < 80400
 static std::mutex property_handlers_init_mutex;
+#endif
 }  // namespace
 
 static void initialize_property_handlers(zend_object_handlers *handlers, const zend_object_handlers *base_handlers) {
@@ -385,7 +391,7 @@ TYPEPHP_RUNTIME_API int typephp_runtime_init(int argc, char **argv) {
     typephp_runtime_module = php_embed_get_module();
     module_init(typephp_runtime_module);
 
-#ifndef PHP_WIN32
+#if !defined(PHP_WIN32) && !defined(__wasi__)
     save_ps_args(argc, argv);
 #endif
 

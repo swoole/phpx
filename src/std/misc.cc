@@ -214,6 +214,10 @@ Variant shell_exec(const String &command) {
         return Variant(nullptr);
     }
 
+#ifdef __wasi__
+    php::throwException(zend_ce_error, "shell_exec() is not supported on WASI");
+    return Variant(nullptr);
+#else
 #ifdef PHP_WIN32
     FILE *in = VCWD_POPEN(command.data(), "rt");
 #else
@@ -235,6 +239,7 @@ Variant shell_exec(const String &command) {
         zend_string_release(ret);
     }
     return Variant(nullptr);
+#endif
 }
 
 }  // namespace php::fn
