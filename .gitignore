@@ -70,4 +70,6 @@ bin/phpx
 /test_output.xml
 /test_results.xml
 /wasm/wasm32-wasip2/
+/wasm/bin/*/wit-bindgen
+/wasm/bin/*/wit-bindgen.exe
 /phpx.sln
