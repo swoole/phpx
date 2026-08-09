@@ -2201,7 +2201,8 @@ extern PHPX_API Variant false_;
 extern Object newClosure(const ClosureFn &fn,
                          const ArgList &uses = {},
                          const Object &_this = {},
-                         zend_class_entry *scope = nullptr);
+                         zend_class_entry *scope = nullptr,
+                         std::initializer_list<const char *> parameter_names = {});
 
 extern Object newObject(zend_class_entry *ce);
 extern Object newObject(zend_class_entry *ce, Args &args, zend_array *named_args = nullptr);

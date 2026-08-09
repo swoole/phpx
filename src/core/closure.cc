@@ -22,6 +22,18 @@
 
 namespace php {
 
+static void freeClosureFunction(zend_function *function) {
+    if (function->common.arg_info != nullptr) {
+        auto *arg_info = const_cast<zend_internal_arg_info *>(
+            reinterpret_cast<const zend_internal_arg_info *>(function->common.arg_info));
+        for (uint32_t i = 0; i < function->common.num_args; i++) {
+            efree(const_cast<char *>(arg_info[i].name));
+        }
+        efree(arg_info);
+    }
+    efree(function);
+}
+
 struct ClosureState {
     Object this_;
     ClosureFn fn_;
@@ -32,7 +44,7 @@ struct ClosureState {
         : this_(_this), fn_(fn), vars_(uses), zf_(zf) {}
 
     ~ClosureState() {
-        efree(zf_);
+        freeClosureFunction(zf_);
     }
 };
 
@@ -79,7 +91,7 @@ static zend_object *newClosureCarrier(const ClosureFn &fn,
         new (carrier->state_storage) ClosureState(fn, _this, uses, zf);
     } catch (...) {
         efree(carrier);
-        efree(zf);
+        freeClosureFunction(zf);
         throw;
     }
     zend_object_std_init(&carrier->std, zend_standard_class_def);
@@ -88,7 +100,11 @@ static zend_object *newClosureCarrier(const ClosureFn &fn,
     return &carrier->std;
 }
 
-Object newClosure(const ClosureFn &fn, const ArgList &uses, const Object &_this, zend_class_entry *scope) {
+Object newClosure(const ClosureFn &fn,
+                  const ArgList &uses,
+                  const Object &_this,
+                  zend_class_entry *scope,
+                  std::initializer_list<const char *> parameter_names) {
     auto func = (zend_function *) emalloc(sizeof(zend_internal_function));
     memset(func, 0, sizeof(zend_internal_function));
 
@@ -105,6 +121,18 @@ Object newClosure(const ClosureFn &fn, const ArgList &uses, const Object &_this,
         }
     };
     func->internal_function.function_name = fnName.str();
+    if (parameter_names.size() != 0) {
+        const auto count = static_cast<uint32_t>(parameter_names.size());
+        auto *arg_info = static_cast<zend_internal_arg_info *>(ecalloc(count, sizeof(zend_internal_arg_info)));
+        uint32_t index = 0;
+        for (const auto &parameter_name : parameter_names) {
+            arg_info[index].name = estrdup(parameter_name);
+            arg_info[index].type = ZEND_TYPE_INIT_NONE(0);
+            index++;
+        }
+        func->common.arg_info = reinterpret_cast<zend_arg_info *>(arg_info);
+        func->common.num_args = count;
+    }
     // The carrier is only an implementation detail used to keep the C++
     // callback state alive. Visibility and self:: resolution must use the
     // lexical PHP class in which the closure was declared.

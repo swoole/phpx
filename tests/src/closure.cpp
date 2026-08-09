@@ -24,6 +24,21 @@ TEST(closure, base) {
     ASSERT_EQ(rs.toInt(), 1000);
 }
 
+TEST(closure, named_arguments_use_declared_parameter_names) {
+    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &) -> Variant {
+        return getCallArg(0).concat(getCallArg(1));
+    };
+
+    auto closure = newClosure(fn, {}, {}, nullptr, {"left", "right"});
+    Args positional;
+    positional.append("left:");
+    Array named;
+    named.set("right", "7");
+
+    auto result = call(closure, positional, named.array());
+    ASSERT_STREQ(result.toCString(), "left:7");
+}
+
 TEST(closure, ref) {
     ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &vars_) -> Variant {
         auto v = vars_.get(0);
