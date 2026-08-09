@@ -466,8 +466,9 @@ void Variant::offsetUnset(const Variant &key) {
 }
 
 Variant Variant::getProperty(zend_string *prop_name) const {
+    auto obj = checkedObject("Attempt to read property");
     zval rv;
-    zval *member_p = zend_read_property_ex(ce(), object(), prop_name, false, &rv);
+    zval *member_p = zend_read_property_ex(obj->ce, obj, prop_name, false, &rv);
     throwErrorIfOccurred();
     if (member_p == &rv) {
         return Variant{member_p, Ctor::Move};
@@ -477,7 +478,8 @@ Variant Variant::getProperty(zend_string *prop_name) const {
 }
 
 void Variant::setProperty(zend_string *prop_name, const Variant &value) const {
-    zend_update_property_ex(ce(), object(), prop_name, NO_CONST_V(value));
+    auto obj = checkedObject("Attempt to write property");
+    zend_update_property_ex(obj->ce, obj, prop_name, NO_CONST_V(value));
     throwErrorIfOccurred();
 }
 
@@ -499,6 +501,7 @@ Variant Variant::getProperty(const Variant &name) const {
 }
 
 void Variant::setProperty(const Variant &name, const Variant &value) const {
+    checkedObject("Attempt to write property");
     auto zk = NO_CONST_V(name);
     auto prop_name = zval_get_string(zk);
     try {
@@ -511,14 +514,16 @@ void Variant::setProperty(const Variant &name, const Variant &value) const {
 }
 
 void Variant::unsetProperty(zend_string *prop_name) {
+    auto obj = checkedObject("Attempt to unset property");
     do {
-        FakeScopeGuard fake_scope_guard{ce()};
-        object()->handlers->unset_property(object(), prop_name, 0);
+        FakeScopeGuard fake_scope_guard{obj->ce};
+        obj->handlers->unset_property(obj, prop_name, 0);
     } while (0);
     throwErrorIfOccurred();
 }
 
 void Variant::unsetProperty(const Variant &name) {
+    checkedObject("Attempt to unset property");
     auto zk = NO_CONST_V(name);
     auto prop_name = zval_get_string(zk);
     try {
@@ -1247,19 +1252,21 @@ Variant Variant::call(const Variant &fn, const ArgList &args, zend_array *named_
 
 Variant Variant::call(const Variant &fn, Array &args, zend_array *named_args) {
     Args _args(args);
-    return call_impl(unwrap_ptr(), fn.unwrap_ptr(), _args, named_args);
+    return call(fn, _args, named_args);
 }
 
 Variant Variant::call(zend_function *fn) {
+    auto obj = checkedObject("Call to a member function");
     Variant retval{};
-    zend_call_known_function(fn, object(), ce(), retval.ptr(), 0, nullptr, nullptr);
+    zend_call_known_function(fn, obj, obj->ce, retval.ptr(), 0, nullptr, nullptr);
     throwErrorIfOccurred();
     return retval;
 }
 
 Variant Variant::call(zend_function *fn, Args &_args, zend_array *named_args) {
+    auto obj = checkedObject("Call to a member function");
     Variant retval{};
-    zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), named_args);
+    zend_call_known_function(fn, obj, obj->ce, retval.ptr(), _args.count(), _args.ptr(), named_args);
     throwErrorIfOccurred();
     return retval;
 }

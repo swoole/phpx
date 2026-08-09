@@ -24,15 +24,17 @@ END_EXTERN_C()
 
 namespace php {
 bool Object::offsetExists(const Variant &offset, int check_empty) const {
-    auto result = object()->handlers->has_dimension(object(), NO_CONST_V(offset), check_empty) != 0;
+    auto obj = checkedObject("Cannot check offset");
+    auto result = obj->handlers->has_dimension(obj, NO_CONST_V(offset), check_empty) != 0;
     throwErrorIfOccurred();
     return result;
 }
 
 bool Object::offsetExists(zend_long offset, int check_empty) {
+    auto obj = checkedObject("Cannot check offset");
     zval tmp;
     ZVAL_LONG(&tmp, offset);
-    auto result = object()->handlers->has_dimension(object(), &tmp, check_empty) != 0;
+    auto result = obj->handlers->has_dimension(obj, &tmp, check_empty) != 0;
     throwErrorIfOccurred();
     return result;
 }
@@ -49,53 +51,60 @@ static Variant wrap_dimension_result(zval *result, zval *rv) {
 }
 
 Variant Object::offsetGet(const Variant &offset, int type) {
+    auto obj = checkedObject("Cannot read offset");
     zval rv;
     ZVAL_UNDEF(&rv);
-    auto result = object()->handlers->read_dimension(object(), NO_CONST_V(offset), type, &rv);
+    auto result = obj->handlers->read_dimension(obj, NO_CONST_V(offset), type, &rv);
     return wrap_dimension_result(result, &rv);
 }
 
 Variant Object::offsetGet(zend_long offset, int type) {
+    auto obj = checkedObject("Cannot read offset");
     zval tmp;
     ZVAL_LONG(&tmp, offset);
     zval rv;
     ZVAL_UNDEF(&rv);
-    auto result = object()->handlers->read_dimension(object(), &tmp, type, &rv);
+    auto result = obj->handlers->read_dimension(obj, &tmp, type, &rv);
     return wrap_dimension_result(result, &rv);
 }
 
 void Object::offsetSet(const Variant &offset, const Variant &value) {
-    object()->handlers->write_dimension(object(), NO_CONST_V(offset), NO_CONST_V(value));
+    auto obj = checkedObject("Cannot write offset");
+    obj->handlers->write_dimension(obj, NO_CONST_V(offset), NO_CONST_V(value));
     throwErrorIfOccurred();
 }
 
 void Object::offsetSet(zend_long offset, const Variant &value) {
+    auto obj = checkedObject("Cannot write offset");
     zval tmp;
     ZVAL_LONG(&tmp, offset);
-    object()->handlers->write_dimension(object(), &tmp, NO_CONST_V(value));
+    obj->handlers->write_dimension(obj, &tmp, NO_CONST_V(value));
     throwErrorIfOccurred();
 }
 
 void Object::offsetUnset(const Variant &offset) {
-    object()->handlers->unset_dimension(object(), NO_CONST_V(offset));
+    auto obj = checkedObject("Cannot unset offset");
+    obj->handlers->unset_dimension(obj, NO_CONST_V(offset));
     throwErrorIfOccurred();
 }
 
 void Object::offsetUnset(zend_long offset) {
+    auto obj = checkedObject("Cannot unset offset");
     zval tmp;
     ZVAL_LONG(&tmp, offset);
-    object()->handlers->unset_dimension(object(), &tmp);
+    obj->handlers->unset_dimension(obj, &tmp);
     throwErrorIfOccurred();
 }
 
 String Object::hash() const {
-    return String(php_spl_object_hash(object()), Ctor::Move);
+    return String(php_spl_object_hash(checkedObject("Cannot hash object")), Ctor::Move);
 }
 
 zend_long Object::count() {
-    if (object()->handlers->count_elements) {
+    auto obj = checkedObject("Cannot count object");
+    if (obj->handlers->count_elements) {
         zend_long rv;
-        auto rc = object()->handlers->count_elements(object(), &rv);
+        auto rc = obj->handlers->count_elements(obj, &rv);
         throwErrorIfOccurred();
         return rc == SUCCESS ? rv : 0;
     } else {
@@ -104,10 +113,11 @@ zend_long Object::count() {
 }
 
 bool Object::propertyExists(const String &name, PropertyOperation op) const {
+    auto obj = checkedObject("Cannot inspect object properties");
     bool rs;
     do {
-        FakeScopeGuard fake_scope_guard{ce()};
-        rs = object()->handlers->has_property(object(), name.str(), op, NULL);
+        FakeScopeGuard fake_scope_guard{obj->ce};
+        rs = obj->handlers->has_property(obj, name.str(), op, NULL);
     } while (0);
 
     throwErrorIfOccurred();
@@ -115,28 +125,31 @@ bool Object::propertyExists(const String &name, PropertyOperation op) const {
 }
 
 bool Object::instanceOf(const String &name) const {
+    auto obj = checkedObject("Cannot inspect object class");
     auto cls_ce = getClassEntry(name);
     if (!cls_ce) {
         return false;
     }
-    return instanceof_function(ce(), cls_ce);
+    return instanceof_function(obj->ce, cls_ce);
 }
 
 Variant Object::callParentMethod(const String &func, const ArgList &args) {
     Args _args(args);
     Variant retval;
 
-    if (UNEXPECTED(isNull())) {
-        throwError("call method `%s` on null", func.data());
+    if (UNEXPECTED(!isObject())) {
+        throwError("call method `%s` on %s", func.data(), typeStr());
         return retval;
     }
 
-    if (UNEXPECTED(parent_ce() == nullptr)) {
+    auto obj = object();
+
+    if (UNEXPECTED(obj->ce->parent == nullptr)) {
         throwError("class does not inherit the parent class");
         return retval;
     }
 
-    auto fn = (zend_function *) zend_hash_find_ptr_lc(&parent_ce()->function_table, func.str());
+    auto fn = (zend_function *) zend_hash_find_ptr_lc(&obj->ce->parent->function_table, func.str());
     if (UNEXPECTED(fn == nullptr)) {
         throwError("Couldn't find implementation for method %s::%s", ZSTR_VAL(parent_ce()->name), func.data());
     } else if (UNEXPECTED(fn->common.fn_flags & ZEND_ACC_ABSTRACT)) {
@@ -144,7 +157,7 @@ Variant Object::callParentMethod(const String &func, const ArgList &args) {
                    ZSTR_VAL(fn->common.scope->name),
                    ZSTR_VAL(fn->common.function_name));
     } else {
-        zend_call_known_function(fn, object(), ce(), retval.ptr(), _args.count(), _args.ptr(), nullptr);
+        zend_call_known_function(fn, obj, obj->ce, retval.ptr(), _args.count(), _args.ptr(), nullptr);
         throwErrorIfOccurred();
     }
 
@@ -156,17 +169,18 @@ Variant Object::get(const String &name) const {
 }
 
 Object Object::clone() const {
-    if (UNEXPECTED(isNull())) {
-        throwError("Attempt to clone on null");
+    if (UNEXPECTED(!isObject())) {
+        throwError("Attempt to clone on %s", typeStr());
         return {};
     }
 
-    auto clone_obj = object()->handlers->clone_obj;
+    auto obj = object();
+    auto clone_obj = obj->handlers->clone_obj;
     if (clone_obj == nullptr) {
-        throwError("Trying to clone an uncloneable object of class %s", ZSTR_VAL(ce()->name));
+        throwError("Trying to clone an uncloneable object of class %s", ZSTR_VAL(obj->ce->name));
         return {};
     }
-    const auto new_object = clone_obj(object());
+    const auto new_object = clone_obj(obj);
     throwErrorIfOccurred();
 
     Object retval;

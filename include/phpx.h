@@ -1032,6 +1032,13 @@ class Variant {
     PHPX_UNSAFE zend_object *object() const noexcept {
         return Z_OBJ_P(unwrap_ptr());
     }
+    zend_object *checkedObject(const char *operation) const {
+        if (UNEXPECTED(!isObject())) {
+            throwError("%s on %s", operation, typeStr());
+            return nullptr;
+        }
+        return object();
+    }
     PHPX_UNSAFE zval *zv() const noexcept {
         return Z_INDIRECT(val);
     }
@@ -1203,7 +1210,7 @@ class Variant {
     Reference attrRef(const String &name);
     Variant attr(const Variant &name, AttrMode mode = AttrMode::Get) const;
     Variant attr(uintptr_t offset, AttrMode mode = AttrMode::Get) const {
-        auto member_p = OBJ_PROP(object(), offset);
+        auto member_p = OBJ_PROP(checkedObject("Attempt to read property"), offset);
         return Variant{member_p, zval_wrap(member_p)};
     }
     /**
@@ -1904,7 +1911,7 @@ class Object : public Variant {
     Object(const Variant &v, Ctor method = Ctor::Copy) : Object(v.unwrap_ptr(), method) {}
     Object() = default;
     zend_class_entry *parent_ce() {
-        return Z_OBJCE_P(unwrap_ptr())->parent;
+        return checkedObject("Cannot access parent class")->ce->parent;
     }
     Variant callParentMethod(const String &func) {
         return callParentMethod(func, {});
@@ -1936,7 +1943,7 @@ class Object : public Variant {
     }
 
     Array getProperties() const {
-        auto ht = zend_std_get_properties(object());
+        auto ht = zend_std_get_properties(checkedObject("Cannot get properties"));
         if (UNEXPECTED(!ht)) {
             return Array{};
         }
@@ -1944,21 +1951,21 @@ class Object : public Variant {
     }
 
     String getClassName() const {
-        return ce()->name;
+        return checkedObject("Cannot get class name")->ce->name;
     }
     uint32_t getId() const {
-        return Z_OBJ_HANDLE(val);
+        return checkedObject("Cannot get object id")->handle;
     }
     String hash() const;
     zend_long count();
     bool methodExists(const String &name) const {
         auto lcname = name.lower();
-        return zend_hash_exists(&ce()->function_table, lcname.str());
+        return zend_hash_exists(&checkedObject("Cannot inspect object methods")->ce->function_table, lcname.str());
     }
     bool propertyExists(const String &name, PropertyOperation op = PROP_EXISTS) const;
     bool instanceOf(const String &name) const;
     bool instanceOf(const zend_class_entry *ce_) const {
-        return instanceof_function(ce(), ce_);
+        return instanceof_function(checkedObject("Cannot inspect object class")->ce, ce_);
     }
     Object clone() const;
 };

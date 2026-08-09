@@ -693,9 +693,33 @@ TEST(object, newItem) {
 
 TEST(object, null) {
     try_call([]() { null_object.call("foo", {}); }, "call method `foo` on null");
+    try_call(
+        []() {
+            Array args;
+            null_object.call("foo", args);
+        },
+        "call method `foo` on null");
     try_call([]() { null_object.callParentMethod("foo", {}); }, "call method `foo` on null");
     try_call([]() { null_object.attr("bar"); }, "Attempt to read property `bar` on null");
+    try_call([]() { null_object.attr(uintptr_t{0}); }, "Attempt to read property on null");
     try_call([]() { null_object.attrRef("bar"); }, "Attempt to read property `bar` on null");
+    try_call([]() { null_object.get("bar"); }, "Attempt to read property on null");
+    try_call([]() { null_object.set("bar", 1); }, "Attempt to write property on null");
+    try_call([]() { null_object.unsetProperty("bar"); }, "Attempt to unset property on null");
+    try_call([]() { null_object.offsetExists(0); }, "Cannot check offset on null");
+    try_call([]() { null_object.offsetGet(0); }, "Cannot read offset on null");
+    try_call([]() { null_object.offsetSet(0, 1); }, "Cannot write offset on null");
+    try_call([]() { null_object.offsetUnset(0); }, "Cannot unset offset on null");
+    try_call([]() { null_object.getProperties(); }, "Cannot get properties on null");
+    try_call([]() { null_object.getClassName(); }, "Cannot get class name on null");
+    try_call([]() { null_object.getId(); }, "Cannot get object id on null");
+    try_call([]() { null_object.hash(); }, "Cannot hash object on null");
+    try_call([]() { null_object.count(); }, "Cannot count object on null");
+    try_call([]() { null_object.methodExists("foo"); }, "Cannot inspect object methods on null");
+    try_call([]() { null_object.propertyExists("bar"); }, "Cannot inspect object properties on null");
+    try_call([]() { null_object.instanceOf("stdClass"); }, "Cannot inspect object class on null");
+    try_call([]() { null_object.instanceOf(zend_standard_class_def); }, "Cannot inspect object class on null");
+    try_call([]() { null_object.parent_ce(); }, "Cannot access parent class on null");
 }
 
 TEST(object, non_existent_attr_operations) {
