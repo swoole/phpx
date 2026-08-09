@@ -2167,13 +2167,18 @@ static inline Array toArray(const StdMap<K, T> &map) {
 
 static inline Object toObject(const Variant &v, zend_class_entry *ce) {
     if (UNEXPECTED(!v.isObject())) {
-        throwError("The parameter `object` must be `object`, got `%s`", v.typeStr());
+        throwExceptionEx(zend_ce_type_error,
+                         0,
+                         "The parameter `object` must be `object`, got `%s`",
+                         v.typeStr());
         return {};
     }
     if (UNEXPECTED(!instanceof_function(v.ce(), ce))) {
-        throwError("The parameter `object` must be instance of class `%s`, object of `%s` given",
-                   ZSTR_VAL(ce->name),
-                   ZSTR_VAL(v.ce()->name));
+        throwExceptionEx(zend_ce_type_error,
+                         0,
+                         "The parameter `object` must be instance of class `%s`, object of `%s` given",
+                         ZSTR_VAL(ce->name),
+                         ZSTR_VAL(v.ce()->name));
         return {};
     }
     return Object{v.unwrap_ptr()};
