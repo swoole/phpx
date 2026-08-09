@@ -82,6 +82,36 @@ enum IncludeType {
     REQUIRE_ONCE = ZEND_REQUIRE_ONCE,
 };
 
+/**
+ * Owns a persistent zend_string independently of the request memory pool.
+ *
+ * Use this type when a Zend string must remain valid while execution may
+ * unwind through a request shutdown. It deliberately does not derive from
+ * Variant because the regular zval destructor only supports request strings.
+ */
+class PersistentZendString final {
+    struct Deleter final {
+        void operator()(zend_string *value) const noexcept {
+            zend_string_release(value);
+        }
+    };
+
+    std::unique_ptr<zend_string, Deleter> value_;
+
+  public:
+    explicit PersistentZendString(const std::string &value)
+        : value_(zend_string_init(value.data(), value.size(), true)) {}
+
+    PersistentZendString(const PersistentZendString &) = delete;
+    PersistentZendString &operator=(const PersistentZendString &) = delete;
+    PersistentZendString(PersistentZendString &&) noexcept = default;
+    PersistentZendString &operator=(PersistentZendString &&) noexcept = default;
+
+    zend_string *get() const noexcept {
+        return value_.get();
+    }
+};
+
 enum PropertyOperation {
     PROP_ISSET = ZEND_PROPERTY_ISSET,
     PROP_EMPTY = ZEND_PROPERTY_NOT_EMPTY,
@@ -106,7 +136,7 @@ PHPX_API bool updateConstant(const String &cls, const String &name, const Varian
 PHPX_API bool updateConstant(zend_class_entry *ce, const String &name, const Variant &data);
 PHPX_API void initGlobal(const String &name, Variant &var);
 PHPX_API void unsetGlobal(const String &name);
-PHPX_API Variant include(const String &file, IncludeType type = INCLUDE);
+PHPX_API Variant include(Variant file, IncludeType type = INCLUDE);
 PHPX_API Variant eval(const String &script, const char *filename = nullptr);
 PHPX_API Variant call(const Variant &func, Args &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &func, Array &args, zend_array *named_args = nullptr);
