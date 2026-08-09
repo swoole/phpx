@@ -173,6 +173,28 @@ TEST(object, method) {
     ASSERT_GT(str.length(), 0);
 }
 
+TEST(object, to_plain_value_uses_zend_converter) {
+    if (getClassEntry("PyObject") == nullptr || getClassEntry("PyCore") == nullptr) {
+        GTEST_SKIP() << "phpy extension is not loaded";
+    }
+
+    auto object = newObject("PyObject", {42});
+    Variant dynamic = object;
+
+    auto plain = toPlainValue(dynamic);
+
+    ASSERT_TRUE(plain.isInt());
+    ASSERT_EQ(plain.toInt(), 42);
+
+    // Repeated conversions reuse the cached internal class and method metadata.
+    auto second = toPlainValue(dynamic);
+    ASSERT_TRUE(second.isInt());
+    ASSERT_EQ(second.toInt(), 42);
+
+    try_call([]() { toPlainValue(newObject("stdClass")); },
+             "toPlainValue() currently supports PyObject only");
+}
+
 TEST(object, method_with_array_and_named_args) {
     include(get_include_dir() + "/library.php", INCLUDE_ONCE);
 
