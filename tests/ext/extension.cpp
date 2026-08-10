@@ -68,16 +68,16 @@ PHPX_FUNCTION(phpx_test4) {
     zend_try {
         switch (id) {
         case 0:
-            retval = include(args[1].toString());
+            retval = include(args[1]);
             break;
         case 1:
-            retval = include(args[1].toString(), INCLUDE_ONCE);
+            retval = include(args[1], INCLUDE_ONCE);
             break;
         case 2:
-            retval = include(args[1].toString(), REQUIRE);
+            retval = include(args[1], REQUIRE);
             break;
         case 3:
-            retval = include(args[1].toString(), REQUIRE_ONCE);
+            retval = include(args[1], REQUIRE_ONCE);
             break;
         default:
             break;

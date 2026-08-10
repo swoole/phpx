@@ -12,6 +12,29 @@ TEST(base_extra, include_require) {
     try_call([]() { include("/nonexistent/file.php", REQUIRE); }, "");
 }
 
+TEST(base_extra, include_value_path) {
+    using ValueInclude = Variant (*)(Variant, IncludeType);
+    const ValueInclude include_value = &php::include;
+    const std::string filename = get_include_dir() + "/../include/return_const.php";
+
+    auto result = include_value(Variant(filename), REQUIRE);
+
+    ASSERT_STREQ(result.toCString(), PHP_VERSION);
+}
+
+TEST(base_extra, persistent_zend_string_owns_storage) {
+    const std::string value = "persistent path";
+    PersistentZendString string(value);
+
+    ASSERT_NE(string.get(), nullptr);
+    ASSERT_TRUE(GC_FLAGS(string.get()) & IS_STR_PERSISTENT);
+    ASSERT_EQ(std::string(ZSTR_VAL(string.get()), ZSTR_LEN(string.get())), value);
+
+    PersistentZendString moved(std::move(string));
+    ASSERT_EQ(string.get(), nullptr);
+    ASSERT_NE(moved.get(), nullptr);
+}
+
 // Test include with REQUIRE_ONCE (file exists)
 TEST(base_extra, include_require_once) {
     // REQUIRE_ONCE returns true on subsequent includes (file already loaded)

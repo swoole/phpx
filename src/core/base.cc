@@ -631,8 +631,14 @@ static Variant include_impl(zend_string *filename, const int type, const char *e
     return result;
 }
 
-Variant include(const String &file, IncludeType type) {
-    return include_impl(file.str(), type);
+Variant include(Variant file, IncludeType type) {
+    // A compiled function called by ZendVM may throw directly through this
+    // frame. Detach the request-allocated argument before entering ZendVM, and
+    // keep only persistent path storage alive during the included execution.
+    std::string path = file.toStdString();
+    file.unset();
+    PersistentZendString stable_file(path);
+    return include_impl(stable_file.get(), type);
 }
 
 Variant eval(const String &script, const char *filename) {
