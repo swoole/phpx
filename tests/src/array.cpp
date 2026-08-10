@@ -3,12 +3,11 @@
 
 using namespace php;
 
-TEST(array, empty_uses_shared_zend_array_until_first_write) {
+TEST(array, default_constructor_creates_mutable_array) {
     Array array;
 
-    ASSERT_EQ(array.array(), &zend_empty_array);
-    array.append(42);
     ASSERT_NE(array.array(), &zend_empty_array);
+    array.append(42);
     ASSERT_EQ(array.get(0).toInt(), 42);
 }
 

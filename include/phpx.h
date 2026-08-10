@@ -1621,7 +1621,7 @@ class ArrayItem : public Variant {
 class Array : public Variant {
     static void initArray(zval *array, size_t size = 0) {
         if (size == 0) {
-            ZVAL_EMPTY_ARRAY(array);
+            array_init(array);
         } else {
             array_init_size(array, (uint32_t) size);
         }
@@ -2181,7 +2181,7 @@ static inline Reference newReference(const Variant &v) {
 
 static inline Reference getEmptyArrayRef() {
     Reference ref;
-    ZVAL_EMPTY_ARRAY(ref.refval());
+    array_init(ref.refval());
     return ref;
 }
 

@@ -193,16 +193,14 @@ String uniqid(const String &prefix, bool more_entropy) {
 // ========================
 
 Array parse_str(const String &str) {
-    // treat_data() mutates the HashTable directly rather than through Array's
-    // copy-on-write-aware API.
-    Array result(1);
+    Array result;
     auto res = estrndup(str.data(), str.length());
     sapi_module.treat_data(PARSE_STRING, res, result.ptr());
     return result;
 }
 
 void parse_str(const String &str, Array &result) {
-    result = Array(1);
+    result = Array;
     auto res = estrndup(str.data(), str.length());
     sapi_module.treat_data(PARSE_STRING, res, result.ptr());
 }
