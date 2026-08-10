@@ -200,7 +200,7 @@ Array parse_str(const String &str) {
 }
 
 void parse_str(const String &str, Array &result) {
-    result = Array;
+    result = Array();
     auto res = estrndup(str.data(), str.length());
     sapi_module.treat_data(PARSE_STRING, res, result.ptr());
 }
