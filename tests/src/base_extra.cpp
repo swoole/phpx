@@ -418,6 +418,7 @@ TEST(base_extra, exec_function_retval) {
     ASSERT_EQ(rs.toInt(), 5);
 }
 
+#ifdef ENABLE_FACADE_API
 // Test set_time_limit (no-op call, tests the facade)
 TEST(base_extra, facade_set_time_limit) {
     set_time_limit(30);
@@ -599,6 +600,8 @@ TEST(base_extra, facade_string_search) {
     auto rpos = call("strrpos", {"hello world world", "world"});
     ASSERT_EQ(rpos.toInt(), 12);
 }
+
+#endif // ENABLE_FACADE_API
 
 // Test sort with flags
 TEST(base_extra, sort_with_flags) {

@@ -19,7 +19,7 @@ TEST(string, match) {
 
     // Compare with preg_match
     Array preg_result;
-    php::preg_match(pattern, str, preg_result.toReference());
+    call("preg_match", {pattern, str, preg_result.toReference()});
     ASSERT_EQ(result[0].toString(), preg_result[0].toString());
     ASSERT_EQ(result[1].toString(), preg_result[1].toString());
 }

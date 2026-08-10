@@ -511,7 +511,7 @@ TEST(variant, json) {
     ASSERT_EQ(json_encode(v5).toBool(), false);
 
     var error = json_last_error();
-    ASSERT_TRUE(error.equals(JSON_ERROR_UTF8));
+    ASSERT_TRUE(error.equals(constant("JSON_ERROR_UTF8")));
 }
 
 TEST(variant, ref0) {

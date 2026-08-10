@@ -649,7 +649,7 @@ TEST(object, array_property_map_via_attr) {
 }
 
 TEST(object, toObject2) {
-    auto v = date_create("now");
+    auto v = call("date_create", {"now"});
     auto o = toObject(v, "DateTime");
     auto ts = o.call("getTimestamp");
     ASSERT_GE(ts.toInt(), 10000000);

@@ -38,12 +38,12 @@ TEST(exists, basic_array_access) {
 }
 
 TEST(exists, object_array_access_uses_offset_exists_before_read) {
-    WeakMap map;
+    auto map = newObject("WeakMap");
     auto source = newObject("stdClass");
     auto missing = newObject("stdClass");
-    map.offsetSet(source, "cached");
+    map.call("offsetSet", {source, "cached"});
 
-    Variant v = map.getObject();
+    Variant v = map;
 
     ASSERT_TRUE(exists(v, {{ArrayDimFetch, source}}));
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, missing}}));
