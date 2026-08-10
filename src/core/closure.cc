@@ -111,6 +111,11 @@ Object newClosure(const ClosureFn &fn,
     String fnName("{closure}");
     func->type = ZEND_INTERNAL_FUNCTION;
     func->internal_function.handler = [](INTERNAL_FUNCTION_PARAMETERS) {
+        if (UNEXPECTED(Z_TYPE(execute_data->This) != IS_OBJECT
+                       || Z_OBJ(execute_data->This)->handlers != &closure_carrier_handlers)) {
+            throwError("Closure::call(), Closure::bind(), and Closure::bindTo() are not supported for TypePHP closures");
+            return;
+        }
         auto *state = closure_carrier_from_obj(Z_OBJ_P(ZEND_THIS))->state();
         auto rv = state->fn_(INTERNAL_FUNCTION_PARAM_PASSTHRU, state->this_, state->vars_);
         zval *retval = rv.direct_ptr();

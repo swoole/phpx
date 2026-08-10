@@ -104,4 +104,21 @@ TEST(closure, preserves_lexical_scope) {
     auto closure = newClosure(fn, {}, object, lexical_scope);
     ASSERT_STREQ(closure().toCString(), "PhpxClosureScopeParent");
 }
+
+TEST(closure, call_is_rejected_without_type_confusion) {
+    auto result = run_in_child_capture_stdout([]() -> int {
+        eval("class PhpxClosureCallPublicTarget { public string $value = 'bound'; }");
+        ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &) -> Variant {
+            return this_.get("value");
+        };
+
+        auto closure = newClosure(fn);
+        auto target = newObject("PhpxClosureCallPublicTarget");
+        closure.call("call", {target});
+        return 0;
+    });
+
+    ASSERT_TRUE(result.exited) << result.output;
+    ASSERT_EQ(result.exit_code, 1) << result.output;
+}
 #endif
