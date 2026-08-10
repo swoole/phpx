@@ -226,6 +226,8 @@ int array_data_compare(Bucket *f, Bucket *s);
 bool prepare_slice(long &offset, long &length, size_t total);
 Variant call_impl(const zval *object, const zval *func, Args &args, zend_array *named_args = nullptr);
 Variant call_impl(const zval *object, const zval *func);
+bool rejectConstructorCall(zend_function *func);
+bool rejectCloneCall(zend_function *func);
 
 #ifdef ZTS
 #define THREAD_LOCAL thread_local

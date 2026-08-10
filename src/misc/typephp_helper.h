@@ -46,6 +46,50 @@ extern zend_function *php_get_method(int func_id,
                                      const php::Str &class_name);
 extern uint32_t php_get_prop(int prop_id, const php::Str &prop_name, int class_id, const php::Str &class_name);
 
+/** Invoke the lexical parent constructor as part of a new-expression chain. */
+static inline php::Variant typephp_call_parent_constructor(php::Object &object,
+                                                           zend_function *constructor,
+                                                           php::Args &args,
+                                                           zend_array *named_args = nullptr) {
+    php::Variant retval;
+    zend_call_known_function(
+        constructor, object.checkedObject("Call to parent constructor"), object.ce(), retval.ptr(),
+        args.count(), args.ptr(), named_args);
+    php::throwErrorIfOccurred();
+    return retval;
+}
+
+static inline php::Variant typephp_call_parent_constructor(php::Object &object, zend_function *constructor) {
+    php::Args args;
+    return typephp_call_parent_constructor(object, constructor, args);
+}
+
+static inline php::Variant typephp_call_parent_constructor(php::Object &object,
+                                                           zend_function *constructor,
+                                                           const php::ArgList &args,
+                                                           zend_array *named_args = nullptr) {
+    php::Args call_args(args);
+    return typephp_call_parent_constructor(object, constructor, call_args, named_args);
+}
+
+static inline php::Variant typephp_call_parent_constructor(php::Object &object,
+                                                           zend_function *constructor,
+                                                           php::Array &args,
+                                                           zend_array *named_args = nullptr) {
+    php::Args call_args(args);
+    return typephp_call_parent_constructor(object, constructor, call_args, named_args);
+}
+
+/** Invoke the lexical parent clone hook as part of a clone-expression chain. */
+static inline php::Variant typephp_call_parent_clone(php::Object &object, zend_function *clone_method) {
+    php::Variant retval;
+    zend_call_known_function(
+        clone_method, object.checkedObject("Call to parent clone method"), object.ce(), retval.ptr(),
+        0, nullptr, nullptr);
+    php::throwErrorIfOccurred();
+    return retval;
+}
+
 /**
  * Create a deep copy from $GLOBALS. $GLOBALS is a special INDIRECT zval
  * pointing to &EG(symbol_table), whose refcount MUST NOT be directly

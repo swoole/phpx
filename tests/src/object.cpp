@@ -912,6 +912,54 @@ TEST(object, call) {
     ASSERT_STREQ(rs.toCString(), "2000-01-01 00:00:00");
 }
 
+TEST(object, variant_call_rejects_constructor) {
+    eval(R"PHP(
+        class PhpxConstructorCallProbe {
+            public int $value = 0;
+            public function __construct(int $value = 1) {
+                $this->value = $value;
+            }
+        }
+    )PHP");
+
+    auto object = newObject("PhpxConstructorCallProbe", {1});
+    try_call(
+        [&object]() { object.call("__construct", {2}); },
+        "Constructor PhpxConstructorCallProbe::__construct() can only be invoked by new");
+
+    auto *constructor = getMethod(object.ce(), "__construct");
+    try_call(
+        [&object, constructor]() { object.call(constructor, {3}); },
+        "Constructor PhpxConstructorCallProbe::__construct() can only be invoked by new");
+
+    ASSERT_EQ(object.get("value").toInt(), 1);
+}
+
+TEST(object, variant_call_rejects_clone_method) {
+    eval(R"PHP(
+        class PhpxCloneCallProbe {
+            public int $value = 1;
+            public function __clone() {
+                $this->value = 2;
+            }
+        }
+    )PHP");
+
+    auto object = newObject("PhpxCloneCallProbe");
+    try_call(
+        [&object]() { object.call("__clone"); },
+        "Clone method PhpxCloneCallProbe::__clone() can only be invoked by clone");
+
+    auto *clone_method = getMethod(object.ce(), "__clone");
+    try_call(
+        [&object, clone_method]() { object.call(clone_method); },
+        "Clone method PhpxCloneCallProbe::__clone() can only be invoked by clone");
+
+    auto copy = object.clone();
+    ASSERT_EQ(object.get("value").toInt(), 1);
+    ASSERT_EQ(copy.get("value").toInt(), 2);
+}
+
 TEST(object, call_args_on_indirect_property_object) {
     auto holder = newObject("stdClass");
     holder.attr("inner", AttrMode::Update) = newObject("DateTime", {"2000-01-01"});

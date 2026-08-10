@@ -474,10 +474,40 @@ static void call_function_impl(const zval *zobject,
             zend_hash_update_ptr(func_cache_map, Z_STR_P(function_name), _cache);
         }
     _do_call:
-        zend_call_function(&fci, fci_cache);
+        if (!rejectConstructorCall(fci_cache->function_handler)
+            && !rejectCloneCall(fci_cache->function_handler)) {
+            zend_call_function(&fci, fci_cache);
+        }
     }
 
     throwErrorIfOccurred();
+}
+
+bool rejectConstructorCall(zend_function *func) {
+    if (EXPECTED(!(func->common.fn_flags & ZEND_ACC_CTOR))) {
+        return false;
+    }
+
+    const char *class_name = func->common.scope && func->common.scope->name
+        ? ZSTR_VAL(func->common.scope->name)
+        : "unknown";
+    throwError("Constructor %s::__construct() can only be invoked by new", class_name);
+    return true;
+}
+
+bool rejectCloneCall(zend_function *func) {
+    // Zend resolves the effective clone hook once while linking the class.
+    // Pointer identity avoids repeating a case-insensitive method-name lookup
+    // on every dynamic call.
+    if (EXPECTED(func->common.scope == nullptr || func->common.scope->clone != func)) {
+        return false;
+    }
+
+    const char *class_name = func->common.scope && func->common.scope->name
+        ? ZSTR_VAL(func->common.scope->name)
+        : "unknown";
+    throwError("Clone method %s::__clone() can only be invoked by clone", class_name);
+    return true;
 }
 
 Variant call_impl(const zval *object, const zval *func, Args &args, zend_array *named_args) {
