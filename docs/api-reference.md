@@ -712,7 +712,7 @@ void define(const String &name, const Variant &value);
 
 ```cpp
 // 包含文件
-Variant include(const String &file, IncludeType type = INCLUDE);
+Variant include(Variant file, IncludeType type = INCLUDE);
 Variant eval(const String &script);
 
 // 包含类型
