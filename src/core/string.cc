@@ -185,7 +185,9 @@ String String::substr(long f, long l) const {
 }
 
 Array String::split(const String &delim, const Int limit) const {
-    Array retval;
+    // php_explode() writes directly to the HashTable and cannot separate the
+    // shared immutable empty array on our behalf.
+    Array retval(1);
     php_explode(delim.str(), str(), retval.ptr(), limit);
     return retval;
 }

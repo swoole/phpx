@@ -1619,6 +1619,14 @@ class ArrayItem : public Variant {
 };
 
 class Array : public Variant {
+    static void initArray(zval *array, size_t size = 0) {
+        if (size == 0) {
+            ZVAL_EMPTY_ARRAY(array);
+        } else {
+            array_init_size(array, (uint32_t) size);
+        }
+    }
+
     void copyFrom(const ArrayList &list);
     void copyFrom(const StrKeyMap &list);
     void copyFrom(const StdStrKeyMap &list);
@@ -1676,7 +1684,7 @@ class Array : public Variant {
 
     void checkArray() {
         if (isNull() || isUndef()) {
-            array_init(unwrap_ptr());
+            initArray(unwrap_ptr());
         } else if (!isArray()) {
             throwError("parameter 1 must be `array`, got `%s`", typeStr());
         }
@@ -1684,16 +1692,15 @@ class Array : public Variant {
 
     void rebuild(size_t size = 0) {
         destroy();
-        auto zarr = unwrap_ptr();
-        array_init_size(zarr, (uint32_t) size);
+        initArray(unwrap_ptr(), size);
     }
 
   public:
     Array() {
-        array_init(&val);
+        initArray(&val);
     }
     explicit Array(size_t N) {
-        array_init_size(&val, (uint32_t) N);
+        initArray(&val, N);
     }
     Array(const zval *v, Ctor method = Ctor::Copy) : Variant(v, method) {
         checkArray();
@@ -1707,37 +1714,37 @@ class Array : public Variant {
 
     template <typename T, std::size_t N>
     Array(const StdArray<T, N> &arr) {
-        array_init_size(&val, (uint32_t) N);
+        initArray(&val, N);
         copyFrom(arr);
     }
 
     template <typename T>
     Array(const StdVector<T> &arr) {
-        array_init_size(&val, (uint32_t) arr.size());
+        initArray(&val, arr.size());
         copyFrom(arr);
     }
 
     template <typename K, typename T>
     Array(const StdOrderedMap<K, T> &map) {
-        array_init_size(&val, (uint32_t) map.size());
+        initArray(&val, map.size());
         copyFrom(map);
     }
 
     template <typename K, typename T>
     Array(const StdMap<K, T> &map) {
-        array_init_size(&val, (uint32_t) map.size());
+        initArray(&val, map.size());
         copyFrom(map);
     }
 
     template <typename... Ts>
     Array(const std::tuple<Ts...> &values) {
-        array_init_size(&val, sizeof...(Ts));
+        initArray(&val, sizeof...(Ts));
         copyFromTuple(values);
     }
 
     template <typename... Ts>
     Array(std::tuple<Ts...> &&values) {
-        array_init_size(&val, sizeof...(Ts));
+        initArray(&val, sizeof...(Ts));
         copyFromTuple(std::move(values));
     }
 
@@ -2174,7 +2181,7 @@ static inline Reference newReference(const Variant &v) {
 
 static inline Reference getEmptyArrayRef() {
     Reference ref;
-    array_init(ref.refval());
+    ZVAL_EMPTY_ARRAY(ref.refval());
     return ref;
 }
 

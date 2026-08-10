@@ -36,8 +36,10 @@ Array explode(const String &delimiter, const String &string, Int limit) {
     }
 
     if (limit > 1) {
+        result = Array(1);
         php_explode(delimiter.str(), string.str(), result.ptr(), limit);
     } else if (limit < 0) {
+        result = Array(1);
         php_explode_negative_limit(delimiter.str(), string.str(), result.ptr(), limit);
     } else {
         // limit == 0 or 1: return the whole string as a single element

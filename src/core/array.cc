@@ -124,22 +124,22 @@ void Array::copyFrom(const IntKeyMap &list) {
 }
 
 Array::Array(const ArrayList &list) {
-    array_init(&val);
+    initArray(&val, list.size());
     copyFrom(list);
 }
 
 Array::Array(const StrKeyMap &list) {
-    array_init(&val);
+    initArray(&val, list.size());
     copyFrom(list);
 }
 
 Array::Array(const StdStrKeyMap &list) {
-    array_init(&val);
+    initArray(&val, list.size());
     copyFrom(list);
 }
 
 Array::Array(const IntKeyMap &list) {
-    array_init(&val);
+    initArray(&val, list.size());
     copyFrom(list);
 }
 
@@ -339,21 +339,28 @@ ArrayItem::ArrayItem(Array &_array, zend_ulong _index, const String &_key)
 }
 
 ArrayItem &ArrayItem::operator=(const Variant &v) {
-    const auto zv = NO_CONST_V(v);
-    zend_array *ht = array_.array();
+    zval copied;
+    zval_copy(&copied, v.direct_ptr());
 
-    if (isIndirect()) {
-        copyFrom(v.unwrap_ptr());
+    auto zarr = array_.unwrap_ptr();
+    SEPARATE_ARRAY(zarr);
+    zend_array *ht = Z_ARR_P(zarr);
+    zval *new_zv;
+    if (key_.str() != zend_empty_string) {
+        new_zv = zend_symtable_find(ht, key_.str());
     } else {
-        zval *new_zv;
-        Z_TRY_ADDREF_P(zv);
-        if (key_.str() != zend_empty_string) {
-            new_zv = zend_symtable_update(ht, key_.str(), zv);
-        } else {
-            new_zv = zend_hash_index_update(ht, index_, zv);
-        }
-        ZVAL_INDIRECT(&val, new_zv);
+        new_zv = zend_hash_index_find(ht, index_);
     }
+    if (new_zv != nullptr) {
+        Variant target(new_zv, Z_ISREF_P(new_zv) ? Ctor::CopyRef : Ctor::Indirect);
+        target.copyFrom(&copied);
+        zval_ptr_dtor(&copied);
+    } else if (key_.str() != zend_empty_string) {
+        new_zv = zend_symtable_update(ht, key_.str(), &copied);
+    } else {
+        new_zv = zend_hash_index_update(ht, index_, &copied);
+    }
+    ZVAL_INDIRECT(&val, new_zv);
 
     return *this;
 }

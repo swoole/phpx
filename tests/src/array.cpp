@@ -3,6 +3,38 @@
 
 using namespace php;
 
+TEST(array, empty_uses_shared_zend_array_until_first_write) {
+    Array array;
+
+    ASSERT_EQ(array.array(), &zend_empty_array);
+    array.append(42);
+    ASSERT_NE(array.array(), &zend_empty_array);
+    ASSERT_EQ(array.get(0).toInt(), 42);
+}
+
+TEST(array, subscript_assignment_preserves_copy_on_write) {
+    Array original{"original"};
+    Array copy = original;
+
+    copy[0] = "changed";
+
+    ASSERT_STREQ(original.get(0).toCString(), "original");
+    ASSERT_STREQ(copy.get(0).toCString(), "changed");
+}
+
+TEST(array, subscript_assignment_updates_existing_reference) {
+    Variant value = "original";
+    Reference reference = value.toReference();
+    Variant referenced(reference.const_ptr(), Ctor::CopyRef);
+    Array array;
+    array.append(referenced);
+
+    array[0] = "changed";
+
+    ASSERT_STREQ(reference.toCString(), "changed");
+    ASSERT_TRUE(array.get(0).isReference());
+}
+
 TEST(array, tuple_conversion) {
     auto values = std::make_tuple(42, String("hello"), true);
     Array array(values);

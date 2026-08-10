@@ -265,7 +265,12 @@ static void _copy_constant_array(zval *dst, zval *src) {
     zend_ulong idx;
     zval *new_val, *val;
 
-    array_init_size(dst, zend_hash_num_elements(Z_ARRVAL_P(src)));
+    const uint32_t size = zend_hash_num_elements(Z_ARRVAL_P(src));
+    if (size == 0) {
+        ZVAL_EMPTY_ARRAY(dst);
+        return;
+    }
+    array_init_size(dst, size);
     ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(src), idx, key, val) {
         ZVAL_DEREF(val);
         if (key) {

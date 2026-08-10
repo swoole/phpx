@@ -157,7 +157,7 @@ Array array_keys_filter(const Array &array, const Variant &filter_value, bool st
         return Array();
     }
 
-    Array result;
+    Array result(static_cast<size_t>(elem_count));
     zval *entry;
     zend_ulong num_idx;
     zend_string *str_idx;
@@ -219,7 +219,7 @@ Array array_values(const Array &array) {
     // Convert to list (re-indexed) via zend internal API
     zend_array *new_ht = zend_array_to_list(arrval);
     Array result;
-    zend_array_destroy(result.array());  // free empty init array
+    zval_ptr_dtor(result.ptr());
     ZVAL_ARR(result.ptr(), new_ht);      // take ownership of new_ht
     return result;
 }
@@ -349,7 +349,7 @@ Array array_fill(Int start_index, Int count, const Variant &value) {
     }
 
     Array result;
-    zend_array_destroy(result.array());
+    zval_ptr_dtor(result.ptr());
     ZVAL_ARR(result.ptr(), dest);
     return result;
 }
