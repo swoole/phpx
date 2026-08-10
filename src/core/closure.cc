@@ -113,7 +113,7 @@ Object newClosure(const ClosureFn &fn,
     func->internal_function.handler = [](INTERNAL_FUNCTION_PARAMETERS) {
         if (UNEXPECTED(Z_TYPE(execute_data->This) != IS_OBJECT
                        || Z_OBJ(execute_data->This)->handlers != &closure_carrier_handlers)) {
-            throwError("Closure::call(), Closure::bind(), and Closure::bindTo() are not supported for TypePHP closures");
+            throwError("Closure::call(), Closure::bind(), and Closure::bindTo() are not supported");
             return;
         }
         auto *state = closure_carrier_from_obj(Z_OBJ_P(ZEND_THIS))->state();
