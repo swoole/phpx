@@ -172,6 +172,57 @@ TEST(std_misc, json_decode) {
     ASSERT_EQ(r3.toInt(), 42);
 }
 
+TEST(std_misc, json_exceptions_and_options) {
+    bool decode_caught = false;
+    try {
+        (void) fn::json_decode("{broken", true, 512, PHP_JSON_THROW_ON_ERROR);
+    } catch (zend_object *) {
+        auto exception = catchException();
+        decode_caught = exception.instanceOf("JsonException");
+    }
+    ASSERT_TRUE(decode_caught);
+
+    bool encode_caught = false;
+    try {
+        (void) fn::json_encode(NAN, PHP_JSON_THROW_ON_ERROR);
+    } catch (zend_object *) {
+        auto exception = catchException();
+        encode_caught = exception.instanceOf("JsonException");
+    }
+    ASSERT_TRUE(encode_caught);
+
+    auto partial = fn::json_encode(NAN, PHP_JSON_THROW_ON_ERROR | PHP_JSON_PARTIAL_OUTPUT_ON_ERROR);
+    ASSERT_STREQ(partial.toCString(), "0");
+
+    ASSERT_TRUE(fn::json_decode("{broken").isNull());
+    ASSERT_EQ(JSON_G(error_code), PHP_JSON_ERROR_SYNTAX);
+    ASSERT_TRUE(fn::json_decode("{}").isObject());
+    ASSERT_EQ(JSON_G(error_code), PHP_JSON_ERROR_NONE);
+
+    auto object = fn::json_decode("{\"value\":1}", false, 512, PHP_JSON_OBJECT_AS_ARRAY);
+    ASSERT_TRUE(object.isObject());
+
+    bool depth_caught = false;
+    try {
+        (void) fn::json_decode("{}", true, 0);
+    } catch (zend_object *) {
+        auto exception = catchException();
+        depth_caught = exception.instanceOf("ValueError");
+    }
+    ASSERT_TRUE(depth_caught);
+
+#if SIZEOF_ZEND_LONG > 4
+    bool oversized_depth_caught = false;
+    try {
+        (void) fn::json_decode("{}", true, static_cast<zend_long>(INT_MAX) + 1);
+    } catch (zend_object *) {
+        auto exception = catchException();
+        oversized_depth_caught = exception.instanceOf("ValueError");
+    }
+    ASSERT_TRUE(oversized_depth_caught);
+#endif
+}
+
 // ========================
 // Serialize
 // ========================

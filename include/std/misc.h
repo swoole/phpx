@@ -200,12 +200,33 @@ inline Int rand(Int min, Int max) {
 // json_encode(mixed $value, int $flags = 0, int $depth = 512): string|false
 // ========================
 
-inline Variant json_encode(const Variant &value, int options = 0, int depth = 512) {
+namespace detail {
+inline void throwJsonException(php_json_error_code code) {
+    // php_json_get_error_msg() is private to ext/json. Query the public PHP
+    // function only on the exceptional path so messages stay version-correct
+    // without adding overhead to successful encoding.
+    Variant message = php::call(php::getFunction(String("json_last_error_msg")), {});
+    php::throwException(php::getClassEntrySafe(String("JsonException")), message.toCString(), code);
+}
+}  // namespace detail
+
+inline Variant json_encode(const Variant &value, int options = 0, zend_long depth = 512) {
     smart_str buf = {0};
-    if (php_json_encode_ex(&buf, const_cast<zval *>(value.unwrap_ptr()), options, depth) != SUCCESS) {
-        smart_str_free(&buf);
-        return Variant(false);
+    php_json_encode_ex(&buf, const_cast<zval *>(value.unwrap_ptr()), options, depth);
+
+    const php_json_error_code error = static_cast<php_json_error_code>(JSON_G(error_code));
+    if (error != PHP_JSON_ERROR_NONE) {
+        if ((options & PHP_JSON_THROW_ON_ERROR) && !(options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR)) {
+            smart_str_free(&buf);
+            detail::throwJsonException(error);
+            return Variant(false);
+        }
+        if (!(options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR)) {
+            smart_str_free(&buf);
+            return Variant(false);
+        }
     }
+
     smart_str_0(&buf);
     if (!buf.s) {
         return Variant(String());
@@ -219,12 +240,34 @@ inline Variant json_encode(const Variant &value, int options = 0, int depth = 51
 // json_decode(string $json, ?bool $assoc = null, int $depth = 512, int $flags = 0): mixed
 // ========================
 
-inline Variant json_decode(const String &json, const Variant &assoc = Variant(), int depth = 512, int options = 0) {
+inline Variant json_decode(
+    const String &json, const Variant &assoc = Variant(), zend_long depth = 512, int options = 0) {
+    if (UNEXPECTED(depth <= 0)) {
+        php::throwExceptionEx(
+            zend_ce_value_error, 0, "json_decode(): Argument #3 ($depth) must be greater than 0");
+        return Variant(nullptr);
+    }
+    if (UNEXPECTED(depth > INT_MAX)) {
+        php::throwExceptionEx(
+            zend_ce_value_error, 0, "json_decode(): Argument #3 ($depth) must be less than %d", INT_MAX);
+        return Variant(nullptr);
+    }
+
+    if (!(options & PHP_JSON_THROW_ON_ERROR)) {
+        JSON_G(error_code) = PHP_JSON_ERROR_NONE;
+    }
+    if (!assoc.isNull()) {
+        if (assoc.toBool()) {
+            options |= PHP_JSON_OBJECT_AS_ARRAY;
+        } else {
+            options &= ~PHP_JSON_OBJECT_AS_ARRAY;
+        }
+    }
+
     zval retval;
     ZVAL_NULL(&retval);
-    bool assoc_bool = assoc.isNull() ? false : assoc.toBool();
-    if (php_json_decode_ex(
-            &retval, json.data(), json.length(), options | (assoc_bool ? PHP_JSON_OBJECT_AS_ARRAY : 0), depth) != SUCCESS) {
+    if (php_json_decode_ex(&retval, json.data(), json.length(), options, depth) != SUCCESS) {
+        php::throwErrorIfOccurred();
         return Variant(nullptr);
     }
     return Variant(&retval, Ctor::Move);
