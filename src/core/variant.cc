@@ -1258,9 +1258,6 @@ Variant Variant::call(const Variant &fn, Array &args, zend_array *named_args) {
 Variant Variant::call(zend_function *fn) {
     auto obj = checkedObject("Call to a member function");
     Variant retval{};
-    if (rejectConstructorCall(fn) || rejectCloneCall(fn)) {
-        return retval;
-    }
     zend_call_known_function(fn, obj, obj->ce, retval.ptr(), 0, nullptr, nullptr);
     throwErrorIfOccurred();
     return retval;
@@ -1269,9 +1266,6 @@ Variant Variant::call(zend_function *fn) {
 Variant Variant::call(zend_function *fn, Args &_args, zend_array *named_args) {
     auto obj = checkedObject("Call to a member function");
     Variant retval{};
-    if (rejectConstructorCall(fn) || rejectCloneCall(fn)) {
-        return retval;
-    }
     zend_call_known_function(fn, obj, obj->ce, retval.ptr(), _args.count(), _args.ptr(), named_args);
     throwErrorIfOccurred();
     return retval;
