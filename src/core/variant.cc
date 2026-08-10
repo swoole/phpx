@@ -182,27 +182,6 @@ Array Variant::toArray() const {
     return Array(unwrap_ptr());
 }
 
-Variant toPlainValue(const Variant &value) {
-    if (UNEXPECTED(!value.isObject())) {
-        throwError("toPlainValue() currently supports PyObject only, got %s", value.typeStr());
-        return {};
-    }
-
-    // PyObject and PyCore are internal extension classes registered during
-    // MINIT, so their class and method metadata remain valid for the lifetime
-    // of the PHP process. Unlike user-defined symbols, no request cleanup is
-    // required for these pointers.
-    static zend_class_entry *const py_object_ce = getClassEntry("PyObject");
-    auto object = value.toObject();
-    if (UNEXPECTED(py_object_ce == nullptr || !object.instanceOf(py_object_ce))) {
-        throwError("toPlainValue() currently supports PyObject only, got %s", object.getClassName().data());
-        return {};
-    }
-
-    static zend_function *const scalar = getMethod(getClassEntrySafe("PyCore"), "scalar");
-    return php::call(scalar->common.scope, scalar, ArgList{value});
-}
-
 Object Variant::toObject() const {
     return Object(unwrap_ptr());
 }
