@@ -156,7 +156,49 @@ Object newClosure(const ClosureFn &fn,
     return {&closure, Ctor::Move};
 }
 
-Object makeScopedCallable(const Variant &callable, const CallableScope &scope) {
+static bool isRelativeCallableClass(const zval *callable) {
+    const zval *class_name = nullptr;
+    if (Z_TYPE_P(callable) == IS_STRING) {
+        const char *separator = static_cast<const char *>(
+            php_memnstr(Z_STRVAL_P(callable), "::", 2, Z_STRVAL_P(callable) + Z_STRLEN_P(callable)));
+        if (separator == nullptr) {
+            return false;
+        }
+        const size_t length = static_cast<size_t>(separator - Z_STRVAL_P(callable));
+        return (length == 4 && zend_binary_strcasecmp(Z_STRVAL_P(callable), length, "self", 4) == 0)
+            || (length == 6 && zend_binary_strcasecmp(Z_STRVAL_P(callable), length, "parent", 6) == 0)
+            || (length == 6 && zend_binary_strcasecmp(Z_STRVAL_P(callable), length, "static", 6) == 0);
+    }
+    if (Z_TYPE_P(callable) == IS_ARRAY) {
+        class_name = zend_hash_index_find(Z_ARRVAL_P(callable), 0);
+        if (class_name == nullptr) {
+            return false;
+        }
+        ZVAL_DEREF(class_name);
+        if (Z_TYPE_P(class_name) != IS_STRING) {
+            return false;
+        }
+        return zend_string_equals_literal_ci(Z_STR_P(class_name), "self")
+            || zend_string_equals_literal_ci(Z_STR_P(class_name), "parent")
+            || zend_string_equals_literal_ci(Z_STR_P(class_name), "static");
+    }
+    return false;
+}
+
+static bool canReuseResolvedCallable(const Variant &callable, const zend_fcall_info_cache &cache) {
+    if (cache.function_handler->common.fn_flags & ZEND_ACC_CALL_VIA_TRAMPOLINE) {
+        return false;
+    }
+    if (cache.function_handler->common.scope != nullptr
+        && !(cache.function_handler->common.fn_flags & ZEND_ACC_PUBLIC)) {
+        return false;
+    }
+    return !isRelativeCallableClass(callable.unwrap_ptr());
+}
+
+static Variant makeScopedCallableImpl(const Variant &callable,
+                                      const CallableScope &scope,
+                                      bool reuse_public_callable) {
     if (UNEXPECTED(scope.caller_function == nullptr || scope.lexicalScope() == nullptr)) {
         throwError("Explicit callable scope must not be null");
         return {};
@@ -185,6 +227,14 @@ Object makeScopedCallable(const Variant &callable, const CallableScope &scope) {
         }
         throwError("%s", message.c_str());
         return {};
+    }
+
+    // Public callbacks with an absolute target resolve identically without the
+    // caller's lexical scope. Preserve their original representation and avoid
+    // allocating a fake Closure on every internal-function invocation.
+    if (reuse_public_callable && canReuseResolvedCallable(callable, cache)) {
+        zend_release_fcall_info_cache(&cache);
+        return {callable};
     }
 
     if (!(cache.function_handler->common.fn_flags & ZEND_ACC_CALL_VIA_TRAMPOLINE)) {
@@ -240,16 +290,30 @@ Object makeScopedCallable(const Variant &callable, const CallableScope &scope) {
     return newClosure(forward, {callable}, bound_this, scope.lexicalScope());
 }
 
+Variant prepareScopedCallback(const Variant &callable, const CallableScope &scope) {
+    return makeScopedCallableImpl(callable, scope, true);
+}
+
+Object makeScopedCallable(const Variant &callable, const CallableScope &scope) {
+    return Object(makeScopedCallableImpl(callable, scope, false));
+}
+
 Array makeScopedCallableMap(const Variant &callbacks, const CallableScope &scope) {
     if (UNEXPECTED(!callbacks.isArray())) {
         throwError("Scoped callback map must be an array, %s given", callbacks.typeStr());
         return {};
     }
 
-    Array result;
     Array source(callbacks);
+    // Array uses Zend's copy-on-write semantics. If every callback can be
+    // reused, no HashTable is copied. The first scoped replacement separates
+    // the array once, after which only the values requiring a Closure change.
+    Array result(callbacks);
     for (auto item : source) {
-        result.set(item.key, makeScopedCallable(item.value, scope));
+        Variant scoped = prepareScopedCallback(item.value, scope);
+        if (!fast_is_identical_function(scoped.unwrap_ptr(), item.value.unwrap_ptr())) {
+            result.set(item.key, scoped);
+        }
     }
     return result;
 }

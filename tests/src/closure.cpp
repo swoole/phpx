@@ -112,6 +112,10 @@ TEST(closure, scoped_callable_preserves_private_and_magic_dispatch) {
                 return $value * 3;
             }
 
+            public function publicMultiply(int $value): int {
+                return $value * 4;
+            }
+
             public function __call(string $name, array $args): string {
                 return 'magic:' . $name . ':' . $args[0];
             }
@@ -128,7 +132,18 @@ TEST(closure, scoped_callable_preserves_private_and_magic_dispatch) {
     auto *target_scope = getClassEntry("PhpxScopedCallableTarget");
     CallableScope instance_scope{getMethod(target_scope, "multiply"), object.ce(), object.object()};
     auto private_callable = makeScopedCallable(callback, instance_scope);
+    ASSERT_TRUE(private_callable.isObject());
     ASSERT_EQ(private_callable({7}).toInt(), 21);
+
+    Array public_callback{object, "publicMultiply"};
+    auto public_callable = prepareScopedCallback(public_callback, instance_scope);
+    ASSERT_TRUE(public_callable.isArray());
+    ASSERT_EQ(call("array_map", {public_callable, Array{2}}).toArray().get(0).toInt(), 8);
+
+    Array relative_public_callback{"self", "publicMultiply"};
+    auto relative_public_callable = makeScopedCallable(relative_public_callback, instance_scope);
+    ASSERT_TRUE(relative_public_callable.isObject());
+    ASSERT_EQ(relative_public_callable({3}).toInt(), 12);
 
     Array self_callback{"self", "multiply"};
     ASSERT_EQ(callScoped(self_callback, instance_scope, {6}).toInt(), 18);
@@ -147,8 +162,18 @@ TEST(closure, scoped_callable_preserves_private_and_magic_dispatch) {
 
     Array callbacks;
     callbacks.set("triple", callback);
+    callbacks.set("quadruple", public_callback);
     auto scoped_callbacks = makeScopedCallableMap(callbacks, instance_scope);
+    ASSERT_NE(scoped_callbacks.array(), callbacks.array());
+    ASSERT_TRUE(scoped_callbacks.get("triple").isObject());
+    ASSERT_TRUE(scoped_callbacks.get("quadruple").isArray());
     ASSERT_EQ(scoped_callbacks.get("triple")({4}).toInt(), 12);
+    ASSERT_EQ(call(scoped_callbacks.get("quadruple"), {4}).toInt(), 16);
+
+    Array public_callbacks;
+    public_callbacks.set("quadruple", public_callback);
+    auto reusable_callbacks = makeScopedCallableMap(public_callbacks, instance_scope);
+    ASSERT_EQ(reusable_callbacks.array(), public_callbacks.array());
 }
 
 TEST(closure, call_is_rejected_without_type_confusion) {

@@ -2287,6 +2287,7 @@ extern Object newClosure(const ClosureFn &fn,
                          const Object &_this = {},
                          zend_class_entry *scope = nullptr,
                          std::initializer_list<const char *> parameter_names = {});
+extern PHPX_API Variant prepareScopedCallback(const Variant &callable, const CallableScope &scope);
 extern PHPX_API Object makeScopedCallable(const Variant &callable, const CallableScope &scope);
 extern PHPX_API Array makeScopedCallableMap(const Variant &callbacks, const CallableScope &scope);
 
