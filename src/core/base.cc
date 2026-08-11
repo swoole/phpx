@@ -16,6 +16,7 @@
 
 #include "phpx.h"
 #include "phpx_fake_scope_guard.h"
+#include "callable_scope.h"
 
 namespace php {
 void initDecimalContext();
@@ -460,19 +461,8 @@ static void call_function_impl(const zval *zobject,
 
     bool callable = fci_cache != nullptr;
     if (!callable && explicit_scope != nullptr) {
-        // zend_is_callable_at_frame() only reads the supplied frame while
-        // resolving visibility. This stack-local frame makes the lexical
-        // scope explicit without mutating EG(current_execute_data) or the
-        // shared zend_function currently executing interpreted PHP code.
-        zend_function scope_function{};
-        scope_function.type = ZEND_USER_FUNCTION;
-        scope_function.common.scope = explicit_scope;
-
-        zend_execute_data scope_frame{};
-        zend_vm_init_call_frame(
-            &scope_frame, ZEND_CALL_TOP_FUNCTION, &scope_function, 0, explicit_scope);
-        callable = zend_is_callable_at_frame(
-            &fci.function_name, fci.object, &scope_frame, 0, &fcc, &error);
+        detail::CallableScopeFrame scope_frame(explicit_scope);
+        callable = scope_frame.resolve(&fci.function_name, fci.object, &fcc, &error);
     } else if (!callable) {
         callable = zend_is_callable_ex(&fci.function_name, fci.object, 0, NULL, &fcc, &error);
     }

@@ -15,6 +15,7 @@
 */
 
 #include "phpx.h"
+#include "callable_scope.h"
 
 #include "zend_closures.h"
 
@@ -161,6 +162,58 @@ Object makeScopedCallable(const Variant &callable, zend_class_entry *scope) {
         return {};
     }
 
+    if (callable.isObject() && instanceof_function(callable.ce(), zend_ce_closure)) {
+        return {callable};
+    }
+
+    zend_fcall_info_cache cache{};
+    char *error = nullptr;
+    zval callable_value;
+    ZVAL_COPY_VALUE(&callable_value, callable.unwrap_ptr());
+    detail::CallableScopeFrame scope_frame(scope);
+    if (!scope_frame.resolve(&callable_value, nullptr, &cache, &error)) {
+        auto callable_name = zend_get_callable_name(&callable_value);
+        std::string message = "Invalid callback ";
+        message.append(ZSTR_VAL(callable_name), ZSTR_LEN(callable_name));
+        if (error != nullptr) {
+            message.append(", ");
+            message.append(error);
+        }
+        zend_string_release(callable_name);
+        if (error != nullptr) {
+            efree(error);
+        }
+        throwError("%s", message.c_str());
+        return {};
+    }
+
+    if (!(cache.function_handler->common.fn_flags & ZEND_ACC_CALL_VIA_TRAMPOLINE)) {
+        zval closure;
+        if (cache.object != nullptr) {
+            zval instance;
+            ZVAL_OBJ(&instance, cache.object);
+            zend_create_fake_closure(
+                &closure,
+                cache.function_handler,
+                cache.function_handler->common.scope,
+                cache.called_scope,
+                &instance);
+        } else {
+            zend_create_fake_closure(
+                &closure,
+                cache.function_handler,
+                cache.function_handler->common.scope,
+                cache.called_scope,
+                nullptr);
+        }
+        return {&closure, Ctor::Move};
+    }
+
+    // Magic __call()/__callStatic() resolution returns a temporary Zend
+    // trampoline. Keep the uncommon path small and safe by forwarding it
+    // through scoped resolution instead of duplicating zend_closures.c's
+    // private trampoline-to-closure implementation.
+    zend_release_fcall_info_cache(&cache);
     ClosureFn forward = [](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &captures) -> Variant {
         Args args(ZEND_NUM_ARGS());
         for (uint32_t i = 0; i < ZEND_NUM_ARGS(); i++) {
