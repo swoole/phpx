@@ -16,7 +16,6 @@
 
 #include "phpx.h"
 #include "phpx_fake_scope_guard.h"
-#include "callable_scope.h"
 
 namespace php {
 void initDecimalContext();
@@ -461,8 +460,7 @@ static void call_function_impl(const zval *zobject,
 
     bool callable = fci_cache != nullptr;
     if (!callable && explicit_scope != nullptr) {
-        detail::CallableScopeFrame scope_frame(*explicit_scope);
-        callable = scope_frame.resolve(&fci.function_name, fci.object, &fcc, &error);
+        callable = explicit_scope->resolve(&fci.function_name, fci.object, &fcc, &error);
     } else if (!callable) {
         callable = zend_is_callable_ex(&fci.function_name, fci.object, 0, NULL, &fcc, &error);
     }

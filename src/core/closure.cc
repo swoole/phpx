@@ -15,7 +15,6 @@
 */
 
 #include "phpx.h"
-#include "callable_scope.h"
 
 #include "zend_closures.h"
 
@@ -212,8 +211,7 @@ static Variant makeScopedCallableImpl(const Variant &callable,
     char *error = nullptr;
     zval callable_value;
     ZVAL_COPY_VALUE(&callable_value, callable.unwrap_ptr());
-    detail::CallableScopeFrame scope_frame(scope);
-    if (!scope_frame.resolve(&callable_value, nullptr, &cache, &error)) {
+    if (!scope.resolve(&callable_value, nullptr, &cache, &error)) {
         auto callable_name = zend_get_callable_name(&callable_value);
         std::string message = "Invalid callback ";
         message.append(ZSTR_VAL(callable_name), ZSTR_LEN(callable_name));

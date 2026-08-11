@@ -142,9 +142,10 @@ PHPX_API Variant call(const Variant &func, Args &args, zend_array *named_args = 
 PHPX_API Variant call(const Variant &func, Array &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &func, const ArgList &args, zend_array *named_args = nullptr);
 
-/** Lexical and late-bound context used while Zend resolves a callable. */
-struct CallableScope {
-    // Borrowed for the duration of callScoped(). TypePHP methods are persistent;
+/** Reusable lexical and late-bound context used while Zend resolves callables. */
+class CallableScope final {
+  public:
+    // Borrowed for this context's stack lifetime. TypePHP methods are persistent;
     // a Closure's function remains valid while its owning Closure is alive.
     zend_function *caller_function;
     zend_class_entry *called_scope;
@@ -155,11 +156,43 @@ struct CallableScope {
                   zend_object *this_object)
         : caller_function(caller_function),
           called_scope(called_scope),
-          this_object(this_object) {}
+          this_object(this_object) {
+        if (caller_function == nullptr) {
+            return;
+        }
+
+        uint32_t call_info = ZEND_CALL_TOP_FUNCTION;
+        void *object_or_called_scope = called_scope
+            ? static_cast<void *>(called_scope)
+            : static_cast<void *>(lexicalScope());
+        if (this_object != nullptr) {
+            call_info |= ZEND_CALL_HAS_THIS;
+            object_or_called_scope = this_object;
+        }
+        zend_vm_init_call_frame(
+            &frame_, call_info, caller_function, 0, object_or_called_scope);
+    }
+
+    CallableScope(const CallableScope &) = delete;
+    CallableScope &operator=(const CallableScope &) = delete;
+    CallableScope(CallableScope &&) = delete;
+    CallableScope &operator=(CallableScope &&) = delete;
 
     zend_class_entry *lexicalScope() const noexcept {
         return caller_function ? caller_function->common.scope : nullptr;
     }
+
+    bool resolve(zval *callable,
+                 zend_object *object,
+                 zend_fcall_info_cache *cache,
+                 char **error) const {
+        ZEND_ASSERT(caller_function != nullptr);
+        ZEND_ASSERT(lexicalScope() != nullptr);
+        return zend_is_callable_at_frame(callable, object, &frame_, 0, cache, error);
+    }
+
+  private:
+    mutable zend_execute_data frame_{};
 };
 
 PHPX_API Variant callScoped(const Variant &func,
