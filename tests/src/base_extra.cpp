@@ -250,6 +250,15 @@ TEST(base_extra, call_with_args) {
     ASSERT_EQ(arr[2].toInt(), 3);
 }
 
+TEST(base_extra, call_string_does_not_cache_zend_trampoline) {
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
+
+    for (int i = 0; i < 3; i++) {
+        auto result = call("TestMagicStaticCall::missing", {i});
+        ASSERT_EQ(result.toStdString(), "missing:" + std::to_string(i));
+    }
+}
+
 // Test getClassEntry edge cases
 TEST(base_extra, getClassEntry_edge) {
     auto ce1 = getClassEntry("stdClass");

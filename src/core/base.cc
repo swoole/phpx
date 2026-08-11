@@ -473,7 +473,12 @@ static void call_function_impl(const zval *zobject,
         zend_string_release_ex(callable_name, 0);
     } else if (fci_cache == nullptr) {
         fci_cache = &fcc;
-        if (with_cache) {
+        // Zend releases CALL_VIA_TRAMPOLINE handlers after the call, while
+        // NEVER_CACHE handlers are explicitly unsuitable for persistent
+        // fcall caches. Keeping either pointer here would make the next call
+        // access freed or otherwise transient state.
+        const uint32_t non_cacheable_flags = ZEND_ACC_CALL_VIA_TRAMPOLINE | ZEND_ACC_NEVER_CACHE;
+        if (with_cache && EXPECTED(!(fcc.function_handler->common.fn_flags & non_cacheable_flags))) {
             auto _cache = (zend_fcall_info_cache *) pemalloc(sizeof(fcc), 1);
             *_cache = fcc;
             zend_hash_update_ptr(func_cache_map, Z_STR_P(function_name), _cache);

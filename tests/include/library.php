@@ -43,6 +43,14 @@ class TestClass3 extends TestAbstract {
     }
 }
 
+class TestMagicStaticCall
+{
+    public static function __callStatic(string $name, array $arguments): string
+    {
+        return $name . ':' . $arguments[0];
+    }
+}
+
 function createUser(
     string $name,
     int    $age,
