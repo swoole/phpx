@@ -870,7 +870,12 @@ Reference toReference(const Variant &v, const OperationChain &list) {
     // Keep the root and every direct array/property access bound to the
     // original zval. Variant's regular copy/move operations intentionally
     // apply PHP value-assignment semantics and would detach these wrappers.
-    path.emplace_back(v.direct_ptr(), Ctor::Indirect);
+    // A by-reference function parameter stores an IS_REFERENCE wrapper in the
+    // PHPX Reference object. Pointing an INDIRECT zval at that wrapper creates
+    // an INDIRECT -> REFERENCE chain, while Variant::item()/attr() deliberately
+    // unwrap only to the actual PHP value. Bind the traversal root to the
+    // referenced value itself so writes keep aliasing the caller's storage.
+    path.emplace_back(v.unwrap_ptr(), Ctor::Indirect);
 
     const size_t total = list.size();
     size_t count = 0;
