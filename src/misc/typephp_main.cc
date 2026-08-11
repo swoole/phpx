@@ -392,7 +392,6 @@ TYPEPHP_RUNTIME_API int typephp_runtime_init(int argc, char **argv) {
     }
 
     php_embed_init(argc, argv);
-    php::throw_impl = [](zend_object *ex) { throw ex; };
 
     typephp_runtime_module = php_embed_get_module();
     module_init(typephp_runtime_module);

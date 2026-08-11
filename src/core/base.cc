@@ -18,6 +18,7 @@
 #include "phpx_fake_scope_guard.h"
 
 extern "C" {
+#include "zend_observer.h"
 #if PHP_VERSION_ID >= 80400
 #include "zend_property_hooks.h"
 #endif
@@ -34,7 +35,6 @@ DebugInfo debug_info{
 };
 
 static zend_array *func_cache_map = nullptr;
-std::function<void(zend_object *)> throw_impl;
 
 void error(int level, const char *format, ...) {
     va_list args;
@@ -399,8 +399,10 @@ bool updateConstant(zend_class_entry *ce, const String &name, const Variant &dat
     zval *ret_constant = NULL;
     auto c = (zend_class_constant *) zend_hash_find_ptr(CE_CONSTANTS_TABLE(ce), constant_name);
     if (c != NULL) {
-        zval_ptr_dtor_safe(&c->value);
+        zval old = c->value;
         ZVAL_COPY(&c->value, data.const_ptr());
+        zval_ptr_dtor(&old);
+        throwErrorIfOccurred();
         return true;
     } else {
         return false;
@@ -416,9 +418,7 @@ void exit(const Variant &status) {
         EG(exit_status) = 0;
     }
     zend_throw_graceful_exit();
-    if (throw_impl) {
-        throw_impl(EG(exception));
-    }
+    throwErrorIfOccurred();
 }
 
 static void box_dtor(zend_resource *res) {
@@ -808,14 +808,46 @@ static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_
     return new_op_array;
 }
 
-static Variant include_impl(zend_string *filename, const int type, const char *eval_filename = nullptr) {
+static void execute_with_symbol_table(zend_op_array *op_array, zval *return_value, zend_array *symbol_table) {
+    if (UNEXPECTED(EG(exception) != nullptr)) {
+        return;
+    }
+
+    zend_execute_data *previous_execute_data = EG(current_execute_data);
+    void *object_or_called_scope = zend_get_this_object(previous_execute_data);
+    uint32_t call_info = ZEND_CALL_TOP_CODE | ZEND_CALL_HAS_SYMBOL_TABLE;
+    if (object_or_called_scope != nullptr) {
+        call_info |= ZEND_CALL_HAS_THIS;
+    } else {
+        object_or_called_scope = zend_get_called_scope(previous_execute_data);
+    }
+
+    zend_execute_data *execute_data =
+        zend_vm_stack_push_call_frame(call_info, reinterpret_cast<zend_function *>(op_array), 0, object_or_called_scope);
+    execute_data->symbol_table = symbol_table;
+    zend_init_code_execute_data(execute_data, op_array, return_value);
+    ZEND_OBSERVER_FCALL_BEGIN(execute_data);
+    zend_execute_ex(execute_data);
+    // Observer end handlers are called by ZEND_RETURN. The VM has already
+    // detached CVs from the explicit symbol table before returning here.
+    zend_vm_stack_free_call_frame(execute_data);
+}
+
+static Variant include_impl(zend_string *filename,
+                            const int type,
+                            const char *eval_filename = nullptr,
+                            zend_array *symbol_table = nullptr) {
     Variant result;
     zend_op_array *new_op_array = zend_include_or_eval(filename, type, eval_filename);
 
     if (UNEXPECTED(new_op_array == ZEND_FAKE_OP_ARRAY)) {
         return true;
     } else if (EXPECTED(new_op_array != nullptr && EG(exception) == nullptr)) {
-        zend_execute(new_op_array, result.ptr());
+        if (symbol_table != nullptr) {
+            execute_with_symbol_table(new_op_array, result.ptr(), symbol_table);
+        } else {
+            zend_execute(new_op_array, result.ptr());
+        }
     }
 
     if (EXPECTED(new_op_array != nullptr)) {
@@ -837,6 +869,13 @@ Variant include(Variant file, IncludeType type) {
     file.unset();
     PersistentZendString stable_file(path);
     return include_impl(stable_file.get(), type);
+}
+
+Variant include(Variant file, IncludeType type, const Array &scope) {
+    std::string path = file.toStdString();
+    file.unset();
+    PersistentZendString stable_file(path);
+    return include_impl(stable_file.get(), type, nullptr, Z_ARR_P(scope.const_ptr()));
 }
 
 Variant eval(const String &script, const char *filename) {

@@ -144,6 +144,7 @@ PHPX_API bool updateConstant(zend_class_entry *ce, const String &name, const Var
 PHPX_API void initGlobal(const String &name, Variant &var);
 PHPX_API void unsetGlobal(const String &name);
 PHPX_API Variant include(Variant file, IncludeType type = INCLUDE);
+PHPX_API Variant include(Variant file, IncludeType type, const Array &scope);
 PHPX_API Variant eval(const String &script, const char *filename = nullptr);
 PHPX_API Variant call(const Variant &func, Args &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &func, Array &args, zend_array *named_args = nullptr);
@@ -263,12 +264,10 @@ PHPX_API void enableDebugInfo(bool enable = true);
 
 void augmentException();
 
-extern PHPX_API std::function<void(zend_object *)> throw_impl;
-
 inline void throwErrorIfOccurred() {
-    if (UNEXPECTED(EG(exception) != nullptr && throw_impl != nullptr)) {
+    if (UNEXPECTED(EG(exception) != nullptr)) {
         augmentException();
-        throw_impl(EG(exception));
+        throw EG(exception);
     }
 }
 
@@ -921,13 +920,22 @@ using enable_if_floating_point = std::enable_if_t<is_floating_point_v<T>, Ret>;
 template <typename T, typename Ret = int>
 using enable_if_arithmetic_non_bool = std::enable_if_t<is_arithmetic_non_bool_v<T>, Ret>;
 
-zend_object *zval_ptr_dtor_safe(zval *zv);
-
 class Variant {
   protected:
     zval val;
     void destroy() {
-        zval_ptr_dtor_safe(unwrap_ptr());
+        zval *target = unwrap_ptr();
+        zval old;
+        ZVAL_COPY_VALUE(&old, target);
+        if (target == &val) {
+            val = {};
+        } else {
+            // Indirect values may point into a HashTable bucket. Preserve u2,
+            // which contains the bucket collision-chain metadata.
+            ZVAL_UNDEF(target);
+        }
+        zval_ptr_dtor(&old);
+        throwErrorIfOccurred();
     }
     void addRef() {
         Z_TRY_ADDREF_P(&val);
@@ -2142,7 +2150,7 @@ class Reference : public Variant {
         checkRef();
     }
     Reference &operator=(const Reference &v);
-    Reference &operator=(Reference &&v) noexcept;
+    Reference &operator=(Reference &&v);
     Reference &operator=(Reference *);
     Reference &operator=(const Variant &v);
 };

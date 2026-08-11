@@ -17,10 +17,6 @@
 #include "phpx.h"
 #include "phpx_fake_scope_guard.h"
 
-#if PHP_VERSION_ID < 80400
-#include "zend_fibers.h"
-#endif
-
 BEGIN_EXTERN_C()
 #include "zend_smart_str.h"
 #include <ext/spl/php_spl.h>
@@ -59,7 +55,8 @@ void Variant::copyFrom(const zval *src) {
         auto zv = unwrap_ptr();
         zval tmp = *zv;
         zval_copy(zv, src);
-        zval_ptr_dtor_safe(&tmp);
+        zval_ptr_dtor(&tmp);
+        throwErrorIfOccurred();
     }
 }
 
@@ -104,7 +101,8 @@ Variant &Variant::operator=(Variant &&v) {
     zval old = val;
     zval_copy_value(&val, &v.val);
     ZVAL_UNDEF(&v.val);
-    zval_ptr_dtor_safe(&old);
+    zval_ptr_dtor(&old);
+    throwErrorIfOccurred();
     return *this;
 }
 
@@ -144,7 +142,8 @@ void Variant::rebindReference(const Variant &reference) {
 
     zval old = val;
     zval_copy(&val, reference.const_ptr());
-    zval_ptr_dtor_safe(&old);
+    zval_ptr_dtor(&old);
+    throwErrorIfOccurred();
 }
 
 std::string Variant::toStdString() const {
@@ -200,47 +199,23 @@ size_t Variant::length() const {
     }
 }
 
-zend_object *zval_ptr_dtor_safe(zval *zv) {
-    zend_object *obj = nullptr;
-    auto target = zv;
-    if (Z_TYPE_P(target) == IS_REFERENCE) {
-        target = Z_REFVAL_P(target);
-    }
-    if (Z_TYPE_P(target) == IS_OBJECT) {
-        obj = Z_OBJ_P(target);
-    }
-    try {
-        zval_ptr_dtor(zv);
-    } catch (zend_object *exception) {
-        if (obj) {
-            GC_DELREF(obj);
-#if PHP_VERSION_ID < 80400
-            zend_fiber_switch_unblock();
-#endif
-            zend_object_release(obj);
-        }
-        return exception;
-    }
-    return nullptr;
-}
-
 void Variant::unset() {
-    zend_object *catched_exception = nullptr;
-    if (isIndirect()) {
-        catched_exception = zval_ptr_dtor_safe(Z_INDIRECT(val));
-        *Z_INDIRECT(val) = {};
-    } else {
-        catched_exception = zval_ptr_dtor_safe(&val);
+    const bool indirect = isIndirect();
+    zval *target = indirect ? Z_INDIRECT(val) : &val;
+    zval old;
+    ZVAL_COPY_VALUE(&old, target);
+    if (indirect) {
+        // HashTable buckets store their collision-chain link in zval.u2.
+        ZVAL_UNDEF(target);
     }
     val = {};
-    if (catched_exception) {
-        throw catched_exception;
-    }
+    zval_ptr_dtor(&old);
+    throwErrorIfOccurred();
 }
 
 Variant::~Variant() {
     if (!isIndirect()) {
-        zval_ptr_dtor_safe(&val);
+        zval_ptr_dtor(&val);
     }
 }
 
@@ -1282,25 +1257,33 @@ Variant Variant::call(zend_function *fn, const ArgList &args, zend_array *named_
 }
 
 void Reference::copyRef(const zval *zv) {
-    zval_ptr_dtor_safe(&val);
-    zval_copy_value(&val, zv);
-    zval_try_add_ref(&val);
+    zval replacement;
+    zval_copy(&replacement, zv);
+    zval old = val;
+    ZVAL_COPY_VALUE(&val, &replacement);
+    zval_ptr_dtor(&old);
+    throwErrorIfOccurred();
 }
 
 Reference &Reference::operator=(const Reference &v) {
     if (&v != this) {
-        zval_ptr_dtor_safe(&val);
-        zval_copy(&val, v.const_ptr());
+        zval replacement;
+        zval_copy(&replacement, v.const_ptr());
+        zval old = val;
+        ZVAL_COPY_VALUE(&val, &replacement);
+        zval_ptr_dtor(&old);
+        throwErrorIfOccurred();
     }
     return *this;
 }
 
-Reference &Reference::operator=(Reference &&v) noexcept {
+Reference &Reference::operator=(Reference &&v) {
     if (&v != this) {
         zval old = val;
         zval_copy_value(&val, &v.val);
         ZVAL_UNDEF(&v.val);
-        zval_ptr_dtor_safe(&old);
+        zval_ptr_dtor(&old);
+        throwErrorIfOccurred();
     }
     return *this;
 }
@@ -1329,8 +1312,11 @@ Reference &Reference::operator=(const Variant &v) {
                     throwErrorIfOccurred();
                 }
             } else {
-                zval_ptr_dtor(refval());
-                zval_copy(refval(), v.direct_ptr());
+                zval *target = refval();
+                zval old = *target;
+                zval_copy(target, v.direct_ptr());
+                zval_ptr_dtor(&old);
+                throwErrorIfOccurred();
             }
         }
     }
