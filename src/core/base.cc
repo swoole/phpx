@@ -808,23 +808,6 @@ static zend_never_inline zend_op_array *ZEND_FASTCALL zend_include_or_eval(zend_
     return new_op_array;
 }
 
-class IsolatedZendExecution final {
-  public:
-    IsolatedZendExecution() noexcept : previous_execute_data_(EG(current_execute_data)) {
-        EG(current_execute_data) = nullptr;
-    }
-
-    IsolatedZendExecution(const IsolatedZendExecution &) = delete;
-    IsolatedZendExecution &operator=(const IsolatedZendExecution &) = delete;
-
-    ~IsolatedZendExecution() noexcept {
-        EG(current_execute_data) = previous_execute_data_;
-    }
-
-  private:
-    zend_execute_data *previous_execute_data_;
-};
-
 static Variant include_impl(zend_string *filename, const int type, const char *eval_filename = nullptr) {
     Variant result;
     zend_op_array *new_op_array = zend_include_or_eval(filename, type, eval_filename);
@@ -832,12 +815,6 @@ static Variant include_impl(zend_string *filename, const int type, const char *e
     if (UNEXPECTED(new_op_array == ZEND_FAKE_OP_ARRAY)) {
         return true;
     } else if (EXPECTED(new_op_array != nullptr && EG(exception) == nullptr)) {
-        // AOT locals live in C++ and cannot be represented by a Zend symbol
-        // table. Do not let zend_execute() search through internal callback
-        // frames for a stale user-code frame (notably during shutdown exception
-        // handling); execute included/evaluated PHP in the request-global
-        // symbol table instead.
-        IsolatedZendExecution isolated_execution;
         zend_execute(new_op_array, result.ptr());
     }
 
