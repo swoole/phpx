@@ -17,6 +17,12 @@
 #include "phpx.h"
 #include "phpx_fake_scope_guard.h"
 
+extern "C" {
+#if PHP_VERSION_ID >= 80400
+#include "zend_property_hooks.h"
+#endif
+}
+
 namespace php {
 void initDecimalContext();
 
@@ -313,6 +319,71 @@ Variant classConstant(const Variant &target, const Variant &name, zend_class_ent
         return {};
     }
     return classConstant(ce, name, scope);
+}
+
+#if PHP_VERSION_ID >= 80400
+static zend_function *createPropertyHook(zend_class_entry *ce,
+                                         zend_property_info *property_info,
+                                         std::string_view method_name,
+                                         std::string_view hook_name) {
+    if (method_name.empty()) {
+        return nullptr;
+    }
+
+    auto source = static_cast<zend_function *>(
+        zend_hash_str_find_ptr(&ce->function_table, method_name.data(), method_name.size()));
+    if (UNEXPECTED(source == nullptr)) {
+        zend_error_noreturn(E_CORE_ERROR,
+                            "Property hook implementation %s::%.*s is missing",
+                            ZSTR_VAL(ce->name),
+                            static_cast<int>(method_name.size()),
+                            method_name.data());
+    }
+
+    auto hook = static_cast<zend_internal_function *>(pemalloc(sizeof(zend_internal_function), true));
+    memcpy(hook, &source->internal_function, sizeof(zend_internal_function));
+    hook->function_name = zend_string_init(hook_name.data(), hook_name.size(), true);
+    hook->fn_flags &= ~ZEND_ACC_FINAL;
+    hook->prop_info = property_info;
+    return reinterpret_cast<zend_function *>(hook);
+}
+#endif
+
+void registerPropertyHooks(zend_class_entry *ce,
+                           zend_property_info *property_info,
+                           std::string_view getter,
+                           std::string_view setter) {
+#if PHP_VERSION_ID >= 80400
+    ZEND_ASSERT(ce != nullptr);
+    ZEND_ASSERT(property_info != nullptr);
+    ZEND_ASSERT(property_info->hooks == nullptr);
+
+    property_info->hooks = static_cast<zend_function **>(pemalloc(ZEND_PROPERTY_HOOK_STRUCT_SIZE, true));
+    memset(property_info->hooks, 0, ZEND_PROPERTY_HOOK_STRUCT_SIZE);
+
+    const std::string property_name{zend_get_unmangled_property_name(property_info->name)};
+    if (!getter.empty()) {
+        const std::string hook_name = "$" + property_name + "::get";
+        property_info->hooks[ZEND_PROPERTY_HOOK_GET] =
+            createPropertyHook(ce, property_info, getter, hook_name);
+    }
+    if (!setter.empty()) {
+        const std::string hook_name = "$" + property_name + "::set";
+        property_info->hooks[ZEND_PROPERTY_HOOK_SET] =
+            createPropertyHook(ce, property_info, setter, hook_name);
+    }
+
+    ce->num_hooked_props++;
+    if (ce->get_iterator == nullptr) {
+        ce->get_iterator = zend_hooked_object_get_iterator;
+    }
+#else
+    (void) ce;
+    (void) property_info;
+    (void) getter;
+    (void) setter;
+    throwError("Property hooks require PHP 8.4 or later");
+#endif
 }
 
 bool updateConstant(const String &cls, const String &name, const Variant &data) {
