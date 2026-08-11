@@ -8,6 +8,7 @@
 #include <mutex>
 #endif
 BEGIN_EXTERN_C()
+#include "ext/standard/basic_functions.h"
 #include "sapi/embed/php_embed.h"
 #if !defined(PHP_WIN32) && !defined(__wasi__)
 #include "ps_title.h"
@@ -437,6 +438,26 @@ TYPEPHP_RUNTIME_API void typephp_runtime_shutdown() {
         return;
     }
 
+    // The TypePHP module is registered after php_embed_init(), so it is not in
+    // PHP's precomputed RSHUTDOWN handler list. Run the user-visible shutdown
+    // phases first, while the TypePHP request state is still alive. The Embed
+    // SAPI will see an empty shutdown-function table and no remaining objects
+    // when it performs the complete request shutdown below.
+    EG(flags) |= EG_FLAGS_IN_SHUTDOWN;
+    EG(current_execute_data) = nullptr;
+    if (PG(modules_activated)) {
+        php_call_shutdown_functions();
+        php_free_shutdown_functions();
+    }
+    zend_try {
+        zend_call_destructors();
+    }
+    zend_end_try();
+
+    // Keep this manual cleanup and registry removal. Registering an internal
+    // module after request startup exposes a PHP Embed double-release bug for
+    // its persistent strings if the module remains registered through
+    // php_module_shutdown().
     typephp_runtime_module->request_shutdown_func(typephp_runtime_module->type, typephp_runtime_module->module_number);
     module_shutdown(typephp_runtime_module);
     php_embed_shutdown();
