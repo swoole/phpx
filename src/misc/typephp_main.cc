@@ -59,7 +59,7 @@ static zend_execute_data *get_user_code_frame() {
 php::UserCodeScopeGuard::UserCodeScopeGuard(const CallableScope &scope) {
     auto *frame = get_user_code_frame();
     if (UNEXPECTED(frame == nullptr || frame->func == nullptr)) {
-        php::throwError("A user-code frame is required for scoped callback argument unpacking");
+        php::throwError("A user-code frame is required for scoped dynamic callback calls");
         return;
     }
     function_ = frame->func;
