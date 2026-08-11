@@ -268,6 +268,53 @@ Variant constant(zend_class_entry *ce, const String &name) {
     return ret_constant;
 }
 
+static String checkedClassConstantName(const Variant &name) {
+    if (UNEXPECTED(!name.isString())) {
+        zend_type_error("Cannot use value of type %s as class constant name", name.typeStr());
+        throwErrorIfOccurred();
+        return {};
+    }
+    return String(name);
+}
+
+Variant classConstant(zend_class_entry *ce, const Variant &name) {
+    if (UNEXPECTED(ce == nullptr)) {
+        return {};
+    }
+    const String constant_name = checkedClassConstantName(name);
+    if (UNEXPECTED(EG(exception))) {
+        return {};
+    }
+
+    if (zend_string_equals_ci(constant_name.str(), ZSTR_KNOWN(ZEND_STR_CLASS))) {
+        return String(ce->name);
+    }
+
+    auto value = zend_get_class_constant_ex(
+        ce->name,
+        constant_name.str(),
+        zend_get_executed_scope(),
+        ZEND_FETCH_CLASS_EXCEPTION);
+    throwErrorIfOccurred();
+    return Variant(value);
+}
+
+Variant classConstant(const Variant &target, const Variant &name) {
+    zend_class_entry *ce;
+    if (target.isObject()) {
+        ce = target.ce();
+    } else if (target.isString()) {
+        ce = getClassEntrySafe(String(target));
+        if (UNEXPECTED(ce == nullptr)) {
+            return {};
+        }
+    } else {
+        throwError("Class name must be a valid object or a string");
+        return {};
+    }
+    return classConstant(ce, name);
+}
+
 bool updateConstant(const String &cls, const String &name, const Variant &data) {
     auto ce = getClassEntrySafe(cls);
     if (!ce) {
