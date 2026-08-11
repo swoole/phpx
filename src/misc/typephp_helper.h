@@ -234,6 +234,13 @@ static inline void appendCallExtraNamedArgs(Array &args) {
 
 extern php::Str php_get_called_class(php::Object &this_);
 extern zend_class_entry *php_get_called_ce(php::Object &this_);
+static inline php::CallableScope php_get_callable_scope(zend_function *caller_function,
+                                                        php::Object &this_) {
+    auto *called_scope = php_get_called_ce(this_);
+    return this_.isObject()
+        ? php::CallableScope{caller_function, called_scope, this_.object()}
+        : php::CallableScope{caller_function, called_scope, nullptr};
+}
 extern php::Scope php_switch_scope(php::Object &this_);
 extern void php_restore_scope(php::Scope &ori_scope);
 

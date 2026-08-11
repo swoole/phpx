@@ -12,11 +12,20 @@ namespace php::detail {
  */
 class CallableScopeFrame final {
   public:
-    explicit CallableScopeFrame(zend_class_entry *scope) {
-        function_.type = ZEND_USER_FUNCTION;
-        function_.common.scope = scope;
+    explicit CallableScopeFrame(const CallableScope &scope) {
+        ZEND_ASSERT(scope.caller_function != nullptr);
+        ZEND_ASSERT(scope.lexicalScope() != nullptr);
+
+        uint32_t call_info = ZEND_CALL_TOP_FUNCTION;
+        void *object_or_called_scope = scope.called_scope
+            ? static_cast<void *>(scope.called_scope)
+            : static_cast<void *>(scope.lexicalScope());
+        if (scope.this_object != nullptr) {
+            call_info |= ZEND_CALL_HAS_THIS;
+            object_or_called_scope = scope.this_object;
+        }
         zend_vm_init_call_frame(
-            &frame_, ZEND_CALL_TOP_FUNCTION, &function_, 0, scope);
+            &frame_, call_info, scope.caller_function, 0, object_or_called_scope);
     }
 
     bool resolve(zval *callable,
@@ -27,7 +36,6 @@ class CallableScopeFrame final {
     }
 
   private:
-    zend_function function_{};
     zend_execute_data frame_{};
 };
 

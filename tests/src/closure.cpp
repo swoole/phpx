@@ -117,26 +117,37 @@ TEST(closure, scoped_callable_preserves_private_and_magic_dispatch) {
             }
         }
 
-        class PhpxScopedCallableForeign {}
+        class PhpxScopedCallableForeign {
+            public function scopeAnchor(): void {}
+        }
     )PHP");
 
     auto object = newObject("PhpxScopedCallableTarget");
     Array callback{object, "multiply"};
 
-    auto private_callable = makeScopedCallable(callback, getClassEntry("PhpxScopedCallableTarget"));
+    auto *target_scope = getClassEntry("PhpxScopedCallableTarget");
+    CallableScope instance_scope{getMethod(target_scope, "multiply"), object.ce(), object.object()};
+    auto private_callable = makeScopedCallable(callback, instance_scope);
     ASSERT_EQ(private_callable({7}).toInt(), 21);
+
+    Array self_callback{"self", "multiply"};
+    ASSERT_EQ(callScoped(self_callback, instance_scope, {6}).toInt(), 18);
+    auto self_callable = makeScopedCallable(self_callback, instance_scope);
+    ASSERT_EQ(self_callable({8}).toInt(), 24);
 
     auto mapped = call("array_map", {private_callable, Array{1, 2, 3}}).toArray();
     ASSERT_EQ(mapped.get(0).toInt(), 3);
     ASSERT_EQ(mapped.get(1).toInt(), 6);
     ASSERT_EQ(mapped.get(2).toInt(), 9);
 
-    auto magic_callable = makeScopedCallable(callback, getClassEntry("PhpxScopedCallableForeign"));
+    auto *foreign_scope = getClassEntry("PhpxScopedCallableForeign");
+    CallableScope foreign_context{getMethod(foreign_scope, "scopeAnchor"), foreign_scope, nullptr};
+    auto magic_callable = makeScopedCallable(callback, foreign_context);
     ASSERT_STREQ(magic_callable({5}).toCString(), "magic:multiply:5");
 
     Array callbacks;
     callbacks.set("triple", callback);
-    auto scoped_callbacks = makeScopedCallableMap(callbacks, getClassEntry("PhpxScopedCallableTarget"));
+    auto scoped_callbacks = makeScopedCallableMap(callbacks, instance_scope);
     ASSERT_EQ(scoped_callbacks.get("triple")({4}).toInt(), 12);
 }
 

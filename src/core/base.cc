@@ -430,7 +430,7 @@ static void call_function_impl(const zval *zobject,
                                uint32_t param_count,
                                zval params[],
                                zend_array *named_params = nullptr,
-                               zend_class_entry *explicit_scope = nullptr) {
+                               const CallableScope *explicit_scope = nullptr) {
     zend_fcall_info fci;
 
     fci.size = sizeof(fci);
@@ -461,7 +461,7 @@ static void call_function_impl(const zval *zobject,
 
     bool callable = fci_cache != nullptr;
     if (!callable && explicit_scope != nullptr) {
-        detail::CallableScopeFrame scope_frame(explicit_scope);
+        detail::CallableScopeFrame scope_frame(*explicit_scope);
         callable = scope_frame.resolve(&fci.function_name, fci.object, &fcc, &error);
     } else if (!callable) {
         callable = zend_is_callable_ex(&fci.function_name, fci.object, 0, NULL, &fcc, &error);
@@ -503,40 +503,40 @@ Variant call_impl(const zval *object, const zval *func) {
 
 Variant callScoped(const Variant &object,
                    const Variant &func,
-                   zend_class_entry *scope,
+                   const CallableScope &scope,
                    Args &args,
                    zend_array *named_args) {
     if (UNEXPECTED(!object.isObject())) {
         throwError("call method `%s` on %s", func.toCString(), object.typeStr());
         return {};
     }
-    if (UNEXPECTED(scope == nullptr)) {
+    if (UNEXPECTED(scope.caller_function == nullptr || scope.lexicalScope() == nullptr)) {
         throwError("Explicit callable scope must not be null");
         return {};
     }
 
     Variant retval{};
     call_function_impl(
-        object.unwrap_ptr(), func.unwrap_ptr(), retval.ptr(), args.count(), args.ptr(), named_args, scope);
+        object.unwrap_ptr(), func.unwrap_ptr(), retval.ptr(), args.count(), args.ptr(), named_args, &scope);
     return retval;
 }
 
 Variant callScoped(const Variant &func,
-                   zend_class_entry *scope,
+                   const CallableScope &scope,
                    Args &args,
                    zend_array *named_args) {
-    if (UNEXPECTED(scope == nullptr)) {
+    if (UNEXPECTED(scope.caller_function == nullptr || scope.lexicalScope() == nullptr)) {
         throwError("Explicit callable scope must not be null");
         return {};
     }
 
     Variant retval{};
-    call_function_impl(nullptr, func.unwrap_ptr(), retval.ptr(), args.count(), args.ptr(), named_args, scope);
+    call_function_impl(nullptr, func.unwrap_ptr(), retval.ptr(), args.count(), args.ptr(), named_args, &scope);
     return retval;
 }
 
 Variant callScoped(const Variant &func,
-                   zend_class_entry *scope,
+                   const CallableScope &scope,
                    Array &args,
                    zend_array *named_args) {
     Args call_args(args);
@@ -544,7 +544,7 @@ Variant callScoped(const Variant &func,
 }
 
 Variant callScoped(const Variant &func,
-                   zend_class_entry *scope,
+                   const CallableScope &scope,
                    const ArgList &args,
                    zend_array *named_args) {
     Args call_args(args);
@@ -553,7 +553,7 @@ Variant callScoped(const Variant &func,
 
 Variant callScoped(const Variant &object,
                    const Variant &func,
-                   zend_class_entry *scope,
+                   const CallableScope &scope,
                    Array &args,
                    zend_array *named_args) {
     Args call_args(args);
@@ -562,7 +562,7 @@ Variant callScoped(const Variant &object,
 
 Variant callScoped(const Variant &object,
                    const Variant &func,
-                   zend_class_entry *scope,
+                   const CallableScope &scope,
                    const ArgList &args,
                    zend_array *named_args) {
     Args call_args(args);

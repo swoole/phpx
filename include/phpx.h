@@ -141,31 +141,52 @@ PHPX_API Variant eval(const String &script, const char *filename = nullptr);
 PHPX_API Variant call(const Variant &func, Args &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &func, Array &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &func, const ArgList &args, zend_array *named_args = nullptr);
+
+/** Lexical and late-bound context used while Zend resolves a callable. */
+struct CallableScope {
+    // Borrowed for the duration of callScoped(). TypePHP methods are persistent;
+    // a Closure's function remains valid while its owning Closure is alive.
+    zend_function *caller_function;
+    zend_class_entry *called_scope;
+    zend_object *this_object;
+
+    CallableScope(zend_function *caller_function,
+                  zend_class_entry *called_scope,
+                  zend_object *this_object)
+        : caller_function(caller_function),
+          called_scope(called_scope),
+          this_object(this_object) {}
+
+    zend_class_entry *lexicalScope() const noexcept {
+        return caller_function ? caller_function->common.scope : nullptr;
+    }
+};
+
 PHPX_API Variant callScoped(const Variant &func,
-                           zend_class_entry *scope,
+                           const CallableScope &scope,
                            Args &args,
                            zend_array *named_args = nullptr);
 PHPX_API Variant callScoped(const Variant &func,
-                           zend_class_entry *scope,
+                           const CallableScope &scope,
                            Array &args,
                            zend_array *named_args = nullptr);
 PHPX_API Variant callScoped(const Variant &func,
-                           zend_class_entry *scope,
+                           const CallableScope &scope,
                            const ArgList &args = {},
                            zend_array *named_args = nullptr);
 PHPX_API Variant callScoped(const Variant &object,
                            const Variant &func,
-                           zend_class_entry *scope,
+                           const CallableScope &scope,
                            Args &args,
                            zend_array *named_args = nullptr);
 PHPX_API Variant callScoped(const Variant &object,
                            const Variant &func,
-                           zend_class_entry *scope,
+                           const CallableScope &scope,
                            Array &args,
                            zend_array *named_args = nullptr);
 PHPX_API Variant callScoped(const Variant &object,
                            const Variant &func,
-                           zend_class_entry *scope,
+                           const CallableScope &scope,
                            const ArgList &args = {},
                            zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, zend_array *named_args = nullptr);
@@ -2266,8 +2287,8 @@ extern Object newClosure(const ClosureFn &fn,
                          const Object &_this = {},
                          zend_class_entry *scope = nullptr,
                          std::initializer_list<const char *> parameter_names = {});
-extern PHPX_API Object makeScopedCallable(const Variant &callable, zend_class_entry *scope);
-extern PHPX_API Array makeScopedCallableMap(const Variant &callbacks, zend_class_entry *scope);
+extern PHPX_API Object makeScopedCallable(const Variant &callable, const CallableScope &scope);
+extern PHPX_API Array makeScopedCallableMap(const Variant &callbacks, const CallableScope &scope);
 
 extern Object newObject(zend_class_entry *ce);
 extern Object newObject(zend_class_entry *ce, Args &args, zend_array *named_args = nullptr);

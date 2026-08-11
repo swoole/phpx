@@ -156,8 +156,8 @@ Object newClosure(const ClosureFn &fn,
     return {&closure, Ctor::Move};
 }
 
-Object makeScopedCallable(const Variant &callable, zend_class_entry *scope) {
-    if (UNEXPECTED(scope == nullptr)) {
+Object makeScopedCallable(const Variant &callable, const CallableScope &scope) {
+    if (UNEXPECTED(scope.caller_function == nullptr || scope.lexicalScope() == nullptr)) {
         throwError("Explicit callable scope must not be null");
         return {};
     }
@@ -223,13 +223,24 @@ Object makeScopedCallable(const Variant &callable, zend_class_entry *scope) {
         if (ZEND_CALL_INFO(execute_data) & ZEND_CALL_HAS_EXTRA_NAMED_PARAMS) {
             named_args = execute_data->extra_named_params;
         }
-        return callScoped(captures.get(0), zend_get_executed_scope(), args, named_args);
+        CallableScope scope{
+            execute_data->func,
+            zend_get_called_scope(execute_data),
+            zend_get_this_object(execute_data),
+        };
+        return callScoped(captures.get(0), scope, args, named_args);
     };
 
-    return newClosure(forward, {callable}, {}, scope);
+    Object bound_this;
+    if (scope.this_object != nullptr) {
+        zval object;
+        ZVAL_OBJ(&object, scope.this_object);
+        bound_this = Object(&object);
+    }
+    return newClosure(forward, {callable}, bound_this, scope.lexicalScope());
 }
 
-Array makeScopedCallableMap(const Variant &callbacks, zend_class_entry *scope) {
+Array makeScopedCallableMap(const Variant &callbacks, const CallableScope &scope) {
     if (UNEXPECTED(!callbacks.isArray())) {
         throwError("Scoped callback map must be an array, %s given", callbacks.typeStr());
         return {};

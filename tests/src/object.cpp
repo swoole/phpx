@@ -937,7 +937,9 @@ TEST(object, call_scoped_resolves_visibility_without_leaking_scope) {
         }
 
         class PhpxScopedCallChild extends PhpxScopedCallTarget {}
-        class PhpxScopedCallForeign {}
+        class PhpxScopedCallForeign {
+            public function scopeAnchor(): void {}
+        }
     )PHP");
 
     auto target = newObject("PhpxScopedCallTarget");
@@ -946,15 +948,18 @@ TEST(object, call_scoped_resolves_visibility_without_leaking_scope) {
     auto child_scope = getClassEntry("PhpxScopedCallChild");
     auto foreign_scope = getClassEntry("PhpxScopedCallForeign");
 
-    ASSERT_STREQ(callScoped(target, "privateValue", target_scope).toCString(), "private");
-    ASSERT_STREQ(callScoped(child, "protectedValue", child_scope).toCString(), "protected");
-    ASSERT_STREQ(callScoped(target, "privateValue", foreign_scope).toCString(), "magic:privateValue");
-    ASSERT_STREQ(callScoped(target, "publicEntry", foreign_scope).toCString(), "target-private");
+    auto *target_caller = getMethod(target_scope, "publicEntry");
+    auto *foreign_caller = getMethod(foreign_scope, "scopeAnchor");
+    ASSERT_STREQ(callScoped(target, "privateValue", CallableScope{target_caller, target_scope, target.object()}).toCString(), "private");
+    ASSERT_STREQ(callScoped(child, "protectedValue", CallableScope{target_caller, child_scope, child.object()}).toCString(), "protected");
+    ASSERT_STREQ(callScoped(target, "privateValue", CallableScope{foreign_caller, foreign_scope, nullptr}).toCString(), "magic:privateValue");
+    ASSERT_STREQ(callScoped(target, "publicEntry", CallableScope{foreign_caller, foreign_scope, nullptr}).toCString(), "target-private");
 }
 
 TEST(object, call_scoped_supports_arguments_and_named_arguments) {
     eval(R"PHP(
         class PhpxScopedCallArguments {
+            public function scopeAnchor(): void {}
             private function format(string $left, string $right = 'R'): string {
                 return $left . ':' . $right;
             }
@@ -963,12 +968,13 @@ TEST(object, call_scoped_supports_arguments_and_named_arguments) {
 
     auto object = newObject("PhpxScopedCallArguments");
     auto scope = getClassEntry("PhpxScopedCallArguments");
+    CallableScope call_scope{getMethod(scope, "scopeAnchor"), scope, object.object()};
 
-    ASSERT_STREQ(callScoped(object, "format", scope, {"L"}).toCString(), "L:R");
+    ASSERT_STREQ(callScoped(object, "format", call_scope, {"L"}).toCString(), "L:R");
 
     Array named;
     named.set("right", "B");
-    ASSERT_STREQ(callScoped(object, "format", scope, {"A"}, named.array()).toCString(), "A:B");
+    ASSERT_STREQ(callScoped(object, "format", call_scope, {"A"}, named.array()).toCString(), "A:B");
 }
 
 TEST(object, variant_call_invokes_constructor) {
