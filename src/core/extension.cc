@@ -362,8 +362,12 @@ void ZEND_FASTCALL _exec_function(zend_execute_data *data, zval *return_value) {
         args.append(param_ptr);
         param_ptr++;
     }
-    auto retval = func->impl(args);
-    retval.moveTo(return_value);
+    try {
+        auto retval = func->impl(args);
+        retval.moveTo(return_value);
+    } catch (zend_object *) {
+        // PHP exception stored in EG(exception), Zend VM will handle propagation
+    }
 }
 
 void ZEND_FASTCALL _exec_method(zend_execute_data *data, zval *return_value) {
@@ -403,8 +407,12 @@ void ZEND_FASTCALL _exec_method(zend_execute_data *data, zval *return_value) {
         args.append(param_ptr);
         param_ptr++;
     }
-    auto retval = method->impl(_this, args);
-    retval.moveTo(return_value);
+    try {
+        auto retval = method->impl(_this, args);
+        retval.moveTo(return_value);
+    } catch (zend_object *) {
+        // PHP exception stored in EG(exception), Zend VM will handle propagation
+    }
 }
 
 }  // namespace php
