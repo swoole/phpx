@@ -7,6 +7,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#ifdef ZTS
+#include <atomic>
+#endif
 
 #if defined(_WIN32)
 #define TYPEPHP_SYMBOL_EXPORT __declspec(dllexport)
@@ -38,13 +41,75 @@ void typephp_uninstall_reflection_attribute_handlers();
 #define TYPEPHP_COLD_ATTRIBUTE
 #endif
 
+namespace php {
+
+/**
+ * One module-lifetime cache slot for a symbol resolved after PHP startup.
+ * ZTS publishes the value atomically; NTS deliberately remains a plain value.
+ */
+#ifdef ZTS
+template <typename T>
+using PersistentCacheSlot = std::atomic<T>;
+#else
+template <typename T>
+using PersistentCacheSlot = T;
+#endif
+
+template <typename T, typename Resolver>
+static inline T getPersistentCache(PersistentCacheSlot<T> &slot, Resolver &&resolver) {
+#ifdef ZTS
+    T value = slot.load(std::memory_order_acquire);
+    if (UNEXPECTED(value == T{})) {
+        T resolved = resolver();
+        T expected{};
+        if (slot.compare_exchange_strong(expected, resolved, std::memory_order_release, std::memory_order_acquire)) {
+            value = resolved;
+        } else {
+            value = expected;
+        }
+    }
+    return value;
+#else
+    if (UNEXPECTED(slot == T{})) {
+        slot = resolver();
+    }
+    return slot;
+#endif
+}
+
+template <typename T>
+static inline void resetPersistentCache(PersistentCacheSlot<T> &slot) {
+#ifdef ZTS
+    slot.store(T{}, std::memory_order_relaxed);
+#else
+    slot = T{};
+#endif
+}
+
+}  // namespace php
+
 extern zend_class_entry *php_get_class(int class_id, const php::Str &class_name);
 extern zend_function *php_get_func(int func_id, const php::Str &func_name);
 extern zend_function *php_get_method(int func_id,
                                      const php::Str &method_name,
                                      int class_id,
                                      const php::Str &class_name);
-extern uint32_t php_get_prop(int prop_id, const php::Str &prop_name, int class_id, const php::Str &class_name);
+
+/* Persistent (MINIT-registered, module-lifetime) symbol caches. They are initialized
+ * lazily after PHP startup — once disable_functions/disable_classes have finalized
+ * the runtime tables — and are never cleared at request shutdown. There is no
+ * dynamic propMap: property offset caches only cover declared properties of
+ * compiled/internal classes, which are stable for the module lifetime. */
+extern zend_class_entry *php_get_persistent_class(int class_id, const php::Str &class_name);
+extern zend_function *php_get_persistent_func(int func_id, const php::Str &func_name);
+extern zend_function *php_get_persistent_method(int func_id,
+                                                const php::Str &method_name,
+                                                int class_id,
+                                                const php::Str &class_name);
+extern uint32_t php_get_persistent_prop(int prop_id,
+                                        const php::Str &prop_name,
+                                        int class_id,
+                                        const php::Str &class_name);
 
 /** Invoke the lexical parent constructor as part of a new-expression chain. */
 static inline php::Variant typephp_call_parent_constructor(php::Object &object,
@@ -52,9 +117,13 @@ static inline php::Variant typephp_call_parent_constructor(php::Object &object,
                                                            php::Args &args,
                                                            zend_array *named_args = nullptr) {
     php::Variant retval;
-    zend_call_known_function(
-        constructor, object.checkedObject("Call to parent constructor"), object.ce(), retval.ptr(),
-        args.count(), args.ptr(), named_args);
+    zend_call_known_function(constructor,
+                             object.checkedObject("Call to parent constructor"),
+                             object.ce(),
+                             retval.ptr(),
+                             args.count(),
+                             args.ptr(),
+                             named_args);
     php::throwErrorIfOccurred();
     return retval;
 }
@@ -83,9 +152,13 @@ static inline php::Variant typephp_call_parent_constructor(php::Object &object,
 /** Invoke the lexical parent clone hook as part of a clone-expression chain. */
 static inline php::Variant typephp_call_parent_clone(php::Object &object, zend_function *clone_method) {
     php::Variant retval;
-    zend_call_known_function(
-        clone_method, object.checkedObject("Call to parent clone method"), object.ce(), retval.ptr(),
-        0, nullptr, nullptr);
+    zend_call_known_function(clone_method,
+                             object.checkedObject("Call to parent clone method"),
+                             object.ce(),
+                             retval.ptr(),
+                             0,
+                             nullptr,
+                             nullptr);
     php::throwErrorIfOccurred();
     return retval;
 }
