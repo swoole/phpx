@@ -277,7 +277,7 @@ static String checkedClassConstantName(const Variant &name) {
     return String(name);
 }
 
-Variant classConstant(zend_class_entry *ce, const Variant &name) {
+Variant classConstant(zend_class_entry *ce, const Variant &name, zend_class_entry *scope) {
     if (UNEXPECTED(ce == nullptr)) {
         return {};
     }
@@ -293,13 +293,13 @@ Variant classConstant(zend_class_entry *ce, const Variant &name) {
     auto value = zend_get_class_constant_ex(
         ce->name,
         constant_name.str(),
-        zend_get_executed_scope(),
+        scope,
         ZEND_FETCH_CLASS_EXCEPTION);
     throwErrorIfOccurred();
     return Variant(value);
 }
 
-Variant classConstant(const Variant &target, const Variant &name) {
+Variant classConstant(const Variant &target, const Variant &name, zend_class_entry *scope) {
     zend_class_entry *ce;
     if (target.isObject()) {
         ce = target.ce();
@@ -312,7 +312,7 @@ Variant classConstant(const Variant &target, const Variant &name) {
         throwError("Class name must be a valid object or a string");
         return {};
     }
-    return classConstant(ce, name);
+    return classConstant(ce, name, scope);
 }
 
 bool updateConstant(const String &cls, const String &name, const Variant &data) {
