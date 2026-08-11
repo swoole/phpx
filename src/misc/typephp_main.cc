@@ -56,7 +56,7 @@ static zend_execute_data *get_user_code_frame() {
     return frame;
 }
 
-php::UserCodeScopeGuard::UserCodeScopeGuard(zend_class_entry *scope) {
+php::UserCodeScopeGuard::UserCodeScopeGuard(const CallableScope &scope) {
     auto *frame = get_user_code_frame();
     if (UNEXPECTED(frame == nullptr || frame->func == nullptr)) {
         php::throwError("A user-code frame is required for scoped callback argument unpacking");
@@ -64,7 +64,7 @@ php::UserCodeScopeGuard::UserCodeScopeGuard(zend_class_entry *scope) {
     }
     function_ = frame->func;
     previous_scope_ = function_->common.scope;
-    function_->common.scope = scope;
+    function_->common.scope = scope.lexicalScope();
 }
 
 php::UserCodeScopeGuard::~UserCodeScopeGuard() noexcept {

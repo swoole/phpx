@@ -182,6 +182,10 @@ class CallableScope final {
         return caller_function_ ? caller_function_->common.scope : nullptr;
     }
 
+    zend_class_entry *calledScope() const noexcept {
+        return called_scope_ ? called_scope_ : lexicalScope();
+    }
+
     zend_object *thisObject() const noexcept {
         return this_object_;
     }
@@ -1990,6 +1994,11 @@ class Args {
         return reinterpret_cast<zval *>(params.data());
     }
     Variant get(size_t i) const;
+    void set(size_t i, const Variant &value) {
+        if (i < params.size()) {
+            params[i] = value;
+        }
+    }
     Array toArray() const;
     Variant operator[](size_t i) const {
         return get(i);
@@ -2330,6 +2339,8 @@ extern Object newClosure(const ClosureFn &fn,
 extern PHPX_API Variant prepareScopedCallback(const Variant &callable, const CallableScope &scope);
 extern PHPX_API Object makeScopedCallable(const Variant &callable, const CallableScope &scope);
 extern PHPX_API Array makeScopedCallableMap(const Variant &callbacks, const CallableScope &scope);
+extern PHPX_API Variant normalizeCallableClass(const Variant &callable, const CallableScope &scope);
+extern PHPX_API void normalizeCallableClass(Args &args, size_t index, const CallableScope &scope);
 
 extern Object newObject(zend_class_entry *ce);
 extern Object newObject(zend_class_entry *ce, Args &args, zend_array *named_args = nullptr);

@@ -107,7 +107,8 @@ TEST(closure, preserves_lexical_scope) {
 
 TEST(closure, scoped_callable_preserves_private_and_magic_dispatch) {
     eval(R"PHP(
-        class PhpxScopedCallableTarget {
+        class PhpxScopedCallableBase {}
+        class PhpxScopedCallableTarget extends PhpxScopedCallableBase {
             private function multiply(int $value): int {
                 return $value * 3;
             }
@@ -124,6 +125,7 @@ TEST(closure, scoped_callable_preserves_private_and_magic_dispatch) {
         class PhpxScopedCallableForeign {
             public function scopeAnchor(): void {}
         }
+        class PhpxScopedCallableChild extends PhpxScopedCallableTarget {}
     )PHP");
 
     auto object = newObject("PhpxScopedCallableTarget");
@@ -174,6 +176,34 @@ TEST(closure, scoped_callable_preserves_private_and_magic_dispatch) {
     public_callbacks.set("quadruple", public_callback);
     auto reusable_callbacks = makeScopedCallableMap(public_callbacks, instance_scope);
     ASSERT_EQ(reusable_callbacks.array(), public_callbacks.array());
+}
+
+TEST(closure, normalize_callable_class_resolves_relative_class_names) {
+    auto object = newObject("PhpxScopedCallableChild");
+    auto *lexical_scope = getClassEntry("PhpxScopedCallableTarget");
+    auto *called_scope = object.ce();
+    CallableScope scope{
+        getMethod(lexical_scope, "multiply"),
+        called_scope,
+        object.object(),
+    };
+
+    auto self_callback = normalizeCallableClass(Array{"self", "multiply"}, scope).toArray();
+    ASSERT_STREQ(self_callback.get(0).toCString(), "PhpxScopedCallableTarget");
+
+    auto static_callback = normalizeCallableClass(Array{"static", "multiply"}, scope).toArray();
+    ASSERT_STREQ(static_callback.get(0).toCString(), "PhpxScopedCallableChild");
+
+    auto parent_callback = normalizeCallableClass(Array{"parent", "multiply"}, scope).toArray();
+    ASSERT_STREQ(parent_callback.get(0).toCString(), "PhpxScopedCallableBase");
+
+    Array absolute{"PhpxScopedCallableTarget", "multiply"};
+    auto unchanged = normalizeCallableClass(absolute, scope).toArray();
+    ASSERT_EQ(unchanged.array(), absolute.array());
+
+    Args unpacked{ArgList{Array{"static", "multiply"}, 1}};
+    normalizeCallableClass(unpacked, 0, scope);
+    ASSERT_STREQ(unpacked.get(0).toArray().get(0).toCString(), "PhpxScopedCallableChild");
 }
 
 TEST(closure, call_is_rejected_without_type_confusion) {

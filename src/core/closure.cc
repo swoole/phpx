@@ -195,6 +195,51 @@ static bool canReuseResolvedCallable(const Variant &callable, const zend_fcall_i
     return !isRelativeCallableClass(callable.unwrap_ptr());
 }
 
+Variant normalizeCallableClass(const Variant &callable, const CallableScope &scope) {
+    if (!callable.isArray()) {
+        return {callable};
+    }
+
+    Array callback(callable);
+    if (callback.count() != 2) {
+        return {callable};
+    }
+
+    Variant class_name = callback.get(0);
+    if (!class_name.isString()) {
+        return {callable};
+    }
+
+    zend_class_entry *target = nullptr;
+    zend_string *relative_name = Z_STR_P(class_name.const_ptr());
+    if (zend_string_equals_literal_ci(relative_name, "self")) {
+        target = scope.lexicalScope();
+    } else if (zend_string_equals_literal_ci(relative_name, "parent")) {
+        auto *lexical_scope = scope.lexicalScope();
+        target = lexical_scope ? lexical_scope->parent : nullptr;
+    } else if (zend_string_equals_literal_ci(relative_name, "static")) {
+        target = scope.calledScope();
+    } else {
+        return {callable};
+    }
+
+    // Leave an invalid relative target unchanged so Zend produces its native
+    // callback diagnostic (for example parent without a parent class).
+    if (target == nullptr) {
+        return {callable};
+    }
+
+    Array normalized(callable);
+    normalized.set(static_cast<zend_ulong>(0), Str(target->name));
+    return normalized;
+}
+
+void normalizeCallableClass(Args &args, size_t index, const CallableScope &scope) {
+    if (args.exists(index)) {
+        args.set(index, normalizeCallableClass(args.get(index), scope));
+    }
+}
+
 static Variant makeScopedCallableImpl(const Variant &callable,
                                       const CallableScope &scope,
                                       bool reuse_public_callable) {

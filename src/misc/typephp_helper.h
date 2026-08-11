@@ -181,7 +181,7 @@ namespace php {
  */
 class UserCodeScopeGuard final {
   public:
-    explicit UserCodeScopeGuard(zend_class_entry *scope);
+    explicit UserCodeScopeGuard(const CallableScope &scope);
     ~UserCodeScopeGuard() noexcept;
 
     UserCodeScopeGuard(const UserCodeScopeGuard &) = delete;
