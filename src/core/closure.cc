@@ -111,18 +111,24 @@ Object newClosure(const ClosureFn &fn,
     String fnName("{closure}");
     func->type = ZEND_INTERNAL_FUNCTION;
     func->internal_function.handler = [](INTERNAL_FUNCTION_PARAMETERS) {
-        if (UNEXPECTED(Z_TYPE(execute_data->This) != IS_OBJECT
-                       || Z_OBJ(execute_data->This)->handlers != &closure_carrier_handlers)) {
-            throwError("Closure::call(), Closure::bind(), and Closure::bindTo() are not supported");
-            return;
-        }
-        auto *state = closure_carrier_from_obj(Z_OBJ_P(ZEND_THIS))->state();
-        auto rv = state->fn_(INTERNAL_FUNCTION_PARAM_PASSTHRU, state->this_, state->vars_);
-        zval *retval = rv.direct_ptr();
-        if (Z_ISREF_P(retval) && !(EX(func)->common.fn_flags & ZEND_ACC_RETURN_REFERENCE)) {
-            ZVAL_COPY_DEREF(return_value, retval);
-        } else {
-            rv.moveTo(return_value);
+        try {
+            if (UNEXPECTED(Z_TYPE(execute_data->This) != IS_OBJECT
+                           || Z_OBJ(execute_data->This)->handlers != &closure_carrier_handlers)) {
+                throwError("Closure::call(), Closure::bind(), and Closure::bindTo() are not supported");
+                return;
+            }
+            auto *state = closure_carrier_from_obj(Z_OBJ_P(ZEND_THIS))->state();
+            auto rv = state->fn_(INTERNAL_FUNCTION_PARAM_PASSTHRU, state->this_, state->vars_);
+            zval *retval = rv.direct_ptr();
+            if (Z_ISREF_P(retval) && !(EX(func)->common.fn_flags & ZEND_ACC_RETURN_REFERENCE)) {
+                ZVAL_COPY_DEREF(return_value, retval);
+            } else {
+                rv.moveTo(return_value);
+            }
+        } catch (zend_object *) {
+            // The PHP exception is already stored in EG(exception). Returning
+            // normally lets ZendVM release its callback frame before the outer
+            // PHPX call boundary converts it back to a C++ exception.
         }
     };
     func->internal_function.function_name = fnName.str();

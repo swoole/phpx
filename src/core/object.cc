@@ -180,11 +180,16 @@ Object Object::clone() const {
         throwError("Trying to clone an uncloneable object of class %s", ZSTR_VAL(obj->ce->name));
         return {};
     }
-    const auto new_object = clone_obj(obj);
-    throwErrorIfOccurred();
-
     Object retval;
-    ZVAL_OBJ(retval.ptr(), new_object);
+    const auto new_object = clone_obj(obj);
+    if (new_object != nullptr) {
+        // Take ownership before propagating a possible __clone() exception.
+        // Zend may return the allocated clone with EG(exception) set; keeping
+        // it in an RAII wrapper ensures that exceptional callbacks do not leak
+        // the partially initialized object.
+        ZVAL_OBJ(retval.ptr(), new_object);
+    }
+    throwErrorIfOccurred();
     return retval;
 }
 
