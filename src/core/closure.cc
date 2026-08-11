@@ -154,4 +154,39 @@ Object newClosure(const ClosureFn &fn,
 
     return {&closure, Ctor::Move};
 }
+
+Object makeScopedCallable(const Variant &callable, zend_class_entry *scope) {
+    if (UNEXPECTED(scope == nullptr)) {
+        throwError("Explicit callable scope must not be null");
+        return {};
+    }
+
+    ClosureFn forward = [](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &captures) -> Variant {
+        Args args(ZEND_NUM_ARGS());
+        for (uint32_t i = 0; i < ZEND_NUM_ARGS(); i++) {
+            args.append(ZEND_CALL_ARG(execute_data, i + 1));
+        }
+        zend_array *named_args = nullptr;
+        if (ZEND_CALL_INFO(execute_data) & ZEND_CALL_HAS_EXTRA_NAMED_PARAMS) {
+            named_args = execute_data->extra_named_params;
+        }
+        return callScoped(captures.get(0), zend_get_executed_scope(), args, named_args);
+    };
+
+    return newClosure(forward, {callable}, {}, scope);
+}
+
+Array makeScopedCallableMap(const Variant &callbacks, zend_class_entry *scope) {
+    if (UNEXPECTED(!callbacks.isArray())) {
+        throwError("Scoped callback map must be an array, %s given", callbacks.typeStr());
+        return {};
+    }
+
+    Array result;
+    Array source(callbacks);
+    for (auto item : source) {
+        result.set(item.key, makeScopedCallable(item.value, scope));
+    }
+    return result;
+}
 }  // namespace php

@@ -141,6 +141,33 @@ PHPX_API Variant eval(const String &script, const char *filename = nullptr);
 PHPX_API Variant call(const Variant &func, Args &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &func, Array &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &func, const ArgList &args, zend_array *named_args = nullptr);
+PHPX_API Variant callScoped(const Variant &func,
+                           zend_class_entry *scope,
+                           Args &args,
+                           zend_array *named_args = nullptr);
+PHPX_API Variant callScoped(const Variant &func,
+                           zend_class_entry *scope,
+                           Array &args,
+                           zend_array *named_args = nullptr);
+PHPX_API Variant callScoped(const Variant &func,
+                           zend_class_entry *scope,
+                           const ArgList &args = {},
+                           zend_array *named_args = nullptr);
+PHPX_API Variant callScoped(const Variant &object,
+                           const Variant &func,
+                           zend_class_entry *scope,
+                           Args &args,
+                           zend_array *named_args = nullptr);
+PHPX_API Variant callScoped(const Variant &object,
+                           const Variant &func,
+                           zend_class_entry *scope,
+                           Array &args,
+                           zend_array *named_args = nullptr);
+PHPX_API Variant callScoped(const Variant &object,
+                           const Variant &func,
+                           zend_class_entry *scope,
+                           const ArgList &args = {},
+                           zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, Args &_args, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, Array &args, zend_array *named_args = nullptr);
@@ -2239,6 +2266,8 @@ extern Object newClosure(const ClosureFn &fn,
                          const Object &_this = {},
                          zend_class_entry *scope = nullptr,
                          std::initializer_list<const char *> parameter_names = {});
+extern PHPX_API Object makeScopedCallable(const Variant &callable, zend_class_entry *scope);
+extern PHPX_API Array makeScopedCallableMap(const Variant &callbacks, zend_class_entry *scope);
 
 extern Object newObject(zend_class_entry *ce);
 extern Object newObject(zend_class_entry *ce, Args &args, zend_array *named_args = nullptr);

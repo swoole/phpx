@@ -105,6 +105,41 @@ TEST(closure, preserves_lexical_scope) {
     ASSERT_STREQ(closure().toCString(), "PhpxClosureScopeParent");
 }
 
+TEST(closure, scoped_callable_preserves_private_and_magic_dispatch) {
+    eval(R"PHP(
+        class PhpxScopedCallableTarget {
+            private function multiply(int $value): int {
+                return $value * 3;
+            }
+
+            public function __call(string $name, array $args): string {
+                return 'magic:' . $name . ':' . $args[0];
+            }
+        }
+
+        class PhpxScopedCallableForeign {}
+    )PHP");
+
+    auto object = newObject("PhpxScopedCallableTarget");
+    Array callback{object, "multiply"};
+
+    auto private_callable = makeScopedCallable(callback, getClassEntry("PhpxScopedCallableTarget"));
+    ASSERT_EQ(private_callable({7}).toInt(), 21);
+
+    auto mapped = call("array_map", {private_callable, Array{1, 2, 3}}).toArray();
+    ASSERT_EQ(mapped.get(0).toInt(), 3);
+    ASSERT_EQ(mapped.get(1).toInt(), 6);
+    ASSERT_EQ(mapped.get(2).toInt(), 9);
+
+    auto magic_callable = makeScopedCallable(callback, getClassEntry("PhpxScopedCallableForeign"));
+    ASSERT_STREQ(magic_callable({5}).toCString(), "magic:multiply:5");
+
+    Array callbacks;
+    callbacks.set("triple", callback);
+    auto scoped_callbacks = makeScopedCallableMap(callbacks, getClassEntry("PhpxScopedCallableTarget"));
+    ASSERT_EQ(scoped_callbacks.get("triple")({4}).toInt(), 12);
+}
+
 TEST(closure, call_is_rejected_without_type_confusion) {
     auto result = run_in_child_capture_stdout([]() -> int {
         ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &) -> Variant {

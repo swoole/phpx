@@ -912,6 +912,65 @@ TEST(object, call) {
     ASSERT_STREQ(rs.toCString(), "2000-01-01 00:00:00");
 }
 
+TEST(object, call_scoped_resolves_visibility_without_leaking_scope) {
+    eval(R"PHP(
+        class PhpxScopedCallTarget {
+            private function privateValue(): string {
+                return 'private';
+            }
+
+            protected function protectedValue(): string {
+                return 'protected';
+            }
+
+            public function publicEntry(): string {
+                return $this->ownPrivateValue();
+            }
+
+            private function ownPrivateValue(): string {
+                return 'target-private';
+            }
+
+            public function __call(string $name, array $args): string {
+                return 'magic:' . $name;
+            }
+        }
+
+        class PhpxScopedCallChild extends PhpxScopedCallTarget {}
+        class PhpxScopedCallForeign {}
+    )PHP");
+
+    auto target = newObject("PhpxScopedCallTarget");
+    auto child = newObject("PhpxScopedCallChild");
+    auto target_scope = getClassEntry("PhpxScopedCallTarget");
+    auto child_scope = getClassEntry("PhpxScopedCallChild");
+    auto foreign_scope = getClassEntry("PhpxScopedCallForeign");
+
+    ASSERT_STREQ(callScoped(target, "privateValue", target_scope).toCString(), "private");
+    ASSERT_STREQ(callScoped(child, "protectedValue", child_scope).toCString(), "protected");
+    ASSERT_STREQ(callScoped(target, "privateValue", foreign_scope).toCString(), "magic:privateValue");
+    ASSERT_STREQ(callScoped(target, "publicEntry", foreign_scope).toCString(), "target-private");
+}
+
+TEST(object, call_scoped_supports_arguments_and_named_arguments) {
+    eval(R"PHP(
+        class PhpxScopedCallArguments {
+            private function format(string $left, string $right = 'R'): string {
+                return $left . ':' . $right;
+            }
+        }
+    )PHP");
+
+    auto object = newObject("PhpxScopedCallArguments");
+    auto scope = getClassEntry("PhpxScopedCallArguments");
+
+    ASSERT_STREQ(callScoped(object, "format", scope, {"L"}).toCString(), "L:R");
+
+    Array named;
+    named.set("right", "B");
+    ASSERT_STREQ(callScoped(object, "format", scope, {"A"}, named.array()).toCString(), "A:B");
+}
+
 TEST(object, variant_call_invokes_constructor) {
     eval(R"PHP(
         class PhpxConstructorCallProbe {
