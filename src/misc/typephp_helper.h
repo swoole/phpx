@@ -173,9 +173,25 @@ static inline php::Var php_globals_array() {
 }
 
 namespace php {
-struct Scope {
-    zend_class_entry *ce;
-    zend_execute_data *frame;
+/**
+ * Temporarily exposes the called class through the nearest user-code frame.
+ *
+ * TypePHP uses this only when argument unpacking hides the callback position
+ * from the compiler. Ordinary callable resolution uses CallableScope instead.
+ */
+class UserCodeScopeGuard final {
+  public:
+    explicit UserCodeScopeGuard(zend_class_entry *scope);
+    ~UserCodeScopeGuard() noexcept;
+
+    UserCodeScopeGuard(const UserCodeScopeGuard &) = delete;
+    UserCodeScopeGuard &operator=(const UserCodeScopeGuard &) = delete;
+    UserCodeScopeGuard(UserCodeScopeGuard &&) = delete;
+    UserCodeScopeGuard &operator=(UserCodeScopeGuard &&) = delete;
+
+  private:
+    zend_function *function_ = nullptr;
+    zend_class_entry *previous_scope_ = nullptr;
 };
 [[noreturn]] static inline void throwStdContainerTypeMismatch() {
     throwException(zend_ce_type_error, "std container type mismatch");
@@ -243,9 +259,6 @@ static inline php::CallableScope php_get_callable_scope(zend_function *caller_fu
         this_.isObject() ? this_.object() : nullptr,
     };
 }
-extern php::Scope php_switch_scope(php::Object &this_);
-extern void php_restore_scope(php::Scope &ori_scope);
-
 extern inline php::Var php_deindirect(const php::Var &var) {
     return php::Var{var.const_ptr(), php::Ctor::CopyRef};
 }

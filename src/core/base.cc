@@ -508,7 +508,7 @@ Variant callScoped(const Variant &object,
         throwError("call method `%s` on %s", func.toCString(), object.typeStr());
         return {};
     }
-    if (UNEXPECTED(scope.caller_function == nullptr || scope.lexicalScope() == nullptr)) {
+    if (UNEXPECTED(!scope.isValid())) {
         throwError("Explicit callable scope must not be null");
         return {};
     }
@@ -523,7 +523,7 @@ Variant callScoped(const Variant &func,
                    const CallableScope &scope,
                    Args &args,
                    zend_array *named_args) {
-    if (UNEXPECTED(scope.caller_function == nullptr || scope.lexicalScope() == nullptr)) {
+    if (UNEXPECTED(!scope.isValid())) {
         throwError("Explicit callable scope must not be null");
         return {};
     }

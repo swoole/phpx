@@ -147,16 +147,12 @@ class CallableScope final {
   public:
     // Borrowed for this context's stack lifetime. TypePHP methods are persistent;
     // a Closure's function remains valid while its owning Closure is alive.
-    zend_function *caller_function;
-    zend_class_entry *called_scope;
-    zend_object *this_object;
-
     CallableScope(zend_function *caller_function,
                   zend_class_entry *called_scope,
                   zend_object *this_object)
-        : caller_function(caller_function),
-          called_scope(called_scope),
-          this_object(this_object) {
+        : caller_function_(caller_function),
+          called_scope_(called_scope),
+          this_object_(this_object) {
         if (caller_function == nullptr) {
             return;
         }
@@ -178,20 +174,31 @@ class CallableScope final {
     CallableScope(CallableScope &&) = delete;
     CallableScope &operator=(CallableScope &&) = delete;
 
+    bool isValid() const noexcept {
+        return caller_function_ != nullptr && lexicalScope() != nullptr;
+    }
+
     zend_class_entry *lexicalScope() const noexcept {
-        return caller_function ? caller_function->common.scope : nullptr;
+        return caller_function_ ? caller_function_->common.scope : nullptr;
+    }
+
+    zend_object *thisObject() const noexcept {
+        return this_object_;
     }
 
     bool resolve(zval *callable,
                  zend_object *object,
                  zend_fcall_info_cache *cache,
                  char **error) const {
-        ZEND_ASSERT(caller_function != nullptr);
+        ZEND_ASSERT(caller_function_ != nullptr);
         ZEND_ASSERT(lexicalScope() != nullptr);
         return zend_is_callable_at_frame(callable, object, &frame_, 0, cache, error);
     }
 
   private:
+    zend_function *caller_function_;
+    zend_class_entry *called_scope_;
+    zend_object *this_object_;
     mutable zend_execute_data frame_{};
 };
 

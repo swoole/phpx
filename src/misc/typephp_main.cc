@@ -48,7 +48,7 @@ zend_class_entry *php_get_called_ce(php::Object &this_) {
     }
 }
 
-static zend_execute_data *get_frame() {
+static zend_execute_data *get_user_code_frame() {
     zend_execute_data *frame = EG(current_execute_data);
     while (frame && (!frame->func || !ZEND_USER_CODE(frame->func->type))) {
         frame = frame->prev_execute_data;
@@ -56,16 +56,21 @@ static zend_execute_data *get_frame() {
     return frame;
 }
 
-php::Scope php_switch_scope(php::Object &this_) {
-    php::Scope scope;
-    scope.frame = get_frame();
-    scope.ce = scope.frame->func->common.scope;
-    scope.frame->func->common.scope = php_get_called_ce(this_);
-    return scope;
+php::UserCodeScopeGuard::UserCodeScopeGuard(zend_class_entry *scope) {
+    auto *frame = get_user_code_frame();
+    if (UNEXPECTED(frame == nullptr || frame->func == nullptr)) {
+        php::throwError("A user-code frame is required for scoped callback argument unpacking");
+        return;
+    }
+    function_ = frame->func;
+    previous_scope_ = function_->common.scope;
+    function_->common.scope = scope;
 }
 
-void php_restore_scope(php::Scope &ori_scope) {
-    ori_scope.frame->func->common.scope = ori_scope.ce;
+php::UserCodeScopeGuard::~UserCodeScopeGuard() noexcept {
+    if (function_ != nullptr) {
+        function_->common.scope = previous_scope_;
+    }
 }
 
 static php_stream *s_in_process = NULL;

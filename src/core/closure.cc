@@ -198,7 +198,7 @@ static bool canReuseResolvedCallable(const Variant &callable, const zend_fcall_i
 static Variant makeScopedCallableImpl(const Variant &callable,
                                       const CallableScope &scope,
                                       bool reuse_public_callable) {
-    if (UNEXPECTED(scope.caller_function == nullptr || scope.lexicalScope() == nullptr)) {
+    if (UNEXPECTED(!scope.isValid())) {
         throwError("Explicit callable scope must not be null");
         return {};
     }
@@ -280,9 +280,9 @@ static Variant makeScopedCallableImpl(const Variant &callable,
     };
 
     Object bound_this;
-    if (scope.this_object != nullptr) {
+    if (scope.thisObject() != nullptr) {
         zval object;
-        ZVAL_OBJ(&object, scope.this_object);
+        ZVAL_OBJ(&object, scope.thisObject());
         bound_this = Object(&object);
     }
     return newClosure(forward, {callable}, bound_this, scope.lexicalScope());
