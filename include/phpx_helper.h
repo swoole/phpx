@@ -318,6 +318,21 @@ static inline uint32_t getCallArgNum() {
     return ZEND_CALL_NUM_ARGS(EG(current_execute_data));
 }
 
+/**
+ * Validate arguments at a generated Zend-to-C++ wrapper boundary.
+ *
+ * The declared count excludes the open-ended part of a variadic signature.
+ * Zend owns the ArgumentCountError wording; throwErrorIfOccurred() then brings
+ * the exception into the native C++ frame so its RAII objects unwind safely.
+ */
+static inline void checkCallArgCount(uint32_t required, uint32_t declared, bool variadic) {
+    const uint32_t given = getCallArgNum();
+    if (UNEXPECTED(given < required || (!variadic && given > declared))) {
+        zend_wrong_parameters_count_error(required, variadic ? UINT32_MAX : declared);
+        throwErrorIfOccurred();
+    }
+}
+
 static inline zend_array *getCallExtraNamedArgs() {
     auto execute_data = EG(current_execute_data);
     if (UNEXPECTED(ZEND_CALL_INFO(execute_data) & ZEND_CALL_HAS_EXTRA_NAMED_PARAMS)) {
