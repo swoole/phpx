@@ -162,20 +162,6 @@ TEST(closure, scoped_callable_preserves_private_and_magic_dispatch) {
     auto magic_callable = makeScopedCallable(callback, foreign_context);
     ASSERT_STREQ(magic_callable({5}).toCString(), "magic:multiply:5");
 
-    Array callbacks;
-    callbacks.set("triple", callback);
-    callbacks.set("quadruple", public_callback);
-    auto scoped_callbacks = makeScopedCallableMap(callbacks, instance_scope);
-    ASSERT_NE(scoped_callbacks.array(), callbacks.array());
-    ASSERT_TRUE(scoped_callbacks.get("triple").isObject());
-    ASSERT_TRUE(scoped_callbacks.get("quadruple").isArray());
-    ASSERT_EQ(scoped_callbacks.get("triple")({4}).toInt(), 12);
-    ASSERT_EQ(call(scoped_callbacks.get("quadruple"), {4}).toInt(), 16);
-
-    Array public_callbacks;
-    public_callbacks.set("quadruple", public_callback);
-    auto reusable_callbacks = makeScopedCallableMap(public_callbacks, instance_scope);
-    ASSERT_EQ(reusable_callbacks.array(), public_callbacks.array());
 }
 
 TEST(closure, normalize_callable_class_resolves_relative_class_names) {

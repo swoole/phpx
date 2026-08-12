@@ -347,23 +347,4 @@ Object makeScopedCallable(const Variant &callable, const CallableScope &scope) {
     return Object(makeScopedCallableImpl(callable, scope, false));
 }
 
-Array makeScopedCallableMap(const Variant &callbacks, const CallableScope &scope) {
-    if (UNEXPECTED(!callbacks.isArray())) {
-        throwError("Scoped callback map must be an array, %s given", callbacks.typeStr());
-        return {};
-    }
-
-    Array source(callbacks);
-    // Array uses Zend's copy-on-write semantics. If every callback can be
-    // reused, no HashTable is copied. The first scoped replacement separates
-    // the array once, after which only the values requiring a Closure change.
-    Array result(callbacks);
-    for (auto item : source) {
-        Variant scoped = prepareScopedCallback(item.value, scope);
-        if (!fast_is_identical_function(scoped.unwrap_ptr(), item.value.unwrap_ptr())) {
-            result.set(item.key, scoped);
-        }
-    }
-    return result;
-}
 }  // namespace php

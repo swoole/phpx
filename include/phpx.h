@@ -2353,7 +2353,6 @@ extern Object newClosure(const ClosureFn &fn,
                          std::initializer_list<const char *> parameter_names = {});
 extern PHPX_API Variant prepareScopedCallback(const Variant &callable, const CallableScope &scope);
 extern PHPX_API Object makeScopedCallable(const Variant &callable, const CallableScope &scope);
-extern PHPX_API Array makeScopedCallableMap(const Variant &callbacks, const CallableScope &scope);
 extern PHPX_API Variant normalizeCallableClass(const Variant &callable, const CallableScope &scope);
 extern PHPX_API void normalizeCallableClass(Args &args, size_t index, const CallableScope &scope);
 
