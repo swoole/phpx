@@ -15,23 +15,11 @@ by Git. TypePHP locates this directory through the existing PHPX resolution
 rules (`PHPX_HOME`, Composer package metadata, then `vendor/swoole/phpx`) and
 does not define a separate WASI SDK environment variable.
 
-Language-level WIT exports additionally use a host-side generator shipped by
-the PHPX package:
-
-```text
-phpx/wasm/bin/
-├── linux-x86_64/wit-bindgen
-├── linux-aarch64/wit-bindgen
-├── macos-x86_64/wit-bindgen
-├── macos-arm64/wit-bindgen
-└── windows-x86_64/wit-bindgen.exe
-```
-
-This is a build tool, not a PHPX runtime facility. It is intentionally not
+Language-level WIT exports additionally use the host-side
+`wit-bindgen-cli 0.60.0` executable from `PATH`. This is an application build
+tool, not a PHPX runtime facility: PHPX does not package it and it is not
 linked into `libphpx.so`, `phpx.dll`, or `wasm32-wasip2/lib/libphpx.a`.
-`tpc` locates the matching binary relative to `PHPX_HOME` (which takes
-precedence) or the Composer PHPX directory. Users do not install Rust,
-`wit-bindgen`, or `wasm-tools`.
+Command components do not require `wit-bindgen`.
 
 TypePHP invokes the pinned upstream C generator internally:
 
@@ -40,10 +28,9 @@ wit-bindgen c --world <world> --rename-world <c-name> \
   --out-dir <dir> <world.wit>
 ```
 
-The generator version is pinned by the PHPX release. Its manifest schema is an
-internal PHPX/TypePHP ABI and may only change together with their bound
-versions. Generated source is cached by the WIT contents, manifest schema, and
-generator version.
+TypePHP validates the generator version before a library build. Its manifest
+schema is an internal PHPX/TypePHP ABI and may only change together with their
+bound versions.
 
 ## Building PHPX/WASI
 
