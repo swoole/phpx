@@ -316,6 +316,17 @@ endif()
 # ============ mpdecimal ============
 set(MPDECIMAL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mpdecimal)
 
+# ============ Native Object GC (Wren-derived) ============
+add_library(wren_gc STATIC
+    thirdparty/wren-gc/src/wren_gc.c
+)
+target_include_directories(wren_gc PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/wren-gc/include
+)
+set_target_properties(wren_gc PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+)
+
 if (IS_WINDOWS)
     # Windows: 使用 PHP SDK 中预置的 mpdecimal DLL 导入库
     find_library(MPDECIMAL_LIBRARY
@@ -438,10 +449,11 @@ if (IS_WINDOWS)
         ${PHP_LIBRARY}
         gmp gmpxx mpfr
         mpdecimal
+        wren_gc
     )
 else()
     target_link_libraries(phpx PUBLIC gmp gmpxx mpfr)
-    target_link_libraries(phpx PUBLIC mpdecimal)
+    target_link_libraries(phpx PUBLIC mpdecimal wren_gc)
 endif()
 
 if (CODE_COVERAGE AND NOT IS_WINDOWS)

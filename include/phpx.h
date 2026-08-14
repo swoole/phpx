@@ -57,6 +57,8 @@ extern "C" {
 #define PHPX_API PHPAPI
 #define PHPX_UNSAFE
 
+#include "phpx_native_gc.h"
+
 #define IS_STR_OFFSET_SET (1 << 5)
 
 /**

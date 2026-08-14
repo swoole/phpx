@@ -488,6 +488,7 @@ void request_init() {
         return;
     }
     initDecimalContext();
+    nativeGcRequestInit();
     request_active = true;
     if (box_res_id == 0) {
         box_res_id = zend_register_list_destructors_ex(box_dtor, nullptr, box_res_name, 0);
@@ -507,6 +508,7 @@ void request_shutdown() {
         pefree(func_cache_map, 1);
         func_cache_map = nullptr;
     }
+    nativeGcRequestShutdown();
     request_active = false;
 }
 
