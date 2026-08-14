@@ -4,7 +4,6 @@
 
 using namespace php;
 
-#if PHP_VERSION_ID >= 80200
 TEST(closure, base) {
     ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &vars_) -> Variant {
         auto arg_0 = getCallArg(0);
@@ -207,4 +206,3 @@ TEST(closure, call_is_rejected_without_type_confusion) {
     ASSERT_TRUE(result.exited) << result.output;
     ASSERT_EQ(result.exit_code, 1) << result.output;
 }
-#endif

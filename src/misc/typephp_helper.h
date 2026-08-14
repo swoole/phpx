@@ -283,38 +283,22 @@ static inline auto php_get_create_object_fn(zend_class_entry *ce) {
  */
 extern void typephp_unset_typed_property(zend_object *object, zend_string *member, void **cache_slot);
 
-/** Install TypePHP's cross-version property hook and asymmetric-set handlers. */
+/** Install TypePHP's property hook and asymmetric-set handlers. */
 extern void typephp_install_property_handlers(zend_class_entry *class_entry, zend_object_handlers *handlers);
 
-/** Attach per-class handlers after create_object on PHP versions before 8.4. */
-extern zend_object *typephp_attach_property_handlers(zend_object *object, zend_object_handlers *handlers);
-
 /**
- * Create an AOT object and initialize its runtime property defaults without
- * exposing PHP-version-specific handler ordering to generated code.
- *
- * On PHP < 8.4 the saved allocator must always be used, then the per-class
- * handlers are attached before initialization. On PHP >= 8.4 a class may use
- * the standard allocator directly, but must delegate to the saved allocator
- * when an ancestor owns runtime initialization or custom object storage.
+ * Create an AOT object and initialize its runtime property defaults. A class
+ * delegates to the saved allocator when an ancestor owns runtime
+ * initialization or custom object storage.
  */
 template <typename Initializer>
 static inline zend_object *typephp_create_object_with_defaults(zend_class_entry *class_type,
                                                                zend_object *(*base_create_object)(zend_class_entry *),
-                                                               zend_object_handlers *handlers,
-                                                               bool delegate_to_base_on_php84,
+                                                               bool delegate_to_base,
                                                                Initializer &&initializer) {
-#if PHP_VERSION_ID < 80400
-    (void) delegate_to_base_on_php84;
-    auto *object = base_create_object(class_type);
-    typephp_attach_property_handlers(object, handlers);
-
-    php::FakeScopeGuard fake_scope_guard{object->ce};
-    initializer(object);
-    return object;
-#else
+    const auto *handlers = class_type->default_object_handlers;
     zend_object *object;
-    if (delegate_to_base_on_php84) {
+    if (delegate_to_base) {
         object = base_create_object(class_type);
     } else {
         object = zend_objects_new(class_type);
@@ -330,7 +314,6 @@ static inline zend_object *typephp_create_object_with_defaults(zend_class_entry 
     }
     object->handlers = handlers;
     return object;
-#endif
 }
 
 /** Write a dynamic property while preserving the AOT source-level class scope. */

@@ -15,7 +15,7 @@ Zend API 的 C++ 封装库
 
 ## 系统要求
 
-- PHP 8.2 或更高版本
+- PHP 8.4 或更高版本
 - Linux/macOS/Windows
 - GCC 9 或更高版本（支持 C++17）
 - Composer

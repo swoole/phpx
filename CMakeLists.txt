@@ -189,6 +189,17 @@ else()
         set(PHP_CONFIG "php-config")
     endif()
 
+    execute_process(COMMAND ${PHP_CONFIG} --vernum
+        OUTPUT_VARIABLE PHP_VERSION_ID
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE PHP_CONFIG_RESULT)
+    if (NOT PHP_CONFIG_RESULT EQUAL 0)
+        message(FATAL_ERROR "Failed to query PHP version from php-config: ${PHP_CONFIG_RESULT}")
+    endif()
+    if (PHP_VERSION_ID LESS 80400)
+        message(FATAL_ERROR "PHPX requires PHP 8.4 or later; php-config reports ${PHP_VERSION_ID}")
+    endif()
+
     execute_process(COMMAND ${PHP_CONFIG} --includes
         OUTPUT_VARIABLE PHP_INCLUDES
         OUTPUT_STRIP_TRAILING_WHITESPACE

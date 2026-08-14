@@ -4,9 +4,6 @@
 
 #include <phpx.h>
 #include <typephp_helper.h>
-#if PHP_VERSION_ID < 80400
-#include <mutex>
-#endif
 BEGIN_EXTERN_C()
 #include "ext/standard/basic_functions.h"
 #include "sapi/embed/php_embed.h"
@@ -18,11 +15,7 @@ END_EXTERN_C()
 extern zend_module_entry *php_embed_get_module();
 
 void module_init(zend_module_entry *module) {
-#if PHP_VERSION_ID >= 80400
     if (zend_register_module_ex(module, MODULE_PERSISTENT) == NULL) {
-#else
-    if (zend_register_module_ex(module) == NULL) {
-#endif
         zend_error(E_ERROR, "Failed to register module [%s]", module->name);
         exit(255);
     }
@@ -274,9 +267,6 @@ static zval *write_hook_property(zend_object *object, zend_string *member, zval 
     return OBJ_PROP(object, property_info->offset);
 }
 
-#if PHP_VERSION_ID < 80400
-static std::mutex property_handlers_init_mutex;
-#endif
 }  // namespace
 
 static void initialize_property_handlers(zend_object_handlers *handlers, const zend_object_handlers *base_handlers) {
@@ -287,28 +277,8 @@ static void initialize_property_handlers(zend_object_handlers *handlers, const z
 }
 
 void typephp_install_property_handlers(zend_class_entry *class_entry, zend_object_handlers *handlers) {
-#if PHP_VERSION_ID >= 80400
     initialize_property_handlers(handlers, class_entry->default_object_handlers);
     class_entry->default_object_handlers = handlers;
-#else
-    (void) class_entry;
-    memset(handlers, 0, sizeof(zend_object_handlers));
-#endif
-}
-
-zend_object *typephp_attach_property_handlers(zend_object *object, zend_object_handlers *handlers) {
-#if PHP_VERSION_ID < 80400
-    if (UNEXPECTED(handlers->read_property != read_hook_property)) {
-        std::lock_guard<std::mutex> lock(property_handlers_init_mutex);
-        if (handlers->read_property != read_hook_property) {
-            initialize_property_handlers(handlers, object->handlers);
-        }
-    }
-    object->handlers = handlers;
-#else
-    (void) handlers;
-#endif
-    return object;
 }
 
 php::Variant typephp_read_property_scoped(const php::Variant &object,

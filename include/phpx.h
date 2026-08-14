@@ -33,8 +33,8 @@ extern "C" {
 #include "phpx_types.h"
 #include "phpx_compat.h"
 
-#if PHP_VERSION_ID < 80200
-#error "only supports PHP-8.2 or later."
+#if PHP_VERSION_ID < 80400
+#error "PHPX requires PHP 8.4 or later."
 #endif
 
 #include <unordered_map>

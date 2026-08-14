@@ -15,7 +15,7 @@ C++ wrapper for Zend API
 
 ## Requirements
 
-- PHP 8.2 or later
+- PHP 8.4 or later
 - Linux/macOS/Windows
 - GCC 9 or later (with C++17 support)
 - Composer

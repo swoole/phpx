@@ -36,14 +36,12 @@ TEST(class_facade, datetime_createFromFormat) {
     ASSERT_STREQ(fmt.toCString(), "2009-02-15");
 }
 
-#if PHP_VERSION_ID >= 80400
 TEST(class_facade, datetime_createFromTimestamp) {
     auto dt_var = DateTime::createFromTimestamp(946684800);
     ASSERT_TRUE(dt_var.isObject());
     auto fmt = dt_var.call("format", {"Y-m-d"});
     ASSERT_STREQ(fmt.toCString(), "2000-01-01");
 }
-#endif
 
 TEST(class_facade, datetime_modify) {
     DateTime dt("2022-01-01");
@@ -125,22 +123,18 @@ TEST(class_facade, datetime_setISODate) {
     ASSERT_TRUE(fmt.isString());
 }
 
-#if PHP_VERSION_ID >= 80400
 TEST(class_facade, datetime_getMicrosecond) {
     DateTime dt;
     auto ms = dt.getMicrosecond();
     ASSERT_TRUE(ms.isInt());
 }
-#endif
 
-#if PHP_VERSION_ID >= 80400
 TEST(class_facade, datetime_setMicrosecond) {
     DateTime dt("2022-01-01");
     dt.setMicrosecond(500000);
     auto fmt = dt.format("u");
     ASSERT_STREQ(fmt.toCString(), "500000");
 }
-#endif
 
 TEST(class_facade, datetime_getLastErrors) {
     auto errors = DateTime::getLastErrors();
@@ -1064,10 +1058,9 @@ TEST(class_facade, reflection_parameter_getName) {
 }
 
 // ============================================================
-// ReflectionConstant (PHP 8.2+)
+// ReflectionConstant
 // ============================================================
 
-#if PHP_VERSION_ID >= 80400
 TEST(class_facade, reflection_constant) {
     ReflectionConstant rc("PHP_INT_MAX");
     ASSERT_STREQ(rc.getName().toCString(), "PHP_INT_MAX");
@@ -1079,7 +1072,6 @@ TEST(class_facade, reflection_constant_getShortName) {
     ASSERT_STREQ(rc.getShortName().toCString(), "PHP_INT_MAX");
     ASSERT_FALSE(rc.isDeprecated().toBool());
 }
-#endif
 
 // ============================================================
 // ReflectionReference

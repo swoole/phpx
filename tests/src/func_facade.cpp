@@ -47,7 +47,6 @@ TEST(func_facade, json_decode_flags) {
     ASSERT_STREQ(arr.get("key").toCString(), "12345678901234567890");
 }
 
-#if PHP_VERSION_ID >= 80300
 TEST(func_facade, json_validate) {
     ASSERT_TRUE(json_validate("{\"valid\": true}").toBool());
     ASSERT_FALSE(json_validate("{invalid json").toBool());
@@ -55,7 +54,6 @@ TEST(func_facade, json_validate) {
     ASSERT_TRUE(json_validate("42").toBool());
     ASSERT_TRUE(json_validate("\"string\"").toBool());
 }
-#endif
 
 TEST(func_facade, json_last_error) {
     json_decode("invalid");
@@ -743,7 +741,6 @@ TEST(func_facade, strcasecmp_strncasecmp) {
     ASSERT_EQ(php::strncasecmp("ABCDE", "abcxy", 3).toInt(), 0);
 }
 
-#if PHP_VERSION_ID >= 80300
 TEST(func_facade, str_increment_decrement) {
     auto rs = str_increment("a");
     ASSERT_STREQ(rs.toCString(), "b");
@@ -751,7 +748,6 @@ TEST(func_facade, str_increment_decrement) {
     auto rs2 = str_decrement("b");
     ASSERT_STREQ(rs2.toCString(), "a");
 }
-#endif
 
 TEST(func_facade, quotemeta) {
     auto rs = quotemeta(".+*?[^]$()");

@@ -126,11 +126,7 @@ static Array php_do_pcre_match(String &str, const String &regx, Int flags, Int s
     zval count = {};
     zval return_value = {};
     php_pcre_pce_incref(pce);
-#if PHP_VERSION_ID >= 80400
     php_pcre_match_impl(pce, str.str(), &count, &return_value, global, flags, start_offset);
-#else
-    php_pcre_match_impl(pce, str.str(), &count, &return_value, global, flags > 0, flags, start_offset);
-#endif
     php_pcre_pce_decref(pce);
 
     if (!zval_is_array(&return_value)) {

@@ -19,9 +19,7 @@
 
 extern "C" {
 #include "zend_observer.h"
-#if PHP_VERSION_ID >= 80400
 #include "zend_property_hooks.h"
-#endif
 }
 
 namespace php {
@@ -321,7 +319,6 @@ Variant classConstant(const Variant &target, const Variant &name, zend_class_ent
     return classConstant(ce, name, scope);
 }
 
-#if PHP_VERSION_ID >= 80400
 static zend_function *createPropertyHook(zend_class_entry *ce,
                                          zend_property_info *property_info,
                                          std::string_view method_name,
@@ -387,13 +384,11 @@ static zend_function *createAbstractPropertyHook(zend_class_entry *ce,
     ZEND_MAP_PTR_INIT(hook->run_time_cache, nullptr);
     return reinterpret_cast<zend_function *>(hook);
 }
-#endif
 
 void registerPropertyHooks(zend_class_entry *ce,
                            zend_property_info *property_info,
                            std::string_view getter,
                            std::string_view setter) {
-#if PHP_VERSION_ID >= 80400
     ZEND_ASSERT(ce != nullptr);
     ZEND_ASSERT(property_info != nullptr);
     ZEND_ASSERT(property_info->hooks == nullptr);
@@ -417,20 +412,12 @@ void registerPropertyHooks(zend_class_entry *ce,
     if (ce->get_iterator == nullptr) {
         ce->get_iterator = zend_hooked_object_get_iterator;
     }
-#else
-    (void) ce;
-    (void) property_info;
-    (void) getter;
-    (void) setter;
-    throwError("Property hooks require PHP 8.4 or later");
-#endif
 }
 
 void registerAbstractPropertyHooks(zend_class_entry *ce,
                                    zend_property_info *property_info,
                                    bool getter,
                                    bool setter) {
-#if PHP_VERSION_ID >= 80400
     ZEND_ASSERT(ce != nullptr);
     ZEND_ASSERT(ce->ce_flags & ZEND_ACC_INTERFACE);
     ZEND_ASSERT(property_info != nullptr);
@@ -447,13 +434,6 @@ void registerAbstractPropertyHooks(zend_class_entry *ce,
             createAbstractPropertyHook(ce, property_info, ZEND_PROPERTY_HOOK_SET);
     }
     ce->num_hooked_props++;
-#else
-    (void) ce;
-    (void) property_info;
-    (void) getter;
-    (void) setter;
-    throwError("Interface property hooks require PHP 8.4 or later");
-#endif
 }
 
 bool updateConstant(const String &cls, const String &name, const Variant &data) {
