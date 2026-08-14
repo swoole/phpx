@@ -4,7 +4,7 @@
 
 [![Twitter](https://badgen.net/badge/icon/twitter?icon=twitter&label)](https://twitter.com/phpswoole)
 [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.swoole.dev)
-[![Build Status](https://github.com/matyhtf/phpx/workflows/libphpx/badge.svg)](https://github.com/matyhtf/phpx/actions?query=workflow%3Alibphpx)
+[![Unit Tests](https://github.com/swoole/phpx/actions/workflows/test.yml/badge.svg)](https://github.com/swoole/phpx/actions/workflows/test.yml)
 [![License](https://img.shields.io/badge/license-apache2-blue.svg)](LICENSE)
 [![Latest Release](https://img.shields.io/github/release/swoole/phpx.svg)](https://github.com/swoole/phpx/releases/)
 [![Codecov](https://codecov.io/gh/swoole/phpx/branch/master/graph/badge.svg)](https://codecov.io/gh/swoole/phpx)
@@ -90,7 +90,7 @@ PHPX_METHOD(MyClass, greet) {
     // Access object properties
     auto name = _this.get("name");
     auto value = _this.get("value");
-    
+
     // Return formatted string
     return "Hello, " + name.toStdString() + "! Value: " + to_string(value.toInt());
 }
@@ -99,12 +99,12 @@ PHPX_METHOD(MyClass, processData) {
     // Work with Array type
     Array input = args[0];
     Array result;
-    
+
     // Iterate and transform
     for (auto &item : input) {
         result.append(item.value.toInt() * 2);
     }
-    
+
     return result;
 }
 
@@ -114,56 +114,56 @@ PHPX_FUNCTION(my_extension_func) {
     Variant str_var = "Hello PHPX";
     Variant int_var = 42;
     Variant float_var = 3.14159;
-    
+
     // Array operations
     Array arr;
     arr.set("name", "PHPX");
     arr.set("version", 8.2);
     arr.set("features", Array{"C++17", "Type-safe", "Modern API"});
-    
+
     // Object creation and method calls
     Object datetime = newObject("DateTime");
     auto formatted = datetime.call("format", {"Y-m-d H:i:s"});
-    
+
     // Facade functions - direct PHP function calls
     php::var_dump(arr);                    // Debug output
     php::print_r(datetime);                // Print object
-    
+
     // File operations
     auto content = php::file_get_contents("/etc/hosts");
     if (content.isString()) {
         echo("File length: ", content.length(), "\n");
     }
-    
+
     // Array manipulation with references
     Array numbers{1, 2, 3, 4, 5};
     Reference ref = numbers.toReference();
     php::sort(ref);                        // Sort array
     php::array_push(ref, 6, 7, 8);        // Push elements
-    
+
     RETURN_STRING("PHPX Demo Completed!");
 }
 
 // Extension entry point
 PHPX_EXTENSION() {
     Extension *ext = new Extension("my_extension", "1.0.0");
-    
+
     // Register lifecycle callbacks
     ext->onStart = [ext]() noexcept {
         // Register constants
         ext->registerConstant("MY_EXT_VERSION", 10000);
-        
+
         // Register class with methods
         Class *c = new Class("MyClass");
         c->addProperty("name", "", ZEND_ACC_PUBLIC);
         c->addProperty("value", 0, ZEND_ACC_PUBLIC);
         c->registerFunctions(class_MyClass_methods);  // From arginfo header
         ext->registerClass(c);
-        
+
         // Register standalone functions
         ext->registerFunction(PHPX_FN(my_extension_func));
     };
-    
+
     // PHP info page configuration
     ext->info({"my_extension support", "enabled"},
               {
@@ -171,7 +171,7 @@ PHPX_EXTENSION() {
                   {"version", ext->version},
                   {"github", "https://github.com/your/repo"},
               });
-    
+
     return ext;
 }
 ```
