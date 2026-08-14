@@ -83,11 +83,17 @@ struct NativeGcStats {
 };
 
 PHPX_API void *nativeGcAllocate(const NativeTypeDescriptor &type);
+PHPX_API void *nativeGcRequireObject(void *object, const char *typeName);
 PHPX_API void nativeGcAbandon(void *object) noexcept;
 PHPX_API void nativeGcCollect();
 PHPX_API NativeGcStats nativeGcStats() noexcept;
 PHPX_API void nativeGcRequestInit() noexcept;
 PHPX_API void nativeGcRequestShutdown() noexcept;
+
+template <typename T>
+T &nativeDeref(T *object, const char *typeName) {
+    return *static_cast<T *>(nativeGcRequireObject(object, typeName));
+}
 
 template <typename T, typename... Args>
 T *nativeNew(const NativeTypeDescriptor &type, Args &&...args) {

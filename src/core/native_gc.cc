@@ -143,7 +143,23 @@ void *nativeGcAllocate(const NativeTypeDescriptor &type)
     if (UNEXPECTED(object == nullptr)) {
         throw std::bad_alloc();
     }
-    rethrowFinalizerException();
+    try {
+        rethrowFinalizerException();
+    } catch (...) {
+        // The allocation is linked into the heap, but its C++ object has not
+        // been placement-constructed yet. Remove raw storage without invoking
+        // the descriptor destroy callback before propagating the finalizer.
+        wren_gc_abandon(native_heap, object);
+        throw;
+    }
+    return object;
+}
+
+void *nativeGcRequireObject(void *object, const char *typeName)
+{
+    if (UNEXPECTED(object == nullptr)) {
+        throwError("Call on null native object of type %s", typeName);
+    }
     return object;
 }
 
