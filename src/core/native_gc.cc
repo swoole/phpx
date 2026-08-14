@@ -5,16 +5,23 @@ extern "C" {
 }
 
 #include <exception>
+#include <vector>
 
 namespace php {
 namespace {
 THREAD_LOCAL WrenGcHeap *native_heap = nullptr;
 THREAD_LOCAL NativeRootFrame *native_root_top = nullptr;
+THREAD_LOCAL std::vector<NativeRootSlot> native_request_roots;
 THREAD_LOCAL zend_object *pending_zend_exception = nullptr;
 THREAD_LOCAL std::exception_ptr pending_cpp_exception;
 
 void markRoots(WrenGcVisitFn visit, void *visit_context, void *)
 {
+    for (NativeRootSlot slot : native_request_roots) {
+        if (slot != nullptr) {
+            visit(*slot, visit_context);
+        }
+    }
     for (NativeRootFrame *frame = native_root_top; frame != nullptr; frame = frame->previous()) {
         NativeRootSlot *slots = frame->slots();
         for (size_t i = 0; i < frame->count(); ++i) {
@@ -188,16 +195,29 @@ NativeGcStats nativeGcStats() noexcept
     return {stats.bytes_allocated, stats.next_collection, stats.object_count, stats.collection_count};
 }
 
+void nativeGcRegisterRequestRoot(NativeRootSlot slot)
+{
+    ZEND_ASSERT(slot != nullptr);
+    native_request_roots.push_back(slot);
+}
+
 void nativeGcRequestInit() noexcept
 {
     ZEND_ASSERT(native_heap == nullptr);
     ZEND_ASSERT(native_root_top == nullptr);
+    ZEND_ASSERT(native_request_roots.empty());
     discardPendingFinalizerException();
 }
 
 void nativeGcRequestShutdown() noexcept
 {
     ZEND_ASSERT(native_root_top == nullptr);
+    for (NativeRootSlot slot : native_request_roots) {
+        if (slot != nullptr) {
+            *slot = nullptr;
+        }
+    }
+    native_request_roots.clear();
     if (native_heap != nullptr) {
         wren_gc_heap_free(native_heap);
         native_heap = nullptr;

@@ -87,6 +87,7 @@ PHPX_API void *nativeGcRequireObject(void *object, const char *typeName);
 PHPX_API void nativeGcAbandon(void *object) noexcept;
 PHPX_API void nativeGcCollect();
 PHPX_API NativeGcStats nativeGcStats() noexcept;
+PHPX_API void nativeGcRegisterRequestRoot(NativeRootSlot slot);
 PHPX_API void nativeGcRequestInit() noexcept;
 PHPX_API void nativeGcRequestShutdown() noexcept;
 
