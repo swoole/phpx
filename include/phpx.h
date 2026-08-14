@@ -139,6 +139,10 @@ PHPX_API void registerPropertyHooks(zend_class_entry *ce,
                                    zend_property_info *property_info,
                                    std::string_view getter,
                                    std::string_view setter);
+PHPX_API void registerAbstractPropertyHooks(zend_class_entry *ce,
+                                           zend_property_info *property_info,
+                                           bool getter,
+                                           bool setter);
 PHPX_API bool updateConstant(const String &cls, const String &name, const Variant &data);
 PHPX_API bool updateConstant(zend_class_entry *ce, const String &name, const Variant &data);
 PHPX_API void initGlobal(const String &name, Variant &var);

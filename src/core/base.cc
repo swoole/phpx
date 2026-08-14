@@ -347,6 +347,46 @@ static zend_function *createPropertyHook(zend_class_entry *ce,
     hook->prop_info = property_info;
     return reinterpret_cast<zend_function *>(hook);
 }
+
+static zend_function *createAbstractPropertyHook(zend_class_entry *ce,
+                                                 zend_property_info *property_info,
+                                                 zend_property_hook_kind kind) {
+    const bool setter = kind == ZEND_PROPERTY_HOOK_SET;
+    const uint32_t num_args = setter ? 1 : 0;
+    auto arg_info = static_cast<zend_internal_arg_info *>(
+        pemalloc(sizeof(zend_internal_arg_info) * (num_args + 1), true));
+    memset(arg_info, 0, sizeof(zend_internal_arg_info) * (num_args + 1));
+    arg_info[0].name = reinterpret_cast<const char *>(static_cast<uintptr_t>(num_args));
+    if (setter) {
+        const zend_type void_type = ZEND_TYPE_INIT_CODE(IS_VOID, false, 0);
+        arg_info[0].type = void_type;
+    } else {
+        arg_info[0].type = property_info->type;
+    }
+    if (setter) {
+        arg_info[1].name = "value";
+        arg_info[1].type = property_info->type;
+    }
+
+    auto hook = static_cast<zend_internal_function *>(pemalloc(sizeof(zend_internal_function), true));
+    memset(hook, 0, sizeof(zend_internal_function));
+    hook->type = ZEND_INTERNAL_FUNCTION;
+    hook->fn_flags = ZEND_ACC_PUBLIC | ZEND_ACC_ABSTRACT | ZEND_ACC_HAS_RETURN_TYPE;
+    if (setter && ZEND_TYPE_IS_SET(property_info->type)) {
+        hook->fn_flags |= ZEND_ACC_HAS_TYPE_HINTS;
+    }
+    const std::string property_name{zend_get_unmangled_property_name(property_info->name)};
+    const std::string hook_name = "$" + property_name + (setter ? "::set" : "::get");
+    hook->function_name = zend_string_init(hook_name.data(), hook_name.size(), true);
+    hook->scope = ce;
+    hook->num_args = num_args;
+    hook->required_num_args = num_args;
+    hook->arg_info = arg_info + 1;
+    hook->prop_info = property_info;
+    hook->module = ce->info.internal.module;
+    ZEND_MAP_PTR_INIT(hook->run_time_cache, nullptr);
+    return reinterpret_cast<zend_function *>(hook);
+}
 #endif
 
 void registerPropertyHooks(zend_class_entry *ce,
@@ -383,6 +423,36 @@ void registerPropertyHooks(zend_class_entry *ce,
     (void) getter;
     (void) setter;
     throwError("Property hooks require PHP 8.4 or later");
+#endif
+}
+
+void registerAbstractPropertyHooks(zend_class_entry *ce,
+                                   zend_property_info *property_info,
+                                   bool getter,
+                                   bool setter) {
+#if PHP_VERSION_ID >= 80400
+    ZEND_ASSERT(ce != nullptr);
+    ZEND_ASSERT(ce->ce_flags & ZEND_ACC_INTERFACE);
+    ZEND_ASSERT(property_info != nullptr);
+    ZEND_ASSERT(property_info->hooks == nullptr);
+
+    property_info->hooks = static_cast<zend_function **>(pemalloc(ZEND_PROPERTY_HOOK_STRUCT_SIZE, true));
+    memset(property_info->hooks, 0, ZEND_PROPERTY_HOOK_STRUCT_SIZE);
+    if (getter) {
+        property_info->hooks[ZEND_PROPERTY_HOOK_GET] =
+            createAbstractPropertyHook(ce, property_info, ZEND_PROPERTY_HOOK_GET);
+    }
+    if (setter) {
+        property_info->hooks[ZEND_PROPERTY_HOOK_SET] =
+            createAbstractPropertyHook(ce, property_info, ZEND_PROPERTY_HOOK_SET);
+    }
+    ce->num_hooked_props++;
+#else
+    (void) ce;
+    (void) property_info;
+    (void) getter;
+    (void) setter;
+    throwError("Interface property hooks require PHP 8.4 or later");
 #endif
 }
 
