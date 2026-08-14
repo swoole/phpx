@@ -210,6 +210,7 @@ file(GLOB PHPX_WASI_STD_SOURCES CONFIGURE_DEPENDS
 add_library(phpx STATIC
     ${PHPX_WASI_CORE_SOURCES}
     ${PHPX_WASI_STD_SOURCES}
+    "${PHPX_ROOT}/thirdparty/wren-gc/src/wren_gc.c"
     "${PHPX_ROOT}/src/misc/typephp_helper.cc"
     "${PHPX_ROOT}/src/misc/typephp_main.cc"
 )
@@ -230,6 +231,7 @@ target_compile_options(phpx PRIVATE
 )
 
 target_include_directories(phpx PRIVATE
+    "${PHPX_ROOT}/thirdparty/wren-gc/include"
     "${MPDECIMAL_WASI_SOURCE_DIR}/libmpdec++"
     "${MPDECIMAL_WASI_SOURCE_DIR}/libmpdec"
     "${PHPX_WASI_PHP_INCLUDE_DIR}"
@@ -263,6 +265,7 @@ install(FILES
     "${PHPX_ROOT}/include/phpx_big_int.h"
     "${PHPX_ROOT}/include/phpx_big_float.h"
     "${PHPX_ROOT}/include/phpx_decimal.h"
+    "${PHPX_ROOT}/include/phpx_native_gc.h"
     "${PHPX_ROOT}/include/phpx_std.h"
     DESTINATION include/phpx
 )

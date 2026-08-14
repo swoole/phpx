@@ -125,4 +125,23 @@ T *nativeConstruct(const NativeTypeDescriptor &type, Initializer &&initializer) 
     }
 }
 
+template <typename T, typename Initializer>
+T *nativeClone(const NativeTypeDescriptor &type, const T &source, Initializer &&initializer) {
+    void *storage = nativeGcAllocate(type);
+    T *object = nullptr;
+    try {
+        object = new (storage) T(source);
+        NativeRootSlot slots[] = {reinterpret_cast<void **>(&object)};
+        NativeRootFrame roots(slots, 1);
+        std::forward<Initializer>(initializer)(*object);
+        return object;
+    } catch (...) {
+        if (object != nullptr) {
+            object->~T();
+        }
+        nativeGcAbandon(storage);
+        throw;
+    }
+}
+
 } // namespace php
