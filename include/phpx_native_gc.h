@@ -75,6 +75,65 @@ class PHPX_API NativeRootFrame final {
     size_t count_;
 };
 
+/**
+ * Roots Native Object pointers held by a compile-time std container.
+ *
+ * Container storage may move while a vector/map grows, so registering the
+ * address of each element as a NativeRootSlot would leave dangling root
+ * addresses. This frame instead keeps one stable reference to the container
+ * and enumerates its current elements whenever the collector marks roots.
+ */
+class PHPX_API NativeContainerRootFrameBase {
+  public:
+    using TraceFn = void (*)(const void *container, NativeMarker &marker) noexcept;
+
+    NativeContainerRootFrameBase(const void *container, TraceFn trace) noexcept;
+    ~NativeContainerRootFrameBase() noexcept;
+
+    NativeContainerRootFrameBase(const NativeContainerRootFrameBase &) = delete;
+    NativeContainerRootFrameBase &operator=(const NativeContainerRootFrameBase &) = delete;
+
+    NativeContainerRootFrameBase *previous() const noexcept {
+        return previous_;
+    }
+
+    void trace(NativeMarker &marker) const noexcept {
+        trace_(container_, marker);
+    }
+
+  private:
+    NativeContainerRootFrameBase *previous_;
+    const void *container_;
+    TraceFn trace_;
+};
+
+template <typename Entry>
+static inline void markNativeContainerEntry(const Entry &entry, NativeMarker &marker) noexcept {
+    using Value = std::remove_cv_t<std::remove_reference_t<Entry>>;
+    if constexpr (std::is_pointer_v<Value>) {
+        marker.mark(entry);
+    } else {
+        // StdMap/StdOrderedMap iterators expose a key/value pair.
+        static_assert(std::is_pointer_v<std::remove_cv_t<std::remove_reference_t<decltype(entry.second)>>>,
+                      "Native std containers must store pointer values");
+        marker.mark(entry.second);
+    }
+}
+
+template <typename Container>
+class NativeContainerRootFrame final : private NativeContainerRootFrameBase {
+  public:
+    explicit NativeContainerRootFrame(const Container &container) noexcept
+        : NativeContainerRootFrameBase(&container, traceContainer) {}
+
+  private:
+    static void traceContainer(const void *container, NativeMarker &marker) noexcept {
+        for (const auto &entry : *static_cast<const Container *>(container)) {
+            markNativeContainerEntry(entry, marker);
+        }
+    }
+};
+
 struct NativeGcStats {
     size_t bytesAllocated;
     size_t nextCollection;
@@ -90,6 +149,17 @@ PHPX_API NativeGcStats nativeGcStats() noexcept;
 PHPX_API void nativeGcRegisterRequestRoot(NativeRootSlot slot);
 PHPX_API void nativeGcRequestInit() noexcept;
 PHPX_API void nativeGcRequestShutdown() noexcept;
+
+/**
+ * Validate a non-null Native ABI boundary without erasing the concrete
+ * pointer type. Keeping T* is important for normal C++ derived-to-base
+ * adjustment when a Native subclass is returned as its declared base class.
+ */
+template <typename T>
+T *nativeRequireObject(T *object, const char *typeName) {
+    nativeGcRequireObject(object, typeName);
+    return object;
+}
 
 template <typename T>
 T &nativeDeref(T *object, const char *typeName) {

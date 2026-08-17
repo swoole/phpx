@@ -11,6 +11,7 @@ namespace php {
 namespace {
 THREAD_LOCAL WrenGcHeap *native_heap = nullptr;
 THREAD_LOCAL NativeRootFrame *native_root_top = nullptr;
+THREAD_LOCAL NativeContainerRootFrameBase *native_container_root_top = nullptr;
 THREAD_LOCAL std::vector<NativeRootSlot> native_request_roots;
 THREAD_LOCAL zend_object *pending_zend_exception = nullptr;
 THREAD_LOCAL std::exception_ptr pending_cpp_exception;
@@ -29,6 +30,12 @@ void markRoots(WrenGcVisitFn visit, void *visit_context, void *)
                 visit(*slots[i], visit_context);
             }
         }
+    }
+    NativeMarker marker(visit, visit_context);
+    for (NativeContainerRootFrameBase *frame = native_container_root_top;
+         frame != nullptr;
+         frame = frame->previous()) {
+        frame->trace(marker);
     }
 }
 
@@ -136,6 +143,18 @@ NativeRootFrame::~NativeRootFrame() noexcept
     native_root_top = previous_;
 }
 
+NativeContainerRootFrameBase::NativeContainerRootFrameBase(const void *container, TraceFn trace) noexcept
+    : previous_(native_container_root_top), container_(container), trace_(trace)
+{
+    native_container_root_top = this;
+}
+
+NativeContainerRootFrameBase::~NativeContainerRootFrameBase() noexcept
+{
+    ZEND_ASSERT(native_container_root_top == this);
+    native_container_root_top = previous_;
+}
+
 void *nativeGcAllocate(const NativeTypeDescriptor &type)
 {
     void *object = wren_gc_allocate(
@@ -205,6 +224,7 @@ void nativeGcRequestInit() noexcept
 {
     ZEND_ASSERT(native_heap == nullptr);
     ZEND_ASSERT(native_root_top == nullptr);
+    ZEND_ASSERT(native_container_root_top == nullptr);
     ZEND_ASSERT(native_request_roots.empty());
     discardPendingFinalizerException();
 }
@@ -212,16 +232,24 @@ void nativeGcRequestInit() noexcept
 void nativeGcRequestShutdown() noexcept
 {
     ZEND_ASSERT(native_root_top == nullptr);
-    for (NativeRootSlot slot : native_request_roots) {
-        if (slot != nullptr) {
-            *slot = nullptr;
+    ZEND_ASSERT(native_container_root_top == nullptr);
+    const auto clear_request_roots = []() noexcept {
+        for (NativeRootSlot slot : native_request_roots) {
+            if (slot != nullptr) {
+                *slot = nullptr;
+            }
         }
-    }
-    native_request_roots.clear();
+    };
+    clear_request_roots();
     if (native_heap != nullptr) {
         wren_gc_heap_free(native_heap);
         native_heap = nullptr;
     }
+    // A shutdown finalizer may publish its object back into a registered
+    // global/static slot. The heap is nevertheless being destroyed, so clear
+    // those slots again to prevent a dangling pointer from crossing requests.
+    clear_request_roots();
+    native_request_roots.clear();
     discardPendingFinalizerException();
 }
 

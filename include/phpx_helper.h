@@ -21,6 +21,10 @@
 #include "phpx_scope_guard.h"
 #include "phpx_operator.h"
 
+extern "C" {
+#include <main/php_streams.h>
+}
+
 #include <array>
 #include <type_traits>
 
@@ -148,7 +152,11 @@ static inline String toString(const Variant &v) {
 }
 
 static inline Variant toStream(const Variant &v) {
-    if (UNEXPECTED(!v.isResource())) {
+    php_stream *stream = nullptr;
+    if (EXPECTED(v.isResource())) {
+        php_stream_from_zval_no_verify(stream, NO_CONST_V(v));
+    }
+    if (UNEXPECTED(stream == nullptr)) {
         php::throwException(zend_ce_type_error, "Invalid stream resource");
         return php::null;
     }

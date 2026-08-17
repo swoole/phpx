@@ -1,5 +1,7 @@
 #include "phpx_test.h"
 
+#include <stdexcept>
+
 extern "C" {
 #include "wren_gc.h"
 }
@@ -12,6 +14,7 @@ struct NativeGcCounters {
 
 struct NativeGcNode {
     NativeGcNode *child = nullptr;
+    NativeGcNode **resurrectionRoot = nullptr;
     NativeGcCounters *counters = nullptr;
 };
 
@@ -38,6 +41,55 @@ const php::NativeTypeDescriptor nativeNodeType = {
     alignof(NativeGcNode),
     traceNativeNode,
     finalizeNativeNode,
+    destroyNativeNode,
+};
+
+NativeGcNode *shutdownResurrectionRoot = nullptr;
+
+void finalizeAndResurrectAtShutdown(void *object)
+{
+    auto *node = static_cast<NativeGcNode *>(object);
+    node->counters->finalized++;
+    shutdownResurrectionRoot = node;
+}
+
+const php::NativeTypeDescriptor shutdownResurrectionType = {
+    "ShutdownResurrectionNode",
+    sizeof(NativeGcNode),
+    alignof(NativeGcNode),
+    traceNativeNode,
+    finalizeAndResurrectAtShutdown,
+    destroyNativeNode,
+};
+
+void finalizeAndResurrect(void *object)
+{
+    auto *node = static_cast<NativeGcNode *>(object);
+    node->counters->finalized++;
+    *node->resurrectionRoot = node;
+}
+
+const php::NativeTypeDescriptor resurrectionType = {
+    "ResurrectionNode",
+    sizeof(NativeGcNode),
+    alignof(NativeGcNode),
+    traceNativeNode,
+    finalizeAndResurrect,
+    destroyNativeNode,
+};
+
+void finalizeAndThrow(void *object)
+{
+    static_cast<NativeGcNode *>(object)->counters->finalized++;
+    throw std::runtime_error("native finalizer failure");
+}
+
+const php::NativeTypeDescriptor throwingFinalizerType = {
+    "ThrowingFinalizerNode",
+    sizeof(NativeGcNode),
+    alignof(NativeGcNode),
+    traceNativeNode,
+    finalizeAndThrow,
     destroyNativeNode,
 };
 } // namespace
@@ -97,4 +149,91 @@ TEST(native_gc, request_root_keeps_global_slot_alive)
     EXPECT_EQ(0u, php::nativeGcStats().objectCount);
     EXPECT_EQ(1, counters.finalized);
     EXPECT_EQ(1, counters.destroyed);
+}
+
+TEST(native_gc, container_root_frames_follow_sequence_and_map_elements)
+{
+    NativeGcCounters counters;
+    php::StdVector<NativeGcNode *> sequence;
+    php::StdMap<php::Int, NativeGcNode *> map;
+
+    auto *first = php::nativeNew<NativeGcNode>(nativeNodeType);
+    first->counters = &counters;
+    auto *second = php::nativeNew<NativeGcNode>(nativeNodeType);
+    second->counters = &counters;
+    sequence.push_back(first);
+    map.offsetSet(1, second);
+    first = nullptr;
+    second = nullptr;
+
+    {
+        php::NativeContainerRootFrame sequenceRoots(sequence);
+        php::NativeContainerRootFrame mapRoots(map);
+        php::nativeGcCollect();
+        EXPECT_EQ(2u, php::nativeGcStats().objectCount);
+        EXPECT_EQ(0, counters.finalized);
+
+        // Root enumeration follows the container's current storage rather
+        // than retaining addresses invalidated by mutation or reallocation.
+        sequence.offsetUnset(0);
+        map.offsetUnset(1);
+        php::nativeGcCollect();
+        EXPECT_EQ(0u, php::nativeGcStats().objectCount);
+    }
+    EXPECT_EQ(2, counters.finalized);
+    EXPECT_EQ(2, counters.destroyed);
+}
+
+TEST(native_gc, shutdown_clears_roots_written_by_finalizers)
+{
+    NativeGcCounters counters;
+    shutdownResurrectionRoot = php::nativeNew<NativeGcNode>(shutdownResurrectionType);
+    shutdownResurrectionRoot->counters = &counters;
+    php::nativeGcRegisterRequestRoot(reinterpret_cast<void **>(&shutdownResurrectionRoot));
+
+    php::request_shutdown();
+
+    EXPECT_EQ(nullptr, shutdownResurrectionRoot);
+    EXPECT_EQ(1, counters.finalized);
+    EXPECT_EQ(1, counters.destroyed);
+
+    // The test runner owns the surrounding request and expects subsequent
+    // tests, plus its final shutdown, to see an active PHPX request.
+    php::request_init();
+}
+
+TEST(native_gc, finalizer_can_resurrect_into_request_root_once)
+{
+    static NativeGcNode *requestRoot = nullptr;
+    NativeGcCounters counters;
+    requestRoot = php::nativeNew<NativeGcNode>(resurrectionType);
+    requestRoot->counters = &counters;
+    requestRoot->resurrectionRoot = &requestRoot;
+    php::nativeGcRegisterRequestRoot(reinterpret_cast<void **>(&requestRoot));
+
+    requestRoot = nullptr;
+    php::nativeGcCollect();
+    ASSERT_NE(nullptr, requestRoot);
+    EXPECT_EQ(1, counters.finalized);
+    EXPECT_EQ(0, counters.destroyed);
+
+    requestRoot = nullptr;
+    php::nativeGcCollect();
+    EXPECT_EQ(1, counters.finalized);
+    EXPECT_EQ(1, counters.destroyed);
+}
+
+TEST(native_gc, finalizer_exception_is_rethrown_after_object_is_destroyed)
+{
+    NativeGcCounters counters;
+    NativeGcNode *node = php::nativeNew<NativeGcNode>(throwingFinalizerType);
+    node->counters = &counters;
+
+    EXPECT_THROW(php::nativeGcCollect(), std::runtime_error);
+    EXPECT_EQ(1, counters.finalized);
+    EXPECT_EQ(1, counters.destroyed);
+    EXPECT_EQ(0u, php::nativeGcStats().objectCount);
+
+    // The remembered exception must be consumed exactly once.
+    EXPECT_NO_THROW(php::nativeGcCollect());
 }
