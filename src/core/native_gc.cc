@@ -12,6 +12,7 @@ namespace {
 THREAD_LOCAL WrenGcHeap *native_heap = nullptr;
 THREAD_LOCAL NativeRootFrame *native_root_top = nullptr;
 THREAD_LOCAL NativeContainerRootFrameBase *native_container_root_top = nullptr;
+THREAD_LOCAL size_t native_root_request_epoch = 0;
 THREAD_LOCAL std::vector<NativeRootSlot> native_request_roots;
 THREAD_LOCAL zend_object *pending_zend_exception = nullptr;
 THREAD_LOCAL std::exception_ptr pending_cpp_exception;
@@ -132,27 +133,53 @@ void discardPendingFinalizerException() noexcept
 } // namespace
 
 NativeRootFrame::NativeRootFrame(NativeRootSlot *slots, size_t count) noexcept
-    : previous_(native_root_top), slots_(slots), count_(count)
+    : previous_(native_root_top), newer_(nullptr), slots_(slots), count_(count),
+      requestEpoch_(native_root_request_epoch)
 {
+    if (previous_ != nullptr) {
+        previous_->newer_ = this;
+    }
     native_root_top = this;
 }
 
 NativeRootFrame::~NativeRootFrame() noexcept
 {
-    ZEND_ASSERT(native_root_top == this);
-    native_root_top = previous_;
+    if (requestEpoch_ != native_root_request_epoch) {
+        return;
+    }
+    if (newer_ != nullptr) {
+        newer_->previous_ = previous_;
+    } else {
+        native_root_top = previous_;
+    }
+    if (previous_ != nullptr) {
+        previous_->newer_ = newer_;
+    }
 }
 
 NativeContainerRootFrameBase::NativeContainerRootFrameBase(const void *container, TraceFn trace) noexcept
-    : previous_(native_container_root_top), container_(container), trace_(trace)
+    : previous_(native_container_root_top), newer_(nullptr), container_(container), trace_(trace),
+      requestEpoch_(native_root_request_epoch)
 {
+    if (previous_ != nullptr) {
+        previous_->newer_ = this;
+    }
     native_container_root_top = this;
 }
 
 NativeContainerRootFrameBase::~NativeContainerRootFrameBase() noexcept
 {
-    ZEND_ASSERT(native_container_root_top == this);
-    native_container_root_top = previous_;
+    if (requestEpoch_ != native_root_request_epoch) {
+        return;
+    }
+    if (newer_ != nullptr) {
+        newer_->previous_ = previous_;
+    } else {
+        native_container_root_top = previous_;
+    }
+    if (previous_ != nullptr) {
+        previous_->newer_ = newer_;
+    }
 }
 
 void *nativeGcAllocate(const NativeTypeDescriptor &type)
@@ -231,8 +258,12 @@ void nativeGcRequestInit() noexcept
 
 void nativeGcRequestShutdown() noexcept
 {
-    ZEND_ASSERT(native_root_top == nullptr);
-    ZEND_ASSERT(native_container_root_top == nullptr);
+    // Suspended Fibers may still own C++ root frames when PHP reaches module
+    // RSHUTDOWN. Detach the complete registry in O(1); their later stack
+    // unwinding observes the old epoch and safely skips unlinking.
+    native_root_top = nullptr;
+    native_container_root_top = nullptr;
+    native_root_request_epoch++;
     const auto clear_request_roots = []() noexcept {
         for (NativeRootSlot slot : native_request_roots) {
             if (slot != nullptr) {
@@ -250,6 +281,11 @@ void nativeGcRequestShutdown() noexcept
     // those slots again to prevent a dangling pointer from crossing requests.
     clear_request_roots();
     native_request_roots.clear();
+    // A finalizer is allowed to call back into TypePHP and may therefore have
+    // created another frame. No such frame may survive into the next request.
+    native_root_top = nullptr;
+    native_container_root_top = nullptr;
+    native_root_request_epoch++;
     discardPendingFinalizerException();
 }
 

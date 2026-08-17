@@ -70,9 +70,13 @@ class PHPX_API NativeRootFrame final {
     }
 
   private:
+    // Intrusive bidirectional links allow a suspended Fiber's older frame to
+    // disappear while a newer frame on another Fiber is still alive.
     NativeRootFrame *previous_;
+    NativeRootFrame *newer_;
     NativeRootSlot *slots_;
     size_t count_;
+    size_t requestEpoch_;
 };
 
 /**
@@ -102,9 +106,12 @@ class PHPX_API NativeContainerRootFrameBase {
     }
 
   private:
+    // Container roots obey the same non-LIFO Fiber lifetime as scalar roots.
     NativeContainerRootFrameBase *previous_;
+    NativeContainerRootFrameBase *newer_;
     const void *container_;
     TraceFn trace_;
+    size_t requestEpoch_;
 };
 
 template <typename Entry>

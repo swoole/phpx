@@ -132,6 +132,35 @@ TEST(native_gc, root_frame_traces_native_graph)
     EXPECT_EQ(2, counters.destroyed);
 }
 
+TEST(native_gc, root_frames_survive_non_lifo_fiber_lifetimes)
+{
+    NativeGcCounters counters;
+    NativeGcNode *first = php::nativeNew<NativeGcNode>(nativeNodeType);
+    NativeGcNode *second = php::nativeNew<NativeGcNode>(nativeNodeType);
+    first->counters = &counters;
+    second->counters = &counters;
+    php::NativeRootSlot firstSlots[] = {reinterpret_cast<void **>(&first)};
+    php::NativeRootSlot secondSlots[] = {reinterpret_cast<void **>(&second)};
+
+    // A Fiber can suspend the older C++ stack, create a newer root frame on
+    // another stack, then resume and destroy the older frame first.
+    auto *older = new php::NativeRootFrame(firstSlots, 1);
+    auto *newer = new php::NativeRootFrame(secondSlots, 1);
+    delete older;
+    first = nullptr;
+
+    php::nativeGcCollect();
+    EXPECT_EQ(1u, php::nativeGcStats().objectCount);
+    EXPECT_EQ(1, counters.finalized);
+
+    delete newer;
+    second = nullptr;
+    php::nativeGcCollect();
+    EXPECT_EQ(0u, php::nativeGcStats().objectCount);
+    EXPECT_EQ(2, counters.finalized);
+    EXPECT_EQ(2, counters.destroyed);
+}
+
 TEST(native_gc, request_root_keeps_global_slot_alive)
 {
     static NativeGcNode *requestRoot = nullptr;
@@ -184,6 +213,37 @@ TEST(native_gc, container_root_frames_follow_sequence_and_map_elements)
     EXPECT_EQ(2, counters.destroyed);
 }
 
+TEST(native_gc, container_root_frames_survive_non_lifo_fiber_lifetimes)
+{
+    NativeGcCounters counters;
+    php::StdVector<NativeGcNode *> olderContainer;
+    php::StdVector<NativeGcNode *> newerContainer;
+    auto *olderValue = php::nativeNew<NativeGcNode>(nativeNodeType);
+    auto *newerValue = php::nativeNew<NativeGcNode>(nativeNodeType);
+    olderValue->counters = &counters;
+    newerValue->counters = &counters;
+    olderContainer.push_back(olderValue);
+    newerContainer.push_back(newerValue);
+    olderValue = nullptr;
+    newerValue = nullptr;
+
+    auto *older = new php::NativeContainerRootFrame(olderContainer);
+    auto *newer = new php::NativeContainerRootFrame(newerContainer);
+    delete older;
+    olderContainer.offsetUnset(0);
+
+    php::nativeGcCollect();
+    EXPECT_EQ(1u, php::nativeGcStats().objectCount);
+    EXPECT_EQ(1, counters.finalized);
+
+    delete newer;
+    newerContainer.offsetUnset(0);
+    php::nativeGcCollect();
+    EXPECT_EQ(0u, php::nativeGcStats().objectCount);
+    EXPECT_EQ(2, counters.finalized);
+    EXPECT_EQ(2, counters.destroyed);
+}
+
 TEST(native_gc, shutdown_clears_roots_written_by_finalizers)
 {
     NativeGcCounters counters;
@@ -200,6 +260,31 @@ TEST(native_gc, shutdown_clears_roots_written_by_finalizers)
     // The test runner owns the surrounding request and expects subsequent
     // tests, plus its final shutdown, to see an active PHPX request.
     php::request_init();
+}
+
+TEST(native_gc, shutdown_detaches_frames_owned_by_suspended_fibers)
+{
+    NativeGcCounters counters;
+    NativeGcNode *value = php::nativeNew<NativeGcNode>(nativeNodeType);
+    value->counters = &counters;
+    php::NativeRootSlot slots[] = {reinterpret_cast<void **>(&value)};
+    auto *suspendedFrame = new php::NativeRootFrame(slots, 1);
+
+    php::nativeGcRequestShutdown();
+    EXPECT_EQ(1, counters.finalized);
+    EXPECT_EQ(1, counters.destroyed);
+
+    // Simulate destruction of the suspended Fiber stack after RSHUTDOWN and
+    // prove that the stale frame cannot reattach itself to the next request.
+    php::nativeGcRequestInit();
+    delete suspendedFrame;
+
+    NativeGcNode *nextRequestValue = php::nativeNew<NativeGcNode>(nativeNodeType);
+    nextRequestValue->counters = &counters;
+    php::nativeGcCollect();
+    EXPECT_EQ(0u, php::nativeGcStats().objectCount);
+    EXPECT_EQ(2, counters.finalized);
+    EXPECT_EQ(2, counters.destroyed);
 }
 
 TEST(native_gc, finalizer_can_resurrect_into_request_root_once)

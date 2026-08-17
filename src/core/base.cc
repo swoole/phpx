@@ -503,12 +503,15 @@ void request_shutdown() {
     if (!request_active) {
         return;
     }
+    // Native finalizers are user code: they may access TypePHP globals and
+    // perform cached dynamic calls. Run them before tearing down any PHPX
+    // request cache; the embedding module clears its own globals afterwards.
+    nativeGcRequestShutdown();
     if (func_cache_map) {
         zend_hash_destroy(func_cache_map);
         pefree(func_cache_map, 1);
         func_cache_map = nullptr;
     }
-    nativeGcRequestShutdown();
     request_active = false;
 }
 
