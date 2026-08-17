@@ -272,13 +272,21 @@ T *nativeClone(const NativeTypeDescriptor &type, const T &source, Initializer &&
         return object;
     } catch (...) {
         if (object != nullptr) {
-            if (!nativeGcIsReachable(object)) {
+            if (type.finalize == nullptr && !nativeGcIsReachable(object)) {
+                // Without a PHP-level destructor there is no observable
+                // finalization to defer. Release copied PHPX fields promptly,
+                // matching the normal failed-clone cleanup path.
                 object->~T();
                 nativeGcAbandon(storage);
             }
         } else {
             nativeGcAbandon(storage);
         }
+        // The copy itself is fully constructed before the PHP-level __clone()
+        // callback runs. A type with __destruct() must still pass through
+        // Native finalization, and an escaped `$this` must remain valid. Leave
+        // such an object in the tracing heap; roots decide whether it survives
+        // this cycle and the finalizer still runs at most once.
         throw;
     }
 }
