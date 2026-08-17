@@ -14,6 +14,7 @@ typedef struct WrenGcObject {
     WrenGcDestroyFn destroy;
     bool marked;
     bool finalized;
+    bool allocated_during_collection;
 } WrenGcObject;
 
 struct WrenGcHeap {
@@ -106,6 +107,18 @@ static void clear_marks(WrenGcHeap *heap)
     heap->gray_count = 0;
 }
 
+static void prepare_post_finalizer_mark(WrenGcHeap *heap)
+{
+    heap->gray_count = 0;
+    for (WrenGcObject *object = heap->objects; object != NULL; object = object->next) {
+        object->marked = object->allocated_during_collection;
+        if (object->marked) {
+            /* Construction has completed by the time the finalizer returns. */
+            gray_push(heap, object);
+        }
+    }
+}
+
 static void mark_reachable(WrenGcHeap *heap)
 {
     mark_roots(heap);
@@ -186,8 +199,16 @@ void *wren_gc_allocate(
     object->trace = trace;
     object->finalize = finalize;
     object->destroy = destroy;
-    object->marked = false;
+    /*
+     * A finalizer may allocate another Native object. The current mark phase
+     * has already passed, so a new white object would be swept immediately
+     * without ever running its own finalizer. Treat allocations made during a
+     * collection as live for this cycle; normal root tracing decides their
+     * reachability on the next collection.
+     */
+    object->marked = heap->collecting;
     object->finalized = false;
+    object->allocated_during_collection = heap->collecting;
     ((WrenGcObject **) object->payload)[-1] = object;
 
     heap->objects = object;
@@ -206,7 +227,7 @@ void wren_gc_collect(WrenGcHeap *heap)
     mark_reachable(heap);
 
     if (run_finalizers(heap)) {
-        clear_marks(heap);
+        prepare_post_finalizer_mark(heap);
         mark_reachable(heap);
     }
 
@@ -223,6 +244,7 @@ void wren_gc_collect(WrenGcHeap *heap)
             free(object);
         } else {
             object->marked = false;
+            object->allocated_during_collection = false;
             link = &object->next;
         }
     }
@@ -252,6 +274,35 @@ void wren_gc_abandon(WrenGcHeap *heap, void *payload)
             return;
         }
         link = &(*link)->next;
+    }
+}
+
+bool wren_gc_is_reachable(WrenGcHeap *heap, const void *payload)
+{
+    if (heap == NULL || payload == NULL) {
+        return false;
+    }
+    WrenGcObject *target = object_header(payload);
+    if (heap->collecting) {
+        /*
+         * Allocations made by a finalizer are protected for the current
+         * collection. Conservatively retain a failed construction here and
+         * let the next complete root scan decide its reachability.
+         */
+        return true;
+    }
+    clear_marks(heap);
+    mark_reachable(heap);
+    const bool reachable = target->marked;
+    clear_marks(heap);
+    return reachable;
+}
+
+void wren_gc_suppress_finalizer(void *payload)
+{
+    WrenGcObject *object = object_header(payload);
+    if (object != NULL) {
+        object->finalized = true;
     }
 }
 

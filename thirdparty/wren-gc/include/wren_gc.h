@@ -47,6 +47,8 @@ void *wren_gc_allocate(
 void wren_gc_mark(WrenGcHeap *heap, void *object);
 void wren_gc_collect(WrenGcHeap *heap);
 void wren_gc_abandon(WrenGcHeap *heap, void *object);
+bool wren_gc_is_reachable(WrenGcHeap *heap, const void *object);
+void wren_gc_suppress_finalizer(void *object);
 const void *wren_gc_type_data(const void *object);
 bool wren_gc_is_finalized(const void *object);
 WrenGcStats wren_gc_stats(const WrenGcHeap *heap);

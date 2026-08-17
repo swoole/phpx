@@ -322,3 +322,46 @@ TEST(native_gc, finalizer_exception_is_rethrown_after_object_is_destroyed)
     // The remembered exception must be consumed exactly once.
     EXPECT_NO_THROW(php::nativeGcCollect());
 }
+
+TEST(native_gc, finalizer_chain_runs_all_callbacks_and_preserves_first_cpp_exception)
+{
+    php::NativeFinalizerChain chain;
+    int callbacks = 0;
+
+    chain.run([&] {
+        callbacks++;
+        throw std::runtime_error("first finalizer");
+    });
+    chain.run([&] { callbacks++; });
+
+    EXPECT_EQ(2, callbacks);
+    try {
+        chain.rethrow();
+        FAIL() << "Expected the first finalizer exception";
+    } catch (const std::runtime_error &exception) {
+        EXPECT_STREQ("first finalizer", exception.what());
+    }
+}
+
+TEST(native_gc, finalizer_chain_clears_zend_state_between_callbacks)
+{
+    php::NativeFinalizerChain chain;
+    int callbacks = 0;
+
+    chain.run([&] {
+        callbacks++;
+        php::throwError("first Zend finalizer");
+    });
+    EXPECT_EQ(nullptr, EG(exception));
+    chain.run([&] { callbacks++; });
+
+    EXPECT_EQ(2, callbacks);
+    try {
+        chain.rethrow();
+        FAIL() << "Expected the preserved Zend exception";
+    } catch (zend_object *) {
+        php::Object exception = php::catchException();
+        EXPECT_EQ("first Zend finalizer", exception.call("getMessage").toStdString());
+    }
+    EXPECT_EQ(nullptr, EG(exception));
+}

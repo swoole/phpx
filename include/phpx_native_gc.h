@@ -7,6 +7,7 @@
 #pragma once
 
 #include <cstddef>
+#include <exception>
 #include <new>
 #include <utility>
 
@@ -45,6 +46,45 @@ struct NativeTypeDescriptor {
     NativeTraceFn trace;
     NativeFinalizeFn finalize;
     NativeDestroyFn destroy;
+};
+
+/**
+ * Run an inheritance finalizer chain without allowing an exception from a
+ * derived PHP-level destructor to skip base destructors.
+ *
+ * The first exception is preserved and rethrown after every callback has run.
+ * Zend's pending exception is cleared between callbacks so the remaining
+ * destructors can safely call PHP APIs. This helper is used only by generated
+ * Native Class finalizers; ordinary classes pay no cost for it.
+ */
+class PHPX_API NativeFinalizerChain final {
+  public:
+    NativeFinalizerChain() noexcept = default;
+    ~NativeFinalizerChain() noexcept;
+
+    NativeFinalizerChain(const NativeFinalizerChain &) = delete;
+    NativeFinalizerChain &operator=(const NativeFinalizerChain &) = delete;
+
+    template <typename Callback>
+    void run(Callback &&callback) noexcept {
+        try {
+            std::forward<Callback>(callback)();
+        } catch (zend_object *exception) {
+            remember(exception);
+        } catch (...) {
+            remember(std::current_exception());
+        }
+    }
+
+    void rethrow();
+
+  private:
+    void remember(zend_object *exception) noexcept;
+    void remember(std::exception_ptr exception) noexcept;
+
+    bool failed_ = false;
+    zend_object *zendException_ = nullptr;
+    std::exception_ptr cppException_;
 };
 
 using NativeRootSlot = void **;
@@ -151,6 +191,8 @@ struct NativeGcStats {
 PHPX_API void *nativeGcAllocate(const NativeTypeDescriptor &type);
 PHPX_API void *nativeGcRequireObject(void *object, const char *typeName);
 PHPX_API void nativeGcAbandon(void *object) noexcept;
+PHPX_API bool nativeGcIsReachable(const void *object) noexcept;
+PHPX_API void nativeGcSuppressFinalizer(void *object) noexcept;
 PHPX_API void nativeGcCollect();
 PHPX_API NativeGcStats nativeGcStats() noexcept;
 PHPX_API void nativeGcRegisterRequestRoot(NativeRootSlot slot);
@@ -202,9 +244,18 @@ T *nativeConstruct(const NativeTypeDescriptor &type, Initializer &&initializer) 
         return object;
     } catch (...) {
         if (object != nullptr) {
-            object->~T();
+            if (nativeGcIsReachable(object)) {
+                // PHP permits a constructor to publish `$this` before it
+                // throws. Keep that fully allocated object alive, but suppress
+                // its user destructor just like Zend does for a failed ctor.
+                nativeGcSuppressFinalizer(object);
+            } else {
+                object->~T();
+                nativeGcAbandon(storage);
+            }
+        } else {
+            nativeGcAbandon(storage);
         }
-        nativeGcAbandon(storage);
         throw;
     }
 }
@@ -221,9 +272,13 @@ T *nativeClone(const NativeTypeDescriptor &type, const T &source, Initializer &&
         return object;
     } catch (...) {
         if (object != nullptr) {
-            object->~T();
+            if (!nativeGcIsReachable(object)) {
+                object->~T();
+                nativeGcAbandon(storage);
+            }
+        } else {
+            nativeGcAbandon(storage);
         }
-        nativeGcAbandon(storage);
         throw;
     }
 }

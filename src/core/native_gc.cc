@@ -182,6 +182,48 @@ NativeContainerRootFrameBase::~NativeContainerRootFrameBase() noexcept
     }
 }
 
+NativeFinalizerChain::~NativeFinalizerChain() noexcept
+{
+    if (zendException_ != nullptr) {
+        OBJ_RELEASE(zendException_);
+    }
+}
+
+void NativeFinalizerChain::remember(zend_object *exception) noexcept
+{
+    if (!failed_) {
+        failed_ = true;
+        GC_ADDREF(exception);
+        zendException_ = exception;
+    }
+    if (EG(exception) != nullptr) {
+        zend_clear_exception();
+    }
+}
+
+void NativeFinalizerChain::remember(std::exception_ptr exception) noexcept
+{
+    if (!failed_) {
+        failed_ = true;
+        cppException_ = std::move(exception);
+    }
+}
+
+void NativeFinalizerChain::rethrow()
+{
+    if (zendException_ != nullptr) {
+        zend_object *exception = zendException_;
+        zendException_ = nullptr;
+        EG(exception) = exception;
+        throw exception;
+    }
+    if (cppException_) {
+        std::exception_ptr exception = std::move(cppException_);
+        cppException_ = nullptr;
+        std::rethrow_exception(exception);
+    }
+}
+
 void *nativeGcAllocate(const NativeTypeDescriptor &type)
 {
     void *object = wren_gc_allocate(
@@ -221,6 +263,16 @@ void nativeGcAbandon(void *object) noexcept
     if (native_heap != nullptr) {
         wren_gc_abandon(native_heap, object);
     }
+}
+
+bool nativeGcIsReachable(const void *object) noexcept
+{
+    return native_heap != nullptr && wren_gc_is_reachable(native_heap, object);
+}
+
+void nativeGcSuppressFinalizer(void *object) noexcept
+{
+    wren_gc_suppress_finalizer(object);
 }
 
 void nativeGcCollect()

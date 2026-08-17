@@ -14,12 +14,16 @@ struct Node {
     Node *child = nullptr;
     Node **resurrection_root = nullptr;
     Counters *counters = nullptr;
+    WrenGcHeap *heap = nullptr;
+    bool allocate_child_on_finalize = false;
 };
 
 struct Roots {
     Node *first = nullptr;
     Node *second = nullptr;
 };
+
+Node *allocateNode(WrenGcHeap *heap, Counters &counters);
 
 void markRoots(WrenGcVisitFn visit, void *visit_context, void *roots_context)
 {
@@ -38,6 +42,10 @@ void finalizeNode(void *payload)
 {
     auto *node = static_cast<Node *>(payload);
     node->counters->finalized++;
+    if (node->allocate_child_on_finalize) {
+        node->allocate_child_on_finalize = false;
+        allocateNode(node->heap, *node->counters);
+    }
     if (node->resurrection_root != nullptr) {
         *node->resurrection_root = node;
     }
@@ -62,6 +70,7 @@ Node *allocateNode(WrenGcHeap *heap, Counters &counters)
     EXPECT_NE(nullptr, node);
     new (node) Node{};
     node->counters = &counters;
+    node->heap = heap;
     return node;
 }
 } // namespace
@@ -137,5 +146,57 @@ TEST(wren_gc, finalizer_can_resurrect_object_only_once)
     wren_gc_collect(heap);
     EXPECT_EQ(1, counters.finalized);
     EXPECT_EQ(1, counters.destroyed);
+    wren_gc_heap_free(heap);
+}
+
+TEST(wren_gc, allocation_from_finalizer_survives_current_sweep)
+{
+    Roots roots;
+    WrenGcConfig config;
+    wren_gc_config_init(&config);
+    config.mark_roots = markRoots;
+    config.roots_context = &roots;
+    auto *heap = wren_gc_heap_new(&config);
+    ASSERT_NE(nullptr, heap);
+
+    Counters counters;
+    Node *node = allocateNode(heap, counters);
+    node->allocate_child_on_finalize = true;
+
+    wren_gc_collect(heap);
+    EXPECT_EQ(1, counters.finalized);
+    EXPECT_EQ(1, counters.destroyed);
+    EXPECT_EQ(1u, wren_gc_stats(heap).object_count);
+
+    wren_gc_collect(heap);
+    EXPECT_EQ(2, counters.finalized);
+    EXPECT_EQ(2, counters.destroyed);
+    EXPECT_EQ(0u, wren_gc_stats(heap).object_count);
+    wren_gc_heap_free(heap);
+}
+
+TEST(wren_gc, reachability_probe_and_finalizer_suppression_preserve_published_failures)
+{
+    Roots roots;
+    WrenGcConfig config;
+    wren_gc_config_init(&config);
+    config.mark_roots = markRoots;
+    config.roots_context = &roots;
+    auto *heap = wren_gc_heap_new(&config);
+    ASSERT_NE(nullptr, heap);
+
+    Counters counters;
+    Node *node = allocateNode(heap, counters);
+    EXPECT_FALSE(wren_gc_is_reachable(heap, node));
+
+    roots.first = node;
+    EXPECT_TRUE(wren_gc_is_reachable(heap, node));
+    wren_gc_suppress_finalizer(node);
+
+    roots.first = nullptr;
+    wren_gc_collect(heap);
+    EXPECT_EQ(0, counters.finalized);
+    EXPECT_EQ(1, counters.destroyed);
+    EXPECT_EQ(0u, wren_gc_stats(heap).object_count);
     wren_gc_heap_free(heap);
 }
