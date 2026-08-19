@@ -14,6 +14,8 @@ typedef void (*WrenGcTraceFn)(void *object, WrenGcVisitFn visit, void *context);
 typedef void (*WrenGcFinalizeFn)(void *object);
 typedef void (*WrenGcDestroyFn)(void *object);
 typedef void (*WrenGcRootsFn)(WrenGcVisitFn visit, void *visit_context, void *roots_context);
+typedef size_t (*WrenGcObjectSizeFn)(const void *type_data);
+typedef bool (*WrenGcHasFinalizerFn)(const void *type_data);
 
 typedef struct WrenGcConfig {
     size_t initial_heap_size;
@@ -21,6 +23,11 @@ typedef struct WrenGcConfig {
     unsigned heap_growth_percent;
     WrenGcRootsFn mark_roots;
     void *roots_context;
+    WrenGcObjectSizeFn object_size;
+    WrenGcTraceFn trace;
+    WrenGcHasFinalizerFn has_finalizer;
+    WrenGcFinalizeFn finalize;
+    WrenGcDestroyFn destroy;
 } WrenGcConfig;
 
 typedef struct WrenGcStats {
@@ -36,12 +43,8 @@ void wren_gc_heap_free(WrenGcHeap *heap);
 
 void *wren_gc_allocate(
     WrenGcHeap *heap,
-    size_t size,
     size_t alignment,
-    const void *type_data,
-    WrenGcTraceFn trace,
-    WrenGcFinalizeFn finalize,
-    WrenGcDestroyFn destroy
+    const void *type_data
 );
 
 void wren_gc_mark(WrenGcHeap *heap, void *object);
@@ -52,6 +55,7 @@ void wren_gc_suppress_finalizer(void *object);
 const void *wren_gc_type_data(const void *object);
 bool wren_gc_is_finalized(const void *object);
 WrenGcStats wren_gc_stats(const WrenGcHeap *heap);
+size_t wren_gc_header_size(void);
 
 #ifdef __cplusplus
 }

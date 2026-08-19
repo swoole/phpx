@@ -22,6 +22,12 @@ THREAD_LOCAL std::vector<NativeRootSlot> native_request_roots;
 THREAD_LOCAL zend_object *pending_zend_exception = nullptr;
 THREAD_LOCAL std::exception_ptr pending_cpp_exception;
 
+size_t objectSize(const void *typeData) noexcept;
+bool hasFinalizer(const void *typeData) noexcept;
+void traceObject(void *object, WrenGcVisitFn visit, void *context);
+void finalizeObject(void *object) noexcept;
+void destroyObject(void *object) noexcept;
+
 void markRoots(WrenGcVisitFn visit, void *visit_context, void *)
 {
     for (NativeRootSlot slot : native_request_roots) {
@@ -51,6 +57,11 @@ WrenGcHeap *heap()
         WrenGcConfig config;
         wren_gc_config_init(&config);
         config.mark_roots = markRoots;
+        config.object_size = objectSize;
+        config.trace = traceObject;
+        config.has_finalizer = hasFinalizer;
+        config.finalize = finalizeObject;
+        config.destroy = destroyObject;
         native_heap = wren_gc_heap_new(&config);
         if (UNEXPECTED(native_heap == nullptr)) {
             throw std::bad_alloc();
@@ -62,6 +73,16 @@ WrenGcHeap *heap()
 const NativeTypeDescriptor *descriptor(void *object) noexcept
 {
     return static_cast<const NativeTypeDescriptor *>(wren_gc_type_data(object));
+}
+
+size_t objectSize(const void *typeData) noexcept
+{
+    return static_cast<const NativeTypeDescriptor *>(typeData)->size;
+}
+
+bool hasFinalizer(const void *typeData) noexcept
+{
+    return static_cast<const NativeTypeDescriptor *>(typeData)->finalize != nullptr;
 }
 
 void traceObject(void *object, WrenGcVisitFn visit, void *context)
@@ -241,12 +262,8 @@ void *nativeGcAllocate(const NativeTypeDescriptor &type)
 {
     void *object = wren_gc_allocate(
         heap(),
-        type.size,
         type.alignment,
-        &type,
-        traceObject,
-        finalizeObject,
-        destroyObject
+        &type
     );
     if (UNEXPECTED(object == nullptr)) {
         throw std::bad_alloc();

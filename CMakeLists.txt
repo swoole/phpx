@@ -324,6 +324,8 @@ target_include_directories(wren_gc PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/wren-gc/include
 )
 set_target_properties(wren_gc PROPERTIES
+    C_STANDARD 11
+    C_STANDARD_REQUIRED ON
     POSITION_INDEPENDENT_CODE ON
 )
 

@@ -1,21 +1,24 @@
 #include "wren_gc.h"
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
 typedef struct WrenGcObject {
-    struct WrenGcObject *next;
-    void *payload;
-    size_t allocation_size;
+    uintptr_t next_and_flags;
     const void *type_data;
-    WrenGcTraceFn trace;
-    WrenGcFinalizeFn finalize;
-    WrenGcDestroyFn destroy;
-    bool marked;
-    bool finalized;
-    bool allocated_during_collection;
 } WrenGcObject;
+
+enum {
+    WREN_GC_MARKED = 1u,
+    WREN_GC_FINALIZED = 2u,
+    WREN_GC_ALLOCATED_DURING_COLLECTION = 4u,
+    WREN_GC_FLAGS = 7u,
+};
+
+_Static_assert(sizeof(WrenGcObject) == 2u * sizeof(void *), "Wren GC header must contain exactly two words");
+_Static_assert(_Alignof(max_align_t) >= 8u, "Wren GC requires three free pointer tag bits");
 
 struct WrenGcHeap {
     WrenGcConfig config;
@@ -30,16 +33,39 @@ struct WrenGcHeap {
     bool collecting;
 };
 
-static size_t normalize_alignment(size_t alignment)
+static size_t payload_offset(void)
 {
-    const size_t minimum = sizeof(void *);
-    if (alignment < minimum) {
-        alignment = minimum;
+    const size_t alignment = _Alignof(max_align_t);
+    return (sizeof(WrenGcObject) + alignment - 1u) & ~(alignment - 1u);
+}
+
+static WrenGcObject *object_next(const WrenGcObject *object)
+{
+    return (WrenGcObject *) (object->next_and_flags & ~(uintptr_t) WREN_GC_FLAGS);
+}
+
+static void object_set_next(WrenGcObject *object, WrenGcObject *next)
+{
+    object->next_and_flags = (object->next_and_flags & WREN_GC_FLAGS) | (uintptr_t) next;
+}
+
+static bool object_has_flag(const WrenGcObject *object, uintptr_t flag)
+{
+    return (object->next_and_flags & flag) != 0;
+}
+
+static void object_set_flag(WrenGcObject *object, uintptr_t flag, bool enabled)
+{
+    if (enabled) {
+        object->next_and_flags |= flag;
+    } else {
+        object->next_and_flags &= ~flag;
     }
-    if ((alignment & (alignment - 1)) != 0) {
-        return 0;
-    }
-    return alignment;
+}
+
+static void *object_payload(WrenGcObject *object)
+{
+    return (void *) ((unsigned char *) object + payload_offset());
 }
 
 static WrenGcObject *object_header(const void *payload)
@@ -47,7 +73,12 @@ static WrenGcObject *object_header(const void *payload)
     if (payload == NULL) {
         return NULL;
     }
-    return ((WrenGcObject *const *) payload)[-1];
+    return (WrenGcObject *) ((unsigned char *) payload - payload_offset());
+}
+
+static size_t object_allocation_size(const WrenGcHeap *heap, const WrenGcObject *object)
+{
+    return payload_offset() + heap->config.object_size(object->type_data);
 }
 
 static void gray_push(WrenGcHeap *heap, WrenGcObject *object)
@@ -70,10 +101,10 @@ void wren_gc_mark(WrenGcHeap *heap, void *payload)
         return;
     }
     WrenGcObject *object = object_header(payload);
-    if (object == NULL || object->marked) {
+    if (object == NULL || object_has_flag(object, WREN_GC_MARKED)) {
         return;
     }
-    object->marked = true;
+    object_set_flag(object, WREN_GC_MARKED, true);
     gray_push(heap, object);
 }
 
@@ -93,16 +124,16 @@ static void trace_gray(WrenGcHeap *heap)
 {
     while (heap->gray_count > 0) {
         WrenGcObject *object = heap->gray[--heap->gray_count];
-        if (object->trace != NULL) {
-            object->trace(object->payload, visit_object, heap);
+        if (heap->config.trace != NULL) {
+            heap->config.trace(object_payload(object), visit_object, heap);
         }
     }
 }
 
 static void clear_marks(WrenGcHeap *heap)
 {
-    for (WrenGcObject *object = heap->objects; object != NULL; object = object->next) {
-        object->marked = false;
+    for (WrenGcObject *object = heap->objects; object != NULL; object = object_next(object)) {
+        object_set_flag(object, WREN_GC_MARKED, false);
     }
     heap->gray_count = 0;
 }
@@ -110,9 +141,10 @@ static void clear_marks(WrenGcHeap *heap)
 static void prepare_post_finalizer_mark(WrenGcHeap *heap)
 {
     heap->gray_count = 0;
-    for (WrenGcObject *object = heap->objects; object != NULL; object = object->next) {
-        object->marked = object->allocated_during_collection;
-        if (object->marked) {
+    for (WrenGcObject *object = heap->objects; object != NULL; object = object_next(object)) {
+        const bool allocated = object_has_flag(object, WREN_GC_ALLOCATED_DURING_COLLECTION);
+        object_set_flag(object, WREN_GC_MARKED, allocated);
+        if (allocated) {
             /* Construction has completed by the time the finalizer returns. */
             gray_push(heap, object);
         }
@@ -127,12 +159,17 @@ static void mark_reachable(WrenGcHeap *heap)
 
 static bool run_finalizers(WrenGcHeap *heap)
 {
+    if (heap->config.has_finalizer == NULL || heap->config.finalize == NULL) {
+        return false;
+    }
     bool ran = false;
-    for (WrenGcObject *object = heap->objects; object != NULL; object = object->next) {
-        if (!object->marked && !object->finalized && object->finalize != NULL) {
-            object->finalized = true;
+    for (WrenGcObject *object = heap->objects; object != NULL; object = object_next(object)) {
+        if (!object_has_flag(object, WREN_GC_MARKED)
+            && !object_has_flag(object, WREN_GC_FINALIZED)
+            && heap->config.has_finalizer(object->type_data)) {
+            object_set_flag(object, WREN_GC_FINALIZED, true);
             ran = true;
-            object->finalize(object->payload);
+            heap->config.finalize(object_payload(object));
         }
     }
     return ran;
@@ -167,21 +204,25 @@ WrenGcHeap *wren_gc_heap_new(const WrenGcConfig *config)
 
 void *wren_gc_allocate(
     WrenGcHeap *heap,
-    size_t size,
     size_t alignment,
-    const void *type_data,
-    WrenGcTraceFn trace,
-    WrenGcFinalizeFn finalize,
-    WrenGcDestroyFn destroy
+    const void *type_data
 ) {
-    if (heap == NULL || size == 0) {
+    const size_t size = heap != NULL && heap->config.object_size != NULL
+        ? heap->config.object_size(type_data)
+        : 0;
+    if (heap == NULL
+        || size == 0
+        || heap->config.object_size == NULL
+        || heap->config.destroy == NULL) {
         return NULL;
     }
-    alignment = normalize_alignment(alignment);
-    if (alignment == 0 || size > SIZE_MAX - sizeof(WrenGcObject) - sizeof(void *) - alignment) {
+    if (alignment == 0
+        || (alignment & (alignment - 1u)) != 0
+        || alignment > _Alignof(max_align_t)
+        || size > SIZE_MAX - payload_offset()) {
         return NULL;
     }
-    const size_t allocation_size = sizeof(WrenGcObject) + sizeof(void *) + alignment - 1 + size;
+    const size_t allocation_size = payload_offset() + size;
     if (!heap->collecting && heap->bytes_allocated + allocation_size > heap->next_collection) {
         wren_gc_collect(heap);
     }
@@ -190,15 +231,8 @@ void *wren_gc_allocate(
     if (object == NULL) {
         return NULL;
     }
-    uintptr_t start = (uintptr_t) object + sizeof(*object) + sizeof(void *);
-    uintptr_t aligned = (start + alignment - 1) & ~(uintptr_t) (alignment - 1);
-    object->next = heap->objects;
-    object->payload = (void *) aligned;
-    object->allocation_size = allocation_size;
+    object->next_and_flags = (uintptr_t) heap->objects;
     object->type_data = type_data;
-    object->trace = trace;
-    object->finalize = finalize;
-    object->destroy = destroy;
     /*
      * A finalizer may allocate another Native object. The current mark phase
      * has already passed, so a new white object would be swept immediately
@@ -206,15 +240,13 @@ void *wren_gc_allocate(
      * collection as live for this cycle; normal root tracing decides their
      * reachability on the next collection.
      */
-    object->marked = heap->collecting;
-    object->finalized = false;
-    object->allocated_during_collection = heap->collecting;
-    ((WrenGcObject **) object->payload)[-1] = object;
+    object_set_flag(object, WREN_GC_MARKED, heap->collecting);
+    object_set_flag(object, WREN_GC_ALLOCATED_DURING_COLLECTION, heap->collecting);
 
     heap->objects = object;
     heap->bytes_allocated += allocation_size;
     heap->object_count++;
-    return object->payload;
+    return object_payload(object);
 }
 
 void wren_gc_collect(WrenGcHeap *heap)
@@ -231,22 +263,27 @@ void wren_gc_collect(WrenGcHeap *heap)
         mark_reachable(heap);
     }
 
-    WrenGcObject **link = &heap->objects;
-    while (*link != NULL) {
-        WrenGcObject *object = *link;
-        if (!object->marked) {
-            *link = object->next;
-            if (object->destroy != NULL) {
-                object->destroy(object->payload);
+    WrenGcObject *previous = NULL;
+    WrenGcObject *object = heap->objects;
+    while (object != NULL) {
+        WrenGcObject *next = object_next(object);
+        if (!object_has_flag(object, WREN_GC_MARKED)) {
+            const size_t allocation_size = object_allocation_size(heap, object);
+            if (previous == NULL) {
+                heap->objects = next;
+            } else {
+                object_set_next(previous, next);
             }
-            heap->bytes_allocated -= object->allocation_size;
+            heap->config.destroy(object_payload(object));
+            heap->bytes_allocated -= allocation_size;
             heap->object_count--;
             free(object);
         } else {
-            object->marked = false;
-            object->allocated_during_collection = false;
-            link = &object->next;
+            object_set_flag(object, WREN_GC_MARKED, false);
+            object_set_flag(object, WREN_GC_ALLOCATED_DURING_COLLECTION, false);
+            previous = object;
         }
+        object = next;
     }
 
     size_t growth = (heap->bytes_allocated * heap->config.heap_growth_percent) / 100u;
@@ -264,16 +301,20 @@ void wren_gc_abandon(WrenGcHeap *heap, void *payload)
         return;
     }
     WrenGcObject *target = object_header(payload);
-    WrenGcObject **link = &heap->objects;
-    while (*link != NULL) {
-        if (*link == target) {
-            *link = target->next;
-            heap->bytes_allocated -= target->allocation_size;
+    WrenGcObject *previous = NULL;
+    for (WrenGcObject *object = heap->objects; object != NULL; object = object_next(object)) {
+        if (object == target) {
+            if (previous == NULL) {
+                heap->objects = object_next(target);
+            } else {
+                object_set_next(previous, object_next(target));
+            }
+            heap->bytes_allocated -= object_allocation_size(heap, target);
             heap->object_count--;
             free(target);
             return;
         }
-        link = &(*link)->next;
+        previous = object;
     }
 }
 
@@ -293,7 +334,7 @@ bool wren_gc_is_reachable(WrenGcHeap *heap, const void *payload)
     }
     clear_marks(heap);
     mark_reachable(heap);
-    const bool reachable = target->marked;
+    const bool reachable = object_has_flag(target, WREN_GC_MARKED);
     clear_marks(heap);
     return reachable;
 }
@@ -302,7 +343,7 @@ void wren_gc_suppress_finalizer(void *payload)
 {
     WrenGcObject *object = object_header(payload);
     if (object != NULL) {
-        object->finalized = true;
+        object_set_flag(object, WREN_GC_FINALIZED, true);
     }
 }
 
@@ -313,14 +354,15 @@ void wren_gc_heap_free(WrenGcHeap *heap)
     }
     while (heap->objects != NULL) {
         WrenGcObject *object = heap->objects;
-        heap->objects = object->next;
-        if (!object->finalized && object->finalize != NULL) {
-            object->finalized = true;
-            object->finalize(object->payload);
+        heap->objects = object_next(object);
+        if (!object_has_flag(object, WREN_GC_FINALIZED)
+            && heap->config.has_finalizer != NULL
+            && heap->config.finalize != NULL
+            && heap->config.has_finalizer(object->type_data)) {
+            object_set_flag(object, WREN_GC_FINALIZED, true);
+            heap->config.finalize(object_payload(object));
         }
-        if (object->destroy != NULL) {
-            object->destroy(object->payload);
-        }
+        heap->config.destroy(object_payload(object));
         free(object);
     }
     free(heap->gray);
@@ -336,7 +378,7 @@ const void *wren_gc_type_data(const void *payload)
 bool wren_gc_is_finalized(const void *payload)
 {
     WrenGcObject *object = object_header(payload);
-    return object != NULL && object->finalized;
+    return object != NULL && object_has_flag(object, WREN_GC_FINALIZED);
 }
 
 WrenGcStats wren_gc_stats(const WrenGcHeap *heap)
@@ -349,4 +391,9 @@ WrenGcStats wren_gc_stats(const WrenGcHeap *heap)
         stats.collection_count = heap->collection_count;
     }
     return stats;
+}
+
+size_t wren_gc_header_size(void)
+{
+    return sizeof(WrenGcObject);
 }
