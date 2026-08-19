@@ -178,7 +178,7 @@ static bool run_finalizers(WrenGcHeap *heap)
 void wren_gc_config_init(WrenGcConfig *config)
 {
     memset(config, 0, sizeof(*config));
-    config->initial_heap_size = 10u * 1024u * 1024u;
+    config->initial_heap_size = 16u * 1024u * 1024u;
     config->minimum_heap_size = 1024u * 1024u;
     config->heap_growth_percent = 50;
 }

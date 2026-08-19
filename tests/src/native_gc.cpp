@@ -99,7 +99,7 @@ TEST(wren_gc, uses_stable_native_heap_defaults)
     WrenGcConfig config;
     wren_gc_config_init(&config);
 
-    EXPECT_EQ(10u * 1024u * 1024u, config.initial_heap_size);
+    EXPECT_EQ(16u * 1024u * 1024u, config.initial_heap_size);
     EXPECT_EQ(1024u * 1024u, config.minimum_heap_size);
     EXPECT_EQ(50u, config.heap_growth_percent);
 
