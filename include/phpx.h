@@ -1997,13 +1997,19 @@ class Args {
         }
     }
     void append(const zval *zv) {
+        if (UNEXPECTED(params.size() == UINT32_MAX)) {
+            throwError("Argument list exceeds the ZendVM 32-bit limit");
+            return;
+        }
         params.emplace_back(zv, Ctor::CopyRef);
     }
     void append(const Variant &v) {
         append(v.const_ptr());
     }
-    size_t count() const {
-        return params.size();
+    uint32_t count() const {
+        // append() maintains this invariant. Returning Zend's native argument
+        // count type prevents implicit size_t narrowing at every call boundary.
+        return static_cast<uint32_t>(params.size());
     }
     bool exists(const size_t i) const {
         return i < count();

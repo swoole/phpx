@@ -7,7 +7,6 @@
 #pragma once
 
 #include <cstddef>
-#include <exception>
 #include <new>
 #include <utility>
 
@@ -72,19 +71,24 @@ class PHPX_API NativeFinalizerChain final {
         } catch (zend_object *exception) {
             remember(exception);
         } catch (...) {
-            remember(std::current_exception());
+            rememberCurrentException();
         }
     }
 
     void rethrow();
 
   private:
+    struct CppExceptionState;
+
     void remember(zend_object *exception) noexcept;
-    void remember(std::exception_ptr exception) noexcept;
+    void rememberCurrentException() noexcept;
 
     bool failed_ = false;
     zend_object *zendException_ = nullptr;
-    std::exception_ptr cppException_;
+    // Keep STL implementation types out of this exported class layout. Apart
+    // from avoiding MSVC C4251, the opaque state makes allocation exceptional:
+    // the ordinary finalizer path remains allocation-free.
+    CppExceptionState *cppException_ = nullptr;
 };
 
 using NativeRootSlot = void **;

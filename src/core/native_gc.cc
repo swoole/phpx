@@ -8,6 +8,11 @@ extern "C" {
 #include <vector>
 
 namespace php {
+
+struct NativeFinalizerChain::CppExceptionState {
+    std::exception_ptr exception;
+};
+
 namespace {
 THREAD_LOCAL WrenGcHeap *native_heap = nullptr;
 THREAD_LOCAL NativeRootFrame *native_root_top = nullptr;
@@ -187,6 +192,7 @@ NativeFinalizerChain::~NativeFinalizerChain() noexcept
     if (zendException_ != nullptr) {
         OBJ_RELEASE(zendException_);
     }
+    delete cppException_;
 }
 
 void NativeFinalizerChain::remember(zend_object *exception) noexcept
@@ -201,11 +207,16 @@ void NativeFinalizerChain::remember(zend_object *exception) noexcept
     }
 }
 
-void NativeFinalizerChain::remember(std::exception_ptr exception) noexcept
+void NativeFinalizerChain::rememberCurrentException() noexcept
 {
     if (!failed_) {
         failed_ = true;
-        cppException_ = std::move(exception);
+        cppException_ = new (std::nothrow) CppExceptionState{std::current_exception()};
+        if (UNEXPECTED(cppException_ == nullptr)) {
+            // There is no safe way to preserve and later rethrow the active
+            // exception after an allocation failure.
+            std::terminate();
+        }
     }
 }
 
@@ -217,9 +228,11 @@ void NativeFinalizerChain::rethrow()
         EG(exception) = exception;
         throw exception;
     }
-    if (cppException_) {
-        std::exception_ptr exception = std::move(cppException_);
+    if (cppException_ != nullptr) {
+        CppExceptionState *state = cppException_;
         cppException_ = nullptr;
+        std::exception_ptr exception = std::move(state->exception);
+        delete state;
         std::rethrow_exception(exception);
     }
 }
