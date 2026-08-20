@@ -202,6 +202,74 @@ static inline Bool toBoolExact(const Variant &v, const char *property = nullptr)
     return Z_TYPE_P(zv) == IS_TRUE;
 }
 
+static inline String toStringExact(const Variant &v, const char *property = nullptr) {
+    const zval *zv = v.unwrap_ptr();
+    if (UNEXPECTED(Z_TYPE_P(zv) != IS_STRING)) {
+        throwExactTypeError(v, "string", property);
+        return {};
+    }
+    return String(Z_STR_P(zv));
+}
+
+static inline Array toArrayExact(const Variant &v, const char *property = nullptr) {
+    const zval *zv = v.unwrap_ptr();
+    if (UNEXPECTED(Z_TYPE_P(zv) != IS_ARRAY)) {
+        throwExactTypeError(v, "array", property);
+        return {};
+    }
+    return Array(v);
+}
+
+static inline Object toObjectExact(const Variant &v, const char *property = nullptr) {
+    const zval *zv = v.unwrap_ptr();
+    if (UNEXPECTED(Z_TYPE_P(zv) != IS_OBJECT)) {
+        throwExactTypeError(v, "object", property);
+        return {};
+    }
+    return Object(v);
+}
+
+static inline Object toObjectExact(
+    const Variant &v, zend_class_entry *expected_ce, const char *property = nullptr) {
+    const zval *zv = v.unwrap_ptr();
+    if (UNEXPECTED(Z_TYPE_P(zv) != IS_OBJECT
+        || !instanceof_function(Z_OBJCE_P(zv), expected_ce))) {
+        throwExactTypeError(v, ZSTR_VAL(expected_ce->name), property);
+        return {};
+    }
+    return Object(v);
+}
+
+static inline Variant toStreamExact(const Variant &v, const char *property = nullptr) {
+    php_stream *stream = nullptr;
+    if (EXPECTED(v.isResource())) {
+        php_stream_from_zval_no_verify(stream, NO_CONST_V(v));
+    }
+    if (UNEXPECTED(stream == nullptr)) {
+        throwExactTypeError(v, "stream", property);
+        return php::null;
+    }
+    return v;
+}
+
+template <typename T>
+static inline Variant toBoxExact(
+    const Variant &v, const char *property = nullptr, const char *expected = "Box") {
+    static_assert(std::is_base_of_v<Box, T>, "T must derive from php::Box");
+    const zval *zv = v.unwrap_ptr();
+    if (UNEXPECTED(Z_TYPE_P(zv) != IS_RESOURCE)) {
+        throwExactTypeError(v, expected, property);
+        return php::null;
+    }
+    zend_resource *resource = Z_RES_P(zv);
+    if (UNEXPECTED(resource->type != getBoxResourceId()
+        || dynamic_cast<T *>(static_cast<Box *>(resource->ptr)) == nullptr)) {
+        throwExactTypeError(v, expected, property);
+        return php::null;
+    }
+    return v;
+}
+
 static inline Reference toReferenceExact(const Variant &v, const char *property = nullptr) {
     const zval *zv = v.direct_ptr();
     if (UNEXPECTED(Z_TYPE_P(zv) != IS_REFERENCE)) {

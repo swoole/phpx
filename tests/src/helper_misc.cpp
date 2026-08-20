@@ -150,6 +150,20 @@ TEST(helper_exact_type_check, scalar_values) {
     ASSERT_TRUE(php::toBoolExact(bool_value, "Test::$boolValue"));
 }
 
+TEST(helper_exact_type_check, compound_values) {
+    Variant string_value("value");
+    Array array_value;
+    array_value.append(42);
+    Object object_value = newObject("stdClass");
+
+    ASSERT_EQ(php::toStringExact(string_value, "Test::$stringValue"), "value");
+    ASSERT_EQ(php::toArrayExact(array_value, "Test::$arrayValue").length(), 1);
+    ASSERT_EQ(php::toObjectExact(object_value, "Test::$objectValue").getClassName(), "stdClass");
+    ASSERT_EQ(
+        php::toObjectExact(object_value, object_value.ce(), "Test::$typedObjectValue").getClassName(),
+        "stdClass");
+}
+
 TEST(helper_exact_type_check, scalar_type_error) {
     Variant string_value("42");
 
@@ -169,6 +183,41 @@ TEST(helper_exact_type_check, scalar_type_error) {
         auto e = catchException();
         auto msg = e.call("getMessage");
         ASSERT_TRUE(str_contains(msg, "Cannot assign int to property Test::$boolValue of type bool").toBool());
+    }
+}
+
+TEST(helper_exact_type_check, compound_type_error) {
+    try {
+        php::toStringExact(Variant(42), "Test::$stringValue");
+        FAIL() << "toStringExact should throw for int";
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        ASSERT_TRUE(str_contains(e.call("getMessage"), "of type string").toBool());
+    }
+
+    try {
+        php::toArrayExact(Variant("array"), "Test::$arrayValue");
+        FAIL() << "toArrayExact should throw for string";
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        ASSERT_TRUE(str_contains(e.call("getMessage"), "of type array").toBool());
+    }
+
+    try {
+        php::toObjectExact(Variant("object"), "Test::$objectValue");
+        FAIL() << "toObjectExact should throw for string";
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        ASSERT_TRUE(str_contains(e.call("getMessage"), "of type object").toBool());
+    }
+
+    try {
+        Object object_value = newObject("stdClass");
+        php::toObjectExact(object_value, zend_ce_exception, "Test::$typedObjectValue");
+        FAIL() << "toObjectExact should reject an incompatible class";
+    } catch (zend_object *ex) {
+        auto e = catchException();
+        ASSERT_TRUE(str_contains(e.call("getMessage"), "of type Exception").toBool());
     }
 }
 
