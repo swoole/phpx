@@ -67,6 +67,24 @@ static inline ClosureCarrier *closure_carrier_from_obj(zend_object *object) {
         reinterpret_cast<char *>(object) - XtOffsetOf(ClosureCarrier, std));
 }
 
+static HashTable *closure_carrier_get_gc(zend_object *object, zval **table, int *n) {
+    auto *state = closure_carrier_from_obj(object)->state();
+    auto *gc_buffer = zend_get_gc_buffer_create();
+
+    // ClosureState lives outside Zend's property table. Expose the bound
+    // object and captured variables so cyclic closures remain collectable.
+    zend_get_gc_buffer_add_zval(gc_buffer, state->this_.ptr());
+    zval *capture = state->vars_.ptr();
+    for (uint32_t i = 0; i < state->vars_.count(); i++) {
+        zend_get_gc_buffer_add_zval(gc_buffer, capture + i);
+    }
+    zend_get_gc_buffer_use(gc_buffer, table, n);
+
+    // ClosureCarrier is private implementation storage and never has PHP
+    // properties. All of its GC-visible edges are returned through table.
+    return nullptr;
+}
+
 static void closure_carrier_free(zend_object *object) {
     auto *carrier = closure_carrier_from_obj(object);
     zend_object_std_dtor(&carrier->std);
@@ -81,6 +99,7 @@ static zend_object *newClosureCarrier(const ClosureFn &fn,
         memcpy(&closure_carrier_handlers, &std_object_handlers, sizeof(zend_object_handlers));
         closure_carrier_handlers.offset = XtOffsetOf(ClosureCarrier, std);
         closure_carrier_handlers.free_obj = closure_carrier_free;
+        closure_carrier_handlers.get_gc = closure_carrier_get_gc;
         closure_carrier_handlers.clone_obj = nullptr;
         closure_carrier_handlers_initialized = true;
     }

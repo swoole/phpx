@@ -88,6 +88,24 @@ TEST(closure, use_value_and_reference_capture) {
     ASSERT_EQ(referenced.toInt(), 3000);
 }
 
+TEST(closure, captured_reference_cycle_is_visible_to_zend_gc) {
+    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &) -> Variant {
+        return null;
+    };
+
+    Variant closure;
+    Variant captured;
+    closure = newClosure(fn, {captured.toReference()});
+    captured = closure;
+
+    Object weak_ref(call(Array{"WeakReference", "create"}, {closure}));
+    closure.unset();
+    captured.unset();
+
+    zend_gc_collect_cycles();
+    ASSERT_TRUE(weak_ref.call("get").isNull());
+}
+
 TEST(closure, preserves_lexical_scope) {
     eval(R"PHP(
         class PhpxClosureScopeParent {}
