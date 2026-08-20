@@ -17,8 +17,24 @@ enum {
     WREN_GC_FLAGS = 7u,
 };
 
+/*
+ * MSVC supports the C11 alignment operators used here, but its C standard
+ * library does not consistently declare max_align_t. Match the fundamental
+ * alignment guaranteed by the Microsoft CRT allocator instead. Other C11
+ * implementations can use the standard type directly.
+ */
+#if defined(_MSC_VER)
+#if defined(_WIN64)
+#define WREN_GC_MAX_ALIGNMENT 16u
+#else
+#define WREN_GC_MAX_ALIGNMENT 8u
+#endif
+#else
+#define WREN_GC_MAX_ALIGNMENT _Alignof(max_align_t)
+#endif
+
 _Static_assert(sizeof(WrenGcObject) == 2u * sizeof(void *), "Wren GC header must contain exactly two words");
-_Static_assert(_Alignof(max_align_t) >= 8u, "Wren GC requires three free pointer tag bits");
+_Static_assert(WREN_GC_MAX_ALIGNMENT >= 8u, "Wren GC requires three free pointer tag bits");
 
 struct WrenGcHeap {
     WrenGcConfig config;
@@ -35,7 +51,7 @@ struct WrenGcHeap {
 
 static size_t payload_offset(void)
 {
-    const size_t alignment = _Alignof(max_align_t);
+    const size_t alignment = WREN_GC_MAX_ALIGNMENT;
     return (sizeof(WrenGcObject) + alignment - 1u) & ~(alignment - 1u);
 }
 
@@ -218,7 +234,7 @@ void *wren_gc_allocate(
     }
     if (alignment == 0
         || (alignment & (alignment - 1u)) != 0
-        || alignment > _Alignof(max_align_t)
+        || alignment > WREN_GC_MAX_ALIGNMENT
         || size > SIZE_MAX - payload_offset()) {
         return NULL;
     }
