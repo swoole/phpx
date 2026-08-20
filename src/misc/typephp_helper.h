@@ -44,6 +44,34 @@ void typephp_uninstall_reflection_attribute_handlers();
 namespace php {
 
 /**
+ * Validate an indexed list write against PHP's real append position.
+ *
+ * HashTable::nNextFreeElement deliberately does not shrink when elements are
+ * unset. It is therefore the correct upper boundary for a write that may
+ * either update an earlier numeric key or append without skipping the key PHP
+ * itself would choose for `$array[]`.
+ */
+static inline Int safeArrayIndex(Int index, const Variant &array) {
+    const zval *value = array.unwrap_ptr();
+    if (UNEXPECTED(!zval_is_array(value))) {
+        throwError("Array index validation expects an array, %s given", array.typeStr());
+        return -1;
+    }
+
+    Int next_index = zend_hash_next_free_element(Z_ARRVAL_P(value));
+    // zend_hash_next_index_insert() maps the uninitialized sentinel to the
+    // first normal list index. Do the same without mutating the HashTable.
+    if (next_index == ZEND_LONG_MIN) {
+        next_index = 0;
+    }
+    if (UNEXPECTED(index < 0 || index > next_index)) {
+        throwError("Array index out of bounds: index %ld, append index %ld", (long) index, (long) next_index);
+        return -1;
+    }
+    return index;
+}
+
+/**
  * One module-lifetime cache slot for a symbol resolved after PHP startup.
  * ZTS publishes the value atomically; NTS deliberately remains a plain value.
  */
