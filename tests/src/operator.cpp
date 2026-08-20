@@ -108,6 +108,33 @@ TEST(operator_arithmetic, all_operators) {
     }
 }
 
+TEST(operator_arithmetic, signed_overflow_detection_uses_signed_semantics) {
+    Variant negative_one(-1);
+    Variant positive_one(1);
+    Variant zero(0);
+
+    Variant sum = negative_one + positive_one;
+    ASSERT_TRUE(sum.isInt());
+    ASSERT_EQ(sum.toInt(), 0);
+
+    Variant difference = zero - positive_one;
+    ASSERT_TRUE(difference.isInt());
+    ASSERT_EQ(difference.toInt(), -1);
+
+    negative_one += positive_one;
+    ASSERT_TRUE(negative_one.isInt());
+    ASSERT_EQ(negative_one.toInt(), 0);
+
+    zero -= positive_one;
+    ASSERT_TRUE(zero.isInt());
+    ASSERT_EQ(zero.toInt(), -1);
+
+    Variant maximum(ZEND_LONG_MAX);
+    Variant minimum(ZEND_LONG_MIN);
+    ASSERT_TRUE((maximum + positive_one).isFloat());
+    ASSERT_TRUE((minimum - positive_one).isFloat());
+}
+
 // Test all bitwise operators (<<, >>, &, |, ^)
 TEST(operator_bitwise, all_operators) {
     // Left shift operator test

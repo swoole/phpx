@@ -572,23 +572,23 @@ Variant Variant::serialize() {
 
 // Fast integer arithmetic with overflow detection.
 // GCC/Clang: __builtin_*_overflow — compile to single add+jo / sub+jo / mul+jo.
-// MSVC:      _addcarry_u64 / _subborrow_u64 from <intrin.h>; manual mul check.
-// Others:    portable manual overflow checks.
+// MSVC/other compilers: portable signed boundary checks. Unsigned carry and
+// borrow intrinsics cannot detect signed overflow (for example, -1 + 1 has an
+// unsigned carry but does not overflow as a signed integer).
 #if defined(__GNUC__) || defined(__clang__)
 #define PHPX_HAS_BUILTIN_OVERFLOW 1
-#elif defined(_MSC_VER)
-#include <intrin.h>
+#else
+#define PHPX_HAS_BUILTIN_OVERFLOW 0
 #endif
 
 static inline bool fast_add_overflow(zend_long a, zend_long b, zend_long *result) {
 #if PHPX_HAS_BUILTIN_OVERFLOW
     return __builtin_add_overflow(a, b, result);
-#elif defined(_MSC_VER)
-    unsigned char carry = _addcarry_u64(0, (unsigned __int64) a, (unsigned __int64) b, (unsigned __int64 *) result);
-    return carry != 0;
 #else
-    if ((b > 0) && (a > ZEND_LONG_MAX - b)) return true;
-    if ((b < 0) && (a < ZEND_LONG_MIN - b)) return true;
+    if (UNEXPECTED((b > 0 && a > ZEND_LONG_MAX - b)
+                   || (b < 0 && a < ZEND_LONG_MIN - b))) {
+        return true;
+    }
     *result = a + b;
     return false;
 #endif
@@ -597,12 +597,11 @@ static inline bool fast_add_overflow(zend_long a, zend_long b, zend_long *result
 static inline bool fast_sub_overflow(zend_long a, zend_long b, zend_long *result) {
 #if PHPX_HAS_BUILTIN_OVERFLOW
     return __builtin_sub_overflow(a, b, result);
-#elif defined(_MSC_VER)
-    unsigned char borrow = _subborrow_u64(0, (unsigned __int64) a, (unsigned __int64) b, (unsigned __int64 *) result);
-    return borrow != 0;
 #else
-    if ((b < 0) && (a > ZEND_LONG_MAX + b)) return true;
-    if ((b > 0) && (a < ZEND_LONG_MIN + b)) return true;
+    if (UNEXPECTED((b < 0 && a > ZEND_LONG_MAX + b)
+                   || (b > 0 && a < ZEND_LONG_MIN + b))) {
+        return true;
+    }
     *result = a - b;
     return false;
 #endif
