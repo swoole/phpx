@@ -71,8 +71,13 @@ static bool call_reflection_method(zend_object *object, zend_function *method, z
 static bool get_materialized_arguments(zend_object *object, zval *arguments, bool *had_lazy_value) {
     last_get_arguments_had_lazy_value = false;
     ZVAL_UNDEF(arguments);
-    zend_call_known_function(
-        reinterpret_cast<zend_function *>(reflection_get_arguments), object, object->ce, arguments, 0, nullptr, nullptr);
+    zend_call_known_function(reinterpret_cast<zend_function *>(reflection_get_arguments),
+                             object,
+                             object->ce,
+                             arguments,
+                             0,
+                             nullptr,
+                             nullptr);
     *had_lazy_value = last_get_arguments_had_lazy_value;
     return !EG(exception);
 }
@@ -454,12 +459,12 @@ zend_result typephp_install_reflection_attribute_handlers() {
     reflection_get_arguments = find_internal_method(reflection_attribute, ZEND_STRL("getarguments"));
     reflection_new_instance = find_internal_method(reflection_attribute, ZEND_STRL("newinstance"));
     reflection_to_string = find_internal_method(reflection_attribute, ZEND_STRL("__tostring"));
-    reflection_get_name = reinterpret_cast<zend_function *>(
-        find_internal_method(reflection_attribute, ZEND_STRL("getname")));
-    reflection_get_target = reinterpret_cast<zend_function *>(
-        find_internal_method(reflection_attribute, ZEND_STRL("gettarget")));
-    reflection_is_repeated = reinterpret_cast<zend_function *>(
-        find_internal_method(reflection_attribute, ZEND_STRL("isrepeated")));
+    reflection_get_name =
+        reinterpret_cast<zend_function *>(find_internal_method(reflection_attribute, ZEND_STRL("getname")));
+    reflection_get_target =
+        reinterpret_cast<zend_function *>(find_internal_method(reflection_attribute, ZEND_STRL("gettarget")));
+    reflection_is_repeated =
+        reinterpret_cast<zend_function *>(find_internal_method(reflection_attribute, ZEND_STRL("isrepeated")));
     if (reflection_get_arguments == nullptr || reflection_new_instance == nullptr || reflection_to_string == nullptr ||
         reflection_get_name == nullptr || reflection_get_target == nullptr || reflection_is_repeated == nullptr) {
         reflection_hook_install_count = 0;

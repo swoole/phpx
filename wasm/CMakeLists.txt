@@ -212,7 +212,6 @@ add_library(phpx STATIC
     ${PHPX_WASI_STD_SOURCES}
     "${PHPX_ROOT}/thirdparty/wren-gc/src/wren_gc.c"
     "${PHPX_ROOT}/src/misc/typephp_helper.cc"
-    "${PHPX_ROOT}/src/misc/typephp_main.cc"
 )
 
 set_target_properties(phpx PROPERTIES

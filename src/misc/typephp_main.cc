@@ -12,13 +12,16 @@ BEGIN_EXTERN_C()
 #endif
 END_EXTERN_C()
 
-#ifndef TYPEPHP_EMBED_GET_MODULE
-#define TYPEPHP_EMBED_GET_MODULE php_embed_get_module
+#ifndef TYPEPHP_PROJECT_NAME
+#error "TYPEPHP_PROJECT_NAME must be defined for the embedded runtime"
 #endif
 
-extern zend_module_entry *TYPEPHP_EMBED_GET_MODULE();
+#define TYPEPHP_EMBED_GET_MODULE_NAME_INNER(project) php_##project##_embed_get_module
+#define TYPEPHP_EMBED_GET_MODULE_NAME(project) TYPEPHP_EMBED_GET_MODULE_NAME_INNER(project)
 
-void module_init(zend_module_entry *module) {
+extern zend_module_entry *TYPEPHP_EMBED_GET_MODULE_NAME(TYPEPHP_PROJECT_NAME)();
+
+static void module_init(zend_module_entry *module) {
     if (zend_register_module_ex(module, MODULE_PERSISTENT) == NULL) {
         zend_error(E_ERROR, "Failed to register module [%s]", module->name);
         exit(255);
@@ -29,8 +32,8 @@ void module_init(zend_module_entry *module) {
     }
 }
 
-php::Str php_get_called_class(php::Object &this_) {
-    auto ce = php_get_called_ce(this_);
+php::Str php::getCalledClass(php::Object &this_) {
+    auto ce = getCalledCe(this_);
     if (ce) {
         return php::Str(ce->name);
     } else {
@@ -38,7 +41,7 @@ php::Str php_get_called_class(php::Object &this_) {
     }
 }
 
-zend_class_entry *php_get_called_ce(php::Object &this_) {
+zend_class_entry *php::getCalledCe(php::Object &this_) {
     if (this_.isObject()) {
         return this_.ce();
     } else {
@@ -115,7 +118,7 @@ static void cli_register_file_handles(void) {
     zend_register_constant(&ec);
 }
 
-void module_shutdown(zend_module_entry *module) {
+static void module_shutdown(zend_module_entry *module) {
     /**
      * There is a bug in PHP's handling of internal strings. All interned strings are released in the request shutdown
      * function, but then released again in the php_embed_shutdown function, resulting in a use-after-free issue. These
@@ -367,7 +370,7 @@ TYPEPHP_RUNTIME_API int typephp_runtime_init(int argc, char **argv) {
 
     php_embed_init(argc, argv);
 
-    typephp_runtime_module = TYPEPHP_EMBED_GET_MODULE();
+    typephp_runtime_module = TYPEPHP_EMBED_GET_MODULE_NAME(TYPEPHP_PROJECT_NAME)();
     module_init(typephp_runtime_module);
 
 #if !defined(PHP_WIN32) && !defined(__wasi__)
