@@ -1909,15 +1909,35 @@ class Array : public Variant {
     }
 
     void set(zend_ulong i, const Variant &v);
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    void set(T i, const Variant &v) {
+        set(static_cast<zend_ulong>(i), v);
+    }
     void set(const Variant &key, const Variant &v);
     void set(zend_string *str_key, const Variant &v);
+    void set(const String &key, const Variant &v) {
+        set(key.str(), v);
+    }
+    void set(const char *key, const Variant &v) {
+        set(String(key), v);
+    }
     void append(const Variant &v);
     void append(Variant &&v);
+    Variant get(zend_string *str_key) const {
+        // PHP array access converts numeric string keys to integer keys.
+        // CopyRef materializes an owned read value and enables the generated
+        // assignment to transfer it without an indirect-wrapper slow path.
+        return {zend_symtable_find(array(), str_key), Ctor::CopyRef};
+    }
     Variant get(const String &key) const {
-        return {zend_hash_find(array(), key.str()), Ctor::CopyRef};
+        return get(key.str());
     }
     Variant get(zend_ulong i) const {
         return {zend_hash_index_find(array(), i), Ctor::CopyRef};
+    }
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    Variant get(T i) const {
+        return get(static_cast<zend_ulong>(i));
     }
     ArrayItem operator[](zend_ulong i) {
         return {*this, i, String{}};

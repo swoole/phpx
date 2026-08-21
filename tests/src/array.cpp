@@ -21,6 +21,24 @@ TEST(array, subscript_assignment_preserves_copy_on_write) {
     ASSERT_STREQ(copy.get(0).toCString(), "changed");
 }
 
+TEST(array, get_returns_owned_values_and_preserves_php_keys) {
+    Array array;
+    array.set(static_cast<zend_ulong>(0), "first");
+    array.set(String("12"), "numeric");
+    array.set(String("name"), "phpx");
+
+    Variant first = array.get(0);
+    array.set(static_cast<zend_ulong>(0), "changed");
+
+    ASSERT_STREQ(first.toCString(), "first");
+    String numericKey("12");
+    String nameKey("name");
+    ASSERT_STREQ(array.get(numericKey).toCString(), "numeric");
+    ASSERT_STREQ(array.get(nameKey.str()).toCString(), "phpx");
+    ASSERT_TRUE(array.get(999).isNull());
+    ASSERT_TRUE(array.get(String("missing")).isNull());
+}
+
 TEST(array, subscript_assignment_updates_existing_reference) {
     Variant value = "original";
     Reference reference = value.toReference();
