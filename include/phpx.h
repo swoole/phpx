@@ -1923,6 +1923,7 @@ class Array : public Variant {
     }
     void append(const Variant &v);
     void append(Variant &&v);
+    Variant get(const Variant &key) const;
     Variant get(zend_string *str_key) const {
         // PHP array access converts numeric string keys to integer keys.
         // CopyRef materializes an owned read value and enables the generated
@@ -1931,6 +1932,9 @@ class Array : public Variant {
     }
     Variant get(const String &key) const {
         return get(key.str());
+    }
+    Variant get(const char *key) const {
+        return get(String(key));
     }
     Variant get(zend_ulong i) const {
         return {zend_hash_index_find(array(), i), Ctor::CopyRef};

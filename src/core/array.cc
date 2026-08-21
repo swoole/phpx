@@ -222,6 +222,15 @@ void Array::append(Variant &&v) {
     add_next_index_zval(zarr, &moved);
 }
 
+Variant Array::get(const Variant &key) const {
+    if (key.isInt() || key.isFloat()) {
+        return get(static_cast<zend_ulong>(key.toInt()));
+    }
+
+    auto str_key = key.toString();
+    return get(str_key.str());
+}
+
 bool Array::del(zend_ulong index) {
     auto zarr = unwrap_ptr();
     SEPARATE_ARRAY(zarr);

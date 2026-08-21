@@ -26,6 +26,7 @@ TEST(array, get_returns_owned_values_and_preserves_php_keys) {
     array.set(static_cast<zend_ulong>(0), "first");
     array.set(String("12"), "numeric");
     array.set(String("name"), "phpx");
+    array.set(Variant("variant"), "dynamic");
 
     Variant first = array.get(0);
     array.set(static_cast<zend_ulong>(0), "changed");
@@ -35,6 +36,7 @@ TEST(array, get_returns_owned_values_and_preserves_php_keys) {
     String nameKey("name");
     ASSERT_STREQ(array.get(numericKey).toCString(), "numeric");
     ASSERT_STREQ(array.get(nameKey.str()).toCString(), "phpx");
+    ASSERT_STREQ(array.get(Variant("variant")).toCString(), "dynamic");
     ASSERT_TRUE(array.get(999).isNull());
     ASSERT_TRUE(array.get(String("missing")).isNull());
 }
