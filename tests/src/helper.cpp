@@ -21,6 +21,27 @@ TEST(helper, type_error_slow_paths) {
         "{closure}(): Return value must be of type int|string, bool given");
 }
 
+TEST(helper, exact_call_argument_conversions) {
+    ASSERT_EQ(toIntArgExact(42, "Demo::run", 1, "value"), 42);
+    ASSERT_DOUBLE_EQ(toFloatArgExact(1.5, "Demo::run", 1, "value"), 1.5);
+    ASSERT_DOUBLE_EQ(toFloatArgExact(42, "Demo::run", 1, "value"), 42.0);
+    ASSERT_TRUE(toBoolArgExact(true, "Demo::run", 1, "value"));
+    ASSERT_EQ(toStringArgExact("value", "Demo::run", 1, "value").toStdString(), "value");
+
+    try_call(
+        []() { (void) toIntArgExact("42", "Demo::run", 1, "value"); },
+        "Demo::run(): Argument #1 ($value) must be of type int, string given");
+    try_call(
+        []() { (void) toFloatArgExact("1.5", "Demo::run", 1, "value"); },
+        "Demo::run(): Argument #1 ($value) must be of type float, string given");
+    try_call(
+        []() { (void) toBoolArgExact(1, "Demo::run", 1, "value"); },
+        "Demo::run(): Argument #1 ($value) must be of type bool, int given");
+    try_call(
+        []() { (void) toStringArgExact(42, "Demo::run", 1, "value"); },
+        "Demo::run(): Argument #1 ($value) must be of type string, int given");
+}
+
 TEST(helper, toInt) {
     auto v = php::toSize("512k");
     ASSERT_EQ(v, 512 * 1024);

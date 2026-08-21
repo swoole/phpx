@@ -228,6 +228,64 @@ static inline String toStringExact(const Variant &v, const char *property = null
     return String(Z_STR_P(zv));
 }
 
+/**
+ * Strict scalar conversions at a native call boundary.
+ *
+ * These helpers keep the zval type check and successful conversion inline,
+ * while delegating the unlikely error path to throwArgumentTypeError().
+ * The argument expression is evaluated once before entering the helper.
+ */
+static inline Int toIntArgExact(const Variant &v,
+                                const String &callable_name,
+                                zend_long argument_number,
+                                const String &parameter_name) {
+    const zval *zv = v.unwrap_ptr();
+    if (UNEXPECTED(Z_TYPE_P(zv) != IS_LONG)) {
+        throwArgumentTypeError(v, callable_name, argument_number, parameter_name, String("int"));
+        return 0;
+    }
+    return Z_LVAL_P(zv);
+}
+
+static inline Float toFloatArgExact(const Variant &v,
+                                    const String &callable_name,
+                                    zend_long argument_number,
+                                    const String &parameter_name) {
+    const zval *zv = v.unwrap_ptr();
+    if (Z_TYPE_P(zv) == IS_DOUBLE) {
+        return Z_DVAL_P(zv);
+    }
+    if (Z_TYPE_P(zv) == IS_LONG) {
+        return static_cast<Float>(Z_LVAL_P(zv));
+    }
+    throwArgumentTypeError(v, callable_name, argument_number, parameter_name, String("float"));
+    return 0;
+}
+
+static inline Bool toBoolArgExact(const Variant &v,
+                                  const String &callable_name,
+                                  zend_long argument_number,
+                                  const String &parameter_name) {
+    const zval *zv = v.unwrap_ptr();
+    if (UNEXPECTED(Z_TYPE_P(zv) != IS_TRUE && Z_TYPE_P(zv) != IS_FALSE)) {
+        throwArgumentTypeError(v, callable_name, argument_number, parameter_name, String("bool"));
+        return false;
+    }
+    return Z_TYPE_P(zv) == IS_TRUE;
+}
+
+static inline String toStringArgExact(const Variant &v,
+                                      const String &callable_name,
+                                      zend_long argument_number,
+                                      const String &parameter_name) {
+    const zval *zv = v.unwrap_ptr();
+    if (UNEXPECTED(Z_TYPE_P(zv) != IS_STRING)) {
+        throwArgumentTypeError(v, callable_name, argument_number, parameter_name, String("string"));
+        return {};
+    }
+    return String(Z_STR_P(zv));
+}
+
 static inline Array toArrayExact(const Variant &v, const char *property = nullptr) {
     const zval *zv = v.unwrap_ptr();
     if (UNEXPECTED(Z_TYPE_P(zv) != IS_ARRAY)) {
