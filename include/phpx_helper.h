@@ -29,6 +29,23 @@ extern "C" {
 #include <type_traits>
 
 namespace php {
+
+/**
+ * Slow paths for declared parameter and return-type boundary failures.
+ *
+ * Keep message construction outside generated wrappers so the common path
+ * contains only the inlined zval type test and an unlikely branch.
+ */
+PHPX_API ZEND_COLD zend_never_inline void throwArgumentTypeError(const Variant &value,
+                                                                 const String &callable_name,
+                                                                 zend_long argument_number,
+                                                                 const String &parameter_name,
+                                                                 const String &expected_type);
+PHPX_API ZEND_COLD zend_never_inline void throwReturnTypeError(const Variant &value,
+                                                               const String &callable_name,
+                                                               const String &expected_type,
+                                                               bool use_returned_word);
+
 static inline bool same(Int a, Int b) {
     return a == b;
 }

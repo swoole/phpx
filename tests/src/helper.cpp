@@ -9,6 +9,18 @@ TEST(helper, empty_str_to_int) {
     ASSERT_EQ(i, 0);
 }
 
+TEST(helper, type_error_slow_paths) {
+    try_call(
+        []() { throwArgumentTypeError(123, "Demo::run", 2, "value", "string"); },
+        "Demo::run(): Argument #2 ($value) must be of type string, int given");
+    try_call(
+        []() { throwReturnTypeError(false, "Demo::run", "int", true); },
+        "Demo::run(): Return value must be of type int, bool returned");
+    try_call(
+        []() { throwReturnTypeError(false, "{closure}", "int|string", false); },
+        "{closure}(): Return value must be of type int|string, bool given");
+}
+
 TEST(helper, toInt) {
     auto v = php::toSize("512k");
     ASSERT_EQ(v, 512 * 1024);
