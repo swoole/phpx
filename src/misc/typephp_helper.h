@@ -116,29 +116,6 @@ static inline void resetPersistentCache(PersistentCacheSlot<T> &slot) {
 
 }  // namespace php
 
-extern zend_class_entry *php_get_class(int class_id, const php::Str &class_name);
-extern zend_function *php_get_func(int func_id, const php::Str &func_name);
-extern zend_function *php_get_method(int func_id,
-                                     const php::Str &method_name,
-                                     int class_id,
-                                     const php::Str &class_name);
-
-/* Persistent (MINIT-registered, module-lifetime) symbol caches. They are initialized
- * lazily after PHP startup — once disable_functions/disable_classes have finalized
- * the runtime tables — and are never cleared at request shutdown. There is no
- * dynamic propMap: property offset caches only cover declared properties of
- * compiled/internal classes, which are stable for the module lifetime. */
-extern zend_class_entry *php_get_persistent_class(int class_id, const php::Str &class_name);
-extern zend_function *php_get_persistent_func(int func_id, const php::Str &func_name);
-extern zend_function *php_get_persistent_method(int func_id,
-                                                const php::Str &method_name,
-                                                int class_id,
-                                                const php::Str &class_name);
-extern uint32_t php_get_persistent_prop(int prop_id,
-                                        const php::Str &prop_name,
-                                        int class_id,
-                                        const php::Str &class_name);
-
 /** Invoke the lexical parent constructor as part of a new-expression chain. */
 static inline php::Variant typephp_call_parent_constructor(php::Object &object,
                                                            zend_function *constructor,

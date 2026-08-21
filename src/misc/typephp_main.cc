@@ -12,7 +12,11 @@ BEGIN_EXTERN_C()
 #endif
 END_EXTERN_C()
 
-extern zend_module_entry *php_embed_get_module();
+#ifndef TYPEPHP_EMBED_GET_MODULE
+#define TYPEPHP_EMBED_GET_MODULE php_embed_get_module
+#endif
+
+extern zend_module_entry *TYPEPHP_EMBED_GET_MODULE();
 
 void module_init(zend_module_entry *module) {
     if (zend_register_module_ex(module, MODULE_PERSISTENT) == NULL) {
@@ -363,7 +367,7 @@ TYPEPHP_RUNTIME_API int typephp_runtime_init(int argc, char **argv) {
 
     php_embed_init(argc, argv);
 
-    typephp_runtime_module = php_embed_get_module();
+    typephp_runtime_module = TYPEPHP_EMBED_GET_MODULE();
     module_init(typephp_runtime_module);
 
 #if !defined(PHP_WIN32) && !defined(__wasi__)
