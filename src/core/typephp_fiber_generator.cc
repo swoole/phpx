@@ -43,6 +43,7 @@ void typephp_fiber_rethrow(const php::Var &) {
 }
 
 void typephp_register_fiber_generator_class() {}
+void typephp_unregister_fiber_generator_class() {}
 
 #else
 
@@ -55,6 +56,10 @@ extern "C" {
 }
 
 zend_class_entry *typephp_fiber_generator_ce = nullptr;
+
+namespace {
+uint32_t typephp_fiber_generator_registration_count = 0;
+}
 
 static const php::Str &typephp_fiber_str_callback() {
     static const php::Str name{ZEND_STRL("callback"), true};
@@ -642,6 +647,10 @@ static const zend_function_entry typephp_fiber_generator_methods[] = {
 // clang-format on
 
 void typephp_register_fiber_generator_class() {
+    if (typephp_fiber_generator_registration_count++ != 0) {
+        return;
+    }
+
     static zend_object_handlers object_handlers;
     zend_class_entry ce;
     INIT_CLASS_ENTRY(ce, "FiberGenerator", typephp_fiber_generator_methods);
@@ -661,6 +670,15 @@ void typephp_register_fiber_generator_class() {
     zend_declare_property_long(typephp_fiber_generator_ce, ZEND_STRL("yield_count"), 0, ZEND_ACC_PRIVATE);
     zend_declare_property_long(typephp_fiber_generator_ce, ZEND_STRL("next_index"), 0, ZEND_ACC_PRIVATE);
     zend_declare_property_null(typephp_fiber_generator_ce, ZEND_STRL("return_value"), ZEND_ACC_PRIVATE);
+}
+
+void typephp_unregister_fiber_generator_class() {
+    if (typephp_fiber_generator_registration_count == 0 || --typephp_fiber_generator_registration_count != 0) {
+        return;
+    }
+    // Zend owns the class entry. Only forget the borrowed pointer so a later
+    // complete Embed startup may register the class in the new class table.
+    typephp_fiber_generator_ce = nullptr;
 }
 
 #endif

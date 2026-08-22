@@ -201,6 +201,7 @@ file(GLOB PHPX_WASI_CORE_SOURCES CONFIGURE_DEPENDS
 )
 list(REMOVE_ITEM PHPX_WASI_CORE_SOURCES
     "${PHPX_ROOT}/src/core/literal_string.cc"
+    "${PHPX_ROOT}/src/core/typephp_fiber_generator.cc"
 )
 
 file(GLOB PHPX_WASI_STD_SOURCES CONFIGURE_DEPENDS
@@ -211,7 +212,6 @@ add_library(phpx STATIC
     ${PHPX_WASI_CORE_SOURCES}
     ${PHPX_WASI_STD_SOURCES}
     "${PHPX_ROOT}/thirdparty/wren-gc/src/wren_gc.c"
-    "${PHPX_ROOT}/src/misc/typephp_helper.cc"
 )
 
 set_target_properties(phpx PROPERTIES
@@ -276,8 +276,9 @@ install(DIRECTORY "${PHPX_ROOT}/include/std/"
     FILES_MATCHING PATTERN "*.h"
 )
 install(FILES
-    "${PHPX_ROOT}/src/misc/typephp_helper.h"
-    "${PHPX_ROOT}/src/misc/typephp_fiber_generator.h"
+    "${PHPX_ROOT}/include/typephp_helper.h"
+    "${PHPX_ROOT}/include/typephp_fiber_generator.h"
+    "${PHPX_ROOT}/include/typephp_runtime.h"
     DESTINATION include/phpx
 )
 

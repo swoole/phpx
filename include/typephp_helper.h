@@ -29,13 +29,13 @@
 using typephp_attribute_value_factory = php::Var (*)(php::Bool describe);
 
 /** Mark one persistent attribute argument for request-time value materialization. */
-void typephp_attribute_set_lazy_value_argument(zend_attribute *attribute,
-                                               uint32_t argument_index,
-                                               typephp_attribute_value_factory factory);
+PHPX_API void typephp_attribute_set_lazy_value_argument(zend_attribute *attribute,
+                                                        uint32_t argument_index,
+                                                        typephp_attribute_value_factory factory);
 
 /** Install/uninstall TypePHP's ReflectionAttribute lazy-argument handlers. */
-zend_result typephp_install_reflection_attribute_handlers();
-void typephp_uninstall_reflection_attribute_handlers();
+PHPX_API zend_result typephp_install_reflection_attribute_handlers();
+PHPX_API void typephp_uninstall_reflection_attribute_handlers();
 
 #if defined(__GNUC__) || defined(__clang__)
 #define TYPEPHP_HOT_ATTRIBUTE __attribute__((hot))
@@ -133,7 +133,7 @@ static inline Var globalsArray() {
  * TypePHP uses this only when argument unpacking hides the callback position
  * from the compiler. Ordinary callable resolution uses CallableScope instead.
  */
-class UserCodeScopeGuard final {
+class PHPX_API UserCodeScopeGuard final {
   public:
     explicit UserCodeScopeGuard(const CallableScope &scope);
     ~UserCodeScopeGuard() noexcept;
@@ -201,8 +201,8 @@ static inline void appendCallExtraNamedArgs(Array &args) {
     ZEND_HASH_FOREACH_END();
 }
 
-extern Str getCalledClass(Object &this_);
-extern zend_class_entry *getCalledCe(Object &this_);
+PHPX_API Str getCalledClass(Object &this_);
+PHPX_API zend_class_entry *getCalledCe(Object &this_);
 static inline CallableScope getCallableScope(zend_function *caller_function, Object &this_) {
     auto *called_scope = getCalledCe(this_);
     return CallableScope{
@@ -287,10 +287,10 @@ static inline php::Variant typephp_call_parent_clone(php::Object &object, zend_f
  * properties fall through to std behavior. Existing reference containers are
  * preserved by resetting their inner value.
  */
-extern void typephp_unset_typed_property(zend_object *object, zend_string *member, void **cache_slot);
+PHPX_API void typephp_unset_typed_property(zend_object *object, zend_string *member, void **cache_slot);
 
 /** Install TypePHP's property hook and asymmetric-set handlers. */
-extern void typephp_install_property_handlers(zend_class_entry *class_entry, zend_object_handlers *handlers);
+PHPX_API void typephp_install_property_handlers(zend_class_entry *class_entry, zend_object_handlers *handlers);
 
 /**
  * Create an AOT object and initialize its runtime property defaults. A class
@@ -323,16 +323,16 @@ static inline zend_object *typephp_create_object_with_defaults(zend_class_entry 
 }
 
 /** Write a dynamic property while preserving the AOT source-level class scope. */
-extern void typephp_write_property_scoped(const php::Variant &object,
-                                          const php::Variant &member,
-                                          const php::Variant &value,
-                                          zend_class_entry *scope);
+PHPX_API void typephp_write_property_scoped(const php::Variant &object,
+                                            const php::Variant &member,
+                                            const php::Variant &value,
+                                            zend_class_entry *scope);
 
 /** Read a dynamic property using the lexical scope supplied by an AOT trait wrapper. */
-extern php::Variant typephp_read_property_scoped(const php::Variant &object,
-                                                 const php::Variant &member,
-                                                 zend_class_entry *scope,
-                                                 php::AttrMode mode);
+PHPX_API php::Variant typephp_read_property_scoped(const php::Variant &object,
+                                                   const php::Variant &member,
+                                                   zend_class_entry *scope,
+                                                   php::AttrMode mode);
 
 /**
  * Return a typed C++ reference into a static-property (or object-property) zval's
