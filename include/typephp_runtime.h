@@ -14,7 +14,11 @@
 #define TYPEPHP_RUNTIME_SHUTDOWN(project) TYPEPHP_PROJECT_SYMBOL(typephp_, project, _runtime_shutdown)
 
 #ifdef _WIN32
+#ifdef TYPEPHP_RUNTIME_EXPORTS
 #define TYPEPHP_RUNTIME_API extern "C" __declspec(dllexport)
+#else
+#define TYPEPHP_RUNTIME_API extern "C" __declspec(dllimport)
+#endif
 #else
 #define TYPEPHP_RUNTIME_API extern "C" __attribute__((visibility("default")))
 #endif

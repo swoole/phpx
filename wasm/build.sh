@@ -90,6 +90,7 @@ cmake --install "${build_root}/cmake"
 
 required_files=(
     include/phpx/phpx.h
+    include/phpx/phpx_python.h
     include/phpx/typephp_helper.h
     include/gmp.h
     include/mpfr.h

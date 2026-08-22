@@ -268,6 +268,7 @@ install(FILES
     "${PHPX_ROOT}/include/phpx_big_float.h"
     "${PHPX_ROOT}/include/phpx_decimal.h"
     "${PHPX_ROOT}/include/phpx_native_gc.h"
+    "${PHPX_ROOT}/include/phpx_python.h"
     "${PHPX_ROOT}/include/phpx_std.h"
     DESTINATION include/phpx
 )
