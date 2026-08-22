@@ -103,7 +103,11 @@ class NativeRootSlot final {
   public:
     template <typename T>
     NativeRootSlot(T **slot) noexcept : slot_(slot), access_(access<T>) {
-        static_assert(std::is_object_v<T>, "Native roots must point to object types");
+        // Generated forward-declaration slots use void*. Concrete method
+        // locals use T*. Both are object-pointer representations and retain
+        // their exact slot type through access<T>().
+        static_assert(std::is_object_v<T> || std::is_void_v<T>,
+                      "Native roots must point to object types");
     }
 
     void *get() const noexcept {
