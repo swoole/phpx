@@ -35,6 +35,30 @@ TEST(caller, args) {
     ASSERT_STREQ(args.get(2).toCString(), "go");
 }
 
+TEST(caller, args_owns_a_contiguous_zval_array_and_preserves_references) {
+    Variant value = 1;
+    Reference reference = value.toReference();
+
+    Args args;
+    args.append("first");
+    args.append(reference);
+
+    ASSERT_EQ(Z_TYPE(args.ptr()[0]), IS_STRING);
+    ASSERT_EQ(Z_TYPE(args.ptr()[1]), IS_REFERENCE);
+    args.set(1, 42);
+    ASSERT_EQ(value.toInt(), 42);
+
+    Args copied = args;
+    ASSERT_EQ(copied.count(), 2u);
+    ASSERT_EQ(Z_TYPE(copied.ptr()[0]), IS_STRING);
+    ASSERT_EQ(copied.get(1).toInt(), 42);
+
+    Args moved = std::move(copied);
+    ASSERT_TRUE(copied.empty());
+    ASSERT_EQ(moved.count(), 2u);
+    ASSERT_STREQ(moved.get(0).toCString(), "first");
+}
+
 TEST(caller, func) {
     auto retval = is_dir({"/tmp"});
     ASSERT_TRUE(retval.toBool());

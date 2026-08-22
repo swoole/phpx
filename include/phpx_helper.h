@@ -91,7 +91,10 @@ static inline Int toInt(Int v) {
 }
 
 static inline Int toInt(Float v) {
-    return static_cast<Int>(v);
+    // A direct C++ floating-to-integer conversion is undefined when the value
+    // is NaN, infinite, or outside the signed range. Zend implements PHP's
+    // defined modulo conversion for those cases without invoking C++ UB.
+    return zend_dval_to_lval(v);
 }
 
 static inline Int toInt(Bool v) {

@@ -279,7 +279,7 @@ zend_result extension_after_request(int type, int module_number) {
 Array Args::toArray() const {
     Array array(params.size());
     for (const auto &param : params) {
-        array.append(param);
+        array.append(Variant(&param, Ctor::CopyRef));
     }
     return array;
 }
@@ -288,7 +288,7 @@ Variant Args::get(size_t i) const {
     if (i >= count()) {
         return null;
     }
-    return {params.at(i).const_ptr(), Ctor::CopyRef};
+    return {&params.at(i), Ctor::CopyRef};
 }
 
 Resource *getResource(const std::string &name) {

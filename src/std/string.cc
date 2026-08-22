@@ -232,43 +232,39 @@ Variant stristr(const String &haystack, const String &needle, bool before_needle
 // ========================
 
 String substr(const String &s, Int offset, const Variant &length) {
-    size_t slen = s.length();
-
-    // Handle negative offset
+    const size_t slen = s.length();
+    size_t start;
     if (offset < 0) {
-        offset = (Int) slen + offset;
-        if (offset < 0) {
-            offset = 0;
-        }
+        // Compute the magnitude without negating ZEND_LONG_MIN.
+        const size_t distance = static_cast<size_t>(-(offset + 1)) + 1;
+        start = distance > slen ? 0 : slen - distance;
+    } else {
+        start = static_cast<size_t>(offset);
     }
 
-    // If offset is beyond string length, return empty
-    if ((size_t) offset >= slen) {
+    if (start >= slen) {
         return String();
     }
 
-    size_t result_len;
+    const size_t remaining = slen - start;
+    size_t result_len = remaining;
     if (length.isNull()) {
-        // No length specified — take rest of string
-        result_len = slen - (size_t) offset;
+        // No length specified: take the remainder.
     } else {
-        Int length_int = length.toInt();
+        const Int length_int = length.toInt();
         if (length_int < 0) {
-            // Negative length means omit that many characters from the end
-            Int end = (Int) slen + length_int;
-            if (end <= offset) {
+            const size_t omitted = static_cast<size_t>(-(length_int + 1)) + 1;
+            if (omitted >= remaining) {
                 return String();
             }
-            result_len = (size_t) (end - offset);
+            result_len = remaining - omitted;
         } else {
-            result_len = (size_t) length_int;
-            if ((size_t) (offset + (Int) result_len) > slen) {
-                result_len = slen - (size_t) offset;
-            }
+            const size_t requested = static_cast<size_t>(length_int);
+            result_len = requested < remaining ? requested : remaining;
         }
     }
 
-    return String(zend_string_init(s.data() + offset, result_len, 0), Ctor::Move);
+    return String(zend_string_init(s.data() + start, result_len, 0), Ctor::Move);
 }
 
 // ========================

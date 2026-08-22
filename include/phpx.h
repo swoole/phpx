@@ -2003,12 +2003,52 @@ class Array : public Variant {
 };
 
 class Args {
-    std::vector<Variant> params;
+    // Zend consumes arguments as a real contiguous zval array. Storing
+    // Variant wrappers and reinterpret_casting their addresses to zval* relies
+    // on non-portable object layout and makes pointer arithmetic formally UB.
+    std::vector<zval> params;
+
+    void release() noexcept {
+        for (auto &param : params) {
+            zval_ptr_dtor(&param);
+        }
+        params.clear();
+    }
 
   public:
     Args() = default;
     explicit Args(size_t n) {
         params.reserve(n);
+    }
+    Args(const Args &other) : Args(other.params.size()) {
+        try {
+            for (const auto &param : other.params) {
+                append(&param);
+            }
+        } catch (...) {
+            release();
+            throw;
+        }
+    }
+    Args(Args &&other) noexcept {
+        params.swap(other.params);
+    }
+    Args &operator=(const Args &other) {
+        if (this != &other) {
+            Args copy(other);
+            params.swap(copy.params);
+        }
+        return *this;
+    }
+    Args &operator=(Args &&other) noexcept {
+        if (this != &other) {
+            release();
+            params.swap(other.params);
+        }
+        return *this;
+    }
+    ~Args() noexcept {
+        release();
     }
     explicit Args(const ArgList &args) : Args(args.size()) {
         for (const auto &arg : args) {
@@ -2026,7 +2066,9 @@ class Args {
         }
     }
     void append(const zval *zv) {
-        params.emplace_back(zv, Ctor::CopyRef);
+        ZVAL_DEINDIRECT(zv);
+        params.emplace_back();
+        ZVAL_COPY(&params.back(), zv);
     }
     void append(const Variant &v) {
         append(v.const_ptr());
@@ -2044,12 +2086,14 @@ class Args {
         return params.empty();
     }
     zval *ptr() {
-        return reinterpret_cast<zval *>(params.data());
+        return params.data();
     }
     Variant get(size_t i) const;
     void set(size_t i, const Variant &value) {
         if (i < params.size()) {
-            params[i] = value;
+            zval *target = &params[i];
+            Variant slot(target, Z_ISREF_P(target) ? Ctor::CopyRef : Ctor::Indirect);
+            slot = value;
         }
     }
     Array toArray() const;

@@ -280,6 +280,18 @@ TEST(std_misc, uniqid_more_entropy) {
     ASSERT_EQ(strncmp(prefixed.data(), "entropy_", 8), 0);
 }
 
+TEST(std_misc, uniqid_preserves_long_prefix_without_truncation) {
+    std::string prefix(4096, 'p');
+
+    auto id = fn::uniqid(prefix);
+    ASSERT_EQ(id.length(), prefix.length() + 13);
+    ASSERT_EQ(id.toStdString().compare(0, prefix.length(), prefix), 0);
+
+    auto entropy_id = fn::uniqid(prefix, true);
+    ASSERT_EQ(entropy_id.length(), prefix.length() + 23);
+    ASSERT_EQ(entropy_id.toStdString().compare(0, prefix.length(), prefix), 0);
+}
+
 // ========================
 // version_compare
 // ========================

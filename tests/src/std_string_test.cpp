@@ -1,6 +1,8 @@
 #include "phpx_test.h"
 #include "phpx_std.h"
 
+#include <limits>
+
 using namespace php;
 
 TEST(std_string, ord) {
@@ -234,6 +236,10 @@ TEST(std_string, substr) {
     ASSERT_TRUE(fn::substr("hello", 3, -3).empty());
     ASSERT_STREQ(fn::substr("hello", 1, -1).toCString(), "ell");
     ASSERT_STREQ(fn::substr("hello", 3, 50).toCString(), "lo");
+    ASSERT_STREQ(fn::substr("hello", 1, std::numeric_limits<php::Int>::max()).toCString(), "ello");
+    ASSERT_TRUE(fn::substr("hello", 1, std::numeric_limits<php::Int>::min()).empty());
+    ASSERT_STREQ(fn::substr("hello", std::numeric_limits<php::Int>::min()).toCString(), "hello");
+    ASSERT_TRUE(fn::substr("hello", std::numeric_limits<php::Int>::max()).empty());
 }
 
 TEST(std_string, str_repeat) {

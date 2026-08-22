@@ -2,6 +2,8 @@
 #include "phpx_func.h"
 #include "phpx_helper.h"
 
+#include <limits>
+
 using namespace php;
 
 // Test equals functions
@@ -34,6 +36,11 @@ TEST(helper_toInt, int_toInt) {
 
 TEST(helper_misc, toInt) {
     ASSERT_EQ(php::toInt(34.56), 34);
+    ASSERT_EQ(php::toInt(std::numeric_limits<double>::infinity()), 0);
+    ASSERT_EQ(php::toInt(-std::numeric_limits<double>::infinity()), 0);
+    ASSERT_EQ(php::toInt(std::numeric_limits<double>::quiet_NaN()), 0);
+    ASSERT_EQ(php::toInt(std::numeric_limits<double>::max()), 0);
+    ASSERT_EQ(php::toInt(9223372036854775808.0), std::numeric_limits<php::Int>::min());
 
     std::string s1("1990882");
     ASSERT_EQ(php::toInt(s1), 1990882);

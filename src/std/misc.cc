@@ -155,7 +155,6 @@ Variant print_r(const Variant &value, bool do_return) {
 // ========================
 
 static zend_string *_uniqid_hash(const String &prefix, bool more_entropy) {
-    char uniqid_buf[128];
     auto now = std::chrono::system_clock::now();
     auto duration = now.time_since_epoch();
     auto sec_dur = std::chrono::duration_cast<std::chrono::seconds>(duration);
@@ -164,23 +163,19 @@ static zend_string *_uniqid_hash(const String &prefix, bool more_entropy) {
     int usec = static_cast<int>(usec_dur.count() % 0x100000);
 
     if (more_entropy) {
-        int len = snprintf(uniqid_buf,
-                           sizeof(uniqid_buf),
-                           "%s%08" PRIx64 "%05x%.8F",
-                           prefix.length() > 0 ? prefix.data() : "",
-                           static_cast<std::uint64_t>(sec),
-                           usec,
-                           php_combined_lcg() * 10);
-        return zend_string_init(uniqid_buf, len, 0);
+        return zend_strpprintf(0,
+                               "%s%08" PRIx64 "%05x%.8F",
+                               prefix.length() > 0 ? prefix.data() : "",
+                               static_cast<std::uint64_t>(sec),
+                               usec,
+                               php_combined_lcg() * 10);
     }
 
-    int len = snprintf(uniqid_buf,
-                       sizeof(uniqid_buf),
-                       "%s%08" PRIx64 "%05x",
-                       prefix.length() > 0 ? prefix.data() : "",
-                       static_cast<std::uint64_t>(sec),
-                       usec);
-    return zend_string_init(uniqid_buf, len, 0);
+    return zend_strpprintf(0,
+                           "%s%08" PRIx64 "%05x",
+                           prefix.length() > 0 ? prefix.data() : "",
+                           static_cast<std::uint64_t>(sec),
+                           usec);
 }
 
 String uniqid(const String &prefix, bool more_entropy) {
