@@ -207,8 +207,15 @@ static PHP_MINIT_FUNCTION(phpx_gtest_runtime) {
     zend_class_entry hooked_ce;
     INIT_CLASS_ENTRY(hooked_ce, "PhpxGtestHooked", hooked_object_methods);
     gtest_hooked_ce = zend_register_internal_class(&hooked_ce);
-    zend_declare_property_string(
-        gtest_hooked_ce, ZEND_STRL("stored"), "initial", ZEND_ACC_PRIVATE);
+    // PHP 8.5 rejects refcounted defaults for internal properties, while
+    // zend_declare_property_string() still creates a refcounted zval. Build
+    // the default from a permanent interned string instead.
+    zval stored_default;
+    ZVAL_INTERNED_STR(
+        &stored_default,
+        zend_string_init_interned(ZEND_STRL("initial"), true));
+    zend_declare_property(
+        gtest_hooked_ce, ZEND_STRL("stored"), &stored_default, ZEND_ACC_PRIVATE);
 
     zval hooked_default;
     ZVAL_EMPTY_STRING(&hooked_default);
@@ -261,27 +268,18 @@ static zend_module_entry phpx_gtest_module = {
     STANDARD_MODULE_PROPERTIES,
 };
 
-static zend_module_entry *startup_gtest_module() {
-    auto *module = zend_register_module_ex(&phpx_gtest_module, MODULE_PERSISTENT);
-    if (module == nullptr || zend_startup_module_ex(module) == FAILURE) {
-        return nullptr;
-    }
-    return module;
-}
-
-static void shutdown_gtest_module(zend_module_entry *module) {
-    if (module == nullptr) {
-        return;
-    }
-    module->module_shutdown_func(module->type, module->module_number);
-    zend_hash_str_del(&module_registry, module->name, strlen(module->name));
+static int phpx_gtest_embed_startup(sapi_module_struct *sapi_module) {
+    return php_module_startup(sapi_module, &phpx_gtest_module);
 }
 
 int main(int argc, char **argv) {
-    php_embed_init(argc, argv);
-    auto *gtest_module = startup_gtest_module();
-    if (gtest_module == nullptr) {
-        php_embed_shutdown();
+    // php_embed_init() starts a request immediately after MINIT. Register the
+    // test module as an additional module so its persistent functions and
+    // classes are present before Zend snapshots the persistent-table bounds.
+    // Starting it after php_embed_init() makes PHP 8.5 treat those symbols as
+    // request-local and destroy their permanent names during request shutdown.
+    php_embed_module.startup = phpx_gtest_embed_startup;
+    if (php_embed_init(argc, argv) == FAILURE) {
         return 255;
     }
 
@@ -301,7 +299,6 @@ int main(int argc, char **argv) {
     zend_end_try();
 
     php::request_shutdown();
-    shutdown_gtest_module(gtest_module);
     php_embed_shutdown();
 
     return gtest_exit_status;
