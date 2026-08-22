@@ -15,13 +15,11 @@
 */
 
 #include "phpx.h"
+#include "runtime_init.h"
 
 #include "zend_closures.h"
 
 #include <new>
-#ifdef ZTS
-#include <mutex>
-#endif
 
 namespace php {
 
@@ -66,28 +64,13 @@ static HashTable *closure_carrier_get_gc(zend_object *object, zval **table, int 
 static void closure_carrier_free(zend_object *object);
 
 static zend_object_handlers closure_carrier_handlers;
-#ifdef ZTS
-static std::once_flag closure_carrier_handlers_once;
-#else
-static bool closure_carrier_handlers_initialized = false;
-#endif
 
-static void initialize_closure_carrier_handlers() {
-    auto initialize = []() {
-        memcpy(&closure_carrier_handlers, &std_object_handlers, sizeof(zend_object_handlers));
-        closure_carrier_handlers.offset = XtOffsetOf(ClosureCarrier, std);
-        closure_carrier_handlers.free_obj = closure_carrier_free;
-        closure_carrier_handlers.get_gc = closure_carrier_get_gc;
-        closure_carrier_handlers.clone_obj = nullptr;
-    };
-#ifdef ZTS
-    std::call_once(closure_carrier_handlers_once, initialize);
-#else
-    if (UNEXPECTED(!closure_carrier_handlers_initialized)) {
-        initialize();
-        closure_carrier_handlers_initialized = true;
-    }
-#endif
+void detail::initializeClosureCarrierHandlers() noexcept {
+    memcpy(&closure_carrier_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+    closure_carrier_handlers.offset = XtOffsetOf(ClosureCarrier, std);
+    closure_carrier_handlers.free_obj = closure_carrier_free;
+    closure_carrier_handlers.get_gc = closure_carrier_get_gc;
+    closure_carrier_handlers.clone_obj = nullptr;
 }
 
 static inline ClosureCarrier *closure_carrier_from_obj(zend_object *object) {
@@ -123,8 +106,6 @@ static zend_object *newClosureCarrier(const ClosureFn &fn,
                                       const Object &_this,
                                       const ArgList &uses,
                                       zend_function *zf) {
-    initialize_closure_carrier_handlers();
-
     auto *carrier = static_cast<ClosureCarrier *>(
         zend_object_alloc(sizeof(ClosureCarrier), zend_standard_class_def));
     try {

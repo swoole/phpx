@@ -16,6 +16,7 @@
 
 #include "phpx.h"
 #include "phpx_fake_scope_guard.h"
+#include "runtime_init.h"
 
 extern "C" {
 #include "zend_observer.h"
@@ -496,30 +497,44 @@ static void box_dtor(zend_resource *res) {
 THREAD_LOCAL static bool request_active = false;
 static int box_res_id = 0;
 #ifdef ZTS
-static std::mutex box_resource_mutex;
+static std::once_flag process_init_once;
+#else
+static bool process_initialized = false;
 #endif
 
-static bool initializeBoxResource() {
+static void initializeBoxResource() noexcept {
+    box_res_id = zend_fetch_list_dtor_id(box_res_name);
+    if (box_res_id == 0) {
+        box_res_id = zend_register_list_destructors_ex(box_dtor, nullptr, box_res_name, 0);
+    }
+    // Resource registration only fails when Zend cannot extend its process-
+    // global destructor table. PHPX cannot safely create any Box afterwards,
+    // so this is an unrecoverable runtime initialization failure.
+    if (UNEXPECTED(box_res_id <= 0)) {
+        std::fputs("PHPX fatal error: failed to register the php::box resource destructor\n", stderr);
+        std::fflush(stderr);
+        std::abort();
+    }
+}
+
+static void initializeProcessState() noexcept {
+    const auto initialize = []() noexcept {
+        initializeBoxResource();
+        detail::initializeClosureCarrierHandlers();
+        python::initializeNativeApi();
+    };
 #ifdef ZTS
-    // Zend's resource-destructor registry is process-global and its mutation
-    // API is not thread-safe. Serialize the first RINIT; NTS pays no locking
-    // or atomic cost.
-    std::lock_guard<std::mutex> lock(box_resource_mutex);
+    // Every worker enters request_init(), but Zend's resource registry and
+    // PHPX's immutable handler/API tables belong to the process. call_once()
+    // both serializes their construction and safely publishes the results.
+    std::call_once(process_init_once, initialize);
+#else
+    // NTS has no competing request threads, so avoid mutex/atomic machinery.
+    if (UNEXPECTED(!process_initialized)) {
+        initialize();
+        process_initialized = true;
+    }
 #endif
-    // A complete embed shutdown destroys the registry while PHPX remains
-    // loaded. Resolve by name on each new request so a restarted runtime never
-    // reuses the stale numeric ID from the preceding Zend instance.
-    int registered_id = zend_fetch_list_dtor_id(box_res_name);
-    if (registered_id == 0) {
-        registered_id = zend_register_list_destructors_ex(box_dtor, nullptr, box_res_name, 0);
-        if (registered_id < 0) {
-            return false;
-        }
-    }
-    if (box_res_id != registered_id) {
-        box_res_id = registered_id;
-    }
-    return true;
 }
 
 int getBoxResourceId() {
@@ -530,10 +545,7 @@ void request_init() {
     if (request_active) {
         return;
     }
-    if (UNEXPECTED(!initializeBoxResource())) {
-        throwError("failed to register box resource");
-        return;
-    }
+    initializeProcessState();
     initDecimalContext();
     nativeGcRequestInit();
     request_active = true;

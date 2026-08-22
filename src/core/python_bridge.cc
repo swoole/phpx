@@ -1,4 +1,5 @@
 #include "phpx_python.h"
+#include "runtime_init.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -26,6 +27,8 @@ struct NativeApi {
     zend_result (*construct)(uint32_t constructor, const zval *argument, zend_bool has_argument, zval *result);
     zend_result (*call)(const zval *object, uint32_t argc, zval *argv, zend_array *named_args, zval *result);
 };
+
+const NativeApi *native_api = nullptr;
 
 using GetNativeApi = const NativeApi *(*) (uint32_t requested_abi);
 
@@ -63,10 +66,6 @@ const NativeApi *resolveApi() {
 }
 
 const NativeApi &api() {
-    // Internal modules and their exported ABI tables are immutable after
-    // MINIT. Function-local static initialization is thread-safe, while all
-    // ZTS workers intentionally share the same read-only table.
-    static const NativeApi *native_api = resolveApi();
     if (UNEXPECTED(native_api == nullptr)) {
         throwError("phpy native API is unavailable or ABI-incompatible");
     }
@@ -89,6 +88,13 @@ Variant takeResult(zval &result, zend_result status) {
 }
 
 }  // namespace
+
+void initializeNativeApi() noexcept {
+    // PHP modules and their exported ABI tables are immutable after MINIT.
+    // request_init() publishes this process-wide pointer before user code can
+    // enter the Python bridge.
+    native_api = resolveApi();
+}
 
 void configureRuntime(bool return_as_object) {
     check(api().configure_runtime(return_as_object));
