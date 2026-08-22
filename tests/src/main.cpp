@@ -1,5 +1,6 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
+#include "typephp_fiber_generator.h"
 
 #include <cerrno>
 #include <cstring>
@@ -63,6 +64,18 @@ void try_call(const std::function<void(void)> &fn, const php::String &msg, bool 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_void, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_mixed, 0, 0, IS_MIXED, 0)
+ZEND_END_ARG_INFO()
+
+static php::Array generator_payload(const php::Var &value,
+                                    const php::Var &key = php::null,
+                                    bool has_key = false) {
+    if (has_key) {
+        return php::Array(php::StdStrKeyMap{{"key", key}, {"value", value}, {"has_key", true}});
+    }
+    return php::Array(php::StdStrKeyMap{{"value", value}, {"has_key", false}});
+}
+
 static int gtest_exit_status = 0;
 
 static void php_main() {
@@ -73,11 +86,98 @@ static ZEND_FUNCTION(main) {
     php_main();
 }
 
-static const zend_function_entry ext_functions[] = {ZEND_FE(main, arginfo_void) ZEND_FE_END};
+static ZEND_FUNCTION(phpx_test_generator_sequence) {
+    try {
+        bool closed = false;
+        php::Var sent = typephp_fiber_suspend(generator_payload(10), &closed);
+        if (closed) {
+            RETURN_NULL();
+        }
+        typephp_fiber_suspend(generator_payload(sent, 7, true), &closed);
+        RETURN_LONG(42);
+    } catch (zend_object *exception) {
+        ZEND_ASSERT(EG(exception) == exception);
+    }
+}
+
+static ZEND_FUNCTION(phpx_test_generator_yield_from_array) {
+    try {
+        php::Array values;
+        values.set("first", "A");
+        values.set(3, "B");
+        bool closed = false;
+        typephp_fiber_yield_from(values, &closed);
+        RETURN_LONG(21);
+    } catch (zend_object *exception) {
+        ZEND_ASSERT(EG(exception) == exception);
+    }
+}
+
+static ZEND_FUNCTION(phpx_test_generator_yield_from_generator) {
+    try {
+        php::Var iterator = php::eval("return (function () { yield 'nested' => 5; return 77; })();");
+        bool closed = false;
+        php::Var result = typephp_fiber_yield_from(iterator, &closed);
+        ZVAL_COPY(return_value, result.const_ptr());
+    } catch (zend_object *exception) {
+        ZEND_ASSERT(EG(exception) == exception);
+    }
+}
+
+static const zend_function_entry ext_functions[] = {
+    ZEND_FE(main, arginfo_void)
+    ZEND_FE(phpx_test_generator_sequence, arginfo_mixed)
+    ZEND_FE(phpx_test_generator_yield_from_array, arginfo_mixed)
+    ZEND_FE(phpx_test_generator_yield_from_generator, arginfo_mixed)
+    ZEND_FE_END
+};
+
+static PHP_MINIT_FUNCTION(phpx_gtest_runtime) {
+    typephp_register_fiber_generator_class();
+    return SUCCESS;
+}
+
+static PHP_MSHUTDOWN_FUNCTION(phpx_gtest_runtime) {
+    typephp_unregister_fiber_generator_class();
+    return SUCCESS;
+}
+
+static zend_module_entry phpx_gtest_module = {
+    STANDARD_MODULE_HEADER,
+    "phpx_gtest_runtime",
+    ext_functions,
+    PHP_MINIT(phpx_gtest_runtime),
+    PHP_MSHUTDOWN(phpx_gtest_runtime),
+    nullptr,
+    nullptr,
+    nullptr,
+    "test",
+    STANDARD_MODULE_PROPERTIES,
+};
+
+static zend_module_entry *startup_gtest_module() {
+    auto *module = zend_register_module_ex(&phpx_gtest_module, MODULE_PERSISTENT);
+    if (module == nullptr || zend_startup_module_ex(module) == FAILURE) {
+        return nullptr;
+    }
+    return module;
+}
+
+static void shutdown_gtest_module(zend_module_entry *module) {
+    if (module == nullptr) {
+        return;
+    }
+    module->module_shutdown_func(module->type, module->module_number);
+    zend_hash_str_del(&module_registry, module->name, strlen(module->name));
+}
 
 int main(int argc, char **argv) {
     php_embed_init(argc, argv);
-    zend_register_functions(nullptr, ext_functions, nullptr, 0);
+    auto *gtest_module = startup_gtest_module();
+    if (gtest_module == nullptr) {
+        php_embed_shutdown();
+        return 255;
+    }
 
     php::request_init();
     init_root_path(argv[0]);
@@ -95,6 +195,7 @@ int main(int argc, char **argv) {
     zend_end_try();
 
     php::request_shutdown();
+    shutdown_gtest_module(gtest_module);
     php_embed_shutdown();
 
     return gtest_exit_status;
