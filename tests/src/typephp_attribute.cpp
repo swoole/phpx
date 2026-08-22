@@ -32,6 +32,50 @@ zend_function *lazy_attribute_target() {
 
             #[PhpxOrdinaryAttribute(9)]
             function phpx_ordinary_attribute_target(): void {}
+
+            #[Attribute]
+            class PhpxNoConstructorAttribute {}
+            #[PhpxNoConstructorAttribute(1)]
+            function phpx_no_constructor_attribute_target(): void {}
+
+            #[Attribute]
+            class PhpxPrivateConstructorAttribute {
+                private function __construct(mixed $value) {}
+            }
+            #[PhpxPrivateConstructorAttribute(1)]
+            function phpx_private_constructor_attribute_target(): void {}
+
+            #[Attribute]
+            class PhpxThrowingConstructorAttribute {
+                public function __construct(mixed $value) {
+                    throw new RuntimeException('attribute constructor failure');
+                }
+            }
+            #[PhpxThrowingConstructorAttribute(1)]
+            function phpx_throwing_constructor_attribute_target(): void {}
+
+            #[Attribute(Attribute::TARGET_CLASS)]
+            class PhpxClassOnlyAttribute {
+                public function __construct(mixed $value) {}
+            }
+            #[PhpxClassOnlyAttribute(1)]
+            function phpx_wrong_target_attribute_target(): void {}
+
+            #[Attribute]
+            class PhpxNonRepeatableAttribute {
+                public function __construct(mixed $value) {}
+            }
+            #[PhpxNonRepeatableAttribute(1), PhpxNonRepeatableAttribute(2)]
+            function phpx_repeated_attribute_target(): void {}
+
+            class PhpxNotAnAttribute {
+                public function __construct(mixed $value) {}
+            }
+            #[PhpxNotAnAttribute(1)]
+            function phpx_non_attribute_target(): void {}
+
+            #[PhpxMissingAttribute(1)]
+            function phpx_missing_attribute_target(): void {}
         )PHP");
         function = getFunction("phpx_lazy_attribute_target");
     }
@@ -46,6 +90,14 @@ Object first_reflection_attribute(const char *function_name) {
     auto reflection = newObject("ReflectionFunction", {function_name});
     Array attributes = reflection.call("getAttributes").toArray();
     return Object(attributes.get(0));
+}
+
+void make_first_attribute_argument_lazy(const char *function_name, const char *attribute_name) {
+    auto *function = getFunction(function_name);
+    auto *attribute = find_attribute(function, attribute_name, strlen(attribute_name));
+    ASSERT_NE(attribute, nullptr);
+    ASSERT_GT(attribute->argc, 0u);
+    typephp_attribute_set_lazy_value_argument(attribute, 0, lazy_attribute_value);
 }
 
 class ReflectionAttributeHooks final {
@@ -118,4 +170,49 @@ TEST(typephp_attribute, ordinary_attributes_use_original_reflection_handlers) {
     ASSERT_EQ(arguments.get(0).toInt(), 9);
     ASSERT_EQ(reflection_attribute.call("newInstance").toObject().attr("value").toInt(), 9);
     ASSERT_NE(reflection_attribute.call("__toString").toStdString().find("PhpxOrdinaryAttribute"), std::string::npos);
+}
+
+TEST(typephp_attribute, lazy_instantiation_reports_invalid_attribute_definitions) {
+    (void) lazy_attribute_target();
+    ReflectionAttributeHooks hooks;
+    ASSERT_TRUE(hooks.installed());
+
+    make_first_attribute_argument_lazy(
+        "phpx_no_constructor_attribute_target", "phpxnoconstructorattribute");
+    auto no_constructor = first_reflection_attribute("phpx_no_constructor_attribute_target");
+    try_call(
+        [&]() { no_constructor.call("newInstance"); },
+        "does not have a constructor, cannot pass arguments");
+
+    make_first_attribute_argument_lazy(
+        "phpx_private_constructor_attribute_target", "phpxprivateconstructorattribute");
+    auto private_constructor = first_reflection_attribute("phpx_private_constructor_attribute_target");
+    try_call(
+        [&]() { private_constructor.call("newInstance"); },
+        "Attribute constructor of class PhpxPrivateConstructorAttribute must be public");
+
+    make_first_attribute_argument_lazy(
+        "phpx_throwing_constructor_attribute_target", "phpxthrowingconstructorattribute");
+    auto throwing_constructor = first_reflection_attribute("phpx_throwing_constructor_attribute_target");
+    try_call([&]() { throwing_constructor.call("newInstance"); }, "attribute constructor failure");
+
+    make_first_attribute_argument_lazy(
+        "phpx_wrong_target_attribute_target", "phpxclassonlyattribute");
+    auto wrong_target = first_reflection_attribute("phpx_wrong_target_attribute_target");
+    try_call([&]() { wrong_target.call("newInstance"); }, "cannot target function");
+
+    make_first_attribute_argument_lazy(
+        "phpx_repeated_attribute_target", "phpxnonrepeatableattribute");
+    auto repeated = first_reflection_attribute("phpx_repeated_attribute_target");
+    try_call([&]() { repeated.call("newInstance"); }, "must not be repeated");
+
+    make_first_attribute_argument_lazy(
+        "phpx_non_attribute_target", "phpxnotanattribute");
+    auto non_attribute = first_reflection_attribute("phpx_non_attribute_target");
+    try_call([&]() { non_attribute.call("newInstance"); }, "Attempting to use non-attribute class");
+
+    make_first_attribute_argument_lazy(
+        "phpx_missing_attribute_target", "phpxmissingattribute");
+    auto missing_attribute = first_reflection_attribute("phpx_missing_attribute_target");
+    try_call([&]() { missing_attribute.call("newInstance"); }, "Attribute class \"PhpxMissingAttribute\" not found");
 }

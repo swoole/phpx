@@ -381,3 +381,31 @@ TEST(decimal, boolean_conversion_uses_numeric_value) {
     ASSERT_FALSE(Decimal::toBool(zero).toBool());
     ASSERT_TRUE(Decimal::toBool(nonzero).toBool());
 }
+
+TEST(decimal, invalid_operands_report_type_errors) {
+    Variant invalid = Array{};
+    auto one = Decimal::newInstance(Variant(1));
+
+    try_call([]() { Decimal::newInstance(1.5); }, "Cannot construct Decimal from float");
+    try_call([&]() { Decimal::add(invalid, one); }, "expects valid Decimal argument");
+    try_call([&]() { Decimal::sub(invalid, one); }, "expects valid Decimal argument");
+    try_call([&]() { Decimal::mul(invalid, one); }, "expects valid Decimal argument");
+    try_call([&]() { Decimal::div(invalid, one); }, "expects valid Decimal argument");
+    try_call([&]() { Decimal::mod(invalid, one); }, "expects valid Decimal argument");
+    try_call([&]() { Decimal::neg(invalid); }, "expects valid Decimal argument");
+    try_call([&]() { Decimal::cmp(invalid, one); }, "expects valid Decimal argument");
+    try_call([&]() { Decimal::abs(invalid); }, "expects valid Decimal argument");
+    try_call([&]() { Decimal::pow(invalid, one); }, "expects valid Decimal argument");
+    try_call([&]() { Decimal::divmod(invalid, one); }, "expects valid Decimal argument");
+    try_call([&]() { Decimal::powmod(invalid, one, one); }, "expects valid Decimal argument");
+    try_call([&]() { Decimal::sqrt(invalid); }, "expects valid Decimal argument");
+    try_call([&]() { Decimal::floor(invalid); }, "expects valid Decimal argument");
+    try_call([&]() { Decimal::ceil(invalid); }, "expects valid Decimal argument");
+    try_call([&]() { Decimal::round(invalid); }, "expects valid Decimal argument");
+    try_call([&]() { Decimal::toString(invalid); }, "expects Decimal argument");
+    try_call([&]() { Decimal::toInt(invalid); }, "expects Decimal argument");
+    try_call([&]() { Decimal::toFloat(invalid); }, "expects Decimal argument");
+    try_call([&]() { Decimal::toBool(invalid); }, "expects Decimal argument");
+
+    try_call([]() { Decimal::sqrt(Decimal::newInstance(Variant(-1))); }, "invalid operation");
+}

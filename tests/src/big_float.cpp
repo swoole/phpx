@@ -368,3 +368,24 @@ TEST(bigfloat, huge_exponent_uses_bounded_scientific_notation) {
     ASSERT_LT(output.length(), 100u);
     ASSERT_NE(std::strstr(output.data(), "E1000001"), nullptr);
 }
+
+TEST(bigfloat, invalid_operands_report_type_errors) {
+    Variant invalid = Array{};
+    auto one = BigFloat::newInstance(Variant(1));
+
+    try_call([&]() { BigFloat::newInstance(invalid); }, "expects valid BigFloat argument");
+    try_call([&]() { BigFloat::add(invalid, one); }, "expects valid BigFloat argument");
+    try_call([&]() { BigFloat::sub(invalid, one); }, "expects valid BigFloat argument");
+    try_call([&]() { BigFloat::mul(invalid, one); }, "expects valid BigFloat argument");
+    try_call([&]() { BigFloat::div(invalid, one); }, "expects valid BigFloat argument");
+    try_call([&]() { BigFloat::neg(invalid); }, "expects valid BigFloat argument");
+    try_call([&]() { BigFloat::cmp(invalid, one); }, "expects valid BigFloat argument");
+    try_call([&]() { BigFloat::abs(invalid); }, "expects valid BigFloat argument");
+    try_call([&]() { BigFloat::sqrt(invalid); }, "expects valid BigFloat argument");
+    try_call([&]() { BigFloat::toString(invalid); }, "expects BigFloat argument");
+    try_call([&]() { BigFloat::toInt(invalid); }, "expects BigFloat argument");
+    try_call([&]() { BigFloat::toFloat(invalid); }, "expects BigFloat argument");
+    try_call([&]() { BigFloat::toBool(invalid); }, "expects BigFloat argument");
+
+    try_call([]() { BigFloat::sqrt(BigFloat::newInstance(Variant(-1))); }, "square root of negative number");
+}

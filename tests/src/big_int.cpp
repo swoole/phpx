@@ -584,3 +584,42 @@ TEST(bigint, invalid_numeric_string_throws_value_error) {
     }
     ASSERT_TRUE(exception_caught);
 }
+
+TEST(bigint, invalid_operands_report_type_errors) {
+    Variant invalid = Array{};
+    auto one = bi(1);
+
+    try_call([]() { BigInt::newInstance(1.5); }, "Cannot construct BigInt from float");
+    try_call([&]() { BigInt::add(invalid, one); }, "expects BigInt argument");
+    try_call([&]() { BigInt::sub(invalid, one); }, "expects BigInt argument");
+    try_call([&]() { BigInt::mul(invalid, one); }, "expects BigInt argument");
+    try_call([&]() { BigInt::div(invalid, one); }, "expects BigInt argument");
+    try_call([&]() { BigInt::mod(invalid, one); }, "expects BigInt argument");
+    try_call([&]() { BigInt::pow(invalid, one); }, "expects BigInt argument");
+    try_call([&]() { BigInt::neg(invalid); }, "expects BigInt argument");
+    try_call([&]() { BigInt::cmp(invalid, one); }, "expects BigInt argument");
+    try_call([&]() { BigInt::abs(invalid); }, "expects BigInt argument");
+    try_call([&]() { BigInt::gcd(invalid, one); }, "expects BigInt argument");
+    try_call([&]() { BigInt::divmod(invalid, one); }, "expects BigInt argument");
+    try_call([&]() { BigInt::powmod(invalid, one, one); }, "expects BigInt argument");
+    try_call([&]() { BigInt::sqrt(invalid); }, "expects BigInt argument");
+    try_call([&]() { BigInt::bitAnd(invalid, one); }, "expects BigInt argument");
+    try_call([&]() { BigInt::bitOr(invalid, one); }, "expects BigInt argument");
+    try_call([&]() { BigInt::bitXor(invalid, one); }, "expects BigInt argument");
+    try_call([&]() { BigInt::bitNot(invalid); }, "expects BigInt argument");
+    try_call([&]() { BigInt::testBit(invalid, 0); }, "expects BigInt argument");
+    try_call([&]() { BigInt::popCount(invalid); }, "expects BigInt argument");
+    try_call([&]() { BigInt::bitShiftLeft(invalid, 1); }, "expects BigInt argument");
+    try_call([&]() { BigInt::bitShiftRight(invalid, 1); }, "expects BigInt argument");
+    try_call([&]() { BigInt::toString(invalid); }, "toString expects BigInt argument");
+    try_call([&]() { BigInt::toInt(invalid); }, "toInt expects BigInt argument");
+    try_call([&]() { BigInt::toFloat(invalid); }, "toFloat expects BigInt argument");
+    try_call([&]() { BigInt::toBool(invalid); }, "toBool expects BigInt argument");
+
+    try_call([&]() { BigInt::testBit(one, "zero"); }, "testBit expects int index");
+    try_call([&]() { BigInt::testBit(one, -1); }, "index must be non-negative");
+    try_call([&]() { BigInt::bitShiftLeft(one, "one"); }, "expects int shift amount");
+    try_call([&]() { BigInt::bitShiftLeft(one, -1); }, "must be non-negative");
+    try_call([&]() { BigInt::bitShiftRight(one, "one"); }, "expects int shift amount");
+    try_call([&]() { BigInt::bitShiftRight(one, -1); }, "must be non-negative");
+}

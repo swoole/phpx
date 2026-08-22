@@ -134,6 +134,10 @@ TEST(closure, scoped_callable_preserves_private_and_magic_dispatch) {
                 return $value * 4;
             }
 
+            public static function publicStaticMultiply(int $value): int {
+                return $value * 5;
+            }
+
             public function __call(string $name, array $args): string {
                 return 'magic:' . $name . ':' . $args[0];
             }
@@ -207,6 +211,53 @@ TEST(closure, normalize_callable_class_resolves_relative_class_names) {
     Args unpacked{ArgList{Array{"static", "multiply"}, 1}};
     normalizeCallableClass(unpacked, 0, scope);
     ASSERT_STREQ(unpacked.get(0).toArray().get(0).toCString(), "PhpxScopedCallableChild");
+
+    Variant scalar = "strlen";
+    ASSERT_TRUE(normalizeCallableClass(scalar, scope).equals(scalar));
+
+    Array incomplete{"self"};
+    ASSERT_EQ(normalizeCallableClass(incomplete, scope).toArray().array(), incomplete.array());
+
+    Array non_string_class{object, "multiply"};
+    ASSERT_EQ(normalizeCallableClass(non_string_class, scope).toArray().array(), non_string_class.array());
+
+    auto *base_scope = getClassEntry("PhpxScopedCallableBase");
+    CallableScope base_context{getMethod(lexical_scope, "multiply"), base_scope, nullptr};
+    Array missing_parent{"parent", "multiply"};
+    ASSERT_EQ(normalizeCallableClass(missing_parent, base_context).toArray().array(), missing_parent.array());
+
+    Args unchanged_args{ArgList{1}};
+    normalizeCallableClass(unchanged_args, 5, scope);
+    ASSERT_EQ(unchanged_args.count(), 1u);
+}
+
+TEST(closure, scoped_callable_validates_scope_and_callback) {
+    CallableScope invalid_scope{nullptr, nullptr, nullptr};
+    try_call(
+        [&]() { makeScopedCallable("strlen", invalid_scope); },
+        "Explicit callable scope must not be null");
+
+    auto *scope_ce = getClassEntry("PhpxScopedCallableTarget");
+    Object object = newObject(scope_ce);
+    CallableScope scope{getMethod(scope_ce, "multiply"), scope_ce, object.object()};
+    try_call(
+        [&]() { makeScopedCallable("function_that_does_not_exist", scope); },
+        "Invalid callback function_that_does_not_exist");
+
+    Variant existing = eval("return static fn(int $value): int => $value + 1;");
+    Variant prepared = prepareScopedCallback(existing, scope);
+    ASSERT_EQ(prepared.object(), existing.object());
+
+    Variant public_function = "strlen";
+    Variant reusable = prepareScopedCallback(public_function, scope);
+    ASSERT_TRUE(reusable.isString());
+    ASSERT_EQ(call(reusable, {"phpx"}).toInt(), 4);
+
+    Object static_callable = makeScopedCallable("PhpxScopedCallableTarget::publicStaticMultiply", scope);
+    ASSERT_EQ(static_callable({2}).toInt(), 10);
+
+    Object relative_static = prepareScopedCallback("self::publicStaticMultiply", scope).toObject();
+    ASSERT_EQ(relative_static({3}).toInt(), 15);
 }
 
 TEST(closure, call_is_rejected_without_type_confusion) {
