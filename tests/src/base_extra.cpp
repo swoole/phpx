@@ -4,6 +4,15 @@
 
 using namespace php;
 
+TEST(base_extra, args_to_array_preserves_order) {
+    Args args{ArgList{1, "two", true}};
+    Array values = args.toArray();
+    ASSERT_EQ(values.count(), 3);
+    ASSERT_EQ(values.get(0).toInt(), 1);
+    ASSERT_STREQ(values.get(1).toCString(), "two");
+    ASSERT_TRUE(values.get(2).toBool());
+}
+
 // Test include with REQUIRE type
 TEST(base_extra, include_require) {
     auto rs = include(get_include_dir() + "/../include/return_const.php", REQUIRE);

@@ -4,6 +4,18 @@
 
 using namespace php;
 
+TEST(array_extra, zend_string_key_initializer_and_assignment) {
+    String first_key{"first"};
+    String second_key{"second"};
+
+    Array first(StrKeyMap{{first_key.str(), 1}});
+    ASSERT_EQ(first.get(first_key).toInt(), 1);
+
+    Array second;
+    second = StrKeyMap{{second_key.str(), 2}};
+    ASSERT_EQ(second.get(second_key).toInt(), 2);
+}
+
 // Test search with strict mode
 TEST(array_extra, search_strict) {
     Array arr = create_map();

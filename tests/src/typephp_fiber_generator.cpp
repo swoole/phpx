@@ -89,6 +89,24 @@ TEST(typephp_fiber_generator, yield_from_generator_returns_delegated_result) {
     ASSERT_EQ(generator.call("getReturn").toInt(), 77);
 }
 
+TEST(typephp_fiber_generator, yield_from_iterator_aggregate_uses_get_iterator) {
+    auto generator = typephp_new_fiber_generator("phpx_test_generator_yield_from_iterator_aggregate");
+
+    ASSERT_EQ(generator.call("current").toInt(), 12);
+    ASSERT_STREQ(generator.call("key").toCString(), "aggregate");
+    generator.call("next");
+    ASSERT_EQ(generator.call("getReturn").toInt(), 33);
+}
+
+TEST(typephp_fiber_generator, yield_from_generator_forwards_send_value) {
+    auto generator = typephp_new_fiber_generator("phpx_test_generator_yield_from_send");
+
+    ASSERT_STREQ(generator.call("current").toCString(), "initial");
+    ASSERT_STREQ(generator.call("send", {"forwarded"}).toCString(), "forwarded");
+    generator.call("next");
+    ASSERT_EQ(generator.call("getReturn").toInt(), 99);
+}
+
 TEST(typephp_fiber_generator, suspend_outside_fiber_reports_error) {
     bool closed = false;
     try_call(

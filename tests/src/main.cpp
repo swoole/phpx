@@ -157,11 +157,47 @@ static ZEND_FUNCTION(phpx_test_generator_yield_from_generator) {
     }
 }
 
+static ZEND_FUNCTION(phpx_test_generator_yield_from_iterator_aggregate) {
+    try {
+        php::Var iterator = php::eval(R"PHP(
+            return new class implements IteratorAggregate {
+                public function getIterator(): Traversable {
+                    return new ArrayIterator(['aggregate' => 12]);
+                }
+            };
+        )PHP");
+        bool closed = false;
+        typephp_fiber_yield_from(iterator, &closed);
+        RETURN_LONG(33);
+    } catch (zend_object *exception) {
+        ZEND_ASSERT(EG(exception) == exception);
+    }
+}
+
+static ZEND_FUNCTION(phpx_test_generator_yield_from_send) {
+    try {
+        php::Var iterator = php::eval(R"PHP(
+            return (function () {
+                $sent = yield 'initial';
+                yield $sent;
+                return 99;
+            })();
+        )PHP");
+        bool closed = false;
+        php::Var result = typephp_fiber_yield_from(iterator, &closed);
+        ZVAL_COPY(return_value, result.const_ptr());
+    } catch (zend_object *exception) {
+        ZEND_ASSERT(EG(exception) == exception);
+    }
+}
+
 static const zend_function_entry ext_functions[] = {
     ZEND_FE(main, arginfo_void)
     ZEND_FE(phpx_test_generator_sequence, arginfo_mixed)
     ZEND_FE(phpx_test_generator_yield_from_array, arginfo_mixed)
     ZEND_FE(phpx_test_generator_yield_from_generator, arginfo_mixed)
+    ZEND_FE(phpx_test_generator_yield_from_iterator_aggregate, arginfo_mixed)
+    ZEND_FE(phpx_test_generator_yield_from_send, arginfo_mixed)
     ZEND_FE_END
 };
 

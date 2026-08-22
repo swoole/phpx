@@ -274,4 +274,65 @@ TEST(foreach_iterator, rewind_exception_releases_iterator) {
 
 TEST(foreach_iterator, rejects_invalid_value_and_object_reference) {
     try_call([]() { ForeachIterator iterator(42); }, "foreach() argument must be of type array|object");
+
+    Array values{1};
+    ForeachIterator by_value(values);
+    ASSERT_TRUE(by_value.next());
+    try_call([&by_value]() { (void) by_value.valueRef(); }, "Cannot use & with foreach");
+}
+
+TEST(foreach_iterator, object_iterator_propagates_iteration_method_exceptions) {
+    eval(R"PHP(
+        class PhpxForeachExceptionalIterator implements Iterator {
+            private int $position = 0;
+            public function __construct(private string $failure) {}
+            public function rewind(): void { $this->position = 0; }
+            public function valid(): bool {
+                if ($this->failure === 'valid') { throw new RuntimeException('valid failure'); }
+                return $this->position < 2;
+            }
+            public function current(): mixed {
+                if ($this->failure === 'current') { throw new RuntimeException('current failure'); }
+                return $this->position;
+            }
+            public function key(): mixed {
+                if ($this->failure === 'key') { throw new RuntimeException('key failure'); }
+                return $this->position;
+            }
+            public function next(): void {
+                if ($this->failure === 'next') { throw new RuntimeException('next failure'); }
+                ++$this->position;
+            }
+        }
+    )PHP");
+
+    auto create = [](const char *failure) {
+        return newObject("PhpxForeachExceptionalIterator", {failure});
+    };
+
+    auto valid = create("valid");
+    try_call([&valid]() {
+        ForeachIterator iterator(valid);
+        (void) iterator.next();
+    }, "valid failure");
+
+    auto current = create("current");
+    try_call([&current]() {
+        ForeachIterator iterator(current);
+        ASSERT_TRUE(iterator.next());
+    }, "current failure");
+
+    auto key = create("key");
+    try_call([&key]() {
+        ForeachIterator iterator(key);
+        ASSERT_TRUE(iterator.next());
+        (void) iterator.key();
+    }, "key failure");
+
+    auto next = create("next");
+    try_call([&next]() {
+        ForeachIterator iterator(next);
+        ASSERT_TRUE(iterator.next());
+        (void) iterator.next();
+    }, "next failure");
 }
