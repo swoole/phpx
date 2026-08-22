@@ -85,6 +85,15 @@ TEST(variant_edge, append_string) {
     ASSERT_STREQ(s.toCString(), "hello world123 php");
 }
 
+TEST(variant_edge, writable_string_item_normalizes_negative_offset) {
+    var value("abc");
+    value.item(-1, true) = "Z";
+    ASSERT_STREQ(value.toCString(), "abZ");
+
+    try_call([&value]() { value.item(-4, true) = "X"; }, "String offset `-4` out of range");
+    ASSERT_STREQ(value.toCString(), "abZ");
+}
+
 // Test append on object via Variant (ArrayObject has offsetSet)
 TEST(variant_edge, append_object) {
     auto o = newObject("ArrayObject");

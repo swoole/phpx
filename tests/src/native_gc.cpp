@@ -132,7 +132,7 @@ TEST(native_gc, root_frame_traces_native_graph)
     root->child = php::nativeNew<NativeGcNode>(nativeNodeType);
     root->child->counters = &counters;
 
-    php::NativeRootSlot slots[] = {reinterpret_cast<void **>(&root)};
+    php::NativeRootSlot slots[] = {&root};
     {
         php::NativeRootFrame frame(slots, 1);
         php::nativeGcCollect();
@@ -154,8 +154,8 @@ TEST(native_gc, root_frames_survive_non_lifo_fiber_lifetimes)
     NativeGcNode *second = php::nativeNew<NativeGcNode>(nativeNodeType);
     first->counters = &counters;
     second->counters = &counters;
-    php::NativeRootSlot firstSlots[] = {reinterpret_cast<void **>(&first)};
-    php::NativeRootSlot secondSlots[] = {reinterpret_cast<void **>(&second)};
+    php::NativeRootSlot firstSlots[] = {&first};
+    php::NativeRootSlot secondSlots[] = {&second};
 
     // A Fiber can suspend the older C++ stack, create a newer root frame on
     // another stack, then resume and destroy the older frame first.
@@ -182,7 +182,7 @@ TEST(native_gc, request_root_keeps_global_slot_alive)
     NativeGcCounters counters;
     requestRoot = php::nativeNew<NativeGcNode>(nativeNodeType);
     requestRoot->counters = &counters;
-    php::nativeGcRegisterRequestRoot(reinterpret_cast<void **>(&requestRoot));
+    php::nativeGcRegisterRequestRoot(&requestRoot);
 
     php::nativeGcCollect();
     EXPECT_EQ(1u, php::nativeGcStats().objectCount);
@@ -264,7 +264,7 @@ TEST(native_gc, shutdown_clears_roots_written_by_finalizers)
     NativeGcCounters counters;
     shutdownResurrectionRoot = php::nativeNew<NativeGcNode>(shutdownResurrectionType);
     shutdownResurrectionRoot->counters = &counters;
-    php::nativeGcRegisterRequestRoot(reinterpret_cast<void **>(&shutdownResurrectionRoot));
+    php::nativeGcRegisterRequestRoot(&shutdownResurrectionRoot);
 
     php::request_shutdown();
 
@@ -282,7 +282,7 @@ TEST(native_gc, shutdown_detaches_frames_owned_by_suspended_fibers)
     NativeGcCounters counters;
     NativeGcNode *value = php::nativeNew<NativeGcNode>(nativeNodeType);
     value->counters = &counters;
-    php::NativeRootSlot slots[] = {reinterpret_cast<void **>(&value)};
+    php::NativeRootSlot slots[] = {&value};
     auto *suspendedFrame = new php::NativeRootFrame(slots, 1);
 
     php::nativeGcRequestShutdown();
@@ -309,7 +309,7 @@ TEST(native_gc, finalizer_can_resurrect_into_request_root_once)
     requestRoot = php::nativeNew<NativeGcNode>(resurrectionType);
     requestRoot->counters = &counters;
     requestRoot->resurrectionRoot = &requestRoot;
-    php::nativeGcRegisterRequestRoot(reinterpret_cast<void **>(&requestRoot));
+    php::nativeGcRegisterRequestRoot(&requestRoot);
 
     requestRoot = nullptr;
     php::nativeGcCollect();
@@ -392,7 +392,7 @@ TEST(native_gc, failed_published_construction_survives_without_finalizer)
 {
     static NativeGcNode *published = nullptr;
     NativeGcCounters counters;
-    php::nativeGcRegisterRequestRoot(reinterpret_cast<void **>(&published));
+    php::nativeGcRegisterRequestRoot(&published);
 
     EXPECT_THROW(
         php::nativeConstruct<NativeGcNode>(nativeNodeType, [&](NativeGcNode &node) {

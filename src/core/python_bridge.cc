@@ -63,8 +63,9 @@ const NativeApi *resolveApi() {
 }
 
 const NativeApi &api() {
-    // PHP modules are fixed after MINIT. C++ local-static initialization also
-    // makes this process-wide cache race-free in ZTS builds.
+    // Internal modules and their exported ABI tables are immutable after
+    // MINIT. Function-local static initialization is thread-safe, while all
+    // ZTS workers intentionally share the same read-only table.
     static const NativeApi *native_api = resolveApi();
     if (UNEXPECTED(native_api == nullptr)) {
         throwError("phpy native API is unavailable or ABI-incompatible");

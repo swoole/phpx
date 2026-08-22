@@ -1555,9 +1555,7 @@ class String : public Variant {
     }
     Array match(const String &regx, Int flags = 0, Int start_offset = 0);
     Array matchAll(const String &regx, Int flags = 0, Int start_offset = 0);
-    Int offset(Int _offset) const {
-        size_t len = length();
-
+    static Int normalizeOffset(Int _offset, size_t len) {
         if (_offset < 0) {
             // Avoid signed overflow for ZEND_LONG_MIN.
             size_t distance = static_cast<size_t>(-(_offset + 1)) + 1;
@@ -1569,8 +1567,11 @@ class String : public Variant {
             if (UNEXPECTED(static_cast<size_t>(_offset) >= len)) {
                 return -1;
             }
-            return _offset;
         }
+        return _offset;
+    }
+    Int offset(Int _offset) const {
+        return normalizeOffset(_offset, length());
     }
     bool equals(const char *s, size_t slen) const {
         return length() == slen && memcmp(data(), s, slen) == 0;

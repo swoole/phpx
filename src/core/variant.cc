@@ -1008,12 +1008,15 @@ Variant Variant::item(zend_long offset, bool update) {
         }
     } else if (zval_is_string(zvar)) {
         if (update) {
-            auto str = Z_STR_P(zvar);
-            if (offset >= str->len || offset >= UINT_MAX) {
+            const Int normalized_offset = String::normalizeOffset(offset, Z_STRLEN_P(zvar));
+            if (normalized_offset < 0 || normalized_offset >= UINT_MAX) {
                 throwError("String offset `" ZEND_LONG_FMT "` out of range", offset);
                 return {};
             }
-            return Variant{zvar, offset, Ctor::Indirect};
+            // Z_FE_POS is uint32_t. Store only the checked, non-negative
+            // physical position; casting a PHP negative offset directly here
+            // would turn -1 into a far out-of-bounds write in setByteOfStr().
+            return Variant{zvar, normalized_offset, Ctor::Indirect};
         } else {
             String tmp(zvar, Ctor::Indirect);
             return tmp.offsetGet(offset);

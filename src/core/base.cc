@@ -22,6 +22,10 @@ extern "C" {
 #include "zend_property_hooks.h"
 }
 
+#ifdef ZTS
+#include <mutex>
+#endif
+
 namespace php {
 void initDecimalContext();
 
@@ -490,7 +494,33 @@ static void box_dtor(zend_resource *res) {
 }
 
 THREAD_LOCAL static bool request_active = false;
-THREAD_LOCAL static int box_res_id = 0;
+static int box_res_id = 0;
+#ifdef ZTS
+static std::mutex box_resource_mutex;
+#endif
+
+static bool initializeBoxResource() {
+#ifdef ZTS
+    // Zend's resource-destructor registry is process-global and its mutation
+    // API is not thread-safe. Serialize the first RINIT; NTS pays no locking
+    // or atomic cost.
+    std::lock_guard<std::mutex> lock(box_resource_mutex);
+#endif
+    // A complete embed shutdown destroys the registry while PHPX remains
+    // loaded. Resolve by name on each new request so a restarted runtime never
+    // reuses the stale numeric ID from the preceding Zend instance.
+    int registered_id = zend_fetch_list_dtor_id(box_res_name);
+    if (registered_id == 0) {
+        registered_id = zend_register_list_destructors_ex(box_dtor, nullptr, box_res_name, 0);
+        if (registered_id < 0) {
+            return false;
+        }
+    }
+    if (box_res_id != registered_id) {
+        box_res_id = registered_id;
+    }
+    return true;
+}
 
 int getBoxResourceId() {
     return box_res_id;
@@ -500,16 +530,13 @@ void request_init() {
     if (request_active) {
         return;
     }
+    if (UNEXPECTED(!initializeBoxResource())) {
+        throwError("failed to register box resource");
+        return;
+    }
     initDecimalContext();
     nativeGcRequestInit();
     request_active = true;
-    if (box_res_id == 0) {
-        box_res_id = zend_register_list_destructors_ex(box_dtor, nullptr, box_res_name, 0);
-        if (box_res_id < 0) {
-            request_active = false;
-            throwError("failed to register box resource");
-        }
-    }
 }
 
 void request_shutdown() {

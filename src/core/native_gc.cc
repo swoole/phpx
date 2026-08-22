@@ -31,15 +31,17 @@ void destroyObject(void *object) noexcept;
 void markRoots(WrenGcVisitFn visit, void *visit_context, void *)
 {
     for (NativeRootSlot slot : native_request_roots) {
-        if (slot != nullptr) {
-            visit(*slot, visit_context);
+        void *object = slot.get();
+        if (object != nullptr) {
+            visit(object, visit_context);
         }
     }
     for (NativeRootFrame *frame = native_root_top; frame != nullptr; frame = frame->previous()) {
         NativeRootSlot *slots = frame->slots();
         for (size_t i = 0; i < frame->count(); ++i) {
-            if (slots[i] != nullptr) {
-                visit(*slots[i], visit_context);
+            void *object = slots[i].get();
+            if (object != nullptr) {
+                visit(object, visit_context);
             }
         }
     }
@@ -325,7 +327,7 @@ NativeGcStats nativeGcStats() noexcept
 
 void nativeGcRegisterRequestRoot(NativeRootSlot slot)
 {
-    ZEND_ASSERT(slot != nullptr);
+    ZEND_ASSERT(slot.valid());
     native_request_roots.push_back(slot);
 }
 
@@ -348,9 +350,7 @@ void nativeGcRequestShutdown() noexcept
     native_root_request_epoch++;
     const auto clear_request_roots = []() noexcept {
         for (NativeRootSlot slot : native_request_roots) {
-            if (slot != nullptr) {
-                *slot = nullptr;
-            }
+            slot.clear();
         }
     };
     clear_request_roots();

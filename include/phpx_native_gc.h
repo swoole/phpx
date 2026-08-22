@@ -8,6 +8,7 @@
 
 #include <cstddef>
 #include <new>
+#include <type_traits>
 #include <utility>
 
 namespace php {
@@ -91,7 +92,50 @@ class PHPX_API NativeFinalizerChain final {
     CppExceptionState *cppException_ = nullptr;
 };
 
-using NativeRootSlot = void **;
+/**
+ * Type-erased address of one typed Native object pointer.
+ *
+ * A T** may not be dereferenced through void** under C++ strict-aliasing
+ * rules. Keep the original slot type in a generated accessor instead. This
+ * costs no allocation and is visited only while tracing or clearing roots.
+ */
+class NativeRootSlot final {
+  public:
+    template <typename T>
+    NativeRootSlot(T **slot) noexcept : slot_(slot), access_(access<T>) {
+        static_assert(std::is_object_v<T>, "Native roots must point to object types");
+    }
+
+    void *get() const noexcept {
+        return access_(slot_, false);
+    }
+
+    void clear() const noexcept {
+        access_(slot_, true);
+    }
+
+    bool valid() const noexcept {
+        return slot_ != nullptr;
+    }
+
+  private:
+    using AccessFn = void *(*)(void *slot, bool clear) noexcept;
+
+    template <typename T>
+    static void *access(void *slot, bool clear) noexcept {
+        auto **typed_slot = static_cast<T **>(slot);
+        if (clear) {
+            *typed_slot = nullptr;
+            return nullptr;
+        }
+        return static_cast<void *>(*typed_slot);
+    }
+
+    void *slot_;
+    AccessFn access_;
+};
+
+static_assert(sizeof(NativeRootSlot) == sizeof(void *) * 2);
 
 class PHPX_API NativeRootFrame final {
   public:
@@ -242,7 +286,7 @@ T *nativeConstruct(const NativeTypeDescriptor &type, Initializer &&initializer) 
     T *object = nullptr;
     try {
         object = new (storage) T();
-        NativeRootSlot slots[] = {reinterpret_cast<void **>(&object)};
+        NativeRootSlot slots[] = {&object};
         NativeRootFrame roots(slots, 1);
         std::forward<Initializer>(initializer)(*object);
         return object;
@@ -270,7 +314,7 @@ T *nativeClone(const NativeTypeDescriptor &type, const T &source, Initializer &&
     T *object = nullptr;
     try {
         object = new (storage) T(source);
-        NativeRootSlot slots[] = {reinterpret_cast<void **>(&object)};
+        NativeRootSlot slots[] = {&object};
         NativeRootFrame roots(slots, 1);
         std::forward<Initializer>(initializer)(*object);
         return object;
