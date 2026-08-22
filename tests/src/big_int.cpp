@@ -586,7 +586,7 @@ TEST(bigint, invalid_numeric_string_throws_value_error) {
 }
 
 TEST(bigint, invalid_operands_report_type_errors) {
-    Variant invalid = Array{};
+    Variant invalid = true;
     auto one = bi(1);
 
     try_call([]() { BigInt::newInstance(1.5); }, "Cannot construct BigInt from float");
@@ -611,10 +611,10 @@ TEST(bigint, invalid_operands_report_type_errors) {
     try_call([&]() { BigInt::popCount(invalid); }, "expects BigInt argument");
     try_call([&]() { BigInt::bitShiftLeft(invalid, 1); }, "expects BigInt argument");
     try_call([&]() { BigInt::bitShiftRight(invalid, 1); }, "expects BigInt argument");
-    try_call([&]() { BigInt::toString(invalid); }, "toString expects BigInt argument");
-    try_call([&]() { BigInt::toInt(invalid); }, "toInt expects BigInt argument");
-    try_call([&]() { BigInt::toFloat(invalid); }, "toFloat expects BigInt argument");
-    try_call([&]() { BigInt::toBool(invalid); }, "toBool expects BigInt argument");
+    try_call([&]() { BigInt::toString(invalid); }, "not a resource type");
+    try_call([&]() { BigInt::toInt(invalid); }, "not a resource type");
+    try_call([&]() { BigInt::toFloat(invalid); }, "not a resource type");
+    try_call([&]() { BigInt::toBool(invalid); }, "not a resource type");
 
     try_call([&]() { BigInt::testBit(one, "zero"); }, "testBit expects int index");
     try_call([&]() { BigInt::testBit(one, -1); }, "index must be non-negative");

@@ -45,6 +45,12 @@ TEST(std_misc, hash) {
     // raw output
     auto r3 = fn::hash("md5", "hello", true);
     ASSERT_EQ(r3.toString().length(), 16);
+
+    auto error_reporting = EG(error_reporting);
+    EG(error_reporting) = 0;
+    auto invalid = fn::hash("not-a-hash", "hello");
+    EG(error_reporting) = error_reporting;
+    ASSERT_TRUE(invalid.isFalse());
 }
 
 // ========================
@@ -269,6 +275,9 @@ TEST(std_misc, uniqid_func) {
 TEST(std_misc, uniqid_more_entropy) {
     auto id1 = fn::uniqid("", true);
     ASSERT_GT(id1.length(), 13);
+
+    auto prefixed = fn::uniqid("entropy_", true);
+    ASSERT_EQ(strncmp(prefixed.data(), "entropy_", 8), 0);
 }
 
 // ========================
@@ -285,6 +294,18 @@ TEST(std_misc, version_compare) {
     ASSERT_TRUE(fn::version_compare("2.0", "1.0", ">").toBool());
     ASSERT_TRUE(fn::version_compare("1.0", "2.0", "<").toBool());
     ASSERT_FALSE(fn::version_compare("1.0", "2.0", ">=").toBool());
+    ASSERT_TRUE(fn::version_compare("1.0", "2.0", "<=").toBool());
+    ASSERT_TRUE(fn::version_compare("1.0", "2.0", "le").toBool());
+    ASSERT_TRUE(fn::version_compare("2.0", "1.0", "gt").toBool());
+    ASSERT_TRUE(fn::version_compare("2.0", "1.0", "ge").toBool());
+    ASSERT_TRUE(fn::version_compare("1.0", "1.0", "==").toBool());
+    ASSERT_TRUE(fn::version_compare("1.0", "1.0", "eq").toBool());
+    ASSERT_TRUE(fn::version_compare("1.0", "2.0", "!=").toBool());
+    ASSERT_TRUE(fn::version_compare("1.0", "2.0", "<>").toBool());
+    ASSERT_TRUE(fn::version_compare("1.0", "2.0", "ne").toBool());
+    ASSERT_EQ(fn::version_compare("1.0", "1.0", "").toInt(), 0);
+    try_call([]() { fn::version_compare("1", "2", "invalid"); },
+             "must be a valid comparison operator");
 }
 
 // ========================
@@ -364,6 +385,12 @@ TEST(std_misc, shell_exec) {
     auto out = fn::shell_exec("echo hello");
     ASSERT_TRUE(out.isString());
     ASSERT_STREQ(out.toString().toCString(), "hello\n");
+
+    ASSERT_TRUE(fn::shell_exec("true").isNull());
+    try_call([]() {
+        (void) fn::shell_exec("");
+        throwErrorIfOccurred();
+    }, "cannot be empty");
 }
 
 TEST(std_misc, realpath) {

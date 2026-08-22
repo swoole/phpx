@@ -370,10 +370,10 @@ TEST(bigfloat, huge_exponent_uses_bounded_scientific_notation) {
 }
 
 TEST(bigfloat, invalid_operands_report_type_errors) {
-    Variant invalid = Array{};
+    Variant invalid = true;
     auto one = BigFloat::newInstance(Variant(1));
 
-    try_call([&]() { BigFloat::newInstance(invalid); }, "expects valid BigFloat argument");
+    try_call([]() { BigFloat::newInstance(Variant("not-a-number")); }, "Invalid BigFloat numeric string");
     try_call([&]() { BigFloat::add(invalid, one); }, "expects valid BigFloat argument");
     try_call([&]() { BigFloat::sub(invalid, one); }, "expects valid BigFloat argument");
     try_call([&]() { BigFloat::mul(invalid, one); }, "expects valid BigFloat argument");
@@ -382,10 +382,10 @@ TEST(bigfloat, invalid_operands_report_type_errors) {
     try_call([&]() { BigFloat::cmp(invalid, one); }, "expects valid BigFloat argument");
     try_call([&]() { BigFloat::abs(invalid); }, "expects valid BigFloat argument");
     try_call([&]() { BigFloat::sqrt(invalid); }, "expects valid BigFloat argument");
-    try_call([&]() { BigFloat::toString(invalid); }, "expects BigFloat argument");
-    try_call([&]() { BigFloat::toInt(invalid); }, "expects BigFloat argument");
-    try_call([&]() { BigFloat::toFloat(invalid); }, "expects BigFloat argument");
-    try_call([&]() { BigFloat::toBool(invalid); }, "expects BigFloat argument");
+    try_call([&]() { BigFloat::toString(invalid); }, "not a resource type");
+    try_call([&]() { BigFloat::toInt(invalid); }, "not a resource type");
+    try_call([&]() { BigFloat::toFloat(invalid); }, "not a resource type");
+    try_call([&]() { BigFloat::toBool(invalid); }, "not a resource type");
 
     try_call([]() { BigFloat::sqrt(BigFloat::newInstance(Variant(-1))); }, "square root of negative number");
 }

@@ -221,10 +221,10 @@ TEST(closure, normalize_callable_class_resolves_relative_class_names) {
     Array non_string_class{object, "multiply"};
     ASSERT_EQ(normalizeCallableClass(non_string_class, scope).toArray().array(), non_string_class.array());
 
-    auto *base_scope = getClassEntry("PhpxScopedCallableBase");
-    CallableScope base_context{getMethod(lexical_scope, "multiply"), base_scope, nullptr};
+    auto *foreign_scope = getClassEntry("PhpxScopedCallableForeign");
+    CallableScope base_context{getMethod(foreign_scope, "scopeAnchor"), foreign_scope, nullptr};
     Array missing_parent{"parent", "multiply"};
-    ASSERT_EQ(normalizeCallableClass(missing_parent, base_context).toArray().array(), missing_parent.array());
+    ASSERT_TRUE(normalizeCallableClass(missing_parent, base_context).equals(missing_parent));
 
     Args unchanged_args{ArgList{1}};
     normalizeCallableClass(unchanged_args, 5, scope);

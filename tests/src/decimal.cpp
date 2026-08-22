@@ -383,7 +383,7 @@ TEST(decimal, boolean_conversion_uses_numeric_value) {
 }
 
 TEST(decimal, invalid_operands_report_type_errors) {
-    Variant invalid = Array{};
+    Variant invalid = true;
     auto one = Decimal::newInstance(Variant(1));
 
     try_call([]() { Decimal::newInstance(1.5); }, "Cannot construct Decimal from float");
@@ -402,10 +402,10 @@ TEST(decimal, invalid_operands_report_type_errors) {
     try_call([&]() { Decimal::floor(invalid); }, "expects valid Decimal argument");
     try_call([&]() { Decimal::ceil(invalid); }, "expects valid Decimal argument");
     try_call([&]() { Decimal::round(invalid); }, "expects valid Decimal argument");
-    try_call([&]() { Decimal::toString(invalid); }, "expects Decimal argument");
-    try_call([&]() { Decimal::toInt(invalid); }, "expects Decimal argument");
-    try_call([&]() { Decimal::toFloat(invalid); }, "expects Decimal argument");
-    try_call([&]() { Decimal::toBool(invalid); }, "expects Decimal argument");
+    try_call([&]() { Decimal::toString(invalid); }, "not a resource type");
+    try_call([&]() { Decimal::toInt(invalid); }, "not a resource type");
+    try_call([&]() { Decimal::toFloat(invalid); }, "not a resource type");
+    try_call([&]() { Decimal::toBool(invalid); }, "not a resource type");
 
     try_call([]() { Decimal::sqrt(Decimal::newInstance(Variant(-1))); }, "invalid operation");
 }

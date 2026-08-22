@@ -13,6 +13,7 @@ TEST(std_array, in_array) {
     // strict mode
     ASSERT_TRUE(fn::in_array("2", a));
     ASSERT_FALSE(fn::in_array("2", a, true));
+    ASSERT_TRUE(fn::in_array(2, a, true));
 }
 
 TEST(std_array, array_key_exists) {
@@ -46,6 +47,13 @@ TEST(std_array, array_search) {
     ASSERT_TRUE(r4.isInt());
     auto r5 = fn::array_search("2", a, true);
     ASSERT_TRUE(r5.isFalse());
+
+    Array keyed;
+    keyed.set("named", 7);
+    keyed.set(11, "eleven");
+    ASSERT_STREQ(fn::array_search(7, keyed, true).toCString(), "named");
+    ASSERT_EQ(fn::array_search("eleven", keyed, true).toInt(), 11);
+    ASSERT_STREQ(fn::array_search("7", keyed).toCString(), "named");
 }
 
 TEST(std_array, array_keys) {
@@ -56,6 +64,11 @@ TEST(std_array, array_keys) {
 
     auto keys = fn::array_keys(a);
     ASSERT_EQ(keys.length(), 3);
+
+    auto packed_keys = fn::array_keys(Array{"a", "b", "c"});
+    ASSERT_EQ(packed_keys.get(0).toInt(), 0);
+    ASSERT_EQ(packed_keys.get(2).toInt(), 2);
+    ASSERT_TRUE(fn::array_keys(Array{}).empty());
 }
 
 TEST(std_array, array_values) {
@@ -65,6 +78,11 @@ TEST(std_array, array_values) {
 
     auto vals = fn::array_values(a);
     ASSERT_EQ(vals.length(), 2);
+
+    Array packed{1, 2};
+    auto packed_values = fn::array_values(packed);
+    ASSERT_EQ(packed_values.array(), packed.array());
+    ASSERT_TRUE(fn::array_values(Array{}).empty());
 }
 
 TEST(std_array, array_key_first_last) {
@@ -85,6 +103,12 @@ TEST(std_array, array_key_first_last) {
     ASSERT_TRUE(ef.isNull());
     auto el = fn::array_key_last(empty);
     ASSERT_TRUE(el.isNull());
+
+    Array numeric;
+    numeric.set(4, "first");
+    numeric.set(9, "last");
+    ASSERT_EQ(fn::array_key_first(numeric).toInt(), 4);
+    ASSERT_EQ(fn::array_key_last(numeric).toInt(), 9);
 }
 
 TEST(std_array, array_merge) {
@@ -148,6 +172,9 @@ TEST(std_array, count) {
     // Var argument
     var v = Array{10, 20, 30};
     ASSERT_EQ(fn::count(v), 3);
+
+    Array nested{Array{1, 2}, Array{3}};
+    ASSERT_EQ(fn::count(nested, 1), 5);
 }
 
 TEST(std_array, count_exception) {
@@ -190,6 +217,10 @@ TEST(std_array, array_push) {
     var arr2 = Array{"a"};
     fn::array_push(arr2, "b");
     ASSERT_EQ(arr2.length(), 2);
+
+    Variant not_array = 1;
+    try_call([&]() { fn::array_push(not_array, 2); },
+             "array_push(): Argument #1 ($array) must be of type array");
 }
 
 TEST(std_array, array_fill) {
@@ -208,6 +239,9 @@ TEST(std_array, array_fill) {
     // Zero count
     auto c = fn::array_fill(0, 0, "z");
     ASSERT_EQ(c.length(), 0);
+
+    try_call([]() { fn::array_fill(0, -1, "x"); },
+             "array_fill(): Argument #2 ($count) must be greater than or equal to 0");
 }
 
 TEST(std_array, array_keys_filter) {
@@ -235,4 +269,15 @@ TEST(std_array, array_keys_filter) {
     Array empty;
     auto emptyKeys = fn::array_keys_filter(empty, 1);
     ASSERT_EQ(emptyKeys.length(), 0);
+
+    Array mixed;
+    mixed.set(4, 2);
+    mixed.set("named", 2);
+    auto strict_keys = fn::array_keys_filter(mixed, 2, true);
+    ASSERT_EQ(strict_keys.get(0).toInt(), 4);
+    ASSERT_STREQ(strict_keys.get(1).toCString(), "named");
+
+    auto loose_keys = fn::array_keys_filter(mixed, "2");
+    ASSERT_EQ(loose_keys.get(0).toInt(), 4);
+    ASSERT_STREQ(loose_keys.get(1).toCString(), "named");
 }
