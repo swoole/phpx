@@ -123,6 +123,19 @@ TEST(array, append_rvalue_indirect_materializes_value) {
     ASSERT_STREQ(array.get(1).toCString(), "first");
 }
 
+TEST(array, set_materializes_a_source_bucket_before_structural_mutation) {
+    Array array{"source"};
+
+    // The source is a borrowed pointer into the packed HashTable. Adding a
+    // string key converts that table to mixed storage before Zend consumes the
+    // value, so Array::set() must snapshot the zval first.
+    array.set("named", array.item(0));
+    array[0] = "changed";
+
+    ASSERT_STREQ(array.get(0).toCString(), "changed");
+    ASSERT_STREQ(array.get("named").toCString(), "source");
+}
+
 TEST(array, append_self_creates_value_snapshot) {
     Array array{1};
 

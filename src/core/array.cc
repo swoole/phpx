@@ -179,20 +179,23 @@ void Array::set(const Variant &key, const Variant &v) {
 }
 
 void Array::set(zend_string *str_key, const Variant &v) {
-    auto zv = NO_CONST_Z(v.direct_ptr());
-    Z_TRY_ADDREF_P(zv);
+    // v may borrow a bucket from this array. Converting packed storage to a
+    // mixed HashTable, separating it, or growing it can invalidate that bucket
+    // before Zend copies pData. Snapshot the zval while the source is stable.
+    zval copied;
+    ZVAL_COPY(&copied, v.direct_ptr());
     auto zarr = unwrap_ptr();
     SEPARATE_ARRAY(zarr);
-    zend_symtable_update(Z_ARRVAL_P(zarr), str_key, zv);
+    zend_symtable_update(Z_ARRVAL_P(zarr), str_key, &copied);
 }
 
 void Array::set(zend_ulong i, const Variant &v) {
-    auto zv = NO_CONST_Z(v.direct_ptr());
-    Z_TRY_ADDREF_P(zv);
+    zval copied;
+    ZVAL_COPY(&copied, v.direct_ptr());
 
     auto zarr = unwrap_ptr();
     SEPARATE_ARRAY(zarr);
-    add_index_zval(zarr, i, zv);
+    add_index_zval(zarr, i, &copied);
 }
 
 void Array::setValue(const Variant &key, const Variant &v) {

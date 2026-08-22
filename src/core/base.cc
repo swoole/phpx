@@ -32,7 +32,10 @@ DebugInfo debug_info{
     0,
 };
 
-static zend_array *func_cache_map = nullptr;
+// Resolved user functions live for one request. In ZTS each worker owns an
+// independent request, so sharing this map would let one RSHUTDOWN free cache
+// entries while another thread is still calling through them.
+THREAD_LOCAL static zend_array *func_cache_map = nullptr;
 
 void error(int level, const char *format, ...) {
     va_list args;

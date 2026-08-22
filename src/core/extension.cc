@@ -279,7 +279,10 @@ zend_result extension_after_request(int type, int module_number) {
 Array Args::toArray() const {
     Array array(params.size());
     for (const auto &param : params) {
-        array.append(Variant(&param, Ctor::CopyRef));
+        // Borrow the stable Args slot. Array::append() performs the one owning
+        // ZVAL_COPY required by the result; CopyRef here would add and release
+        // an otherwise redundant temporary reference for every argument.
+        array.append(Variant(&param, Ctor::Indirect));
     }
     return array;
 }
