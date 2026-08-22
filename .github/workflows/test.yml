@@ -58,7 +58,7 @@ jobs:
       - name: Enable phpy for native bridge tests
         working-directory: third_party/phpy
         run: |
-          php_ini_dir="$(php --ini | sed -n 's/^Scan for additional .ini files in: //p')"
+          php_ini_dir="$(php-config --ini-dir)"
           echo "extension=$(pwd)/modules/phpy.so" | sudo tee "${php_ini_dir}/90-phpy.ini"
           php --ri phpy
       - name: Show machine information
