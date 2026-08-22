@@ -63,8 +63,8 @@ TEST(same, bool_comparison) {
     ASSERT_FALSE(php::same((php::Bool) 0, true));
 
     // Test comparison with other types (should use explicit conversion)
-    ASSERT_TRUE(php::same((php::Bool)(5 != 0), true));
-    ASSERT_TRUE(php::same((php::Bool)(0 == 0), true));
+    ASSERT_TRUE(php::same((php::Bool) (5 != 0), true));
+    ASSERT_TRUE(php::same((php::Bool) (0 == 0), true));
 }
 
 TEST(same, cross_type_comparison) {
@@ -75,12 +75,12 @@ TEST(same, cross_type_comparison) {
     ASSERT_FALSE(php::same((php::Float) 5L, 5.1));
 
     // Integer and boolean comparison (requires explicit conversion)
-    ASSERT_TRUE(php::same((php::Bool)(1L != 0), true));
-    ASSERT_TRUE(php::same((php::Bool)(0L == 0), true));
+    ASSERT_TRUE(php::same((php::Bool) (1L != 0), true));
+    ASSERT_TRUE(php::same((php::Bool) (0L == 0), true));
 
     // Float and boolean comparison (requires explicit conversion)
-    ASSERT_TRUE(php::same((php::Bool)(1.0 != 0.0), true));
-    ASSERT_TRUE(php::same((php::Bool)(0.0 == 0.0), true));
+    ASSERT_TRUE(php::same((php::Bool) (1.0 != 0.0), true));
+    ASSERT_TRUE(php::same((php::Bool) (0.0 == 0.0), true));
 }
 
 TEST(same, edge_cases) {

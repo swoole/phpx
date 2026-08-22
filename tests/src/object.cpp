@@ -43,11 +43,8 @@ TEST(object, base) {
 
     try_call([]() { auto o2 = newObject("class_not_exists"); }, "class 'class_not_exists' is undefined");
 
-    try_call(
-        []() {
-            auto o3 = newObject("class_not_exists", {1234, "hello world"});
-        },
-        "class 'class_not_exists' is undefined");
+    try_call([]() { auto o3 = newObject("class_not_exists", {1234, "hello world"}); },
+             "class 'class_not_exists' is undefined");
 
     Array arr3;
     arr3.append("hello world");
@@ -364,18 +361,12 @@ TEST(object, call_parent_method) {
     ASSERT_STREQ(obj.getClassName().data(), "TestClass2");
 
     auto obj2 = newObject("TestClass");
-    try_call(
-        [&]() {
-            auto rs = obj2.callParentMethod("test", {"hello", "world"});
-        },
-        "class does not inherit the parent class");
+    try_call([&]() { auto rs = obj2.callParentMethod("test", {"hello", "world"}); },
+             "class does not inherit the parent class");
 
     auto obj3 = newObject("TestClass3");
-    try_call(
-        [&]() {
-            auto rs = obj3.callParentMethod("test", {"hello", "world"});
-        },
-        "Cannot call abstract method TestAbstract::test()");
+    try_call([&]() { auto rs = obj3.callParentMethod("test", {"hello", "world"}); },
+             "Cannot call abstract method TestAbstract::test()");
 }
 
 TEST(object, instanceOf) {
@@ -604,7 +595,8 @@ TEST(object, array_property_via_attr) {
     auto prop3 = o1.get("prop");
     ASSERT_STREQ(prop3.offsetGet(6).toCString(), "erlang");
 
-    try_call([&]() { o1.attr("propInt", AttrMode::Update).newItem() = 1899; }, "Only array/object support the newItem() method");
+    try_call([&]() { o1.attr("propInt", AttrMode::Update).newItem() = 1899; },
+             "Only array/object support the newItem() method");
 }
 
 TEST(object, update_magic_property_uses_read_write_context) {
@@ -950,10 +942,16 @@ TEST(object, call_scoped_resolves_visibility_without_leaking_scope) {
 
     auto *target_caller = getMethod(target_scope, "publicEntry");
     auto *foreign_caller = getMethod(foreign_scope, "scopeAnchor");
-    ASSERT_STREQ(callScoped(target, "privateValue", CallableScope{target_caller, target_scope, target.object()}).toCString(), "private");
-    ASSERT_STREQ(callScoped(child, "protectedValue", CallableScope{target_caller, child_scope, child.object()}).toCString(), "protected");
-    ASSERT_STREQ(callScoped(target, "privateValue", CallableScope{foreign_caller, foreign_scope, nullptr}).toCString(), "magic:privateValue");
-    ASSERT_STREQ(callScoped(target, "publicEntry", CallableScope{foreign_caller, foreign_scope, nullptr}).toCString(), "target-private");
+    ASSERT_STREQ(
+        callScoped(target, "privateValue", CallableScope{target_caller, target_scope, target.object()}).toCString(),
+        "private");
+    ASSERT_STREQ(
+        callScoped(child, "protectedValue", CallableScope{target_caller, child_scope, child.object()}).toCString(),
+        "protected");
+    ASSERT_STREQ(callScoped(target, "privateValue", CallableScope{foreign_caller, foreign_scope, nullptr}).toCString(),
+                 "magic:privateValue");
+    ASSERT_STREQ(callScoped(target, "publicEntry", CallableScope{foreign_caller, foreign_scope, nullptr}).toCString(),
+                 "target-private");
 }
 
 TEST(object, call_scoped_supports_arguments_and_named_arguments) {

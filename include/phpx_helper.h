@@ -307,11 +307,9 @@ static inline Object toObjectExact(const Variant &v, const char *property = null
     return Object(v);
 }
 
-static inline Object toObjectExact(
-    const Variant &v, zend_class_entry *expected_ce, const char *property = nullptr) {
+static inline Object toObjectExact(const Variant &v, zend_class_entry *expected_ce, const char *property = nullptr) {
     const zval *zv = v.unwrap_ptr();
-    if (UNEXPECTED(Z_TYPE_P(zv) != IS_OBJECT
-        || !instanceof_function(Z_OBJCE_P(zv), expected_ce))) {
+    if (UNEXPECTED(Z_TYPE_P(zv) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(zv), expected_ce))) {
         throwExactTypeError(v, ZSTR_VAL(expected_ce->name), property);
         return {};
     }
@@ -331,8 +329,7 @@ static inline Variant toStreamExact(const Variant &v, const char *property = nul
 }
 
 template <typename T>
-static inline Variant toBoxExact(
-    const Variant &v, const char *property = nullptr, const char *expected = "Box") {
+static inline Variant toBoxExact(const Variant &v, const char *property = nullptr, const char *expected = "Box") {
     static_assert(std::is_base_of_v<Box, T>, "T must derive from php::Box");
     const zval *zv = v.unwrap_ptr();
     if (UNEXPECTED(Z_TYPE_P(zv) != IS_RESOURCE)) {
@@ -340,8 +337,8 @@ static inline Variant toBoxExact(
         return php::null;
     }
     zend_resource *resource = Z_RES_P(zv);
-    if (UNEXPECTED(resource->type != getBoxResourceId()
-        || dynamic_cast<T *>(static_cast<Box *>(resource->ptr)) == nullptr)) {
+    if (UNEXPECTED(resource->type != getBoxResourceId() ||
+                   dynamic_cast<T *>(static_cast<Box *>(resource->ptr)) == nullptr)) {
         throwExactTypeError(v, expected, property);
         return php::null;
     }

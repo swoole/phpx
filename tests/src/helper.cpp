@@ -10,15 +10,12 @@ TEST(helper, empty_str_to_int) {
 }
 
 TEST(helper, type_error_slow_paths) {
-    try_call(
-        []() { throwArgumentTypeError(123, "Demo::run", 2, "value", "string"); },
-        "Demo::run(): Argument #2 ($value) must be of type string, int given");
-    try_call(
-        []() { throwReturnTypeError(false, "Demo::run", "int", true); },
-        "Demo::run(): Return value must be of type int, bool returned");
-    try_call(
-        []() { throwReturnTypeError(false, "{closure}", "int|string", false); },
-        "{closure}(): Return value must be of type int|string, bool given");
+    try_call([]() { throwArgumentTypeError(123, "Demo::run", 2, "value", "string"); },
+             "Demo::run(): Argument #2 ($value) must be of type string, int given");
+    try_call([]() { throwReturnTypeError(false, "Demo::run", "int", true); },
+             "Demo::run(): Return value must be of type int, bool returned");
+    try_call([]() { throwReturnTypeError(false, "{closure}", "int|string", false); },
+             "{closure}(): Return value must be of type int|string, bool given");
 }
 
 TEST(helper, exact_call_argument_conversions) {
@@ -28,18 +25,14 @@ TEST(helper, exact_call_argument_conversions) {
     ASSERT_TRUE(toBoolArgExact(true, "Demo::run", 1, "value"));
     ASSERT_EQ(toStringArgExact("value", "Demo::run", 1, "value").toStdString(), "value");
 
-    try_call(
-        []() { (void) toIntArgExact("42", "Demo::run", 1, "value"); },
-        "Demo::run(): Argument #1 ($value) must be of type int, string given");
-    try_call(
-        []() { (void) toFloatArgExact("1.5", "Demo::run", 1, "value"); },
-        "Demo::run(): Argument #1 ($value) must be of type float, string given");
-    try_call(
-        []() { (void) toBoolArgExact(1, "Demo::run", 1, "value"); },
-        "Demo::run(): Argument #1 ($value) must be of type bool, int given");
-    try_call(
-        []() { (void) toStringArgExact(42, "Demo::run", 1, "value"); },
-        "Demo::run(): Argument #1 ($value) must be of type string, int given");
+    try_call([]() { (void) toIntArgExact("42", "Demo::run", 1, "value"); },
+             "Demo::run(): Argument #1 ($value) must be of type int, string given");
+    try_call([]() { (void) toFloatArgExact("1.5", "Demo::run", 1, "value"); },
+             "Demo::run(): Argument #1 ($value) must be of type float, string given");
+    try_call([]() { (void) toBoolArgExact(1, "Demo::run", 1, "value"); },
+             "Demo::run(): Argument #1 ($value) must be of type bool, int given");
+    try_call([]() { (void) toStringArgExact(42, "Demo::run", 1, "value"); },
+             "Demo::run(): Argument #1 ($value) must be of type string, int given");
 }
 
 TEST(helper, toInt) {

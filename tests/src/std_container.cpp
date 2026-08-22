@@ -246,15 +246,19 @@ TEST(std_container_box, stdmap_lazy_default_only_runs_for_missing_key) {
     StdMap<Int, Int> map;
     map.offsetSet(1, 10);
     int factory_calls = 0;
-    ASSERT_EQ(map.offsetGetForUpdateLazy(1, [&factory_calls]() {
-        ++factory_calls;
-        return 20;
-    }), 10);
+    ASSERT_EQ(map.offsetGetForUpdateLazy(1,
+                                         [&factory_calls]() {
+                                             ++factory_calls;
+                                             return 20;
+                                         }),
+              10);
     ASSERT_EQ(factory_calls, 0);
-    ASSERT_EQ(map.offsetGetForUpdateLazy(2, [&factory_calls]() {
-        ++factory_calls;
-        return 30;
-    }), 30);
+    ASSERT_EQ(map.offsetGetForUpdateLazy(2,
+                                         [&factory_calls]() {
+                                             ++factory_calls;
+                                             return 30;
+                                         }),
+              30);
     ASSERT_EQ(factory_calls, 1);
 }
 

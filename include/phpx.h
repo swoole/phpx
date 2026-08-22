@@ -138,13 +138,13 @@ PHPX_API Variant constant(zend_class_entry *ce, const String &name);
 PHPX_API Variant classConstant(const Variant &target, const Variant &name, zend_class_entry *scope = nullptr);
 PHPX_API Variant classConstant(zend_class_entry *ce, const Variant &name, zend_class_entry *scope = nullptr);
 PHPX_API void registerPropertyHooks(zend_class_entry *ce,
-                                   zend_property_info *property_info,
-                                   std::string_view getter,
-                                   std::string_view setter);
+                                    zend_property_info *property_info,
+                                    std::string_view getter,
+                                    std::string_view setter);
 PHPX_API void registerAbstractPropertyHooks(zend_class_entry *ce,
-                                           zend_property_info *property_info,
-                                           bool getter,
-                                           bool setter);
+                                            zend_property_info *property_info,
+                                            bool getter,
+                                            bool setter);
 PHPX_API bool updateConstant(const String &cls, const String &name, const Variant &data);
 PHPX_API bool updateConstant(zend_class_entry *ce, const String &name, const Variant &data);
 PHPX_API void initGlobal(const String &name, Variant &var);
@@ -161,26 +161,20 @@ class CallableScope final {
   public:
     // Borrowed for this context's stack lifetime. TypePHP methods are persistent;
     // a Closure's function remains valid while its owning Closure is alive.
-    CallableScope(zend_function *caller_function,
-                  zend_class_entry *called_scope,
-                  zend_object *this_object)
-        : caller_function_(caller_function),
-          called_scope_(called_scope),
-          this_object_(this_object) {
+    CallableScope(zend_function *caller_function, zend_class_entry *called_scope, zend_object *this_object)
+        : caller_function_(caller_function), called_scope_(called_scope), this_object_(this_object) {
         if (caller_function == nullptr) {
             return;
         }
 
         uint32_t call_info = ZEND_CALL_TOP_FUNCTION;
-        void *object_or_called_scope = called_scope
-            ? static_cast<void *>(called_scope)
-            : static_cast<void *>(lexicalScope());
+        void *object_or_called_scope =
+            called_scope ? static_cast<void *>(called_scope) : static_cast<void *>(lexicalScope());
         if (this_object != nullptr) {
             call_info |= ZEND_CALL_HAS_THIS;
             object_or_called_scope = this_object;
         }
-        zend_vm_init_call_frame(
-            &frame_, call_info, caller_function, 0, object_or_called_scope);
+        zend_vm_init_call_frame(&frame_, call_info, caller_function, 0, object_or_called_scope);
     }
 
     CallableScope(const CallableScope &) = delete;
@@ -204,10 +198,7 @@ class CallableScope final {
         return this_object_;
     }
 
-    bool resolve(zval *callable,
-                 zend_object *object,
-                 zend_fcall_info_cache *cache,
-                 char **error) const {
+    bool resolve(zval *callable, zend_object *object, zend_fcall_info_cache *cache, char **error) const {
         ZEND_ASSERT(caller_function_ != nullptr);
         ZEND_ASSERT(lexicalScope() != nullptr);
         return zend_is_callable_at_frame(callable, object, &frame_, 0, cache, error);
@@ -221,32 +212,32 @@ class CallableScope final {
 };
 
 PHPX_API Variant callScoped(const Variant &func,
-                           const CallableScope &scope,
-                           Args &args,
-                           zend_array *named_args = nullptr);
+                            const CallableScope &scope,
+                            Args &args,
+                            zend_array *named_args = nullptr);
 PHPX_API Variant callScoped(const Variant &func,
-                           const CallableScope &scope,
-                           Array &args,
-                           zend_array *named_args = nullptr);
+                            const CallableScope &scope,
+                            Array &args,
+                            zend_array *named_args = nullptr);
 PHPX_API Variant callScoped(const Variant &func,
-                           const CallableScope &scope,
-                           const ArgList &args = {},
-                           zend_array *named_args = nullptr);
+                            const CallableScope &scope,
+                            const ArgList &args = {},
+                            zend_array *named_args = nullptr);
 PHPX_API Variant callScoped(const Variant &object,
-                           const Variant &func,
-                           const CallableScope &scope,
-                           Args &args,
-                           zend_array *named_args = nullptr);
+                            const Variant &func,
+                            const CallableScope &scope,
+                            Args &args,
+                            zend_array *named_args = nullptr);
 PHPX_API Variant callScoped(const Variant &object,
-                           const Variant &func,
-                           const CallableScope &scope,
-                           Array &args,
-                           zend_array *named_args = nullptr);
+                            const Variant &func,
+                            const CallableScope &scope,
+                            Array &args,
+                            zend_array *named_args = nullptr);
 PHPX_API Variant callScoped(const Variant &object,
-                           const Variant &func,
-                           const CallableScope &scope,
-                           const ArgList &args = {},
-                           zend_array *named_args = nullptr);
+                            const Variant &func,
+                            const CallableScope &scope,
+                            const ArgList &args = {},
+                            zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, Args &_args, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, Array &args, zend_array *named_args = nullptr);
@@ -2406,10 +2397,7 @@ static inline Array toArray(const StdMap<K, T> &map) {
 
 static inline Object toObject(const Variant &v, zend_class_entry *ce) {
     if (UNEXPECTED(!v.isObject())) {
-        throwExceptionEx(zend_ce_type_error,
-                         0,
-                         "The parameter `object` must be `object`, got `%s`",
-                         v.typeStr());
+        throwExceptionEx(zend_ce_type_error, 0, "The parameter `object` must be `object`, got `%s`", v.typeStr());
         return {};
     }
     if (UNEXPECTED(!instanceof_function(v.ce(), ce))) {

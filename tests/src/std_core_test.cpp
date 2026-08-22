@@ -159,16 +159,20 @@ TEST(std_core, define_array) {
 }
 
 TEST(std_core, define_rejects_invalid_and_recursive_constants) {
-    try_call([]() {
-        fn::define("PhpxStdClass::VALUE", 1);
-        throwErrorIfOccurred();
-    }, "cannot be a class constant");
+    try_call(
+        []() {
+            fn::define("PhpxStdClass::VALUE", 1);
+            throwErrorIfOccurred();
+        },
+        "cannot be a class constant");
 
     Variant recursive = eval("$value = []; $value['self'] =& $value; return $value;");
-    try_call([&recursive]() {
-        fn::define("PHPX_RECURSIVE_CONSTANT", recursive);
-        throwErrorIfOccurred();
-    }, "cannot be a recursive array");
+    try_call(
+        [&recursive]() {
+            fn::define("PHPX_RECURSIVE_CONSTANT", recursive);
+            throwErrorIfOccurred();
+        },
+        "cannot be a recursive array");
 
     ASSERT_TRUE(fn::define("PHPX_CASE_WARNING_CONSTANT", 1, true));
     ASSERT_FALSE(fn::define("PHPX_CASE_WARNING_CONSTANT", 2));

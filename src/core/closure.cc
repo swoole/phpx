@@ -74,8 +74,7 @@ void detail::initializeClosureCarrierHandlers() noexcept {
 }
 
 static inline ClosureCarrier *closure_carrier_from_obj(zend_object *object) {
-    return reinterpret_cast<ClosureCarrier *>(
-        reinterpret_cast<char *>(object) - XtOffsetOf(ClosureCarrier, std));
+    return reinterpret_cast<ClosureCarrier *>(reinterpret_cast<char *>(object) - XtOffsetOf(ClosureCarrier, std));
 }
 
 static HashTable *closure_carrier_get_gc(zend_object *object, zval **table, int *n) {
@@ -106,8 +105,7 @@ static zend_object *newClosureCarrier(const ClosureFn &fn,
                                       const Object &_this,
                                       const ArgList &uses,
                                       zend_function *zf) {
-    auto *carrier = static_cast<ClosureCarrier *>(
-        zend_object_alloc(sizeof(ClosureCarrier), zend_standard_class_def));
+    auto *carrier = static_cast<ClosureCarrier *>(zend_object_alloc(sizeof(ClosureCarrier), zend_standard_class_def));
     try {
         new (carrier->state_storage) ClosureState(fn, _this, uses, zf);
     } catch (...) {
@@ -133,8 +131,8 @@ Object newClosure(const ClosureFn &fn,
     func->type = ZEND_INTERNAL_FUNCTION;
     func->internal_function.handler = [](INTERNAL_FUNCTION_PARAMETERS) {
         try {
-            if (UNEXPECTED(Z_TYPE(execute_data->This) != IS_OBJECT
-                           || Z_OBJ(execute_data->This)->handlers != &closure_carrier_handlers)) {
+            if (UNEXPECTED(Z_TYPE(execute_data->This) != IS_OBJECT ||
+                           Z_OBJ(execute_data->This)->handlers != &closure_carrier_handlers)) {
                 throwError("Closure::call(), Closure::bind(), and Closure::bindTo() are not supported");
                 return;
             }
@@ -191,9 +189,9 @@ static bool isRelativeCallableClass(const zval *callable) {
             return false;
         }
         const size_t length = static_cast<size_t>(separator - Z_STRVAL_P(callable));
-        return (length == 4 && zend_binary_strcasecmp(Z_STRVAL_P(callable), length, "self", 4) == 0)
-            || (length == 6 && zend_binary_strcasecmp(Z_STRVAL_P(callable), length, "parent", 6) == 0)
-            || (length == 6 && zend_binary_strcasecmp(Z_STRVAL_P(callable), length, "static", 6) == 0);
+        return (length == 4 && zend_binary_strcasecmp(Z_STRVAL_P(callable), length, "self", 4) == 0) ||
+               (length == 6 && zend_binary_strcasecmp(Z_STRVAL_P(callable), length, "parent", 6) == 0) ||
+               (length == 6 && zend_binary_strcasecmp(Z_STRVAL_P(callable), length, "static", 6) == 0);
     }
     if (Z_TYPE_P(callable) == IS_ARRAY) {
         class_name = zend_hash_index_find(Z_ARRVAL_P(callable), 0);
@@ -204,9 +202,9 @@ static bool isRelativeCallableClass(const zval *callable) {
         if (Z_TYPE_P(class_name) != IS_STRING) {
             return false;
         }
-        return zend_string_equals_literal_ci(Z_STR_P(class_name), "self")
-            || zend_string_equals_literal_ci(Z_STR_P(class_name), "parent")
-            || zend_string_equals_literal_ci(Z_STR_P(class_name), "static");
+        return zend_string_equals_literal_ci(Z_STR_P(class_name), "self") ||
+               zend_string_equals_literal_ci(Z_STR_P(class_name), "parent") ||
+               zend_string_equals_literal_ci(Z_STR_P(class_name), "static");
     }
     return false;
 }
@@ -215,8 +213,8 @@ static bool canReuseResolvedCallable(const Variant &callable, const zend_fcall_i
     if (cache.function_handler->common.fn_flags & ZEND_ACC_CALL_VIA_TRAMPOLINE) {
         return false;
     }
-    if (cache.function_handler->common.scope != nullptr
-        && !(cache.function_handler->common.fn_flags & ZEND_ACC_PUBLIC)) {
+    if (cache.function_handler->common.scope != nullptr &&
+        !(cache.function_handler->common.fn_flags & ZEND_ACC_PUBLIC)) {
         return false;
     }
     return !isRelativeCallableClass(callable.unwrap_ptr());
@@ -267,9 +265,7 @@ void normalizeCallableClass(Args &args, size_t index, const CallableScope &scope
     }
 }
 
-static Variant makeScopedCallableImpl(const Variant &callable,
-                                      const CallableScope &scope,
-                                      bool reuse_public_callable) {
+static Variant makeScopedCallableImpl(const Variant &callable, const CallableScope &scope, bool reuse_public_callable) {
     if (UNEXPECTED(!scope.isValid())) {
         throwError("Explicit callable scope must not be null");
         return {};
@@ -313,18 +309,10 @@ static Variant makeScopedCallableImpl(const Variant &callable,
             zval instance;
             ZVAL_OBJ(&instance, cache.object);
             zend_create_fake_closure(
-                &closure,
-                cache.function_handler,
-                cache.function_handler->common.scope,
-                cache.called_scope,
-                &instance);
+                &closure, cache.function_handler, cache.function_handler->common.scope, cache.called_scope, &instance);
         } else {
             zend_create_fake_closure(
-                &closure,
-                cache.function_handler,
-                cache.function_handler->common.scope,
-                cache.called_scope,
-                nullptr);
+                &closure, cache.function_handler, cache.function_handler->common.scope, cache.called_scope, nullptr);
         }
         return {&closure, Ctor::Move};
     }

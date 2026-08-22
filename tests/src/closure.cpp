@@ -89,9 +89,7 @@ TEST(closure, use_value_and_reference_capture) {
 }
 
 TEST(closure, captured_reference_cycle_is_visible_to_zend_gc) {
-    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &) -> Variant {
-        return null;
-    };
+    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &) -> Variant { return null; };
 
     Variant closure;
     Variant captured;
@@ -182,7 +180,6 @@ TEST(closure, scoped_callable_preserves_private_and_magic_dispatch) {
     CallableScope foreign_context{getMethod(foreign_scope, "scopeAnchor"), foreign_scope, nullptr};
     auto magic_callable = makeScopedCallable(callback, foreign_context);
     ASSERT_STREQ(magic_callable({5}).toCString(), "magic:multiply:5");
-
 }
 
 TEST(closure, normalize_callable_class_resolves_relative_class_names) {
@@ -233,16 +230,13 @@ TEST(closure, normalize_callable_class_resolves_relative_class_names) {
 
 TEST(closure, scoped_callable_validates_scope_and_callback) {
     CallableScope invalid_scope{nullptr, nullptr, nullptr};
-    try_call(
-        [&]() { makeScopedCallable("strlen", invalid_scope); },
-        "Explicit callable scope must not be null");
+    try_call([&]() { makeScopedCallable("strlen", invalid_scope); }, "Explicit callable scope must not be null");
 
     auto *scope_ce = getClassEntry("PhpxScopedCallableTarget");
     Object object = newObject(scope_ce);
     CallableScope scope{getMethod(scope_ce, "multiply"), scope_ce, object.object()};
-    try_call(
-        [&]() { makeScopedCallable("function_that_does_not_exist", scope); },
-        "Invalid callback function_that_does_not_exist");
+    try_call([&]() { makeScopedCallable("function_that_does_not_exist", scope); },
+             "Invalid callback function_that_does_not_exist");
 
     Variant existing = eval("return static fn(int $value): int => $value + 1;");
     Variant prepared = prepareScopedCallback(existing, scope);
@@ -262,9 +256,7 @@ TEST(closure, scoped_callable_validates_scope_and_callback) {
 
 TEST(closure, call_is_rejected_without_type_confusion) {
     auto result = run_in_child_capture_stdout([]() -> int {
-        ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &) -> Variant {
-            return null;
-        };
+        ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &) -> Variant { return null; };
 
         auto closure = newClosure(fn);
         auto target = newObject("stdClass");

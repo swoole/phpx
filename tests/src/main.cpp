@@ -71,7 +71,7 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_hook_get, 0, 0, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_hook_set, 0, 1, IS_VOID, 0)
-    ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
+ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 static zend_class_entry *gtest_hooked_ce = nullptr;
@@ -79,30 +79,24 @@ static zend_class_entry *gtest_hook_interface_ce = nullptr;
 
 static ZEND_METHOD(PhpxGtestHooked, readHook) {
     zval rv;
-    zval *value = zend_read_property(
-        gtest_hooked_ce, Z_OBJ_P(ZEND_THIS), ZEND_STRL("stored"), false, &rv);
+    zval *value = zend_read_property(gtest_hooked_ce, Z_OBJ_P(ZEND_THIS), ZEND_STRL("stored"), false, &rv);
     RETURN_STR(zval_get_string(value));
 }
 
 static ZEND_METHOD(PhpxGtestHooked, writeHook) {
     zend_string *value;
     ZEND_PARSE_PARAMETERS_START(1, 1)
-        Z_PARAM_STR(value)
+    Z_PARAM_STR(value)
     ZEND_PARSE_PARAMETERS_END();
 
-    zend_update_property_str(
-        gtest_hooked_ce, Z_OBJ_P(ZEND_THIS), ZEND_STRL("stored"), value);
+    zend_update_property_str(gtest_hooked_ce, Z_OBJ_P(ZEND_THIS), ZEND_STRL("stored"), value);
 }
 
 static const zend_function_entry hooked_object_methods[] = {
     ZEND_ME(PhpxGtestHooked, readHook, arginfo_hook_get, ZEND_ACC_PUBLIC)
-    ZEND_ME(PhpxGtestHooked, writeHook, arginfo_hook_set, ZEND_ACC_PUBLIC)
-    ZEND_FE_END
-};
+        ZEND_ME(PhpxGtestHooked, writeHook, arginfo_hook_set, ZEND_ACC_PUBLIC) ZEND_FE_END};
 
-static php::Array generator_payload(const php::Var &value,
-                                    const php::Var &key = php::null,
-                                    bool has_key = false) {
+static php::Array generator_payload(const php::Var &value, const php::Var &key = php::null, bool has_key = false) {
     if (has_key) {
         return php::Array(php::StdStrKeyMap{{"key", key}, {"value", value}, {"has_key", true}});
     }
@@ -191,15 +185,38 @@ static ZEND_FUNCTION(phpx_test_generator_yield_from_send) {
     }
 }
 
+static ZEND_FUNCTION(phpx_test_generator_yield_from_throw) {
+    try {
+        php::Var iterator = php::eval(R"PHP(
+            return (function () {
+                try {
+                    yield 'initial';
+                } catch (RuntimeException $exception) {
+                    yield 'caught' => $exception->getMessage();
+                }
+                return 91;
+            })();
+        )PHP");
+        bool closed = false;
+        php::Var result = typephp_fiber_yield_from(iterator, &closed);
+        ZVAL_COPY(return_value, result.const_ptr());
+    } catch (zend_object *exception) {
+        ZEND_ASSERT(EG(exception) == exception);
+    }
+}
+
+static ZEND_FUNCTION(phpx_test_generator_returns_immediately) {
+    RETURN_LONG(17);
+}
+
 static const zend_function_entry ext_functions[] = {
-    ZEND_FE(main, arginfo_void)
-    ZEND_FE(phpx_test_generator_sequence, arginfo_mixed)
-    ZEND_FE(phpx_test_generator_yield_from_array, arginfo_mixed)
-    ZEND_FE(phpx_test_generator_yield_from_generator, arginfo_mixed)
-    ZEND_FE(phpx_test_generator_yield_from_iterator_aggregate, arginfo_mixed)
-    ZEND_FE(phpx_test_generator_yield_from_send, arginfo_mixed)
-    ZEND_FE_END
-};
+    ZEND_FE(main, arginfo_void) ZEND_FE(phpx_test_generator_sequence, arginfo_mixed)
+        ZEND_FE(phpx_test_generator_yield_from_array, arginfo_mixed)
+            ZEND_FE(phpx_test_generator_yield_from_generator, arginfo_mixed)
+                ZEND_FE(phpx_test_generator_yield_from_iterator_aggregate, arginfo_mixed)
+                    ZEND_FE(phpx_test_generator_yield_from_send, arginfo_mixed)
+                        ZEND_FE(phpx_test_generator_yield_from_throw, arginfo_mixed)
+                            ZEND_FE(phpx_test_generator_returns_immediately, arginfo_mixed) ZEND_FE_END};
 
 static PHP_MINIT_FUNCTION(phpx_gtest_runtime) {
     typephp_register_fiber_generator_class();
@@ -211,22 +228,18 @@ static PHP_MINIT_FUNCTION(phpx_gtest_runtime) {
     // zend_declare_property_string() still creates a refcounted zval. Build
     // the default from a permanent interned string instead.
     zval stored_default;
-    ZVAL_INTERNED_STR(
-        &stored_default,
-        zend_string_init_interned(ZEND_STRL("initial"), true));
-    zend_declare_property(
-        gtest_hooked_ce, ZEND_STRL("stored"), &stored_default, ZEND_ACC_PRIVATE);
+    ZVAL_INTERNED_STR(&stored_default, zend_string_init_interned(ZEND_STRL("initial"), true));
+    zend_declare_property(gtest_hooked_ce, ZEND_STRL("stored"), &stored_default, ZEND_ACC_PRIVATE);
 
     zval hooked_default;
     ZVAL_EMPTY_STRING(&hooked_default);
     zend_string *hooked_name = zend_string_init(ZEND_STRL("value"), true);
-    zend_property_info *hooked_info = zend_declare_typed_property(
-        gtest_hooked_ce,
-        hooked_name,
-        &hooked_default,
-        ZEND_ACC_PUBLIC,
-        nullptr,
-        ZEND_TYPE_INIT_CODE(IS_STRING, false, 0));
+    zend_property_info *hooked_info = zend_declare_typed_property(gtest_hooked_ce,
+                                                                  hooked_name,
+                                                                  &hooked_default,
+                                                                  ZEND_ACC_PUBLIC,
+                                                                  nullptr,
+                                                                  ZEND_TYPE_INIT_CODE(IS_STRING, false, 0));
     zend_string_release(hooked_name);
     php::registerPropertyHooks(gtest_hooked_ce, hooked_info, "readhook", "writehook");
 
@@ -236,13 +249,13 @@ static PHP_MINIT_FUNCTION(phpx_gtest_runtime) {
     zval interface_default;
     ZVAL_UNDEF(&interface_default);
     zend_string *interface_name = zend_string_init(ZEND_STRL("contractValue"), true);
-    zend_property_info *interface_info = zend_declare_typed_property(
-        gtest_hook_interface_ce,
-        interface_name,
-        &interface_default,
-        ZEND_ACC_PUBLIC | ZEND_ACC_ABSTRACT | ZEND_ACC_VIRTUAL,
-        nullptr,
-        ZEND_TYPE_INIT_CODE(IS_STRING, false, 0));
+    zend_property_info *interface_info =
+        zend_declare_typed_property(gtest_hook_interface_ce,
+                                    interface_name,
+                                    &interface_default,
+                                    ZEND_ACC_PUBLIC | ZEND_ACC_ABSTRACT | ZEND_ACC_VIRTUAL,
+                                    nullptr,
+                                    ZEND_TYPE_INIT_CODE(IS_STRING, false, 0));
     zend_string_release(interface_name);
     php::registerAbstractPropertyHooks(gtest_hook_interface_ce, interface_info, true, true);
     return SUCCESS;

@@ -27,38 +27,32 @@ struct Roots {
     Node *second = nullptr;
 };
 
-size_t objectSize(const void *)
-{
+size_t objectSize(const void *) {
     return sizeof(Node);
 }
 
-size_t oversizedObjectSize(const void *)
-{
+size_t oversizedObjectSize(const void *) {
     return std::numeric_limits<size_t>::max();
 }
 
-bool hasFinalizer(const void *)
-{
+bool hasFinalizer(const void *) {
     return true;
 }
 
 Node *allocateNode(WrenGcHeap *heap, Counters &counters);
 
-void markRoots(WrenGcVisitFn visit, void *visit_context, void *roots_context)
-{
+void markRoots(WrenGcVisitFn visit, void *visit_context, void *roots_context) {
     auto *roots = static_cast<Roots *>(roots_context);
     visit(roots->first, visit_context);
     visit(roots->second, visit_context);
 }
 
-void traceNode(void *payload, WrenGcVisitFn visit, void *context)
-{
+void traceNode(void *payload, WrenGcVisitFn visit, void *context) {
     auto *node = static_cast<Node *>(payload);
     visit(node->child, context);
 }
 
-void finalizeNode(void *payload)
-{
+void finalizeNode(void *payload) {
     auto *node = static_cast<Node *>(payload);
     node->counters->finalized++;
     if (node->allocate_child_on_finalize) {
@@ -70,18 +64,12 @@ void finalizeNode(void *payload)
     }
 }
 
-void destroyNode(void *payload)
-{
+void destroyNode(void *payload) {
     static_cast<Node *>(payload)->counters->destroyed++;
 }
 
-Node *allocateNode(WrenGcHeap *heap, Counters &counters)
-{
-    auto *node = static_cast<Node *>(wren_gc_allocate(
-        heap,
-        alignof(Node),
-        nullptr
-    ));
+Node *allocateNode(WrenGcHeap *heap, Counters &counters) {
+    auto *node = static_cast<Node *>(wren_gc_allocate(heap, alignof(Node), nullptr));
     EXPECT_NE(nullptr, node);
     new (node) Node{};
     node->counters = &counters;
@@ -89,8 +77,7 @@ Node *allocateNode(WrenGcHeap *heap, Counters &counters)
     return node;
 }
 
-void configureHeap(WrenGcConfig &config, Roots &roots)
-{
+void configureHeap(WrenGcConfig &config, Roots &roots) {
     wren_gc_config_init(&config);
     config.mark_roots = markRoots;
     config.roots_context = &roots;
@@ -100,10 +87,9 @@ void configureHeap(WrenGcConfig &config, Roots &roots)
     config.finalize = finalizeNode;
     config.destroy = destroyNode;
 }
-} // namespace
+}  // namespace
 
-TEST(wren_gc, uses_compact_sixteen_byte_header)
-{
+TEST(wren_gc, uses_compact_sixteen_byte_header) {
     if constexpr (sizeof(void *) == 8) {
         EXPECT_EQ(16u, wren_gc_header_size());
     } else {
@@ -125,8 +111,7 @@ TEST(wren_gc, uses_compact_sixteen_byte_header)
     wren_gc_heap_free(heap);
 }
 
-TEST(wren_gc, rejects_an_allocation_size_that_cannot_include_its_header)
-{
+TEST(wren_gc, rejects_an_allocation_size_that_cannot_include_its_header) {
     Roots roots;
     WrenGcConfig config;
     configureHeap(config, roots);
@@ -140,8 +125,7 @@ TEST(wren_gc, rejects_an_allocation_size_that_cannot_include_its_header)
     wren_gc_heap_free(heap);
 }
 
-TEST(wren_gc, collects_unreachable_cycle)
-{
+TEST(wren_gc, collects_unreachable_cycle) {
     Roots roots;
     WrenGcConfig config;
     configureHeap(config, roots);
@@ -161,8 +145,7 @@ TEST(wren_gc, collects_unreachable_cycle)
     wren_gc_heap_free(heap);
 }
 
-TEST(wren_gc, precise_root_retains_reachable_graph)
-{
+TEST(wren_gc, precise_root_retains_reachable_graph) {
     Roots roots;
     WrenGcConfig config;
     configureHeap(config, roots);
@@ -184,8 +167,7 @@ TEST(wren_gc, precise_root_retains_reachable_graph)
     wren_gc_heap_free(heap);
 }
 
-TEST(wren_gc, finalizer_can_resurrect_object_only_once)
-{
+TEST(wren_gc, finalizer_can_resurrect_object_only_once) {
     Roots roots;
     WrenGcConfig config;
     configureHeap(config, roots);
@@ -208,8 +190,7 @@ TEST(wren_gc, finalizer_can_resurrect_object_only_once)
     wren_gc_heap_free(heap);
 }
 
-TEST(wren_gc, allocation_from_finalizer_survives_current_sweep)
-{
+TEST(wren_gc, allocation_from_finalizer_survives_current_sweep) {
     Roots roots;
     WrenGcConfig config;
     configureHeap(config, roots);
@@ -232,8 +213,7 @@ TEST(wren_gc, allocation_from_finalizer_survives_current_sweep)
     wren_gc_heap_free(heap);
 }
 
-TEST(wren_gc, reachability_probe_and_finalizer_suppression_preserve_published_failures)
-{
+TEST(wren_gc, reachability_probe_and_finalizer_suppression_preserve_published_failures) {
     Roots roots;
     WrenGcConfig config;
     configureHeap(config, roots);

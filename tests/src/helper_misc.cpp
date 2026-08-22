@@ -166,9 +166,8 @@ TEST(helper_exact_type_check, compound_values) {
     ASSERT_EQ(php::toStringExact(string_value, "Test::$stringValue"), "value");
     ASSERT_EQ(php::toArrayExact(array_value, "Test::$arrayValue").length(), 1);
     ASSERT_EQ(php::toObjectExact(object_value, "Test::$objectValue").getClassName(), "stdClass");
-    ASSERT_EQ(
-        php::toObjectExact(object_value, object_value.ce(), "Test::$typedObjectValue").getClassName(),
-        "stdClass");
+    ASSERT_EQ(php::toObjectExact(object_value, object_value.ce(), "Test::$typedObjectValue").getClassName(),
+              "stdClass");
 }
 
 TEST(helper_exact_type_check, scalar_type_error) {

@@ -28,8 +28,7 @@ void traceObject(void *object, WrenGcVisitFn visit, void *context);
 void finalizeObject(void *object) noexcept;
 void destroyObject(void *object) noexcept;
 
-void markRoots(WrenGcVisitFn visit, void *visit_context, void *)
-{
+void markRoots(WrenGcVisitFn visit, void *visit_context, void *) {
     for (NativeRootSlot slot : native_request_roots) {
         void *object = slot.get();
         if (object != nullptr) {
@@ -46,15 +45,12 @@ void markRoots(WrenGcVisitFn visit, void *visit_context, void *)
         }
     }
     NativeMarker marker(visit, visit_context);
-    for (NativeContainerRootFrameBase *frame = native_container_root_top;
-         frame != nullptr;
-         frame = frame->previous()) {
+    for (NativeContainerRootFrameBase *frame = native_container_root_top; frame != nullptr; frame = frame->previous()) {
         frame->trace(marker);
     }
 }
 
-WrenGcHeap *heap()
-{
+WrenGcHeap *heap() {
     if (native_heap == nullptr) {
         WrenGcConfig config;
         wren_gc_config_init(&config);
@@ -72,23 +68,19 @@ WrenGcHeap *heap()
     return native_heap;
 }
 
-const NativeTypeDescriptor *descriptor(void *object) noexcept
-{
+const NativeTypeDescriptor *descriptor(void *object) noexcept {
     return static_cast<const NativeTypeDescriptor *>(wren_gc_type_data(object));
 }
 
-size_t objectSize(const void *typeData) noexcept
-{
+size_t objectSize(const void *typeData) noexcept {
     return static_cast<const NativeTypeDescriptor *>(typeData)->size;
 }
 
-bool hasFinalizer(const void *typeData) noexcept
-{
+bool hasFinalizer(const void *typeData) noexcept {
     return static_cast<const NativeTypeDescriptor *>(typeData)->finalize != nullptr;
 }
 
-void traceObject(void *object, WrenGcVisitFn visit, void *context)
-{
+void traceObject(void *object, WrenGcVisitFn visit, void *context) {
     const NativeTypeDescriptor *type = descriptor(object);
     if (type != nullptr && type->trace != nullptr) {
         NativeMarker marker(visit, context);
@@ -96,8 +88,7 @@ void traceObject(void *object, WrenGcVisitFn visit, void *context)
     }
 }
 
-void rememberZendException(zend_object *exception) noexcept
-{
+void rememberZendException(zend_object *exception) noexcept {
     if (pending_zend_exception == nullptr) {
         GC_ADDREF(exception);
         pending_zend_exception = exception;
@@ -107,8 +98,7 @@ void rememberZendException(zend_object *exception) noexcept
     }
 }
 
-void finalizeObject(void *object) noexcept
-{
+void finalizeObject(void *object) noexcept {
     const NativeTypeDescriptor *type = descriptor(object);
     if (type == nullptr || type->finalize == nullptr) {
         return;
@@ -124,16 +114,14 @@ void finalizeObject(void *object) noexcept
     }
 }
 
-void destroyObject(void *object) noexcept
-{
+void destroyObject(void *object) noexcept {
     const NativeTypeDescriptor *type = descriptor(object);
     if (type != nullptr && type->destroy != nullptr) {
         type->destroy(object);
     }
 }
 
-void rethrowFinalizerException()
-{
+void rethrowFinalizerException() {
     if (pending_zend_exception != nullptr) {
         zend_object *exception = pending_zend_exception;
         pending_zend_exception = nullptr;
@@ -147,8 +135,7 @@ void rethrowFinalizerException()
     }
 }
 
-void discardPendingFinalizerException() noexcept
-{
+void discardPendingFinalizerException() noexcept {
     if (pending_zend_exception != nullptr) {
         OBJ_RELEASE(pending_zend_exception);
         pending_zend_exception = nullptr;
@@ -158,20 +145,21 @@ void discardPendingFinalizerException() noexcept
         zend_clear_exception();
     }
 }
-} // namespace
+}  // namespace
 
 NativeRootFrame::NativeRootFrame(NativeRootSlot *slots, size_t count) noexcept
-    : previous_(native_root_top), newer_(nullptr), slots_(slots), count_(count),
-      requestEpoch_(native_root_request_epoch)
-{
+    : previous_(native_root_top),
+      newer_(nullptr),
+      slots_(slots),
+      count_(count),
+      requestEpoch_(native_root_request_epoch) {
     if (previous_ != nullptr) {
         previous_->newer_ = this;
     }
     native_root_top = this;
 }
 
-NativeRootFrame::~NativeRootFrame() noexcept
-{
+NativeRootFrame::~NativeRootFrame() noexcept {
     if (requestEpoch_ != native_root_request_epoch) {
         return;
     }
@@ -186,17 +174,18 @@ NativeRootFrame::~NativeRootFrame() noexcept
 }
 
 NativeContainerRootFrameBase::NativeContainerRootFrameBase(const void *container, TraceFn trace) noexcept
-    : previous_(native_container_root_top), newer_(nullptr), container_(container), trace_(trace),
-      requestEpoch_(native_root_request_epoch)
-{
+    : previous_(native_container_root_top),
+      newer_(nullptr),
+      container_(container),
+      trace_(trace),
+      requestEpoch_(native_root_request_epoch) {
     if (previous_ != nullptr) {
         previous_->newer_ = this;
     }
     native_container_root_top = this;
 }
 
-NativeContainerRootFrameBase::~NativeContainerRootFrameBase() noexcept
-{
+NativeContainerRootFrameBase::~NativeContainerRootFrameBase() noexcept {
     if (requestEpoch_ != native_root_request_epoch) {
         return;
     }
@@ -210,16 +199,14 @@ NativeContainerRootFrameBase::~NativeContainerRootFrameBase() noexcept
     }
 }
 
-NativeFinalizerChain::~NativeFinalizerChain() noexcept
-{
+NativeFinalizerChain::~NativeFinalizerChain() noexcept {
     if (zendException_ != nullptr) {
         OBJ_RELEASE(zendException_);
     }
     delete cppException_;
 }
 
-void NativeFinalizerChain::remember(zend_object *exception) noexcept
-{
+void NativeFinalizerChain::remember(zend_object *exception) noexcept {
     if (!failed_) {
         failed_ = true;
         GC_ADDREF(exception);
@@ -230,8 +217,7 @@ void NativeFinalizerChain::remember(zend_object *exception) noexcept
     }
 }
 
-void NativeFinalizerChain::rememberCurrentException() noexcept
-{
+void NativeFinalizerChain::rememberCurrentException() noexcept {
     if (!failed_) {
         failed_ = true;
         cppException_ = new (std::nothrow) CppExceptionState{std::current_exception()};
@@ -243,8 +229,7 @@ void NativeFinalizerChain::rememberCurrentException() noexcept
     }
 }
 
-void NativeFinalizerChain::rethrow()
-{
+void NativeFinalizerChain::rethrow() {
     if (zendException_ != nullptr) {
         zend_object *exception = zendException_;
         zendException_ = nullptr;
@@ -260,13 +245,8 @@ void NativeFinalizerChain::rethrow()
     }
 }
 
-void *nativeGcAllocate(const NativeTypeDescriptor &type)
-{
-    void *object = wren_gc_allocate(
-        heap(),
-        type.alignment,
-        &type
-    );
+void *nativeGcAllocate(const NativeTypeDescriptor &type) {
+    void *object = wren_gc_allocate(heap(), type.alignment, &type);
     if (UNEXPECTED(object == nullptr)) {
         throw std::bad_alloc();
     }
@@ -282,33 +262,28 @@ void *nativeGcAllocate(const NativeTypeDescriptor &type)
     return object;
 }
 
-void *nativeGcRequireObject(void *object, const char *typeName)
-{
+void *nativeGcRequireObject(void *object, const char *typeName) {
     if (UNEXPECTED(object == nullptr)) {
         throwError("Call on null native object of type %s", typeName);
     }
     return object;
 }
 
-void nativeGcAbandon(void *object) noexcept
-{
+void nativeGcAbandon(void *object) noexcept {
     if (native_heap != nullptr) {
         wren_gc_abandon(native_heap, object);
     }
 }
 
-bool nativeGcIsReachable(const void *object) noexcept
-{
+bool nativeGcIsReachable(const void *object) noexcept {
     return native_heap != nullptr && wren_gc_is_reachable(native_heap, object);
 }
 
-void nativeGcSuppressFinalizer(void *object) noexcept
-{
+void nativeGcSuppressFinalizer(void *object) noexcept {
     wren_gc_suppress_finalizer(object);
 }
 
-void nativeGcCollect()
-{
+void nativeGcCollect() {
     if (native_heap == nullptr) {
         return;
     }
@@ -316,8 +291,7 @@ void nativeGcCollect()
     rethrowFinalizerException();
 }
 
-NativeGcStats nativeGcStats() noexcept
-{
+NativeGcStats nativeGcStats() noexcept {
     if (native_heap == nullptr) {
         return {};
     }
@@ -325,14 +299,12 @@ NativeGcStats nativeGcStats() noexcept
     return {stats.bytes_allocated, stats.next_collection, stats.object_count, stats.collection_count};
 }
 
-void nativeGcRegisterRequestRoot(NativeRootSlot slot)
-{
+void nativeGcRegisterRequestRoot(NativeRootSlot slot) {
     ZEND_ASSERT(slot.valid());
     native_request_roots.push_back(slot);
 }
 
-void nativeGcRequestInit() noexcept
-{
+void nativeGcRequestInit() noexcept {
     ZEND_ASSERT(native_heap == nullptr);
     ZEND_ASSERT(native_root_top == nullptr);
     ZEND_ASSERT(native_container_root_top == nullptr);
@@ -340,8 +312,7 @@ void nativeGcRequestInit() noexcept
     discardPendingFinalizerException();
 }
 
-void nativeGcRequestShutdown() noexcept
-{
+void nativeGcRequestShutdown() noexcept {
     // Suspended Fibers may still own C++ root frames when PHP reaches module
     // RSHUTDOWN. Detach the complete registry in O(1); their later stack
     // unwinding observes the old epoch and safely skips unlinking.
@@ -371,4 +342,4 @@ void nativeGcRequestShutdown() noexcept
     discardPendingFinalizerException();
 }
 
-} // namespace php
+}  // namespace php

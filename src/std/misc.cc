@@ -171,11 +171,8 @@ static zend_string *_uniqid_hash(const String &prefix, bool more_entropy) {
                                php_combined_lcg() * 10);
     }
 
-    return zend_strpprintf(0,
-                           "%s%08" PRIx64 "%05x",
-                           prefix.length() > 0 ? prefix.data() : "",
-                           static_cast<std::uint64_t>(sec),
-                           usec);
+    return zend_strpprintf(
+        0, "%s%08" PRIx64 "%05x", prefix.length() > 0 ? prefix.data() : "", static_cast<std::uint64_t>(sec), usec);
 }
 
 String uniqid(const String &prefix, bool more_entropy) {

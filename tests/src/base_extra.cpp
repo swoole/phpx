@@ -224,8 +224,8 @@ TEST(base_extra, update_class_constant_by_class_name) {
 
 TEST(base_extra, property_hook_registration_helpers) {
     auto *hooked_ce = getClassEntry("PhpxGtestHooked");
-    auto *property_info = static_cast<zend_property_info *>(
-        zend_hash_str_find_ptr(&hooked_ce->properties_info, ZEND_STRL("value")));
+    auto *property_info =
+        static_cast<zend_property_info *>(zend_hash_str_find_ptr(&hooked_ce->properties_info, ZEND_STRL("value")));
     ASSERT_NE(property_info, nullptr);
     ASSERT_NE(property_info->hooks, nullptr);
     ASSERT_NE(property_info->hooks[ZEND_PROPERTY_HOOK_GET], nullptr);
@@ -434,8 +434,7 @@ TEST(base_extra, include_with_explicit_symbol_table) {
     scope.set("first", "A");
     scope.set("second", 42);
 
-    Variant result = include(
-        get_include_dir() + "/return_scope.php", INCLUDE, scope);
+    Variant result = include(get_include_dir() + "/return_scope.php", INCLUDE, scope);
     Array values = result.toArray();
     ASSERT_STREQ(values.get("first").toCString(), "A");
     ASSERT_EQ(values.get("second").toInt(), 42);
@@ -703,7 +702,7 @@ TEST(base_extra, facade_string_search) {
     ASSERT_EQ(rpos.toInt(), 12);
 }
 
-#endif // ENABLE_FACADE_API
+#endif  // ENABLE_FACADE_API
 
 // Test sort with flags
 TEST(base_extra, sort_with_flags) {

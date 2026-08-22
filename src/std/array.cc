@@ -220,7 +220,7 @@ Array array_values(const Array &array) {
     zend_array *new_ht = zend_array_to_list(arrval);
     Array result;
     zval_ptr_dtor(result.ptr());
-    ZVAL_ARR(result.ptr(), new_ht);      // take ownership of new_ht
+    ZVAL_ARR(result.ptr(), new_ht);  // take ownership of new_ht
     return result;
 }
 
@@ -343,8 +343,7 @@ Array array_fill(Int start_index, Int count, const Variant &value) {
     // Match Zend's allocation limits before narrowing the requested capacity
     // to uint32_t or evaluating start_index + i in the fill loop.
     if (UNEXPECTED(count > INT_MAX)) {
-        php::throwException(zend_ce_value_error,
-                            "array_fill(): Argument #2 ($count) is too large");
+        php::throwException(zend_ce_value_error, "array_fill(): Argument #2 ($count) is too large");
         return Array();
     }
     if (UNEXPECTED(start_index > ZEND_LONG_MAX - count + 1)) {

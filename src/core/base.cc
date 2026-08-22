@@ -259,10 +259,7 @@ Variant constant(const String &name, ConstantLookup lookup) {
     if (lookup == ConstantLookup::UnqualifiedInNamespace) {
         flags |= IS_CONSTANT_UNQUALIFIED_IN_NAMESPACE;
     }
-    auto c = zend_get_constant_ex(
-        name.str(),
-        zend_get_executed_scope(),
-        flags);
+    auto c = zend_get_constant_ex(name.str(), zend_get_executed_scope(), flags);
     throwErrorIfOccurred();
     return Variant{c};
 }
@@ -312,11 +309,7 @@ Variant classConstant(zend_class_entry *ce, const Variant &name, zend_class_entr
         return String(ce->name);
     }
 
-    auto value = zend_get_class_constant_ex(
-        ce->name,
-        constant_name.str(),
-        scope,
-        ZEND_FETCH_CLASS_EXCEPTION);
+    auto value = zend_get_class_constant_ex(ce->name, constant_name.str(), scope, ZEND_FETCH_CLASS_EXCEPTION);
     throwErrorIfOccurred();
     return Variant(value);
 }
@@ -368,8 +361,8 @@ static zend_function *createAbstractPropertyHook(zend_class_entry *ce,
                                                  zend_property_hook_kind kind) {
     const bool setter = kind == ZEND_PROPERTY_HOOK_SET;
     const uint32_t num_args = setter ? 1 : 0;
-    auto arg_info = static_cast<zend_internal_arg_info *>(
-        pemalloc(sizeof(zend_internal_arg_info) * (num_args + 1), true));
+    auto arg_info =
+        static_cast<zend_internal_arg_info *>(pemalloc(sizeof(zend_internal_arg_info) * (num_args + 1), true));
     memset(arg_info, 0, sizeof(zend_internal_arg_info) * (num_args + 1));
     arg_info[0].name = reinterpret_cast<const char *>(static_cast<uintptr_t>(num_args));
     if (setter) {
@@ -417,13 +410,11 @@ void registerPropertyHooks(zend_class_entry *ce,
     const std::string property_name{zend_get_unmangled_property_name(property_info->name)};
     if (!getter.empty()) {
         const std::string hook_name = "$" + property_name + "::get";
-        property_info->hooks[ZEND_PROPERTY_HOOK_GET] =
-            createPropertyHook(ce, property_info, getter, hook_name);
+        property_info->hooks[ZEND_PROPERTY_HOOK_GET] = createPropertyHook(ce, property_info, getter, hook_name);
     }
     if (!setter.empty()) {
         const std::string hook_name = "$" + property_name + "::set";
-        property_info->hooks[ZEND_PROPERTY_HOOK_SET] =
-            createPropertyHook(ce, property_info, setter, hook_name);
+        property_info->hooks[ZEND_PROPERTY_HOOK_SET] = createPropertyHook(ce, property_info, setter, hook_name);
     }
 
     ce->num_hooked_props++;
@@ -432,10 +423,7 @@ void registerPropertyHooks(zend_class_entry *ce,
     }
 }
 
-void registerAbstractPropertyHooks(zend_class_entry *ce,
-                                   zend_property_info *property_info,
-                                   bool getter,
-                                   bool setter) {
+void registerAbstractPropertyHooks(zend_class_entry *ce, zend_property_info *property_info, bool getter, bool setter) {
     ZEND_ASSERT(ce != nullptr);
     ZEND_ASSERT(ce->ce_flags & ZEND_ACC_INTERFACE);
     ZEND_ASSERT(property_info != nullptr);
@@ -729,11 +717,8 @@ Variant call_impl(const zval *object, const zval *func) {
     return retval;
 }
 
-Variant callScoped(const Variant &object,
-                   const Variant &func,
-                   const CallableScope &scope,
-                   Args &args,
-                   zend_array *named_args) {
+Variant callScoped(
+    const Variant &object, const Variant &func, const CallableScope &scope, Args &args, zend_array *named_args) {
     if (UNEXPECTED(!object.isObject())) {
         throwError("call method `%s` on %s", func.toCString(), object.typeStr());
         return {};
@@ -749,10 +734,7 @@ Variant callScoped(const Variant &object,
     return retval;
 }
 
-Variant callScoped(const Variant &func,
-                   const CallableScope &scope,
-                   Args &args,
-                   zend_array *named_args) {
+Variant callScoped(const Variant &func, const CallableScope &scope, Args &args, zend_array *named_args) {
     if (UNEXPECTED(!scope.isValid())) {
         throwError("Explicit callable scope must not be null");
         return {};
@@ -763,27 +745,18 @@ Variant callScoped(const Variant &func,
     return retval;
 }
 
-Variant callScoped(const Variant &func,
-                   const CallableScope &scope,
-                   Array &args,
-                   zend_array *named_args) {
+Variant callScoped(const Variant &func, const CallableScope &scope, Array &args, zend_array *named_args) {
     Args call_args(args);
     return callScoped(func, scope, call_args, named_args);
 }
 
-Variant callScoped(const Variant &func,
-                   const CallableScope &scope,
-                   const ArgList &args,
-                   zend_array *named_args) {
+Variant callScoped(const Variant &func, const CallableScope &scope, const ArgList &args, zend_array *named_args) {
     Args call_args(args);
     return callScoped(func, scope, call_args, named_args);
 }
 
-Variant callScoped(const Variant &object,
-                   const Variant &func,
-                   const CallableScope &scope,
-                   Array &args,
-                   zend_array *named_args) {
+Variant callScoped(
+    const Variant &object, const Variant &func, const CallableScope &scope, Array &args, zend_array *named_args) {
     Args call_args(args);
     return callScoped(object, func, scope, call_args, named_args);
 }
@@ -929,8 +902,8 @@ static void execute_with_symbol_table(zend_op_array *op_array, zval *return_valu
         object_or_called_scope = zend_get_called_scope(previous_execute_data);
     }
 
-    zend_execute_data *execute_data =
-        zend_vm_stack_push_call_frame(call_info, reinterpret_cast<zend_function *>(op_array), 0, object_or_called_scope);
+    zend_execute_data *execute_data = zend_vm_stack_push_call_frame(
+        call_info, reinterpret_cast<zend_function *>(op_array), 0, object_or_called_scope);
     execute_data->symbol_table = symbol_table;
     zend_init_code_execute_data(execute_data, op_array, return_value);
     ZEND_OBSERVER_FCALL_BEGIN(execute_data);
@@ -1153,8 +1126,8 @@ Reference toReference(const Variant &v, const OperationChain &list) {
                 return tmp.attrRef(expr.second);
             }
         } else {
-            Variant next = expr.first == ArrayDimFetch ? tmp.item(expr.second, true)
-                                                       : tmp.attr(expr.second, AttrMode::Update);
+            Variant next =
+                expr.first == ArrayDimFetch ? tmp.item(expr.second, true) : tmp.attr(expr.second, AttrMode::Update);
             if (next.isIndirect()) {
                 path.emplace_back(next.direct_ptr(), Ctor::Indirect);
             } else {
@@ -1207,7 +1180,12 @@ Reference getStaticPropertyRef(const String &class_name, const String &prop) {
 }
 
 Reference getStaticPropertyRef(zend_class_entry *ce, const String &prop) {
-    auto rv = zend_read_static_property_ex(ce, prop.str(), true);
+    zend_property_info *prop_info = nullptr;
+    zval *rv;
+    do {
+        FakeScopeGuard scope_guard{ce};
+        rv = zend_std_get_static_property_with_info(ce, prop.str(), BP_VAR_IS, &prop_info);
+    } while (0);
     throwErrorIfOccurred();
     if (rv == nullptr) {
         return {};
@@ -1218,20 +1196,6 @@ Reference getStaticPropertyRef(zend_class_entry *ce, const String &prop) {
 
     Variant member{rv, zval_wrap(rv)};
     auto ref = member.toReference();
-    auto prop_info = static_cast<zend_property_info *>(zend_hash_find_ptr(&ce->properties_info, prop.str()));
-    if (!prop_info || prop_info == ZEND_WRONG_PROPERTY_INFO) {
-        prop_info = nullptr;
-        void *candidate_ptr;
-        ZEND_HASH_FOREACH_PTR(&ce->properties_info, candidate_ptr) {
-            auto candidate = static_cast<zend_property_info *>(candidate_ptr);
-            if ((candidate->flags & ZEND_ACC_STATIC) && candidate->offset < ce->default_static_members_count &&
-                CE_STATIC_MEMBERS(ce) + candidate->offset == rv && zend_string_equals(candidate->name, prop.str())) {
-                prop_info = candidate;
-                break;
-            }
-        }
-        ZEND_HASH_FOREACH_END();
-    }
     if (prop_info && ZEND_TYPE_IS_SET(prop_info->type)) {
         ZEND_REF_ADD_TYPE_SOURCE(ref.reference(), prop_info);
     }

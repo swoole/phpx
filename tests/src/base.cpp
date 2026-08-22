@@ -54,14 +54,10 @@ TEST(base, constant_namespace_fallback) {
     define("PhpX\\Runtime\\PHPX_NAMESPACE_VALUE", "namespaced");
     define("PHPX_NAMESPACE_VALUE", "wrong-global");
 
-    auto global = constant(
-        "PhpX\\Runtime\\PHPX_GLOBAL_FALLBACK_ONLY",
-        ConstantLookup::UnqualifiedInNamespace);
+    auto global = constant("PhpX\\Runtime\\PHPX_GLOBAL_FALLBACK_ONLY", ConstantLookup::UnqualifiedInNamespace);
     ASSERT_STREQ(global.toCString(), "global");
 
-    auto namespaced = constant(
-        "PhpX\\Runtime\\PHPX_NAMESPACE_VALUE",
-        ConstantLookup::UnqualifiedInNamespace);
+    auto namespaced = constant("PhpX\\Runtime\\PHPX_NAMESPACE_VALUE", ConstantLookup::UnqualifiedInNamespace);
     ASSERT_STREQ(namespaced.toCString(), "namespaced");
 }
 

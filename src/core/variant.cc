@@ -585,8 +585,7 @@ static inline bool fast_add_overflow(zend_long a, zend_long b, zend_long *result
 #if PHPX_HAS_BUILTIN_OVERFLOW
     return __builtin_add_overflow(a, b, result);
 #else
-    if (UNEXPECTED((b > 0 && a > ZEND_LONG_MAX - b)
-                   || (b < 0 && a < ZEND_LONG_MIN - b))) {
+    if (UNEXPECTED((b > 0 && a > ZEND_LONG_MAX - b) || (b < 0 && a < ZEND_LONG_MIN - b))) {
         return true;
     }
     *result = a + b;
@@ -598,8 +597,7 @@ static inline bool fast_sub_overflow(zend_long a, zend_long b, zend_long *result
 #if PHPX_HAS_BUILTIN_OVERFLOW
     return __builtin_sub_overflow(a, b, result);
 #else
-    if (UNEXPECTED((b < 0 && a > ZEND_LONG_MAX + b)
-                   || (b > 0 && a < ZEND_LONG_MIN + b))) {
+    if (UNEXPECTED((b < 0 && a > ZEND_LONG_MAX + b) || (b > 0 && a < ZEND_LONG_MIN + b))) {
         return true;
     }
     *result = a - b;

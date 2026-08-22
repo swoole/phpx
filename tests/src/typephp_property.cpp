@@ -82,9 +82,8 @@ TEST(typephp_property, getter_without_setter_is_read_only) {
     auto *scope = property_hook_class();
 
     ASSERT_EQ(typephp_read_property_scoped(object, "virtual", scope, AttrMode::Get).toInt(), 99);
-    try_call(
-        [&]() { typephp_write_property_scoped(object, "virtual", 1, scope); },
-        "Property PhpxPropertyHookCoverage::$virtual is read-only");
+    try_call([&]() { typephp_write_property_scoped(object, "virtual", 1, scope); },
+             "Property PhpxPropertyHookCoverage::$virtual is read-only");
 }
 
 TEST(typephp_property, typed_unset_resets_supported_types) {
@@ -114,12 +113,10 @@ TEST(typephp_property, asymmetric_set_visibility_uses_explicit_scope) {
     auto object = new_property_hook_object();
     auto *scope = property_hook_class();
 
-    try_call(
-        [&]() { typephp_write_property_scoped(object, "privateWrite", 1, nullptr); },
-        "Cannot modify private(set) property");
-    try_call(
-        [&]() { typephp_write_property_scoped(object, "protectedWrite", 1, nullptr); },
-        "Cannot modify protected(set) property");
+    try_call([&]() { typephp_write_property_scoped(object, "privateWrite", 1, nullptr); },
+             "Cannot modify private(set) property");
+    try_call([&]() { typephp_write_property_scoped(object, "protectedWrite", 1, nullptr); },
+             "Cannot modify protected(set) property");
 
     typephp_write_property_scoped(object, "privateWrite", 2, scope);
     typephp_write_property_scoped(object, "protectedWrite", 3, scope);
@@ -134,10 +131,8 @@ TEST(typephp_property, trait_scope_resolves_to_property_owner) {
 }
 
 TEST(typephp_property, scoped_helpers_reject_non_objects) {
-    try_call(
-        []() { (void) typephp_read_property_scoped(42, "value", nullptr, AttrMode::Get); },
-        "Attempt to read property `value` on int");
-    try_call(
-        []() { typephp_write_property_scoped(42, "value", 1, nullptr); },
-        "Attempt to write property `value` on int");
+    try_call([]() { (void) typephp_read_property_scoped(42, "value", nullptr, AttrMode::Get); },
+             "Attempt to read property `value` on int");
+    try_call([]() { typephp_write_property_scoped(42, "value", 1, nullptr); },
+             "Attempt to write property `value` on int");
 }

@@ -316,8 +316,7 @@ TEST(std_misc, version_compare) {
     ASSERT_TRUE(fn::version_compare("1.0", "2.0", "<>").toBool());
     ASSERT_TRUE(fn::version_compare("1.0", "2.0", "ne").toBool());
     ASSERT_EQ(fn::version_compare("1.0", "1.0", "").toInt(), 0);
-    try_call([]() { fn::version_compare("1", "2", "invalid"); },
-             "must be a valid comparison operator");
+    try_call([]() { fn::version_compare("1", "2", "invalid"); }, "must be a valid comparison operator");
 }
 
 // ========================
@@ -399,10 +398,12 @@ TEST(std_misc, shell_exec) {
     ASSERT_STREQ(out.toString().toCString(), "hello\n");
 
     ASSERT_TRUE(fn::shell_exec("true").isNull());
-    try_call([]() {
-        (void) fn::shell_exec("");
-        throwErrorIfOccurred();
-    }, "cannot be empty");
+    try_call(
+        []() {
+            (void) fn::shell_exec("");
+            throwErrorIfOccurred();
+        },
+        "cannot be empty");
 }
 
 TEST(std_misc, realpath) {

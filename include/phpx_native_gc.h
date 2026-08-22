@@ -106,8 +106,7 @@ class NativeRootSlot final {
         // Generated forward-declaration slots use void*. Concrete method
         // locals use T*. Both are object-pointer representations and retain
         // their exact slot type through access<T>().
-        static_assert(std::is_object_v<T> || std::is_void_v<T>,
-                      "Native roots must point to object types");
+        static_assert(std::is_object_v<T> || std::is_void_v<T>, "Native roots must point to object types");
     }
 
     void *get() const noexcept {
@@ -123,7 +122,7 @@ class NativeRootSlot final {
     }
 
   private:
-    using AccessFn = void *(*)(void *slot, bool clear) noexcept;
+    using AccessFn = void *(*) (void *slot, bool clear) noexcept;
 
     template <typename T>
     static void *access(void *slot, bool clear) noexcept {
@@ -343,4 +342,4 @@ T *nativeClone(const NativeTypeDescriptor &type, const T &source, Initializer &&
     }
 }
 
-} // namespace php
+}  // namespace php

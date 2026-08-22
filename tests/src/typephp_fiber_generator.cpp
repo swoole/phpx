@@ -15,9 +15,8 @@ TEST(typephp_fiber_generator, class_is_registered_by_test_module) {
 }
 
 TEST(typephp_fiber_generator, direct_construction_is_rejected) {
-    try_call(
-        []() { (void) newObject("FiberGenerator", {"phpx_test_generator_sequence"}); },
-        "FiberGenerator cannot be directly constructed");
+    try_call([]() { (void) newObject("FiberGenerator", {"phpx_test_generator_sequence"}); },
+             "FiberGenerator cannot be directly constructed");
 }
 
 TEST(typephp_fiber_generator, sequence_supports_current_key_send_and_return) {
@@ -29,9 +28,7 @@ TEST(typephp_fiber_generator, sequence_supports_current_key_send_and_return) {
 
     ASSERT_STREQ(generator.call("send", {"sent"}).toCString(), "sent");
     ASSERT_EQ(generator.call("key").toInt(), 7);
-    try_call(
-        [&]() { generator.call("rewind"); },
-        "Cannot rewind a generator that was already run");
+    try_call([&]() { generator.call("rewind"); }, "Cannot rewind a generator that was already run");
 
     generator.call("next");
     ASSERT_FALSE(generator.call("valid").toBool());
@@ -49,23 +46,19 @@ TEST(typephp_fiber_generator, next_on_new_generator_skips_first_yield) {
 
 TEST(typephp_fiber_generator, get_return_requires_completed_generator) {
     auto generator = typephp_new_fiber_generator("phpx_test_generator_sequence");
-    try_call(
-        [&]() { (void) generator.call("getReturn"); },
-        "Cannot get return value of a generator that hasn't returned");
+    try_call([&]() { (void) generator.call("getReturn"); },
+             "Cannot get return value of a generator that hasn't returned");
 }
 
 TEST(typephp_fiber_generator, throwing_into_suspended_and_closed_generator) {
     auto generator = typephp_new_fiber_generator("phpx_test_generator_sequence");
     ASSERT_EQ(generator.call("current").toInt(), 10);
 
-    try_call(
-        [&]() { generator.call("throw", {newObject("RuntimeException", {"delegated failure"})}); },
-        "delegated failure");
+    try_call([&]() { generator.call("throw", {newObject("RuntimeException", {"delegated failure"})}); },
+             "delegated failure");
     ASSERT_FALSE(generator.call("valid").toBool());
 
-    try_call(
-        [&]() { generator.call("throw", {newObject("LogicException", {"closed failure"})}); },
-        "closed failure");
+    try_call([&]() { generator.call("throw", {newObject("LogicException", {"closed failure"})}); }, "closed failure");
 }
 
 TEST(typephp_fiber_generator, yield_from_array_preserves_keys_and_values) {
@@ -107,18 +100,46 @@ TEST(typephp_fiber_generator, yield_from_generator_forwards_send_value) {
     ASSERT_EQ(generator.call("getReturn").toInt(), 99);
 }
 
+TEST(typephp_fiber_generator, yield_from_generator_forwards_thrown_exception) {
+    auto generator = typephp_new_fiber_generator("phpx_test_generator_yield_from_throw");
+
+    ASSERT_STREQ(generator.call("current").toCString(), "initial");
+
+    auto exception = newObject("RuntimeException", {"delegated failure"});
+    ASSERT_STREQ(generator.call("throw", {exception}).toCString(), "delegated failure");
+    ASSERT_STREQ(generator.call("key").toCString(), "caught");
+
+    generator.call("next");
+    ASSERT_EQ(generator.call("getReturn").toInt(), 91);
+}
+
+TEST(typephp_fiber_generator, throw_starts_new_generator_before_injecting_exception) {
+    auto generator = typephp_new_fiber_generator("phpx_test_generator_yield_from_throw");
+    auto exception = newObject("RuntimeException", {"throw before start"});
+
+    ASSERT_STREQ(generator.call("throw", {exception}).toCString(), "throw before start");
+    ASSERT_STREQ(generator.call("key").toCString(), "caught");
+
+    generator.call("next");
+    ASSERT_EQ(generator.call("getReturn").toInt(), 91);
+}
+
+TEST(typephp_fiber_generator, throw_on_new_generator_that_returns_before_yield_rethrows_exception) {
+    auto generator = typephp_new_fiber_generator("phpx_test_generator_returns_immediately");
+    auto exception = newObject("RuntimeException", {"returned before yield"});
+
+    try_call([&]() { generator.call("throw", {exception}); }, "returned before yield");
+    ASSERT_EQ(generator.call("getReturn").toInt(), 17);
+}
+
 TEST(typephp_fiber_generator, suspend_outside_fiber_reports_error) {
     bool closed = false;
-    try_call(
-        [&]() { (void) typephp_fiber_suspend(1, &closed); },
-        "Cannot suspend outside of a fiber");
+    try_call([&]() { (void) typephp_fiber_suspend(1, &closed); }, "Cannot suspend outside of a fiber");
     ASSERT_TRUE(closed);
 }
 
 TEST(typephp_fiber_generator, yield_outside_fiber_reports_error) {
-    try_call(
-        []() { (void) typephp_fiber_yield(1); },
-        "Cannot suspend outside of a fiber");
+    try_call([]() { (void) typephp_fiber_yield(1); }, "Cannot suspend outside of a fiber");
 }
 
 TEST(typephp_fiber_generator, yield_from_empty_array_completes_without_suspending) {
@@ -129,17 +150,13 @@ TEST(typephp_fiber_generator, yield_from_empty_array_completes_without_suspendin
 }
 
 TEST(typephp_fiber_generator, yield_from_rejects_non_iterable_values) {
-    try_call(
-        []() { (void) typephp_fiber_yield_from(42, nullptr); },
-        "Can use \"yield from\" only with arrays and Traversables");
-    try_call(
-        []() { (void) typephp_fiber_yield_from(newObject("stdClass"), nullptr); },
-        "Can use \"yield from\" only with arrays and Traversables");
+    try_call([]() { (void) typephp_fiber_yield_from(42, nullptr); },
+             "Can use \"yield from\" only with arrays and Traversables");
+    try_call([]() { (void) typephp_fiber_yield_from(newObject("stdClass"), nullptr); },
+             "Can use \"yield from\" only with arrays and Traversables");
 }
 
 TEST(typephp_fiber_generator, rethrow_preserves_throwable) {
     auto exception = newObject("RuntimeException", {"fiber failure"});
-    try_call(
-        [&]() { typephp_fiber_rethrow(exception); },
-        "fiber failure");
+    try_call([&]() { typephp_fiber_rethrow(exception); }, "fiber failure");
 }

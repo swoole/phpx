@@ -18,18 +18,15 @@ struct NativeGcNode {
     NativeGcCounters *counters = nullptr;
 };
 
-void traceNativeNode(void *object, php::NativeMarker &marker)
-{
+void traceNativeNode(void *object, php::NativeMarker &marker) {
     marker.mark(static_cast<NativeGcNode *>(object)->child);
 }
 
-void finalizeNativeNode(void *object)
-{
+void finalizeNativeNode(void *object) {
     static_cast<NativeGcNode *>(object)->counters->finalized++;
 }
 
-void destroyNativeNode(void *object) noexcept
-{
+void destroyNativeNode(void *object) noexcept {
     auto *node = static_cast<NativeGcNode *>(object);
     node->counters->destroyed++;
     node->~NativeGcNode();
@@ -46,8 +43,7 @@ const php::NativeTypeDescriptor nativeNodeType = {
 
 NativeGcNode *shutdownResurrectionRoot = nullptr;
 
-void finalizeAndResurrectAtShutdown(void *object)
-{
+void finalizeAndResurrectAtShutdown(void *object) {
     auto *node = static_cast<NativeGcNode *>(object);
     node->counters->finalized++;
     shutdownResurrectionRoot = node;
@@ -62,8 +58,7 @@ const php::NativeTypeDescriptor shutdownResurrectionType = {
     destroyNativeNode,
 };
 
-void finalizeAndResurrect(void *object)
-{
+void finalizeAndResurrect(void *object) {
     auto *node = static_cast<NativeGcNode *>(object);
     node->counters->finalized++;
     *node->resurrectionRoot = node;
@@ -78,8 +73,7 @@ const php::NativeTypeDescriptor resurrectionType = {
     destroyNativeNode,
 };
 
-void finalizeAndThrow(void *object)
-{
+void finalizeAndThrow(void *object) {
     static_cast<NativeGcNode *>(object)->counters->finalized++;
     throw std::runtime_error("native finalizer failure");
 }
@@ -93,8 +87,7 @@ const php::NativeTypeDescriptor throwingFinalizerType = {
     destroyNativeNode,
 };
 
-void finalizeAndThrowZend(void *object)
-{
+void finalizeAndThrowZend(void *object) {
     static_cast<NativeGcNode *>(object)->counters->finalized++;
     php::throwError("native Zend finalizer failure");
 }
@@ -107,10 +100,9 @@ const php::NativeTypeDescriptor throwingZendFinalizerType = {
     finalizeAndThrowZend,
     destroyNativeNode,
 };
-} // namespace
+}  // namespace
 
-TEST(wren_gc, uses_stable_native_heap_defaults)
-{
+TEST(wren_gc, uses_stable_native_heap_defaults) {
     WrenGcConfig config;
     wren_gc_config_init(&config);
 
@@ -124,8 +116,7 @@ TEST(wren_gc, uses_stable_native_heap_defaults)
     wren_gc_heap_free(heap);
 }
 
-TEST(native_gc, root_frame_traces_native_graph)
-{
+TEST(native_gc, root_frame_traces_native_graph) {
     NativeGcCounters counters;
     NativeGcNode *root = php::nativeNew<NativeGcNode>(nativeNodeType);
     root->counters = &counters;
@@ -147,8 +138,7 @@ TEST(native_gc, root_frame_traces_native_graph)
     EXPECT_EQ(2, counters.destroyed);
 }
 
-TEST(native_gc, root_frames_survive_non_lifo_fiber_lifetimes)
-{
+TEST(native_gc, root_frames_survive_non_lifo_fiber_lifetimes) {
     NativeGcCounters counters;
     NativeGcNode *first = php::nativeNew<NativeGcNode>(nativeNodeType);
     NativeGcNode *second = php::nativeNew<NativeGcNode>(nativeNodeType);
@@ -176,8 +166,7 @@ TEST(native_gc, root_frames_survive_non_lifo_fiber_lifetimes)
     EXPECT_EQ(2, counters.destroyed);
 }
 
-TEST(native_gc, request_root_keeps_global_slot_alive)
-{
+TEST(native_gc, request_root_keeps_global_slot_alive) {
     static NativeGcNode *requestRoot = nullptr;
     NativeGcCounters counters;
     requestRoot = php::nativeNew<NativeGcNode>(nativeNodeType);
@@ -195,8 +184,7 @@ TEST(native_gc, request_root_keeps_global_slot_alive)
     EXPECT_EQ(1, counters.destroyed);
 }
 
-TEST(native_gc, container_root_frames_follow_sequence_and_map_elements)
-{
+TEST(native_gc, container_root_frames_follow_sequence_and_map_elements) {
     NativeGcCounters counters;
     php::StdVector<NativeGcNode *> sequence;
     php::StdMap<php::Int, NativeGcNode *> map;
@@ -228,8 +216,7 @@ TEST(native_gc, container_root_frames_follow_sequence_and_map_elements)
     EXPECT_EQ(2, counters.destroyed);
 }
 
-TEST(native_gc, container_root_frames_survive_non_lifo_fiber_lifetimes)
-{
+TEST(native_gc, container_root_frames_survive_non_lifo_fiber_lifetimes) {
     NativeGcCounters counters;
     php::StdVector<NativeGcNode *> olderContainer;
     php::StdVector<NativeGcNode *> newerContainer;
@@ -259,8 +246,7 @@ TEST(native_gc, container_root_frames_survive_non_lifo_fiber_lifetimes)
     EXPECT_EQ(2, counters.destroyed);
 }
 
-TEST(native_gc, shutdown_clears_roots_written_by_finalizers)
-{
+TEST(native_gc, shutdown_clears_roots_written_by_finalizers) {
     NativeGcCounters counters;
     shutdownResurrectionRoot = php::nativeNew<NativeGcNode>(shutdownResurrectionType);
     shutdownResurrectionRoot->counters = &counters;
@@ -277,8 +263,7 @@ TEST(native_gc, shutdown_clears_roots_written_by_finalizers)
     php::request_init();
 }
 
-TEST(native_gc, shutdown_detaches_frames_owned_by_suspended_fibers)
-{
+TEST(native_gc, shutdown_detaches_frames_owned_by_suspended_fibers) {
     NativeGcCounters counters;
     NativeGcNode *value = php::nativeNew<NativeGcNode>(nativeNodeType);
     value->counters = &counters;
@@ -302,8 +287,7 @@ TEST(native_gc, shutdown_detaches_frames_owned_by_suspended_fibers)
     EXPECT_EQ(2, counters.destroyed);
 }
 
-TEST(native_gc, finalizer_can_resurrect_into_request_root_once)
-{
+TEST(native_gc, finalizer_can_resurrect_into_request_root_once) {
     static NativeGcNode *requestRoot = nullptr;
     NativeGcCounters counters;
     requestRoot = php::nativeNew<NativeGcNode>(resurrectionType);
@@ -323,8 +307,7 @@ TEST(native_gc, finalizer_can_resurrect_into_request_root_once)
     EXPECT_EQ(1, counters.destroyed);
 }
 
-TEST(native_gc, finalizer_exception_is_rethrown_after_object_is_destroyed)
-{
+TEST(native_gc, finalizer_exception_is_rethrown_after_object_is_destroyed) {
     NativeGcCounters counters;
     NativeGcNode *node = php::nativeNew<NativeGcNode>(throwingFinalizerType);
     node->counters = &counters;
@@ -338,8 +321,7 @@ TEST(native_gc, finalizer_exception_is_rethrown_after_object_is_destroyed)
     EXPECT_NO_THROW(php::nativeGcCollect());
 }
 
-TEST(native_gc, zend_finalizer_exception_is_rethrown_after_object_is_destroyed)
-{
+TEST(native_gc, zend_finalizer_exception_is_rethrown_after_object_is_destroyed) {
     NativeGcCounters counters;
     NativeGcNode *node = php::nativeNew<NativeGcNode>(throwingZendFinalizerType);
     node->counters = &counters;
@@ -356,51 +338,47 @@ TEST(native_gc, zend_finalizer_exception_is_rethrown_after_object_is_destroyed)
     EXPECT_EQ(0u, php::nativeGcStats().objectCount);
 }
 
-TEST(native_gc, require_object_rejects_null_and_accepts_live_pointer)
-{
+TEST(native_gc, require_object_rejects_null_and_accepts_live_pointer) {
     NativeGcCounters counters;
     NativeGcNode *node = php::nativeNew<NativeGcNode>(nativeNodeType);
     node->counters = &counters;
 
     EXPECT_EQ(node, php::nativeGcRequireObject(node, "NativeGcNode"));
-    try_call(
-        []() { php::nativeGcRequireObject(nullptr, "NativeGcNode"); },
-        "Call on null native object of type NativeGcNode");
+    try_call([]() { php::nativeGcRequireObject(nullptr, "NativeGcNode"); },
+             "Call on null native object of type NativeGcNode");
 
     php::nativeGcCollect();
     EXPECT_EQ(1, counters.destroyed);
 }
 
-TEST(native_gc, failed_construction_abandons_unpublished_storage)
-{
+TEST(native_gc, failed_construction_abandons_unpublished_storage) {
     NativeGcCounters counters;
     const size_t before = php::nativeGcStats().objectCount;
 
-    EXPECT_THROW(
-        php::nativeConstruct<NativeGcNode>(nativeNodeType, [&](NativeGcNode &node) {
-            node.counters = &counters;
-            throw std::runtime_error("constructor failure");
-        }),
-        std::runtime_error);
+    EXPECT_THROW(php::nativeConstruct<NativeGcNode>(nativeNodeType,
+                                                    [&](NativeGcNode &node) {
+                                                        node.counters = &counters;
+                                                        throw std::runtime_error("constructor failure");
+                                                    }),
+                 std::runtime_error);
 
     EXPECT_EQ(before, php::nativeGcStats().objectCount);
     EXPECT_EQ(0, counters.finalized);
     EXPECT_EQ(0, counters.destroyed);
 }
 
-TEST(native_gc, failed_published_construction_survives_without_finalizer)
-{
+TEST(native_gc, failed_published_construction_survives_without_finalizer) {
     static NativeGcNode *published = nullptr;
     NativeGcCounters counters;
     php::nativeGcRegisterRequestRoot(&published);
 
-    EXPECT_THROW(
-        php::nativeConstruct<NativeGcNode>(nativeNodeType, [&](NativeGcNode &node) {
-            node.counters = &counters;
-            published = &node;
-            throw std::runtime_error("published constructor failure");
-        }),
-        std::runtime_error);
+    EXPECT_THROW(php::nativeConstruct<NativeGcNode>(nativeNodeType,
+                                                    [&](NativeGcNode &node) {
+                                                        node.counters = &counters;
+                                                        published = &node;
+                                                        throw std::runtime_error("published constructor failure");
+                                                    }),
+                 std::runtime_error);
 
     ASSERT_NE(nullptr, published);
     php::nativeGcCollect();
@@ -413,8 +391,7 @@ TEST(native_gc, failed_published_construction_survives_without_finalizer)
     EXPECT_EQ(1, counters.destroyed);
 }
 
-TEST(native_gc, finalizer_chain_runs_all_callbacks_and_preserves_first_cpp_exception)
-{
+TEST(native_gc, finalizer_chain_runs_all_callbacks_and_preserves_first_cpp_exception) {
     php::NativeFinalizerChain chain;
     int callbacks = 0;
 
@@ -433,8 +410,7 @@ TEST(native_gc, finalizer_chain_runs_all_callbacks_and_preserves_first_cpp_excep
     }
 }
 
-TEST(native_gc, finalizer_chain_clears_zend_state_between_callbacks)
-{
+TEST(native_gc, finalizer_chain_clears_zend_state_between_callbacks) {
     php::NativeFinalizerChain chain;
     int callbacks = 0;
 

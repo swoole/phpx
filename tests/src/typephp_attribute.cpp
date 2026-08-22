@@ -177,42 +177,33 @@ TEST(typephp_attribute, lazy_instantiation_reports_invalid_attribute_definitions
     ReflectionAttributeHooks hooks;
     ASSERT_TRUE(hooks.installed());
 
-    make_first_attribute_argument_lazy(
-        "phpx_no_constructor_attribute_target", "phpxnoconstructorattribute");
+    make_first_attribute_argument_lazy("phpx_no_constructor_attribute_target", "phpxnoconstructorattribute");
     auto no_constructor = first_reflection_attribute("phpx_no_constructor_attribute_target");
-    try_call(
-        [&]() { no_constructor.call("newInstance"); },
-        "does not have a constructor, cannot pass arguments");
+    try_call([&]() { no_constructor.call("newInstance"); }, "does not have a constructor, cannot pass arguments");
 
-    make_first_attribute_argument_lazy(
-        "phpx_private_constructor_attribute_target", "phpxprivateconstructorattribute");
+    make_first_attribute_argument_lazy("phpx_private_constructor_attribute_target", "phpxprivateconstructorattribute");
     auto private_constructor = first_reflection_attribute("phpx_private_constructor_attribute_target");
-    try_call(
-        [&]() { private_constructor.call("newInstance"); },
-        "Attribute constructor of class PhpxPrivateConstructorAttribute must be public");
+    try_call([&]() { private_constructor.call("newInstance"); },
+             "Attribute constructor of class PhpxPrivateConstructorAttribute must be public");
 
-    make_first_attribute_argument_lazy(
-        "phpx_throwing_constructor_attribute_target", "phpxthrowingconstructorattribute");
+    make_first_attribute_argument_lazy("phpx_throwing_constructor_attribute_target",
+                                       "phpxthrowingconstructorattribute");
     auto throwing_constructor = first_reflection_attribute("phpx_throwing_constructor_attribute_target");
     try_call([&]() { throwing_constructor.call("newInstance"); }, "attribute constructor failure");
 
-    make_first_attribute_argument_lazy(
-        "phpx_wrong_target_attribute_target", "phpxclassonlyattribute");
+    make_first_attribute_argument_lazy("phpx_wrong_target_attribute_target", "phpxclassonlyattribute");
     auto wrong_target = first_reflection_attribute("phpx_wrong_target_attribute_target");
     try_call([&]() { wrong_target.call("newInstance"); }, "cannot target function");
 
-    make_first_attribute_argument_lazy(
-        "phpx_repeated_attribute_target", "phpxnonrepeatableattribute");
+    make_first_attribute_argument_lazy("phpx_repeated_attribute_target", "phpxnonrepeatableattribute");
     auto repeated = first_reflection_attribute("phpx_repeated_attribute_target");
     try_call([&]() { repeated.call("newInstance"); }, "must not be repeated");
 
-    make_first_attribute_argument_lazy(
-        "phpx_non_attribute_target", "phpxnotanattribute");
+    make_first_attribute_argument_lazy("phpx_non_attribute_target", "phpxnotanattribute");
     auto non_attribute = first_reflection_attribute("phpx_non_attribute_target");
     try_call([&]() { non_attribute.call("newInstance"); }, "Attempting to use non-attribute class");
 
-    make_first_attribute_argument_lazy(
-        "phpx_missing_attribute_target", "phpxmissingattribute");
+    make_first_attribute_argument_lazy("phpx_missing_attribute_target", "phpxmissingattribute");
     auto missing_attribute = first_reflection_attribute("phpx_missing_attribute_target");
     try_call([&]() { missing_attribute.call("newInstance"); }, "Attribute class \"PhpxMissingAttribute\" not found");
 }

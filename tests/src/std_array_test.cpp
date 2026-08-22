@@ -221,8 +221,7 @@ TEST(std_array, array_push) {
     ASSERT_EQ(arr2.length(), 2);
 
     Variant not_array = 1;
-    try_call([&]() { fn::array_push(not_array, 2); },
-             "array_push(): Argument #1 ($array) must be of type array");
+    try_call([&]() { fn::array_push(not_array, 2); }, "array_push(): Argument #1 ($array) must be of type array");
 }
 
 TEST(std_array, array_fill) {
