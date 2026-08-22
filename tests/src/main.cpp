@@ -67,6 +67,39 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_mixed, 0, 0, IS_MIXED, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_hook_get, 0, 0, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_hook_set, 0, 1, IS_VOID, 0)
+    ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+static zend_class_entry *gtest_hooked_ce = nullptr;
+static zend_class_entry *gtest_hook_interface_ce = nullptr;
+
+static ZEND_METHOD(PhpxGtestHooked, readHook) {
+    zval rv;
+    zval *value = zend_read_property(
+        gtest_hooked_ce, Z_OBJ_P(ZEND_THIS), ZEND_STRL("stored"), false, &rv);
+    RETURN_STR(zval_get_string(value));
+}
+
+static ZEND_METHOD(PhpxGtestHooked, writeHook) {
+    zend_string *value;
+    ZEND_PARSE_PARAMETERS_START(1, 1)
+        Z_PARAM_STR(value)
+    ZEND_PARSE_PARAMETERS_END();
+
+    zend_update_property_str(
+        gtest_hooked_ce, Z_OBJ_P(ZEND_THIS), ZEND_STRL("stored"), value);
+}
+
+static const zend_function_entry hooked_object_methods[] = {
+    ZEND_ME(PhpxGtestHooked, readHook, arginfo_hook_get, ZEND_ACC_PUBLIC)
+    ZEND_ME(PhpxGtestHooked, writeHook, arginfo_hook_set, ZEND_ACC_PUBLIC)
+    ZEND_FE_END
+};
+
 static php::Array generator_payload(const php::Var &value,
                                     const php::Var &key = php::null,
                                     bool has_key = false) {
@@ -134,11 +167,48 @@ static const zend_function_entry ext_functions[] = {
 
 static PHP_MINIT_FUNCTION(phpx_gtest_runtime) {
     typephp_register_fiber_generator_class();
+
+    zend_class_entry hooked_ce;
+    INIT_CLASS_ENTRY(hooked_ce, "PhpxGtestHooked", hooked_object_methods);
+    gtest_hooked_ce = zend_register_internal_class(&hooked_ce);
+    zend_declare_property_string(
+        gtest_hooked_ce, ZEND_STRL("stored"), "initial", ZEND_ACC_PRIVATE);
+
+    zval hooked_default;
+    ZVAL_EMPTY_STRING(&hooked_default);
+    zend_string *hooked_name = zend_string_init(ZEND_STRL("value"), true);
+    zend_property_info *hooked_info = zend_declare_typed_property(
+        gtest_hooked_ce,
+        hooked_name,
+        &hooked_default,
+        ZEND_ACC_PUBLIC,
+        nullptr,
+        ZEND_TYPE_INIT_CODE(IS_STRING, false, 0));
+    zend_string_release(hooked_name);
+    php::registerPropertyHooks(gtest_hooked_ce, hooked_info, "readhook", "writehook");
+
+    zend_class_entry hook_interface_ce;
+    INIT_CLASS_ENTRY(hook_interface_ce, "PhpxGtestHookInterface", nullptr);
+    gtest_hook_interface_ce = zend_register_internal_interface(&hook_interface_ce);
+    zval interface_default;
+    ZVAL_UNDEF(&interface_default);
+    zend_string *interface_name = zend_string_init(ZEND_STRL("contractValue"), true);
+    zend_property_info *interface_info = zend_declare_typed_property(
+        gtest_hook_interface_ce,
+        interface_name,
+        &interface_default,
+        ZEND_ACC_PUBLIC | ZEND_ACC_ABSTRACT | ZEND_ACC_VIRTUAL,
+        nullptr,
+        ZEND_TYPE_INIT_CODE(IS_STRING, false, 0));
+    zend_string_release(interface_name);
+    php::registerAbstractPropertyHooks(gtest_hook_interface_ce, interface_info, true, true);
     return SUCCESS;
 }
 
 static PHP_MSHUTDOWN_FUNCTION(phpx_gtest_runtime) {
     typephp_unregister_fiber_generator_class();
+    gtest_hooked_ce = nullptr;
+    gtest_hook_interface_ce = nullptr;
     return SUCCESS;
 }
 

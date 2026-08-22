@@ -92,6 +92,21 @@ const php::NativeTypeDescriptor throwingFinalizerType = {
     finalizeAndThrow,
     destroyNativeNode,
 };
+
+void finalizeAndThrowZend(void *object)
+{
+    static_cast<NativeGcNode *>(object)->counters->finalized++;
+    php::throwError("native Zend finalizer failure");
+}
+
+const php::NativeTypeDescriptor throwingZendFinalizerType = {
+    "ThrowingZendFinalizerNode",
+    sizeof(NativeGcNode),
+    alignof(NativeGcNode),
+    traceNativeNode,
+    finalizeAndThrowZend,
+    destroyNativeNode,
+};
 } // namespace
 
 TEST(wren_gc, uses_stable_native_heap_defaults)
@@ -321,6 +336,81 @@ TEST(native_gc, finalizer_exception_is_rethrown_after_object_is_destroyed)
 
     // The remembered exception must be consumed exactly once.
     EXPECT_NO_THROW(php::nativeGcCollect());
+}
+
+TEST(native_gc, zend_finalizer_exception_is_rethrown_after_object_is_destroyed)
+{
+    NativeGcCounters counters;
+    NativeGcNode *node = php::nativeNew<NativeGcNode>(throwingZendFinalizerType);
+    node->counters = &counters;
+
+    try {
+        php::nativeGcCollect();
+        FAIL() << "Expected the Zend finalizer exception";
+    } catch (zend_object *) {
+        php::Object exception = php::catchException();
+        EXPECT_EQ("native Zend finalizer failure", exception.call("getMessage").toStdString());
+    }
+    EXPECT_EQ(1, counters.finalized);
+    EXPECT_EQ(1, counters.destroyed);
+    EXPECT_EQ(0u, php::nativeGcStats().objectCount);
+}
+
+TEST(native_gc, require_object_rejects_null_and_accepts_live_pointer)
+{
+    NativeGcCounters counters;
+    NativeGcNode *node = php::nativeNew<NativeGcNode>(nativeNodeType);
+    node->counters = &counters;
+
+    EXPECT_EQ(node, php::nativeGcRequireObject(node, "NativeGcNode"));
+    try_call(
+        []() { php::nativeGcRequireObject(nullptr, "NativeGcNode"); },
+        "Call on null native object of type NativeGcNode");
+
+    php::nativeGcCollect();
+    EXPECT_EQ(1, counters.destroyed);
+}
+
+TEST(native_gc, failed_construction_abandons_unpublished_storage)
+{
+    NativeGcCounters counters;
+    const size_t before = php::nativeGcStats().objectCount;
+
+    EXPECT_THROW(
+        php::nativeConstruct<NativeGcNode>(nativeNodeType, [&](NativeGcNode &node) {
+            node.counters = &counters;
+            throw std::runtime_error("constructor failure");
+        }),
+        std::runtime_error);
+
+    EXPECT_EQ(before, php::nativeGcStats().objectCount);
+    EXPECT_EQ(0, counters.finalized);
+    EXPECT_EQ(0, counters.destroyed);
+}
+
+TEST(native_gc, failed_published_construction_survives_without_finalizer)
+{
+    static NativeGcNode *published = nullptr;
+    NativeGcCounters counters;
+    php::nativeGcRegisterRequestRoot(reinterpret_cast<void **>(&published));
+
+    EXPECT_THROW(
+        php::nativeConstruct<NativeGcNode>(nativeNodeType, [&](NativeGcNode &node) {
+            node.counters = &counters;
+            published = &node;
+            throw std::runtime_error("published constructor failure");
+        }),
+        std::runtime_error);
+
+    ASSERT_NE(nullptr, published);
+    php::nativeGcCollect();
+    EXPECT_EQ(0, counters.finalized);
+    EXPECT_EQ(0, counters.destroyed);
+
+    published = nullptr;
+    php::nativeGcCollect();
+    EXPECT_EQ(0, counters.finalized);
+    EXPECT_EQ(1, counters.destroyed);
 }
 
 TEST(native_gc, finalizer_chain_runs_all_callbacks_and_preserves_first_cpp_exception)

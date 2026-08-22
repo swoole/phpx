@@ -2,6 +2,38 @@
 
 using namespace php;
 
+TEST(foreach_iterator, packed_array_snapshot_preserves_values_and_keys) {
+    Array values{10, 20, 30};
+    ForeachIterator iterator(values);
+
+    int expected_key = 0;
+    while (iterator.next()) {
+        ASSERT_EQ(iterator.key().toInt(), expected_key);
+        ASSERT_EQ(iterator.key().toInt(), expected_key);
+        ASSERT_EQ(iterator.value().toInt(), (expected_key + 1) * 10);
+        ++expected_key;
+    }
+    ASSERT_EQ(expected_key, 3);
+    ASSERT_FALSE(iterator.next());
+}
+
+TEST(foreach_iterator, sparse_array_snapshot_skips_holes_and_preserves_mixed_keys) {
+    Array values;
+    values.set(0, "zero");
+    values.set(2, "two");
+    values.set("name", "phpx");
+    values.del(0);
+
+    ForeachIterator iterator(values);
+    ASSERT_TRUE(iterator.next());
+    ASSERT_EQ(iterator.key().toInt(), 2);
+    ASSERT_STREQ(iterator.value().toCString(), "two");
+    ASSERT_TRUE(iterator.next());
+    ASSERT_STREQ(iterator.key().toCString(), "name");
+    ASSERT_STREQ(iterator.value().toCString(), "phpx");
+    ASSERT_FALSE(iterator.next());
+}
+
 TEST(foreach_iterator, array_and_reference) {
     Array values(StdStrKeyMap{{"a", 1}, {"b", 2}});
     ForeachIterator iterator(values, true);

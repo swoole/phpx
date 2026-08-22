@@ -6,6 +6,14 @@
 
 using namespace php;
 
+TEST(big_int, conversion_bridge_preserves_boxed_value) {
+    Variant value = php::toBigInt(static_cast<php::Int>(123));
+    Variant converted = BigInt::toBigDecimal(value);
+
+    ASSERT_NE(converted.toBox<BigInt>(), nullptr);
+    ASSERT_EQ(BigInt::toInt(converted).toInt(), 123);
+}
+
 // Helper: create a BigInt from a string literal without ambiguity
 static inline Variant bi(const char *s) {
     return BigInt::newInstance(Variant(s));

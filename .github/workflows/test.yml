@@ -75,7 +75,11 @@ jobs:
       - name: Run google tests
         run: |
           # sudo sh -c 'echo 0 > /proc/sys/kernel/randomize_va_space'
-          ./bin/phpx-tests
+          # php_embed_init() may use a SAPI-specific default scan directory
+          # rather than the CLI directory where setup-php installed phpy.ini.
+          # Point the embedded test process at the verified CLI scan directory
+          # so the native Python bridge tests run instead of being skipped.
+          PHP_INI_SCAN_DIR="$(php-config --ini-dir)" ./bin/phpx-tests
       - name: Run phpunit tests
         run: |
           composer install

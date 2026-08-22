@@ -190,6 +190,56 @@ TEST(base_extra, update_class_const) {
     ASSERT_EQ(rs2.item("php").toInt(), 3);
 }
 
+TEST(base_extra, class_constant_dynamic_targets_and_names) {
+    auto *date_time = getClassEntry("DateTime");
+    Object object = newObject("DateTime");
+
+    ASSERT_STREQ(classConstant(date_time, "ATOM").toCString(), "Y-m-d\\TH:i:sP");
+    ASSERT_STREQ(classConstant(Variant("DateTime"), "ATOM").toCString(), "Y-m-d\\TH:i:sP");
+    ASSERT_STREQ(classConstant(object, "ATOM").toCString(), "Y-m-d\\TH:i:sP");
+    ASSERT_STREQ(classConstant(date_time, "class").toCString(), "DateTime");
+    ASSERT_TRUE(classConstant(static_cast<zend_class_entry *>(nullptr), "ATOM").isNull());
+
+    try_call([date_time]() { classConstant(date_time, 42); }, "Cannot use value of type int as class constant name");
+    try_call([]() { classConstant(42, "ATOM"); }, "Class name must be a valid object or a string");
+}
+
+TEST(base_extra, update_class_constant_by_class_name) {
+    include(get_include_dir() + "/library.php", INCLUDE_ONCE);
+    Array replacement{"updated", 42};
+
+    ASSERT_TRUE(updateConstant("TestClass2", "CONST_ARRAY", replacement));
+    ASSERT_EQ(constant("TestClass2", "CONST_ARRAY").toArray().get(1).toInt(), 42);
+    ASSERT_FALSE(updateConstant("TestClass2", "UNKNOWN_CONSTANT", replacement));
+}
+
+TEST(base_extra, property_hook_registration_helpers) {
+    auto *hooked_ce = getClassEntry("PhpxGtestHooked");
+    auto *property_info = static_cast<zend_property_info *>(
+        zend_hash_str_find_ptr(&hooked_ce->properties_info, ZEND_STRL("value")));
+    ASSERT_NE(property_info, nullptr);
+    ASSERT_NE(property_info->hooks, nullptr);
+    ASSERT_NE(property_info->hooks[ZEND_PROPERTY_HOOK_GET], nullptr);
+    ASSERT_NE(property_info->hooks[ZEND_PROPERTY_HOOK_SET], nullptr);
+    ASSERT_EQ(property_info->hooks[ZEND_PROPERTY_HOOK_GET]->common.prop_info, property_info);
+    ASSERT_EQ(property_info->hooks[ZEND_PROPERTY_HOOK_SET]->common.prop_info, property_info);
+
+    Object object = newObject(hooked_ce);
+    object.setProperty("value", "changed");
+    ASSERT_STREQ(object.getProperty("stored").toCString(), "changed");
+    ASSERT_STREQ(object.getProperty("value").toCString(), "changed");
+
+    auto *interface_ce = getClassEntry("PhpxGtestHookInterface");
+    auto *interface_info = static_cast<zend_property_info *>(
+        zend_hash_str_find_ptr(&interface_ce->properties_info, ZEND_STRL("contractValue")));
+    ASSERT_NE(interface_info, nullptr);
+    ASSERT_NE(interface_info->hooks, nullptr);
+    ASSERT_NE(interface_info->hooks[ZEND_PROPERTY_HOOK_GET], nullptr);
+    ASSERT_NE(interface_info->hooks[ZEND_PROPERTY_HOOK_SET], nullptr);
+    ASSERT_TRUE(interface_info->hooks[ZEND_PROPERTY_HOOK_GET]->common.fn_flags & ZEND_ACC_ABSTRACT);
+    ASSERT_EQ(interface_info->hooks[ZEND_PROPERTY_HOOK_SET]->common.num_args, 1u);
+}
+
 // Test throwException with different overloads
 TEST(base_extra, throwException_overloads) {
     try {
@@ -346,6 +396,39 @@ TEST(base_extra, call_variant_with_array_and_named_args) {
     ASSERT_EQ(rs.item("age").toInt(), 31);
     ASSERT_STREQ(rs.item("city").toCString(), "shanghai");
     ASSERT_TRUE(rs.item("vip").toBool());
+}
+
+TEST(base_extra, scoped_call_array_overloads) {
+    eval(R"PHP(
+        class PhpxScopedArrayArguments {
+            public function scopeAnchor(): void {}
+            private function join(string $left, string $right): string {
+                return $left . ':' . $right;
+            }
+        }
+    )PHP");
+
+    Object object = newObject("PhpxScopedArrayArguments");
+    auto *scope_ce = object.ce();
+    CallableScope scope{getMethod(scope_ce, "scopeAnchor"), scope_ce, object.object()};
+
+    Array method_args{"left", "right"};
+    ASSERT_STREQ(callScoped(object, "join", scope, method_args).toCString(), "left:right");
+
+    Array callback{object, "join"};
+    Array callback_args{"first", "second"};
+    ASSERT_STREQ(callScoped(callback, scope, callback_args).toCString(), "first:second");
+}
+
+TEST(base_extra, include_with_explicit_symbol_table) {
+    Array scope;
+    scope.set("first", "A");
+    scope.set("second", 42);
+
+    Variant result = include(
+        get_include_dir() + "/return_scope.php", INCLUDE, scope);
+    ASSERT_STREQ(result.get("first").toCString(), "A");
+    ASSERT_EQ(result.get("second").toInt(), 42);
 }
 
 // Test throwErrorIfOccurred (no exception case)

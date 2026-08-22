@@ -6,6 +6,14 @@
 
 using namespace php;
 
+TEST(decimal, conversion_bridge_preserves_boxed_value) {
+    Variant value = php::toDecimal("123.75");
+    Variant converted = Decimal::toBigInt(value);
+
+    ASSERT_NE(converted.toBox<Decimal>(), nullptr);
+    ASSERT_STREQ(Decimal::toString(converted).toCString(), "123.75");
+}
+
 // ============ Construction ============
 
 TEST(decimal, construct_from_string) {
