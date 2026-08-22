@@ -195,6 +195,24 @@ void Array::set(zend_ulong i, const Variant &v) {
     add_index_zval(zarr, i, zv);
 }
 
+void Array::setValue(const Variant &key, const Variant &v) {
+    Variant value(v.direct_ptr());
+    set(key, value);
+}
+
+void Array::appendValue(const Variant &v) {
+    Variant value(v.direct_ptr());
+    append(std::move(value));
+}
+
+void Array::appendValue(Variant &&v) {
+    if (UNEXPECTED(v.isReference()) || UNEXPECTED(v.isIndirect())) {
+        appendValue(static_cast<const Variant &>(v));
+    } else {
+        append(std::move(v));
+    }
+}
+
 void Array::append(const Variant &v) {
     zval copied;
     zval_copy(&copied, v.direct_ptr());

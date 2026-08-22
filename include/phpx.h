@@ -1921,6 +1921,11 @@ class Array : public Variant {
     void set(const char *key, const Variant &v) {
         set(String(key), v);
     }
+    // PHP's ordinary array writes dereference the source zval. The lower-level
+    // set()/append() APIs deliberately preserve references for explicit =& use.
+    void setValue(const Variant &key, const Variant &v);
+    void appendValue(const Variant &v);
+    void appendValue(Variant &&v);
     void append(const Variant &v);
     void append(Variant &&v);
     Variant get(const Variant &key) const;

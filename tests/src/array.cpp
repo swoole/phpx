@@ -136,6 +136,45 @@ TEST(array, append_self_creates_value_snapshot) {
     ASSERT_EQ(snapshot.get(0).toInt(), 1);
 }
 
+TEST(array, value_writes_dereference_source_references) {
+    Variant source = 1;
+    Reference reference = source.toReference();
+    Variant referenced(reference.const_ptr(), Ctor::CopyRef);
+
+    Array values;
+    values.appendValue(referenced);
+    values.setValue("named", referenced);
+
+    reference = 2;
+    ASSERT_EQ(values.get(0).toInt(), 1);
+    ASSERT_FALSE(values.get(0).isReference());
+    ASSERT_EQ(values.get("named").toInt(), 1);
+    ASSERT_FALSE(values.get("named").isReference());
+
+    Array explicitReference;
+    explicitReference.append(referenced);
+    reference = 3;
+    ASSERT_EQ(explicitReference.get(0).toInt(), 3);
+    ASSERT_TRUE(explicitReference.get(0).isReference());
+}
+
+TEST(array, value_write_dereferences_an_indirect_reference) {
+    Variant source = 10;
+    Reference reference = source.toReference();
+    Variant referenced(reference.const_ptr(), Ctor::CopyRef);
+    Array sourceArray;
+    sourceArray.append(referenced);
+
+    Array copy;
+    copy.appendValue(sourceArray.item(0));
+    reference = 20;
+
+    ASSERT_EQ(copy.get(0).toInt(), 10);
+    ASSERT_FALSE(copy.get(0).isReference());
+    ASSERT_EQ(sourceArray.get(0).toInt(), 20);
+    ASSERT_TRUE(sourceArray.get(0).isReference());
+}
+
 TEST(array, list) {
     Array array;
     array.append(50);
