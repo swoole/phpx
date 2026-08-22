@@ -41,6 +41,21 @@ TEST(array, get_returns_owned_values_and_preserves_php_keys) {
     ASSERT_TRUE(array.get(String("missing")).isNull());
 }
 
+TEST(array, variant_keys_preserve_boolean_and_null_write_semantics) {
+    Array array;
+
+    array.setValue(Variant(false), "false-key");
+    array.setValue(Variant(true), "true-key");
+    array.setValue(Variant(), "appended");
+
+    ASSERT_EQ(array.count(), 3);
+    ASSERT_STREQ(array.get(Variant(false)).toCString(), "false-key");
+    ASSERT_STREQ(array.get(Variant(true)).toCString(), "true-key");
+    ASSERT_STREQ(array.get(2).toCString(), "appended");
+    ASSERT_TRUE(array.del(Variant(false)));
+    ASSERT_TRUE(array.get(0).isNull());
+}
+
 TEST(array, subscript_assignment_updates_existing_reference) {
     Variant value = "original";
     Reference reference = value.toReference();

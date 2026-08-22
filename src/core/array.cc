@@ -171,7 +171,7 @@ Array &Array::operator=(const IntKeyMap &list) {
 void Array::set(const Variant &key, const Variant &v) {
     if (key.isNull()) {
         append(v);
-    } else if (key.isInt() || key.isFloat()) {
+    } else if (key.isBool() || key.isInt() || key.isFloat()) {
         set(key.toInt(), v);
     } else {
         auto skey = key.toString();
@@ -245,7 +245,7 @@ void Array::append(Variant &&v) {
 }
 
 Variant Array::get(const Variant &key) const {
-    if (key.isInt() || key.isFloat()) {
+    if (key.isBool() || key.isInt() || key.isFloat()) {
         return get(static_cast<zend_ulong>(key.toInt()));
     }
 
@@ -260,7 +260,7 @@ bool Array::del(zend_ulong index) {
 }
 
 bool Array::del(const Variant &key) {
-    if (key.isInt() || key.isFloat()) {
+    if (key.isBool() || key.isInt() || key.isFloat()) {
         return del(key.toInt());
     } else {
         auto zarr = unwrap_ptr();

@@ -1300,6 +1300,16 @@ TEST(variant, item) {
     auto iv2 = a.item(3);
     iv2 = 1987;
     ASSERT_EQ(a.offsetGet(3).toInt(), 1987);
+
+    Variant nullKey;
+    auto appended = a.item(nullKey, true);
+    appended = 2026;
+    ASSERT_EQ(a.get(5).toInt(), 2026);
+
+    Variant falseKey(false);
+    auto first = a.item(falseKey, true);
+    first = 42;
+    ASSERT_EQ(a.get(0).toInt(), 42);
 }
 
 TEST(variant, item2) {

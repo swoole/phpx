@@ -1041,21 +1041,25 @@ Variant Variant::item(const Variant &key, bool update) {
     zval rv;
     ZVAL_UNDEF(&rv);
 
-    if (key.isInt() || key.isFloat() || zval_is_string(zvar)) {
+    if (key.isBool() || key.isInt() || key.isFloat() || zval_is_string(zvar)) {
         return item(key.toInt(), update);
     }
 
     if (zval_is_array(zvar)) {
-        auto skey = key.toString();
         if (update) {
             SEPARATE_ARRAY(zvar);
         }
-        retval = zend_symtable_find(Z_ARRVAL_P(zvar), skey.str());
-        if (retval == nullptr) {
-            if (update) {
-                retval = zend_symtable_update(Z_ARRVAL_P(zvar), skey.str(), undef());
-            } else {
-                return Variant{undef()};
+        if (key.isNull() && update) {
+            retval = zend_hash_next_index_insert(Z_ARRVAL_P(zvar), undef());
+        } else {
+            auto skey = key.toString();
+            retval = zend_symtable_find(Z_ARRVAL_P(zvar), skey.str());
+            if (retval == nullptr) {
+                if (update) {
+                    retval = zend_symtable_update(Z_ARRVAL_P(zvar), skey.str(), undef());
+                } else {
+                    return Variant{undef()};
+                }
             }
         }
     } else if (zval_is_object(zvar)) {
@@ -1078,8 +1082,12 @@ Variant Variant::item(const Variant &key, bool update) {
     } else {
         if (update) {
             array_init(zvar);
-            auto skey = key.toString();
-            retval = zend_hash_update(Z_ARRVAL_P(zvar), skey.str(), undef());
+            if (key.isNull()) {
+                retval = zend_hash_next_index_insert(Z_ARRVAL_P(zvar), undef());
+            } else {
+                auto skey = key.toString();
+                retval = zend_hash_update(Z_ARRVAL_P(zvar), skey.str(), undef());
+            }
         } else {
             throwError("Only array/object/string support the item() method, type `%s` given", typeStr());
             return Variant{undef()};
