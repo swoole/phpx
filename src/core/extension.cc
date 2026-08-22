@@ -82,7 +82,7 @@ bool Extension::registerResource(const char *name, resource_dtor dtor) const {
     return true;
 }
 
-void Extension::registerConstant(const char *name, long v) const {
+void Extension::registerConstant(const char *name, Int v) const {
     zend_register_long_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 

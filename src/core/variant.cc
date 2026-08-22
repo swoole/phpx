@@ -251,7 +251,7 @@ void Variant::debug() {
     } else if (Z_TYPE_P(_val) == IS_TRUE) {
         printf("value=true\n");
     } else if (Z_TYPE_P(_val) == IS_LONG) {
-        printf("value=%ld\n", Z_LVAL_P(_val));
+        printf("value=" ZEND_LONG_FMT "\n", Z_LVAL_P(_val));
     } else if (Z_TYPE_P(_val) == IS_DOUBLE) {
         printf("value=%f\n", Z_DVAL_P(_val));
     } else if (Z_TYPE_P(_val) == IS_STRING) {

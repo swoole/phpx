@@ -143,7 +143,7 @@ Array String::matchAll(const String &regx, Int flags, Int start_offset) {
     return php_do_pcre_match(*this, regx, flags, start_offset, true);
 }
 
-bool prepare_slice(long &offset, long &length, size_t total) {
+bool prepare_slice(Int &offset, Int &length, size_t total) {
     if (offset < 0) {
         /* if "from" position is negative, count start position from the end
          * of the string
@@ -173,7 +173,7 @@ bool prepare_slice(long &offset, long &length, size_t total) {
     return true;
 }
 
-String String::substr(long f, long l) const {
+String String::substr(Int f, Int l) const {
     if (!prepare_slice(f, l, length())) {
         return "";
     }

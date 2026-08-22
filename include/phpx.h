@@ -327,7 +327,7 @@ Resource *getResource(const std::string &name);
 void request_init();
 void request_shutdown();
 int array_data_compare(Bucket *f, Bucket *s);
-bool prepare_slice(long &offset, long &length, size_t total);
+bool prepare_slice(Int &offset, Int &length, size_t total);
 Variant call_impl(const zval *object, const zval *func, Args &args, zend_array *named_args = nullptr);
 Variant call_impl(const zval *object, const zval *func);
 
@@ -453,7 +453,7 @@ static inline void deref(zval *v) {
 
 static inline Int safeIndex(Int index, Int size) {
     if (UNEXPECTED(index < 0 || index >= size)) {
-        throwError("Array index out of bounds: index %ld, size %ld", (long) index, (long) size);
+        throwError("Array index out of bounds: index " ZEND_LONG_FMT ", size " ZEND_LONG_FMT, index, size);
         return -1;
     }
     return index;
@@ -1600,7 +1600,7 @@ class String : public Variant {
         return Z_STR_P(unwrap_ptr());
     }
     Array split(const String &delim, zend_long limit = ZEND_LONG_MAX) const;
-    String substr(long _offset, long _length = -1) const;
+    String substr(Int _offset, Int _length = -1) const;
     String stripTags(const String &allow, bool allow_tag_spaces = false) const;
     String addSlashes() const;
     String stripSlashes() const;
@@ -1999,7 +1999,7 @@ class Array : public Variant {
     String join(const String &delim);
     void merge(const Array &source);
     void sort(bool renumber = true);
-    Array slice(long offset, long length = -1, bool preserve_keys = false);
+    Array slice(Int offset, Int length = -1, bool preserve_keys = false);
 };
 
 class Args {

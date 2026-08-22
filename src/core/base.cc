@@ -66,7 +66,7 @@ void echo(const Variant &val) {
 }
 
 void echo(Int val) {
-    echo("%ld", val);
+    echo(ZEND_LONG_FMT, val);
 }
 
 void echo(Float val) {

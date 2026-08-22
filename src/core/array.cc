@@ -41,7 +41,7 @@ void Array::sort(bool renumber) {
     zend_hash_sort(Z_ARRVAL_P(zarr), array_data_compare, renumber);
 }
 
-Array Array::slice(long offset, long length, bool preserve_keys) {
+Array Array::slice(Int offset, Int length, bool preserve_keys) {
     if (!prepare_slice(offset, length, count())) {
         return {};
     }

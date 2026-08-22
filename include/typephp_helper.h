@@ -69,7 +69,8 @@ static inline Int safeArrayIndex(Int index, const Variant &array) {
         next_index = 0;
     }
     if (UNEXPECTED(index < 0 || index > next_index)) {
-        throwError("Array index out of bounds: index %ld, append index %ld", (long) index, (long) next_index);
+        throwError(
+            "Array index out of bounds: index " ZEND_LONG_FMT ", append index " ZEND_LONG_FMT, index, next_index);
         return -1;
     }
     return index;

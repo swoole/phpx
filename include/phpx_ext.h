@@ -264,7 +264,7 @@ class Extension {
     bool registerInterface(Interface *i) const;
     bool registerFunctions(const zend_function_entry *functions);
     bool registerResource(const char *name, resource_dtor dtor) const;
-    void registerConstant(const char *name, long v) const;
+    void registerConstant(const char *name, Int v) const;
     void registerConstant(const char *name, int v) const;
     void registerConstant(const char *name, bool v) const;
     void registerConstant(const char *name, double v) const;
