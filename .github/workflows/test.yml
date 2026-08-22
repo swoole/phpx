@@ -9,7 +9,12 @@ jobs:
       matrix:
         php: [ 8.4, 8.5 ]
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
+      - name: Checkout phpy
+        uses: actions/checkout@v4
+        with:
+          repository: swoole/phpy
+          path: third_party/phpy
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -33,7 +38,29 @@ jobs:
             echo "php_hash.h already contains the upstream C++ fix"
           fi
       - name: Install dependencies
-        run: sudo apt update -y && sudo apt install -y googletest libgtest-dev libsodium-dev libkrb5-dev libargon2-dev redis-server libgmp-dev libmpfr-dev
+        run: sudo apt update -y && sudo apt install -y googletest libgtest-dev libsodium-dev libkrb5-dev libargon2-dev redis-server libgmp-dev libmpfr-dev python3-dev
+      - name: Detect Python ABI
+        id: python-abi
+        run: echo "version=$(python3 -c 'import sys; print(f\"{sys.version_info.major}.{sys.version_info.minor}\")')" >> "${GITHUB_OUTPUT}"
+      - name: Cache phpy extension
+        id: cache-phpy
+        uses: actions/cache@v4
+        with:
+          path: third_party/phpy/modules/phpy.so
+          key: phpy-${{ runner.os }}-${{ runner.arch }}-php${{ matrix.php }}-python${{ steps.python-abi.outputs.version }}-${{ hashFiles('third_party/phpy/phpy.cc', 'third_party/phpy/config.m4', 'third_party/phpy/include/**', 'third_party/phpy/src/**') }}
+      - name: Build phpy for native bridge tests
+        if: steps.cache-phpy.outputs.cache-hit != 'true'
+        working-directory: third_party/phpy
+        run: |
+          phpize
+          ./configure
+          make -j$(nproc)
+      - name: Enable phpy for native bridge tests
+        working-directory: third_party/phpy
+        run: |
+          php_ini_dir="$(php --ini | sed -n 's/^Scan for additional .ini files in: //p')"
+          echo "extension=$(pwd)/modules/phpy.so" | sudo tee "${php_ini_dir}/90-phpy.ini"
+          php --ri phpy
       - name: Show machine information
         run: |
           date

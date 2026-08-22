@@ -192,24 +192,24 @@ php::Var typephp_fiber_suspend(const php::Var &value, bool *closed) {
         *closed = false;
     }
     if (UNEXPECTED(fiber == nullptr)) {
-        php::throwException(zend_ce_error, "Cannot suspend outside of a fiber");
         if (closed != nullptr) {
             *closed = true;
         }
+        php::throwException(zend_ce_error, "Cannot suspend outside of a fiber");
         return php::null;
     }
     if (UNEXPECTED(fiber->flags & ZEND_FIBER_FLAG_DESTROYED)) {
-        php::throwException(zend_ce_error, "Cannot suspend in a force-closed fiber");
         if (closed != nullptr) {
             *closed = true;
         }
+        php::throwException(zend_ce_error, "Cannot suspend in a force-closed fiber");
         return php::null;
     }
     if (UNEXPECTED(zend_fiber_switch_blocked())) {
-        php::throwException(zend_ce_error, "Cannot switch fibers in current execution context");
         if (closed != nullptr) {
             *closed = true;
         }
+        php::throwException(zend_ce_error, "Cannot switch fibers in current execution context");
         return php::null;
     }
 

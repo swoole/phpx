@@ -1,5 +1,6 @@
 #include "phpx_test.h"
 #include "phpx_fake_scope_guard.h"
+#include "typephp_helper.h"
 
 using namespace php;
 
@@ -49,4 +50,75 @@ TEST(scope_guard, explicit_restore_is_idempotent) {
     }
 
     ASSERT_EQ(FakeScopeGuard::current(), original_scope);
+}
+
+namespace {
+
+zend_execute_data *find_user_code_frame() {
+    auto *frame = EG(current_execute_data);
+    while (frame != nullptr && (frame->func == nullptr || !ZEND_USER_CODE(frame->func->type))) {
+        frame = frame->prev_execute_data;
+    }
+    return frame;
+}
+
+zend_class_entry *scope_target_class() {
+    static zend_class_entry *class_entry = nullptr;
+    if (class_entry == nullptr) {
+        eval(R"PHP(
+            class PhpxUserCodeScopeTarget {
+                public function scopeAnchor(): void {}
+            }
+        )PHP");
+        class_entry = getClassEntrySafe("PhpxUserCodeScopeTarget");
+    }
+    return class_entry;
+}
+
+}  // namespace
+
+TEST(scope_guard, called_class_supports_object_and_class_carriers) {
+    auto object = newObject("stdClass");
+    ASSERT_EQ(getCalledCe(object), object.ce());
+    ASSERT_STREQ(getCalledClass(object).data(), "stdClass");
+
+    Object class_carrier;
+    auto *class_entry = getClassEntrySafe("ArrayObject");
+    ZVAL_PTR(class_carrier.ptr(), class_entry);
+    ASSERT_EQ(getCalledCe(class_carrier), class_entry);
+    ASSERT_STREQ(getCalledClass(class_carrier).data(), "ArrayObject");
+}
+
+TEST(scope_guard, user_code_scope_is_restored) {
+    auto *frame = find_user_code_frame();
+    ASSERT_NE(frame, nullptr);
+    ASSERT_NE(frame->func, nullptr);
+
+    auto *target = scope_target_class();
+    auto *original_scope = frame->func->common.scope;
+    CallableScope callable_scope{getMethod(target, "scopeAnchor"), target, nullptr};
+
+    {
+        UserCodeScopeGuard guard{callable_scope};
+        ASSERT_EQ(frame->func->common.scope, target);
+    }
+
+    ASSERT_EQ(frame->func->common.scope, original_scope);
+}
+
+TEST(scope_guard, user_code_scope_is_restored_after_cpp_exception) {
+    auto *frame = find_user_code_frame();
+    ASSERT_NE(frame, nullptr);
+    auto *target = scope_target_class();
+    auto *original_scope = frame->func->common.scope;
+    CallableScope callable_scope{getMethod(target, "scopeAnchor"), target, nullptr};
+
+    try {
+        UserCodeScopeGuard guard{callable_scope};
+        ASSERT_EQ(frame->func->common.scope, target);
+        throw 1;
+    } catch (int) {
+    }
+
+    ASSERT_EQ(frame->func->common.scope, original_scope);
 }
