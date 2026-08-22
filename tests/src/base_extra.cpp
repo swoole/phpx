@@ -427,8 +427,9 @@ TEST(base_extra, include_with_explicit_symbol_table) {
 
     Variant result = include(
         get_include_dir() + "/return_scope.php", INCLUDE, scope);
-    ASSERT_STREQ(result.get("first").toCString(), "A");
-    ASSERT_EQ(result.get("second").toInt(), 42);
+    Array values = result.toArray();
+    ASSERT_STREQ(values.get("first").toCString(), "A");
+    ASSERT_EQ(values.get("second").toInt(), 42);
 }
 
 // Test throwErrorIfOccurred (no exception case)

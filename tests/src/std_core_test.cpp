@@ -51,6 +51,12 @@ TEST(std_core, class_exists) {
     ASSERT_TRUE(fn::class_exists("stdClass"));
     ASSERT_FALSE(fn::class_exists("ClassThatDoesNotExist"));
     ASSERT_FALSE(fn::class_exists("ClassThatDoesNotExist", false));
+    ASSERT_TRUE(fn::class_exists("\\ArrayObject", false));
+
+    zend_string *interned = zend_string_init_interned(ZEND_STRL("ArrayObject"), false);
+    String cached_name(interned, Ctor::Move);
+    ASSERT_TRUE(fn::class_exists(cached_name));
+    ASSERT_TRUE(fn::class_exists(cached_name));
 }
 
 TEST(std_core, interface_exists) {
@@ -69,6 +75,22 @@ TEST(std_core, method_exists) {
     ASSERT_TRUE(fn::method_exists(obj, "count"));
     ASSERT_TRUE(fn::method_exists(obj, "offsetSet"));
     ASSERT_FALSE(fn::method_exists(obj, "nonexistentMethod"));
+
+    eval(R"PHP(
+        class PhpxStdMethodProbe {
+            private function hidden(): void {}
+            public function __call(string $name, array $args): mixed { return null; }
+        }
+    )PHP");
+    ASSERT_TRUE(fn::method_exists("PhpxStdMethodProbe", "hidden"));
+    ASSERT_FALSE(fn::method_exists("MissingPhpxStdClass", "hidden"));
+    Object magic = newObject("PhpxStdMethodProbe");
+    ASSERT_FALSE(fn::method_exists(magic, "dynamicMethod"));
+
+    Variant closure = eval("return static fn() => null;");
+    ASSERT_TRUE(fn::method_exists(closure, "__invoke"));
+    ASSERT_TRUE(fn::method_exists("Closure", "__invoke"));
+    try_call([]() { fn::method_exists(42, "method"); }, "must be of type object|string");
 }
 
 TEST(std_core, property_exists) {
@@ -76,6 +98,9 @@ TEST(std_core, property_exists) {
     obj.setProperty("foo", "bar");
     ASSERT_TRUE(fn::property_exists(obj, "foo"));
     ASSERT_FALSE(fn::property_exists(obj, "baz"));
+    ASSERT_TRUE(fn::property_exists("Exception", "message"));
+    ASSERT_FALSE(fn::property_exists("MissingPhpxStdClass", "message"));
+    try_call([]() { fn::property_exists(42, "value"); }, "must be of type object|string");
 }
 
 TEST(std_core, is_a) {
@@ -84,12 +109,20 @@ TEST(std_core, is_a) {
     ASSERT_TRUE(fn::is_a(obj, "IteratorAggregate"));
     ASSERT_FALSE(fn::is_a(obj, "stdClass"));
     ASSERT_TRUE(fn::is_a("ArrayObject", "ArrayObject", true));
+    ASSERT_FALSE(fn::is_a("MissingPhpxStdClass", "ArrayObject", true));
+    ASSERT_FALSE(fn::is_a(42, "ArrayObject"));
+    ASSERT_FALSE(fn::is_a(obj, "MissingPhpxStdClass"));
 }
 
 TEST(std_core, is_subclass_of) {
     // A class is not a subclass of itself
     ASSERT_FALSE(fn::is_subclass_of("ArrayObject", "ArrayObject"));
     ASSERT_FALSE(fn::is_subclass_of("stdClass", "ArrayObject"));
+    Object runtime = newObject("RuntimeException");
+    ASSERT_TRUE(fn::is_subclass_of(runtime, "Exception"));
+    ASSERT_FALSE(fn::is_subclass_of(42, "Exception"));
+    ASSERT_FALSE(fn::is_subclass_of("MissingPhpxStdClass", "Exception", true));
+    ASSERT_FALSE(fn::is_subclass_of(runtime, "MissingPhpxStdClass"));
 }
 
 TEST(std_core, defined) {
@@ -116,6 +149,29 @@ TEST(std_core, define_array) {
     nested.set(Variant(0), arr);
     ASSERT_TRUE(fn::define("MY_TEST_ARR_2", nested));
     ASSERT_TRUE(fn::defined("MY_TEST_ARR_2"));
+
+    Array empty;
+    ASSERT_TRUE(fn::define("MY_TEST_EMPTY_ARR", empty));
+
+    Array associative;
+    associative.set("name", "phpx");
+    ASSERT_TRUE(fn::define("MY_TEST_ASSOC_ARR", associative));
+}
+
+TEST(std_core, define_rejects_invalid_and_recursive_constants) {
+    try_call([]() {
+        fn::define("PhpxStdClass::VALUE", 1);
+        throwErrorIfOccurred();
+    }, "cannot be a class constant");
+
+    Variant recursive = eval("$value = []; $value['self'] =& $value; return $value;");
+    try_call([&recursive]() {
+        fn::define("PHPX_RECURSIVE_CONSTANT", recursive);
+        throwErrorIfOccurred();
+    }, "cannot be a recursive array");
+
+    ASSERT_TRUE(fn::define("PHPX_CASE_WARNING_CONSTANT", 1, true));
+    ASSERT_FALSE(fn::define("PHPX_CASE_WARNING_CONSTANT", 2));
 }
 
 TEST(std_core, gettype) {
@@ -261,4 +317,7 @@ TEST(std_core, get_parent_class) {
     // Class without parent via string
     auto parent4 = fn::get_parent_class("stdClass");
     ASSERT_TRUE(parent4.isFalse());
+
+    ASSERT_TRUE(fn::get_parent_class("MissingPhpxStdClass").isFalse());
+    try_call([]() { fn::get_parent_class(42); }, "must be of type object|string");
 }

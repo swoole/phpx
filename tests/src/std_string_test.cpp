@@ -145,6 +145,11 @@ TEST(std_string, strpos) {
     auto pos4 = fn::strpos("hello hello", "hello", 3);
     ASSERT_TRUE(pos4.isInt());
     ASSERT_EQ(pos4.toInt(), 6);
+
+    ASSERT_EQ(fn::strpos("hello", "").toInt(), 0);
+    ASSERT_EQ(fn::strpos("hello", "lo", -3).toInt(), 3);
+    try_call([]() { fn::strpos("hello", "h", 6); }, "must be contained in argument #1");
+    try_call([]() { fn::strpos("hello", "h", -6); }, "must be contained in argument #1");
 }
 
 TEST(std_string, stripos) {
@@ -158,6 +163,11 @@ TEST(std_string, stripos) {
 
     auto pos3 = fn::stripos("hello", "PHP");
     ASSERT_TRUE(pos3.isFalse());
+
+    ASSERT_EQ(fn::stripos("Hello", "").toInt(), 0);
+    ASSERT_EQ(fn::stripos("Hello", "LO", -3).toInt(), 3);
+    try_call([]() { fn::stripos("hello", "h", 6); }, "must be contained in argument #1");
+    try_call([]() { fn::stripos("hello", "h", -6); }, "must be contained in argument #1");
 }
 
 TEST(std_string, strrpos) {
@@ -167,6 +177,13 @@ TEST(std_string, strrpos) {
 
     auto pos2 = fn::strrpos("hello world", "php");
     ASSERT_TRUE(pos2.isFalse());
+
+    ASSERT_EQ(fn::strrpos("hello", "").toInt(), 5);
+    ASSERT_EQ(fn::strrpos("abcabc", "abc", 1).toInt(), 3);
+    ASSERT_EQ(fn::strrpos("abcabc", "abc", -1).toInt(), 3);
+    ASSERT_EQ(fn::strrpos("abcabc", "abc", -4).toInt(), 0);
+    try_call([]() { fn::strrpos("hello", "h", 6); }, "must be contained in argument #1");
+    try_call([]() { fn::strrpos("hello", "h", -6); }, "must be contained in argument #1");
 }
 
 TEST(std_string, strstr) {
@@ -179,6 +196,9 @@ TEST(std_string, strstr) {
     // before_needle = true
     auto s3 = fn::strstr("hello world", " ", true);
     ASSERT_STREQ(s3.toString().toCString(), "hello");
+
+    ASSERT_STREQ(fn::strstr("hello", "").toCString(), "hello");
+    ASSERT_TRUE(fn::strstr("hello", "", true).toString().empty());
 }
 
 TEST(std_string, stristr) {
@@ -187,6 +207,10 @@ TEST(std_string, stristr) {
 
     auto s2 = fn::stristr("hello world", "PHP");
     ASSERT_TRUE(s2.isFalse());
+
+    ASSERT_STREQ(fn::stristr("Hello", "").toCString(), "Hello");
+    ASSERT_TRUE(fn::stristr("Hello", "", true).toString().empty());
+    ASSERT_STREQ(fn::stristr("Hello World", "world", true).toCString(), "Hello ");
 }
 
 TEST(std_string, substr) {
@@ -204,6 +228,12 @@ TEST(std_string, substr) {
 
     auto s5 = fn::substr("hello world", -5, 3);
     ASSERT_STREQ(s5.toCString(), "wor");
+
+    ASSERT_STREQ(fn::substr("hello", -20).toCString(), "hello");
+    ASSERT_TRUE(fn::substr("hello", 20).empty());
+    ASSERT_TRUE(fn::substr("hello", 3, -3).empty());
+    ASSERT_STREQ(fn::substr("hello", 1, -1).toCString(), "ell");
+    ASSERT_STREQ(fn::substr("hello", 3, 50).toCString(), "lo");
 }
 
 TEST(std_string, str_repeat) {
@@ -241,6 +271,12 @@ TEST(std_string, explode_implode) {
     // join alias
     auto joined2 = fn::join("", Array{"x", "y", "z"});
     ASSERT_STREQ(joined2.toCString(), "xyz");
+
+    ASSERT_EQ(fn::explode(",", "", 1).count(), 1);
+    ASSERT_TRUE(fn::explode(",", "", -1).empty());
+    ASSERT_STREQ(fn::explode(",", "a,b,c", 1).get(0).toCString(), "a,b,c");
+    ASSERT_EQ(fn::explode(",", "a,b,c", -1).count(), 2);
+    try_call([]() { fn::explode("", "value"); }, "must not be empty");
 }
 
 TEST(std_string, dirname_basename) {
@@ -258,4 +294,6 @@ TEST(std_string, dirname_basename) {
 
     auto b2 = fn::basename("/var/www/html/index.php", ".php");
     ASSERT_STREQ(b2.toCString(), "index");
+
+    ASSERT_TRUE(fn::dirname("").empty());
 }
