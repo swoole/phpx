@@ -55,7 +55,8 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
 
     auto zarr = unwrap_ptr();
     /* Start at the beginning and go until we hit offset */
-    int pos = 0;
+    size_t pos = 0;
+    const size_t end = static_cast<size_t>(offset) + static_cast<size_t>(length);
     if (!preserve_keys && (Z_ARRVAL_P(zarr)->u.flags & HASH_FLAG_PACKED)) {
         zend_hash_real_init(Z_ARRVAL_P(&return_value), true);
         ZEND_HASH_FILL_PACKED(Z_ARRVAL_P(&return_value)) {
@@ -64,7 +65,7 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
                 if (pos <= offset) {
                     continue;
                 }
-                if (pos > offset + length) {
+                if (pos > end) {
                     break;
                 }
                 ZEND_HASH_FILL_ADD(entry);
@@ -79,7 +80,7 @@ Array Array::slice(long offset, long length, bool preserve_keys) {
             if (pos <= offset) {
                 continue;
             }
-            if (pos > offset + length) {
+            if (pos > end) {
                 break;
             }
 

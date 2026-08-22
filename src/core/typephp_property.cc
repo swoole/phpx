@@ -57,7 +57,9 @@ namespace {
 zend_function *find_property_helper(zend_object *object, zend_string *member, const char *prefix, size_t prefix_len) {
     static const char hex[] = "0123456789abcdef";
     const size_t member_len = ZSTR_LEN(member);
-    zend_string *method = zend_string_alloc(prefix_len + member_len * 2, false);
+    // Property names are runtime input. Use Zend's checked allocator so the
+    // hexadecimal expansion cannot wrap before the method-name allocation.
+    zend_string *method = zend_string_safe_alloc(2, member_len, prefix_len, false);
     memcpy(ZSTR_VAL(method), prefix, prefix_len);
     for (size_t i = 0; i < member_len; i++) {
         const unsigned char ch = static_cast<unsigned char>(ZSTR_VAL(member)[i]);

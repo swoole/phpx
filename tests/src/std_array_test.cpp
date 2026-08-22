@@ -1,6 +1,8 @@
 #include "phpx_test.h"
 #include "phpx_std.h"
 
+#include <limits>
+
 using namespace php;
 
 TEST(std_array, in_array) {
@@ -242,6 +244,10 @@ TEST(std_array, array_fill) {
 
     try_call([]() { fn::array_fill(0, -1, "x"); },
              "array_fill(): Argument #2 ($count) must be greater than or equal to 0");
+    try_call([]() { fn::array_fill(0, static_cast<php::Int>(INT_MAX) + 1, "x"); },
+             "array_fill(): Argument #2 ($count) is too large");
+    try_call([]() { fn::array_fill(std::numeric_limits<php::Int>::max(), 2, "x"); },
+             "Cannot add element to the array as the next element is already occupied");
 }
 
 TEST(std_array, array_keys_filter) {

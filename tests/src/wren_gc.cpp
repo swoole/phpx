@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 
 extern "C" {
 #include "wren_gc.h"
@@ -29,6 +30,11 @@ struct Roots {
 size_t objectSize(const void *)
 {
     return sizeof(Node);
+}
+
+size_t oversizedObjectSize(const void *)
+{
+    return std::numeric_limits<size_t>::max();
 }
 
 bool hasFinalizer(const void *)
@@ -116,6 +122,21 @@ TEST(wren_gc, uses_compact_sixteen_byte_header)
     if constexpr (sizeof(void *) == 8) {
         EXPECT_EQ(sizeof(Node) + 16u, wren_gc_stats(heap).bytes_allocated);
     }
+    wren_gc_heap_free(heap);
+}
+
+TEST(wren_gc, rejects_an_allocation_size_that_cannot_include_its_header)
+{
+    Roots roots;
+    WrenGcConfig config;
+    configureHeap(config, roots);
+    config.object_size = oversizedObjectSize;
+    auto *heap = wren_gc_heap_new(&config);
+    ASSERT_NE(nullptr, heap);
+
+    EXPECT_EQ(nullptr, wren_gc_allocate(heap, alignof(Node), nullptr));
+    EXPECT_EQ(0u, wren_gc_stats(heap).object_count);
+    EXPECT_EQ(0u, wren_gc_stats(heap).bytes_allocated);
     wren_gc_heap_free(heap);
 }
 

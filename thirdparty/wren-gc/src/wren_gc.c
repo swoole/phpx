@@ -100,7 +100,13 @@ static size_t object_allocation_size(const WrenGcHeap *heap, const WrenGcObject 
 static void gray_push(WrenGcHeap *heap, WrenGcObject *object)
 {
     if (heap->gray_count == heap->gray_capacity) {
-        size_t capacity = heap->gray_capacity < 8 ? 8 : heap->gray_capacity * 2;
+        if (heap->gray_capacity > SIZE_MAX / 2u) {
+            abort();
+        }
+        size_t capacity = heap->gray_capacity < 8 ? 8 : heap->gray_capacity * 2u;
+        if (capacity > SIZE_MAX / sizeof(*heap->gray)) {
+            abort();
+        }
         WrenGcObject **gray = (WrenGcObject **) realloc(heap->gray, capacity * sizeof(*gray));
         if (gray == NULL) {
             abort();
@@ -239,6 +245,9 @@ void *wren_gc_allocate(
         return NULL;
     }
     const size_t allocation_size = payload_offset() + size;
+    if (heap->bytes_allocated > SIZE_MAX - allocation_size) {
+        return NULL;
+    }
     if (!heap->collecting && heap->bytes_allocated + allocation_size > heap->next_collection) {
         wren_gc_collect(heap);
     }
@@ -302,8 +311,16 @@ void wren_gc_collect(WrenGcHeap *heap)
         object = next;
     }
 
-    size_t growth = (heap->bytes_allocated * heap->config.heap_growth_percent) / 100u;
-    heap->next_collection = heap->bytes_allocated + growth;
+    size_t growth;
+    if (heap->config.heap_growth_percent != 0u
+        && heap->bytes_allocated > SIZE_MAX / heap->config.heap_growth_percent) {
+        growth = SIZE_MAX;
+    } else {
+        growth = (heap->bytes_allocated * heap->config.heap_growth_percent) / 100u;
+    }
+    heap->next_collection = growth > SIZE_MAX - heap->bytes_allocated
+        ? SIZE_MAX
+        : heap->bytes_allocated + growth;
     if (heap->next_collection < heap->config.minimum_heap_size) {
         heap->next_collection = heap->config.minimum_heap_size;
     }

@@ -102,8 +102,18 @@ String concat(const ArgList &args) {
             throwErrorIfOccurred();
             return {};
         }
+        const size_t length = ZSTR_LEN(str);
+        if (UNEXPECTED(length > ZSTR_MAX_LEN - total_len)) {
+            zend_string_release(str);
+            for (size_t i = 0; i < index; ++i) {
+                zend_string_release(items[i]);
+            }
+            zend_throw_error(nullptr, "String size overflow");
+            throwErrorIfOccurred();
+            return {};
+        }
         items[index++] = str;
-        total_len += ZSTR_LEN(str);
+        total_len += length;
     }
 
     zend_string *result_str = zend_string_alloc(total_len, 0);

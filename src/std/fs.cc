@@ -6,8 +6,6 @@
 
 #include "std/fs.h"
 
-#include <climits>
-
 namespace php::fn {
 
 static Bool _fs_stat(const String &filename, int type) {
@@ -32,7 +30,9 @@ Bool file_exists(const String &filename) {
 }
 
 Variant realpath(const String &path) {
-    char resolved[PATH_MAX];
+    // expand_filepath() follows Zend's MAXPATHLEN contract. PATH_MAX is not
+    // guaranteed to describe the same buffer size, notably on Windows.
+    char resolved[MAXPATHLEN];
     if (!expand_filepath(path.data(), resolved)) {
         return Variant(false);
     }

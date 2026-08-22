@@ -340,6 +340,18 @@ Array array_fill(Int start_index, Int count, const Variant &value) {
         return Array();
     }
 
+    // Match Zend's allocation limits before narrowing the requested capacity
+    // to uint32_t or evaluating start_index + i in the fill loop.
+    if (UNEXPECTED(count > INT_MAX)) {
+        php::throwException(zend_ce_value_error,
+                            "array_fill(): Argument #2 ($count) is too large");
+        return Array();
+    }
+    if (UNEXPECTED(start_index > ZEND_LONG_MAX - count + 1)) {
+        php::throwError("Cannot add element to the array as the next element is already occupied");
+        return Array();
+    }
+
     zend_array *dest = zend_new_array(static_cast<uint32_t>(count));
     zval val_copy;
 
