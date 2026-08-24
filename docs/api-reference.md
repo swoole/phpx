@@ -301,12 +301,6 @@ zend_array_iterator *getIterator() const;
 zend_array *ptr();
 const zend_array *ptr() const;
 
-// 增加引用计数
-void addRef();
-
-// 减少引用计数
-void release();
-
 // 分离数组（写时复制）
 void separate();
 

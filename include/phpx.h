@@ -332,8 +332,6 @@ extern PHPX_API const char *box_res_name;
 
 PHPX_API int getBoxResourceId();
 
-PHPX_API Array toArray(const Variant &v);
-
 #define PHPX_MAX_DEBUG_DEPTH 64
 
 struct DebugFrame {
