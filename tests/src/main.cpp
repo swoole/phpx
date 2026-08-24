@@ -1,6 +1,7 @@
 #include "phpx_test.h"
 #include "phpx_fake_scope_guard.h"
 #include "phpx_func.h"
+#include "typephp_helper.h"
 #include "typephp_fiber_generator.h"
 
 #include <cerrno>
@@ -256,7 +257,7 @@ static PHP_MINIT_FUNCTION(phpx_gtest_runtime) {
                                                                   nullptr,
                                                                   ZEND_TYPE_INIT_CODE(IS_STRING, false, 0));
     zend_string_release(hooked_name);
-    php::registerPropertyHooks(gtest_hooked_ce, hooked_info, "readhook", "writehook");
+    typephp_register_property_hooks(gtest_hooked_ce, hooked_info, "readhook", "writehook");
 
     zend_class_entry hook_interface_ce;
     INIT_CLASS_ENTRY(hook_interface_ce, "PhpxGtestHookInterface", nullptr);
@@ -272,7 +273,7 @@ static PHP_MINIT_FUNCTION(phpx_gtest_runtime) {
                                     nullptr,
                                     ZEND_TYPE_INIT_CODE(IS_STRING, false, 0));
     zend_string_release(interface_name);
-    php::registerAbstractPropertyHooks(gtest_hook_interface_ce, interface_info, true, true);
+    typephp_register_abstract_property_hooks(gtest_hook_interface_ce, interface_info, true, true);
     return SUCCESS;
 }
 

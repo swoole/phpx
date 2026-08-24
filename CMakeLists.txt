@@ -399,7 +399,7 @@ endif()
 if(ENABLE_FACADE_API)
     file(GLOB_RECURSE SRC_FILES src/core/*.cc src/std/*.cc src/func/*.cc src/class/*.cc src/const/*.cc)
 else()
-    file(GLOB_RECURSE SRC_FILES src/core/*.cc src/std/*.cc)
+    file(GLOB_RECURSE SRC_FILES src/core/*.cc src/std/*.cc src/typephp/*.cc)
     # Facade API 与 tests 耦合较大，保留最常用的 Facade 实现，避免核心单测大量改写
     list(APPEND SRC_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/func/core.cc
