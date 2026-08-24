@@ -937,6 +937,9 @@ class Variant {
     void addRef() {
         Z_TRY_ADDREF_P(&val);
     }
+    // Raw counterpart of addRef(). It only drops a previously acquired
+    // reference and does not destroy the zval; normal ownership release must
+    // continue to use destroy() or the Variant destructor.
     void delRef() {
         Z_TRY_DELREF_P(&val);
     }
@@ -2315,6 +2318,8 @@ class Box {
     }
 
   protected:
+    // Keep metadata as one 8-byte block. extra_info is an ABI/layout reserve
+    // for future Box metadata even when a concrete Box only uses type_info.
     uint32_t type_info = 0;
     uint32_t extra_info = 0;
     virtual ~Box() = default;
