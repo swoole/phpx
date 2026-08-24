@@ -481,10 +481,16 @@ TEST(object, toObject) {
 
 TEST(object, toObject3) {
     auto arr = create_map();
-    GC_SET_REFCOUNT(arr.array(), 2);
     /**
-     * Unsafe operation. Memory leak may occur here. It is only used to test the IS_ARRAY_IMMUTABLE flag bit
+     * Intentionally create an unowned reference before pretending that this
+     * request-allocated array is immutable. The duplicate owned by `o` is
+     * released normally, but the original array remains at refcount 1 when
+     * `arr` is destroyed. Zend therefore reports its HashTable header and
+     * bucket storage as two leaks during shutdown. These expected reports are
+     * an artifact of this unsafe flag-coverage test, not a leak in toObject()
+     * or the Closure exception path.
      */
+    GC_SET_REFCOUNT(arr.array(), 2);
     GC_TYPE_INFO(arr.array()) = GC_ARRAY | ((IS_ARRAY_IMMUTABLE | GC_NOT_COLLECTABLE) << GC_FLAGS_SHIFT);
     auto o = toObject(arr);
     ASSERT_EQ(o.attr("php").toInt(), 3);
