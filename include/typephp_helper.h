@@ -290,7 +290,11 @@ static inline php::Variant typephp_call_parent_clone(php::Object &object, zend_f
  */
 PHPX_API void typephp_unset_typed_property(zend_object *object, zend_string *member, void **cache_slot);
 
-/** Install TypePHP's property hook and asymmetric-set handlers. */
+/**
+ * Install TypePHP's property hook and asymmetric-set handlers. On PHP 8.5+
+ * this also installs a clone-with handler that preserves the handler table and
+ * applies updated properties using the lexical calling scope.
+ */
 PHPX_API void typephp_install_property_handlers(zend_class_entry *class_entry, zend_object_handlers *handlers);
 
 /**

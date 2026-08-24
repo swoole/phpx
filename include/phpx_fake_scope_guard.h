@@ -59,4 +59,11 @@ class FakeScopeGuard final {
     bool active_ = true;
 };
 
+namespace detail {
+
+/** Internal lexical class scope carried by the active scoped php::call(). */
+PHPX_API zend_class_entry *getLexicalCallScope();
+
+}  // namespace detail
+
 }  // namespace php

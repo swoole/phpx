@@ -1,4 +1,5 @@
 #include "phpx_test.h"
+#include "phpx_fake_scope_guard.h"
 #include "phpx_func.h"
 #include "typephp_fiber_generator.h"
 
@@ -209,6 +210,14 @@ static ZEND_FUNCTION(phpx_test_generator_returns_immediately) {
     RETURN_LONG(17);
 }
 
+static ZEND_FUNCTION(phpx_test_lexical_call_scope) {
+    zend_class_entry *scope = php::detail::getLexicalCallScope();
+    if (scope == nullptr) {
+        RETURN_NULL();
+    }
+    RETURN_STR_COPY(scope->name);
+}
+
 static const zend_function_entry ext_functions[] = {
     ZEND_FE(main, arginfo_void) ZEND_FE(phpx_test_generator_sequence, arginfo_mixed)
         ZEND_FE(phpx_test_generator_yield_from_array, arginfo_mixed)
@@ -216,7 +225,8 @@ static const zend_function_entry ext_functions[] = {
                 ZEND_FE(phpx_test_generator_yield_from_iterator_aggregate, arginfo_mixed)
                     ZEND_FE(phpx_test_generator_yield_from_send, arginfo_mixed)
                         ZEND_FE(phpx_test_generator_yield_from_throw, arginfo_mixed)
-                            ZEND_FE(phpx_test_generator_returns_immediately, arginfo_mixed) ZEND_FE_END};
+                            ZEND_FE(phpx_test_generator_returns_immediately, arginfo_mixed)
+                                ZEND_FE(phpx_test_lexical_call_scope, arginfo_mixed) ZEND_FE_END};
 
 static PHP_MINIT_FUNCTION(phpx_gtest_runtime) {
     typephp_register_fiber_generator_class();

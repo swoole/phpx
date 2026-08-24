@@ -109,6 +109,151 @@ bool reject_asymmetric_property_write(zend_object *object, zend_string *member) 
     return false;
 }
 
+zval *write_hook_property(zend_object *object, zend_string *member, zval *value, void **cache_slot);
+
+#if PHP_VERSION_ID >= 80500
+bool is_compatible_property_scope(const zend_class_entry *declaring_scope, const zend_class_entry *scope) {
+    return scope != nullptr && (declaring_scope == scope || instanceof_function(scope, declaring_scope) ||
+                                instanceof_function(declaring_scope, scope));
+}
+
+bool has_property_read_access(const zend_property_info *property_info, const zend_class_entry *scope) {
+    if (property_info->flags & ZEND_ACC_PRIVATE) {
+        return property_info->ce == scope;
+    }
+    if (property_info->flags & ZEND_ACC_PROTECTED) {
+        return is_compatible_property_scope(property_info->prototype->ce, scope);
+    }
+    return true;
+}
+
+bool has_property_set_access(const zend_property_info *property_info, const zend_class_entry *scope) {
+    if (property_info->flags & ZEND_ACC_PRIVATE_SET) {
+        return property_info->ce == scope;
+    }
+    if (property_info->flags & ZEND_ACC_PROTECTED_SET) {
+        return is_compatible_property_scope(property_info->prototype->ce, scope);
+    }
+    return true;
+}
+
+zend_property_info *find_clone_property(zend_object *object, zend_string *member, const zend_class_entry *scope) {
+    // Parent-private properties are stored under a mangled key on the child
+    // object. Resolve the source-level name against the lexical scope first,
+    // matching the behavior of a property write compiled in that scope.
+    if (scope != nullptr && scope != object->ce && instanceof_function(object->ce, scope)) {
+        auto *property_info = static_cast<zend_property_info *>(zend_hash_find_ptr(&scope->properties_info, member));
+        if (property_info != nullptr && property_info->ce == scope && (property_info->flags & ZEND_ACC_PRIVATE)) {
+            return property_info;
+        }
+    }
+
+    return static_cast<zend_property_info *>(zend_hash_find_ptr(&object->ce->properties_info, member));
+}
+
+bool property_uses_strict_types() {
+    zend_execute_data *execute_data = EG(current_execute_data);
+    return execute_data != nullptr && execute_data->func != nullptr && ZEND_CALL_USES_STRICT_TYPES(execute_data);
+}
+
+zval *write_parent_private_clone_property(zend_object *object, zend_property_info *property_info, zval *value) {
+    zval *property = OBJ_PROP(object, property_info->offset);
+    const bool strict = property_uses_strict_types();
+    zval assigned;
+
+    Z_TRY_ADDREF_P(value);
+    ZVAL_COPY_VALUE(&assigned, value);
+    if (ZEND_TYPE_IS_SET(property_info->type) &&
+        UNEXPECTED(!zend_verify_property_type(property_info, &assigned, strict))) {
+        zval_ptr_dtor(&assigned);
+        return &EG(error_zval);
+    }
+
+    Z_PROP_FLAG_P(property) &= ~(IS_PROP_UNINIT | IS_PROP_REINITABLE);
+    return zend_assign_to_variable(property, &assigned, IS_TMP_VAR, strict);
+}
+
+zval *write_clone_property(zend_object *object, zend_string *member, zval *value, const zend_class_entry *scope) {
+    zend_property_info *property_info = find_clone_property(object, member, scope);
+    if (property_info == nullptr || (property_info->flags & ZEND_ACC_STATIC) ||
+        !has_property_read_access(property_info, scope) || !has_property_set_access(property_info, scope)) {
+        php::FakeScopeGuard scope_guard{scope};
+        return zend_std_write_property(object, member, value, nullptr);
+    }
+
+    php::FakeScopeGuard scope_guard{property_info->ce};
+    static const char setter_prefix[] = "__typephp_property_set_";
+    static const char getter_prefix[] = "__typephp_property_get_";
+    if (find_property_helper(object, member, setter_prefix, sizeof(setter_prefix) - 1) != nullptr ||
+        find_property_helper(object, member, getter_prefix, sizeof(getter_prefix) - 1) != nullptr) {
+        return write_hook_property(object, member, value, nullptr);
+    }
+
+    if ((property_info->flags & ZEND_ACC_PRIVATE) && property_info->ce != object->ce) {
+        return write_parent_private_clone_property(object, property_info, value);
+    }
+    return zend_std_write_property(object, member, value, nullptr);
+}
+
+zend_object *clone_object_with(zend_object *old_object, const zend_class_entry *scope, const HashTable *properties) {
+    // Direct AOT method calls have no Zend method frame for
+    // zend_get_executed_scope(). Scoped php::call() carries that lexical scope
+    // separately, while ordinary Zend calls provide it in the clone_obj_with
+    // argument.
+    if (scope == nullptr) {
+        scope = php::detail::getLexicalCallScope();
+    }
+    zend_object *new_object = old_object->handlers->clone_obj(old_object);
+    if (new_object == nullptr) {
+        return nullptr;
+    }
+
+    // A custom clone allocator may restore its base handlers. The clone has
+    // the same runtime class as the source, so retain the exact TypePHP table
+    // before dispatching property hooks on the new object.
+    new_object->handlers = old_object->handlers;
+    if (UNEXPECTED(EG(exception))) {
+        return new_object;
+    }
+
+    if (ZEND_CLASS_HAS_READONLY_PROPS(new_object->ce)) {
+        for (uint32_t i = 0; i < new_object->ce->default_properties_count; i++) {
+            Z_PROP_FLAG_P(OBJ_PROP_NUM(new_object, i)) |= IS_PROP_REINITABLE;
+        }
+    }
+
+    ZEND_HASH_FOREACH_KEY_VAL(properties, zend_ulong index, zend_string * member, zval * value) {
+        if (UNEXPECTED(Z_ISREF_P(value))) {
+            if (Z_REFCOUNT_P(value) == 1) {
+                value = Z_REFVAL_P(value);
+            } else {
+                zend_throw_error(nullptr, "Cannot assign by reference when cloning with updated properties");
+                break;
+            }
+        }
+
+        if (UNEXPECTED(member == nullptr)) {
+            member = zend_long_to_str(index);
+            write_clone_property(new_object, member, value, scope);
+            zend_string_release_ex(member, false);
+        } else {
+            write_clone_property(new_object, member, value, scope);
+        }
+
+        if (UNEXPECTED(EG(exception))) {
+            break;
+        }
+    }
+    ZEND_HASH_FOREACH_END();
+
+    // Do not clear IS_PROP_REINITABLE globally here. Zend intentionally leaves
+    // readonly properties that were not present in `properties` reinitializable
+    // once on the clone; each successful write consumes the flag for the slot
+    // it updates.
+    return new_object;
+}
+#endif
+
 zval *write_hook_property(zend_object *object, zend_string *member, zval *value, void **cache_slot) {
     if (reject_asymmetric_property_write(object, member)) {
         return &EG(uninitialized_zval);
@@ -143,6 +288,9 @@ void initialize_property_handlers(zend_object_handlers *handlers, const zend_obj
     handlers->read_property = read_hook_property;
     handlers->write_property = write_hook_property;
     handlers->unset_property = typephp_unset_typed_property;
+#if PHP_VERSION_ID >= 80500
+    handlers->clone_obj_with = clone_object_with;
+#endif
 }
 
 }  // namespace

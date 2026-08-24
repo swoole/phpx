@@ -52,6 +52,30 @@ TEST(scope_guard, explicit_restore_is_idempotent) {
     ASSERT_EQ(FakeScopeGuard::current(), original_scope);
 }
 
+TEST(scope_guard, scoped_call_exposes_and_restores_lexical_scope) {
+    auto *target = getClassEntrySafe("ArrayObject");
+    auto *probe = getFunction("phpx_test_lexical_call_scope");
+
+    ASSERT_EQ(detail::getLexicalCallScope(), nullptr);
+    Variant result = call(target, probe);
+    ASSERT_TRUE(result.isString());
+    ASSERT_STREQ(result.toCString(), "ArrayObject");
+    ASSERT_EQ(detail::getLexicalCallScope(), nullptr);
+}
+
+TEST(scope_guard, scoped_call_restores_lexical_scope_after_exception) {
+    auto *target = getClassEntrySafe("ArrayObject");
+    auto *strlen_function = getFunction("strlen");
+
+    try {
+        call(target, strlen_function);
+        FAIL() << "Expected an argument-count exception";
+    } catch (zend_object *) {
+        catchException();
+    }
+    ASSERT_EQ(detail::getLexicalCallScope(), nullptr);
+}
+
 namespace {
 
 zend_execute_data *find_user_code_frame() {

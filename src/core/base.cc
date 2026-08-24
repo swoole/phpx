@@ -808,8 +808,33 @@ Variant call(zend_function *func, Array &args, zend_array *named_args) {
     return call(func, _args, named_args);
 }
 
+namespace {
+
+thread_local zend_class_entry *lexical_call_scope = nullptr;
+
+class LexicalCallScopeGuard final {
+  public:
+    explicit LexicalCallScopeGuard(zend_class_entry *scope) : previous_(lexical_call_scope) {
+        lexical_call_scope = scope;
+    }
+
+    ~LexicalCallScopeGuard() {
+        lexical_call_scope = previous_;
+    }
+
+  private:
+    zend_class_entry *previous_;
+};
+
+}  // namespace
+
+zend_class_entry *detail::getLexicalCallScope() {
+    return lexical_call_scope;
+}
+
 Variant call(zend_class_entry *ce, zend_function *func, zend_array *named_args) {
     Variant retval{};
+    LexicalCallScopeGuard scope_guard{ce};
     zend_call_known_function(func, nullptr, ce, retval.ptr(), 0, nullptr, named_args);
     throwErrorIfOccurred();
     return retval;
@@ -817,6 +842,7 @@ Variant call(zend_class_entry *ce, zend_function *func, zend_array *named_args) 
 
 Variant call(zend_class_entry *ce, zend_function *func, Args &args, zend_array *named_args) {
     Variant retval{};
+    LexicalCallScopeGuard scope_guard{ce};
     zend_call_known_function(func, nullptr, ce, retval.ptr(), args.count(), args.ptr(), named_args);
     throwErrorIfOccurred();
     return retval;
