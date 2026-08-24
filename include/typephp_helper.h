@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <string_view>
 #ifdef ZTS
 #include <atomic>
 #endif
@@ -36,6 +37,29 @@ PHPX_API void typephp_attribute_set_lazy_value_argument(zend_attribute *attribut
 /** Install/uninstall TypePHP's ReflectionAttribute lazy-argument handlers. */
 PHPX_API zend_result typephp_install_reflection_attribute_handlers();
 PHPX_API void typephp_uninstall_reflection_attribute_handlers();
+
+/** Attach TypePHP-lowered concrete hooks to an internal class property. */
+PHPX_API void typephp_register_property_hooks(zend_class_entry *class_entry,
+                                              zend_property_info *property_info,
+                                              std::string_view getter,
+                                              std::string_view setter);
+
+/** Attach abstract hook metadata emitted for a TypePHP interface property. */
+PHPX_API void typephp_register_abstract_property_hooks(zend_class_entry *class_entry,
+                                                       zend_property_info *property_info,
+                                                       bool getter,
+                                                       bool setter);
+
+/** Prepare an inherited property-info entry for a TypePHP redeclaration. */
+PHPX_API void typephp_prepare_property_redeclaration(zend_class_entry *class_entry, zend_string *name);
+
+/** Inherit hook kinds omitted by a TypePHP child property declaration. */
+PHPX_API void typephp_finalize_property_hook_inheritance(zend_class_entry *class_entry);
+
+/** Resolve the hook targeted by a TypePHP parent::$property::get()/set() call. */
+PHPX_API zend_function *typephp_get_parent_property_hook(zend_class_entry *parent_class_entry,
+                                                         const php::String &property,
+                                                         zend_property_hook_kind kind);
 
 #if defined(__GNUC__) || defined(__clang__)
 #define TYPEPHP_HOT_ATTRIBUTE __attribute__((hot))

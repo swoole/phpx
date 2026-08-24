@@ -1,6 +1,7 @@
 #include <typephp_helper.h>
 
 #include <cstring>
+#include <string>
 
 void typephp_unset_typed_property(zend_object *object, zend_string *member, void **cache_slot) {
     zend_class_entry *ce = object->ce;
@@ -53,6 +54,71 @@ std_unset:
 }
 
 namespace {
+
+zend_function *create_property_hook(zend_class_entry *class_entry,
+                                    zend_property_info *property_info,
+                                    std::string_view method_name,
+                                    std::string_view hook_name) {
+    if (method_name.empty()) {
+        return nullptr;
+    }
+
+    auto *source = static_cast<zend_function *>(
+        zend_hash_str_find_ptr(&class_entry->function_table, method_name.data(), method_name.size()));
+    if (UNEXPECTED(source == nullptr)) {
+        zend_error_noreturn(E_CORE_ERROR,
+                            "Property hook implementation %s::%.*s is missing",
+                            ZSTR_VAL(class_entry->name),
+                            static_cast<int>(method_name.size()),
+                            method_name.data());
+    }
+
+    auto *hook = static_cast<zend_internal_function *>(pemalloc(sizeof(zend_internal_function), true));
+    memcpy(hook, &source->internal_function, sizeof(zend_internal_function));
+    hook->function_name = zend_string_init(hook_name.data(), hook_name.size(), true);
+    hook->prop_info = property_info;
+    return reinterpret_cast<zend_function *>(hook);
+}
+
+zend_function *create_abstract_property_hook(zend_class_entry *class_entry,
+                                             zend_property_info *property_info,
+                                             zend_property_hook_kind kind) {
+    const bool setter = kind == ZEND_PROPERTY_HOOK_SET;
+    const uint32_t num_args = setter ? 1 : 0;
+    auto *arg_info =
+        static_cast<zend_internal_arg_info *>(pemalloc(sizeof(zend_internal_arg_info) * (num_args + 1), true));
+    memset(arg_info, 0, sizeof(zend_internal_arg_info) * (num_args + 1));
+    arg_info[0].name = reinterpret_cast<const char *>(static_cast<uintptr_t>(num_args));
+    if (setter) {
+        const zend_type void_type = ZEND_TYPE_INIT_CODE(IS_VOID, false, 0);
+        arg_info[0].type = void_type;
+    } else {
+        arg_info[0].type = property_info->type;
+    }
+    if (setter) {
+        arg_info[1].name = "value";
+        arg_info[1].type = property_info->type;
+    }
+
+    auto *hook = static_cast<zend_internal_function *>(pemalloc(sizeof(zend_internal_function), true));
+    memset(hook, 0, sizeof(zend_internal_function));
+    hook->type = ZEND_INTERNAL_FUNCTION;
+    hook->fn_flags = ZEND_ACC_PUBLIC | ZEND_ACC_ABSTRACT | ZEND_ACC_HAS_RETURN_TYPE;
+    if (setter && ZEND_TYPE_IS_SET(property_info->type)) {
+        hook->fn_flags |= ZEND_ACC_HAS_TYPE_HINTS;
+    }
+    const std::string property_name{zend_get_unmangled_property_name(property_info->name)};
+    const std::string hook_name = "$" + property_name + (setter ? "::set" : "::get");
+    hook->function_name = zend_string_init(hook_name.data(), hook_name.size(), true);
+    hook->scope = class_entry;
+    hook->num_args = num_args;
+    hook->required_num_args = num_args;
+    hook->arg_info = arg_info + 1;
+    hook->prop_info = property_info;
+    hook->module = class_entry->info.internal.module;
+    ZEND_MAP_PTR_INIT(hook->run_time_cache, nullptr);
+    return reinterpret_cast<zend_function *>(hook);
+}
 
 zend_function *find_property_helper(zend_object *object, zend_string *member, const char *prefix, size_t prefix_len) {
     static const char hex[] = "0123456789abcdef";
@@ -294,6 +360,158 @@ void initialize_property_handlers(zend_object_handlers *handlers, const zend_obj
 }
 
 }  // namespace
+
+void typephp_register_property_hooks(zend_class_entry *class_entry,
+                                     zend_property_info *property_info,
+                                     std::string_view getter,
+                                     std::string_view setter) {
+    ZEND_ASSERT(class_entry != nullptr);
+    ZEND_ASSERT(property_info != nullptr);
+    ZEND_ASSERT(property_info->hooks == nullptr);
+
+    property_info->hooks = static_cast<zend_function **>(pemalloc(ZEND_PROPERTY_HOOK_STRUCT_SIZE, true));
+    memset(property_info->hooks, 0, ZEND_PROPERTY_HOOK_STRUCT_SIZE);
+
+    const std::string property_name{zend_get_unmangled_property_name(property_info->name)};
+    if (!getter.empty()) {
+        const std::string hook_name = "$" + property_name + "::get";
+        property_info->hooks[ZEND_PROPERTY_HOOK_GET] =
+            create_property_hook(class_entry, property_info, getter, hook_name);
+    }
+    if (!setter.empty()) {
+        const std::string hook_name = "$" + property_name + "::set";
+        property_info->hooks[ZEND_PROPERTY_HOOK_SET] =
+            create_property_hook(class_entry, property_info, setter, hook_name);
+    }
+
+    class_entry->num_hooked_props++;
+    if (class_entry->get_iterator == nullptr) {
+        class_entry->get_iterator = zend_hooked_object_get_iterator;
+    }
+}
+
+void typephp_register_abstract_property_hooks(zend_class_entry *class_entry,
+                                              zend_property_info *property_info,
+                                              bool getter,
+                                              bool setter) {
+    ZEND_ASSERT(class_entry != nullptr);
+    ZEND_ASSERT(class_entry->ce_flags & ZEND_ACC_INTERFACE);
+    ZEND_ASSERT(property_info != nullptr);
+    ZEND_ASSERT(property_info->hooks == nullptr);
+
+    property_info->hooks = static_cast<zend_function **>(pemalloc(ZEND_PROPERTY_HOOK_STRUCT_SIZE, true));
+    memset(property_info->hooks, 0, ZEND_PROPERTY_HOOK_STRUCT_SIZE);
+    if (getter) {
+        property_info->hooks[ZEND_PROPERTY_HOOK_GET] =
+            create_abstract_property_hook(class_entry, property_info, ZEND_PROPERTY_HOOK_GET);
+    }
+    if (setter) {
+        property_info->hooks[ZEND_PROPERTY_HOOK_SET] =
+            create_abstract_property_hook(class_entry, property_info, ZEND_PROPERTY_HOOK_SET);
+    }
+    class_entry->num_hooked_props++;
+}
+
+void typephp_prepare_property_redeclaration(zend_class_entry *class_entry, zend_string *name) {
+    ZEND_ASSERT(class_entry != nullptr);
+    ZEND_ASSERT(name != nullptr);
+    if (class_entry->parent == nullptr) {
+        return;
+    }
+
+    auto *inherited = static_cast<zend_property_info *>(zend_hash_find_ptr(&class_entry->properties_info, name));
+    if (inherited == nullptr || inherited->ce == class_entry) {
+        return;
+    }
+
+    // The parent hook count was copied when the internal child class was
+    // linked. The replacement will either register its own hooks or restore
+    // the missing parent hooks in typephp_finalize_property_hook_inheritance().
+    if (inherited->hooks != nullptr) {
+        ZEND_ASSERT(class_entry->num_hooked_props > 0);
+        class_entry->num_hooked_props--;
+    }
+
+    // zend_declare_typed_property() normally reuses an inherited slot. A
+    // virtual hooked property has no slot, so make the redeclaration allocate
+    // one instead of indexing the virtual offset as a default-table entry.
+    if (inherited->offset == ZEND_VIRTUAL_PROPERTY_OFFSET) {
+        zend_hash_del(&class_entry->properties_info, name);
+    }
+}
+
+void typephp_finalize_property_hook_inheritance(zend_class_entry *class_entry) {
+    ZEND_ASSERT(class_entry != nullptr);
+    if (class_entry->parent == nullptr) {
+        return;
+    }
+
+    void *entry;
+    ZEND_HASH_FOREACH_PTR(&class_entry->properties_info, entry) {
+        auto *property_info = static_cast<zend_property_info *>(entry);
+        // Inherited entries already point at the parent's complete metadata.
+        // Only declarations owned by this class may have replaced that entry
+        // after zend_register_internal_class_with_flags() linked the parent.
+        if (property_info->ce != class_entry || (property_info->flags & ZEND_ACC_PRIVATE)) {
+            continue;
+        }
+
+        auto *parent_info = static_cast<zend_property_info *>(
+            zend_hash_find_ptr(&class_entry->parent->properties_info, property_info->name));
+        if (parent_info == nullptr || parent_info->hooks == nullptr || (parent_info->flags & ZEND_ACC_PRIVATE)) {
+            continue;
+        }
+
+        const bool had_hooks = property_info->hooks != nullptr;
+        if (!had_hooks) {
+            property_info->hooks = static_cast<zend_function **>(pemalloc(ZEND_PROPERTY_HOOK_STRUCT_SIZE, true));
+            memset(property_info->hooks, 0, ZEND_PROPERTY_HOOK_STRUCT_SIZE);
+        }
+
+        bool inherited = false;
+        for (size_t kind = 0; kind < ZEND_PROPERTY_HOOK_COUNT; kind++) {
+            if (property_info->hooks[kind] == nullptr && parent_info->hooks[kind] != nullptr) {
+                property_info->hooks[kind] = parent_info->hooks[kind];
+                inherited = true;
+            }
+        }
+        if (!had_hooks && inherited) {
+            class_entry->num_hooked_props++;
+        }
+    } ZEND_HASH_FOREACH_END();
+
+    if (class_entry->num_hooked_props != 0 && class_entry->get_iterator == nullptr) {
+        class_entry->get_iterator = zend_hooked_object_get_iterator;
+    }
+}
+
+zend_function *typephp_get_parent_property_hook(zend_class_entry *parent_class_entry,
+                                                const php::String &property,
+                                                zend_property_hook_kind kind) {
+    ZEND_ASSERT(parent_class_entry != nullptr);
+    ZEND_ASSERT(kind == ZEND_PROPERTY_HOOK_GET || kind == ZEND_PROPERTY_HOOK_SET);
+
+    auto *property_info = static_cast<zend_property_info *>(
+        zend_hash_find_ptr(&parent_class_entry->properties_info, property.str()));
+    if (property_info == nullptr) {
+        php::throwError(
+            "Undefined property %s::$%s", ZSTR_VAL(parent_class_entry->name), property.data());
+        return nullptr;
+    }
+    if (property_info->flags & ZEND_ACC_PRIVATE) {
+        php::throwError(
+            "Cannot access private property %s::$%s", ZSTR_VAL(parent_class_entry->name), property.data());
+        return nullptr;
+    }
+
+    zend_function *hook = property_info->hooks == nullptr ? nullptr : property_info->hooks[kind];
+    if (hook != nullptr) {
+        return hook;
+    }
+
+    // The trampoline owns and releases the supplied name after the call.
+    return zend_get_property_hook_trampoline(property_info, kind, zend_string_copy(property.str()));
+}
 
 void typephp_install_property_handlers(zend_class_entry *class_entry, zend_object_handlers *handlers) {
     initialize_property_handlers(handlers, class_entry->default_object_handlers);
