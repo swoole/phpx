@@ -3,7 +3,7 @@ on: [ push, pull_request ]
 
 jobs:
   php:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -15,12 +15,82 @@ jobs:
         with:
           repository: swoole/phpy
           path: third_party/phpy
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "${{ matrix.php }}"
-          extensions: embed, curl, redis, json, ffi
-          ini-values: ffi.enable=1
+      - name: Setup PHP and dependencies from PPA
+        shell: bash
+        env:
+          PHP_VERSION: ${{ matrix.php }}
+        run: |
+          set -euo pipefail
+          export DEBIAN_FRONTEND=noninteractive
+
+          sudo apt-get update
+          sudo apt-get install --yes software-properties-common
+          sudo add-apt-repository --yes ppa:ondrej/php
+          sudo apt-get update
+          sudo apt-get install --yes \
+            googletest \
+            lcov \
+            libargon2-dev \
+            libgmp-dev \
+            libgtest-dev \
+            libkrb5-dev \
+            libmpfr-dev \
+            libsodium-dev \
+            python3-dev \
+            redis-server \
+            "php${PHP_VERSION}-cli" \
+            "php${PHP_VERSION}-common" \
+            "php${PHP_VERSION}-curl" \
+            "php${PHP_VERSION}-dev" \
+            "php${PHP_VERSION}-mbstring" \
+            "php${PHP_VERSION}-opcache" \
+            "php${PHP_VERSION}-readline" \
+            "php${PHP_VERSION}-redis" \
+            "php${PHP_VERSION}-xml" \
+            "php${PHP_VERSION}-zip" \
+            "libphp${PHP_VERSION}-embed"
+
+          sudo update-alternatives --set php "/usr/bin/php${PHP_VERSION}"
+          sudo update-alternatives --set phpize "/usr/bin/phpize${PHP_VERSION}"
+          sudo update-alternatives --set php-config "/usr/bin/php-config${PHP_VERSION}"
+          sudo phpenmod -v "${PHP_VERSION}" ffi opcache
+
+          php_ini_dir="/etc/php/${PHP_VERSION}/cli/conf.d"
+          printf '%s\n' \
+            'ffi.enable=1' \
+            'opcache.jit=0' \
+            | sudo tee "${php_ini_dir}/99-phpx-ci.ini" >/dev/null
+
+          embed_package="libphp${PHP_VERSION}-embed"
+          php_version="$(php-config --version)"
+          embed_version="$(dpkg-query --show --showformat='${Version}' "${embed_package}")"
+          case "${embed_version}" in
+            "${php_version}"*) ;;
+            *)
+              echo "${embed_package} ${embed_version} does not match PHP ${php_version}" >&2
+              exit 1
+              ;;
+          esac
+
+          embed_library="$(dpkg-query --listfiles "${embed_package}" \
+            | sed -n '/\/libphp[0-9][^/]*\.so$/ { p; q; }')"
+          test -n "${embed_library}"
+          test -f "${embed_library}"
+
+          embed_dir="${RUNNER_TEMP}/php-embed-${PHP_VERSION}"
+          mkdir -p "${embed_dir}"
+          ln -s "${embed_library}" "${embed_dir}/libphp.so"
+          ln -s "${embed_library}" "${embed_dir}/$(basename "${embed_library}")"
+
+          echo "PHP_INI_SCAN_DIR=${php_ini_dir}" >> "${GITHUB_ENV}"
+          echo "PHP_EMBED_LIBRARY=${embed_library}" >> "${GITHUB_ENV}"
+          echo "LIBRARY_PATH=${embed_dir}${LIBRARY_PATH:+:${LIBRARY_PATH}}" >> "${GITHUB_ENV}"
+          echo "LD_LIBRARY_PATH=${embed_dir}${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}" >> "${GITHUB_ENV}"
+
+          test "$(php -r 'echo PHP_MAJOR_VERSION, ".", PHP_MINOR_VERSION;')" = "${PHP_VERSION}"
+          php -r 'foreach (["curl", "ffi", "mbstring", "redis", "xml", "zip", "Zend OPcache"] as $extension) { if (!extension_loaded($extension)) { fwrite(STDERR, "Missing PHP extension: $extension\n"); exit(1); } }'
+          composer --version
+          echo "Using ${embed_library} from ${embed_package} ${embed_version}"
       # Temporary workaround for php/php-src#22935. Some PHP 8.4/8.5
       # packages contain a php_hash.h revision that is valid C but invalid C++.
       # Keep the source patch separate and remove this step once all supported
@@ -37,11 +107,9 @@ jobs:
           else
             echo "php_hash.h already contains the upstream C++ fix"
           fi
-      - name: Install dependencies
-        run: sudo apt update -y && sudo apt install -y googletest libgtest-dev libsodium-dev libkrb5-dev libargon2-dev redis-server libgmp-dev libmpfr-dev python3-dev
       - name: Detect Python ABI
         id: python-abi
-        run: echo "version=$(python3 -c 'import sys; print(f\"{sys.version_info.major}.{sys.version_info.minor}\")')" >> "${GITHUB_OUTPUT}"
+        run: echo "version=$(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')" >> "${GITHUB_OUTPUT}"
       - name: Cache phpy extension
         id: cache-phpy
         uses: actions/cache@v4
@@ -58,7 +126,7 @@ jobs:
       - name: Enable phpy for native bridge tests
         working-directory: third_party/phpy
         run: |
-          php_ini_dir="$(php-config --ini-dir)"
+          php_ini_dir="/etc/php/${{ matrix.php }}/cli/conf.d"
           echo "extension=$(pwd)/modules/phpy.so" | sudo tee "${php_ini_dir}/90-phpy.ini"
           php --ri phpy
       - name: Show machine information
@@ -72,24 +140,28 @@ jobs:
         run: |
           cmake . -D CODE_COVERAGE=ON -D GITHUB_ACTION=ON -D ENABLE_FACADE_API=ON || exit 1
           make VERBOSE=1 -j$(nproc)
+          linked_embed="$(ldd ./bin/phpx-tests \
+            | awk '$1 ~ /^libphp[0-9.]*\.so/ { print $3; exit }')"
+          test -n "${linked_embed}"
+          test "$(readlink -f "${linked_embed}")" = "$(readlink -f "${PHP_EMBED_LIBRARY}")"
+          ldd ./bin/phpx-tests | grep -E 'libphp(x)?[0-9.]*\.so'
       - name: Run google tests
         run: |
           # sudo sh -c 'echo 0 > /proc/sys/kernel/randomize_va_space'
           # php_embed_init() may use a SAPI-specific default scan directory
-          # rather than the CLI directory where setup-php installed phpy.ini.
-          # Point the embedded test process at the verified CLI scan directory
-          # so the native Python bridge tests run instead of being skipped.
-          PHP_INI_SCAN_DIR="$(php-config --ini-dir)" ./bin/phpx-tests
+          # rather than the CLI directory configured above. PHP_INI_SCAN_DIR
+          # keeps the embedded process on the verified CLI extension set.
+          ./bin/phpx-tests
       - name: Run phpunit tests
         run: |
           composer install
           sudo cp lib/ext.so $(php-config --extension-dir)/phpx_test.so
-          sudo sh -c 'echo "extension=phpx_test.so" > $(php-config --ini-dir)/phpx_test.ini'
+          echo "extension=phpx_test.so" \
+            | sudo tee "/etc/php/${{ matrix.php }}/cli/conf.d/90-phpx_test.ini"
           composer test
       - name: Run coverage
         shell: bash
         run: |
-          sudo apt-get install lcov
           sudo lcov --directory . --capture --branch-coverage --rc geninfo_unexecuted_blocks=1 --ignore-errors mismatch --output-file coverage.info
           sudo lcov --remove coverage.info '/usr/*' --output-file coverage.info
           sudo lcov --list coverage.info
