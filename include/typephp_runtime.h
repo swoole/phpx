@@ -1,6 +1,7 @@
 #pragma once
 
-#include <phpx.h>
+typedef struct _zend_module_entry zend_module_entry;
+typedef zend_module_entry *(*typephp_module_getter)(void);
 
 #define TYPEPHP_PROJECT_SYMBOL_INNER(prefix, project, suffix) prefix##project##suffix
 #define TYPEPHP_PROJECT_SYMBOL(prefix, project, suffix) TYPEPHP_PROJECT_SYMBOL_INNER(prefix, project, suffix)
@@ -26,3 +27,15 @@
 #define TYPEPHP_RUNTIME_INIT_FUNCTION(project)                                                                         \
     TYPEPHP_RUNTIME_API int TYPEPHP_RUNTIME_INIT(project)(int argc, char **argv)
 #define TYPEPHP_RUNTIME_SHUTDOWN_FUNCTION(project) TYPEPHP_RUNTIME_API void TYPEPHP_RUNTIME_SHUTDOWN(project)(void)
+
+/* Project-independent embedded runtime implementation. Project entry files
+ * adapt their generated module getter to these functions. These symbols are
+ * internal to each generated TypePHP binary/library and are not PHPX ABI. */
+#ifdef __cplusplus
+extern "C" {
+#endif
+int typephp_runtime_start(typephp_module_getter get_module, int argc, char **argv);
+void typephp_runtime_stop(void);
+#ifdef __cplusplus
+}
+#endif
