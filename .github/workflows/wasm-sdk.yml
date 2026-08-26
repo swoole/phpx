@@ -1,0 +1,350 @@
+name: WASM SDK package
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phpx-wasm-sdk-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+env:
+  PHP_WASM_REF: v8.5.9
+  WASI_SDK_VERSION: "33.0"
+  WASI_SDK_SHA256: 0ba8b5bfaeb2adf3f29bab5841d76cf5318ab8e1642ea195f88baba1abd47bce
+  WIT_BINDGEN_VERSION: "0.60.0"
+  TYPEPHP_WASI_SDK_ABI: typephp-wasip2-sdk-abi-v4
+
+jobs:
+  build:
+    name: Build wasm32-wasip2 SDK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout PHPX
+        uses: actions/checkout@v4
+
+      - name: Checkout PHP/WASM
+        uses: actions/checkout@v4
+        with:
+          repository: swoole/php-wasm
+          ref: ${{ env.PHP_WASM_REF }}
+          path: third_party/php-wasm
+
+      - name: Resolve PHP/WASM release
+        id: php-wasm-source
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual_tag=$(git -C third_party/php-wasm describe --tags --exact-match)
+          test "${actual_tag}" = "${PHP_WASM_REF}"
+          revision=$(git -C third_party/php-wasm rev-parse HEAD)
+          php_version=$(sed -n 's/^#define PHP_VERSION "\([^"]*\)"/\1/p' \
+            third_party/php-wasm/main/php_version.h)
+          test -n "${php_version}"
+          echo "tag=${actual_tag}" >> "${GITHUB_OUTPUT}"
+          echo "revision=${revision}" >> "${GITHUB_OUTPUT}"
+          echo "php-version=${php_version}" >> "${GITHUB_OUTPUT}"
+
+      - name: Install host build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            autoconf bison build-essential cmake curl file jq ninja-build \
+            patch perl pkg-config re2c xz-utils
+
+      - name: Cache WASI SDK
+        id: cache-wasi-sdk
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/wasi-sdk-${{ env.WASI_SDK_VERSION }}
+          key: wasi-sdk-${{ runner.os }}-${{ runner.arch }}-${{ env.WASI_SDK_VERSION }}-${{ env.WASI_SDK_SHA256 }}
+
+      - name: Install WASI SDK
+        if: steps.cache-wasi-sdk.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="${RUNNER_TEMP}/wasi-sdk-${WASI_SDK_VERSION}.tar.gz"
+          install_dir="${RUNNER_TEMP}/wasi-sdk-${WASI_SDK_VERSION}"
+          curl --fail --location --retry 3 \
+            "https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-33/wasi-sdk-${WASI_SDK_VERSION}-x86_64-linux.tar.gz" \
+            --output "${archive}"
+          echo "${WASI_SDK_SHA256}  ${archive}" | sha256sum --check --strict
+          mkdir -p "${install_dir}"
+          tar --extract --gzip --file "${archive}" \
+            --directory "${install_dir}" --strip-components=1
+
+      - name: Configure WASI SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          wasi_sdk_dir="${RUNNER_TEMP}/wasi-sdk-${WASI_SDK_VERSION}"
+          test -x "${wasi_sdk_dir}/bin/wasm32-wasip2-clang"
+          test -x "${wasi_sdk_dir}/bin/wasm-component-ld"
+          echo "${wasi_sdk_dir}/bin" >> "${GITHUB_PATH}"
+          echo "WASI_SDK_DIR=${wasi_sdk_dir}" >> "${GITHUB_ENV}"
+
+      - name: Cache wit-bindgen
+        id: cache-wit-bindgen
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/wit-bindgen-${{ env.WIT_BINDGEN_VERSION }}
+          key: wit-bindgen-${{ runner.os }}-${{ runner.arch }}-${{ env.WIT_BINDGEN_VERSION }}
+
+      - name: Install wit-bindgen
+        if: steps.cache-wit-bindgen.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo install wit-bindgen-cli \
+            --version "${WIT_BINDGEN_VERSION}" \
+            --locked \
+            --root "${RUNNER_TEMP}/wit-bindgen-${WIT_BINDGEN_VERSION}"
+
+      - name: Configure wit-bindgen
+        shell: bash
+        run: |
+          set -euo pipefail
+          wit_bindgen="${RUNNER_TEMP}/wit-bindgen-${WIT_BINDGEN_VERSION}/bin/wit-bindgen"
+          test -x "${wit_bindgen}"
+          test "$("${wit_bindgen}" --version)" = "wit-bindgen-cli ${WIT_BINDGEN_VERSION}"
+          echo "TYPEPHP_WIT_BINDGEN=${wit_bindgen}" >> "${GITHUB_ENV}"
+
+      - name: Cache PHP/WASM SDK layer
+        id: cache-php-wasm-sdk
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/php-wasm-sdk
+          key: php-wasm-sdk-${{ runner.os }}-${{ runner.arch }}-wasip2-v4-wasi${{ env.WASI_SDK_VERSION }}-wit${{ env.WIT_BINDGEN_VERSION }}-${{ steps.php-wasm-source.outputs.tag }}-${{ steps.php-wasm-source.outputs.revision }}-${{ hashFiles('third_party/php-wasm/wasm/build.sh', 'third_party/php-wasm/wasm/toolchain.sh', 'third_party/php-wasm/wasm/http/**', 'third_party/php-wasm/wasm/patches/**') }}
+
+      - name: Cache PHP/WASM dependency builds
+        if: steps.cache-php-wasm-sdk.outputs.cache-hit != 'true'
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/php-wasm-dependencies
+          key: php-wasm-dependencies-${{ runner.os }}-${{ runner.arch }}-wasi${{ env.WASI_SDK_VERSION }}-${{ hashFiles('third_party/php-wasm/wasm/build.sh', 'third_party/php-wasm/wasm/patches/**') }}
+
+      - name: Build PHP/WASM archive
+        if: steps.cache-php-wasm-sdk.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          third_party/php-wasm/wasm/build.sh \
+            --prefix "${RUNNER_TEMP}/php-wasm-sdk" \
+            --build-dir "${RUNNER_TEMP}/php-wasm-build" \
+            --deps-dir "${RUNNER_TEMP}/php-wasm-dependencies" \
+            --jobs "$(nproc)"
+
+      - name: Validate and stage PHP/WASM SDK layer
+        shell: bash
+        run: |
+          set -euo pipefail
+          php_wasm_sdk="${RUNNER_TEMP}/php-wasm-sdk"
+          required_files=(
+            .typephp-wasi-php-abi
+            include/php/main/php.h
+            include/php/main/php_config.h
+            include/zlib.h
+            include/sodium.h
+            include/openssl/evp.h
+            include/libxml2/libxml/parser.h
+            include/sqlite3.h
+            include/zip.h
+            include/bzlib.h
+            lib/libphp.a
+          )
+          for file_name in "${required_files[@]}"; do
+            test -s "${php_wasm_sdk}/${file_name}"
+          done
+
+          member=$(llvm-ar t "${php_wasm_sdk}/lib/libphp.a" | sed -n '1p')
+          test -n "${member}"
+          llvm-ar p "${php_wasm_sdk}/lib/libphp.a" "${member}" \
+            > "${RUNNER_TEMP}/libphp.member.o"
+          file "${RUNNER_TEMP}/libphp.member.o" | grep -q 'WebAssembly'
+
+          sdk_dir="${GITHUB_WORKSPACE}/wasm/wasm32-wasip2"
+          mkdir -p "${sdk_dir}"
+          cp -a "${php_wasm_sdk}/." "${sdk_dir}/"
+
+      - name: Cache PHPX numeric dependency builds
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/phpx-wasm-build/deps
+          key: phpx-wasm-dependencies-${{ runner.os }}-${{ runner.arch }}-wasi${{ env.WASI_SDK_VERSION }}-${{ hashFiles('wasm/build-deps.sh', 'wasm/toolchain.sh') }}
+
+      - name: Build PHPX/WASM archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          wasm/build.sh \
+            --prefix "${GITHUB_WORKSPACE}/wasm/wasm32-wasip2" \
+            --build-dir "${RUNNER_TEMP}/phpx-wasm-build" \
+            --jobs "$(nproc)"
+
+          printf '%s\n' "${TYPEPHP_WASI_SDK_ABI}" \
+            > "${GITHUB_WORKSPACE}/wasm/wasm32-wasip2/.typephp-wasi-sdk-abi"
+
+      - name: Validate SDK archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdk_dir="${GITHUB_WORKSPACE}/wasm/wasm32-wasip2"
+          required_archives=(
+            libphp.a
+            libphpx.a
+            libgmp.a
+            libgmpxx.a
+            libmpfr.a
+            libmpdec.a
+            libmpdec++.a
+          )
+
+          for name in "${required_archives[@]}"; do
+            archive="${sdk_dir}/lib/${name}"
+            test -s "${archive}"
+            member=$(llvm-ar t "${archive}" | sed -n '1p')
+            test -n "${member}"
+            llvm-ar p "${archive}" "${member}" > "${RUNNER_TEMP}/${name}.member.o"
+            file "${RUNNER_TEMP}/${name}.member.o" | grep -q 'WebAssembly'
+          done
+
+          required_markers=(
+            .typephp-wasi-php-abi
+            .typephp-wasi-numeric-abi
+            .typephp-wasi-runtime-abi
+            .typephp-wasi-sdk-abi
+          )
+          for marker in "${required_markers[@]}"; do
+            test -s "${sdk_dir}/${marker}"
+          done
+
+      - name: Package WASM SDK
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdk_dir="${GITHUB_WORKSPACE}/wasm/wasm32-wasip2"
+          php_version=$(sed -n 's/^#define PHP_VERSION "\([^"]*\)"/\1/p' \
+            third_party/php-wasm/main/php_version.h)
+          test -n "${php_version}"
+
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            package_version="${GITHUB_REF_NAME}"
+          else
+            package_version="build-${GITHUB_RUN_ID}"
+          fi
+          package_name="phpx-wasi-sdk_${package_version}_php${php_version}_wasm32-wasip2"
+          package_root="${RUNNER_TEMP}/package/${package_name}"
+          output_dir="${GITHUB_WORKSPACE}/dist"
+          archive="${output_dir}/${package_name}.tar.gz"
+
+          mkdir -p "${package_root}" "${package_root}/LICENSES" "${output_dir}"
+          cp -a "${sdk_dir}/." "${package_root}/"
+          cp wasm/README.md "${package_root}/README.md"
+          cp LICENSE "${package_root}/LICENSES/PHPX-LICENSE"
+          cp third_party/php-wasm/LICENSE "${package_root}/LICENSES/PHP-LICENSE"
+          cp third_party/php-wasm/README.REDIST.BINS \
+            "${package_root}/LICENSES/PHP-README.REDIST.BINS"
+
+          phpx_revision=$(git rev-parse HEAD)
+          php_wasm_revision=$(git -C third_party/php-wasm rev-parse HEAD)
+          jq --null-input \
+            --arg package "${package_name}" \
+            --arg target "wasm32-wasip2" \
+            --arg php_version "${php_version}" \
+            --arg phpx_revision "${phpx_revision}" \
+            --arg php_wasm_tag "${PHP_WASM_REF}" \
+            --arg php_wasm_revision "${php_wasm_revision}" \
+            --arg wasi_sdk_version "${WASI_SDK_VERSION}" \
+            --arg wit_bindgen_version "${WIT_BINDGEN_VERSION}" \
+            '{
+              package: $package,
+              target: $target,
+              php_version: $php_version,
+              phpx_revision: $phpx_revision,
+              php_wasm_tag: $php_wasm_tag,
+              php_wasm_revision: $php_wasm_revision,
+              wasi_sdk_version: $wasi_sdk_version,
+              wit_bindgen_version: $wit_bindgen_version
+            }' > "${package_root}/manifest.json"
+
+          (
+            cd "${package_root}"
+            find . -type f ! -name FILES.SHA256 -print0 \
+              | LC_ALL=C sort -z \
+              | xargs -0 sha256sum > FILES.SHA256
+          )
+
+          source_date_epoch=$(git show -s --format=%ct HEAD)
+          tar --create --gzip --file "${archive}" \
+            --directory "$(dirname "${package_root}")" \
+            --sort=name \
+            --mtime="@${source_date_epoch}" \
+            --owner=0 --group=0 --numeric-owner \
+            "${package_name}"
+          (
+            cd "${output_dir}"
+            sha256sum "$(basename "${archive}")" \
+              > "$(basename "${archive}").sha256"
+          )
+          tar --list --gzip --file "${archive}" >/dev/null
+
+          echo "name=${package_name}" >> "${GITHUB_OUTPUT}"
+          echo "archive=${archive}" >> "${GITHUB_OUTPUT}"
+          ls -lh "${archive}" "${archive}.sha256"
+
+      - name: Upload tested WASM SDK package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.package.outputs.name }}
+          path: |
+            ${{ steps.package.outputs.archive }}
+            ${{ steps.package.outputs.archive }}.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish WASM SDK asset
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Download tested WASM SDK package
+        uses: actions/download-artifact@v4
+        with:
+          pattern: phpx-wasi-sdk_*
+          path: dist
+          merge-multiple: true
+
+      - name: Publish PHPX release asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t assets < <(find dist -maxdepth 1 -type f \
+            \( -name '*.tar.gz' -o -name '*.tar.gz.sha256' \) | sort)
+          test "${#assets[@]}" -eq 2
+
+          if gh release view "${GITHUB_REF_NAME}" \
+            --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" "${assets[@]}" \
+              --repo "${GITHUB_REPOSITORY}" --clobber
+          else
+            gh release create "${GITHUB_REF_NAME}" "${assets[@]}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --verify-tag \
+              --title "PHPX ${GITHUB_REF_NAME}" \
+              --generate-notes
+          fi
