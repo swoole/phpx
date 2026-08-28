@@ -72,6 +72,31 @@ PHPX_API zend_function *typephp_get_parent_property_hook(zend_class_entry *paren
 namespace php {
 
 /**
+ * Release a generated temporary argument array both after a successful full
+ * expression and while a C++ exception unwinds into the surrounding PHP
+ * try/catch lowering.
+ */
+class ArrayCleanupGuard {
+    Array *array_;
+
+  public:
+    explicit ArrayCleanupGuard(Array &array) noexcept : array_(&array) {}
+    ArrayCleanupGuard(const ArrayCleanupGuard &) = delete;
+    ArrayCleanupGuard &operator=(const ArrayCleanupGuard &) = delete;
+
+    ~ArrayCleanupGuard() {
+        if (array_ != nullptr) {
+            array_->clean();
+        }
+    }
+
+    void cleanup() {
+        array_->clean();
+        array_ = nullptr;
+    }
+};
+
+/**
  * Validate an indexed list write against PHP's real append position.
  *
  * HashTable::nNextFreeElement deliberately does not shrink when elements are

@@ -1317,6 +1317,13 @@ Reference &Reference::operator=(Reference *v) {
 Reference &Reference::operator=(const Variant &v) {
     if (&v != this) {
         if (v.isReference()) {
+            // Two wrappers may already point at the same zend_reference (for
+            // example, a typed by-reference variadic element normalized from
+            // int to float). Destroying the destination value before copying
+            // that same reference would turn the shared value into UNDEF.
+            if (isReference() && Z_REF_P(ptr()) == Z_REF_P(v.direct_ptr())) {
+                return *this;
+            }
             destroy();
             copyRef(v.direct_ptr());
         } else {

@@ -119,11 +119,12 @@ static zend_object *newClosureCarrier(const ClosureFn &fn,
     return &carrier->std;
 }
 
-Object newClosure(const ClosureFn &fn,
-                  const ArgList &uses,
-                  const Object &_this,
-                  zend_class_entry *scope,
-                  std::initializer_list<const char *> parameter_names) {
+static Object newClosureImpl(const ClosureFn &fn,
+                             const ArgList &uses,
+                             const Object &_this,
+                             zend_class_entry *scope,
+                             const ClosureParameter *parameters,
+                             uint32_t parameter_count) {
     auto func = (zend_function *) emalloc(sizeof(zend_internal_function));
     memset(func, 0, sizeof(zend_internal_function));
 
@@ -151,17 +152,23 @@ Object newClosure(const ClosureFn &fn,
         }
     };
     func->internal_function.function_name = fnName.str();
-    if (parameter_names.size() != 0) {
-        const auto count = static_cast<uint32_t>(parameter_names.size());
-        auto *arg_info = static_cast<zend_internal_arg_info *>(ecalloc(count, sizeof(zend_internal_arg_info)));
-        uint32_t index = 0;
-        for (const auto &parameter_name : parameter_names) {
-            arg_info[index].name = estrdup(parameter_name);
-            arg_info[index].type = ZEND_TYPE_INIT_NONE(0);
-            index++;
+    if (parameter_count != 0) {
+        auto *arg_info =
+            static_cast<zend_internal_arg_info *>(ecalloc(parameter_count, sizeof(zend_internal_arg_info)));
+        for (uint32_t index = 0; index < parameter_count; index++) {
+            const auto &parameter = parameters[index];
+            arg_info[index].name = estrdup(parameter.name);
+            arg_info[index].type = ZEND_TYPE_INIT_NONE(static_cast<uint32_t>(
+                _ZEND_ARG_INFO_FLAGS(parameter.by_ref ? 1 : 0, parameter.variadic ? 1 : 0, 0)));
+            if (parameter.required) {
+                func->common.required_num_args++;
+            }
+            if (parameter.variadic) {
+                func->common.fn_flags |= ZEND_ACC_VARIADIC;
+            }
         }
         func->common.arg_info = reinterpret_cast<zend_arg_info *>(arg_info);
-        func->common.num_args = count;
+        func->common.num_args = parameter_count;
     }
     // The carrier is only an implementation detail used to keep the C++
     // callback state alive. Visibility and self:: resolution must use the
@@ -178,6 +185,27 @@ Object newClosure(const ClosureFn &fn,
     zval_ptr_dtor(&carrier);
 
     return {&closure, Ctor::Move};
+}
+
+Object newClosure(const ClosureFn &fn,
+                  const ArgList &uses,
+                  const Object &_this,
+                  zend_class_entry *scope,
+                  std::initializer_list<const char *> parameter_names) {
+    std::vector<ClosureParameter> parameters;
+    parameters.reserve(parameter_names.size());
+    for (const auto *name : parameter_names) {
+        parameters.push_back({name, false, false, false});
+    }
+    return newClosureImpl(fn, uses, _this, scope, parameters.data(), static_cast<uint32_t>(parameters.size()));
+}
+
+Object newClosureWithParameters(const ClosureFn &fn,
+                                const ArgList &uses,
+                                const Object &_this,
+                                zend_class_entry *scope,
+                                std::initializer_list<ClosureParameter> parameters) {
+    return newClosureImpl(fn, uses, _this, scope, parameters.begin(), static_cast<uint32_t>(parameters.size()));
 }
 
 static bool isRelativeCallableClass(const zval *callable) {

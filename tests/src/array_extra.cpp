@@ -169,6 +169,28 @@ TEST(array_extra, merge) {
     ASSERT_EQ(a.count(), 5);
 }
 
+TEST(array_extra, merge_references_preserves_writeback_and_cow) {
+    Array source{1, 2};
+    Array cow_copy(source);
+    Array arguments;
+
+    arguments.mergeReferences(source);
+    arguments.itemRef(0) = 11;
+    arguments.itemRef(1) = 22;
+
+    ASSERT_EQ(source.get(0).toInt(), 11);
+    ASSERT_EQ(source.get(1).toInt(), 22);
+    ASSERT_EQ(cow_copy.get(0).toInt(), 1);
+    ASSERT_EQ(cow_copy.get(1).toInt(), 2);
+
+    Variant external(30);
+    Array named;
+    named.set("value", external.toReference());
+    arguments.mergeReferences(named);
+    arguments.itemRef("value") = 31;
+    ASSERT_EQ(external.toInt(), 31);
+}
+
 // Test array copy construction
 TEST(array_extra, copy_construct) {
     Array a{1, 2, 3};

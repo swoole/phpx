@@ -38,6 +38,23 @@ TEST(closure, named_arguments_use_declared_parameter_names) {
     ASSERT_STREQ(result.toCString(), "left:7");
 }
 
+TEST(closure, parameter_metadata_preserves_reference_arguments) {
+    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &) -> Variant {
+        auto value = getCallArgByRef(0);
+        value = 42;
+        return null;
+    };
+
+    auto closure = newClosureWithParameters(fn, {}, {}, nullptr, {{"value", true, false, true}});
+    Variant value(1);
+    auto reference = value.toReference();
+    Args args;
+    args.append(&reference);
+    call(closure, args);
+
+    ASSERT_EQ(value.toInt(), 42);
+}
+
 TEST(closure, ref) {
     ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &vars_) -> Variant {
         auto v = vars_.get(0);

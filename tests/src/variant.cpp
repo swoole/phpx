@@ -1556,6 +1556,18 @@ TEST(variant, itemRef2) {
     ASSERT_EQ(ref2.toInt(), 2000);
 }
 
+TEST(variant, assigning_alias_of_same_reference_is_noop) {
+    Variant value(123);
+    Reference first = value.toReference();
+    Reference alias(first);
+
+    alias = static_cast<const Variant &>(first);
+
+    ASSERT_EQ(value.toInt(), 123);
+    ASSERT_EQ(first.toInt(), 123);
+    ASSERT_EQ(alias.toInt(), 123);
+}
+
 TEST(variant, itemRef_missing_element_is_created) {
     Array array;
     auto ref = array.itemRef("created");

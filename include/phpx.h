@@ -1983,6 +1983,16 @@ class Array : public Variant {
     bool contains(const Variant &_other_var, bool strict = false) const;
     String join(const String &delim);
     void merge(const Array &source);
+    /**
+     * Append source elements using PHP argument-unpacking semantics for a
+     * by-reference variadic parameter. The source array is separated before
+     * its elements are converted to references, so ordinary COW aliases keep
+     * their values while assignments in the callee write back to source.
+     */
+    void mergeReferences(Array &source);
+    void mergeReferences(Array &&source) {
+        mergeReferences(source);
+    }
     void sort(bool renumber = true);
     Array slice(Int offset, Int length = -1, bool preserve_keys = false);
 };
@@ -2427,11 +2437,23 @@ extern PHPX_API Int zero;
 extern PHPX_API Variant true_;
 extern PHPX_API Variant false_;
 
+struct ClosureParameter {
+    const char *name;
+    bool by_ref;
+    bool variadic;
+    bool required;
+};
+
 extern Object newClosure(const ClosureFn &fn,
                          const ArgList &uses = {},
                          const Object &_this = {},
                          zend_class_entry *scope = nullptr,
                          std::initializer_list<const char *> parameter_names = {});
+extern Object newClosureWithParameters(const ClosureFn &fn,
+                                       const ArgList &uses,
+                                       const Object &_this,
+                                       zend_class_entry *scope,
+                                       std::initializer_list<ClosureParameter> parameters);
 extern PHPX_API Variant prepareScopedCallback(const Variant &callable, const CallableScope &scope);
 extern PHPX_API Object makeScopedCallable(const Variant &callable, const CallableScope &scope);
 extern PHPX_API Variant normalizeCallableClass(const Variant &callable, const CallableScope &scope);

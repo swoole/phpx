@@ -308,6 +308,36 @@ void Array::merge(const Array &source) {
     php_array_merge(Z_ARRVAL_P(zarr), source.array());
 }
 
+void Array::mergeReferences(Array &source) {
+    if (UNEXPECTED(this == &source)) {
+        Array copy(source);
+        mergeReferences(copy);
+        return;
+    }
+
+    // PHP separates the unpacked array before turning its elements into
+    // references. This is observable when the source has a COW sibling:
+    // $copy = $source; byRef(...$source) changes $source, not $copy.
+    auto source_zarr = source.unwrap_ptr();
+    SEPARATE_ARRAY(source_zarr);
+
+    zend_ulong index;
+    zend_string *key;
+    zval *value;
+    ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(source_zarr), index, key, value) {
+        if (!Z_ISREF_P(value)) {
+            ZVAL_MAKE_REF(value);
+        }
+        Variant reference(value, Ctor::CopyRef);
+        if (key != nullptr) {
+            set(key, reference);
+        } else {
+            append(reference);
+        }
+    }
+    ZEND_HASH_FOREACH_END();
+}
+
 Variant ArrayIterator::key() const {
     if (HT_IS_PACKED(array_)) {
         return (zend_long) idx_;
