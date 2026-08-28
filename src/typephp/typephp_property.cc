@@ -592,21 +592,30 @@ void typephp_write_property_scoped(const php::Variant &object,
         php::throwError("Attempt to write property `%s` on %s", member.toCString(), object.typeStr());
         return;
     }
-    php::String property_name = member.toString();
+    zend_string *temporary_name = nullptr;
+    zend_string *property_name =
+        zval_try_get_tmp_string(const_cast<zval *>(member.unwrap_ptr()), &temporary_name);
+    if (UNEXPECTED(property_name == nullptr)) {
+        php::throwErrorIfOccurred();
+        return;
+    }
     // Trait properties are inserted into the consuming class. Resolve the
     // source trait scope to the class that owns the actual property slot.
     if (scope && (scope->ce_flags & ZEND_ACC_TRAIT)) {
         auto *property_info = static_cast<zend_property_info *>(
-            zend_hash_find_ptr(&object.object()->ce->properties_info, property_name.str()));
+            zend_hash_find_ptr(&object.object()->ce->properties_info, property_name));
         if (property_info) {
             scope = property_info->ce;
         }
     }
     {
         php::FakeScopeGuard fake_scope_guard{scope};
+        zval *write_value = const_cast<zval *>(value.direct_ptr());
+        ZVAL_DEREF(write_value);
         object.object()->handlers->write_property(
-            object.object(), property_name.str(), const_cast<zval *>(value.const_ptr()), nullptr);
+            object.object(), property_name, write_value, nullptr);
     }
+    zend_tmp_string_release(temporary_name);
     php::throwErrorIfOccurred();
 }
 

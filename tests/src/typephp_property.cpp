@@ -93,6 +93,29 @@ TEST(typephp_property, scoped_read_and_write_use_hooks) {
     ASSERT_EQ(typephp_read_property_scoped(object, "plain", scope, AttrMode::Get).toInt(), 8);
 }
 
+TEST(typephp_property, scoped_write_borrows_string_names_and_dereferences_values) {
+    auto object = new_property_hook_object();
+    auto *scope = property_hook_class();
+
+    Variant property_name{"plain"};
+    auto property_name_reference = property_name.toReference();
+    Variant source{19};
+    auto source_reference = source.toReference();
+
+    typephp_write_property_scoped(object, property_name_reference, source_reference, scope);
+    source_reference = 20;
+
+    ASSERT_EQ(typephp_read_property_scoped(object, "plain", scope, AttrMode::Get).toInt(), 19);
+    ASSERT_EQ(source.toInt(), 20);
+
+    Variant indirect_reference{source_reference.ptr(), Ctor::Indirect};
+    typephp_write_property_scoped(object, property_name_reference, indirect_reference, scope);
+    source_reference = 21;
+
+    ASSERT_EQ(typephp_read_property_scoped(object, "plain", scope, AttrMode::Get).toInt(), 20);
+    ASSERT_EQ(source.toInt(), 21);
+}
+
 TEST(typephp_property, getter_without_setter_is_read_only) {
     auto object = new_property_hook_object();
     auto *scope = property_hook_class();
