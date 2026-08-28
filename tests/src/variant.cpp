@@ -1896,6 +1896,46 @@ TEST(variant, assign_ref6) {
     ASSERT_EQ(b.length(), 4);
 }
 
+TEST(variant, assign_ref_rebind_releases_previous_reference) {
+    Var first = "first";
+    Var target(&first);
+    ASSERT_TRUE(first.isReference());
+    ASSERT_TRUE(target.isReference());
+
+    Var second = "second";
+    Ref second_reference = second.toReference();
+    target = &second_reference;
+
+    first = "first changed";
+    ASSERT_STREQ(first.toCString(), "first changed");
+    ASSERT_STREQ(target.toCString(), "second");
+
+    second_reference = Var("second changed");
+    ASSERT_STREQ(target.toCString(), "second changed");
+
+    target = &target;
+    ASSERT_STREQ(target.toCString(), "second changed");
+}
+
+TEST(variant, assign_ref_rebinds_indirect_slot) {
+    Array values{Var("initial")};
+    Var slot = values.item(0, true);
+
+    Var first = "first";
+    Ref first_reference = first.toReference();
+    slot = &first_reference;
+
+    Var second = "second";
+    Ref second_reference = second.toReference();
+    slot = &second_reference;
+
+    first_reference = Var("first changed");
+    ASSERT_STREQ(values.get(0).toCString(), "second");
+
+    second_reference = Var("second changed");
+    ASSERT_STREQ(values.get(0).toCString(), "second changed");
+}
+
 TEST(variant, assign_ref_after_unset) {
     Var a = 1L;
     Ref b;

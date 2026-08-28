@@ -61,14 +61,26 @@ void Variant::copyFrom(const zval *src) {
 }
 
 void Variant::copyRef(Variant *v) {
-    auto zv = v->direct_ptr();
+    zval *source = v->direct_ptr();
+    zval replacement;
     if (v->isReference()) {
-        zval_copy_value(direct_ptr(), zv);
+        zval_copy(&replacement, source);
     } else {
-        ZVAL_NEW_REF(direct_ptr(), zv);
-        zval_copy_value(zv, direct_ptr());
+        ZVAL_NEW_REF(&replacement, source);
+        zval_copy_value(source, &replacement);
+        zval_try_add_ref(source);
     }
-    zval_try_add_ref(zv);
+
+    // Reference assignment rebinds the destination slot. It must release the
+    // old reference wrapper itself rather than destroy only its dereferenced
+    // value. ZVAL_COPY_VALUE preserves HashTable bucket metadata when target
+    // is an indirect array element and also makes self-rebinding safe.
+    zval *target = direct_ptr();
+    zval old;
+    ZVAL_COPY_VALUE(&old, target);
+    ZVAL_COPY_VALUE(target, &replacement);
+    zval_ptr_dtor(&old);
+    throwErrorIfOccurred();
 }
 
 Variant &Variant::operator=(const zval *v) {
@@ -107,7 +119,6 @@ Variant &Variant::operator=(Variant &&v) {
 }
 
 Variant &Variant::operator=(Variant *v) {
-    destroy();
     copyRef(v);
     return *this;
 }
