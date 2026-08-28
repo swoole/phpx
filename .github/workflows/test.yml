@@ -21,22 +21,6 @@ jobs:
           php-version: "${{ matrix.php }}"
           extensions: embed, curl, redis, json, ffi
           ini-values: ffi.enable=1, opcache.jit=0
-      # Temporary workaround for php/php-src#22935. Some PHP 8.4/8.5
-      # packages contain a php_hash.h revision that is valid C but invalid C++.
-      # Keep the source patch separate and remove this step once all supported
-      # PHP patch releases contain php/php-src#22940.
-      - name: Patch php_hash.h C++ compatibility
-        shell: bash
-        run: |
-          php_include_dir="$(php-config --include-dir)"
-          php_hash_header="${php_include_dir}/ext/hash/php_hash.h"
-
-          if grep -Fq 'char *base = ecalloc(' "${php_hash_header}"; then
-            sudo patch --directory="${php_include_dir}" --strip=1 \
-              < .github/patches/php-hash-cxx.patch
-          else
-            echo "php_hash.h already contains the upstream C++ fix"
-          fi
       - name: Install dependencies
         run: sudo apt update -y && sudo apt install -y googletest libgtest-dev libsodium-dev libkrb5-dev libargon2-dev redis-server libgmp-dev libmpfr-dev python3-dev
       - name: Detect Python ABI
