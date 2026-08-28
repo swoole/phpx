@@ -359,6 +359,34 @@ void initialize_property_handlers(zend_object_handlers *handlers, const zend_obj
 #endif
 }
 
+void rebind_property_slot(zval *slot, zend_property_info *property_info, const php::Variant &reference) {
+    if (UNEXPECTED(!reference.isReference())) {
+        php::throwError("Expected a reference, got %s", reference.typeStr());
+        return;
+    }
+
+    const bool typed = property_info != nullptr && ZEND_TYPE_IS_SET(property_info->type);
+    auto *reference_value = const_cast<zval *>(reference.direct_ptr());
+    if (typed && UNEXPECTED(!zend_verify_prop_assignable_by_ref(property_info, reference_value, true))) {
+        php::throwErrorIfOccurred();
+        return;
+    }
+
+    if (typed && Z_ISREF_P(slot)) {
+        ZEND_REF_DEL_TYPE_SOURCE(Z_REF_P(slot), property_info);
+    }
+
+    zend_reference *new_reference = Z_REF_P(reference_value);
+    GC_ADDREF(new_reference);
+    zval old = *slot;
+    ZVAL_REF(slot, new_reference);
+    if (typed) {
+        ZEND_REF_ADD_TYPE_SOURCE(new_reference, property_info);
+    }
+    zval_ptr_dtor(&old);
+    php::throwErrorIfOccurred();
+}
+
 }  // namespace
 
 void typephp_register_property_hooks(zend_class_entry *class_entry,
@@ -580,4 +608,59 @@ void typephp_write_property_scoped(const php::Variant &object,
             object.object(), property_name.str(), const_cast<zval *>(value.const_ptr()), nullptr);
     }
     php::throwErrorIfOccurred();
+}
+
+void typephp_rebind_property_reference(const php::Variant &object,
+                                       const php::Variant &member,
+                                       const php::Variant &reference,
+                                       zend_class_entry *scope) {
+    if (UNEXPECTED(!object.isObject())) {
+        php::throwError("Attempt to write property `%s` on %s", member.toCString(), object.typeStr());
+        return;
+    }
+    if (UNEXPECTED(!reference.isReference())) {
+        php::throwError("Expected a reference, got %s", reference.typeStr());
+        return;
+    }
+
+    zend_object *zend_object = object.object();
+    php::String property_name = member.toString();
+    zval rv;
+    ZVAL_UNDEF(&rv);
+    zval *slot;
+    {
+        php::FakeScopeGuard fake_scope_guard{scope};
+        if (reject_asymmetric_property_write(zend_object, property_name.str())) {
+            php::throwErrorIfOccurred();
+            return;
+        }
+        slot = zend_object->handlers->get_property_ptr_ptr(zend_object, property_name.str(), BP_VAR_W, nullptr);
+        if (slot == nullptr) {
+            slot = zend_object->handlers->read_property(zend_object, property_name.str(), BP_VAR_W, nullptr, &rv);
+        }
+    }
+
+    if (UNEXPECTED(EG(exception) != nullptr)) {
+        if (!Z_ISUNDEF(rv)) {
+            zval_ptr_dtor(&rv);
+        }
+        php::throwErrorIfOccurred();
+        return;
+    }
+    if (UNEXPECTED(slot == nullptr || slot == &rv || slot == &EG(uninitialized_zval) || slot == &EG(error_zval))) {
+        if (!Z_ISUNDEF(rv)) {
+            zval_ptr_dtor(&rv);
+        }
+        php::throwError("Cannot assign by reference to overloaded object");
+        return;
+    }
+
+    zend_property_info *property_info = nullptr;
+    const uintptr_t slot_address = reinterpret_cast<uintptr_t>(slot);
+    const uintptr_t properties_begin = reinterpret_cast<uintptr_t>(zend_object->properties_table);
+    const uintptr_t properties_end = properties_begin + zend_object->ce->default_properties_count * sizeof(zval);
+    if (slot_address >= properties_begin && slot_address < properties_end) {
+        property_info = zend_get_property_info_for_slot(zend_object, slot);
+    }
+    rebind_property_slot(slot, property_info, reference);
 }

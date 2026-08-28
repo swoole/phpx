@@ -357,6 +357,15 @@ PHPX_API void typephp_write_property_scoped(const php::Variant &object,
                                             const php::Variant &value,
                                             zend_class_entry *scope);
 
+/**
+ * Bind an object property to an existing PHP reference while preserving
+ * declared-property type sources and runtime property-handler semantics.
+ */
+PHPX_API void typephp_rebind_property_reference(const php::Variant &object,
+                                                const php::Variant &member,
+                                                const php::Variant &reference,
+                                                zend_class_entry *scope);
+
 /** Read a dynamic property using the lexical scope supplied by an AOT trait wrapper. */
 PHPX_API php::Variant typephp_read_property_scoped(const php::Variant &object,
                                                    const php::Variant &member,
