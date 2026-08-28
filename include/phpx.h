@@ -2241,6 +2241,21 @@ static inline T takeValue(T &source) {
 }
 
 /**
+ * Copy a PHP value into independent storage.
+ *
+ * This is the non-consuming counterpart of takeValue(). In particular, an
+ * indirect array item or object property is materialized instead of keeping a
+ * writable alias to its storage, and a Reference is copied by value. Keeping
+ * this operation explicit avoids accidental aliasing caused by constructing a
+ * wrapper directly from an indirect temporary.
+ */
+static inline Variant copyValue(const Variant &source) {
+    Variant result;
+    result = source;
+    return result;
+}
+
+/**
  * A single-pass cursor over PHP arrays and objects.
  *
  * Traversable objects use their Zend iterator implementation. Plain objects

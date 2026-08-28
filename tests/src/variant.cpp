@@ -849,6 +849,27 @@ TEST(variant, take_value_materializes_reference_and_indirect) {
     ASSERT_STREQ(values.get(0).toCString(), "indirect value");
 }
 
+TEST(variant, copy_value_materializes_without_consuming_source) {
+    Variant referenced(41);
+    Variant reference(&referenced);
+    Variant reference_value = copyValue(reference);
+    reference_value += 1;
+
+    ASSERT_TRUE(reference.isReference());
+    ASSERT_EQ(referenced.toInt(), 41);
+    ASSERT_EQ(reference_value.toInt(), 42);
+
+    Array values{10};
+    Variant indirect = values.item(0);
+    Variant indirect_value = copyValue(indirect);
+    indirect_value += 5;
+
+    ASSERT_TRUE(indirect.isIndirect());
+    ASSERT_FALSE(indirect_value.isIndirect());
+    ASSERT_EQ(values.get(0).toInt(), 10);
+    ASSERT_EQ(indirect_value.toInt(), 15);
+}
+
 TEST(variant, concat1) {
     var s("abc");
     // s2 and s point to the same zend_string object
