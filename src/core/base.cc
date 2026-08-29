@@ -275,16 +275,14 @@ Variant constant(zend_class_entry *ce, const String &name) {
         return {zend_get_constant(name.str())};
     }
 
-    auto constant_name = name.str();
-    zval *ret_constant = NULL;
-    auto c = (zend_class_constant *) zend_hash_find_ptr(CE_CONSTANTS_TABLE(ce), constant_name);
-    if (c == NULL) {
-        throwError("Undefined constant %s::%s", ZSTR_VAL(ce->name), ZSTR_VAL(constant_name));
-        ret_constant = NULL;
-    } else {
-        ret_constant = &c->value;
-    }
-    return ret_constant;
+    // Reading the raw zval out of the constants table skips the lazy
+    // evaluation Zend performs on first access, so a constant that has not
+    // been materialised yet - an enum case of an internal class, for one -
+    // comes back as an invalid value. Go through the same API as the other
+    // overloads, which evaluates the constant before returning it.
+    auto value = zend_get_class_constant_ex(ce->name, name.str(), ce, ZEND_FETCH_CLASS_EXCEPTION);
+    throwErrorIfOccurred();
+    return Variant(value);
 }
 
 static String checkedClassConstantName(const Variant &name) {
