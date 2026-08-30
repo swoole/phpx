@@ -49,6 +49,22 @@ TEST(base, constant2) {
     ASSERT_TRUE(c8.isNull());
 }
 
+TEST(base, constant_internal_enum_case) {
+    // An enum case of an internal class is materialised on first access, so
+    // reading the constants table directly hands back a value that is not a
+    // usable object yet.
+    auto *ce = getClassEntrySafe("RoundingMode");
+    ASSERT_NE(ce, nullptr);
+
+    auto by_entry = constant(ce, "HalfEven");
+    ASSERT_TRUE(by_entry.isObject());
+    ASSERT_STREQ(ZSTR_VAL(by_entry.ce()->name), "RoundingMode");
+
+    auto by_name = constant("RoundingMode", "HalfEven");
+    ASSERT_TRUE(by_name.isObject());
+    ASSERT_STREQ(ZSTR_VAL(by_name.ce()->name), "RoundingMode");
+}
+
 TEST(base, constant_namespace_fallback) {
     define("PHPX_GLOBAL_FALLBACK_ONLY", "global");
     define("PhpX\\Runtime\\PHPX_NAMESPACE_VALUE", "namespaced");
