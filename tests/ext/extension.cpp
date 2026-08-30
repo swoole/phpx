@@ -137,6 +137,10 @@ PHPX_EXTENSION() {
 
     extension->onStart = [extension]() noexcept {
         printf("onStart\n");
+        ASSERT_TRUE((getInternalClassEntry("Exception") == zend_ce_exception));
+        ASSERT_TRUE((getInternalClassEntrySafe("eXcEpTiOn") == zend_ce_exception));
+        ASSERT_TRUE((getInternalClassEntry("PHPXMissingInternalClass") == nullptr));
+
         extension->registerConstant("PHPX_CONST_INT", 10002);
         extension->registerConstant("PHPX_CONST_LONG", 10002L);
         extension->registerConstant("PHPX_CONST_FLOAT", 199.188);

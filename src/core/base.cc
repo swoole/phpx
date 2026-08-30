@@ -505,6 +505,21 @@ zend_function *getFunction(const String &name) {
     return fcc.function_handler;
 }
 
+zend_class_entry *getInternalClassEntry(const String &name) {
+    zend_string *lcname = zend_string_tolower_ex(name.str(), true);
+    auto *ce = static_cast<zend_class_entry *>(zend_hash_find_ptr(CG(class_table), lcname));
+    zend_string_release_ex(lcname, true);
+    return ce;
+}
+
+zend_class_entry *getInternalClassEntrySafe(const String &name) {
+    auto *ce = getInternalClassEntry(name);
+    if (UNEXPECTED(ce == nullptr)) {
+        zend_error_noreturn(E_CORE_ERROR, "class '%s' is undefined", name.data());
+    }
+    return ce;
+}
+
 zend_function *getMethod(const String &class_name, const String &name) {
     const auto ce = getClassEntrySafe(class_name);
     if (UNEXPECTED(!ce)) {

@@ -2101,6 +2101,17 @@ PHPX_API extern zend_function *getFunction(const String &name);
 PHPX_API extern zend_function *getMethod(const String &class_name, const String &name);
 PHPX_API extern zend_function *getMethod(zend_class_entry *ce, const String &name);
 
+/**
+ * Resolve an internal class during module initialization.
+ *
+ * Internal classes and classes supplied by extension dependencies are stored
+ * in CG(class_table). Do not use these APIs for PHP-script classes: those
+ * belong to the request class table and may be loaded only after request
+ * startup. The Safe variant raises E_CORE_ERROR when the class is missing.
+ */
+PHPX_API zend_class_entry *getInternalClassEntry(const String &name);
+PHPX_API zend_class_entry *getInternalClassEntrySafe(const String &name);
+
 static inline Variant call(const Variant &func) {
     return call_impl(nullptr, func.const_ptr());
 }
