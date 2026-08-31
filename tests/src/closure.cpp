@@ -55,6 +55,18 @@ TEST(closure, parameter_metadata_preserves_reference_arguments) {
     ASSERT_EQ(value.toInt(), 42);
 }
 
+TEST(closure, explicit_strict_types_are_used_by_nested_internal_calls) {
+    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &) -> Variant {
+        return call("sin", {"1"});
+    };
+
+    auto weak = newClosureWithParameters(fn, {}, {}, nullptr, {});
+    ASSERT_TRUE(weak().isFloat());
+
+    auto strict = newClosureWithParameters(fn, {}, {}, nullptr, {}, ClosureStrictTypes::Enabled);
+    try_call([&]() { strict(); }, "must be of type float");
+}
+
 TEST(closure, ref) {
     ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &this_, Args &vars_) -> Variant {
         auto v = vars_.get(0);

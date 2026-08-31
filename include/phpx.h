@@ -2455,6 +2455,11 @@ struct ClosureParameter {
     bool required;
 };
 
+enum class ClosureStrictTypes : uint8_t {
+    Disabled,
+    Enabled,
+};
+
 extern Object newClosure(const ClosureFn &fn,
                          const ArgList &uses = {},
                          const Object &_this = {},
@@ -2465,6 +2470,12 @@ extern Object newClosureWithParameters(const ClosureFn &fn,
                                        const Object &_this,
                                        zend_class_entry *scope,
                                        std::initializer_list<ClosureParameter> parameters);
+extern Object newClosureWithParameters(const ClosureFn &fn,
+                                       const ArgList &uses,
+                                       const Object &_this,
+                                       zend_class_entry *scope,
+                                       std::initializer_list<ClosureParameter> parameters,
+                                       ClosureStrictTypes strict_types);
 extern PHPX_API Variant prepareScopedCallback(const Variant &callable, const CallableScope &scope);
 extern PHPX_API Object makeScopedCallable(const Variant &callable, const CallableScope &scope);
 extern PHPX_API Variant normalizeCallableClass(const Variant &callable, const CallableScope &scope);

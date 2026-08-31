@@ -124,7 +124,8 @@ static Object newClosureImpl(const ClosureFn &fn,
                              const Object &_this,
                              zend_class_entry *scope,
                              const ClosureParameter *parameters,
-                             uint32_t parameter_count) {
+                             uint32_t parameter_count,
+                             bool strict_types = false) {
     auto func = (zend_function *) emalloc(sizeof(zend_internal_function));
     memset(func, 0, sizeof(zend_internal_function));
 
@@ -152,6 +153,9 @@ static Object newClosureImpl(const ClosureFn &fn,
         }
     };
     func->internal_function.function_name = fnName.str();
+    if (strict_types) {
+        func->common.fn_flags |= ZEND_ACC_STRICT_TYPES;
+    }
     if (parameter_count != 0) {
         auto *arg_info =
             static_cast<zend_internal_arg_info *>(ecalloc(parameter_count, sizeof(zend_internal_arg_info)));
@@ -206,6 +210,22 @@ Object newClosureWithParameters(const ClosureFn &fn,
                                 zend_class_entry *scope,
                                 std::initializer_list<ClosureParameter> parameters) {
     return newClosureImpl(fn, uses, _this, scope, parameters.begin(), static_cast<uint32_t>(parameters.size()));
+}
+
+Object newClosureWithParameters(const ClosureFn &fn,
+                                const ArgList &uses,
+                                const Object &_this,
+                                zend_class_entry *scope,
+                                std::initializer_list<ClosureParameter> parameters,
+                                ClosureStrictTypes strict_types) {
+    return newClosureImpl(
+        fn,
+        uses,
+        _this,
+        scope,
+        parameters.begin(),
+        static_cast<uint32_t>(parameters.size()),
+        strict_types == ClosureStrictTypes::Enabled);
 }
 
 static bool isRelativeCallableClass(const zval *callable) {
