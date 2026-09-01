@@ -907,6 +907,55 @@ using enable_if_floating_point = std::enable_if_t<is_floating_point_v<T>, Ret>;
 template <typename T, typename Ret = int>
 using enable_if_arithmetic_non_bool = std::enable_if_t<is_arithmetic_non_bool_v<T>, Ret>;
 
+namespace detail {
+
+// Checked PHP integer arithmetic. GCC/Clang lower these builtins to a native
+// arithmetic instruction plus the overflow branch; the portable paths avoid
+// signed C++ overflow and are used by MSVC.
+static inline bool intAddOverflow(zend_long a, zend_long b, zend_long *result) {
+#if defined(__GNUC__) || defined(__clang__)
+    return __builtin_add_overflow(a, b, result);
+#else
+    if (UNEXPECTED((b > 0 && a > ZEND_LONG_MAX - b) || (b < 0 && a < ZEND_LONG_MIN - b))) {
+        return true;
+    }
+    *result = a + b;
+    return false;
+#endif
+}
+
+static inline bool intSubOverflow(zend_long a, zend_long b, zend_long *result) {
+#if defined(__GNUC__) || defined(__clang__)
+    return __builtin_sub_overflow(a, b, result);
+#else
+    if (UNEXPECTED((b < 0 && a > ZEND_LONG_MAX + b) || (b > 0 && a < ZEND_LONG_MIN + b))) {
+        return true;
+    }
+    *result = a - b;
+    return false;
+#endif
+}
+
+static inline bool intMulOverflow(zend_long a, zend_long b, zend_long *result) {
+#if defined(__GNUC__) || defined(__clang__)
+    return __builtin_mul_overflow(a, b, result);
+#else
+    if (a == ZEND_LONG_MIN && b == -1) return true;
+    if (b == ZEND_LONG_MIN && a == -1) return true;
+    if (a > 0) {
+        if (b > 0 && a > ZEND_LONG_MAX / b) return true;
+        if (b < 0 && b < ZEND_LONG_MIN / a) return true;
+    } else if (a < 0) {
+        if (b > 0 && a < ZEND_LONG_MIN / b) return true;
+        if (b < 0 && a < ZEND_LONG_MAX / b) return true;
+    }
+    *result = a * b;
+    return false;
+#endif
+}
+
+}  // namespace detail
+
 class Variant {
   protected:
     zval val;
@@ -1393,6 +1442,72 @@ class Variant {
     Variant operator++(int);
     Variant operator--(int);
     // Binary operators
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    Variant &operator+=(T raw) {
+        const Int v = static_cast<Int>(raw);
+        zval *target = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(target) == IS_LONG)) {
+            const zend_long a = Z_LVAL_P(target);
+            zend_long result;
+            if (UNEXPECTED(detail::intAddOverflow(a, v, &result))) {
+                ZVAL_DOUBLE(target, (double) a + (double) v);
+            } else {
+                ZVAL_LONG(target, result);
+            }
+            return *this;
+        }
+        return *this += Variant(v);
+    }
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    Variant &operator-=(T raw) {
+        const Int v = static_cast<Int>(raw);
+        zval *target = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(target) == IS_LONG)) {
+            const zend_long a = Z_LVAL_P(target);
+            zend_long result;
+            if (UNEXPECTED(detail::intSubOverflow(a, v, &result))) {
+                ZVAL_DOUBLE(target, (double) a - (double) v);
+            } else {
+                ZVAL_LONG(target, result);
+            }
+            return *this;
+        }
+        return *this -= Variant(v);
+    }
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    Variant &operator*=(T raw) {
+        const Int v = static_cast<Int>(raw);
+        zval *target = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(target) == IS_LONG)) {
+            const zend_long a = Z_LVAL_P(target);
+            zend_long result;
+            if (UNEXPECTED(detail::intMulOverflow(a, v, &result))) {
+                ZVAL_DOUBLE(target, (double) a * (double) v);
+            } else {
+                ZVAL_LONG(target, result);
+            }
+            return *this;
+        }
+        return *this *= Variant(v);
+    }
+    Variant &addAssign(const Variant &v) {
+        zval *target = unwrap_ptr();
+        const zval *right = v.unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(target) == IS_LONG && Z_TYPE_P(right) == IS_LONG)) {
+            const zend_long a = Z_LVAL_P(target);
+            const zend_long b = Z_LVAL_P(right);
+            zend_long result;
+            if (UNEXPECTED(detail::intAddOverflow(a, b, &result))) {
+                ZVAL_DOUBLE(target, (double) a + (double) b);
+            } else {
+                ZVAL_LONG(target, result);
+            }
+            return *this;
+        }
+        add_function(target, target, const_cast<zval *>(right));
+        throwErrorIfOccurred();
+        return *this;
+    }
     Variant &operator+=(const Variant &);
     Variant &operator-=(const Variant &);
     Variant &operator/=(const Variant &);
@@ -1403,6 +1518,42 @@ class Variant {
     Variant &operator&=(const Variant &);
     Variant &operator|=(const Variant &);
     Variant &operator^=(const Variant &);
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    Variant operator+(T raw) const {
+        const Int v = static_cast<Int>(raw);
+        const zval *left = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(left) == IS_LONG)) {
+            const zend_long a = Z_LVAL_P(left);
+            zend_long result;
+            return UNEXPECTED(detail::intAddOverflow(a, v, &result)) ? Variant((double) a + (double) v)
+                                                                     : Variant(result);
+        }
+        return *this + Variant(v);
+    }
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    Variant operator-(T raw) const {
+        const Int v = static_cast<Int>(raw);
+        const zval *left = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(left) == IS_LONG)) {
+            const zend_long a = Z_LVAL_P(left);
+            zend_long result;
+            return UNEXPECTED(detail::intSubOverflow(a, v, &result)) ? Variant((double) a - (double) v)
+                                                                     : Variant(result);
+        }
+        return *this - Variant(v);
+    }
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    Variant operator*(T raw) const {
+        const Int v = static_cast<Int>(raw);
+        const zval *left = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(left) == IS_LONG)) {
+            const zend_long a = Z_LVAL_P(left);
+            zend_long result;
+            return UNEXPECTED(detail::intMulOverflow(a, v, &result)) ? Variant((double) a * (double) v)
+                                                                     : Variant(result);
+        }
+        return *this * Variant(v);
+    }
     Variant operator+(const Variant &) const;
     Variant operator-(const Variant &) const;
     Variant operator*(const Variant &) const;

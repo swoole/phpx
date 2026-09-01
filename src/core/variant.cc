@@ -581,60 +581,6 @@ Variant Variant::serialize() {
     return retval;
 }
 
-// Fast integer arithmetic with overflow detection.
-// GCC/Clang: __builtin_*_overflow — compile to single add+jo / sub+jo / mul+jo.
-// MSVC/other compilers: portable signed boundary checks. Unsigned carry and
-// borrow intrinsics cannot detect signed overflow (for example, -1 + 1 has an
-// unsigned carry but does not overflow as a signed integer).
-#if defined(__GNUC__) || defined(__clang__)
-#define PHPX_HAS_BUILTIN_OVERFLOW 1
-#else
-#define PHPX_HAS_BUILTIN_OVERFLOW 0
-#endif
-
-static inline bool fast_add_overflow(zend_long a, zend_long b, zend_long *result) {
-#if PHPX_HAS_BUILTIN_OVERFLOW
-    return __builtin_add_overflow(a, b, result);
-#else
-    if (UNEXPECTED((b > 0 && a > ZEND_LONG_MAX - b) || (b < 0 && a < ZEND_LONG_MIN - b))) {
-        return true;
-    }
-    *result = a + b;
-    return false;
-#endif
-}
-
-static inline bool fast_sub_overflow(zend_long a, zend_long b, zend_long *result) {
-#if PHPX_HAS_BUILTIN_OVERFLOW
-    return __builtin_sub_overflow(a, b, result);
-#else
-    if (UNEXPECTED((b < 0 && a > ZEND_LONG_MAX + b) || (b > 0 && a < ZEND_LONG_MIN + b))) {
-        return true;
-    }
-    *result = a - b;
-    return false;
-#endif
-}
-
-static inline bool fast_mul_overflow(zend_long a, zend_long b, zend_long *result) {
-#if PHPX_HAS_BUILTIN_OVERFLOW
-    return __builtin_mul_overflow(a, b, result);
-#else
-    // MSVC _mul128 is x64-only; portable division-based check is fine for mul.
-    if (a == ZEND_LONG_MIN && b == -1) return true;
-    if (b == ZEND_LONG_MIN && a == -1) return true;
-    if (a > 0) {
-        if (b > 0 && a > ZEND_LONG_MAX / b) return true;
-        if (b < 0 && b < ZEND_LONG_MIN / a) return true;
-    } else if (a < 0) {
-        if (b > 0 && a < ZEND_LONG_MIN / b) return true;
-        if (b < 0 && a < ZEND_LONG_MAX / b) return true;
-    }
-    *result = a * b;
-    return false;
-#endif
-}
-
 Variant &Variant::operator++() {
     increment_function(unwrap_ptr());
     throwErrorIfOccurred();
@@ -662,20 +608,7 @@ Variant Variant::operator--(int) {
 }
 
 Variant &Variant::operator+=(const Variant &v) {
-    if (isInt() && v.isInt()) {
-        zend_long a = Z_LVAL_P(unwrap_ptr());
-        zend_long b = Z_LVAL_P(v.unwrap_ptr());
-        zend_long result;
-        if (fast_add_overflow(a, b, &result)) {
-            ZVAL_DOUBLE(unwrap_ptr(), (double) a + (double) b);
-        } else {
-            ZVAL_LONG(unwrap_ptr(), result);
-        }
-        return *this;
-    }
-    add_function(unwrap_ptr(), unwrap_ptr(), NO_CONST_V(v));
-    throwErrorIfOccurred();
-    return *this;
+    return addAssign(v);
 }
 
 Variant &Variant::operator-=(const Variant &v) {
@@ -683,7 +616,7 @@ Variant &Variant::operator-=(const Variant &v) {
         zend_long a = Z_LVAL_P(unwrap_ptr());
         zend_long b = Z_LVAL_P(v.unwrap_ptr());
         zend_long result;
-        if (fast_sub_overflow(a, b, &result)) {
+        if (detail::intSubOverflow(a, b, &result)) {
             ZVAL_DOUBLE(unwrap_ptr(), (double) a - (double) b);
         } else {
             ZVAL_LONG(unwrap_ptr(), result);
@@ -723,7 +656,7 @@ Variant &Variant::operator*=(const Variant &v) {
         zend_long a = Z_LVAL_P(unwrap_ptr());
         zend_long b = Z_LVAL_P(v.unwrap_ptr());
         zend_long result;
-        if (fast_mul_overflow(a, b, &result)) {
+        if (detail::intMulOverflow(a, b, &result)) {
             ZVAL_DOUBLE(unwrap_ptr(), (double) a * (double) b);
         } else {
             ZVAL_LONG(unwrap_ptr(), result);
@@ -791,7 +724,7 @@ Variant Variant::operator+(const Variant &v) const {
         zend_long a = Z_LVAL_P(unwrap_ptr());
         zend_long b = Z_LVAL_P(v.unwrap_ptr());
         zend_long result;
-        if (fast_add_overflow(a, b, &result)) {
+        if (detail::intAddOverflow(a, b, &result)) {
             return Variant((double) a + (double) b);
         }
         return Variant(result);
@@ -804,7 +737,7 @@ Variant Variant::operator-(const Variant &v) const {
         zend_long a = Z_LVAL_P(unwrap_ptr());
         zend_long b = Z_LVAL_P(v.unwrap_ptr());
         zend_long result;
-        if (fast_sub_overflow(a, b, &result)) {
+        if (detail::intSubOverflow(a, b, &result)) {
             return Variant((double) a - (double) b);
         }
         return Variant(result);
@@ -817,7 +750,7 @@ Variant Variant::operator*(const Variant &v) const {
         zend_long a = Z_LVAL_P(unwrap_ptr());
         zend_long b = Z_LVAL_P(v.unwrap_ptr());
         zend_long result;
-        if (fast_mul_overflow(a, b, &result)) {
+        if (detail::intMulOverflow(a, b, &result)) {
             return Variant((double) a * (double) b);
         }
         return Variant(result);

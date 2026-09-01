@@ -135,6 +135,56 @@ TEST(operator_arithmetic, signed_overflow_detection_uses_signed_semantics) {
     ASSERT_TRUE((minimum - positive_one).isFloat());
 }
 
+TEST(operator_arithmetic, inline_integral_fast_paths_preserve_dynamic_semantics) {
+    Variant sum(10);
+    sum += 5L;
+    ASSERT_TRUE(sum.isInt());
+    ASSERT_EQ(sum.toInt(), 15);
+
+    Variant difference(10);
+    difference -= 3L;
+    ASSERT_TRUE(difference.isInt());
+    ASSERT_EQ(difference.toInt(), 7);
+
+    Variant product(10);
+    product *= 4L;
+    ASSERT_TRUE(product.isInt());
+    ASSERT_EQ(product.toInt(), 40);
+
+    Variant maximum(ZEND_LONG_MAX);
+    maximum += 1L;
+    ASSERT_TRUE(maximum.isFloat());
+
+    Variant minimum(ZEND_LONG_MIN);
+    minimum -= 1L;
+    ASSERT_TRUE(minimum.isFloat());
+
+    Variant multiply_overflow(ZEND_LONG_MAX);
+    multiply_overflow *= 2L;
+    ASSERT_TRUE(multiply_overflow.isFloat());
+
+    Variant fractional(10);
+    fractional += 2.5;
+    ASSERT_TRUE(fractional.isFloat());
+    ASSERT_DOUBLE_EQ(fractional.toFloat(), 12.5);
+
+    Variant numeric_string("10");
+    numeric_string += 2L;
+    ASSERT_TRUE(numeric_string.isInt());
+    ASSERT_EQ(numeric_string.toInt(), 12);
+
+    Variant left(7);
+    Variant added = left + 5L;
+    Variant subtracted = left - 2L;
+    Variant multiplied = left * 3L;
+    ASSERT_EQ(added.toInt(), 12);
+    ASSERT_EQ(subtracted.toInt(), 5);
+    ASSERT_EQ(multiplied.toInt(), 21);
+    ASSERT_TRUE((Variant(ZEND_LONG_MAX) + 1L).isFloat());
+    ASSERT_TRUE((Variant(ZEND_LONG_MIN) - 1L).isFloat());
+    ASSERT_TRUE((Variant(ZEND_LONG_MAX) * 2L).isFloat());
+}
+
 // Test all bitwise operators (<<, >>, &, |, ^)
 TEST(operator_bitwise, all_operators) {
     // Left shift operator test
