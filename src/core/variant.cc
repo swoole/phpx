@@ -1081,13 +1081,13 @@ Reference Variant::attrRef(const String &prop_name) {
     return ref;
 }
 
-Variant Variant::attr(const Variant &name, AttrMode mode) const {
+Variant Variant::attr(const String &name, AttrMode mode) const {
     if (UNEXPECTED(!isObject())) {
         throwError("Attempt to read property `%s` on %s", name.toCString(), typeStr());
         return {};
     }
 
-    auto prop_name = name.toString();
+    auto prop_name = name.str();
     zval rv;
     zval *member_p;
     if (mode == AttrMode::Update) {
@@ -1096,24 +1096,24 @@ Variant Variant::attr(const Variant &name, AttrMode mode) const {
         // __get() directly and can return a writable reference.
         do {
             FakeScopeGuard fake_scope_guard{ce()};
-            member_p = object()->handlers->read_property(object(), prop_name.str(), BP_VAR_RW, nullptr, &rv);
+            member_p = object()->handlers->read_property(object(), prop_name, BP_VAR_RW, nullptr, &rv);
         } while (0);
     } else {
         // BP_VAR_IS is needed by empty() and by intermediate property reads in
         // an isset() chain. A final isset() uses has_property() instead.
-        member_p = zend_read_property_ex(ce(), object(), prop_name.str(), mode == AttrMode::Isset, &rv);
+        member_p = zend_read_property_ex(ce(), object(), prop_name, mode == AttrMode::Isset, &rv);
     }
     throwErrorIfOccurred();
 
     if (zval_is_null(member_p) && mode == AttrMode::Update) {
         do {
             FakeScopeGuard fake_scope_guard{ce()};
-            member_p = object()->handlers->write_property(object(), prop_name.str(), undef(), NULL);
+            member_p = object()->handlers->write_property(object(), prop_name, undef(), NULL);
         } while (0);
         throwErrorIfOccurred();
 
         if (member_p == undef()) {
-            throwError("Dynamic property `%s` assignment is not supported", name.toCString());
+            throwError("Dynamic property `%s` assignment is not supported", ZSTR_VAL(prop_name));
         }
     }
 

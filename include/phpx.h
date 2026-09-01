@@ -1384,6 +1384,8 @@ class Variant {
     Reference itemRef(const Variant &key);
     Variant newItem();
     Reference attrRef(const String &name);
+    Variant attr(const char *name, AttrMode mode = AttrMode::Get) const;
+    Variant attr(const String &name, AttrMode mode = AttrMode::Get) const;
     Variant attr(const Variant &name, AttrMode mode = AttrMode::Get) const;
     Variant attr(uintptr_t offset, AttrMode mode = AttrMode::Get) const {
         auto member_p = OBJ_PROP(checkedObject("Attempt to read property"), offset);
@@ -1776,6 +1778,14 @@ class String : public Variant {
     String dirname() const;
     void print() const;
 };
+
+inline Variant Variant::attr(const char *name, AttrMode mode) const {
+    return attr(String{name}, mode);
+}
+
+inline Variant Variant::attr(const Variant &name, AttrMode mode) const {
+    return attr(name.toString(), mode);
+}
 
 inline bool StdStringLess::operator()(const String &a, const String &b) const {
     return zend_binary_strcmp(a.data(), a.length(), b.data(), b.length()) < 0;
