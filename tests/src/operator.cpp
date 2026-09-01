@@ -177,12 +177,38 @@ TEST(operator_arithmetic, inline_integral_fast_paths_preserve_dynamic_semantics)
     Variant added = left + 5L;
     Variant subtracted = left - 2L;
     Variant multiplied = left * 3L;
+    Variant divided_exact = Variant(12) / 3L;
+    Variant divided_fractional = Variant(10) / 4L;
     ASSERT_EQ(added.toInt(), 12);
     ASSERT_EQ(subtracted.toInt(), 5);
     ASSERT_EQ(multiplied.toInt(), 21);
+    ASSERT_TRUE(divided_exact.isInt());
+    ASSERT_EQ(divided_exact.toInt(), 4);
+    ASSERT_TRUE(divided_fractional.isFloat());
+    ASSERT_DOUBLE_EQ(divided_fractional.toFloat(), 2.5);
     ASSERT_TRUE((Variant(ZEND_LONG_MAX) + 1L).isFloat());
     ASSERT_TRUE((Variant(ZEND_LONG_MIN) - 1L).isFloat());
     ASSERT_TRUE((Variant(ZEND_LONG_MAX) * 2L).isFloat());
+    ASSERT_TRUE((Variant(ZEND_LONG_MIN) / -1L).isFloat());
+
+    Variant divide_assign_exact(12);
+    divide_assign_exact /= 3L;
+    ASSERT_TRUE(divide_assign_exact.isInt());
+    ASSERT_EQ(divide_assign_exact.toInt(), 4);
+
+    Variant divide_assign_fractional(10);
+    divide_assign_fractional /= 4L;
+    ASSERT_TRUE(divide_assign_fractional.isFloat());
+    ASSERT_DOUBLE_EQ(divide_assign_fractional.toFloat(), 2.5);
+
+    bool division_by_zero_caught = false;
+    try {
+        Variant result = Variant(10) / 0L;
+    } catch (zend_object *) {
+        division_by_zero_caught = true;
+        catchException();
+    }
+    ASSERT_TRUE(division_by_zero_caught);
 }
 
 // Test all bitwise operators (<<, >>, &, |, ^)

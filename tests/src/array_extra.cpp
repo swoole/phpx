@@ -43,6 +43,26 @@ TEST(array_extra, contains_strict) {
     ASSERT_FALSE(arr.contains(99, true));
 }
 
+TEST(array_extra, append_value_primitive_overloads_preserve_types_and_cow) {
+    Array values;
+    values.appendValue(42L);
+    values.appendValue(2.5);
+    values.appendValue(true);
+    values.appendValue(nullptr);
+
+    ASSERT_TRUE(values.get(0).isInt());
+    ASSERT_EQ(values.get(0).toInt(), 42);
+    ASSERT_TRUE(values.get(1).isFloat());
+    ASSERT_DOUBLE_EQ(values.get(1).toFloat(), 2.5);
+    ASSERT_TRUE(values.get(2).isTrue());
+    ASSERT_TRUE(values.get(3).isNull());
+
+    Array copy(values);
+    values.appendValue(99L);
+    ASSERT_EQ(values.count(), 5);
+    ASSERT_EQ(copy.count(), 4);
+}
+
 // Test isList for packed and non-packed arrays
 TEST(array_extra, isList) {
     Array a1{1, 2, 3, 4, 5};

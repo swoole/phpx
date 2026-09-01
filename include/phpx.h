@@ -1490,6 +1490,25 @@ class Variant {
         }
         return *this *= Variant(v);
     }
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    Variant &operator/=(T raw) {
+        const Int v = static_cast<Int>(raw);
+        zval *target = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(target) == IS_LONG) && EXPECTED(v != 0)) {
+            const zend_long a = Z_LVAL_P(target);
+            if (UNEXPECTED(a == ZEND_LONG_MIN && v == -1)) {
+                ZVAL_DOUBLE(target, (double) a / (double) v);
+            } else if (a % v == 0) {
+                ZVAL_LONG(target, a / v);
+            } else {
+                ZVAL_DOUBLE(target, (double) a / (double) v);
+            }
+            return *this;
+        }
+        // Preserve PHP's dynamic coercion and DivisionByZeroError behavior on
+        // the uncommon non-integer/zero-divisor path.
+        return *this /= Variant(v);
+    }
     Variant &addAssign(const Variant &v) {
         zval *target = unwrap_ptr();
         const zval *right = v.unwrap_ptr();
@@ -1553,6 +1572,19 @@ class Variant {
                                                                      : Variant(result);
         }
         return *this * Variant(v);
+    }
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    Variant operator/(T raw) const {
+        const Int v = static_cast<Int>(raw);
+        const zval *left = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(left) == IS_LONG) && EXPECTED(v != 0)) {
+            const zend_long a = Z_LVAL_P(left);
+            if (UNEXPECTED(a == ZEND_LONG_MIN && v == -1)) {
+                return Variant((double) a / (double) v);
+            }
+            return a % v == 0 ? Variant(a / v) : Variant((double) a / (double) v);
+        }
+        return *this / Variant(v);
     }
     Variant operator+(const Variant &) const;
     Variant operator-(const Variant &) const;
@@ -2060,6 +2092,28 @@ class Array : public Variant {
     // PHP's ordinary array writes dereference the source zval. The lower-level
     // set()/append() APIs deliberately preserve references for explicit =& use.
     void setValue(const Variant &key, const Variant &v);
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    void appendValue(T value) {
+        zval *target = unwrap_ptr();
+        SEPARATE_ARRAY(target);
+        add_next_index_long(target, static_cast<zend_long>(value));
+    }
+    template <typename T, enable_if_floating_point<T> = 0>
+    void appendValue(T value) {
+        zval *target = unwrap_ptr();
+        SEPARATE_ARRAY(target);
+        add_next_index_double(target, static_cast<double>(value));
+    }
+    void appendValue(bool value) {
+        zval *target = unwrap_ptr();
+        SEPARATE_ARRAY(target);
+        add_next_index_bool(target, value);
+    }
+    void appendValue(std::nullptr_t) {
+        zval *target = unwrap_ptr();
+        SEPARATE_ARRAY(target);
+        add_next_index_null(target);
+    }
     void appendValue(const Variant &v);
     void appendValue(Variant &&v);
     void append(const Variant &v);
