@@ -606,28 +606,56 @@ Variant Variant::serialize() {
 }
 
 Variant &Variant::operator++() {
-    increment_function(unwrap_ptr());
+    zval *p = unwrap_ptr();
+    if (EXPECTED(Z_TYPE_P(p) == IS_LONG)) {
+        const zend_long val = Z_LVAL_P(p);
+        zend_long result;
+        if (UNEXPECTED(detail::intAddOverflow(val, 1, &result))) {
+            ZVAL_DOUBLE(p, static_cast<double>(val) + 1.0);
+        } else {
+            ZVAL_LONG(p, result);
+        }
+        return *this;
+    }
+    if (EXPECTED(Z_TYPE_P(p) == IS_DOUBLE)) {
+        Z_DVAL_P(p) += 1.0;
+        return *this;
+    }
+    increment_function(p);
     throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator--() {
-    decrement_function(unwrap_ptr());
+    zval *p = unwrap_ptr();
+    if (EXPECTED(Z_TYPE_P(p) == IS_LONG)) {
+        const zend_long val = Z_LVAL_P(p);
+        zend_long result;
+        if (UNEXPECTED(detail::intSubOverflow(val, 1, &result))) {
+            ZVAL_DOUBLE(p, static_cast<double>(val) - 1.0);
+        } else {
+            ZVAL_LONG(p, result);
+        }
+        return *this;
+    }
+    if (EXPECTED(Z_TYPE_P(p) == IS_DOUBLE)) {
+        Z_DVAL_P(p) -= 1.0;
+        return *this;
+    }
+    decrement_function(p);
     throwErrorIfOccurred();
     return *this;
 }
 
 Variant Variant::operator++(int) {
     auto original = *this;
-    increment_function(unwrap_ptr());
-    throwErrorIfOccurred();
+    ++(*this);
     return original;
 }
 
 Variant Variant::operator--(int) {
     auto original = *this;
-    decrement_function(unwrap_ptr());
-    throwErrorIfOccurred();
+    --(*this);
     return original;
 }
 
