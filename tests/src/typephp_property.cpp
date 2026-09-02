@@ -75,6 +75,29 @@ zend_class_entry *property_hook_class() {
     return class_entry;
 }
 
+zend_class_entry *magic_property_class(const char *name, const char *prefix) {
+    if (auto *class_entry = getClassEntry(name)) {
+        return class_entry;
+    }
+    eval(String::format(R"PHP(
+        #[AllowDynamicProperties]
+        class %s {
+            private array $values = [];
+            public int $setCalls = 0;
+            public function __get(string $name): mixed {
+                return $this->values[$name] ?? null;
+            }
+            public function __set(string $name, mixed $value): void {
+                $this->setCalls++;
+                $this->values[$name] = '%s:' . $value;
+            }
+        }
+    )PHP",
+                        name,
+                        prefix));
+    return getClassEntrySafe(name);
+}
+
 Object new_property_hook_object() {
     return newObject(property_hook_class());
 }
@@ -114,6 +137,33 @@ TEST(typephp_property, scoped_write_borrows_string_names_and_dereferences_values
 
     ASSERT_EQ(typephp_read_property_scoped(object, "plain", scope, AttrMode::Get).toInt(), 20);
     ASSERT_EQ(source.toInt(), 21);
+}
+
+TEST(typephp_property, named_cache_uses_handlers_and_revalidates_runtime_class) {
+    auto first = newObject(magic_property_class("PhpxCachedMagicFirst", "first"));
+    auto second = newObject(magic_property_class("PhpxCachedMagicSecond", "second"));
+    String member{"value"};
+    PropertyCacheSlot read_cache;
+    PropertyCacheSlot write_cache;
+
+    typephp_write_property_cached(first, member, 1, nullptr, write_cache);
+    typephp_write_property_cached(second, member, 2, nullptr, write_cache);
+    typephp_write_property_cached(first, member, 3, nullptr, write_cache);
+
+    ASSERT_STREQ(typephp_read_property_cached(first, member, AttrMode::Get, read_cache).toCString(), "first:3");
+    ASSERT_STREQ(typephp_read_property_cached(second, member, AttrMode::Get, read_cache).toCString(), "second:2");
+    ASSERT_STREQ(typephp_read_property_cached(first, member, AttrMode::Get, read_cache).toCString(), "first:3");
+    ASSERT_EQ(first.attr("setCalls").toInt(), 2);
+    ASSERT_EQ(second.attr("setCalls").toInt(), 1);
+}
+
+TEST(typephp_property, named_cache_rejects_non_objects) {
+    String member{"value"};
+    PropertyCacheSlot cache;
+    try_call([&]() { (void) typephp_read_property_cached(42, member, AttrMode::Get, cache); },
+             "Attempt to read property `value` on int");
+    try_call([&]() { typephp_write_property_cached(42, member, 1, nullptr, cache); },
+             "Attempt to write property `value` on int");
 }
 
 TEST(typephp_property, getter_without_setter_is_read_only) {

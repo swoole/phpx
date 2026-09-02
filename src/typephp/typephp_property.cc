@@ -584,6 +584,46 @@ php::Variant typephp_read_property_scoped(const php::Variant &object,
     return php::Variant{member_p, php::zval_wrap(member_p)};
 }
 
+php::Variant typephp_read_property_cached(const php::Variant &object,
+                                          const php::String &member,
+                                          php::AttrMode mode,
+                                          php::PropertyCacheSlot &cache) {
+    if (UNEXPECTED(!object.isObject())) {
+        php::throwError("Attempt to read property `%s` on %s", member.toCString(), object.typeStr());
+        return {};
+    }
+
+    zval rv;
+    zval *member_p;
+    {
+        // Match Variant::attr(String): named reads use the receiver class as
+        // their fake scope. The generated call-site cache never changes that
+        // scope, and Zend validates the runtime CE before reusing the slot.
+        php::FakeScopeGuard fake_scope_guard{object.ce()};
+        member_p = object.object()->handlers->read_property(
+            object.object(),
+            member.str(),
+            mode == php::AttrMode::Update ? BP_VAR_RW : (mode == php::AttrMode::Isset ? BP_VAR_IS : BP_VAR_R),
+            cache.data(),
+            &rv);
+        php::throwErrorIfOccurred();
+
+        if (php::zval_is_null(member_p) && mode == php::AttrMode::Update) {
+            member_p = object.object()->handlers->write_property(
+                object.object(), member.str(), php::undef(), cache.data());
+            php::throwErrorIfOccurred();
+            if (member_p == php::undef()) {
+                php::throwError("Dynamic property `%s` assignment is not supported", member.toCString());
+            }
+        }
+    }
+
+    if (member_p == &rv) {
+        return php::Variant{member_p, php::Ctor::Move};
+    }
+    return php::Variant{member_p, php::zval_wrap(member_p)};
+}
+
 void typephp_write_property_scoped(const php::Variant &object,
                                    const php::Variant &member,
                                    const php::Variant &value,
@@ -616,6 +656,34 @@ void typephp_write_property_scoped(const php::Variant &object,
             object.object(), property_name, write_value, nullptr);
     }
     zend_tmp_string_release(temporary_name);
+    php::throwErrorIfOccurred();
+}
+
+void typephp_write_property_cached(const php::Variant &object,
+                                   const php::String &member,
+                                   const php::Variant &value,
+                                   zend_class_entry *scope,
+                                   php::PropertyCacheSlot &cache) {
+    if (UNEXPECTED(!object.isObject())) {
+        php::throwError("Attempt to write property `%s` on %s", member.toCString(), object.typeStr());
+        return;
+    }
+    // This helper is emitted only for named non-trait accesses. Retain the
+    // trait correction defensively for direct API users.
+    if (scope && (scope->ce_flags & ZEND_ACC_TRAIT)) {
+        auto *property_info = static_cast<zend_property_info *>(
+            zend_hash_find_ptr(&object.object()->ce->properties_info, member.str()));
+        if (property_info) {
+            scope = property_info->ce;
+        }
+    }
+    {
+        php::FakeScopeGuard fake_scope_guard{scope};
+        zval *write_value = const_cast<zval *>(value.direct_ptr());
+        ZVAL_DEREF(write_value);
+        object.object()->handlers->write_property(
+            object.object(), member.str(), write_value, cache.data());
+    }
     php::throwErrorIfOccurred();
 }
 

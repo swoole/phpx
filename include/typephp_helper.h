@@ -169,6 +169,68 @@ static inline void resetPersistentCache(PersistentCacheSlot<T> &slot) {
 }
 
 /**
+ * One request-local Zend object-handler cache entry.
+ *
+ * Zend treats three adjacent pointers as one polymorphic property cache: the
+ * runtime class entry, an encoded property offset/sentinel, and optional
+ * property metadata. Keep the representation opaque so generated code can
+ * only pass it back to the standard object handlers, never dereference a
+ * cached offset itself.
+ */
+class PropertyCacheSlot final {
+    void *slots_[3]{};
+
+  public:
+    PropertyCacheSlot() = default;
+    PropertyCacheSlot(const PropertyCacheSlot &) = delete;
+    PropertyCacheSlot &operator=(const PropertyCacheSlot &) = delete;
+
+    void **data() noexcept {
+        return slots_;
+    }
+
+    void reset() noexcept {
+        slots_[0] = nullptr;
+        slots_[1] = nullptr;
+        slots_[2] = nullptr;
+    }
+};
+
+static_assert(sizeof(PropertyCacheSlot) == sizeof(void *) * 3);
+
+/** Exception-safe owner of Zend's per-object magic-property recursion guard. */
+class MagicPropertyGuard final {
+    zend_object *object_ = nullptr;
+    uint32_t *guard_ = nullptr;
+    uint32_t flag_ = 0;
+    bool active_ = false;
+
+  public:
+    MagicPropertyGuard(zend_object *object, zend_string *member, uint32_t flag) noexcept
+        : object_(object), guard_(zend_get_property_guard(object, member)), flag_(flag) {}
+
+    MagicPropertyGuard(const MagicPropertyGuard &) = delete;
+    MagicPropertyGuard &operator=(const MagicPropertyGuard &) = delete;
+
+    bool enter() noexcept {
+        if (UNEXPECTED((*guard_ & flag_) != 0)) {
+            return false;
+        }
+        GC_ADDREF(object_);
+        *guard_ |= flag_;
+        active_ = true;
+        return true;
+    }
+
+    ~MagicPropertyGuard() noexcept {
+        if (active_) {
+            *guard_ &= ~flag_;
+            OBJ_RELEASE(object_);
+        }
+    }
+};
+
+/**
  * Create a deep copy from $GLOBALS. $GLOBALS is a special INDIRECT zval
  * pointing to &EG(symbol_table), whose refcount MUST NOT be directly
  * manipulated. Use zend_array_dup to create a proper separated copy.
@@ -383,6 +445,16 @@ PHPX_API void typephp_write_property_scoped(const php::Variant &object,
                                             zend_class_entry *scope);
 
 /**
+ * Write a statically named property through its normal object handler while
+ * supplying one request-local cache entry dedicated to this write site.
+ */
+PHPX_API void typephp_write_property_cached(const php::Variant &object,
+                                            const php::String &member,
+                                            const php::Variant &value,
+                                            zend_class_entry *scope,
+                                            php::PropertyCacheSlot &cache);
+
+/**
  * Bind an object property to an existing PHP reference while preserving
  * declared-property type sources and runtime property-handler semantics.
  */
@@ -396,6 +468,72 @@ PHPX_API php::Variant typephp_read_property_scoped(const php::Variant &object,
                                                    const php::Variant &member,
                                                    zend_class_entry *scope,
                                                    php::AttrMode mode);
+
+/**
+ * Read a statically named property through its normal object handler while
+ * supplying one request-local cache entry dedicated to this read site.
+ */
+PHPX_API php::Variant typephp_read_property_cached(const php::Variant &object,
+                                                   const php::String &member,
+                                                   php::AttrMode mode,
+                                                   php::PropertyCacheSlot &cache);
+
+/**
+ * Directly invoke a statically proven TypePHP __get() implementation only
+ * while the runtime object remains the exact simple object anticipated by the
+ * compiler. Every dynamic or custom-handler case falls back to Zend.
+ */
+template <typename Getter>
+static inline php::Variant typephp_read_magic_property_direct(
+    const php::Variant &object,
+    const php::String &member,
+    zend_class_entry *expected_class,
+    php::PropertyCacheSlot &cache,
+    Getter &&getter) {
+    if (EXPECTED(object.isObject())) {
+        zend_object *zobj = object.object();
+        const zend_object_handlers *standard_handlers = zend_get_std_object_handlers();
+        if (EXPECTED(zobj->ce == expected_class)
+            && EXPECTED(zobj->handlers->read_property == standard_handlers->read_property)
+            && EXPECTED(!zend_lazy_object_must_init(zobj))
+            && EXPECTED(zend_hash_find(&zobj->ce->properties_info, member.str()) == nullptr)
+            && EXPECTED(zobj->properties == nullptr || zend_hash_find(zobj->properties, member.str()) == nullptr)) {
+            php::MagicPropertyGuard guard{zobj, member.str(), ZEND_GUARD_PROPERTY_GET};
+            if (EXPECTED(guard.enter())) {
+                return getter();
+            }
+        }
+    }
+    return typephp_read_property_cached(object, member, php::AttrMode::Get, cache);
+}
+
+/** Guarded direct counterpart for a statically proven TypePHP __set(). */
+template <typename Setter>
+static inline void typephp_write_magic_property_direct(
+    const php::Variant &object,
+    const php::String &member,
+    const php::Variant &value,
+    zend_class_entry *scope,
+    zend_class_entry *expected_class,
+    php::PropertyCacheSlot &cache,
+    Setter &&setter) {
+    if (EXPECTED(object.isObject())) {
+        zend_object *zobj = object.object();
+        const zend_object_handlers *standard_handlers = zend_get_std_object_handlers();
+        if (EXPECTED(zobj->ce == expected_class)
+            && EXPECTED(zobj->handlers->write_property == standard_handlers->write_property)
+            && EXPECTED(!zend_lazy_object_must_init(zobj))
+            && EXPECTED(zend_hash_find(&zobj->ce->properties_info, member.str()) == nullptr)
+            && EXPECTED(zobj->properties == nullptr || zend_hash_find(zobj->properties, member.str()) == nullptr)) {
+            php::MagicPropertyGuard guard{zobj, member.str(), ZEND_GUARD_PROPERTY_SET};
+            if (EXPECTED(guard.enter())) {
+                setter();
+                return;
+            }
+        }
+    }
+    typephp_write_property_cached(object, member, value, scope, cache);
+}
 
 /**
  * Return a typed C++ reference into a static-property (or object-property) zval's
