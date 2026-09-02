@@ -508,6 +508,47 @@ TEST(operator_comparison, mixed_type_fast_paths) {
     }
 }
 
+TEST(operator_comparison, primitive_overloads) {
+    {
+        Variant v(10);
+        ASSERT_TRUE(v < 20L);
+        ASSERT_FALSE(v < 10L);
+        ASSERT_FALSE(v < 5L);
+        ASSERT_TRUE(v > 5L);
+        ASSERT_FALSE(v > 10L);
+        ASSERT_FALSE(v > 20L);
+        ASSERT_TRUE(v <= 10L);
+        ASSERT_TRUE(v <= 20L);
+        ASSERT_FALSE(v <= 5L);
+        ASSERT_TRUE(v >= 10L);
+        ASSERT_TRUE(v >= 5L);
+        ASSERT_FALSE(v >= 20L);
+    }
+    {
+        Variant v(3.14);
+        ASSERT_TRUE(v < 5.0);
+        ASSERT_FALSE(v < 3.14);
+        ASSERT_FALSE(v < 2.0);
+        ASSERT_TRUE(v > 2.0);
+        ASSERT_FALSE(v > 3.14);
+        ASSERT_FALSE(v > 5.0);
+        ASSERT_TRUE(v <= 3.14);
+        ASSERT_TRUE(v <= 5.0);
+        ASSERT_FALSE(v <= 2.0);
+        ASSERT_TRUE(v >= 3.14);
+        ASSERT_TRUE(v >= 2.0);
+        ASSERT_FALSE(v >= 5.0);
+    }
+    {
+        Variant neg(-5);
+        ASSERT_TRUE(neg < 0L);
+        ASSERT_TRUE(neg < -1L);
+        ASSERT_FALSE(neg < -10L);
+        ASSERT_TRUE(neg > -10L);
+        ASSERT_FALSE(neg > 0L);
+    }
+}
+
 // Test mixed type operations
 TEST(operator_mixed_types, arithmetic_operations) {
     // Integer and floating point operations
