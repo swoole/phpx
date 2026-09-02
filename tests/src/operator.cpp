@@ -401,6 +401,70 @@ TEST(operator_comparison, all_operators) {
     }
 }
 
+TEST(operator_comparison, integral_fast_paths) {
+    {
+        Variant a(10);
+        Variant b(20);
+        ASSERT_TRUE(a < b);
+        ASSERT_FALSE(b < a);
+        ASSERT_FALSE(a < a);
+        ASSERT_TRUE(a <= b);
+        ASSERT_TRUE(a <= a);
+        ASSERT_FALSE(b <= a);
+        ASSERT_FALSE(a > b);
+        ASSERT_TRUE(b > a);
+        ASSERT_FALSE(a > a);
+        ASSERT_FALSE(a >= b);
+        ASSERT_TRUE(b >= a);
+        ASSERT_TRUE(a >= a);
+    }
+    {
+        Variant neg(-5);
+        Variant pos(5);
+        ASSERT_TRUE(neg < pos);
+        ASSERT_FALSE(pos < neg);
+        ASSERT_TRUE(neg <= pos);
+        ASSERT_FALSE(pos <= neg);
+        ASSERT_FALSE(neg > pos);
+        ASSERT_TRUE(pos > neg);
+        ASSERT_FALSE(neg >= pos);
+        ASSERT_TRUE(pos >= neg);
+    }
+    {
+        Variant max_val(ZEND_LONG_MAX);
+        Variant min_val(ZEND_LONG_MIN);
+        Variant zero(0);
+        ASSERT_TRUE(min_val < max_val);
+        ASSERT_FALSE(max_val < min_val);
+        ASSERT_TRUE(min_val <= max_val);
+        ASSERT_FALSE(max_val <= min_val);
+        ASSERT_FALSE(min_val > max_val);
+        ASSERT_TRUE(max_val > min_val);
+        ASSERT_FALSE(min_val >= max_val);
+        ASSERT_TRUE(max_val >= min_val);
+        ASSERT_TRUE(zero >= min_val);
+        ASSERT_TRUE(zero <= max_val);
+    }
+    {
+        Variant int_val(10);
+        Variant float_val(10.5);
+        ASSERT_TRUE(int_val < float_val);
+        ASSERT_FALSE(float_val < int_val);
+        ASSERT_TRUE(int_val <= float_val);
+        ASSERT_FALSE(float_val <= int_val);
+        ASSERT_FALSE(int_val > float_val);
+        ASSERT_TRUE(float_val > int_val);
+        ASSERT_FALSE(int_val >= float_val);
+        ASSERT_TRUE(float_val >= int_val);
+    }
+    {
+        Variant int_val(10);
+        Variant str_val("15");
+        ASSERT_TRUE(int_val < str_val);
+        ASSERT_FALSE(str_val < int_val);
+    }
+}
+
 // Test mixed type operations
 TEST(operator_mixed_types, arithmetic_operations) {
     // Integer and floating point operations
