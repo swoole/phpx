@@ -717,9 +717,9 @@ TEST(func_facade, str_rot13) {
 }
 
 TEST(func_facade, strcoll) {
-    ASSERT_EQ(php::strcoll("a", "b").toInt(), -1);
+    ASSERT_LT(php::strcoll("a", "b").toInt(), 0);
     ASSERT_EQ(php::strcoll("a", "a").toInt(), 0);
-    ASSERT_EQ(php::strcoll("b", "a").toInt(), 1);
+    ASSERT_GT(php::strcoll("b", "a").toInt(), 0);
 }
 
 TEST(func_facade, sprintf) {

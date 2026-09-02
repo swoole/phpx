@@ -46,6 +46,10 @@ string get_include_dir() {
     return get_root_path() + "/tests/include";
 }
 
+php::String get_machine_architecture() {
+    return php::eval("return php_uname('m');").toString();
+}
+
 void try_call(const std::function<void(void)> &fn, const php::String &msg, bool print) {
     try {
         fn();

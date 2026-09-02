@@ -109,25 +109,26 @@ TEST(caller, curl) {
 
 TEST(caller, call) {
     String php_uname_fn("php_uname");
+    auto machine = get_machine_architecture();
     auto rs = call(php_uname_fn);
     ASSERT_TRUE(rs.isString());
-    ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
+    ASSERT_TRUE(str_contains(rs, machine).isTrue());
 
     rs = call(php_uname_fn, {"m"});
     ASSERT_TRUE(rs.isString());
-    ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
+    ASSERT_STREQ(rs.toCString(), machine.toCString());
 
     Array arr;
     arr.append("m");
     rs = call(php_uname_fn, arr);
     ASSERT_TRUE(rs.isString());
-    ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
+    ASSERT_STREQ(rs.toCString(), machine.toCString());
 
     Args args;
     args.append("m");
     rs = call(php_uname_fn, args);
     ASSERT_TRUE(rs.isString());
-    ASSERT_TRUE(str_contains(rs, "x86_64").isTrue());
+    ASSERT_STREQ(rs.toCString(), machine.toCString());
 }
 
 TEST(caller, http_build_query) {

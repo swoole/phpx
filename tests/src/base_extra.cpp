@@ -365,7 +365,7 @@ TEST(base_extra, call_with_array) {
     args.append("m");
     auto fn = getFunction("php_uname");
     auto rs = call(fn, args);
-    ASSERT_STREQ(rs.toCString(), "x86_64");
+    ASSERT_STREQ(rs.toCString(), get_machine_architecture().toCString());
 }
 
 // Test call with ArgList
@@ -373,7 +373,7 @@ TEST(base_extra, call_with_arglist) {
     ArgList args{"m"};
     auto fn = getFunction("php_uname");
     auto rs = call(fn, args);
-    ASSERT_STREQ(rs.toCString(), "x86_64");
+    ASSERT_STREQ(rs.toCString(), get_machine_architecture().toCString());
 }
 
 // Test call with named args (zend_array)
@@ -479,7 +479,7 @@ TEST(base_extra, call_string_func) {
     var fn("php_uname");
     ArgList args{"m"};
     auto rs = call(fn, args);
-    ASSERT_STREQ(rs.toCString(), "x86_64");
+    ASSERT_STREQ(rs.toCString(), get_machine_architecture().toCString());
 }
 
 TEST(base_extra, request_lifecycle_reinitializes_function_cache) {

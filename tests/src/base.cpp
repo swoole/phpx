@@ -416,7 +416,7 @@ TEST(base, is_callable_ex) {
 TEST(base, call) {
     auto fn1 = getFunction("php_uname");
     auto rt1 = call(fn1, {"m"});
-    ASSERT_STREQ(rt1.toCString(), "x86_64");
+    ASSERT_STREQ(rt1.toCString(), get_machine_architecture().toCString());
 
     auto fn2 = getFunction("posix_getpid");
     auto rt2 = call(fn2);

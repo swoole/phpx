@@ -25,7 +25,7 @@ TEST(facade, redis) {
 
 TEST(facade, uname) {
     auto m = php_uname("m");
-    ASSERT_STREQ(m.toCString(), "x86_64");
+    ASSERT_STREQ(m.toCString(), get_machine_architecture().toCString());
 }
 
 #ifndef GITHUB_ACTION
