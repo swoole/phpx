@@ -45,6 +45,7 @@
 build.ninja
 .ninja_deps
 .ninja_log
+__pycache__
 CMakeFiles/
 examples/gtk/gtk.so.dSYM/
 examples/test/test.so.dSYM/

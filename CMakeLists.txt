@@ -353,14 +353,31 @@ if (IS_WINDOWS)
         INTERFACE_INCLUDE_DIRECTORIES "${PHP_SDK_DIR}/include;${MPDECIMAL_DIR}/libmpdec++"
     )
 
-    # 复制 DLL 到输出目录
-    file(GLOB MPDEC_DLLS "${PHP_LIBRARY_DIR}/libmpdec-4.0.1.dll" "${PHP_LIBRARY_DIR}/libmpdec++-4.0.1.dll")
-    foreach(_dll ${MPDEC_DLLS})
-        add_custom_command(TARGET phpx POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_dll}" $<TARGET_FILE_DIR:phpx>
-            COMMENT "Copying ${_dll} to output"
-        )
+    set(MPDEC_DLLS
+        "${PHP_LIBRARY_DIR}/libmpdec-4.0.1.dll"
+        "${PHP_LIBRARY_DIR}/libmpdec++-4.0.1.dll"
+    )
+    foreach(_dll IN LISTS MPDEC_DLLS)
+        if(NOT EXISTS "${_dll}")
+            message(FATAL_ERROR "Required mpdecimal runtime DLL not found: ${_dll}")
+        endif()
     endforeach()
+
+    # Register runtime DLL copies only after the destination target exists.
+    # add_custom_command(TARGET ...) rejects targets that have not been
+    # created yet, so callers must invoke this helper after add_library() or
+    # add_executable().
+    function(copy_mpdecimal_runtime_dlls target)
+        foreach(_dll IN LISTS MPDEC_DLLS)
+            add_custom_command(TARGET ${target} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${_dll}"
+                    "$<TARGET_FILE_DIR:${target}>"
+                COMMENT "Copying ${_dll} to ${target} output"
+                VERBATIM
+            )
+        endforeach()
+    endfunction()
 else()
     # Linux/macOS: 内置编译 mpdecimal + libmpdec++
     message(STATUS "Using bundled mpdecimal with uint128")
@@ -436,6 +453,8 @@ if (IS_WINDOWS)
         SUFFIX ".dll"
     )
 
+    copy_mpdecimal_runtime_dlls(phpx)
+
     if(PHP_EMBED_LIBRARY AND USE_PHP_EMBED)
         add_custom_command(TARGET phpx POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -500,6 +519,8 @@ if(BUILD_TESTS)
                     $<TARGET_FILE_DIR:phpx-tests>
                 COMMENT "Copying phpx.dll to test directory"
             )
+
+            copy_mpdecimal_runtime_dlls(phpx-tests)
 
             if(PHP_EMBED_LIBRARY AND USE_PHP_EMBED)
                 add_custom_command(TARGET phpx-tests POST_BUILD
