@@ -1426,6 +1426,71 @@ class Variant {
     bool operator<=(const Variant &v) const;
     bool operator>=(const Variant &v) const;
 
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    bool operator<(T raw) const {
+        const zval *left = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(left) == IS_LONG)) {
+            return Z_LVAL_P(left) < static_cast<Int>(raw);
+        }
+        return *this < Variant(raw);
+    }
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    bool operator>(T raw) const {
+        const zval *left = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(left) == IS_LONG)) {
+            return Z_LVAL_P(left) > static_cast<Int>(raw);
+        }
+        return *this > Variant(raw);
+    }
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    bool operator<=(T raw) const {
+        const zval *left = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(left) == IS_LONG)) {
+            return Z_LVAL_P(left) <= static_cast<Int>(raw);
+        }
+        return *this <= Variant(raw);
+    }
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    bool operator>=(T raw) const {
+        const zval *left = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(left) == IS_LONG)) {
+            return Z_LVAL_P(left) >= static_cast<Int>(raw);
+        }
+        return *this >= Variant(raw);
+    }
+    template <typename T, enable_if_floating_point<T> = 0>
+    bool operator<(T raw) const {
+        const zval *left = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(left) == IS_DOUBLE)) {
+            return Z_DVAL_P(left) < static_cast<double>(raw);
+        }
+        return *this < Variant(raw);
+    }
+    template <typename T, enable_if_floating_point<T> = 0>
+    bool operator>(T raw) const {
+        const zval *left = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(left) == IS_DOUBLE)) {
+            return Z_DVAL_P(left) > static_cast<double>(raw);
+        }
+        return *this > Variant(raw);
+    }
+    template <typename T, enable_if_floating_point<T> = 0>
+    bool operator<=(T raw) const {
+        const zval *left = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(left) == IS_DOUBLE)) {
+            return Z_DVAL_P(left) <= static_cast<double>(raw);
+        }
+        return *this <= Variant(raw);
+    }
+    template <typename T, enable_if_floating_point<T> = 0>
+    bool operator>=(T raw) const {
+        const zval *left = unwrap_ptr();
+        if (EXPECTED(Z_TYPE_P(left) == IS_DOUBLE)) {
+            return Z_DVAL_P(left) >= static_cast<double>(raw);
+        }
+        return *this >= Variant(raw);
+    }
+
     bool equals(const Variant &v, bool strict = false) const;
     bool almostEquals(const Variant &v, double eps = 1e-9) const {
         return std::fabs(toFloat() - v.toFloat()) <= eps;

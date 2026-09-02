@@ -551,6 +551,29 @@ static zend_result ZEND_FASTCALL is_greater_or_equal_function(zval *result, zval
     return is_smaller_or_equal_function(result, op2, op1);
 }
 
+static bool compare_fast_impl(binary_op_type op, const Variant &a, const Variant &b) {
+    const zval *left = a.unwrap_ptr();
+    const zval *right = b.unwrap_ptr();
+    if (EXPECTED(Z_TYPE_P(left) == IS_LONG && Z_TYPE_P(right) == IS_LONG)) {
+        const zend_long x = Z_LVAL_P(left);
+        const zend_long y = Z_LVAL_P(right);
+        if (op == is_smaller_function) return x < y;
+        if (op == is_smaller_or_equal_function) return x <= y;
+        if (op == is_greater_function) return x > y;
+        if (op == is_greater_or_equal_function) return x >= y;
+    }
+    if ((Z_TYPE_P(left) == IS_LONG || Z_TYPE_P(left) == IS_DOUBLE)
+            && (Z_TYPE_P(right) == IS_LONG || Z_TYPE_P(right) == IS_DOUBLE)) {
+        const double x = (Z_TYPE_P(left) == IS_LONG) ? (double) Z_LVAL_P(left) : Z_DVAL_P(left);
+        const double y = (Z_TYPE_P(right) == IS_LONG) ? (double) Z_LVAL_P(right) : Z_DVAL_P(right);
+        if (op == is_smaller_function) return x < y;
+        if (op == is_smaller_or_equal_function) return x <= y;
+        if (op == is_greater_function) return x > y;
+        if (op == is_greater_or_equal_function) return x >= y;
+    }
+    return compare_op(op, left, right);
+}
+
 bool Variant::equals(const Variant &v, bool strict) const {
     if (strict) {
         return compare_op(is_identical_function, const_ptr(), v.const_ptr());
@@ -851,19 +874,19 @@ void Variant::append(const Variant &v) {
 }
 
 bool Variant::operator<(const Variant &v) const {
-    return compare_op(is_smaller_function, const_ptr(), v.const_ptr());
+    return compare_fast_impl(is_smaller_function, *this, v);
 }
 
 bool Variant::operator<=(const Variant &v) const {
-    return compare_op(is_smaller_or_equal_function, const_ptr(), v.const_ptr());
+    return compare_fast_impl(is_smaller_or_equal_function, *this, v);
 }
 
 bool Variant::operator>(const Variant &v) const {
-    return compare_op(is_greater_function, const_ptr(), v.const_ptr());
+    return compare_fast_impl(is_greater_function, *this, v);
 }
 
 bool Variant::operator>=(const Variant &v) const {
-    return compare_op(is_greater_or_equal_function, const_ptr(), v.const_ptr());
+    return compare_fast_impl(is_greater_or_equal_function, *this, v);
 }
 
 Variant Variant::operator()() const {

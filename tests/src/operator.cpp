@@ -401,6 +401,154 @@ TEST(operator_comparison, all_operators) {
     }
 }
 
+TEST(operator_comparison, integral_fast_paths) {
+    {
+        Variant a(10);
+        Variant b(20);
+        ASSERT_TRUE(a < b);
+        ASSERT_FALSE(b < a);
+        ASSERT_FALSE(a < a);
+        ASSERT_TRUE(a <= b);
+        ASSERT_TRUE(a <= a);
+        ASSERT_FALSE(b <= a);
+        ASSERT_FALSE(a > b);
+        ASSERT_TRUE(b > a);
+        ASSERT_FALSE(a > a);
+        ASSERT_FALSE(a >= b);
+        ASSERT_TRUE(b >= a);
+        ASSERT_TRUE(a >= a);
+    }
+    {
+        Variant neg(-5);
+        Variant pos(5);
+        ASSERT_TRUE(neg < pos);
+        ASSERT_FALSE(pos < neg);
+        ASSERT_TRUE(neg <= pos);
+        ASSERT_FALSE(pos <= neg);
+        ASSERT_FALSE(neg > pos);
+        ASSERT_TRUE(pos > neg);
+        ASSERT_FALSE(neg >= pos);
+        ASSERT_TRUE(pos >= neg);
+    }
+    {
+        Variant max_val(ZEND_LONG_MAX);
+        Variant min_val(ZEND_LONG_MIN);
+        Variant zero(0);
+        ASSERT_TRUE(min_val < max_val);
+        ASSERT_FALSE(max_val < min_val);
+        ASSERT_TRUE(min_val <= max_val);
+        ASSERT_FALSE(max_val <= min_val);
+        ASSERT_FALSE(min_val > max_val);
+        ASSERT_TRUE(max_val > min_val);
+        ASSERT_FALSE(min_val >= max_val);
+        ASSERT_TRUE(max_val >= min_val);
+        ASSERT_TRUE(zero >= min_val);
+        ASSERT_TRUE(zero <= max_val);
+    }
+    {
+        Variant int_val(10);
+        Variant float_val(10.5);
+        ASSERT_TRUE(int_val < float_val);
+        ASSERT_FALSE(float_val < int_val);
+        ASSERT_TRUE(int_val <= float_val);
+        ASSERT_FALSE(float_val <= int_val);
+        ASSERT_FALSE(int_val > float_val);
+        ASSERT_TRUE(float_val > int_val);
+        ASSERT_FALSE(int_val >= float_val);
+        ASSERT_TRUE(float_val >= int_val);
+    }
+    {
+        Variant int_val(10);
+        Variant str_val("15");
+        ASSERT_TRUE(int_val < str_val);
+        ASSERT_FALSE(str_val < int_val);
+    }
+}
+
+TEST(operator_comparison, mixed_type_fast_paths) {
+    {
+        Variant float_val(3.14);
+        Variant int_val(5);
+        ASSERT_TRUE(float_val < int_val);
+        ASSERT_FALSE(int_val < float_val);
+        ASSERT_TRUE(float_val <= int_val);
+        ASSERT_FALSE(int_val <= float_val);
+        ASSERT_FALSE(float_val > int_val);
+        ASSERT_TRUE(int_val > float_val);
+        ASSERT_FALSE(float_val >= int_val);
+        ASSERT_TRUE(int_val >= float_val);
+    }
+    {
+        Variant int_val(5);
+        Variant float_val(3.14);
+        ASSERT_FALSE(int_val < float_val);
+        ASSERT_TRUE(float_val < int_val);
+        ASSERT_FALSE(int_val <= float_val);
+        ASSERT_TRUE(float_val <= int_val);
+        ASSERT_TRUE(int_val > float_val);
+        ASSERT_FALSE(float_val > int_val);
+        ASSERT_TRUE(int_val >= float_val);
+        ASSERT_FALSE(float_val >= int_val);
+    }
+    {
+        Variant a(5.0);
+        Variant b(5.0);
+        ASSERT_FALSE(a < b);
+        ASSERT_TRUE(a <= b);
+        ASSERT_FALSE(a > b);
+        ASSERT_TRUE(a >= b);
+    }
+    {
+        Variant neg_float(-1.5);
+        Variant pos_int(1);
+        ASSERT_TRUE(neg_float < pos_int);
+        ASSERT_FALSE(pos_int < neg_float);
+        ASSERT_TRUE(neg_float <= pos_int);
+        ASSERT_FALSE(pos_int <= neg_float);
+    }
+}
+
+TEST(operator_comparison, primitive_overloads) {
+    {
+        Variant v(10);
+        ASSERT_TRUE(v < 20L);
+        ASSERT_FALSE(v < 10L);
+        ASSERT_FALSE(v < 5L);
+        ASSERT_TRUE(v > 5L);
+        ASSERT_FALSE(v > 10L);
+        ASSERT_FALSE(v > 20L);
+        ASSERT_TRUE(v <= 10L);
+        ASSERT_TRUE(v <= 20L);
+        ASSERT_FALSE(v <= 5L);
+        ASSERT_TRUE(v >= 10L);
+        ASSERT_TRUE(v >= 5L);
+        ASSERT_FALSE(v >= 20L);
+    }
+    {
+        Variant v(3.14);
+        ASSERT_TRUE(v < 5.0);
+        ASSERT_FALSE(v < 3.14);
+        ASSERT_FALSE(v < 2.0);
+        ASSERT_TRUE(v > 2.0);
+        ASSERT_FALSE(v > 3.14);
+        ASSERT_FALSE(v > 5.0);
+        ASSERT_TRUE(v <= 3.14);
+        ASSERT_TRUE(v <= 5.0);
+        ASSERT_FALSE(v <= 2.0);
+        ASSERT_TRUE(v >= 3.14);
+        ASSERT_TRUE(v >= 2.0);
+        ASSERT_FALSE(v >= 5.0);
+    }
+    {
+        Variant neg(-5);
+        ASSERT_TRUE(neg < 0L);
+        ASSERT_TRUE(neg < -1L);
+        ASSERT_FALSE(neg < -10L);
+        ASSERT_TRUE(neg > -10L);
+        ASSERT_FALSE(neg > 0L);
+    }
+}
+
 // Test mixed type operations
 TEST(operator_mixed_types, arithmetic_operations) {
     // Integer and floating point operations
