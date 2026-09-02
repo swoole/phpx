@@ -551,25 +551,25 @@ static zend_result ZEND_FASTCALL is_greater_or_equal_function(zval *result, zval
     return is_smaller_or_equal_function(result, op2, op1);
 }
 
-bool Variant::compareOp(binary_op_type op, const Variant &v) const {
-    const zval *left = unwrap_ptr();
-    const zval *right = v.unwrap_ptr();
+static bool compare_fast_impl(binary_op_type op, const Variant &a, const Variant &b) {
+    const zval *left = a.unwrap_ptr();
+    const zval *right = b.unwrap_ptr();
     if (EXPECTED(Z_TYPE_P(left) == IS_LONG && Z_TYPE_P(right) == IS_LONG)) {
-        const zend_long a = Z_LVAL_P(left);
-        const zend_long b = Z_LVAL_P(right);
-        if (op == is_smaller_function) return a < b;
-        if (op == is_smaller_or_equal_function) return a <= b;
-        if (op == is_greater_function) return a > b;
-        if (op == is_greater_or_equal_function) return a >= b;
+        const zend_long x = Z_LVAL_P(left);
+        const zend_long y = Z_LVAL_P(right);
+        if (op == is_smaller_function) return x < y;
+        if (op == is_smaller_or_equal_function) return x <= y;
+        if (op == is_greater_function) return x > y;
+        if (op == is_greater_or_equal_function) return x >= y;
     }
     if ((Z_TYPE_P(left) == IS_LONG || Z_TYPE_P(left) == IS_DOUBLE)
             && (Z_TYPE_P(right) == IS_LONG || Z_TYPE_P(right) == IS_DOUBLE)) {
-        const double a = (Z_TYPE_P(left) == IS_LONG) ? (double) Z_LVAL_P(left) : Z_DVAL_P(left);
-        const double b = (Z_TYPE_P(right) == IS_LONG) ? (double) Z_LVAL_P(right) : Z_DVAL_P(right);
-        if (op == is_smaller_function) return a < b;
-        if (op == is_smaller_or_equal_function) return a <= b;
-        if (op == is_greater_function) return a > b;
-        if (op == is_greater_or_equal_function) return a >= b;
+        const double x = (Z_TYPE_P(left) == IS_LONG) ? (double) Z_LVAL_P(left) : Z_DVAL_P(left);
+        const double y = (Z_TYPE_P(right) == IS_LONG) ? (double) Z_LVAL_P(right) : Z_DVAL_P(right);
+        if (op == is_smaller_function) return x < y;
+        if (op == is_smaller_or_equal_function) return x <= y;
+        if (op == is_greater_function) return x > y;
+        if (op == is_greater_or_equal_function) return x >= y;
     }
     return compare_op(op, left, right);
 }
@@ -874,19 +874,19 @@ void Variant::append(const Variant &v) {
 }
 
 bool Variant::operator<(const Variant &v) const {
-    return compareOp(is_smaller_function, v);
+    return compare_fast_impl(is_smaller_function, *this, v);
 }
 
 bool Variant::operator<=(const Variant &v) const {
-    return compareOp(is_smaller_or_equal_function, v);
+    return compare_fast_impl(is_smaller_or_equal_function, *this, v);
 }
 
 bool Variant::operator>(const Variant &v) const {
-    return compareOp(is_greater_function, v);
+    return compare_fast_impl(is_greater_function, *this, v);
 }
 
 bool Variant::operator>=(const Variant &v) const {
-    return compareOp(is_greater_or_equal_function, v);
+    return compare_fast_impl(is_greater_or_equal_function, *this, v);
 }
 
 Variant Variant::operator()() const {
