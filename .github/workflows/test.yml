@@ -3,11 +3,20 @@ on: [ push, pull_request ]
 
 jobs:
   php:
-    runs-on: ubuntu-latest
+    name: Linux ${{ matrix.arch }} / PHP ${{ matrix.php }}
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
         php: [ 8.4, 8.5 ]
+        arch: [ x64, arm64 ]
+        include:
+          - arch: x64
+            runner: ubuntu-latest
+            coverage: "ON"
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+            coverage: "OFF"
     steps:
       - uses: actions/checkout@v4
       - name: Checkout phpy
@@ -52,9 +61,15 @@ jobs:
           uname -a
           php -v
           php --ini
+      - name: Verify runner architecture
+        run: |
+          case "${{ matrix.arch }}:$(uname -m)" in
+            x64:x86_64|arm64:aarch64|arm64:arm64) ;;
+            *) echo "Unexpected runner architecture: $(uname -m)" >&2; exit 1 ;;
+          esac
       - name: Build
         run: |
-          cmake . -D CODE_COVERAGE=ON -D GITHUB_ACTION=ON -D ENABLE_FACADE_API=ON || exit 1
+          cmake . -D CODE_COVERAGE=${{ matrix.coverage }} -D GITHUB_ACTION=ON -D ENABLE_FACADE_API=ON || exit 1
           make VERBOSE=1 -j$(nproc)
       - name: Run google tests
         run: |
@@ -71,6 +86,7 @@ jobs:
           sudo sh -c 'echo "extension=phpx_test.so" > $(php-config --ini-dir)/phpx_test.ini'
           composer test
       - name: Run coverage
+        if: matrix.arch == 'x64'
         shell: bash
         run: |
           sudo apt-get install lcov
@@ -78,6 +94,7 @@ jobs:
           sudo lcov --remove coverage.info '/usr/*' --output-file coverage.info
           sudo lcov --list coverage.info
       - name: Upload coverage to Codecov
+        if: matrix.arch == 'x64'
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
