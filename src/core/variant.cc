@@ -543,35 +543,36 @@ static inline Variant calc_op(const binary_op_type op, const zval *op1, const zv
     return result;
 }
 
-static zend_result ZEND_FASTCALL is_greater_function(zval *result, zval *op1, zval *op2) {
-    return is_smaller_function(result, op2, op1);
-}
-
-static zend_result ZEND_FASTCALL is_greater_or_equal_function(zval *result, zval *op1, zval *op2) {
-    return is_smaller_or_equal_function(result, op2, op1);
-}
-
-static bool compare_fast_impl(binary_op_type op, const Variant &a, const Variant &b) {
+template <detail::CompareRelation Relation>
+static bool compare_fast_impl(const Variant &a, const Variant &b) {
     const zval *left = a.unwrap_ptr();
     const zval *right = b.unwrap_ptr();
-    if (EXPECTED(Z_TYPE_P(left) == IS_LONG && Z_TYPE_P(right) == IS_LONG)) {
-        const zend_long x = Z_LVAL_P(left);
-        const zend_long y = Z_LVAL_P(right);
-        if (op == is_smaller_function) return x < y;
-        if (op == is_smaller_or_equal_function) return x <= y;
-        if (op == is_greater_function) return x > y;
-        if (op == is_greater_or_equal_function) return x >= y;
+    const uint8_t left_type = Z_TYPE_P(left);
+    const uint8_t right_type = Z_TYPE_P(right);
+
+    if (EXPECTED(left_type == IS_LONG)) {
+        if (EXPECTED(right_type == IS_LONG)) {
+            return detail::compareRelation<Relation>(Z_LVAL_P(left), Z_LVAL_P(right));
+        }
+        if (EXPECTED(right_type == IS_DOUBLE)) {
+            return detail::compareRelation<Relation>(static_cast<double>(Z_LVAL_P(left)), Z_DVAL_P(right));
+        }
+    } else if (EXPECTED(left_type == IS_DOUBLE)) {
+        if (EXPECTED(right_type == IS_DOUBLE)) {
+            return detail::compareRelation<Relation>(Z_DVAL_P(left), Z_DVAL_P(right));
+        }
+        if (EXPECTED(right_type == IS_LONG)) {
+            return detail::compareRelation<Relation>(Z_DVAL_P(left), static_cast<double>(Z_LVAL_P(right)));
+        }
     }
-    if ((Z_TYPE_P(left) == IS_LONG || Z_TYPE_P(left) == IS_DOUBLE)
-            && (Z_TYPE_P(right) == IS_LONG || Z_TYPE_P(right) == IS_DOUBLE)) {
-        const double x = (Z_TYPE_P(left) == IS_LONG) ? (double) Z_LVAL_P(left) : Z_DVAL_P(left);
-        const double y = (Z_TYPE_P(right) == IS_LONG) ? (double) Z_LVAL_P(right) : Z_DVAL_P(right);
-        if (op == is_smaller_function) return x < y;
-        if (op == is_smaller_or_equal_function) return x <= y;
-        if (op == is_greater_function) return x > y;
-        if (op == is_greater_or_equal_function) return x >= y;
+
+    constexpr binary_op_type op =
+        detail::compare_relation_is_inclusive_v<Relation> ? is_smaller_or_equal_function : is_smaller_function;
+    if constexpr (detail::compare_relation_is_reverse_v<Relation>) {
+        return compare_op(op, right, left);
+    } else {
+        return compare_op(op, left, right);
     }
-    return compare_op(op, left, right);
 }
 
 bool Variant::equals(const Variant &v, bool strict) const {
@@ -874,19 +875,19 @@ void Variant::append(const Variant &v) {
 }
 
 bool Variant::operator<(const Variant &v) const {
-    return compare_fast_impl(is_smaller_function, *this, v);
+    return compare_fast_impl<detail::CompareRelation::Less>(*this, v);
 }
 
 bool Variant::operator<=(const Variant &v) const {
-    return compare_fast_impl(is_smaller_or_equal_function, *this, v);
+    return compare_fast_impl<detail::CompareRelation::LessOrEqual>(*this, v);
 }
 
 bool Variant::operator>(const Variant &v) const {
-    return compare_fast_impl(is_greater_function, *this, v);
+    return compare_fast_impl<detail::CompareRelation::Greater>(*this, v);
 }
 
 bool Variant::operator>=(const Variant &v) const {
-    return compare_fast_impl(is_greater_or_equal_function, *this, v);
+    return compare_fast_impl<detail::CompareRelation::GreaterOrEqual>(*this, v);
 }
 
 Variant Variant::operator()() const {

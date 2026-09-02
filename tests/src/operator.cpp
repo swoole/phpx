@@ -2,9 +2,27 @@
 #include "phpx_func.h"
 #include "phpx_helper.h"
 
+#include <cmath>
+#include <cstdint>
+#include <limits>
 #include <type_traits>
+#include <vector>
 
 using namespace php;
+
+static bool zend_ordered_compare(const Variant &left, const Variant &right, bool inclusive) {
+    zval result;
+    const auto op = inclusive ? is_smaller_or_equal_function : is_smaller_function;
+    EXPECT_EQ(op(&result, NO_CONST_V(left), NO_CONST_V(right)), SUCCESS);
+    return Z_TYPE(result) == IS_TRUE;
+}
+
+static void expect_relational_operators_match_zend(const Variant &left, const Variant &right) {
+    EXPECT_EQ(left < right, zend_ordered_compare(left, right, false));
+    EXPECT_EQ(left <= right, zend_ordered_compare(left, right, true));
+    EXPECT_EQ(left > right, zend_ordered_compare(right, left, false));
+    EXPECT_EQ(left >= right, zend_ordered_compare(right, left, true));
+}
 
 // Test all arithmetic operators (+, -, *, /, %)
 TEST(operator_arithmetic, all_operators) {
@@ -547,6 +565,94 @@ TEST(operator_comparison, primitive_overloads) {
         ASSERT_TRUE(neg > -10L);
         ASSERT_FALSE(neg > 0L);
     }
+}
+
+TEST(operator_comparison, fast_paths_match_zend_at_numeric_boundaries) {
+    std::vector<Variant> values = {
+        Variant(ZEND_LONG_MIN),
+        Variant(-1),
+        Variant(0),
+        Variant(1),
+        Variant(ZEND_LONG_MAX),
+        Variant(-std::numeric_limits<double>::infinity()),
+        Variant(-0.0),
+        Variant(0.0),
+        Variant(0.5),
+        Variant(std::numeric_limits<double>::infinity()),
+        Variant(std::numeric_limits<double>::quiet_NaN()),
+    };
+    if constexpr (sizeof(Int) >= sizeof(int64_t)) {
+        values.emplace_back(static_cast<Int>(INT64_C(9007199254740991)));
+        values.emplace_back(static_cast<Int>(INT64_C(9007199254740992)));
+        values.emplace_back(static_cast<Int>(INT64_C(9007199254740993)));
+        values.emplace_back(9007199254740992.0);
+    }
+
+    for (const auto &left : values) {
+        for (const auto &right : values) {
+            expect_relational_operators_match_zend(left, right);
+        }
+    }
+}
+
+TEST(operator_comparison, references_indirect_values_and_fallback_match_zend) {
+    Variant referenced_value(42);
+    Reference reference = referenced_value.toReference();
+    Variant other(42.5);
+    expect_relational_operators_match_zend(reference, other);
+    expect_relational_operators_match_zend(other, reference);
+
+    Array values;
+    values.appendValue(42);
+    Variant indirect = values.item(0);
+    ASSERT_TRUE(indirect.isIndirect());
+    expect_relational_operators_match_zend(indirect, other);
+    expect_relational_operators_match_zend(other, indirect);
+
+    const std::vector<Variant> fallback_values = {
+        Variant(nullptr),
+        Variant(false),
+        Variant(true),
+        Variant("0"),
+        Variant("10.5"),
+        Variant("text"),
+    };
+    for (const auto &left : fallback_values) {
+        for (const auto &right : fallback_values) {
+            expect_relational_operators_match_zend(left, right);
+        }
+    }
+}
+
+TEST(operator_comparison, primitive_overloads_preserve_variant_conversion_semantics) {
+    const std::vector<Variant> left_values = {
+        Variant(10),
+        Variant(10.5),
+        Variant("10"),
+    };
+    const auto check = [&left_values](auto raw) {
+        const Variant boxed(raw);
+        for (const auto &left : left_values) {
+            EXPECT_EQ(left < raw, left < boxed);
+            EXPECT_EQ(left <= raw, left <= boxed);
+            EXPECT_EQ(left > raw, left > boxed);
+            EXPECT_EQ(left >= raw, left >= boxed);
+            EXPECT_EQ((raw < left).toBool(), boxed < left);
+            EXPECT_EQ((raw <= left).toBool(), boxed <= left);
+            EXPECT_EQ((raw > left).toBool(), boxed > left);
+            EXPECT_EQ((raw >= left).toBool(), boxed >= left);
+        }
+    };
+
+    check(int8_t{-1});
+    check(int32_t{10});
+    check(int64_t{11});
+    check(uint32_t{12});
+    check(std::numeric_limits<uint64_t>::max());
+    check(9.5F);
+    check(10.5);
+    check(11.5L);
+    check(std::numeric_limits<double>::quiet_NaN());
 }
 
 // Test mixed type operations

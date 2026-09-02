@@ -909,6 +909,39 @@ using enable_if_arithmetic_non_bool = std::enable_if_t<is_arithmetic_non_bool_v<
 
 namespace detail {
 
+enum class CompareRelation : uint8_t {
+    Less,
+    LessOrEqual,
+    Greater,
+    GreaterOrEqual,
+};
+
+template <CompareRelation Relation>
+inline constexpr bool compare_relation_is_reverse_v =
+    Relation == CompareRelation::Greater || Relation == CompareRelation::GreaterOrEqual;
+
+template <CompareRelation Relation>
+inline constexpr bool compare_relation_is_inclusive_v =
+    Relation == CompareRelation::LessOrEqual || Relation == CompareRelation::GreaterOrEqual;
+
+template <bool Inclusive, typename L, typename R>
+static zend_always_inline bool compareOrdered(L left, R right) {
+    if constexpr (Inclusive) {
+        return left <= right;
+    } else {
+        return left < right;
+    }
+}
+
+template <CompareRelation Relation, typename L, typename R>
+static zend_always_inline bool compareRelation(L left, R right) {
+    if constexpr (compare_relation_is_reverse_v<Relation>) {
+        return compareOrdered<compare_relation_is_inclusive_v<Relation>>(right, left);
+    } else {
+        return compareOrdered<compare_relation_is_inclusive_v<Relation>>(left, right);
+    }
+}
+
 // Checked PHP integer arithmetic. GCC/Clang lower these builtins to a native
 // arithmetic instruction plus the overflow branch; the portable paths avoid
 // signed C++ overflow and are used by MSVC.
@@ -1426,69 +1459,61 @@ class Variant {
     bool operator<=(const Variant &v) const;
     bool operator>=(const Variant &v) const;
 
-    template <typename T, enable_if_integral_non_bool<T> = 0>
+  private:
+    template <detail::CompareRelation Relation>
+    bool comparePrimitiveFallback(const Variant &right) const {
+        if constexpr (Relation == detail::CompareRelation::Less) {
+            return operator<(right);
+        } else if constexpr (Relation == detail::CompareRelation::LessOrEqual) {
+            return operator<=(right);
+        } else if constexpr (Relation == detail::CompareRelation::Greater) {
+            return operator>(right);
+        } else {
+            return operator>=(right);
+        }
+    }
+
+    template <detail::CompareRelation Relation, typename T>
+    bool comparePrimitive(T raw) const {
+        const zval *left = unwrap_ptr();
+        const uint8_t left_type = Z_TYPE_P(left);
+        if constexpr (is_integral_non_bool_v<T>) {
+            const Int right = static_cast<Int>(raw);
+            if (EXPECTED(left_type == IS_LONG)) {
+                return detail::compareRelation<Relation>(Z_LVAL_P(left), right);
+            }
+            if (EXPECTED(left_type == IS_DOUBLE)) {
+                return detail::compareRelation<Relation>(Z_DVAL_P(left), static_cast<double>(right));
+            }
+            return comparePrimitiveFallback<Relation>(Variant(right));
+        } else {
+            const double right = static_cast<double>(raw);
+            if (EXPECTED(left_type == IS_DOUBLE)) {
+                return detail::compareRelation<Relation>(Z_DVAL_P(left), right);
+            }
+            if (EXPECTED(left_type == IS_LONG)) {
+                return detail::compareRelation<Relation>(static_cast<double>(Z_LVAL_P(left)), right);
+            }
+            return comparePrimitiveFallback<Relation>(Variant(right));
+        }
+    }
+
+  public:
+    template <typename T, enable_if_arithmetic_non_bool<T> = 0>
     bool operator<(T raw) const {
-        const zval *left = unwrap_ptr();
-        if (EXPECTED(Z_TYPE_P(left) == IS_LONG)) {
-            return Z_LVAL_P(left) < static_cast<Int>(raw);
-        }
-        return *this < Variant(raw);
+        return comparePrimitive<detail::CompareRelation::Less>(raw);
     }
-    template <typename T, enable_if_integral_non_bool<T> = 0>
+    template <typename T, enable_if_arithmetic_non_bool<T> = 0>
     bool operator>(T raw) const {
-        const zval *left = unwrap_ptr();
-        if (EXPECTED(Z_TYPE_P(left) == IS_LONG)) {
-            return Z_LVAL_P(left) > static_cast<Int>(raw);
-        }
-        return *this > Variant(raw);
+        return comparePrimitive<detail::CompareRelation::Greater>(raw);
     }
-    template <typename T, enable_if_integral_non_bool<T> = 0>
+    template <typename T, enable_if_arithmetic_non_bool<T> = 0>
     bool operator<=(T raw) const {
-        const zval *left = unwrap_ptr();
-        if (EXPECTED(Z_TYPE_P(left) == IS_LONG)) {
-            return Z_LVAL_P(left) <= static_cast<Int>(raw);
-        }
-        return *this <= Variant(raw);
+        return comparePrimitive<detail::CompareRelation::LessOrEqual>(raw);
     }
-    template <typename T, enable_if_integral_non_bool<T> = 0>
+    template <typename T, enable_if_arithmetic_non_bool<T> = 0>
     bool operator>=(T raw) const {
-        const zval *left = unwrap_ptr();
-        if (EXPECTED(Z_TYPE_P(left) == IS_LONG)) {
-            return Z_LVAL_P(left) >= static_cast<Int>(raw);
-        }
-        return *this >= Variant(raw);
-    }
-    template <typename T, enable_if_floating_point<T> = 0>
-    bool operator<(T raw) const {
-        const zval *left = unwrap_ptr();
-        if (EXPECTED(Z_TYPE_P(left) == IS_DOUBLE)) {
-            return Z_DVAL_P(left) < static_cast<double>(raw);
-        }
-        return *this < Variant(raw);
-    }
-    template <typename T, enable_if_floating_point<T> = 0>
-    bool operator>(T raw) const {
-        const zval *left = unwrap_ptr();
-        if (EXPECTED(Z_TYPE_P(left) == IS_DOUBLE)) {
-            return Z_DVAL_P(left) > static_cast<double>(raw);
-        }
-        return *this > Variant(raw);
-    }
-    template <typename T, enable_if_floating_point<T> = 0>
-    bool operator<=(T raw) const {
-        const zval *left = unwrap_ptr();
-        if (EXPECTED(Z_TYPE_P(left) == IS_DOUBLE)) {
-            return Z_DVAL_P(left) <= static_cast<double>(raw);
-        }
-        return *this <= Variant(raw);
-    }
-    template <typename T, enable_if_floating_point<T> = 0>
-    bool operator>=(T raw) const {
-        const zval *left = unwrap_ptr();
-        if (EXPECTED(Z_TYPE_P(left) == IS_DOUBLE)) {
-            return Z_DVAL_P(left) >= static_cast<double>(raw);
-        }
-        return *this >= Variant(raw);
+        return comparePrimitive<detail::CompareRelation::GreaterOrEqual>(raw);
     }
 
     bool equals(const Variant &v, bool strict = false) const;

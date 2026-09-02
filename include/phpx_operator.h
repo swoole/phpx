@@ -75,22 +75,22 @@ static inline Variant operator^(T a, const Variant &b) {
 
 template <typename T>
 static inline Variant operator<=(T a, const Variant &b) {
-    return Variant(a) <= b;
+    return Variant(b >= a);
 }
 
 template <typename T>
 static inline Variant operator<(T a, const Variant &b) {
-    return Variant(a) < b;
+    return Variant(b > a);
 }
 
 template <typename T>
 static inline Variant operator>=(T a, const Variant &b) {
-    return Variant(a) >= b;
+    return Variant(b <= a);
 }
 
 template <typename T>
 static inline Variant operator>(T a, const Variant &b) {
-    return Variant(a) > b;
+    return Variant(b < a);
 }
 
 template <typename T>
