@@ -465,6 +465,49 @@ TEST(operator_comparison, integral_fast_paths) {
     }
 }
 
+TEST(operator_comparison, mixed_type_fast_paths) {
+    {
+        Variant float_val(3.14);
+        Variant int_val(5);
+        ASSERT_TRUE(float_val < int_val);
+        ASSERT_FALSE(int_val < float_val);
+        ASSERT_TRUE(float_val <= int_val);
+        ASSERT_FALSE(int_val <= float_val);
+        ASSERT_FALSE(float_val > int_val);
+        ASSERT_TRUE(int_val > float_val);
+        ASSERT_FALSE(float_val >= int_val);
+        ASSERT_TRUE(int_val >= float_val);
+    }
+    {
+        Variant int_val(5);
+        Variant float_val(3.14);
+        ASSERT_FALSE(int_val < float_val);
+        ASSERT_TRUE(float_val < int_val);
+        ASSERT_FALSE(int_val <= float_val);
+        ASSERT_TRUE(float_val <= int_val);
+        ASSERT_TRUE(int_val > float_val);
+        ASSERT_FALSE(float_val > int_val);
+        ASSERT_TRUE(int_val >= float_val);
+        ASSERT_FALSE(float_val >= int_val);
+    }
+    {
+        Variant a(5.0);
+        Variant b(5.0);
+        ASSERT_FALSE(a < b);
+        ASSERT_TRUE(a <= b);
+        ASSERT_FALSE(a > b);
+        ASSERT_TRUE(a >= b);
+    }
+    {
+        Variant neg_float(-1.5);
+        Variant pos_int(1);
+        ASSERT_TRUE(neg_float < pos_int);
+        ASSERT_FALSE(pos_int < neg_float);
+        ASSERT_TRUE(neg_float <= pos_int);
+        ASSERT_FALSE(pos_int <= neg_float);
+    }
+}
+
 // Test mixed type operations
 TEST(operator_mixed_types, arithmetic_operations) {
     // Integer and floating point operations

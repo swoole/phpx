@@ -562,6 +562,15 @@ bool Variant::compareOp(binary_op_type op, const Variant &v) const {
         if (op == is_greater_function) return a > b;
         if (op == is_greater_or_equal_function) return a >= b;
     }
+    if ((Z_TYPE_P(left) == IS_LONG || Z_TYPE_P(left) == IS_DOUBLE)
+            && (Z_TYPE_P(right) == IS_LONG || Z_TYPE_P(right) == IS_DOUBLE)) {
+        const double a = (Z_TYPE_P(left) == IS_LONG) ? (double) Z_LVAL_P(left) : Z_DVAL_P(left);
+        const double b = (Z_TYPE_P(right) == IS_LONG) ? (double) Z_LVAL_P(right) : Z_DVAL_P(right);
+        if (op == is_smaller_function) return a < b;
+        if (op == is_smaller_or_equal_function) return a <= b;
+        if (op == is_greater_function) return a > b;
+        if (op == is_greater_or_equal_function) return a >= b;
+    }
     return compare_op(op, left, right);
 }
 
