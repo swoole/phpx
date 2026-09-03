@@ -153,6 +153,68 @@ TEST(operator_arithmetic, signed_overflow_detection_uses_signed_semantics) {
     ASSERT_TRUE((minimum - positive_one).isFloat());
 }
 
+TEST(operator_arithmetic, increment_decrement_overflow_to_float) {
+    // ++ on ZEND_LONG_MAX should overflow to double
+    Variant max_plus(ZEND_LONG_MAX);
+    ++max_plus;
+    ASSERT_TRUE(max_plus.isFloat());
+    ASSERT_DOUBLE_EQ(max_plus.toFloat(), static_cast<double>(ZEND_LONG_MAX) + 1.0);
+
+    // -- on ZEND_LONG_MIN should underflow to double
+    Variant min_minus(ZEND_LONG_MIN);
+    --min_minus;
+    ASSERT_TRUE(min_minus.isFloat());
+    ASSERT_DOUBLE_EQ(min_minus.toFloat(), static_cast<double>(ZEND_LONG_MIN) - 1.0);
+
+    // postfix ++ overflow
+    Variant max_post(ZEND_LONG_MAX);
+    Variant before = max_post++;
+    ASSERT_TRUE(before.isInt());
+    ASSERT_EQ(before.toInt(), ZEND_LONG_MAX);
+    ASSERT_TRUE(max_post.isFloat());
+    ASSERT_DOUBLE_EQ(max_post.toFloat(), static_cast<double>(ZEND_LONG_MAX) + 1.0);
+
+    // postfix -- underflow
+    Variant min_post(ZEND_LONG_MIN);
+    Variant before2 = min_post--;
+    ASSERT_TRUE(before2.isInt());
+    ASSERT_EQ(before2.toInt(), ZEND_LONG_MIN);
+    ASSERT_TRUE(min_post.isFloat());
+    ASSERT_DOUBLE_EQ(min_post.toFloat(), static_cast<double>(ZEND_LONG_MIN) - 1.0);
+}
+
+TEST(operator_arithmetic, increment_decrement_normal_paths) {
+    // IS_LONG normal increment
+    Variant a(41);
+    ++a;
+    ASSERT_TRUE(a.isInt());
+    ASSERT_EQ(a.toInt(), 42);
+
+    // IS_LONG normal decrement
+    Variant b(43);
+    --b;
+    ASSERT_TRUE(b.isInt());
+    ASSERT_EQ(b.toInt(), 42);
+
+    // IS_DOUBLE increment
+    Variant c(1.5);
+    ++c;
+    ASSERT_TRUE(c.isFloat());
+    ASSERT_DOUBLE_EQ(c.toFloat(), 2.5);
+
+    // IS_DOUBLE decrement
+    Variant d(3.5);
+    --d;
+    ASSERT_TRUE(d.isFloat());
+    ASSERT_DOUBLE_EQ(d.toFloat(), 2.5);
+
+    // chained increment
+    Variant e(10);
+    ++(++e);
+    ASSERT_TRUE(e.isInt());
+    ASSERT_EQ(e.toInt(), 12);
+}
+
 TEST(operator_arithmetic, inline_integral_fast_paths_preserve_dynamic_semantics) {
     Variant sum(10);
     sum += 5L;
