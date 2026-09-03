@@ -392,6 +392,28 @@ static inline php::Variant typephp_call_parent_clone(php::Object &object, zend_f
 }
 
 /**
+ * Read one dynamic dimension for TypePHP's null-coalescing assignment.
+ *
+ * ArrayAccess requires offsetExists() followed by offsetGet(), because an
+ * existing null value still selects the assignment branch. Arrays, strings,
+ * and unsupported scalar values retain PHPX's normal exists() behavior.
+ * Keeping this dispatch here prevents generated code from duplicating the
+ * ArrayAccess protocol without exposing Zend dimension-handler details.
+ */
+static inline bool typephp_coalesce_dimension_read(const php::Variant &container,
+                                                   const php::Variant &key,
+                                                   php::Variant &result) {
+    if (container.isObject()) {
+        if (!container.offsetExists(key)) {
+            return false;
+        }
+        result = container.offsetGet(key);
+        return !result.isNull();
+    }
+    return php::exists(container, {{php::ArrayDimFetch, key}}, result);
+}
+
+/**
  * Custom unset_property handler that resets typed properties to their
  * type-appropriate default values instead of making them uninitialized.
  * Only simple scalar/array types (int, float, bool, string, array) and
