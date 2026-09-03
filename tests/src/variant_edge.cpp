@@ -49,6 +49,21 @@ TEST(variant_edge, offsetSet_object) {
     ASSERT_EQ(o.offsetGet("key2").toInt(), 100);
 }
 
+TEST(variant_edge, offsetSet_rejects_unsupported_scalars) {
+    constexpr const char *error = "Only array/object/string support the offsetSet() method";
+
+    var false_value(false);
+    try_call([&false_value]() { false_value.offsetSet("key", 1); }, error);
+    var true_value(true);
+    try_call([&true_value]() { true_value.offsetSet("key", 1); }, error);
+    var int_value(1);
+    try_call([&int_value]() { int_value.offsetSet(0, 1); }, error);
+    var float_value(1.5);
+    try_call([&float_value]() { float_value.offsetSet("key", 1); }, error);
+    var resource_value = php::fopen("/tmp/phpx-offset-set", "w+");
+    try_call([&resource_value]() { resource_value.offsetSet("key", 1); }, error);
+}
+
 // Test offsetUnset on object
 TEST(variant_edge, offsetUnset_object) {
     auto o = newObject("ArrayObject");

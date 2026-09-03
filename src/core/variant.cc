@@ -398,6 +398,8 @@ void Variant::offsetSet(zend_long offset, const Variant &value) {
     } else if (zval_is_string(zvar)) {
         String tmp(zvar, Ctor::Indirect);
         tmp.offsetSet(offset, value);
+    } else {
+        throwError("Only array/object/string support the offsetSet() method, type `%s` given", typeStr());
     }
 }
 
@@ -420,6 +422,8 @@ void Variant::offsetSet(const Variant &key, const Variant &value) {
         }
         String tmp(zvar, Ctor::Indirect);
         tmp.offsetSet(key.toInt(), value);
+    } else {
+        throwError("Only array/object/string support the offsetSet() method, type `%s` given", typeStr());
     }
 }
 
