@@ -71,4 +71,5 @@ bin/phpx
 /test_output.xml
 /test_results.xml
 /wasm/wasm32-wasip2/
+/full-static/sdk
 /phpx.sln
