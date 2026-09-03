@@ -1498,6 +1498,31 @@ class Variant {
         }
     }
 
+    template <typename T, enable_if_arithmetic_non_bool<T> = 0>
+    bool equalsPrimitive(T raw, bool strict) const {
+        const zval *left = unwrap_ptr();
+        const uint8_t left_type = Z_TYPE_P(left);
+        if constexpr (is_integral_non_bool_v<T>) {
+            const Int right = static_cast<Int>(raw);
+            if (EXPECTED(left_type == IS_LONG)) {
+                return Z_LVAL_P(left) == right;
+            }
+            if (EXPECTED(left_type == IS_DOUBLE)) {
+                return Z_DVAL_P(left) == static_cast<double>(right);
+            }
+            return equals(Variant(right), strict);
+        } else {
+            const double right = static_cast<double>(raw);
+            if (EXPECTED(left_type == IS_DOUBLE)) {
+                return Z_DVAL_P(left) == right;
+            }
+            if (EXPECTED(left_type == IS_LONG)) {
+                return static_cast<double>(Z_LVAL_P(left)) == right;
+            }
+            return equals(Variant(right), strict);
+        }
+    }
+
   public:
     template <typename T, enable_if_arithmetic_non_bool<T> = 0>
     bool operator<(T raw) const {
@@ -1514,6 +1539,14 @@ class Variant {
     template <typename T, enable_if_arithmetic_non_bool<T> = 0>
     bool operator>=(T raw) const {
         return comparePrimitive<detail::CompareRelation::GreaterOrEqual>(raw);
+    }
+    template <typename T, enable_if_arithmetic_non_bool<T> = 0>
+    bool operator==(T raw) const {
+        return equalsPrimitive(raw, false);
+    }
+    template <typename T, enable_if_arithmetic_non_bool<T> = 0>
+    bool operator!=(T raw) const {
+        return !equalsPrimitive(raw, false);
     }
 
     bool equals(const Variant &v, bool strict = false) const;

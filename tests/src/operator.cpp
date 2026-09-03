@@ -849,3 +849,89 @@ TEST(operator_precedence, precedence_and_associativity) {
         ASSERT_EQ(result2.toInt(), 5);
     }
 }
+
+TEST(operator_comparison, equality_fast_paths) {
+    // IS_LONG × IS_LONG
+    {
+        Variant a(42);
+        Variant b(42);
+        Variant c(43);
+        EXPECT_TRUE(a == b);
+        EXPECT_FALSE(a == c);
+        EXPECT_FALSE(a != b);
+        EXPECT_TRUE(a != c);
+    }
+
+    // IS_DOUBLE × IS_DOUBLE
+    {
+        Variant a(3.14);
+        Variant b(3.14);
+        Variant c(2.71);
+        EXPECT_TRUE(a == b);
+        EXPECT_FALSE(a == c);
+        EXPECT_FALSE(a != b);
+        EXPECT_TRUE(a != c);
+    }
+
+    // Mixed IS_LONG × IS_DOUBLE
+    {
+        Variant a(2);
+        Variant b(2.0);
+        Variant c(2.1);
+        EXPECT_TRUE(a == b);
+        EXPECT_FALSE(a == c);
+        EXPECT_FALSE(a != b);
+        EXPECT_TRUE(a != c);
+    }
+
+    // Primitive type overloads: Variant == int
+    {
+        Variant a(42);
+        EXPECT_TRUE(a == 42);
+        EXPECT_FALSE(a == 43);
+        EXPECT_FALSE(a != 42);
+        EXPECT_TRUE(a != 43);
+    }
+
+    // Primitive type overloads: Variant == float
+    {
+        Variant a(3.14);
+        EXPECT_TRUE(a == 3.14);
+        EXPECT_FALSE(a == 2.71);
+        EXPECT_FALSE(a != 3.14);
+        EXPECT_TRUE(a != 2.71);
+    }
+
+    // Reverse: primitive == Variant (int == Variant)
+    {
+        Variant a(42);
+        EXPECT_TRUE(42 == a);
+        EXPECT_FALSE(43 == a);
+    }
+
+    // Reverse: primitive == Variant (float == Variant)
+    {
+        Variant a(3.14);
+        EXPECT_TRUE(3.14 == a);
+        EXPECT_FALSE(2.71 == a);
+    }
+
+    // String fallback
+    {
+        Variant a("hello");
+        Variant b("hello");
+        Variant c("world");
+        EXPECT_TRUE(a == b);
+        EXPECT_FALSE(a == c);
+        EXPECT_TRUE(a != c);
+    }
+
+    // php::equals free function
+    {
+        Variant a(42);
+        Variant b(42);
+        Variant c(43);
+        EXPECT_TRUE(php::equals(a, b));
+        EXPECT_FALSE(php::equals(a, c));
+    }
+}

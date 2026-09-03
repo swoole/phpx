@@ -890,7 +890,7 @@ Variant eval(const String &script, const char *filename) {
 }
 
 bool equals(const Variant &a, const Variant &b) {
-    return compare(a, b) == 0;
+    return a.equals(b);
 }
 
 bool same(const Variant &a, const Variant &b) {

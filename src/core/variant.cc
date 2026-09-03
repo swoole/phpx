@@ -575,12 +575,37 @@ static bool compare_fast_impl(const Variant &a, const Variant &b) {
     }
 }
 
-bool Variant::equals(const Variant &v, bool strict) const {
-    if (strict) {
-        return compare_op(is_identical_function, const_ptr(), v.const_ptr());
-    } else {
-        return compare_op(is_equal_function, const_ptr(), v.const_ptr());
+// Fast path for == and ===: skip Zend API when both operands are IS_LONG or IS_DOUBLE.
+static bool equals_fast_impl(const Variant &a, const Variant &b, bool strict) {
+    const zval *left = a.const_ptr();
+    const zval *right = b.const_ptr();
+    const uint8_t left_type = Z_TYPE_P(left);
+    const uint8_t right_type = Z_TYPE_P(right);
+
+    if (EXPECTED(left_type == IS_LONG)) {
+        if (EXPECTED(right_type == IS_LONG)) {
+            return Z_LVAL_P(left) == Z_LVAL_P(right);
+        }
+        if (EXPECTED(right_type == IS_DOUBLE)) {
+            return static_cast<double>(Z_LVAL_P(left)) == Z_DVAL_P(right);
+        }
+    } else if (EXPECTED(left_type == IS_DOUBLE)) {
+        if (EXPECTED(right_type == IS_DOUBLE)) {
+            return Z_DVAL_P(left) == Z_DVAL_P(right);
+        }
+        if (EXPECTED(right_type == IS_LONG)) {
+            return Z_DVAL_P(left) == static_cast<double>(Z_LVAL_P(right));
+        }
     }
+
+    if (strict) {
+        return compare_op(is_identical_function, left, right);
+    }
+    return compare_op(is_equal_function, left, right);
+}
+
+bool Variant::equals(const Variant &v, bool strict) const {
+    return equals_fast_impl(*this, v, strict);
 }
 
 Variant Variant::serialize() {
