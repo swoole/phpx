@@ -100,3 +100,305 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.info
           fail_ci_if_error: true
+
+  macos:
+    name: macOS ARM64 / PHP ${{ matrix.php }} ZTS
+    runs-on: macos-15
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ 8.4, 8.5 ]
+    env:
+      CC: clang
+      CXX: clang++
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "${{ matrix.php }}"
+          coverage: none
+        env:
+          fail-fast: true
+          phpts: ts
+          update: true
+
+      - name: Install build dependencies
+        run: brew install cmake gmp mpfr pkg-config
+
+      - name: Verify PHP and toolchain
+        run: |
+          php -v
+          php-config --version
+          php-config --configure-options
+          clang++ --version
+          sw_vers
+
+          php -r 'if (!PHP_ZTS) { fwrite(STDERR, "Expected a ZTS PHP build\n"); exit(1); }'
+          case "$(php -r 'echo PHP_VERSION;')" in
+            "${{ matrix.php }}"*) ;;
+            *) echo "setup-php installed an unexpected PHP version" >&2; exit 1 ;;
+          esac
+          case "$(uname -m)" in
+            arm64|aarch64) ;;
+            *) echo "Expected an ARM64 runner, got $(uname -m)" >&2; exit 1 ;;
+          esac
+
+          php_home="$(php-config --prefix)"
+          test -x "${php_home}/bin/php-config"
+          test -f "${php_home}/lib/libphp.dylib"
+          echo "PHP_HOME=${php_home}" >> "${GITHUB_ENV}"
+          echo "DYLD_LIBRARY_PATH=${GITHUB_WORKSPACE}/lib:${php_home}/lib" >> "${GITHUB_ENV}"
+
+      - name: Build PHPX
+        run: |
+          cmake -S . -B build-platform \
+            -D CMAKE_BUILD_TYPE=Release \
+            -D BUILD_TESTS=OFF \
+            -D BUILD_EXT=OFF \
+            -D GITHUB_ACTION=ON \
+            -D ENABLE_FACADE_API=ON \
+            -D php_dir="${PHP_HOME}"
+          cmake --build build-platform --target phpx --parallel 2
+
+      - name: Verify build output
+        run: |
+          test -f lib/libphpx.dylib
+          file lib/libphpx.dylib
+          file lib/libphpx.dylib | grep -Eiq 'arm64|aarch64'
+          otool -L lib/libphpx.dylib
+
+  windows:
+    name: Windows x64 / PHP ${{ matrix.php }} ZTS
+    runs-on: windows-2022
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ 8.4, 8.5 ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "${{ matrix.php }}"
+          coverage: none
+        env:
+          fail-fast: true
+          phpts: ts
+          update: true
+
+      - name: Resolve PHP build environment
+        id: php-build-env
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          php -v
+          php --ini
+          $phpVersion = php -r 'echo PHP_VERSION;'
+          if (-not $phpVersion.StartsWith('${{ matrix.php }}.')) {
+              throw "setup-php installed PHP $phpVersion, expected ${{ matrix.php }}.x"
+          }
+          if ((php -r 'echo PHP_ZTS ? "zts" : "nts";') -ne 'zts') {
+              throw 'setup-php installed NTS PHP, expected ZTS'
+          }
+
+          $phpHome = Split-Path -Parent (Get-Command php).Source
+          $archiveName = "php-devel-pack-$phpVersion-Win32-vs17-x64.zip"
+          $archive = Join-Path $env:RUNNER_TEMP $archiveName
+
+          "PHP_VERSION=$phpVersion" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PHP_HOME=$phpHome" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "PHP_DEVEL_ARCHIVE=$archive" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "version=$phpVersion" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "archive=$archive" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Cache PHP development package
+        id: cache-php-devel
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.php-build-env.outputs.archive }}
+          key: windows-2022-php-devel-${{ steps.php-build-env.outputs.version }}-zts-vs17-x64
+
+      - name: Install matching PHP development SDK
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $archive = $env:PHP_DEVEL_ARCHIVE
+          $archiveName = Split-Path -Leaf $archive
+          if (-not (Test-Path $archive)) {
+              $downloaded = $false
+              foreach ($baseUrl in @(
+                  'https://downloads.php.net/~windows/releases',
+                  'https://downloads.php.net/~windows/releases/archives'
+              )) {
+                  try {
+                      Invoke-WebRequest -Uri "$baseUrl/$archiveName" -OutFile $archive
+                      $downloaded = $true
+                      break
+                  } catch {
+                      Remove-Item $archive -Force -ErrorAction SilentlyContinue
+                  }
+              }
+              if (-not $downloaded) {
+                  throw "Unable to download the PHP $env:PHP_VERSION ZTS development pack"
+              }
+          }
+
+          $extractDir = Join-Path $env:RUNNER_TEMP "php-devel-$env:PHP_VERSION"
+          Expand-Archive -Path $archive -DestinationPath $extractDir -Force
+          $sdkSource = Get-ChildItem $extractDir -Directory |
+              Where-Object { Test-Path (Join-Path $_.FullName 'include\main\php.h') } |
+              Select-Object -First 1
+          if ($null -eq $sdkSource) {
+              throw "The PHP development archive has an unexpected layout: $archiveName"
+          }
+
+          $sdkInclude = Join-Path $env:PHP_HOME 'SDK\include'
+          $sdkLib = Join-Path $env:PHP_HOME 'SDK\lib'
+          New-Item $sdkInclude, $sdkLib -ItemType Directory -Force | Out-Null
+          Copy-Item (Join-Path $sdkSource.FullName 'include\*') $sdkInclude -Recurse -Force
+          Copy-Item (Join-Path $sdkSource.FullName 'lib\*') $sdkLib -Force
+
+          foreach ($required in @(
+              (Join-Path $sdkInclude 'main\php.h'),
+              (Join-Path $sdkLib 'php8ts.lib'),
+              (Join-Path $env:PHP_HOME 'php8ts.dll')
+          )) {
+              if (-not (Test-Path $required)) {
+                  throw "Required PHP SDK file is missing: $required"
+              }
+          }
+
+      - name: Configure MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Cache GMP and MPFR
+        id: cache-gmp-mpfr
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}\phpx-cache\vcpkg-x64-windows
+          key: windows-2022-msvc-vcpkg-gmp-mpfr-x64-v1
+
+      - name: Install GMP and MPFR
+        if: steps.cache-gmp-mpfr.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $triplet = 'x64-windows'
+          $vcpkg = Join-Path $env:VCPKG_INSTALLATION_ROOT 'vcpkg.exe'
+          & $vcpkg install "gmp:$triplet" "mpfr:$triplet"
+          if ($LASTEXITCODE -ne 0) {
+              throw "vcpkg failed with exit code $LASTEXITCODE"
+          }
+
+          $installed = Join-Path $env:VCPKG_INSTALLATION_ROOT "installed\$triplet"
+          $cache = Join-Path $env:RUNNER_TEMP 'phpx-cache\vcpkg-x64-windows'
+          New-Item "$cache\include", "$cache\lib", "$cache\bin" -ItemType Directory -Force |
+              Out-Null
+          Copy-Item (Join-Path $installed 'include\*') "$cache\include" -Recurse -Force
+          foreach ($library in @('gmp.lib', 'gmpxx.lib', 'mpfr.lib')) {
+              Copy-Item (Join-Path $installed "lib\$library") "$cache\lib" -Force
+          }
+          Copy-Item (Join-Path $installed 'bin\*.dll') "$cache\bin" -Force
+
+      - name: Stage GMP and MPFR
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $cache = Join-Path $env:RUNNER_TEMP 'phpx-cache\vcpkg-x64-windows'
+          $sdkInclude = Join-Path $env:PHP_HOME 'SDK\include'
+          $sdkLib = Join-Path $env:PHP_HOME 'SDK\lib'
+          Copy-Item "$cache\include\*" $sdkInclude -Recurse -Force
+          Copy-Item "$cache\lib\*.lib" $sdkLib -Force
+          Copy-Item "$cache\bin\*.dll" $env:PHP_HOME -Force
+
+      - name: Cache mpdecimal
+        id: cache-mpdecimal
+        uses: actions/cache@v4
+        with:
+          path: thirdparty\mpdecimal\vcbuild\dist64
+          key: windows-2022-msvc-mpdecimal-x64-${{ hashFiles('thirdparty/mpdecimal/**') }}
+
+      - name: Build mpdecimal
+        if: steps.cache-mpdecimal.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          Push-Location thirdparty\mpdecimal\vcbuild
+          try {
+              & cmd.exe /d /s /c vcbuild64.bat
+              if ($LASTEXITCODE -ne 0) {
+                  throw "mpdecimal build failed with exit code $LASTEXITCODE"
+              }
+          } finally {
+              Pop-Location
+          }
+
+      - name: Stage mpdecimal
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $dist = Join-Path $env:GITHUB_WORKSPACE 'thirdparty\mpdecimal\vcbuild\dist64'
+          $sdkInclude = Join-Path $env:PHP_HOME 'SDK\include'
+          $sdkLib = Join-Path $env:PHP_HOME 'SDK\lib'
+          Copy-Item (Join-Path $dist '*.lib') $sdkLib -Force
+          Copy-Item (Join-Path $dist '*.dll') $sdkLib -Force
+          Copy-Item (Join-Path $dist '*.dll') $env:PHP_HOME -Force
+          Copy-Item (Join-Path $dist 'mpdecimal.h') $sdkInclude -Force
+          Copy-Item (Join-Path $dist 'decimal.hh') $sdkInclude -Force
+
+      # The Google Test executable currently uses POSIX-only process APIs
+      # (fork, pipe and waitpid), so Windows validates the production library
+      # build while those unsupported tests remain disabled.
+      - name: Build PHPX
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $sdkLib = Join-Path $env:PHP_HOME 'SDK\lib'
+          cmake -S . -B build-platform -G Ninja `
+              -D CMAKE_BUILD_TYPE=Release `
+              -D BUILD_TESTS=OFF `
+              -D BUILD_EXT=OFF `
+              -D GITHUB_ACTION=ON `
+              -D ENABLE_FACADE_API=ON `
+              -D MPDECIMAL_LIBRARY="$sdkLib\libmpdec-4.0.1.dll.lib" `
+              -D MPDECIMALXX_LIBRARY="$sdkLib\libmpdec++-4.0.1.dll.lib"
+          if ($LASTEXITCODE -ne 0) {
+              throw "PHPX configuration failed with exit code $LASTEXITCODE"
+          }
+
+          cmake --build build-platform --target phpx --parallel 2
+          if ($LASTEXITCODE -ne 0) {
+              throw "PHPX build failed with exit code $LASTEXITCODE"
+          }
+
+      - name: Verify build output
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          foreach ($required in @(
+              (Join-Path $env:GITHUB_WORKSPACE 'lib\phpx.lib'),
+              (Join-Path $env:GITHUB_WORKSPACE 'build-platform\phpx.dll')
+          )) {
+              if (-not (Test-Path $required)) {
+                  throw "Required PHPX build output is missing: $required"
+              }
+          }
+          dumpbin /headers build-platform\phpx.dll | Select-String 'machine \(x64\)'
+          dumpbin /dependents build-platform\phpx.dll
