@@ -29,6 +29,28 @@
 
 using typephp_attribute_value_factory = php::Var (*)(php::Bool describe);
 
+/** Direct trait-use metadata emitted for one TypePHP class or trait. */
+struct typephp_trait_metadata_entry {
+    std::string_view name;
+    const std::string_view *traits;
+    size_t trait_count;
+    bool is_trait;
+};
+
+/**
+ * Register immutable TypePHP trait-use metadata for one extension module.
+ *
+ * TypePHP traits remain compile-time AST templates and deliberately have no
+ * zend_class_entry. This side table lets SPL class_uses() recover their direct
+ * trait list without exposing incomplete runtime trait classes.
+ */
+PHPX_API zend_result typephp_register_trait_metadata(int module_number,
+                                                     const typephp_trait_metadata_entry *entries,
+                                                     size_t entry_count) noexcept;
+
+/** Remove every trait metadata entry owned by an extension module. */
+PHPX_API void typephp_unregister_trait_metadata(int module_number) noexcept;
+
 /** Mark one persistent attribute argument for request-time value materialization. */
 PHPX_API void typephp_attribute_set_lazy_value_argument(zend_attribute *attribute,
                                                         uint32_t argument_index,
