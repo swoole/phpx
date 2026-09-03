@@ -38,35 +38,35 @@ foreach(required_file
     endif()
 endforeach()
 
-# ---- wren_gc ----
-add_library(wren_gc STATIC "${PHPX_ROOT}/thirdparty/wren-gc/src/wren_gc.c")
-target_include_directories(wren_gc PUBLIC "${PHPX_ROOT}/thirdparty/wren-gc/include")
-set_target_properties(wren_gc PROPERTIES
+# ---- wren_gc（OBJECT library，对象最终并入 phpx）----
+add_library(wren_gc_obj OBJECT "${PHPX_ROOT}/thirdparty/wren-gc/src/wren_gc.c")
+target_include_directories(wren_gc_obj PUBLIC "${PHPX_ROOT}/thirdparty/wren-gc/include")
+set_target_properties(wren_gc_obj PROPERTIES
     C_STANDARD 11
     C_STANDARD_REQUIRED ON
     POSITION_INDEPENDENT_CODE ON
 )
 
-# ---- mpdecimal（bundled，mpdecimal.h 已随仓库提供）----
+# ---- mpdecimal（OBJECT library，对象最终并入 phpx）----
 set(MPDECIMAL_DIR "${PHPX_ROOT}/thirdparty/mpdecimal")
 file(GLOB MPDEC_C_SOURCES "${MPDECIMAL_DIR}/libmpdec/*.c")
 list(FILTER MPDEC_C_SOURCES EXCLUDE REGEX "bench")
 
-add_library(mpdecimal STATIC
+add_library(mpdecimal_obj OBJECT
     ${MPDEC_C_SOURCES}
     "${MPDECIMAL_DIR}/libmpdec++/decimal.cc"
 )
-target_include_directories(mpdecimal PUBLIC
+target_include_directories(mpdecimal_obj PUBLIC
     "${MPDECIMAL_DIR}/libmpdec"
     "${MPDECIMAL_DIR}/libmpdec++"
 )
-target_compile_definitions(mpdecimal PRIVATE CONFIG_64 ANSI HAVE_UINT128_T)
-set_target_properties(mpdecimal PROPERTIES
+target_compile_definitions(mpdecimal_obj PRIVATE CONFIG_64 ANSI HAVE_UINT128_T)
+set_target_properties(mpdecimal_obj PROPERTIES
     C_STANDARD 99
     C_STANDARD_REQUIRED ON
     POSITION_INDEPENDENT_CODE ON
 )
-target_compile_options(mpdecimal PRIVATE -fPIC)
+target_compile_options(mpdecimal_obj PRIVATE -fPIC)
 
 # ---- phpx：core + std + typephp ----
 file(GLOB PHPX_CORE_SOURCES "${PHPX_ROOT}/src/core/*.cc")
@@ -77,6 +77,8 @@ add_library(phpx STATIC
     ${PHPX_CORE_SOURCES}
     ${PHPX_STD_SOURCES}
     ${PHPX_TYPEPHP_SOURCES}
+    $<TARGET_OBJECTS:mpdecimal_obj>
+    $<TARGET_OBJECTS:wren_gc_obj>
 )
 set_target_properties(phpx PROPERTIES
     OUTPUT_NAME phpx
@@ -96,12 +98,15 @@ target_include_directories(phpx PRIVATE
     "${PHPX_PHP_INCLUDE_DIR}/ext/date/lib"
     "${PHPX_GMP_INCLUDE_DIR}"
     "${PHPX_MPFR_INCLUDE_DIR}"
+    "${MPDECIMAL_DIR}/libmpdec"
+    "${MPDECIMAL_DIR}/libmpdec++"
+    "${PHPX_ROOT}/thirdparty/wren-gc/include"
 )
 target_compile_options(phpx PRIVATE -fPIC)
 
-# gmp/gmpxx/mpfr 符号由最终链接的自包含 libphp.a 提供，用 PRIVATE 不传播
+# gmp/gmpxx/mpfr 符号由最终链接的自包含 libphp.a 提供，用 PRIVATE 不传播；
+# mpdecimal / wren_gc 已通过 OBJECT 并入本库，无需再作为依赖链接。
 target_link_directories(phpx PRIVATE "${PHPX_GMP_LIB_DIR}" "${PHPX_MPFR_LIB_DIR}")
 target_link_libraries(phpx PRIVATE gmp gmpxx mpfr)
-target_link_libraries(phpx PUBLIC mpdecimal wren_gc)
 
-install(TARGETS phpx mpdecimal wren_gc ARCHIVE DESTINATION lib)
+install(TARGETS phpx ARCHIVE DESTINATION lib)
