@@ -944,6 +944,12 @@ TEST(operator_comparison, equality_fast_paths) {
         EXPECT_FALSE(a == c);
         EXPECT_FALSE(a != b);
         EXPECT_TRUE(a != c);
+
+        // Loose equality allows mixed numeric types, but strict equality does not.
+        EXPECT_FALSE(a.same(b));
+        EXPECT_FALSE(b.same(a));
+        EXPECT_TRUE(a.same(Variant(2)));
+        EXPECT_TRUE(b.same(Variant(2.0)));
     }
 
     // Primitive type overloads: Variant == int
@@ -969,6 +975,8 @@ TEST(operator_comparison, equality_fast_paths) {
         Variant a(42);
         EXPECT_TRUE(42 == a);
         EXPECT_FALSE(43 == a);
+        EXPECT_FALSE(42 != a);
+        EXPECT_TRUE(43 != a);
     }
 
     // Reverse: primitive == Variant (float == Variant)
@@ -976,6 +984,8 @@ TEST(operator_comparison, equality_fast_paths) {
         Variant a(3.14);
         EXPECT_TRUE(3.14 == a);
         EXPECT_FALSE(2.71 == a);
+        EXPECT_FALSE(3.14 != a);
+        EXPECT_TRUE(2.71 != a);
     }
 
     // String fallback
@@ -995,5 +1005,17 @@ TEST(operator_comparison, equality_fast_paths) {
         Variant c(43);
         EXPECT_TRUE(php::equals(a, b));
         EXPECT_FALSE(php::equals(a, c));
+    }
+
+    // References are transparent to both loose and strict comparison.
+    {
+        Variant value(42);
+        Reference reference = value.toReference();
+        Variant same_int(42);
+        Variant same_float(42.0);
+        EXPECT_TRUE(reference == same_int);
+        EXPECT_TRUE(reference.same(same_int));
+        EXPECT_TRUE(reference == same_float);
+        EXPECT_FALSE(reference.same(same_float));
     }
 }

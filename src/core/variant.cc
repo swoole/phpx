@@ -575,10 +575,12 @@ static bool compare_fast_impl(const Variant &a, const Variant &b) {
     }
 }
 
-// Fast path for == and ===: skip Zend API when both operands are IS_LONG or IS_DOUBLE.
+// Fast path for == and ===: skip Zend API when both operands are numeric.
+// Strict comparison must not use the mixed int/float paths because PHP requires
+// identical zval types for ===.
 static bool equals_fast_impl(const Variant &a, const Variant &b, bool strict) {
-    const zval *left = a.const_ptr();
-    const zval *right = b.const_ptr();
+    const zval *left = a.unwrap_ptr();
+    const zval *right = b.unwrap_ptr();
     const uint8_t left_type = Z_TYPE_P(left);
     const uint8_t right_type = Z_TYPE_P(right);
 
@@ -587,14 +589,14 @@ static bool equals_fast_impl(const Variant &a, const Variant &b, bool strict) {
             return Z_LVAL_P(left) == Z_LVAL_P(right);
         }
         if (EXPECTED(right_type == IS_DOUBLE)) {
-            return static_cast<double>(Z_LVAL_P(left)) == Z_DVAL_P(right);
+            return !strict && static_cast<double>(Z_LVAL_P(left)) == Z_DVAL_P(right);
         }
     } else if (EXPECTED(left_type == IS_DOUBLE)) {
         if (EXPECTED(right_type == IS_DOUBLE)) {
             return Z_DVAL_P(left) == Z_DVAL_P(right);
         }
         if (EXPECTED(right_type == IS_LONG)) {
-            return Z_DVAL_P(left) == static_cast<double>(Z_LVAL_P(right));
+            return !strict && Z_DVAL_P(left) == static_cast<double>(Z_LVAL_P(right));
         }
     }
 
