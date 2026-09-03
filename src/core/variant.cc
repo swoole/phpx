@@ -575,12 +575,37 @@ static bool compare_fast_impl(const Variant &a, const Variant &b) {
     }
 }
 
-bool Variant::equals(const Variant &v, bool strict) const {
-    if (strict) {
-        return compare_op(is_identical_function, const_ptr(), v.const_ptr());
-    } else {
-        return compare_op(is_equal_function, const_ptr(), v.const_ptr());
+// Fast path for == and ===: skip Zend API when both operands are IS_LONG or IS_DOUBLE.
+static bool equals_fast_impl(const Variant &a, const Variant &b, bool strict) {
+    const zval *left = a.const_ptr();
+    const zval *right = b.const_ptr();
+    const uint8_t left_type = Z_TYPE_P(left);
+    const uint8_t right_type = Z_TYPE_P(right);
+
+    if (EXPECTED(left_type == IS_LONG)) {
+        if (EXPECTED(right_type == IS_LONG)) {
+            return Z_LVAL_P(left) == Z_LVAL_P(right);
+        }
+        if (EXPECTED(right_type == IS_DOUBLE)) {
+            return static_cast<double>(Z_LVAL_P(left)) == Z_DVAL_P(right);
+        }
+    } else if (EXPECTED(left_type == IS_DOUBLE)) {
+        if (EXPECTED(right_type == IS_DOUBLE)) {
+            return Z_DVAL_P(left) == Z_DVAL_P(right);
+        }
+        if (EXPECTED(right_type == IS_LONG)) {
+            return Z_DVAL_P(left) == static_cast<double>(Z_LVAL_P(right));
+        }
     }
+
+    if (strict) {
+        return compare_op(is_identical_function, left, right);
+    }
+    return compare_op(is_equal_function, left, right);
+}
+
+bool Variant::equals(const Variant &v, bool strict) const {
+    return equals_fast_impl(*this, v, strict);
 }
 
 Variant Variant::serialize() {
@@ -606,28 +631,56 @@ Variant Variant::serialize() {
 }
 
 Variant &Variant::operator++() {
-    increment_function(unwrap_ptr());
+    zval *p = unwrap_ptr();
+    if (EXPECTED(Z_TYPE_P(p) == IS_LONG)) {
+        const zend_long val = Z_LVAL_P(p);
+        zend_long result;
+        if (UNEXPECTED(detail::intAddOverflow(val, 1, &result))) {
+            ZVAL_DOUBLE(p, static_cast<double>(val) + 1.0);
+        } else {
+            ZVAL_LONG(p, result);
+        }
+        return *this;
+    }
+    if (EXPECTED(Z_TYPE_P(p) == IS_DOUBLE)) {
+        Z_DVAL_P(p) += 1.0;
+        return *this;
+    }
+    increment_function(p);
     throwErrorIfOccurred();
     return *this;
 }
 
 Variant &Variant::operator--() {
-    decrement_function(unwrap_ptr());
+    zval *p = unwrap_ptr();
+    if (EXPECTED(Z_TYPE_P(p) == IS_LONG)) {
+        const zend_long val = Z_LVAL_P(p);
+        zend_long result;
+        if (UNEXPECTED(detail::intSubOverflow(val, 1, &result))) {
+            ZVAL_DOUBLE(p, static_cast<double>(val) - 1.0);
+        } else {
+            ZVAL_LONG(p, result);
+        }
+        return *this;
+    }
+    if (EXPECTED(Z_TYPE_P(p) == IS_DOUBLE)) {
+        Z_DVAL_P(p) -= 1.0;
+        return *this;
+    }
+    decrement_function(p);
     throwErrorIfOccurred();
     return *this;
 }
 
 Variant Variant::operator++(int) {
     auto original = *this;
-    increment_function(unwrap_ptr());
-    throwErrorIfOccurred();
+    ++(*this);
     return original;
 }
 
 Variant Variant::operator--(int) {
     auto original = *this;
-    decrement_function(unwrap_ptr());
-    throwErrorIfOccurred();
+    --(*this);
     return original;
 }
 
