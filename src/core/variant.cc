@@ -382,6 +382,190 @@ bool Variant::offsetExists(const Variant &key) const {
     }
 }
 
+namespace {
+const zval *dimension_value(const Variant &value) {
+    const zval *zv = value.direct_ptr();
+    while (Z_TYPE_P(zv) == IS_INDIRECT || Z_TYPE_P(zv) == IS_REFERENCE) {
+        zv = Z_TYPE_P(zv) == IS_INDIRECT ? Z_INDIRECT_P(zv) : Z_REFVAL_P(zv);
+    }
+    return zv;
+}
+
+zval *dimension_array_slot(zval *array, const zval *key) {
+    zend_ulong index;
+
+    switch (Z_TYPE_P(key)) {
+    case IS_LONG:
+        return zend_hash_index_lookup(Z_ARRVAL_P(array), Z_LVAL_P(key));
+    case IS_STRING:
+        if (ZEND_HANDLE_NUMERIC(Z_STR_P(key), index)) {
+            return zend_hash_index_lookup(Z_ARRVAL_P(array), index);
+        }
+        return zend_hash_lookup(Z_ARRVAL_P(array), Z_STR_P(key));
+    case IS_NULL:
+        zend_error(E_DEPRECATED, "Using null as an array offset is deprecated, use an empty string instead");
+        throwErrorIfOccurred();
+        return zend_hash_lookup(Z_ARRVAL_P(array), ZSTR_EMPTY_ALLOC());
+    case IS_DOUBLE:
+        index = zend_dval_to_lval_safe(Z_DVAL_P(key));
+        throwErrorIfOccurred();
+        return zend_hash_index_lookup(Z_ARRVAL_P(array), index);
+    case IS_RESOURCE:
+        zend_use_resource_as_offset(key);
+        throwErrorIfOccurred();
+        return zend_hash_index_lookup(Z_ARRVAL_P(array), Z_RES_HANDLE_P(key));
+    case IS_FALSE:
+        return zend_hash_index_lookup(Z_ARRVAL_P(array), 0);
+    case IS_TRUE:
+        return zend_hash_index_lookup(Z_ARRVAL_P(array), 1);
+    default:
+        zend_type_error("Illegal offset type");
+        throwErrorIfOccurred();
+        return nullptr;
+    }
+}
+
+Variant assign_array_dimension(zval *target, const zval *dimension, const zval *assigned) {
+    SEPARATE_ARRAY(target);
+    zval *slot = dimension_array_slot(target, dimension);
+    if (slot == nullptr) {
+        return nullptr;
+    }
+    zend_execute_data *execute_data = EG(current_execute_data);
+    const bool strict = execute_data != nullptr && ZEND_CALL_USES_STRICT_TYPES(execute_data);
+    zval *result = zend_assign_to_variable(slot, const_cast<zval *>(assigned), IS_CONST, strict);
+    throwErrorIfOccurred();
+    return Variant(unwrap_zval(result));
+}
+
+zend_long dimension_string_offset(const zval *key) {
+    switch (Z_TYPE_P(key)) {
+    case IS_LONG:
+        return Z_LVAL_P(key);
+    case IS_STRING: {
+        zend_long offset;
+        bool trailing_data = false;
+        if (is_numeric_string_ex(Z_STRVAL_P(key), Z_STRLEN_P(key), &offset, nullptr, true, nullptr, &trailing_data) ==
+            IS_LONG) {
+            if (trailing_data) {
+                zend_error(E_WARNING, "Illegal string offset \"%s\"", Z_STRVAL_P(key));
+                throwErrorIfOccurred();
+            }
+            return offset;
+        }
+        zend_type_error("Cannot access offset of type string on string");
+        throwErrorIfOccurred();
+        return 0;
+    }
+    case IS_DOUBLE:
+        zend_error(E_WARNING, "String offset cast occurred");
+        throwErrorIfOccurred();
+        return zend_dval_to_lval_silent(Z_DVAL_P(key));
+    case IS_NULL:
+    case IS_FALSE:
+    case IS_TRUE:
+        zend_error(E_WARNING, "String offset cast occurred");
+        throwErrorIfOccurred();
+        return zval_get_long(const_cast<zval *>(key));
+    default:
+        zend_type_error("Cannot access offset of type %s on string", zend_zval_type_name(key));
+        throwErrorIfOccurred();
+        return 0;
+    }
+}
+
+Variant assign_string_dimension(zval *target, const zval *key, const zval *value) {
+    SEPARATE_STRING(target);
+    zend_long offset = dimension_string_offset(key);
+    zend_string *string = Z_STR_P(target);
+
+    if (offset < -static_cast<zend_long>(ZSTR_LEN(string))) {
+        zend_error(E_WARNING, "Illegal string offset " ZEND_LONG_FMT, offset);
+        throwErrorIfOccurred();
+        return nullptr;
+    }
+    if (offset < 0) {
+        offset += static_cast<zend_long>(ZSTR_LEN(string));
+    }
+
+    zend_string *assigned = zval_try_get_string(const_cast<zval *>(value));
+    if (assigned == nullptr) {
+        throwErrorIfOccurred();
+        return nullptr;
+    }
+    const size_t assigned_length = ZSTR_LEN(assigned);
+    const zend_uchar character = assigned_length == 0 ? 0 : static_cast<zend_uchar>(ZSTR_VAL(assigned)[0]);
+    zend_string_release(assigned);
+
+    if (assigned_length == 0) {
+        zend_throw_error(nullptr, "Cannot assign an empty string to a string offset");
+        throwErrorIfOccurred();
+        return nullptr;
+    }
+    if (assigned_length != 1) {
+        zend_error(E_WARNING, "Only the first byte will be assigned to the string offset");
+        throwErrorIfOccurred();
+    }
+
+    if (static_cast<size_t>(offset) >= ZSTR_LEN(string)) {
+        const size_t old_length = ZSTR_LEN(string);
+        ZVAL_NEW_STR(target, zend_string_extend(string, static_cast<size_t>(offset) + 1, false));
+        memset(Z_STRVAL_P(target) + old_length, ' ', static_cast<size_t>(offset) - old_length);
+        Z_STRVAL_P(target)[offset + 1] = '\0';
+    } else {
+        zend_string_forget_hash_val(Z_STR_P(target));
+    }
+    Z_STRVAL_P(target)[offset] = static_cast<char>(character);
+
+    zval result;
+    ZVAL_CHAR(&result, character);
+    return Variant(&result, Ctor::Move);
+}
+}  // namespace
+
+Variant Variant::assignKeyedDimension(const Variant &key, const Variant &value) {
+    zval *original = direct_ptr();
+    zval *target = original;
+    if (Z_TYPE_P(target) == IS_REFERENCE) {
+        target = Z_REFVAL_P(target);
+    }
+    Variant dimension_snapshot(dimension_value(key));
+    Variant assigned_snapshot(dimension_value(value));
+    const zval *dimension = dimension_snapshot.unwrap_ptr();
+    const zval *assigned = assigned_snapshot.unwrap_ptr();
+
+    if (Z_TYPE_P(target) == IS_ARRAY) {
+        return assign_array_dimension(target, dimension, assigned);
+    }
+
+    if (Z_TYPE_P(target) == IS_OBJECT) {
+        Object object(target);
+        object.offsetSet(dimension_snapshot, assigned_snapshot);
+        return Variant(assigned);
+    }
+    if (Z_TYPE_P(target) == IS_STRING) {
+        return assign_string_dimension(target, dimension, assigned);
+    }
+    if (Z_TYPE_P(target) <= IS_FALSE) {
+        if (Z_TYPE_P(original) == IS_REFERENCE && ZEND_REF_HAS_TYPE_SOURCES(Z_REF_P(original)) &&
+            !zend_verify_ref_array_assignable(Z_REF_P(original))) {
+            throwErrorIfOccurred();
+            return nullptr;
+        }
+        const bool was_false = Z_TYPE_P(target) == IS_FALSE;
+        array_init(target);
+        if (was_false) {
+            zend_false_to_array_deprecated();
+            throwErrorIfOccurred();
+        }
+        return assign_array_dimension(target, dimension, assigned);
+    }
+
+    zend_throw_error(nullptr, "Cannot use a scalar value as an array");
+    throwErrorIfOccurred();
+    return nullptr;
+}
+
 void Variant::offsetSet(zend_long offset, const Variant &value) {
     auto zvar = unwrap_ptr();
 

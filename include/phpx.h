@@ -1391,6 +1391,9 @@ class Variant {
     Variant offsetGet(const Variant &key) const;
     bool offsetExists(zend_long offset) const;
     bool offsetExists(const Variant &key) const;
+    // Assigns a syntactically present dimension. A null key is therefore an
+    // array key (converted by Zend), not the missing dimension of `$array[]`.
+    Variant assignKeyedDimension(const Variant &key, const Variant &value);
     void offsetSet(zend_long offset, const Variant &value);
     void offsetSet(const Variant &key, const Variant &value);
     void offsetUnset(zend_long offset);

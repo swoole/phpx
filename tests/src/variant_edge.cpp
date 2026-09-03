@@ -49,6 +49,55 @@ TEST(variant_edge, offsetSet_object) {
     ASSERT_EQ(o.offsetGet("key2").toInt(), 100);
 }
 
+TEST(variant_edge, assignKeyedDimension_matches_php_write_semantics) {
+    var null_value;
+    auto null_result = null_value.assignKeyedDimension("key", 7);
+    ASSERT_TRUE(null_value.isArray());
+    ASSERT_EQ(null_value.offsetGet("key").toInt(), 7);
+    ASSERT_EQ(null_result.toInt(), 7);
+
+    var false_value(false);
+    auto false_result = false_value.assignKeyedDimension("key", 8);
+    ASSERT_TRUE(false_value.isArray());
+    ASSERT_EQ(false_value.offsetGet("key").toInt(), 8);
+    ASSERT_EQ(false_result.toInt(), 8);
+
+    var true_value(true);
+    try_call([&true_value]() { true_value.assignKeyedDimension("key", 9); },
+             "Cannot use a scalar value as an array");
+    var int_value(1);
+    try_call([&int_value]() { int_value.assignKeyedDimension("key", 9); },
+             "Cannot use a scalar value as an array");
+    var float_value(1.5);
+    try_call([&float_value]() { float_value.assignKeyedDimension("key", 9); },
+             "Cannot use a scalar value as an array");
+
+    var string_value("abc");
+    auto string_result = string_value.assignKeyedDimension(5, "XY");
+    ASSERT_STREQ(string_value.toCString(), "abc  X");
+    ASSERT_STREQ(string_result.toCString(), "X");
+    try_call([&string_value]() { string_value.assignKeyedDimension("invalid", "Z"); },
+             "Cannot access offset of type string on string");
+
+    var array_value(Array{{"existing", 1}});
+    var alias(&array_value);
+    auto array_result = alias.assignKeyedDimension("added", 10);
+    ASSERT_EQ(array_value.offsetGet("added").toInt(), 10);
+    ASSERT_EQ(array_result.toInt(), 10);
+
+    var referenced_value(1);
+    var reference(&referenced_value);
+    var referenced_array(Array{{"key", reference}});
+    referenced_array.assignKeyedDimension("key", 12);
+    ASSERT_EQ(referenced_value.toInt(), 12);
+    ASSERT_TRUE(referenced_array.item("key").isReference());
+
+    var object_value = newObject("ArrayObject");
+    auto object_result = object_value.assignKeyedDimension("key", 11);
+    ASSERT_EQ(object_value.offsetGet("key").toInt(), 11);
+    ASSERT_EQ(object_result.toInt(), 11);
+}
+
 // Test offsetUnset on object
 TEST(variant_edge, offsetUnset_object) {
     auto o = newObject("ArrayObject");
