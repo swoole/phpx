@@ -77,3 +77,59 @@ TEST(typephp_call, method_cache_guards_class_name_and_magic_trampolines) {
     EXPECT_EQ(typephp_call_method_cached(second, "run", cache, {3}).toString(), "second:3");
     EXPECT_EQ(typephp_call_method_cached(magic, "missing", cache, {4}).toString(), "magic-missing:4");
 }
+
+TEST(typephp_call, scoped_method_cache_guards_lexical_and_called_scope) {
+    eval(R"PHP(
+        class PhpxScopedCachedMethod {
+            public function scopeAnchor(): void {}
+            private function hidden(int $value): string { return 'private:' . $value; }
+            public function __call(string $name, array $args): string {
+                return 'magic-' . $name . ':' . $args[0];
+            }
+        }
+        class PhpxScopedCachedForeign {
+            public function scopeAnchor(): void {}
+        }
+    )PHP");
+
+    Variant target = eval("return new PhpxScopedCachedMethod();");
+    auto *target_ce = getClassEntry("PhpxScopedCachedMethod");
+    auto *foreign_ce = getClassEntry("PhpxScopedCachedForeign");
+    CallableScope target_scope{getMethod(target_ce, "scopeAnchor"), target_ce, target.object()};
+    CallableScope foreign_scope{getMethod(foreign_ce, "scopeAnchor"), foreign_ce, nullptr};
+    MethodCallCacheSlot cache;
+
+    EXPECT_EQ(typephp_call_method_scoped_cached(target, "hidden", target_scope, cache, {1}).toString(), "private:1");
+    EXPECT_EQ(typephp_call_method_scoped_cached(target, "hidden", target_scope, cache, {2}).toString(), "private:2");
+    EXPECT_EQ(typephp_call_method_cached(target, "hidden", cache, {3}).toString(), "magic-hidden:3");
+    EXPECT_EQ(typephp_call_method_scoped_cached(target, "hidden", foreign_scope, cache, {4}).toString(),
+              "magic-hidden:4");
+}
+
+TEST(typephp_call, call_caches_accept_indirect_receivers_and_names) {
+    eval(R"PHP(
+        class PhpxIndirectCachedCall {
+            public function run(int $value): string { return 'run:' . $value; }
+        }
+        function phpx_indirect_cached_function(int $value): string { return 'function:' . $value; }
+    )PHP");
+
+    Array values;
+    values.set("object", eval("return new PhpxIndirectCachedCall();"));
+    values.set("method", "run");
+    values.set("function", "phpx_indirect_cached_function");
+    Variant object = values.item("object", true);
+    Variant method = values.item("method", true);
+    Variant function = values.item("function", true);
+    ASSERT_TRUE(object.isIndirect());
+    ASSERT_TRUE(method.isIndirect());
+    ASSERT_TRUE(function.isIndirect());
+
+    MethodCallCacheSlot method_cache;
+    EXPECT_EQ(typephp_call_method_cached(object, method, method_cache, {1}).toString(), "run:1");
+    EXPECT_EQ(typephp_call_method_cached(object, method, method_cache, {2}).toString(), "run:2");
+
+    FunctionCallCacheSlot function_cache;
+    EXPECT_EQ(typephp_call_cached(function, function_cache, {3}).toString(), "function:3");
+    EXPECT_EQ(typephp_call_cached(function, function_cache, {4}).toString(), "function:4");
+}

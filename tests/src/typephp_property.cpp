@@ -261,3 +261,35 @@ TEST(typephp_property, property_reference_rebind_rejects_non_objects) {
     try_call([&]() { typephp_rebind_property_reference(42, "value", reference, nullptr); },
              "Attempt to write property `value` on int");
 }
+
+TEST(typephp_property, function_local_static_slot_tracks_null_references_and_inherited_storage) {
+    eval(R"PHP(
+        class PhpxStaticSlotBase {
+            public static mixed $value = 'initial';
+        }
+        class PhpxStaticSlotChild extends PhpxStaticSlotBase {}
+    )PHP");
+
+    auto *base = getClassEntrySafe("PhpxStaticSlotBase");
+    auto *child = getClassEntrySafe("PhpxStaticSlotChild");
+    String property{"value"};
+    zval *cached_slot = nullptr;
+    int resolutions = 0;
+    auto resolve = [&]() {
+        resolutions++;
+        return typephp_get_static_property_slot(child, property);
+    };
+
+    Variant first = typephp_get_static_property_cached(cached_slot, resolve);
+    ASSERT_EQ(first.unwrap_ptr(), typephp_get_static_property_cached(cached_slot, resolve).unwrap_ptr());
+    ASSERT_EQ(resolutions, 1);
+
+    first = nullptr;
+    ASSERT_TRUE(typephp_get_static_property_cached(cached_slot, resolve).isNull());
+
+    auto reference = getStaticPropertyRef(child, property);
+    reference = "through-reference";
+    ASSERT_STREQ(typephp_get_static_property_cached(cached_slot, resolve).toCString(), "through-reference");
+    ASSERT_STREQ(getStaticProperty(base, property).toCString(), "through-reference");
+    ASSERT_EQ(resolutions, 1);
+}

@@ -24,7 +24,11 @@ php::Variant invokeCached(const php::Variant &callable,
     zend_fcall_info fci{};
     fci.size = sizeof(fci);
     fci.object = object;
-    php::zval_copy_value(&fci.function_name, callable.const_ptr());
+    // A callable may come from an array/property/reference expression and
+    // therefore be represented by an IS_INDIRECT/IS_REFERENCE wrapper.
+    // zend_is_callable_ex() and the call frame must observe the same
+    // dereferenced value.
+    php::zval_copy_value(&fci.function_name, callable.unwrap_ptr());
     fci.retval = retval.ptr();
     fci.param_count = param_count;
     fci.params = params;
@@ -34,10 +38,15 @@ php::Variant invokeCached(const php::Variant &callable,
     return retval;
 }
 
-zend_fcall_info_cache resolveCallable(const php::Variant &callable, zend_object *object) {
+zend_fcall_info_cache resolveCallable(const php::Variant &callable,
+                                      zend_object *object,
+                                      const php::CallableScope *scope = nullptr) {
     zend_fcall_info_cache cache{};
     char *error = nullptr;
-    if (UNEXPECTED(!zend_is_callable_ex(NO_CONST_V(callable), object, 0, nullptr, &cache, &error))) {
+    bool is_callable = scope == nullptr
+        ? zend_is_callable_ex(NO_CONST_V(callable), object, 0, nullptr, &cache, &error)
+        : scope->resolve(NO_CONST_V(callable), object, &cache, &error);
+    if (UNEXPECTED(!is_callable)) {
         auto *callable_name = zend_get_callable_name_ex(NO_CONST_V(callable), object);
         zend_throw_error(nullptr,
                          "Invalid callback %s%s%s",
@@ -92,6 +101,10 @@ void php::MethodCallCacheSlot::reset() noexcept {
     class_entry_ = nullptr;
     function_ = nullptr;
     called_scope_ = nullptr;
+    lexical_scope_guard_ = nullptr;
+    called_scope_guard_ = nullptr;
+    this_scope_guard_ = nullptr;
+    scoped_ = false;
     polymorphic_ = false;
 }
 
@@ -104,7 +117,7 @@ php::Variant php::FunctionCallCacheSlot::call(const Variant &func,
         return invokeCached(func, resolved.object, &resolved, param_count, params, named_args);
     }
 
-    zend_string *name = Z_STR_P(func.const_ptr());
+    zend_string *name = Z_STR_P(func.unwrap_ptr());
     if (polymorphic_cache_ != nullptr) {
         auto *cached = static_cast<zend_fcall_info_cache *>(zend_hash_find_ptr(polymorphic_cache_, name));
         if (EXPECTED(cached != nullptr)) {
@@ -151,14 +164,14 @@ php::Variant php::MethodCallCacheSlot::call(
         return {};
     }
 
-    zend_object *zend_object = Z_OBJ_P(object.const_ptr());
+    zend_object *zend_object = Z_OBJ_P(object.unwrap_ptr());
     if (UNEXPECTED(!method.isString()) || UNEXPECTED(polymorphic_)) {
         zend_fcall_info_cache resolved = resolveCallable(method, zend_object);
         return invokeCached(method, zend_object, &resolved, param_count, params, named_args);
     }
 
-    zend_string *name = Z_STR_P(method.const_ptr());
-    if (EXPECTED(class_entry_ == zend_object->ce && name_ != nullptr && zend_string_equals(name_, name))) {
+    zend_string *name = Z_STR_P(method.unwrap_ptr());
+    if (EXPECTED(!scoped_ && class_entry_ == zend_object->ce && name_ != nullptr && zend_string_equals(name_, name))) {
         zend_fcall_info_cache resolved{};
         resolved.function_handler = function_;
         resolved.called_scope = called_scope_;
@@ -181,4 +194,59 @@ php::Variant php::MethodCallCacheSlot::call(
         called_scope_ = resolved.called_scope;
     }
     return invokeCached(method, zend_object, &resolved, param_count, params, named_args);
+}
+
+php::Variant php::MethodCallCacheSlot::callScoped(const Variant &object,
+                                                  const Variant &method,
+                                                  const CallableScope &scope,
+                                                  uint32_t param_count,
+                                                  zval *params,
+                                                  zend_array *named_args) {
+    if (UNEXPECTED(!object.isObject())) {
+        php::throwError("call method `%s` on %s", method.toCString(), object.typeStr());
+        return {};
+    }
+    if (UNEXPECTED(!scope.isValid())) {
+        php::throwError("Explicit callable scope must not be null");
+        return {};
+    }
+
+    zend_object *target_object = Z_OBJ_P(object.unwrap_ptr());
+    zend_object *scope_object = scope.thisObject();
+    zend_class_entry *this_scope = scope_object == nullptr ? nullptr : scope_object->ce;
+    if (UNEXPECTED(!method.isString()) || UNEXPECTED(polymorphic_)) {
+        zend_fcall_info_cache resolved = resolveCallable(method, target_object, &scope);
+        return invokeCached(method, target_object, &resolved, param_count, params, named_args);
+    }
+
+    zend_string *name = Z_STR_P(method.unwrap_ptr());
+    if (EXPECTED(scoped_ && class_entry_ == target_object->ce && name_ != nullptr &&
+                 zend_string_equals(name_, name) && lexical_scope_guard_ == scope.lexicalScope() &&
+                 called_scope_guard_ == scope.calledScope() && this_scope_guard_ == this_scope)) {
+        zend_fcall_info_cache resolved{};
+        resolved.function_handler = function_;
+        resolved.called_scope = called_scope_;
+        resolved.object = target_object;
+        return invokeCached(method, target_object, &resolved, param_count, params, named_args);
+    }
+
+    if (UNEXPECTED(name_ != nullptr)) {
+        reset();
+        polymorphic_ = true;
+        zend_fcall_info_cache resolved = resolveCallable(method, target_object, &scope);
+        return invokeCached(method, target_object, &resolved, param_count, params, named_args);
+    }
+
+    zend_fcall_info_cache resolved = resolveCallable(method, target_object, &scope);
+    if (EXPECTED(!(resolved.function_handler->common.fn_flags & NON_CACHEABLE_CALL_FLAGS))) {
+        class_entry_ = target_object->ce;
+        name_ = zend_string_copy(name);
+        function_ = resolved.function_handler;
+        called_scope_ = resolved.called_scope;
+        lexical_scope_guard_ = scope.lexicalScope();
+        called_scope_guard_ = scope.calledScope();
+        this_scope_guard_ = this_scope;
+        scoped_ = true;
+    }
+    return invokeCached(method, target_object, &resolved, param_count, params, named_args);
 }

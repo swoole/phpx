@@ -246,12 +246,16 @@ class PHPX_API FunctionCallCacheSlot final {
     }
 };
 
-/** Request-local monomorphic cache for one unscoped dynamic method call. */
+/** Request-local monomorphic cache for one dynamic method-call site. */
 class PHPX_API MethodCallCacheSlot final {
     zend_class_entry *class_entry_ = nullptr;
     zend_string *name_ = nullptr;
     zend_function *function_ = nullptr;
     zend_class_entry *called_scope_ = nullptr;
+    zend_class_entry *lexical_scope_guard_ = nullptr;
+    zend_class_entry *called_scope_guard_ = nullptr;
+    zend_class_entry *this_scope_guard_ = nullptr;
+    bool scoped_ = false;
     bool polymorphic_ = false;
 
   public:
@@ -268,6 +272,19 @@ class PHPX_API MethodCallCacheSlot final {
                  zend_array *named_args = nullptr);
     Variant call(const Variant &object, const Variant &method, Args &args, zend_array *named_args = nullptr) {
         return call(object, method, args.count(), args.ptr(), named_args);
+    }
+    Variant callScoped(const Variant &object,
+                       const Variant &method,
+                       const CallableScope &scope,
+                       uint32_t param_count,
+                       zval *params,
+                       zend_array *named_args = nullptr);
+    Variant callScoped(const Variant &object,
+                       const Variant &method,
+                       const CallableScope &scope,
+                       Args &args,
+                       zend_array *named_args = nullptr) {
+        return callScoped(object, method, scope, args.count(), args.ptr(), named_args);
     }
 };
 
@@ -430,18 +447,50 @@ static inline php::Str typephp_get_called_class(php::Object &this_) {
     return called_scope == nullptr ? php::Str("") : php::Str(called_scope->name);
 }
 
+static inline php::Str typephp_get_called_class(zend_class_entry *called_scope) {
+    return called_scope == nullptr ? php::Str("") : php::Str(called_scope->name);
+}
+
 /**
  * Read a statically resolved TypePHP static-property slot by its cached
  * offset. This is semantically identical to php::getStaticProperty(ce,
  * offset), but is inline because static property access is emitted in hot
  * generated paths. zval_wrap() deliberately preserves PHP references.
  */
-static inline php::Variant typephp_get_static_property(zend_class_entry *ce, uint32_t offset) {
+static inline zval *typephp_get_static_property_slot(zend_class_entry *ce, uint32_t offset) {
     if (UNEXPECTED(CE_STATIC_MEMBERS(ce) == nullptr)) {
         zend_class_init_statics(ce);
     }
     zval *slot = CE_STATIC_MEMBERS(ce) + offset;
+    ZVAL_DEINDIRECT(slot);
+    return slot;
+}
+
+static inline zval *typephp_get_static_property_slot(zend_class_entry *ce, const php::String &property) {
+    zval *slot = zend_read_static_property_ex(ce, property.str(), true);
+    php::throwErrorIfOccurred();
+    return slot;
+}
+
+static inline php::Variant typephp_get_static_property(zend_class_entry *ce, uint32_t offset) {
+    zval *slot = typephp_get_static_property_slot(ce, offset);
     return php::Variant{slot, php::zval_wrap(slot)};
+}
+
+/**
+ * Lazily resolve one static-property slot into a generated function local.
+ * The resolver is not evaluated on a hit, so lookup disappears from hot loops
+ * without moving static-member initialization ahead of the PHP access itself.
+ * Only the final storage address is cached. A fresh lightweight Variant view is
+ * returned so the property's current value/reference state is always observed.
+ */
+template <typename Resolver>
+static zend_always_inline php::Variant typephp_get_static_property_cached(zval *&cached_slot,
+                                                                          Resolver &&resolver) {
+    if (UNEXPECTED(cached_slot == nullptr)) {
+        cached_slot = resolver();
+    }
+    return php::Variant{cached_slot, php::zval_wrap(cached_slot)};
 }
 
 /**
@@ -553,6 +602,27 @@ static zend_always_inline php::Variant typephp_call_method_cached(const php::Var
                                                                   zend_array *named_args = nullptr) {
     return typephp_invoke_arg_list(
         args, [&](uint32_t count, zval *params) { return cache.call(object, method, count, params, named_args); });
+}
+
+static inline php::Variant typephp_call_method_scoped_cached(const php::Variant &object,
+                                                             const php::Variant &method,
+                                                             const php::CallableScope &scope,
+                                                             php::MethodCallCacheSlot &cache,
+                                                             php::Args &args,
+                                                             zend_array *named_args = nullptr) {
+    return cache.callScoped(object, method, scope, args, named_args);
+}
+
+static zend_always_inline php::Variant typephp_call_method_scoped_cached(
+    const php::Variant &object,
+    const php::Variant &method,
+    const php::CallableScope &scope,
+    php::MethodCallCacheSlot &cache,
+    const php::ArgList &args = {},
+    zend_array *named_args = nullptr) {
+    return typephp_invoke_arg_list(args, [&](uint32_t count, zval *params) {
+        return cache.callScoped(object, method, scope, count, params, named_args);
+    });
 }
 
 /** Invoke the lexical parent constructor as part of a new-expression chain. */
