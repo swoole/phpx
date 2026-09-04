@@ -240,7 +240,10 @@ class PHPX_API FunctionCallCacheSlot final {
     FunctionCallCacheSlot &operator=(const FunctionCallCacheSlot &) = delete;
 
     void reset() noexcept;
-    Variant call(const Variant &func, Args &args, zend_array *named_args = nullptr);
+    Variant call(const Variant &func, uint32_t param_count, zval *params, zend_array *named_args = nullptr);
+    Variant call(const Variant &func, Args &args, zend_array *named_args = nullptr) {
+        return call(func, args.count(), args.ptr(), named_args);
+    }
 };
 
 /** Request-local monomorphic cache for one unscoped dynamic method call. */
@@ -260,8 +263,12 @@ class PHPX_API MethodCallCacheSlot final {
     void reset() noexcept;
     Variant call(const Variant &object,
                  const Variant &method,
-                 Args &args,
+                 uint32_t param_count,
+                 zval *params,
                  zend_array *named_args = nullptr);
+    Variant call(const Variant &object, const Variant &method, Args &args, zend_array *named_args = nullptr) {
+        return call(object, method, args.count(), args.ptr(), named_args);
+    }
 };
 
 /** Exception-safe owner of Zend's per-object magic-property recursion guard. */
@@ -405,6 +412,44 @@ static inline auto getCreateObjectFn(zend_class_entry *ce) {
 
 }  // namespace php
 
+/**
+ * Materialize the common small positional-argument list on the C++ stack.
+ *
+ * This intentionally mirrors php::Args::append(): INDIRECT values are
+ * materialized, references are preserved, and every copied zval is released
+ * after the call. Larger lists keep using php::Args so this optimization does
+ * not change the general-purpose container or its ABI.
+ */
+template <typename Invoke>
+static zend_always_inline php::Variant typephp_invoke_arg_list(const php::ArgList &args, Invoke invoke) {
+    constexpr size_t stack_capacity = 4;
+    if (UNEXPECTED(args.size() > stack_capacity)) {
+        php::Args call_args(args);
+        return invoke(call_args.count(), call_args.ptr());
+    }
+
+    zval params[stack_capacity];
+    uint32_t count = 0;
+    for (const auto &arg : args) {
+        const zval *source = arg.const_ptr();
+        ZVAL_DEINDIRECT(source);
+        ZVAL_COPY(&params[count++], source);
+    }
+
+    try {
+        php::Variant retval = invoke(count, count == 0 ? nullptr : params);
+        for (uint32_t i = 0; i < count; i++) {
+            zval_ptr_dtor(&params[i]);
+        }
+        return retval;
+    } catch (...) {
+        for (uint32_t i = 0; i < count; i++) {
+            zval_ptr_dtor(&params[i]);
+        }
+        throw;
+    }
+}
+
 static inline php::Variant typephp_call_cached(const php::Variant &func,
                                                php::FunctionCallCacheSlot &cache,
                                                php::Args &args,
@@ -412,12 +457,12 @@ static inline php::Variant typephp_call_cached(const php::Variant &func,
     return cache.call(func, args, named_args);
 }
 
-static inline php::Variant typephp_call_cached(const php::Variant &func,
-                                               php::FunctionCallCacheSlot &cache,
-                                               const php::ArgList &args = {},
-                                               zend_array *named_args = nullptr) {
-    php::Args call_args(args);
-    return cache.call(func, call_args, named_args);
+static zend_always_inline php::Variant typephp_call_cached(const php::Variant &func,
+                                                           php::FunctionCallCacheSlot &cache,
+                                                           const php::ArgList &args = {},
+                                                           zend_array *named_args = nullptr) {
+    return typephp_invoke_arg_list(
+        args, [&](uint32_t count, zval *params) { return cache.call(func, count, params, named_args); });
 }
 
 static inline php::Variant typephp_call_method_cached(const php::Variant &object,
@@ -428,13 +473,13 @@ static inline php::Variant typephp_call_method_cached(const php::Variant &object
     return cache.call(object, method, args, named_args);
 }
 
-static inline php::Variant typephp_call_method_cached(const php::Variant &object,
-                                                      const php::Variant &method,
-                                                      php::MethodCallCacheSlot &cache,
-                                                      const php::ArgList &args = {},
-                                                      zend_array *named_args = nullptr) {
-    php::Args call_args(args);
-    return cache.call(object, method, call_args, named_args);
+static zend_always_inline php::Variant typephp_call_method_cached(const php::Variant &object,
+                                                                  const php::Variant &method,
+                                                                  php::MethodCallCacheSlot &cache,
+                                                                  const php::ArgList &args = {},
+                                                                  zend_array *named_args = nullptr) {
+    return typephp_invoke_arg_list(
+        args, [&](uint32_t count, zval *params) { return cache.call(object, method, count, params, named_args); });
 }
 
 /** Invoke the lexical parent constructor as part of a new-expression chain. */
