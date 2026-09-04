@@ -220,6 +220,50 @@ class PropertyCacheSlot final {
 
 static_assert(sizeof(PropertyCacheSlot) == sizeof(void *) * 3);
 
+/**
+ * Request-local cache owned by one TypePHP dynamic function-call site.
+ *
+ * The first stable string callable stays in the inline entry. A call site
+ * that observes several names is promoted to a private HashTable, avoiding a
+ * process-global cache and preventing one extension from retaining another
+ * extension's request functions. Object-bearing callables are never stored.
+ */
+class PHPX_API FunctionCallCacheSlot final {
+    zend_string *name_ = nullptr;
+    zend_fcall_info_cache cache_{};
+    zend_array *polymorphic_cache_ = nullptr;
+
+  public:
+    FunctionCallCacheSlot() = default;
+    ~FunctionCallCacheSlot();
+    FunctionCallCacheSlot(const FunctionCallCacheSlot &) = delete;
+    FunctionCallCacheSlot &operator=(const FunctionCallCacheSlot &) = delete;
+
+    void reset() noexcept;
+    Variant call(const Variant &func, Args &args, zend_array *named_args = nullptr);
+};
+
+/** Request-local monomorphic cache for one unscoped dynamic method call. */
+class PHPX_API MethodCallCacheSlot final {
+    zend_class_entry *class_entry_ = nullptr;
+    zend_string *name_ = nullptr;
+    zend_function *function_ = nullptr;
+    zend_class_entry *called_scope_ = nullptr;
+    bool polymorphic_ = false;
+
+  public:
+    MethodCallCacheSlot() = default;
+    ~MethodCallCacheSlot();
+    MethodCallCacheSlot(const MethodCallCacheSlot &) = delete;
+    MethodCallCacheSlot &operator=(const MethodCallCacheSlot &) = delete;
+
+    void reset() noexcept;
+    Variant call(const Variant &object,
+                 const Variant &method,
+                 Args &args,
+                 zend_array *named_args = nullptr);
+};
+
 /** Exception-safe owner of Zend's per-object magic-property recursion guard. */
 class MagicPropertyGuard final {
     zend_object *object_ = nullptr;
@@ -360,6 +404,38 @@ static inline auto getCreateObjectFn(zend_class_entry *ce) {
 }
 
 }  // namespace php
+
+static inline php::Variant typephp_call_cached(const php::Variant &func,
+                                               php::FunctionCallCacheSlot &cache,
+                                               php::Args &args,
+                                               zend_array *named_args = nullptr) {
+    return cache.call(func, args, named_args);
+}
+
+static inline php::Variant typephp_call_cached(const php::Variant &func,
+                                               php::FunctionCallCacheSlot &cache,
+                                               const php::ArgList &args = {},
+                                               zend_array *named_args = nullptr) {
+    php::Args call_args(args);
+    return cache.call(func, call_args, named_args);
+}
+
+static inline php::Variant typephp_call_method_cached(const php::Variant &object,
+                                                      const php::Variant &method,
+                                                      php::MethodCallCacheSlot &cache,
+                                                      php::Args &args,
+                                                      zend_array *named_args = nullptr) {
+    return cache.call(object, method, args, named_args);
+}
+
+static inline php::Variant typephp_call_method_cached(const php::Variant &object,
+                                                      const php::Variant &method,
+                                                      php::MethodCallCacheSlot &cache,
+                                                      const php::ArgList &args = {},
+                                                      zend_array *named_args = nullptr) {
+    php::Args call_args(args);
+    return cache.call(object, method, call_args, named_args);
+}
 
 /** Invoke the lexical parent constructor as part of a new-expression chain. */
 static inline php::Variant typephp_call_parent_constructor(php::Object &object,
