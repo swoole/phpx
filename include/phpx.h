@@ -1412,6 +1412,12 @@ class Variant {
      * change, and the zval address pointed to by the Indirect object may become an invalid address.
      */
     Variant item(zend_long offset, bool update = false);
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    Variant item(T offset, bool update = false) {
+        return item(static_cast<zend_long>(offset), update);
+    }
+    Variant item(const char *key, bool update = false);
+    Variant item(const String &key, bool update = false);
     Variant item(const Variant &key, bool update = false);
     Reference itemRef(zend_long offset);
     Reference itemRef(const Variant &key);

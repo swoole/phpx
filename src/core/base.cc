@@ -914,6 +914,38 @@ bool empty(const Variant &v, const OperationChain &list) {
 }
 
 static bool exists_impl(const Variant &v, const OperationChain &list, Variant &tmp, bool fetch_last_value) {
+    // The overwhelmingly common isset($array[$key]) case does not need to
+    // copy the root array into the traversal temporary. Besides the refcount
+    // traffic, assigning the fetched element back into that temporary makes
+    // a one-level lookup pay for the general chained-operation machinery.
+    if (EXPECTED(list.size() == 1 && list.begin()->first == ArrayDimFetch && v.isArray())) {
+        const Variant &key = list.begin()->second;
+        HashTable *array = Z_ARRVAL_P(v.unwrap_ptr());
+        zval *value = nullptr;
+        if (EXPECTED(key.isString())) {
+            value = zend_symtable_find(array, Z_STR_P(key.unwrap_ptr()));
+        } else if (key.isInt() || key.isBool() || key.isFloat()) {
+            value = zend_hash_index_find(array, static_cast<zend_ulong>(key.toInt()));
+        } else {
+            Variant fetched = const_cast<Variant &>(v).item(key);
+            if (fetch_last_value) {
+                tmp = fetched;
+            }
+            return !fetched.isNull() && !fetched.isUndef();
+        }
+        if (UNEXPECTED(value == nullptr)) {
+            if (fetch_last_value) {
+                tmp = nullptr;
+            }
+            return false;
+        }
+        if (fetch_last_value) {
+            tmp = value;
+        }
+        ZVAL_DEREF(value);
+        return Z_TYPE_P(value) != IS_NULL && Z_TYPE_P(value) != IS_UNDEF;
+    }
+
     tmp = v;
     if (tmp.isNull() || tmp.isUndef()) {
         return false;

@@ -2,6 +2,7 @@
 #include "phpx_class.h"
 #include "phpx_func.h"
 #include "phpx_helper.h"
+#include "typephp_helper.h"
 
 using namespace php;
 
@@ -140,6 +141,44 @@ TEST(exists, array_dim_fetch_basic) {
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, "key5"}}));
 
     ASSERT_FALSE(exists(v, {{ArrayDimFetch, "nonexistent"}}));
+}
+
+TEST(exists, single_array_lookup_fetches_values_and_dereferences_null) {
+    Variant source = "value";
+    Array values;
+    values.set("reference", source.toReference());
+    values.set("null", nullptr);
+    Variant root = values;
+    Variant result = "stale";
+
+    ASSERT_TRUE(exists(root, {{ArrayDimFetch, "reference"}}, result));
+    ASSERT_STREQ(result.toCString(), "value");
+    ASSERT_FALSE(result.isReference());
+
+    ASSERT_FALSE(exists(root, {{ArrayDimFetch, "null"}}, result));
+    ASSERT_TRUE(result.isNull());
+
+    result = "stale";
+    ASSERT_FALSE(exists(root, {{ArrayDimFetch, "missing"}}, result));
+    ASSERT_TRUE(result.isNull());
+}
+
+TEST(exists, typephp_array_isset_preserves_key_and_result_semantics) {
+    Array values;
+    values.set("present", 42);
+    values.set("null", nullptr);
+    values.set(2, "two");
+    values.set("", "empty-key");
+    Variant root = values;
+    Variant result = "stale";
+
+    ASSERT_TRUE(typephp_array_isset(root, "present", &result));
+    ASSERT_EQ(result.toInt(), 42);
+    ASSERT_FALSE(typephp_array_isset(root, "null", &result));
+    ASSERT_TRUE(result.isNull());
+    ASSERT_TRUE(typephp_array_isset(root, 2.9));
+    ASSERT_TRUE(typephp_array_isset(root, nullptr, &result));
+    ASSERT_STREQ(result.toCString(), "empty-key");
 }
 
 TEST(exists, array_dim_fetch_nested) {

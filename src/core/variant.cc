@@ -372,6 +372,9 @@ bool Variant::offsetExists(const Variant &key) const {
         String tmp(zvar, Ctor::Indirect);
         return tmp.offset(key.toInt()) != -1;
     } else if (zval_is_array(zvar)) {
+        if (EXPECTED(key.isString())) {
+            return zend_symtable_exists(Z_ARRVAL_P(zvar), Z_STR_P(key.unwrap_ptr()));
+        }
         auto skey = key.toString();
         return zend_symtable_exists(Z_ARRVAL_P(zvar), skey.str());
     } else if (zval_is_object(zvar)) {
@@ -1077,11 +1080,18 @@ Variant Variant::item(const Variant &key, bool update) {
         if (key.isNull() && update) {
             retval = zend_hash_next_index_insert(Z_ARRVAL_P(zvar), undef());
         } else {
-            auto skey = key.toString();
-            retval = zend_symtable_find(Z_ARRVAL_P(zvar), skey.str());
+            zend_string *string_key;
+            String converted_key;
+            if (EXPECTED(key.isString())) {
+                string_key = Z_STR_P(key.unwrap_ptr());
+            } else {
+                converted_key = key.toString();
+                string_key = converted_key.str();
+            }
+            retval = zend_symtable_find(Z_ARRVAL_P(zvar), string_key);
             if (retval == nullptr) {
                 if (update) {
-                    retval = zend_symtable_update(Z_ARRVAL_P(zvar), skey.str(), undef());
+                    retval = zend_symtable_update(Z_ARRVAL_P(zvar), string_key, undef());
                 } else {
                     return Variant{undef()};
                 }
@@ -1120,6 +1130,29 @@ Variant Variant::item(const Variant &key, bool update) {
     }
 
     return Variant{retval, zval_wrap(retval)};
+}
+
+Variant Variant::item(const String &key, bool update) {
+    auto zvar = unwrap_ptr();
+    if (EXPECTED(zval_is_array(zvar))) {
+        if (update) {
+            SEPARATE_ARRAY(zvar);
+        }
+        zval *retval = zend_symtable_find(Z_ARRVAL_P(zvar), key.str());
+        if (retval == nullptr) {
+            if (!update) {
+                return Variant{undef()};
+            }
+            retval = zend_symtable_update(Z_ARRVAL_P(zvar), key.str(), undef());
+        }
+        return Variant{retval, zval_wrap(retval)};
+    }
+
+    return item(static_cast<const Variant &>(key), update);
+}
+
+Variant Variant::item(const char *key, bool update) {
+    return item(String(key), update);
 }
 
 Reference Variant::itemRef(zend_long offset) {

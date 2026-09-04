@@ -1053,6 +1053,20 @@ TEST(variant, offsetGet2) {
     ASSERT_EQ(v.offsetGet(sk).toInt(), 0);
 }
 
+TEST(variant, string_item_key_avoids_key_refcount_churn) {
+    Array values;
+    values.set("name", 42);
+    String key(std::string("name"));
+    const int refcount = key.getRefCount();
+
+    ASSERT_EQ(values.item(key).toInt(), 42);
+    ASSERT_EQ(key.getRefCount(), refcount);
+
+    values.item(key, true) = 43;
+    ASSERT_EQ(values.item(key).toInt(), 43);
+    ASSERT_EQ(key.getRefCount(), refcount);
+}
+
 TEST(variant, offsetGet3) {
     auto o = newObject("ArrayObject");
     o.offsetSet(null, 1987);

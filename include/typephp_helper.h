@@ -388,6 +388,7 @@ static inline void appendCallExtraNamedArgs(Array &args) {
 
 PHPX_API Str getCalledClass(Object &this_);
 PHPX_API zend_class_entry *getCalledCe(Object &this_);
+
 static inline CallableScope getCallableScope(zend_function *caller_function, Object &this_) {
     auto *called_scope = getCalledCe(this_);
     return CallableScope{
@@ -411,6 +412,78 @@ static inline auto getCreateObjectFn(zend_class_entry *ce) {
 }
 
 }  // namespace php
+
+/**
+ * Hot AOT equivalents of php::getCalledCe()/getCalledClass(). Keep these in
+ * the TypePHP helper layer so generated code can inline the representation
+ * check without exposing Zend macros at each call site.
+ */
+static inline zend_class_entry *typephp_get_called_ce(php::Object &this_) noexcept {
+    if (EXPECTED(this_.isObject())) {
+        return this_.ce();
+    }
+    return static_cast<zend_class_entry *>(Z_PTR_P(this_.ptr()));
+}
+
+static inline php::Str typephp_get_called_class(php::Object &this_) {
+    zend_class_entry *called_scope = typephp_get_called_ce(this_);
+    return called_scope == nullptr ? php::Str("") : php::Str(called_scope->name);
+}
+
+/**
+ * Read a statically resolved TypePHP static-property slot by its cached
+ * offset. This is semantically identical to php::getStaticProperty(ce,
+ * offset), but is inline because static property access is emitted in hot
+ * generated paths. zval_wrap() deliberately preserves PHP references.
+ */
+static inline php::Variant typephp_get_static_property(zend_class_entry *ce, uint32_t offset) {
+    if (UNEXPECTED(CE_STATIC_MEMBERS(ce) == nullptr)) {
+        zend_class_init_statics(ce);
+    }
+    zval *slot = CE_STATIC_MEMBERS(ce) + offset;
+    return php::Variant{slot, php::zval_wrap(slot)};
+}
+
+/**
+ * Fast isset/coalesce lookup for a value statically known to be an array.
+ * Unusual key types stay on PHPX's general operation-chain path so this
+ * helper changes cost, not semantics.
+ */
+static inline bool typephp_array_isset(const php::Variant &array,
+                                       const php::Variant &key,
+                                       php::Variant *result = nullptr) {
+    const zval *root = array.unwrap_ptr();
+    if (UNEXPECTED(Z_TYPE_P(root) != IS_ARRAY)) {
+        if (result == nullptr) {
+            return php::exists(array, {{php::ArrayDimFetch, key}});
+        }
+        return php::exists(array, {{php::ArrayDimFetch, key}}, *result);
+    }
+
+    zval *value;
+    if (EXPECTED(key.isString())) {
+        value = zend_symtable_find(Z_ARRVAL_P(root), Z_STR_P(key.unwrap_ptr()));
+    } else if (key.isInt() || key.isBool() || key.isFloat()) {
+        value = zend_hash_index_find(Z_ARRVAL_P(root), static_cast<zend_ulong>(key.toInt()));
+    } else {
+        if (result == nullptr) {
+            return php::exists(array, {{php::ArrayDimFetch, key}});
+        }
+        return php::exists(array, {{php::ArrayDimFetch, key}}, *result);
+    }
+
+    if (UNEXPECTED(value == nullptr)) {
+        if (result != nullptr) {
+            *result = nullptr;
+        }
+        return false;
+    }
+    if (result != nullptr) {
+        *result = value;
+    }
+    ZVAL_DEREF(value);
+    return Z_TYPE_P(value) != IS_NULL && Z_TYPE_P(value) != IS_UNDEF;
+}
 
 /**
  * Materialize the common small positional-argument list on the C++ stack.
