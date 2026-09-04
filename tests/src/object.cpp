@@ -860,6 +860,25 @@ TEST(object, simple_property_access) {
     SUCCEED() << "Simple property access test completed";
 }
 
+TEST(object, variant_property_name_reuses_existing_string) {
+    auto obj = newObject("stdClass");
+    obj.set("dynamic_name", 42);
+    obj.set("7", "seven");
+
+    Variant name = String(std::string("dynamic_name"));
+    const int refcount = name.getRefCount();
+    ASSERT_EQ(obj.attr(name).toInt(), 42);
+    ASSERT_EQ(name.getRefCount(), refcount);
+
+    Variant referenced_name = name.toReference();
+    const int referenced_refcount = name.getRefCount();
+    ASSERT_EQ(obj.attr(referenced_name).toInt(), 42);
+    ASSERT_EQ(name.getRefCount(), referenced_refcount);
+
+    Variant numeric_name = 7;
+    ASSERT_STREQ(obj.attr(numeric_name).toCString(), "seven");
+}
+
 TEST(object, move_ctor) {
     zval tmp;
     object_init(&tmp);

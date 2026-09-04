@@ -260,25 +260,79 @@ bool ForeachIterator::next() {
     }
 }
 
-Variant ForeachIterator::getHashKey() const {
-    if (HT_IS_PACKED(hash_table_ ? hash_table_ : Z_ARRVAL_P(array_.unwrap_ptr()))) {
-        return static_cast<zend_long>(current_position_);
+void ForeachIterator::assignCurrentKey(Variant &target) const {
+    if (mode_ == Mode::ArraySnapshot || mode_ == Mode::HashTable) {
+        HashTable *table = hash_table_ ? hash_table_ : Z_ARRVAL_P(array_.unwrap_ptr());
+        if (HT_IS_PACKED(table)) {
+            target = static_cast<zend_long>(current_position_);
+            return;
+        }
+
+        const Bucket *bucket = table->arData + current_position_;
+        if (!bucket->key) {
+            target = static_cast<zend_long>(bucket->h);
+            return;
+        }
+        if (!plain_object_ || ZSTR_VAL(bucket->key)[0] != '\0') {
+            target = bucket->key;
+            return;
+        }
+
+        const char *class_name;
+        const char *property_name;
+        size_t property_name_length;
+        zend_unmangle_property_name_ex(bucket->key, &class_name, &property_name, &property_name_length);
+        Variant property_name_value(property_name, property_name_length);
+        target = std::move(property_name_value);
+        return;
     }
 
-    HashTable *table = hash_table_ ? hash_table_ : Z_ARRVAL_P(array_.unwrap_ptr());
-    const Bucket *bucket = table->arData + current_position_;
-    if (!bucket->key) {
-        return static_cast<zend_long>(bucket->h);
-    }
-    if (!plain_object_ || ZSTR_VAL(bucket->key)[0] != '\0') {
-        return bucket->key;
+    if (mode_ == Mode::ObjectIterator) {
+        const zend_object_iterator_funcs *funcs = object_iterator_->funcs;
+        if (!funcs->get_current_key) {
+            target = static_cast<zend_long>(object_iterator_->index);
+            return;
+        }
+
+        zval current_key;
+        ZVAL_UNDEF(&current_key);
+        funcs->get_current_key(object_iterator_, &current_key);
+        if (UNEXPECTED(EG(exception))) {
+            if (!Z_ISUNDEF(current_key)) {
+                zval_ptr_dtor(&current_key);
+            }
+            throwErrorIfOccurred();
+            return;
+        }
+        target = &current_key;
+        zval_ptr_dtor(&current_key);
+        return;
     }
 
-    const char *class_name;
-    const char *property_name;
-    size_t property_name_length;
-    zend_unmangle_property_name_ex(bucket->key, &class_name, &property_name, &property_name_length);
-    return Variant(property_name, property_name_length);
+    target = nullptr;
+}
+
+void ForeachIterator::assignCurrentValue(Variant &target) const {
+    const zval *value = value_;
+    ZVAL_DEREF(value);
+    target.copyFrom(value);
+}
+
+bool ForeachIterator::nextValue(Variant &value) {
+    if (!next()) {
+        return false;
+    }
+    assignCurrentValue(value);
+    return true;
+}
+
+bool ForeachIterator::nextKeyValue(Variant &key, Variant &value) {
+    if (!next()) {
+        return false;
+    }
+    assignCurrentKey(key);
+    assignCurrentValue(value);
+    return true;
 }
 
 Variant ForeachIterator::key() {
@@ -286,29 +340,10 @@ Variant ForeachIterator::key() {
         return key_;
     }
 
-    if (mode_ == Mode::ArraySnapshot || mode_ == Mode::HashTable) {
-        key_ = getHashKey();
-    } else if (mode_ == Mode::ObjectIterator) {
-        const zend_object_iterator_funcs *funcs = object_iterator_->funcs;
-        if (funcs->get_current_key) {
-            zval current_key;
-            ZVAL_UNDEF(&current_key);
-            funcs->get_current_key(object_iterator_, &current_key);
-            if (UNEXPECTED(EG(exception))) {
-                if (!Z_ISUNDEF(current_key)) {
-                    zval_ptr_dtor(&current_key);
-                }
-                throwErrorIfOccurred();
-                return {};
-            }
-            key_ = &current_key;
-            zval_ptr_dtor(&current_key);
-        } else {
-            key_ = static_cast<zend_long>(object_iterator_->index);
-        }
-    } else {
+    if (mode_ == Mode::None) {
         return {};
     }
+    assignCurrentKey(key_);
 
     key_ready_ = true;
     return key_;

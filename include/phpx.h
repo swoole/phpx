@@ -1907,6 +1907,13 @@ inline Variant Variant::attr(const char *name, AttrMode mode) const {
 }
 
 inline Variant Variant::attr(const Variant &name, AttrMode mode) const {
+    if (EXPECTED(name.isString())) {
+        // Borrow an already-string property name for this synchronous lookup.
+        // The source Variant remains alive for the full attr(String) call, so
+        // no zend_string refcount churn is needed on this hot path.
+        String string_name(name.unwrap_ptr(), Ctor::Indirect);
+        return attr(string_name, mode);
+    }
     return attr(name.toString(), mode);
 }
 
@@ -2650,7 +2657,8 @@ class ForeachIterator {
     bool nextHashTable();
     bool nextObject();
     bool isPropertyVisible(const Bucket *bucket, const zval *value) const;
-    Variant getHashKey() const;
+    void assignCurrentKey(Variant &target) const;
+    void assignCurrentValue(Variant &target) const;
 
   public:
     explicit ForeachIterator(const Variant &iterable, bool by_ref = false, zend_class_entry *scope = nullptr);
@@ -2662,6 +2670,8 @@ class ForeachIterator {
     ForeachIterator &operator=(ForeachIterator &&) = delete;
 
     bool next();
+    bool nextValue(Variant &value);
+    bool nextKeyValue(Variant &key, Variant &value);
     Variant key();
     Variant value() const;
     Reference valueRef();

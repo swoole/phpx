@@ -7,6 +7,9 @@ TEST(typephp_call, function_cache_supports_monomorphic_and_polymorphic_strings) 
     eval(R"PHP(
         function phpx_cached_first(int $value): int { return $value + 1; }
         function phpx_cached_second(int $value): int { return $value + 2; }
+        function phpx_cached_many(int $a, int $b, int $c, int $d, int $e): int {
+            return $a + $b + $c + $d + $e;
+        }
     )PHP");
 
     FunctionCallCacheSlot cache;
@@ -14,6 +17,28 @@ TEST(typephp_call, function_cache_supports_monomorphic_and_polymorphic_strings) 
     EXPECT_EQ(typephp_call_cached("phpx_cached_first", cache, {2}).toInt(), 3);
     EXPECT_EQ(typephp_call_cached("phpx_cached_second", cache, {3}).toInt(), 5);
     EXPECT_EQ(typephp_call_cached("phpx_cached_first", cache, {4}).toInt(), 5);
+    EXPECT_EQ(typephp_call_cached("phpx_cached_many", cache, {1, 2, 3, 4, 5}).toInt(), 15);
+}
+
+TEST(typephp_call, small_argument_path_preserves_references_and_exceptions) {
+    eval(R"PHP(
+        function phpx_cached_increment(int &$value): int { return ++$value; }
+        function phpx_cached_throw(): never { throw new RuntimeException('cached failure'); }
+    )PHP");
+
+    FunctionCallCacheSlot cache;
+    Variant value = 10;
+    Reference reference = value.toReference();
+    EXPECT_EQ(typephp_call_cached("phpx_cached_increment", cache, {&reference}).toInt(), 11);
+    EXPECT_EQ(value.toInt(), 11);
+
+    try {
+        typephp_call_cached("phpx_cached_throw", cache);
+        FAIL() << "expected php::Exception";
+    } catch (zend_object *) {
+        Object exception = catchException();
+        EXPECT_STREQ(exception.call("getMessage").toCString(), "cached failure");
+    }
 }
 
 TEST(typephp_call, non_string_callables_are_not_retained) {

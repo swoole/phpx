@@ -34,6 +34,41 @@ TEST(foreach_iterator, sparse_array_snapshot_skips_holes_and_preserves_mixed_key
     ASSERT_FALSE(iterator.next());
 }
 
+TEST(foreach_iterator, combined_array_iteration_assigns_values_without_reference_aliases) {
+    Variant referenced = 10;
+    Array values;
+    values.set(2, referenced.toReference());
+    values.set("name", 20);
+
+    ForeachIterator iterator(values);
+    Variant key;
+    Variant value;
+
+    ASSERT_TRUE(iterator.nextKeyValue(key, value));
+    ASSERT_EQ(key.toInt(), 2);
+    ASSERT_EQ(value.toInt(), 10);
+    ASSERT_FALSE(value.isReference());
+    value = 99;
+    ASSERT_EQ(referenced.toInt(), 10);
+
+    ASSERT_TRUE(iterator.nextKeyValue(key, value));
+    ASSERT_STREQ(key.toCString(), "name");
+    ASSERT_EQ(value.toInt(), 20);
+    ASSERT_FALSE(iterator.nextKeyValue(key, value));
+}
+
+TEST(foreach_iterator, combined_value_iteration_supports_the_same_target) {
+    Array values{10, 20};
+    ForeachIterator iterator(values);
+    Variant target;
+
+    ASSERT_TRUE(iterator.nextKeyValue(target, target));
+    ASSERT_EQ(target.toInt(), 10);
+    ASSERT_TRUE(iterator.nextValue(target));
+    ASSERT_EQ(target.toInt(), 20);
+    ASSERT_FALSE(iterator.nextValue(target));
+}
+
 TEST(foreach_iterator, array_and_reference) {
     Array values(StdStrKeyMap{{"a", 1}, {"b", 2}});
     ForeachIterator iterator(values, true);
