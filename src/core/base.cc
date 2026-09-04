@@ -545,7 +545,6 @@ static void call_function_impl(const zval *zobject,
     fci.named_params = named_params;
 
     zend_fcall_info_cache fcc;
-    zend_fcall_info_cache *fci_cache = &fcc;
     char *error = NULL;
 
     bool callable;
@@ -555,16 +554,14 @@ static void call_function_impl(const zval *zobject,
         callable = zend_is_callable_ex(&fci.function_name, fci.object, 0, NULL, &fcc, &error);
     }
 
-    if (!callable) {
+    if (EXPECTED(callable)) {
+        zend_call_function(&fci, &fcc);
+    } else {
         ZEND_ASSERT(error && "Should have error if not callable");
         auto callable_name = zend_get_callable_name_ex(&fci.function_name, fci.object);
         zend_throw_error(NULL, "Invalid callback %s, %s", ZSTR_VAL(callable_name), error);
         efree(error);
         zend_string_release_ex(callable_name, 0);
-    }
-
-    if (callable) {
-        zend_call_function(&fci, fci_cache);
     }
 
     throwErrorIfOccurred();
