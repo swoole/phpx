@@ -554,3 +554,67 @@ TEST(base, named_args) {
     auto rs = call(fn, {"Charlie", 22}, name_args.array());
     ASSERT_TRUE(rs.item("vip").toBool());
 }
+
+TEST(base, fixed_args_use_materialized_contiguous_values_without_dynamic_storage) {
+    eval("function phpx_fixed_arg_identity(int $value): int { return $value; }");
+
+    Array values{7};
+    std::array<Variant, 1> args{
+        Variant{values.item(0).const_ptr(), Ctor::CopyRef}};
+    ASSERT_FALSE(args[0].isIndirect());
+
+    auto result = call(getFunction("phpx_fixed_arg_identity"), args);
+    ASSERT_EQ(result.toInt(), 7);
+    values.set(0, 9);
+    ASSERT_EQ(args[0].toInt(), 7);
+}
+
+TEST(base, call_static_method_resolves_dynamic_class_and_method_without_callable_string) {
+    eval(R"PHP(
+        class PhpxStaticCallFirst {
+            public static function run(int $value): string { return 'first:' . $value; }
+            public function instanceMethod(): void {}
+            public static function named(int $value, string $suffix = '!'): string {
+                return $value . $suffix;
+            }
+        }
+        class PhpxStaticCallSecond {
+            public static function run(int $value): string { return 'second:' . $value; }
+        }
+        class PhpxStaticCallMagic {
+            public static function __callStatic(string $name, array $args): string {
+                return 'magic-' . $name . ':' . $args[0];
+            }
+        }
+    )PHP");
+
+    String class_name = "PhpxStaticCallFirst";
+    String method = "run";
+    std::array<Variant, 1> args{1};
+    EXPECT_EQ(callStaticMethod(class_name, method, args).toString(), "first:1");
+
+    class_name = String("PhpxStaticCallSecond");
+    args[0] = 2;
+    EXPECT_EQ(callStaticMethod(class_name, method, args).toString(), "second:2");
+
+    Object object = newObject("PhpxStaticCallFirst");
+    args[0] = 3;
+    EXPECT_EQ(callStaticMethod(object, method, args).toString(), "first:3");
+
+    auto *class_entry = getClassEntrySafe("PhpxStaticCallFirst");
+    Array named_args;
+    named_args.set("suffix", "?");
+    args[0] = 4;
+    EXPECT_EQ(callStaticMethod(class_entry, "named", args, named_args.array()).toString(), "4?");
+
+    args[0] = 5;
+    EXPECT_EQ(callStaticMethod(getClassEntrySafe("PhpxStaticCallMagic"), "missing", args).toString(),
+              "magic-missing:5");
+    args[0] = 6;
+    EXPECT_EQ(callStaticMethod(getClassEntrySafe("PhpxStaticCallMagic"), "missing", args).toString(),
+              "magic-missing:6");
+
+    try_call(
+        [&]() { (void) callStaticMethod(class_entry, "instanceMethod"); },
+        "Non-static method PhpxStaticCallFirst::instanceMethod() cannot be called statically");
+}

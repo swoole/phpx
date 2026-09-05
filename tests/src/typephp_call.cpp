@@ -13,14 +13,20 @@ TEST(typephp_call, function_cache_supports_monomorphic_and_polymorphic_strings) 
     )PHP");
 
     FunctionCallCacheSlot cache;
-    EXPECT_EQ(typephp_call_cached("phpx_cached_first", cache, {1}).toInt(), 2);
-    EXPECT_EQ(typephp_call_cached("phpx_cached_first", cache, {2}).toInt(), 3);
-    EXPECT_EQ(typephp_call_cached("phpx_cached_second", cache, {3}).toInt(), 5);
-    EXPECT_EQ(typephp_call_cached("phpx_cached_first", cache, {4}).toInt(), 5);
-    EXPECT_EQ(typephp_call_cached("phpx_cached_many", cache, {1, 2, 3, 4, 5}).toInt(), 15);
+    std::array<Variant, 1> one_arg{1};
+    EXPECT_EQ(typephp_call_cached("phpx_cached_first", cache, one_arg).toInt(), 2);
+    one_arg[0] = 2;
+    EXPECT_EQ(typephp_call_cached("phpx_cached_first", cache, one_arg).toInt(), 3);
+    one_arg[0] = 3;
+    EXPECT_EQ(typephp_call_cached("phpx_cached_second", cache, one_arg).toInt(), 5);
+    one_arg[0] = 4;
+    EXPECT_EQ(typephp_call_cached("phpx_cached_first", cache, one_arg).toInt(), 5);
+
+    std::array<Variant, 5> five_args{1, 2, 3, 4, 5};
+    EXPECT_EQ(typephp_call_cached("phpx_cached_many", cache, five_args).toInt(), 15);
 }
 
-TEST(typephp_call, small_argument_path_preserves_references_and_exceptions) {
+TEST(typephp_call, fixed_argument_path_preserves_references_and_exceptions) {
     eval(R"PHP(
         function phpx_cached_increment(int &$value): int { return ++$value; }
         function phpx_cached_throw(): never { throw new RuntimeException('cached failure'); }
@@ -29,7 +35,8 @@ TEST(typephp_call, small_argument_path_preserves_references_and_exceptions) {
     FunctionCallCacheSlot cache;
     Variant value = 10;
     Reference reference = value.toReference();
-    EXPECT_EQ(typephp_call_cached("phpx_cached_increment", cache, {&reference}).toInt(), 11);
+    std::array<Variant, 1> args{&reference};
+    EXPECT_EQ(typephp_call_cached("phpx_cached_increment", cache, args).toInt(), 11);
     EXPECT_EQ(value.toInt(), 11);
 
     try {

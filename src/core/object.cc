@@ -133,16 +133,17 @@ bool Object::instanceOf(const String &name) const {
     return instanceof_function(obj->ce, cls_ce);
 }
 
-Variant Object::callParentMethod(const String &func, const ArgList &args) {
-    Args _args(args);
+namespace {
+
+Variant call_parent_method_impl(Object &object, const String &func, uint32_t count, zval *params) {
     Variant retval;
 
-    if (UNEXPECTED(!isObject())) {
-        throwError("call method `%s` on %s", func.data(), typeStr());
+    if (UNEXPECTED(!object.isObject())) {
+        throwError("call method `%s` on %s", func.data(), object.typeStr());
         return retval;
     }
 
-    auto obj = object();
+    auto obj = object.object();
 
     if (UNEXPECTED(obj->ce->parent == nullptr)) {
         throwError("class does not inherit the parent class");
@@ -151,17 +152,49 @@ Variant Object::callParentMethod(const String &func, const ArgList &args) {
 
     auto fn = (zend_function *) zend_hash_find_ptr_lc(&obj->ce->parent->function_table, func.str());
     if (UNEXPECTED(fn == nullptr)) {
-        throwError("Couldn't find implementation for method %s::%s", ZSTR_VAL(parent_ce()->name), func.data());
+        throwError("Couldn't find implementation for method %s::%s", ZSTR_VAL(obj->ce->parent->name), func.data());
     } else if (UNEXPECTED(fn->common.fn_flags & ZEND_ACC_ABSTRACT)) {
         throwError("Cannot call abstract method %s::%s()",
                    ZSTR_VAL(fn->common.scope->name),
                    ZSTR_VAL(fn->common.function_name));
     } else {
-        zend_call_known_function(fn, obj, obj->ce, retval.ptr(), _args.count(), _args.ptr(), nullptr);
+        zend_call_known_function(fn, obj, obj->ce, retval.ptr(), count, params, nullptr);
         throwErrorIfOccurred();
     }
 
     return retval;
+}
+
+Object new_object_impl(zend_class_entry *ce, uint32_t count, zval *params, zend_array *named_args) {
+    Object object;
+
+    auto rc = object_init_ex(object.ptr(), ce);
+    if (EXPECTED(rc == SUCCESS)) {
+        auto this_ = object.object();
+        auto ctor = ce->constructor;
+        if (ctor) {
+            try {
+                zend_call_known_function(ctor, this_, ce, nullptr, count, params, named_args);
+                throwErrorIfOccurred();
+            } catch (...) {
+                zend_object_store_ctor_failed(this_);
+                throw;
+            }
+        }
+    }
+    throwErrorIfOccurred();
+    return object;
+}
+
+}  // namespace
+
+Variant Object::callParentMethod(const String &func, const ArgList &args) {
+    Args call_args(args);
+    return call_parent_method_impl(*this, func, call_args.count(), call_args.ptr());
+}
+
+Variant Object::callParentMethod(const String &func, FixedArgs args) {
+    return call_parent_method_impl(*this, func, args.count(), args.ptr());
 }
 
 Variant Object::get(const String &name) const {
@@ -194,47 +227,15 @@ Object Object::clone() const {
 }
 
 Object newObject(zend_class_entry *ce) {
-    Object object;
-
-    auto rc = object_init_ex(object.ptr(), ce);
-    if (EXPECTED(rc == SUCCESS)) {
-        auto this_ = object.object();
-        auto ctor = ce->constructor;
-        if (ctor) {
-            try {
-                zend_call_known_function(ctor, this_, ce, nullptr, 0, nullptr, nullptr);
-                throwErrorIfOccurred();
-            } catch (...) {
-                zend_object_store_ctor_failed(this_);
-                throw;
-            }
-        }
-    }
-    throwErrorIfOccurred();
-
-    return object;
+    return new_object_impl(ce, 0, nullptr, nullptr);
 }
 
 Object newObject(zend_class_entry *ce, Args &args, zend_array *named_args) {
-    Object object;
+    return new_object_impl(ce, args.count(), args.ptr(), named_args);
+}
 
-    auto rc = object_init_ex(object.ptr(), ce);
-    if (EXPECTED(rc == SUCCESS)) {
-        auto this_ = object.object();
-        auto ctor = ce->constructor;
-        if (ctor) {
-            try {
-                zend_call_known_function(ctor, this_, ce, nullptr, args.count(), args.ptr(), named_args);
-                throwErrorIfOccurred();
-            } catch (...) {
-                zend_object_store_ctor_failed(this_);
-                throw;
-            }
-        }
-    }
-    throwErrorIfOccurred();
-
-    return object;
+Object newObject(zend_class_entry *ce, FixedArgs args, zend_array *named_args) {
+    return new_object_impl(ce, args.count(), args.ptr(), named_args);
 }
 
 Object newObject(zend_class_entry *ce, const ArgList &args, zend_array *named_args) {

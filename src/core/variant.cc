@@ -1293,6 +1293,14 @@ Variant Variant::call(const Variant &fn, const ArgList &args, zend_array *named_
     return call_impl(unwrap_ptr(), fn.unwrap_ptr(), _args, named_args);
 }
 
+Variant Variant::call(const Variant &fn, FixedArgs args, zend_array *named_args) {
+    if (UNEXPECTED(!isObject())) {
+        throwError("call method `%s` on %s", fn.toCString(), typeStr());
+        return {};
+    }
+    return call_impl(unwrap_ptr(), fn.unwrap_ptr(), args, named_args);
+}
+
 Variant Variant::call(const Variant &fn, Array &args, zend_array *named_args) {
     Args _args(args);
     return call(fn, _args, named_args);
@@ -1310,6 +1318,14 @@ Variant Variant::call(zend_function *fn, Args &_args, zend_array *named_args) {
     auto obj = checkedObject("Call to a member function");
     Variant retval{};
     zend_call_known_function(fn, obj, obj->ce, retval.ptr(), _args.count(), _args.ptr(), named_args);
+    throwErrorIfOccurred();
+    return retval;
+}
+
+Variant Variant::call(zend_function *fn, FixedArgs args, zend_array *named_args) {
+    auto obj = checkedObject("Call to a member function");
+    Variant retval{};
+    zend_call_known_function(fn, obj, obj->ce, retval.ptr(), args.count(), args.ptr(), named_args);
     throwErrorIfOccurred();
     return retval;
 }

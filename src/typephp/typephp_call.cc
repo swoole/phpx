@@ -108,10 +108,10 @@ void php::MethodCallCacheSlot::reset() noexcept {
     polymorphic_ = false;
 }
 
-php::Variant php::FunctionCallCacheSlot::call(const Variant &func,
-                                              uint32_t param_count,
-                                              zval *params,
-                                              zend_array *named_args) {
+php::Variant php::FunctionCallCacheSlot::callImpl(const Variant &func,
+                                                  uint32_t param_count,
+                                                  zval *params,
+                                                  zend_array *named_args) {
     if (UNEXPECTED(!func.isString())) {
         zend_fcall_info_cache resolved = resolveCallable(func, nullptr);
         return invokeCached(func, resolved.object, &resolved, param_count, params, named_args);
@@ -157,7 +157,7 @@ php::Variant php::FunctionCallCacheSlot::call(const Variant &func,
     return invokeCached(func, resolved.object, &resolved, param_count, params, named_args);
 }
 
-php::Variant php::MethodCallCacheSlot::call(
+php::Variant php::MethodCallCacheSlot::callImpl(
     const Variant &object, const Variant &method, uint32_t param_count, zval *params, zend_array *named_args) {
     if (UNEXPECTED(!object.isObject())) {
         php::throwError("call method `%s` on %s", method.toCString(), object.typeStr());
@@ -196,12 +196,12 @@ php::Variant php::MethodCallCacheSlot::call(
     return invokeCached(method, zend_object, &resolved, param_count, params, named_args);
 }
 
-php::Variant php::MethodCallCacheSlot::callScoped(const Variant &object,
-                                                  const Variant &method,
-                                                  const CallableScope &scope,
-                                                  uint32_t param_count,
-                                                  zval *params,
-                                                  zend_array *named_args) {
+php::Variant php::MethodCallCacheSlot::callScopedImpl(const Variant &object,
+                                                      const Variant &method,
+                                                      const CallableScope &scope,
+                                                      uint32_t param_count,
+                                                      zval *params,
+                                                      zend_array *named_args) {
     if (UNEXPECTED(!object.isObject())) {
         php::throwError("call method `%s` on %s", method.toCString(), object.typeStr());
         return {};

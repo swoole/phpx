@@ -72,6 +72,7 @@ class Array;
 class Object;
 class String;
 class Args;
+class FixedArgs;
 class Reference;
 class Box;
 

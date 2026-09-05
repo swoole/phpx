@@ -28,9 +28,14 @@ PHPX_API Object construct(Constructor constructor);
 PHPX_API Object construct(Constructor constructor, const Variant &argument);
 PHPX_API Variant call(const Variant &object);
 PHPX_API Variant call(const Variant &object, Args &args, zend_array *named_args = nullptr);
+PHPX_API Variant call(const Variant &object, FixedArgs args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &object, const ArgList &args, zend_array *named_args = nullptr);
 PHPX_API Variant callMember(const Variant &object, const String &name);
 PHPX_API Variant callMember(const Variant &object, const String &name, Args &args, zend_array *named_args = nullptr);
+PHPX_API Variant callMember(const Variant &object,
+                            const String &name,
+                            FixedArgs args,
+                            zend_array *named_args = nullptr);
 PHPX_API Variant callMember(const Variant &object,
                             const String &name,
                             const ArgList &args,

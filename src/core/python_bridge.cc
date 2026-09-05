@@ -135,6 +135,12 @@ Variant call(const Variant &object, Args &args, zend_array *named_args) {
         result, api().call(object.const_ptr(), static_cast<uint32_t>(args.count()), args.ptr(), named_args, &result));
 }
 
+Variant call(const Variant &object, FixedArgs args, zend_array *named_args) {
+    zval result;
+    ZVAL_UNDEF(&result);
+    return takeResult(result, api().call(object.const_ptr(), args.count(), args.ptr(), named_args, &result));
+}
+
 Variant call(const Variant &object, const ArgList &args, zend_array *named_args) {
     Args call_args(args);
     return php::python::call(object, call_args, named_args);
@@ -155,6 +161,19 @@ Variant callMember(const Variant &object, const String &name, Args &args, zend_a
                                         name.data(),
                                         name.length(),
                                         static_cast<uint32_t>(args.count()),
+                                        args.ptr(),
+                                        named_args,
+                                        &result));
+}
+
+Variant callMember(const Variant &object, const String &name, FixedArgs args, zend_array *named_args) {
+    zval result;
+    ZVAL_UNDEF(&result);
+    return takeResult(result,
+                      api().call_member(object.const_ptr(),
+                                        name.data(),
+                                        name.length(),
+                                        args.count(),
                                         args.ptr(),
                                         named_args,
                                         &result));

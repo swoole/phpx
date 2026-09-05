@@ -145,8 +145,45 @@ PHPX_API Variant include(Variant file, IncludeType type = INCLUDE);
 PHPX_API Variant include(Variant file, IncludeType type, const Array &scope);
 PHPX_API Variant eval(const String &script, const char *filename = nullptr);
 PHPX_API Variant call(const Variant &func, Args &args, zend_array *named_args = nullptr);
+PHPX_API Variant call(const Variant &func, FixedArgs args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &func, Array &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &func, const ArgList &args, zend_array *named_args = nullptr);
+
+/**
+ * Resolve and invoke a static method without materializing a
+ * "Class::method" callable string. The zend_class_entry overload is intended
+ * for callers that already know the class. Method handlers are deliberately
+ * resolved on every call because this API serves dynamically dispatched call
+ * sites and does not assume locality in external class/method inputs.
+ */
+PHPX_API Variant callStaticMethod(const Variant &class_or_object,
+                                  const Variant &method);
+PHPX_API Variant callStaticMethod(const Variant &class_or_object,
+                                  const Variant &method,
+                                  Args &args,
+                                  zend_array *named_args = nullptr);
+PHPX_API Variant callStaticMethod(const Variant &class_or_object,
+                                  const Variant &method,
+                                  FixedArgs args,
+                                  zend_array *named_args = nullptr);
+PHPX_API Variant callStaticMethod(const Variant &class_or_object,
+                                  const Variant &method,
+                                  Array &args,
+                                  zend_array *named_args = nullptr);
+PHPX_API Variant callStaticMethod(zend_class_entry *class_entry,
+                                  const Variant &method);
+PHPX_API Variant callStaticMethod(zend_class_entry *class_entry,
+                                  const Variant &method,
+                                  Args &args,
+                                  zend_array *named_args = nullptr);
+PHPX_API Variant callStaticMethod(zend_class_entry *class_entry,
+                                  const Variant &method,
+                                  FixedArgs args,
+                                  zend_array *named_args = nullptr);
+PHPX_API Variant callStaticMethod(zend_class_entry *class_entry,
+                                  const Variant &method,
+                                  Array &args,
+                                  zend_array *named_args = nullptr);
 
 /** Reusable lexical and late-bound context used while Zend resolves callables. */
 class CallableScope final {
@@ -209,6 +246,10 @@ PHPX_API Variant callScoped(const Variant &func,
                             zend_array *named_args = nullptr);
 PHPX_API Variant callScoped(const Variant &func,
                             const CallableScope &scope,
+                            FixedArgs args,
+                            zend_array *named_args = nullptr);
+PHPX_API Variant callScoped(const Variant &func,
+                            const CallableScope &scope,
                             Array &args,
                             zend_array *named_args = nullptr);
 PHPX_API Variant callScoped(const Variant &func,
@@ -223,6 +264,11 @@ PHPX_API Variant callScoped(const Variant &object,
 PHPX_API Variant callScoped(const Variant &object,
                             const Variant &func,
                             const CallableScope &scope,
+                            FixedArgs args,
+                            zend_array *named_args = nullptr);
+PHPX_API Variant callScoped(const Variant &object,
+                            const Variant &func,
+                            const CallableScope &scope,
                             Array &args,
                             zend_array *named_args = nullptr);
 PHPX_API Variant callScoped(const Variant &object,
@@ -232,10 +278,15 @@ PHPX_API Variant callScoped(const Variant &object,
                             zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, Args &_args, zend_array *named_args = nullptr);
+PHPX_API Variant call(zend_function *func, FixedArgs args, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, Array &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_function *func, const ArgList &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_class_entry *ce, zend_function *func, zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_class_entry *ce, zend_function *func, Args &args, zend_array *named_args = nullptr);
+PHPX_API Variant call(zend_class_entry *ce,
+                      zend_function *func,
+                      FixedArgs args,
+                      zend_array *named_args = nullptr);
 PHPX_API Variant call(zend_class_entry *ce, zend_function *func, const ArgList &args, zend_array *named_args = nullptr);
 PHPX_API Variant throwException(const String &class_name, const char *message, int code = 0);
 PHPX_API Variant throwException(zend_class_entry *ce, const char *message, int code = 0);
@@ -312,6 +363,7 @@ void request_shutdown();
 int array_data_compare(Bucket *f, Bucket *s);
 bool prepare_slice(Int &offset, Int &length, size_t total);
 Variant call_impl(const zval *object, const zval *func, Args &args, zend_array *named_args = nullptr);
+Variant call_impl(const zval *object, const zval *func, FixedArgs args, zend_array *named_args = nullptr);
 Variant call_impl(const zval *object, const zval *func);
 
 #ifdef ZTS
@@ -1447,10 +1499,12 @@ class Variant {
         }
         return call_impl(unwrap_ptr(), fn.unwrap_ptr(), args, named_args);
     }
+    Variant call(const Variant &fn, FixedArgs args, zend_array *named_args = nullptr);
     Variant call(const Variant &fn, Array &args, zend_array *named_args = nullptr);
     Variant call(const Variant &fn, const ArgList &args, zend_array *named_args = nullptr);
     Variant call(zend_function *fn);
     Variant call(zend_function *fn, Args &args, zend_array *named_args = nullptr);
+    Variant call(zend_function *fn, FixedArgs args, zend_array *named_args = nullptr);
     Variant call(zend_function *fn, Array &args, zend_array *named_args = nullptr);
     Variant call(zend_function *fn, const ArgList &args, zend_array *named_args = nullptr);
 
@@ -2448,6 +2502,69 @@ class Args {
     }
 };
 
+/**
+ * Non-owning view over a TypePHP-generated std::array<Variant, N>.
+ *
+ * Variant is intentionally ABI-compatible with zval. TypePHP materializes
+ * ordinary arguments before constructing the array, while explicit reference
+ * arguments remain references. The temporary array stays alive for the full
+ * call expression, so PHPX can pass its contiguous storage directly without
+ * exposing zval arrays in generated code or allocating php::Args.
+ */
+class FixedArgs final {
+    static constexpr size_t MAX_COUNT = 65'536;
+
+    zval *params_ = nullptr;
+    uint32_t count_ = 0;
+
+  public:
+    template <size_t N>
+    FixedArgs(std::array<Variant, N> &args) noexcept
+        : count_(static_cast<uint32_t>(N)) {
+        static_assert(N <= MAX_COUNT,
+                      "FixedArgs cannot contain more than 65536 arguments");
+        static_assert(std::is_standard_layout_v<Variant>);
+        static_assert(sizeof(Variant) == sizeof(zval));
+        static_assert(alignof(Variant) == alignof(zval));
+        if constexpr (N != 0) {
+            static_assert(sizeof(std::array<Variant, N>) == sizeof(zval) * N);
+            params_ = args.front().ptr();
+        }
+#if ZEND_DEBUG
+        for (const auto &arg : args) {
+            ZEND_ASSERT(!arg.isIndirect());
+        }
+#endif
+    }
+
+    template <size_t N>
+    FixedArgs(std::array<Variant, N> &&args) noexcept : FixedArgs(args) {}
+
+    uint32_t count() const noexcept {
+        return count_;
+    }
+
+    PHPX_UNSAFE zval *ptr() const noexcept {
+        return params_;
+    }
+};
+
+static inline Variant callStaticMethod(const Variant &class_or_object,
+                                       const Variant &method,
+                                       const ArgList &args,
+                                       zend_array *named_args = nullptr) {
+    Args call_args(args);
+    return callStaticMethod(class_or_object, method, call_args, named_args);
+}
+
+static inline Variant callStaticMethod(zend_class_entry *class_entry,
+                                       const Variant &method,
+                                       const ArgList &args,
+                                       zend_array *named_args = nullptr) {
+    Args call_args(args);
+    return callStaticMethod(class_entry, method, call_args, named_args);
+}
+
 PHPX_API extern zend_function *getFunction(const String &name);
 PHPX_API extern zend_function *getMethod(const String &class_name, const String &name);
 PHPX_API extern zend_function *getMethod(zend_class_entry *ce, const String &name);
@@ -2504,6 +2621,7 @@ class Object : public Variant {
     Variant callParentMethod(const String &func) {
         return callParentMethod(func, {});
     }
+    Variant callParentMethod(const String &func, FixedArgs args);
     Variant callParentMethod(const String &func, const ArgList &args);
 
     bool offsetExists(const Variant &offset, int check_empty = 0) const;
@@ -2837,6 +2955,7 @@ extern PHPX_API void normalizeCallableClass(Args &args, size_t index, const Call
 
 extern Object newObject(zend_class_entry *ce);
 extern Object newObject(zend_class_entry *ce, Args &args, zend_array *named_args = nullptr);
+extern Object newObject(zend_class_entry *ce, FixedArgs args, zend_array *named_args = nullptr);
 extern Object newObject(zend_class_entry *ce, const ArgList &args, zend_array *named_args = nullptr);
 extern Object newObject(zend_class_entry *ce, Array &args, zend_array *named_args = nullptr);
 
@@ -2852,11 +2971,19 @@ static inline Object newObject(const String &name, Args &args, zend_array *named
     return newObject(getClassEntrySafe(name), args, named_args);
 }
 
+static inline Object newObject(const String &name, FixedArgs args, zend_array *named_args = nullptr) {
+    return newObject(getClassEntrySafe(name), args, named_args);
+}
+
 static inline Object newObject(const String &name, Array &args, zend_array *named_args = nullptr) {
     return newObject(getClassEntrySafe(name), args, named_args);
 }
 
 static inline Object newObject(const Variant &name, Args &args, zend_array *named_args = nullptr) {
+    return newObject(name.toString(), args, named_args);
+}
+
+static inline Object newObject(const Variant &name, FixedArgs args, zend_array *named_args = nullptr) {
     return newObject(name.toString(), args, named_args);
 }
 
