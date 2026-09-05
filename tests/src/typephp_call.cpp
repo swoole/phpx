@@ -29,6 +29,15 @@ TEST(typephp_call, function_cache_supports_monomorphic_and_polymorphic_strings) 
 TEST(typephp_call, var_list_deduces_fixed_argument_storage) {
     static_assert(std::is_same_v<decltype(VarList{"phpx_cached_first", 1}), VarList<2>>);
 
+    int evaluation_order = 0;
+    auto advance = [&evaluation_order]() {
+        return ++evaluation_order;
+    };
+    VarList ordered{evaluation_order, advance(), evaluation_order};
+    EXPECT_EQ(ordered.values_[0].toInt(), 0);
+    EXPECT_EQ(ordered.values_[1].toInt(), 1);
+    EXPECT_EQ(ordered.values_[2].toInt(), 1);
+
     eval(R"PHP(
         function phpx_var_list_target(int $value): int { return $value + 1; }
         function phpx_var_list_increment(int &$value): int { return ++$value; }
@@ -74,9 +83,9 @@ TEST(typephp_call, non_string_callables_are_not_retained) {
     const uint32_t references = GC_REFCOUNT(closure.object());
     const uint32_t alternate_references = GC_REFCOUNT(alternate.object());
 
-    EXPECT_EQ(typephp_call_cached(closure, cache, {4}).toInt(), 7);
-    EXPECT_EQ(typephp_call_cached(alternate, cache, {4}).toInt(), 9);
-    EXPECT_EQ(typephp_call_cached(closure, cache, {5}).toInt(), 8);
+    EXPECT_EQ(typephp_call_cached(closure, cache, VarList{4}).toInt(), 7);
+    EXPECT_EQ(typephp_call_cached(alternate, cache, VarList{4}).toInt(), 9);
+    EXPECT_EQ(typephp_call_cached(closure, cache, VarList{5}).toInt(), 8);
     EXPECT_EQ(GC_REFCOUNT(closure.object()), references);
     EXPECT_EQ(GC_REFCOUNT(alternate.object()), alternate_references);
     closure.unset();
@@ -133,10 +142,10 @@ TEST(typephp_call, method_cache_guards_class_name_and_magic_trampolines) {
     Variant magic = eval("return new PhpxCachedMagicMethod();");
     MethodCallCacheSlot cache;
 
-    EXPECT_EQ(typephp_call_method_cached(first, "run", cache, {1}).toString(), "first:1");
-    EXPECT_EQ(typephp_call_method_cached(first, "run", cache, {2}).toString(), "first:2");
-    EXPECT_EQ(typephp_call_method_cached(second, "run", cache, {3}).toString(), "second:3");
-    EXPECT_EQ(typephp_call_method_cached(magic, "missing", cache, {4}).toString(), "magic-missing:4");
+    EXPECT_EQ(typephp_call_method_cached(first, "run", cache, VarList{1}).toString(), "first:1");
+    EXPECT_EQ(typephp_call_method_cached(first, "run", cache, VarList{2}).toString(), "first:2");
+    EXPECT_EQ(typephp_call_method_cached(second, "run", cache, VarList{3}).toString(), "second:3");
+    EXPECT_EQ(typephp_call_method_cached(magic, "missing", cache, VarList{4}).toString(), "magic-missing:4");
 }
 
 TEST(typephp_call, scoped_method_cache_guards_lexical_and_called_scope) {
@@ -160,10 +169,10 @@ TEST(typephp_call, scoped_method_cache_guards_lexical_and_called_scope) {
     CallableScope foreign_scope{getMethod(foreign_ce, "scopeAnchor"), foreign_ce, nullptr};
     MethodCallCacheSlot cache;
 
-    EXPECT_EQ(typephp_call_method_scoped_cached(target, "hidden", target_scope, cache, {1}).toString(), "private:1");
-    EXPECT_EQ(typephp_call_method_scoped_cached(target, "hidden", target_scope, cache, {2}).toString(), "private:2");
-    EXPECT_EQ(typephp_call_method_cached(target, "hidden", cache, {3}).toString(), "magic-hidden:3");
-    EXPECT_EQ(typephp_call_method_scoped_cached(target, "hidden", foreign_scope, cache, {4}).toString(),
+    EXPECT_EQ(typephp_call_method_scoped_cached(target, "hidden", target_scope, cache, VarList{1}).toString(), "private:1");
+    EXPECT_EQ(typephp_call_method_scoped_cached(target, "hidden", target_scope, cache, VarList{2}).toString(), "private:2");
+    EXPECT_EQ(typephp_call_method_cached(target, "hidden", cache, VarList{3}).toString(), "magic-hidden:3");
+    EXPECT_EQ(typephp_call_method_scoped_cached(target, "hidden", foreign_scope, cache, VarList{4}).toString(),
               "magic-hidden:4");
 }
 
@@ -187,10 +196,10 @@ TEST(typephp_call, call_caches_accept_indirect_receivers_and_names) {
     ASSERT_TRUE(function.isIndirect());
 
     MethodCallCacheSlot method_cache;
-    EXPECT_EQ(typephp_call_method_cached(object, method, method_cache, {1}).toString(), "run:1");
-    EXPECT_EQ(typephp_call_method_cached(object, method, method_cache, {2}).toString(), "run:2");
+    EXPECT_EQ(typephp_call_method_cached(object, method, method_cache, VarList{1}).toString(), "run:1");
+    EXPECT_EQ(typephp_call_method_cached(object, method, method_cache, VarList{2}).toString(), "run:2");
 
     FunctionCallCacheSlot function_cache;
-    EXPECT_EQ(typephp_call_cached(function, function_cache, {3}).toString(), "function:3");
-    EXPECT_EQ(typephp_call_cached(function, function_cache, {4}).toString(), "function:4");
+    EXPECT_EQ(typephp_call_cached(function, function_cache, VarList{3}).toString(), "function:3");
+    EXPECT_EQ(typephp_call_cached(function, function_cache, VarList{4}).toString(), "function:4");
 }

@@ -2502,17 +2502,17 @@ class Args {
     }
 };
 
-/** Fixed-size owning argument storage used by generated TypePHP calls. */
+/**
+ * Fixed-size owning argument storage used by generated TypePHP calls.
+ *
+ * This must remain an aggregate. C++17 evaluates aggregate initializer
+ * elements from left to right, while arguments to a variadic constructor do
+ * not have that ordering guarantee. Generated PHP call arguments therefore
+ * keep their source evaluation order without allocating php::Args.
+ */
 template <size_t N>
-class VarList final {
-    friend class FixedArgs;
-
+struct VarList final {
     std::array<Variant, N> values_;
-
-  public:
-    template <typename... Values, std::enable_if_t<sizeof...(Values) == N, int> = 0>
-    explicit VarList(Values &&...values)
-        : values_{Variant(std::forward<Values>(values))...} {}
 };
 
 template <typename... Values>

@@ -471,11 +471,6 @@ static inline zend_class_entry *typephp_get_called_ce(php::Object &this_) noexce
     return static_cast<zend_class_entry *>(Z_PTR_P(this_.ptr()));
 }
 
-static inline php::Str typephp_get_called_class(php::Object &this_) {
-    zend_class_entry *called_scope = typephp_get_called_ce(this_);
-    return called_scope == nullptr ? php::Str("") : php::Str(called_scope->name);
-}
-
 static inline php::Str typephp_get_called_class(zend_class_entry *called_scope) {
     return called_scope == nullptr ? php::Str("") : php::Str(called_scope->name);
 }
@@ -499,11 +494,6 @@ static inline zval *typephp_get_static_property_slot(zend_class_entry *ce, const
     zval *slot = zend_read_static_property_ex(ce, property.str(), true);
     php::throwErrorIfOccurred();
     return slot;
-}
-
-static inline php::Variant typephp_get_static_property(zend_class_entry *ce, uint32_t offset) {
-    zval *slot = typephp_get_static_property_slot(ce, offset);
-    return php::Variant{slot, php::zval_wrap(slot)};
 }
 
 /**
@@ -578,14 +568,6 @@ static zend_always_inline php::Variant typephp_call_cached(const php::Variant &f
 }
 
 static inline php::Variant typephp_call_cached(const php::Variant &func,
-                                               php::FunctionCallCacheSlot &cache,
-                                               const php::ArgList &args,
-                                               zend_array *named_args = nullptr) {
-    php::Args call_args(args);
-    return cache.call(func, call_args, named_args);
-}
-
-static inline php::Variant typephp_call_cached(const php::Variant &func,
                                                php::FunctionCallCacheSlot &cache) {
     return cache.call(func);
 }
@@ -604,15 +586,6 @@ static zend_always_inline php::Variant typephp_call_method_cached(const php::Var
                                                                   php::FixedArgs args,
                                                                   zend_array *named_args = nullptr) {
     return cache.call(object, method, args, named_args);
-}
-
-static inline php::Variant typephp_call_method_cached(const php::Variant &object,
-                                                      const php::Variant &method,
-                                                      php::MethodCallCacheSlot &cache,
-                                                      const php::ArgList &args,
-                                                      zend_array *named_args = nullptr) {
-    php::Args call_args(args);
-    return cache.call(object, method, call_args, named_args);
 }
 
 static inline php::Variant typephp_call_method_cached(const php::Variant &object,
@@ -643,108 +616,8 @@ static zend_always_inline php::Variant typephp_call_method_scoped_cached(
 static inline php::Variant typephp_call_method_scoped_cached(const php::Variant &object,
                                                              const php::Variant &method,
                                                              const php::CallableScope &scope,
-                                                             php::MethodCallCacheSlot &cache,
-                                                             const php::ArgList &args,
-                                                             zend_array *named_args = nullptr) {
-    php::Args call_args(args);
-    return cache.callScoped(object, method, scope, call_args, named_args);
-}
-
-static inline php::Variant typephp_call_method_scoped_cached(const php::Variant &object,
-                                                             const php::Variant &method,
-                                                             const php::CallableScope &scope,
                                                              php::MethodCallCacheSlot &cache) {
     return cache.callScoped(object, method, scope);
-}
-
-/** Invoke the lexical parent constructor as part of a new-expression chain. */
-static inline php::Variant typephp_call_parent_constructor(php::Object &object,
-                                                           zend_function *constructor,
-                                                           php::Args &args,
-                                                           zend_array *named_args = nullptr) {
-    php::Variant retval;
-    zend_call_known_function(constructor,
-                             object.checkedObject("Call to parent constructor"),
-                             object.ce(),
-                             retval.ptr(),
-                             args.count(),
-                             args.ptr(),
-                             named_args);
-    php::throwErrorIfOccurred();
-    return retval;
-}
-
-static inline php::Variant typephp_call_parent_constructor(php::Object &object,
-                                                           zend_function *constructor,
-                                                           const php::ArgList &args,
-                                                           zend_array *named_args = nullptr) {
-    php::Args call_args(args);
-    return typephp_call_parent_constructor(object, constructor, call_args, named_args);
-}
-
-static inline php::Variant typephp_call_parent_constructor(php::Object &object, zend_function *constructor) {
-    php::Args args;
-    return typephp_call_parent_constructor(object, constructor, args);
-}
-
-static inline php::Variant typephp_call_parent_constructor(php::Object &object,
-                                                           zend_function *constructor,
-                                                           php::FixedArgs args,
-                                                           zend_array *named_args = nullptr) {
-    php::Variant retval;
-    zend_call_known_function(constructor,
-                             object.checkedObject("Call to parent constructor"),
-                             object.ce(),
-                             retval.ptr(),
-                             args.count(),
-                             args.ptr(),
-                             named_args);
-    php::throwErrorIfOccurred();
-    return retval;
-}
-
-static inline php::Variant typephp_call_parent_constructor(php::Object &object,
-                                                           zend_function *constructor,
-                                                           php::Array &args,
-                                                           zend_array *named_args = nullptr) {
-    php::Args call_args(args);
-    return typephp_call_parent_constructor(object, constructor, call_args, named_args);
-}
-
-/** Invoke the lexical parent clone hook as part of a clone-expression chain. */
-static inline php::Variant typephp_call_parent_clone(php::Object &object, zend_function *clone_method) {
-    php::Variant retval;
-    zend_call_known_function(clone_method,
-                             object.checkedObject("Call to parent clone method"),
-                             object.ce(),
-                             retval.ptr(),
-                             0,
-                             nullptr,
-                             nullptr);
-    php::throwErrorIfOccurred();
-    return retval;
-}
-
-/**
- * Read one dynamic dimension for TypePHP's null-coalescing assignment.
- *
- * ArrayAccess requires offsetExists() followed by offsetGet(), because an
- * existing null value still selects the assignment branch. Arrays, strings,
- * and unsupported scalar values retain PHPX's normal exists() behavior.
- * Keeping this dispatch here prevents generated code from duplicating the
- * ArrayAccess protocol without exposing Zend dimension-handler details.
- */
-static inline bool typephp_coalesce_dimension_read(const php::Variant &container,
-                                                   const php::Variant &key,
-                                                   php::Variant &result) {
-    if (container.isObject()) {
-        if (!container.offsetExists(key)) {
-            return false;
-        }
-        result = container.offsetGet(key);
-        return !result.isNull();
-    }
-    return php::exists(container, {{php::ArrayDimFetch, key}}, result);
 }
 
 /**
