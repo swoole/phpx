@@ -26,6 +26,25 @@ TEST(typephp_call, function_cache_supports_monomorphic_and_polymorphic_strings) 
     EXPECT_EQ(typephp_call_cached("phpx_cached_many", cache, five_args).toInt(), 15);
 }
 
+TEST(typephp_call, var_list_deduces_fixed_argument_storage) {
+    static_assert(std::is_same_v<decltype(VarList{"phpx_cached_first", 1}), VarList<2>>);
+
+    eval(R"PHP(
+        function phpx_var_list_target(int $value): int { return $value + 1; }
+        function phpx_var_list_increment(int &$value): int { return ++$value; }
+        function phpx_var_list_no_args(): int { return 42; }
+    )PHP");
+    FunctionCallCacheSlot cache;
+    EXPECT_EQ(typephp_call_cached("phpx_var_list_target", cache, VarList{4}).toInt(), 5);
+
+    Variant value = 10;
+    Reference reference = value.toReference();
+    EXPECT_EQ(typephp_call_cached("phpx_var_list_increment", cache, VarList{&reference}).toInt(), 11);
+    EXPECT_EQ(value.toInt(), 11);
+
+    EXPECT_EQ(typephp_call_cached("phpx_var_list_no_args", cache, VarList{}).toInt(), 42);
+}
+
 TEST(typephp_call, fixed_argument_path_preserves_references_and_exceptions) {
     eval(R"PHP(
         function phpx_cached_increment(int &$value): int { return ++$value; }

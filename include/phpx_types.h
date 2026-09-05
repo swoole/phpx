@@ -73,6 +73,8 @@ class Object;
 class String;
 class Args;
 class FixedArgs;
+template <size_t N>
+class VarList;
 class Reference;
 class Box;
 

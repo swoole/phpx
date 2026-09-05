@@ -2502,8 +2502,24 @@ class Args {
     }
 };
 
+/** Fixed-size owning argument storage used by generated TypePHP calls. */
+template <size_t N>
+class VarList final {
+    friend class FixedArgs;
+
+    std::array<Variant, N> values_;
+
+  public:
+    template <typename... Values, std::enable_if_t<sizeof...(Values) == N, int> = 0>
+    explicit VarList(Values &&...values)
+        : values_{Variant(std::forward<Values>(values))...} {}
+};
+
+template <typename... Values>
+VarList(Values &&...) -> VarList<sizeof...(Values)>;
+
 /**
- * Non-owning view over a TypePHP-generated std::array<Variant, N>.
+ * Non-owning view over a TypePHP-generated VarList or std::array<Variant, N>.
  *
  * Variant is intentionally ABI-compatible with zval. TypePHP materializes
  * ordinary arguments before constructing the array, while explicit reference
@@ -2539,6 +2555,12 @@ class FixedArgs final {
 
     template <size_t N>
     FixedArgs(std::array<Variant, N> &&args) noexcept : FixedArgs(args) {}
+
+    template <size_t N>
+    FixedArgs(VarList<N> &args) noexcept : FixedArgs(args.values_) {}
+
+    template <size_t N>
+    FixedArgs(VarList<N> &&args) noexcept : FixedArgs(args.values_) {}
 
     uint32_t count() const noexcept {
         return count_;
