@@ -245,6 +245,9 @@ class PHPX_API FunctionCallCacheSlot final {
     FunctionCallCacheSlot &operator=(const FunctionCallCacheSlot &) = delete;
 
     void reset() noexcept;
+    Variant call(const Variant &func) {
+        return callImpl(func, 0, nullptr, nullptr);
+    }
     Variant call(const Variant &func, Args &args, zend_array *named_args = nullptr) {
         return callImpl(func, args.count(), args.ptr(), named_args);
     }
@@ -284,11 +287,19 @@ class PHPX_API MethodCallCacheSlot final {
     MethodCallCacheSlot &operator=(const MethodCallCacheSlot &) = delete;
 
     void reset() noexcept;
+    Variant call(const Variant &object, const Variant &method) {
+        return callImpl(object, method, 0, nullptr, nullptr);
+    }
     Variant call(const Variant &object, const Variant &method, Args &args, zend_array *named_args = nullptr) {
         return callImpl(object, method, args.count(), args.ptr(), named_args);
     }
     Variant call(const Variant &object, const Variant &method, FixedArgs args, zend_array *named_args = nullptr) {
         return callImpl(object, method, args.count(), args.ptr(), named_args);
+    }
+    Variant callScoped(const Variant &object,
+                       const Variant &method,
+                       const CallableScope &scope) {
+        return callScopedImpl(object, method, scope, 0, nullptr, nullptr);
     }
     Variant callScoped(const Variant &object,
                        const Variant &method,
@@ -576,8 +587,7 @@ static inline php::Variant typephp_call_cached(const php::Variant &func,
 
 static inline php::Variant typephp_call_cached(const php::Variant &func,
                                                php::FunctionCallCacheSlot &cache) {
-    php::Args args;
-    return cache.call(func, args);
+    return cache.call(func);
 }
 
 static inline php::Variant typephp_call_method_cached(const php::Variant &object,
@@ -608,8 +618,7 @@ static inline php::Variant typephp_call_method_cached(const php::Variant &object
 static inline php::Variant typephp_call_method_cached(const php::Variant &object,
                                                       const php::Variant &method,
                                                       php::MethodCallCacheSlot &cache) {
-    php::Args args;
-    return cache.call(object, method, args);
+    return cache.call(object, method);
 }
 
 static inline php::Variant typephp_call_method_scoped_cached(const php::Variant &object,
@@ -645,8 +654,7 @@ static inline php::Variant typephp_call_method_scoped_cached(const php::Variant 
                                                              const php::Variant &method,
                                                              const php::CallableScope &scope,
                                                              php::MethodCallCacheSlot &cache) {
-    php::Args args;
-    return cache.callScoped(object, method, scope, args);
+    return cache.callScoped(object, method, scope);
 }
 
 /** Invoke the lexical parent constructor as part of a new-expression chain. */
