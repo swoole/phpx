@@ -50,13 +50,20 @@ TEST(typephp_call, fixed_argument_path_preserves_references_and_exceptions) {
 
 TEST(typephp_call, non_string_callables_are_not_retained) {
     Variant closure = eval("return static fn (int $value): int => $value + 3;");
+    Variant alternate = eval("return static fn (int $value): int => $value + 5;");
     FunctionCallCacheSlot cache;
     const uint32_t references = GC_REFCOUNT(closure.object());
+    const uint32_t alternate_references = GC_REFCOUNT(alternate.object());
 
     EXPECT_EQ(typephp_call_cached(closure, cache, {4}).toInt(), 7);
+    EXPECT_EQ(typephp_call_cached(alternate, cache, {4}).toInt(), 9);
+    EXPECT_EQ(typephp_call_cached(closure, cache, {5}).toInt(), 8);
     EXPECT_EQ(GC_REFCOUNT(closure.object()), references);
+    EXPECT_EQ(GC_REFCOUNT(alternate.object()), alternate_references);
     closure.unset();
+    alternate.unset();
     EXPECT_TRUE(closure.isUndef());
+    EXPECT_TRUE(alternate.isUndef());
 }
 
 TEST(typephp_call, method_cache_guards_class_name_and_magic_trampolines) {

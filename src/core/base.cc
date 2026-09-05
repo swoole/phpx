@@ -709,14 +709,18 @@ Variant call_static_method_impl(zend_class_entry *class_entry,
         : zend_std_get_static_method(class_entry, method_name, nullptr);
     if (UNEXPECTED(function == nullptr)) {
         if (EXPECTED(EG(exception) == nullptr)) {
-            zend_undefined_method(class_entry, method_name);
+            zend_throw_error(
+                nullptr, "Call to undefined method %s::%s()", ZSTR_VAL(class_entry->name), ZSTR_VAL(method_name));
         }
         throwErrorIfOccurred();
         return {};
     }
 
     if (UNEXPECTED(!(function->common.fn_flags & ZEND_ACC_STATIC))) {
-        zend_non_static_method_call(function);
+        zend_throw_error(zend_ce_error,
+                         "Non-static method %s::%s() cannot be called statically",
+                         ZSTR_VAL(function->common.scope->name),
+                         ZSTR_VAL(function->common.function_name));
         throwErrorIfOccurred();
         return {};
     }

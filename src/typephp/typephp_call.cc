@@ -1,5 +1,7 @@
 #include <typephp_helper.h>
 
+#include <zend_closures.h>
+
 namespace {
 
 constexpr uint32_t NON_CACHEABLE_CALL_FLAGS = ZEND_ACC_CALL_VIA_TRAMPOLINE | ZEND_ACC_NEVER_CACHE;
@@ -62,6 +64,27 @@ zend_fcall_info_cache resolveCallable(const php::Variant &callable,
     return cache;
 }
 
+bool resolveClosureCallable(const php::Variant &callable, zend_fcall_info_cache *cache) noexcept {
+    const zval *value = callable.unwrap_ptr();
+    if (Z_TYPE_P(value) != IS_OBJECT) {
+        return false;
+    }
+
+    zend_object *closure = Z_OBJ_P(value);
+    if (closure->ce != zend_ce_closure) {
+        return false;
+    }
+
+    ZEND_ASSERT(closure->handlers->get_closure != nullptr);
+    if (UNEXPECTED(closure->handlers->get_closure(
+                       closure, &cache->calling_scope, &cache->function_handler, &cache->object, true) != SUCCESS)) {
+        return false;
+    }
+    cache->called_scope = cache->calling_scope;
+    cache->closure = closure;
+    return true;
+}
+
 bool isRelativeStaticCallable(zend_string *name) {
     const char *value = ZSTR_VAL(name);
     const size_t length = ZSTR_LEN(name);
@@ -113,7 +136,11 @@ php::Variant php::FunctionCallCacheSlot::callImpl(const Variant &func,
                                                   zval *params,
                                                   zend_array *named_args) {
     if (UNEXPECTED(!func.isString())) {
-        zend_fcall_info_cache resolved = resolveCallable(func, nullptr);
+        zend_fcall_info_cache resolved{};
+        if (EXPECTED(resolveClosureCallable(func, &resolved))) {
+            return invokeCached(func, resolved.object, &resolved, param_count, params, named_args);
+        }
+        resolved = resolveCallable(func, nullptr);
         return invokeCached(func, resolved.object, &resolved, param_count, params, named_args);
     }
 

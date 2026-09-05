@@ -617,4 +617,7 @@ TEST(base, call_static_method_resolves_dynamic_class_and_method_without_callable
     try_call(
         [&]() { (void) callStaticMethod(class_entry, "instanceMethod"); },
         "Non-static method PhpxStaticCallFirst::instanceMethod() cannot be called statically");
+    try_call(
+        [&]() { (void) callStaticMethod(class_entry, "missing"); },
+        "Call to undefined method PhpxStaticCallFirst::missing()");
 }
