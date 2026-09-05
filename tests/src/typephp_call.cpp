@@ -66,6 +66,34 @@ TEST(typephp_call, non_string_callables_are_not_retained) {
     EXPECT_TRUE(alternate.isUndef());
 }
 
+TEST(typephp_call, closure_fast_path_preserves_binding_named_arguments_and_references) {
+    Variant bound = eval(R"PHP(
+        class PhpxCachedClosureBase {
+            protected int $value = 10;
+            public function make(): Closure {
+                return function (int $increment): string {
+                    return static::class . ':' . ($this->value + $increment);
+                };
+            }
+        }
+        class PhpxCachedClosureChild extends PhpxCachedClosureBase {}
+        return (new PhpxCachedClosureChild())->make();
+    )PHP");
+    FunctionCallCacheSlot cache;
+    Array named_args;
+    named_args.set("increment", 4);
+    std::array<Variant, 0> no_positional_args{};
+    EXPECT_EQ(typephp_call_cached(bound, cache, no_positional_args, named_args.array()).toString(),
+              "PhpxCachedClosureChild:14");
+
+    Variant by_reference = eval("return static function (int &$value): int { return ++$value; };");
+    Variant value = 20;
+    Reference reference = value.toReference();
+    std::array<Variant, 1> args{&reference};
+    EXPECT_EQ(typephp_call_cached(by_reference, cache, args).toInt(), 21);
+    EXPECT_EQ(value.toInt(), 21);
+}
+
 TEST(typephp_call, method_cache_guards_class_name_and_magic_trampolines) {
     eval(R"PHP(
         class PhpxCachedMethodFirst {

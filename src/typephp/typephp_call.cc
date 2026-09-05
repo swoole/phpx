@@ -75,6 +75,10 @@ bool resolveClosureCallable(const php::Variant &callable, zend_fcall_info_cache 
         return false;
     }
 
+    // A Zend Closure already owns its stable function and binding metadata.
+    // Resolve that metadata through the public object handler for this call
+    // only. Retaining the FCC in ClosureCarrier would either leave borrowed
+    // pointers behind or extend the lifetime of the Closure and its captures.
     ZEND_ASSERT(closure->handlers->get_closure != nullptr);
     if (UNEXPECTED(closure->handlers->get_closure(
                        closure, &cache->calling_scope, &cache->function_handler, &cache->object, true) != SUCCESS)) {
