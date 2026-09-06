@@ -143,6 +143,13 @@ inline String rawurldecode(const String &data) {
 // ========================
 
 inline Int random_int(Int min, Int max) {
+    if (UNEXPECTED(min > max)) {
+        php::throwException(
+            zend_ce_value_error,
+            "random_int(): Argument #1 ($min) must be less than or equal to argument #2 ($max)"
+        );
+        return 0;
+    }
     zend_long result;
     if (php_random_int(min, max, &result, true) == FAILURE) {
         throwErrorIfOccurred();
@@ -176,11 +183,18 @@ inline String random_bytes(Int length) {
 // ========================
 
 inline Int mt_rand() {
-    return static_cast<Int>(php_mt_rand());
+    return static_cast<Int>(php_mt_rand() >> 1);
 }
 
 inline Int mt_rand(Int min, Int max) {
-    return static_cast<Int>(php_mt_rand_range(min, max));
+    if (UNEXPECTED(max < min)) {
+        php::throwException(
+            zend_ce_value_error,
+            "mt_rand(): Argument #2 ($max) must be greater than or equal to argument #1 ($min)"
+        );
+        return 0;
+    }
+    return static_cast<Int>(php_mt_rand_common(min, max));
 }
 
 // ========================
@@ -189,11 +203,14 @@ inline Int mt_rand(Int min, Int max) {
 // ========================
 
 inline Int rand() {
-    return static_cast<Int>(php_mt_rand());
+    return static_cast<Int>(php_mt_rand() >> 1);
 }
 
 inline Int rand(Int min, Int max) {
-    return static_cast<Int>(php_mt_rand_range(min, max));
+    if (max < min) {
+        return static_cast<Int>(php_mt_rand_common(max, min));
+    }
+    return static_cast<Int>(php_mt_rand_common(min, max));
 }
 
 // ========================
