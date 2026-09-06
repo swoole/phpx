@@ -147,6 +147,7 @@ final class PhpXCommandTest extends TestCase
         file_put_contents($module, 'module-fixture');
         file_put_contents($runtime, 'runtime-fixture');
         file_put_contents($project . '/include/public.h', "public\n");
+        file_put_contents($project . '/include/public.hh', "public C++\n");
         file_put_contents($project . '/include/nested/public_detail.h', "public detail\n");
         file_put_contents($project . '/src/private.h', "private\n");
         file_put_contents($project . '/src/sample_ext_arginfo.h', "generated\n");
@@ -167,6 +168,7 @@ final class PhpXCommandTest extends TestCase
         self::assertSame(0, $status, $output);
         $installed = $phpIncludeDirectory . '/ext/sample_ext';
         self::assertSame("public\n", file_get_contents($installed . '/public.h'));
+        self::assertSame("public C++\n", file_get_contents($installed . '/public.hh'));
         self::assertSame("public detail\n", file_get_contents($installed . '/nested/public_detail.h'));
         self::assertFileDoesNotExist($installed . '/private.h');
         self::assertFileDoesNotExist($installed . '/sample_ext_arginfo.h');

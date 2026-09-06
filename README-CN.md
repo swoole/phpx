@@ -206,6 +206,11 @@ sudo vendor/bin/phpx enable
 首次初始化可指定 `--php-config=/path/to/php-config`，之后可使用
 `phpx switch /path/to/php-config` 切换 PHP 版本。
 
+stub 文件固定放在 `src/*.stub.php`，生成的 `*_arginfo.h` 与 stub 位于同一
+目录，均属于私有实现文件。`phpx install` 只发布显式放入 `include/` 的
+C/C++ 公共头文件，安装目标为
+`$(php-config --include-dir)/ext/<extension-name>/`；`src/` 下的头文件永不安装。
+
 ### 构建你的扩展
 
 ```shell

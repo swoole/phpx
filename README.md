@@ -207,6 +207,12 @@ module and update `php.ini`. `init` uses `php-config` from `PATH`; use
 `phpx init --php-config=/path/to/php-config` initially or
 `phpx switch /path/to/php-config` later to select another PHP installation.
 
+Stub files belong in `src/*.stub.php`; generated `*_arginfo.h` files are written
+next to their stubs and remain private implementation files. `phpx install`
+publishes only C/C++ headers placed explicitly under `include/`, installing them
+to `$(php-config --include-dir)/ext/<extension-name>/`. Headers under `src/` are
+never installed.
+
 ### Build Your Extension
 
 ```shell

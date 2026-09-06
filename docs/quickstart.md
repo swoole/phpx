@@ -1,327 +1,124 @@
 # 快速开始
 
-本指南将帮助您快速安装 PHPX 并创建第一个 PHP 扩展。
+PHPX 当前支持 PHP 8.4 和 PHP 8.5。开发环境需要对应版本的 PHP CLI、
+PHP 开发包（必须提供 `php-config`）、C++17 编译器、CMake 3.16+ 和 Composer。
 
-## 环境要求
-
-在开始之前，请确保您的系统满足以下要求：
-
-### 必需软件
-- **PHP 8.1** 或更高版本
-- **GCC 4.8+** 或 **Clang**
-- **CMake 3.10+**
-- **Composer**
-
-### 可选工具
-- **GTest**（用于运行测试）
-- **Git**（用于克隆仓库）
-
-## 安装步骤
-
-### 1. 安装依赖
-
-#### Ubuntu/Debian
-```bash
-sudo apt-get update
-sudo apt-get install php8.1-dev php8.1-cli cmake g++ git composer
-```
-
-#### CentOS/RHEL
-```bash
-sudo yum install php-devel php-cli cmake gcc-c++ git composer
-```
-
-#### macOS
-```bash
-brew install php@8.1 cmake composer
-```
-
-### 2. 克隆项目
-```bash
-git clone https://github.com/swoole/phpx.git
-cd phpx
-```
-
-### 3. 编译安装
-```bash
-cmake .
-make -j 4
-sudo make install
-sudo ldconfig
-```
-
-### 4. 验证安装
-```bash
-php-config --includes  # 应显示包含 phpx 头文件的路径
-ls /usr/local/include/phpx/  # 应看到 PHPX 头文件
-```
-
-## 创建第一个扩展
-
-### 方法一：使用 PHPX 工具（推荐）
+## 创建扩展项目
 
 ```bash
-mkdir test
-cd test
+mkdir hello_ext
+cd hello_ext
 composer require swoole/phpx
 vendor/bin/phpx init
+```
 
-# 构建扩展
+`init` 默认使用 `PATH` 中的 `php-config`。存在多个 PHP 版本时，可以在
+初始化时指定准确路径：
+
+```bash
+vendor/bin/phpx init --php-config=/opt/php-8.5/bin/php-config
+```
+
+初始化后的主要目录如下：
+
+```text
+hello_ext/
+├── .phpx.json                 # PHPX 项目及 PHP 版本配置
+├── CMakeLists.txt
+├── build/
+│   └── gen_stub.php           # 来自所选 PHP 开发包
+├── include/                   # 可发布的公共 C/C++ 头文件
+├── run-tests.php              # 来自所选 PHP 开发包
+├── src/
+│   ├── hello_ext.cc
+│   └── hello_ext.stub.php
+└── tests/
+    └── hello_ext.phpt
+```
+
+`init` 也可以补齐已有扩展项目中缺失的工具和配置。它不会覆盖已有的
+CMake、源码、头文件、stub、测试或用户修改过的构建工具。
+
+## 目录约定
+
+- 所有 `.stub.php` 文件只放在 `src/`。
+- `build` 会在对应 stub 旁生成 `src/*_arginfo.h`。
+- `src/` 下的 `.h` 和生成的 arginfo 都是私有实现，不会安装。
+- 只有显式放在 `include/` 下的 C/C++ 头文件是公共 API。
+- `install` 将公共头文件安装到
+  `$(php-config --include-dir)/ext/<extension-name>/`。
+
+## 构建
+
+```bash
 vendor/bin/phpx build
+```
+
+`build` 会先按项目选择的 `php-config` 增量构建 `libphpx`，再构建扩展。
+只有 `.stub.php` 或生成器发生变化时，才会重新生成 arginfo。
+
+可调整构建类型和并行度：
+
+```bash
+vendor/bin/phpx build --type=Debug --jobs=4
+```
+
+## 安装和启用
+
+```bash
 sudo vendor/bin/phpx install
 sudo vendor/bin/phpx enable
 ```
 
-### 方法二：手动创建
+`install` 将扩展模块、匹配的 PHPX 运行库及公共头文件安装到当前项目
+选择的 PHP。`enable` 在该 PHP 的 `php.ini` 中启用扩展；需要停用时执行：
 
-#### 1. 创建项目结构
 ```bash
-mkdir myext
-cd myext
-mkdir src
+sudo vendor/bin/phpx disable
 ```
 
-#### 2. 创建 CMakeLists.txt
-```cmake
-cmake_minimum_required(VERSION 3.10)
-project(myext)
+也可以显式传入已经构建的模块：
 
-set(CMAKE_CXX_STANDARD 17)
-
-find_package(GTest)
-
-execute_process(COMMAND php-config --prefix 
-    OUTPUT_VARIABLE PHP_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND php-config --includes 
-    OUTPUT_VARIABLE PHP_INCLUDES OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND php-config --extension-dir 
-    OUTPUT_VARIABLE PHP_EXTENSION_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-include_directories(${PHP_PREFIX}/include/phpx)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PHP_INCLUDES}")
-
-add_library(myext SHARED src/myext.cc)
-target_link_libraries(myext phpx)
-
-install(TARGETS myext LIBRARY DESTINATION ${PHP_EXTENSION_DIR})
-```
-
-#### 3. 创建扩展代码 (src/myext.cc)
-
-```cpp
-#include "phpx.h"
-
-using namespace php;
-
-// 定义一个简单的函数
-PHPX_FUNCTION(hello) {
-    return "Hello from PHPX!";
-}
-
-// 模块入口
-void php_myext_MINFO_FUNC(zend_module_entry *module) {
-    php_info_print_table_start();
-    php_info_print_table_row(2, "myext support", "enabled");
-    php_info_print_table_end();
-}
-
-// 扩展定义
-Extension ext("myext", "1.0.0");
-
-extern "C" {
-    zend_module_entry myext_module_entry = {
-        STANDARD_MODULE_HEADER,
-        "myext",                    // 扩展名称
-        nullptr,                    // 函数列表（由 PHPX 自动填充）
-        nullptr,                    // MINIT
-        nullptr,                    // MSHUTDOWN
-        nullptr,                    // RINIT
-        nullptr,                    // RSHUTDOWN
-        php_myext_MINFO_FUNC,       // MINFO
-        "1.0.0",                    // 版本号
-        STANDARD_MODULE_PROPERTIES
-    };
-}
-
-#ifdef COMPILE_DL_MYEXT
-ZEND_GET_MODULE(myext)
-#endif
-
-// 注册函数
-extern "C" void startup_extension() {
-    ext.registerFunction("hello", hello);
-}
-```
-
-#### 4. 编译安装
 ```bash
-cmake .
-make -j 4
-sudo make install
+sudo vendor/bin/phpx install /path/to/hello_ext.so
 ```
 
-#### 5. 启用扩展
-编辑 `php.ini`，添加：
-```ini
-extension=myext.so
-```
+## 运行 PHPT
 
-#### 6. 测试
-创建测试文件 `test.php`：
-```php
-<?php
-echo hello() . "\n";
-// 输出：Hello from PHPX!
-```
-
-运行：
 ```bash
-php test.php
+php run-tests.php tests
 ```
 
-## 生成函数存根
+根目录的 `run-tests.php` 与 `build/gen_stub.php` 均来自当前 PHP 开发包，
+无需在 PHPX 仓库中维护 PHP 源码副本。
 
-PHPX 提供了工具来自动生成函数信息和函数入口：
+## 切换 PHP 版本
 
-### 1. 创建存根文件 (myext.stub.php)
-```php
-<?php
-
-/**
- * @generate-function-entries
- */
-
-/**
- * Say hello
- * 
- * @return string
- */
-function hello(): string {}
-```
-
-### 2. 生成代码
 ```bash
-php build/gen_stub.php myext.stub.php
+vendor/bin/phpx switch /opt/php-8.4/bin/php-config
 ```
 
-这将生成：
-- `myext_arginfo.h` - 参数信息
+`switch` 会完成以下操作：
 
-## 常用示例
+1. 校验目标 PHP 版本；
+2. 为目标 PHP 重新构建 PHPX 运行库；
+3. 重新配置扩展的 CMake 构建目录；
+4. 更新 `gen_stub.php` 和 `run-tests.php`；
+5. 将新路径保存到 `.phpx.json`。
 
-### 1. 处理参数
-```cpp
-PHPX_FUNCTION(greet) {
-    String name = args[0].toString();
-    Int age = args[1].toInt();
-    
-    return String("Hello ") + name + ", age: " + std::to_string(age);
-}
+如果官方构建工具已被用户修改，`switch` 会停止并报错，不会覆盖文件。
+之后的 `build`、`install`、`enable` 和 `disable` 都自动使用新的 PHP。
+
+## 命令摘要
+
+```text
+phpx init [name] [--target=DIR] [--php-config=PATH]
+phpx build [--type=Release] [--jobs=4]
+phpx switch <php-config>
+phpx install [module.so|module.dll]
+phpx enable [extension-name]
+phpx disable [extension-name]
 ```
 
-### 2. 数组操作
-```cpp
-PHPX_FUNCTION(array_test) {
-    Array arr;
-    arr.set("name", "John");
-    arr.set("age", 25);
-    arr.set(0, "first");
-    
-    return arr;
-}
-```
-
-### 3. 对象创建
-```cpp
-PHPX_FUNCTION(create_object) {
-    Object obj = newObject("stdClass");
-    obj.setProperty("name", "Test");
-    return obj;
-}
-```
-
-### 4. 错误处理
-```cpp
-PHPX_FUNCTION(divide) {
-    double a = args[0].toDouble();
-    double b = args[1].toDouble();
-    
-    if (b == 0) {
-        throwError("Division by zero");
-        return;
-    }
-    
-    return a / b;
-}
-```
-
-### 5. 调用 PHP 函数
-```cpp
-PHPX_FUNCTION(call_php_func) {
-    Variant result = call("strlen", {"Hello World"});
-    return result;  // 11
-}
-```
-
-## 调试技巧
-
-### 启用调试模式
-```cpp
-enableDebugInfo(true);
-```
-
-### 输出调试信息
-```cpp
-Variant var = getValue();
-var.debug();  // 打印变量信息
-var.print();  // 使用 var_dump 格式打印
-```
-
-### 查看引用计数
-```cpp
-printf("Refcount: %d\n", var.getRefCount());
-```
-
-## 常见问题
-
-### Q: 编译时找不到 phpx.h
-A: 确保已正确安装 PHPX，并且 `include_directories` 指向正确的路径。
-
-### Q: 扩展加载失败
-A: 检查：
-1. 扩展文件是否在正确的目录
-2. `php.ini` 中的路径是否正确
-3. 是否有权限问题
-
-### Q: 段错误（Segmentation Fault）
-A: 常见原因：
-1. 未正确初始化变量
-2. 引用计数错误
-3. 访问已释放的内存
-
-使用 `valgrind` 或 `gdb` 进行调试。
-
-### Q: 如何查看扩展是否加载成功
-```bash
-php -m | grep myext
-# 或
-php --ri myext
-```
-
-## 下一步
-
-完成快速开始后，您可以：
-
-1. 阅读 [API 参考](./api-reference.md) 了解详细的 API
-2. 查看 [示例指南](./examples-guide.md) 学习更多实践
-3. 研究 [架构设计](./architecture.md) 深入理解原理
-
-## 资源链接
-
-- [GitHub 仓库](https://github.com/swoole/phpx)
-- [示例代码](../examples/)
-- [测试代码](../tests/)
-
----
-
-*需要帮助？查看 [常见问题](#常见问题) 或提交 Issue。*
+所有命令均可通过 `--php-config=/path/to/php-config` 临时指定 PHP；项目内
+通常无需重复提供，因为 `init` 和 `switch` 已将选择保存在 `.phpx.json`。

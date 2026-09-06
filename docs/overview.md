@@ -2,7 +2,7 @@
 
 ## 什么是 PHPX？
 
-PHPX（PHP eXtension）是一个使用现代 C++（C++14）封装 Zend API 的库，旨在简化 PHP 扩展的开发流程。通过提供面向对象的接口和类型安全的封装，PHPX 让开发者能够以更直观、更安全的方式编写 PHP 扩展。
+PHPX（PHP eXtension）是一个使用现代 C++（C++17）封装 Zend API 的库，旨在简化 PHP 扩展的开发流程。通过提供面向对象的接口和类型安全的封装，PHPX 让开发者能够以更直观、更安全的方式编写 PHP 扩展。
 
 ## 主要特性
 
@@ -29,8 +29,8 @@ PHPX（PHP eXtension）是一个使用现代 C++（C++14）封装 Zend API 的�
 ## 技术栈
 
 ### 核心依赖
-- **C++14**：现代 C++ 标准，提供 auto、lambda 表达式等特性
-- **PHP 8.1+**：利用最新的 PHP 内核特性
+- **C++17**：PHPX 当前使用的 C++ 标准
+- **PHP 8.4 / 8.5**：当前支持的 PHP 内核版本
 - **Zend Engine**：PHP 的核心引擎
 
 ### 构建工具
@@ -178,7 +178,7 @@ using string = String;
 ## 版本历史
 
 ### PHPX 2.x
-- 支持 PHP 8.1+
+- 支持 PHP 8.4 和 PHP 8.5
 - 重构核心架构
 - 增强类型系统
 - 完善测试覆盖
