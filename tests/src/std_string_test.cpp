@@ -23,6 +23,31 @@ TEST(std_string, chr) {
     ASSERT_STREQ(s3.toCString(), "a");
 }
 
+TEST(std_string, ctype_without_extension_handlers) {
+    ASSERT_TRUE(fn::ctype_alnum("Abc123"));
+    ASSERT_TRUE(fn::ctype_alpha("AbC"));
+    ASSERT_TRUE(fn::ctype_cntrl("\n"));
+    ASSERT_TRUE(fn::ctype_digit("0123"));
+    ASSERT_TRUE(fn::ctype_lower("abc"));
+    ASSERT_TRUE(fn::ctype_graph("!A1"));
+    ASSERT_TRUE(fn::ctype_print(" A1!"));
+    ASSERT_TRUE(fn::ctype_punct("!?"));
+    ASSERT_TRUE(fn::ctype_space(" \t\n"));
+    ASSERT_TRUE(fn::ctype_upper("ABC"));
+    ASSERT_TRUE(fn::ctype_xdigit("A09f"));
+
+    ASSERT_FALSE(fn::ctype_digit("12a"));
+    ASSERT_FALSE(fn::ctype_digit(""));
+    ASSERT_TRUE(fn::ctype_digit(49));
+    ASSERT_TRUE(fn::ctype_alpha(65));
+    ASSERT_TRUE(fn::ctype_digit(1000));
+    ASSERT_FALSE(fn::ctype_alpha(1000));
+    ASSERT_TRUE(fn::ctype_print(-1000));
+    ASSERT_FALSE(fn::ctype_digit(Variant{}));
+    ASSERT_FALSE(fn::ctype_digit(false));
+    ASSERT_FALSE(fn::ctype_digit(Array{}));
+}
+
 TEST(std_string, strlen) {
     var d = 10000;
     ASSERT_EQ(fn::strlen(d), 5);
