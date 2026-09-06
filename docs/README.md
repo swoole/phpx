@@ -1,64 +1,54 @@
-# PHPX 文档索引
+# PHPX 文档
 
-欢迎来到 PHPX 项目的文档中心。PHPX 是一个使用 C++ 封装 Zend API 的强大工具，让 PHP 扩展开发更加简单高效。
+PHPX 是面向 PHP 8.4/8.5 的 C++17 Zend API 封装，当前聚焦两项能力：
 
-## 文档目录
+1. 作为 TypePHP 生成代码的运行时；
+2. 为 C++ PHP 扩展提供类型封装、生命周期注册和项目工具。
 
-### 基础文档
-- [项目概述](./overview.md) - 项目介绍、特性和技术栈
-- [快速开始](./quickstart.md) - 安装和快速上手指南
-- [架构设计](./architecture.md) - 系统架构和设计原理
+## 用户文档
 
-### 开发文档
-- [API 参考](./api-reference.md) - 完整的 API 接口文档
-- [核心类说明](./core-classes.md) - 核心类的详细说明
+- [项目概述](overview.md)
+- [快速开始](quickstart.md)
+- [扩展与运行时架构](architecture.md)
+- [API 参考](api-reference.md)
+- [核心类型与所有权](core-classes.md)
+- [示例项目](examples-guide.md)
+- [最佳实践](best-practices.md)
 
-### 实践文档
-- [示例指南](./examples-guide.md) - 示例代码使用说明
-- [测试指南](./testing-guide.md) - 测试框架和测试方法
-- [调试指南](./debug.md) - 调试功能和工具链详解
-- [最佳实践](./best-practices.md) - 开发最佳实践
+## 开发文档
 
-## 项目结构
+- [测试指南](testing-guide.md)
+- [调试指南](debugging-guide.md)
+- [调试命令速查](debugging-quick-reference.md)
 
-```
+## 版本和平台
+
+- PHP：8.4、8.5
+- C++：C++17
+- 平台：Linux、macOS、Windows
+- 构建：CMake 3.10+
+
+PHPX 不再提供覆盖全部 PHP 内置函数和类的 Facade API。常用且具备明确
+收益的操作位于 `php::` 类型方法或 `phpx_std.h`；其他 PHP 符号通过
+`php::call()`、`newObject()`、`Object::call()` 和
+`callStaticMethod()` 动态调用。
+
+公开 API 的最终依据是 [`include/`](../include/) 中的安装头文件。文档
+不会重复所有内部签名；`src/` 和 `tests/include/` 中的符号均不属于公开
+API。
+
+## 项目目录
+
+```text
 phpx/
-├── src/           # 源代码目录
-│   ├── core/      # 核心实现（Variant, Array, Object 等）
-│   ├── std/       # 常用 PHP 函数的快速路径
-│   └── typephp/   # TypePHP 运行时辅助实现
-├── include/       # 头文件
-├── tests/         # 测试代码
-├── examples/      # 示例代码
-└── docs/          # 本文档目录
+├── bin/phpx       # 扩展项目管理工具
+├── include/       # 安装并发布的 PHPX 头文件
+├── src/core/      # Zend 值、对象、调用及扩展基础实现
+├── src/std/       # 有明确收益的标准函数快速路径
+├── src/typephp/   # TypePHP 专用运行时
+├── tests/         # C++、扩展和 CLI 测试
+└── examples/      # 扩展示例和嵌入示例
 ```
 
-## 核心特性
-
-- **C++14 封装**：现代化的 C++ 语法，简洁安全
-- **类型安全**：Variant 类型系统，自动类型转换
-- **易于使用**：面向对象的 API 设计
-- **高性能**：直接调用 Zend API，无额外开销
-- **完整测试**：单元测试覆盖核心功能
-
-## 快速链接
-
-- [GitHub 仓库](https://github.com/swoole/phpx)
-- [安装指南](./quickstart.md#安装)
-- [Hello World 示例](./quickstart.md#第一个扩展)
-- [API 文档](./api-reference.md)
-
-## 支持的 PHP 版本
-
-- PHP 8.1+
-- 支持 Linux/macOS/Windows 平台
-
-## 社区与支持
-
-- Twitter: [@phpswoole](https://twitter.com/phpswoole)
-- Discord: [Swoole 社区](https://discord.swoole.dev)
-- Issue Tracker: GitHub Issues
-
----
-
-*最后更新：2026-03-27*
+如文档示例与当前头文件产生差异，应以相同版本的安装头文件为准，并提交
+[GitHub Issue](https://github.com/swoole/phpx/issues)。

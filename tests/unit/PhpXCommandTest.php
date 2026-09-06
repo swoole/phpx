@@ -60,6 +60,10 @@ final class PhpXCommandTest extends TestCase
         self::assertDirectoryExists($project . '/vendor');
         self::assertSame("gen-stub-fixture\n", file_get_contents($project . '/build/gen_stub.php'));
         self::assertSame("run-tests-fixture\n", file_get_contents($project . '/run-tests.php'));
+        $cmake = (string) file_get_contents($project . '/CMakeLists.txt');
+        self::assertStringContainsString('target_link_libraries(sample_ext PRIVATE phpx)', $cmake);
+        self::assertStringNotContainsString('find_library(PHPX_LIBRARY', $cmake);
+        self::assertStringNotContainsString('phpx-runtime', $cmake);
         $config = json_decode((string) file_get_contents($project . '/.phpx.json'), true);
         self::assertSame(realpath((string) $config['php-config']), $config['php-config']);
         self::assertSame(
@@ -139,13 +143,11 @@ final class PhpXCommandTest extends TestCase
         $extensionDirectory = $this->temporaryDirectory . '/extensions';
         $phpIncludeDirectory = $this->temporaryDirectory . '/php/include';
         $module = $project . '/sample_ext.so';
-        $runtime = $project . '/build/phpx-runtime/lib/libphpx.so';
-        mkdir(dirname($runtime), 0777, true);
+        mkdir($project);
         mkdir($extensionDirectory);
         mkdir($project . '/include/nested', 0777, true);
         mkdir($project . '/src');
         file_put_contents($module, 'module-fixture');
-        file_put_contents($runtime, 'runtime-fixture');
         file_put_contents($project . '/include/public.h', "public\n");
         file_put_contents($project . '/include/public.hh', "public C++\n");
         file_put_contents($project . '/include/nested/public_detail.h', "public detail\n");
@@ -200,6 +202,60 @@ final class PhpXCommandTest extends TestCase
         self::assertSame("user-modified\n", file_get_contents($project . '/run-tests.php'));
     }
 
+    public function testBuildAcceptsShortParallelOptionWithoutBuildingPhpxRuntime(): void
+    {
+        $project = $this->temporaryDirectory . '/project';
+        $extensionDirectory = $this->temporaryDirectory . '/extensions';
+        $includeDirectory = $this->temporaryDirectory . '/php/include';
+        $commandDirectory = $this->temporaryDirectory . '/bin';
+        $commandLog = $this->temporaryDirectory . '/cmake.log';
+        mkdir($project);
+        mkdir($extensionDirectory);
+        mkdir($commandDirectory);
+        file_put_contents($project . '/CMakeLists.txt', "cmake_minimum_required(VERSION 3.10)\n");
+
+        $phpConfig = $this->createPhpConfigFixture($includeDirectory, $extensionDirectory);
+        file_put_contents($project . '/.phpx.json', json_encode([
+            'name' => 'sample_ext',
+            'php-config' => $phpConfig,
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
+
+        $cmake = $commandDirectory . '/cmake';
+        file_put_contents($cmake, <<<'PHP'
+#!/usr/bin/env php
+<?php
+
+file_put_contents(
+    (string) getenv('PHPX_TEST_COMMAND_LOG'),
+    json_encode(array_slice($argv, 1), JSON_THROW_ON_ERROR) . "\n",
+    FILE_APPEND,
+);
+PHP
+        );
+        chmod($cmake, 0755);
+
+        [$status, $output] = $this->runCommand(
+            ['build', '-j', '7'],
+            $project,
+            [
+                'PATH' => $commandDirectory . PATH_SEPARATOR . getenv('PATH'),
+                'PHPX_TEST_COMMAND_LOG' => $commandLog,
+            ],
+        );
+
+        self::assertSame(0, $status, $output);
+        $commands = array_map(
+            static fn (string $line): array => json_decode($line, true, flags: JSON_THROW_ON_ERROR),
+            file($commandLog, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES),
+        );
+        self::assertCount(2, $commands);
+        self::assertContains('-DPHP_CONFIG=' . $phpConfig, $commands[0]);
+        self::assertSame(['--build', $project . '/build', '--config', 'Release', '--parallel', '7'], $commands[1]);
+        self::assertNotContains('--target', $commands[0]);
+        self::assertNotContains('--target', $commands[1]);
+        self::assertStringNotContainsString('phpx-runtime', file_get_contents($commandLog));
+    }
+
     private function createToolFixtures(): string
     {
         $directory = $this->temporaryDirectory . '/php-build';
@@ -237,7 +293,11 @@ PHP;
     /** @param list<string> $arguments
      *  @return array{int, string}
      */
-    private function runCommand(array $arguments, ?string $workingDirectory = null): array
+    private function runCommand(
+        array $arguments,
+        ?string $workingDirectory = null,
+        ?array $environment = null,
+    ): array
     {
         $command = [PHP_BINARY, '-n', dirname(__DIR__, 2) . '/bin/phpx', ...$arguments];
         $pipes = [];
@@ -246,6 +306,7 @@ PHP;
             [1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
             $pipes,
             $workingDirectory ?? $this->temporaryDirectory,
+            $environment === null ? null : array_merge(getenv(), $environment),
         );
         self::assertIsResource($process);
         $output = stream_get_contents($pipes[1]) . stream_get_contents($pipes[2]);

@@ -54,13 +54,14 @@ CMake、源码、头文件、stub、测试或用户修改过的构建工具。
 vendor/bin/phpx build
 ```
 
-`build` 会先按项目选择的 `php-config` 增量构建 `libphpx`，再构建扩展。
-只有 `.stub.php` 或生成器发生变化时，才会重新生成 arginfo。
+`build` 负责配置并构建当前扩展。只有 `.stub.php` 或生成器发生变化时，
+才会重新生成 arginfo。PHPX 库本身必须由开发者预先构建或安装；如果头文件
+或库不可用，错误由 C++ 编译器或链接器直接报告。
 
 可调整构建类型和并行度：
 
 ```bash
-vendor/bin/phpx build --type=Debug --jobs=4
+vendor/bin/phpx build --type=Debug -j 4
 ```
 
 ## 安装和启用
@@ -70,8 +71,9 @@ sudo vendor/bin/phpx install
 sudo vendor/bin/phpx enable
 ```
 
-`install` 将扩展模块、匹配的 PHPX 运行库及公共头文件安装到当前项目
-选择的 PHP。`enable` 在该 PHP 的 `php.ini` 中启用扩展；需要停用时执行：
+`install` 将扩展模块及公共头文件安装到当前项目选择的 PHP。它不会构建、
+查找或复制 `libphpx`。`enable` 在该 PHP 的 `php.ini` 中启用扩展；需要
+停用时执行：
 
 ```bash
 sudo vendor/bin/phpx disable
@@ -101,10 +103,9 @@ vendor/bin/phpx switch /opt/php-8.4/bin/php-config
 `switch` 会完成以下操作：
 
 1. 校验目标 PHP 版本；
-2. 为目标 PHP 重新构建 PHPX 运行库；
-3. 重新配置扩展的 CMake 构建目录；
-4. 更新 `gen_stub.php` 和 `run-tests.php`；
-5. 将新路径保存到 `.phpx.json`。
+2. 重新配置扩展的 CMake 构建目录；
+3. 更新 `gen_stub.php` 和 `run-tests.php`；
+4. 将新路径保存到 `.phpx.json`。
 
 如果官方构建工具已被用户修改，`switch` 会停止并报错，不会覆盖文件。
 之后的 `build`、`install`、`enable` 和 `disable` 都自动使用新的 PHP。
@@ -113,7 +114,7 @@ vendor/bin/phpx switch /opt/php-8.4/bin/php-config
 
 ```text
 phpx init [name] [--target=DIR] [--php-config=PATH]
-phpx build [--type=Release] [--jobs=4]
+phpx build [-j N] [--type=Release]
 phpx switch <php-config>
 phpx install [module.so|module.dll]
 phpx enable [extension-name]

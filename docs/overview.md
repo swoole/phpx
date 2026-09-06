@@ -1,203 +1,79 @@
 # 项目概述
 
-## 什么是 PHPX？
+## 定位
 
-PHPX（PHP eXtension）是一个使用现代 C++（C++17）封装 Zend API 的库，旨在简化 PHP 扩展的开发流程。通过提供面向对象的接口和类型安全的封装，PHPX 让开发者能够以更直观、更安全的方式编写 PHP 扩展。
+PHPX 使用 C++17 对 PHP 8.4/8.5 Zend API 进行边界清晰的封装。它不是一套
+独立 PHP 运行时，也不尝试复制 Zend VM 的全部内部实现。PHPX 主要服务于：
 
-## 主要特性
+- TypePHP AOT 代码的运行时支持；
+- 使用 C++ 编写和维护 PHP 扩展。
 
-### 🚀 高性能
-- 直接调用 Zend API，零运行时开销
-- 编译型语言，执行效率高
-- 支持共享内存和持久化资源
+项目优先保证生命周期、引用计数、异常边界和 ZTS 安全。只有能够通过
+Zend 公共 API 或可证明的静态条件实现时，才增加性能快速路径。
 
-### 🛡️ 类型安全
-- Variant 类型系统，自动类型转换
-- 编译时类型检查
-- 智能的资源管理（RAII）
+## 主要组成
 
-### 💻 现代化设计
-- C++14 语法，代码简洁优雅
-- 面向对象 API，易于理解和使用
-- 完整的错误处理机制
+### 值封装
 
-### 🔧 开发友好
-- 清晰的错误信息
-- 调试模式支持
-- 丰富的内置函数封装
+`Variant`、`String`、`Array`、`Object` 和 `Reference` 封装 `zval` 及其
+引用计数。默认构造和复制路径拥有自己的值；标记为 Indirect 或直接暴露
+Zend 指针的接口属于低层接口，调用者必须保证被借用存储的生命周期。
 
-## 技术栈
+### PHP 调用桥
 
-### 核心依赖
-- **C++17**：PHPX 当前使用的 C++ 标准
-- **PHP 8.4 / 8.5**：当前支持的 PHP 内核版本
-- **Zend Engine**：PHP 的核心引擎
+- `php::call()` 调用 PHP 函数或 callable；
+- `newObject()` 创建 PHP 对象；
+- `Object::call()` 调用对象方法；
+- `callStaticMethod()` 调用静态方法。
 
-### 构建工具
-- **CMake 3.10+**：跨平台构建系统
-- **GCC 4.8+** 或 **Clang**：C++ 编译器
-- **Composer**：PHP 依赖管理
+PHPX 不再生成覆盖所有 PHP 内置符号的 Facade。`src/std/` 只保留高频且
+具有明确类型或性能收益的封装，其余符号走通用调用桥。
 
-### 测试框架
-- **Google Test**：C++ 单元测试框架
-- **PHPUnit**：PHP 测试工具
+### 扩展开发
 
-## 架构组成
+`phpx_ext.h` 提供 `PHPX_EXTENSION()`、`PHPX_FUNCTION()`、
+`PHPX_METHOD()`、`Extension`、`Class` 和 `Interface`。PHP 函数与方法签名
+写入 `src/*.stub.php`，官方 `gen_stub.php` 在相同目录生成
+`src/*_arginfo.h`，扩展注册生成的函数表。
 
-### 核心模块
+### TypePHP 运行时
 
-#### 1. Core（核心层）
-位于 `src/core/`，提供最基础的数据类型和操作：
+`src/typephp/` 和 `include/typephp_*.h` 包含 TypePHP 专用的属性、调用、
+Trait、Fiber/Generator 和运行时辅助逻辑。这些接口不是普通扩展开发所需
+的 Facade。
 
-- **Variant**：通用变量类型，支持所有 PHP 数据类型
-- **Array**：数组操作封装
-- **Object**：对象操作封装
-- **String**：字符串处理
-- **Resource**：资源类型管理
-- **Closure**：闭包支持
-- **Extension**：扩展管理
+### 项目工具
 
-#### 2. Standard（标准库层）
-位于 `src/std/`，为常用 PHP 操作提供类型安全的快速路径：
+Composer 安装的 `vendor/bin/phpx` 提供：
 
-- **Standard**：标准函数（字符串、数组、数学等）
-- **String / Array / Math**：字符串、数组和数学操作
-- **Date/Time**：日期时间函数
-- **Filesystem**：文件系统函数
-- **Misc**：哈希、JSON、随机数等常用函数
+- `init`：创建新扩展或安全补齐已有项目；
+- `build`：配置并并行构建当前扩展；
+- `switch`：切换项目使用的 `php-config`；
+- `install`：安装扩展模块和公共头文件；
+- `enable` / `disable`：修改所选 PHP 的 `php.ini`。
 
-#### 3. Dynamic Call（动态调用）
+工具不会自动构建、检测或安装 `libphpx`。开发者负责为所选 PHP 准备匹配
+的 PHPX 头文件和库；依赖问题由 C++ 编译器或链接器直接报告。
 
-PHP 函数、类和常量分别通过 `php::call()`、`newObject()` /
-`Object::call()` / `callStaticMethod()` 和 `constant()` 在运行时解析。
-PHPX 不再对所有 PHP 内置符号生成 Facade API。
+## 依赖和平台
 
-## 项目结构
+- PHP 8.4 或 8.5 开发环境；
+- CMake 3.10+；
+- 支持 C++17 的 GCC、Clang 或 MSVC；
+- GMP、MPFR；
+- mpdecimal（Unix 构建使用仓库内源码，Windows 使用 PHP SDK 库）。
 
-```
-phpx/
-├── src/                      # 源代码目录
-│   ├── core/                 # 核心实现 (10 个文件)
-│   │   ├── variant.cc        # Variant 类型实现
-│   │   ├── array.cc          # Array 类型实现
-│   │   ├── object.cc         # Object 类型实现
-│   │   ├── string.cc         # String 类型实现
-│   │   ├── base.cc           # 基础函数实现
-│   │   ├── extension.cc      # 扩展管理实现
-│   │   ├── class.cc          # 类操作实现
-│   │   ├── closure.cc        # 闭包实现
-│   │   └── helper.cc         # 辅助函数实现
-│   ├── std/                  # 常用 PHP 函数的类型安全快速路径
-│   ├── typephp/              # TypePHP 运行时辅助实现
-│   └── php/                  # PHP 相关代码
-├── include/                  # 头文件目录
-│   ├── phpx.h                # 主头文件 (1269 行)
-│   ├── phpx_types.h          # 类型定义
-│   ├── phpx_ext.h            # 扩展声明
-│   └── ...                   # 其他头文件
-├── tests/                    # 测试代码
-│   ├── src/                  # C++ 单元测试 (18 个文件)
-│   │   ├── variant.cpp       # Variant 测试 (35.8KB)
-│   │   ├── array.cpp         # Array 测试
-│   │   ├── object.cpp        # Object 测试
-│   │   ├── base.cpp          # 基础功能测试
-│   │   └── ...               # 其他测试
-│   ├── ext/                  # 扩展测试
-│   ├── include/              # 测试辅助文件
-│   └── unit/                 # 单元测试
-├── examples/                 # 示例代码
-│   ├── test/                 # 基础示例
-│   ├── bloom_filter/         # 布隆过滤器示例
-│   ├── queue/                # 队列示例
-│   ├── rocksdb/              # RocksDB 示例
-│   ├── gtk/                  # GTK 示例
-│   ├── embed/                # 嵌入示例
-│   └── php/                  # PHP 脚本示例
-├── bin/                      # 工具脚本
-│   └── phpx                  # 扩展脚手架及安装管理工具
-├── docs/                     # 文档目录
-├── lib/                      # 编译库文件
-│   ├── libphpx.so            # PHPX 动态库
-│   └── libext.so             # 示例扩展
-└── cmake/                    # CMake 配置
-```
+Linux 和 macOS 通过 `php-config` 选择 PHP。Windows 构建使用带 SDK 的
+`PHP_HOME`。具体扩展项目流程参见[快速开始](quickstart.md)。
 
-## 代码统计
+## 公开与私有文件
 
-### 源代码规模
-- **核心代码**：
-  - `variant.cc`: 25.9KB
-  - `base.cc`: 19.5KB
+PHPX 仓库的 `include/` 是安装接口，`src/` 是实现。对于使用 `phpx init`
+创建的扩展项目：
 
-- **标准库快速路径**：`src/std/`
-- **测试专用 Facade 子集**：`tests/include/`（不安装、不导出）
+- `src/*.stub.php`：PHP 声明；
+- `src/*_arginfo.h`：生成的私有头文件；
+- `src/*.h`：私有扩展头文件；
+- `include/*.{h,hh,hpp,hxx}`：由 `phpx install` 发布的公共头文件。
 
-### 测试覆盖
-- **单元测试**：18 个测试文件
-- **测试代码量**：~200KB
-- **核心测试**：
-  - `variant.cpp`: 35.8KB
-  - `exists.cpp`: 18.4KB
-  - `object.cpp`: 19.4KB
-
-## 设计哲学
-
-### 1. 零开销抽象
-PHPX 的设计遵循"零开销"原则，所有封装都直接映射到 Zend API，不引入额外的运行时成本。
-
-### 2. RAII 资源管理
-利用 C++ 的 RAII 特性，自动管理 PHP 变量的引用计数，避免内存泄漏。
-
-### 3. 类型擦除与恢复
-Variant 类型可以存储任何 PHP 值，并在需要时安全地转换为具体类型。
-
-### 4. 异常安全
-提供完善的错误处理机制，支持 C++ 异常和 PHP 异常的互操作。
-
-## 命名空间
-
-所有 PHPX 代码都在 `php` 命名空间下：
-
-```cpp
-namespace php {
-    class Variant;
-    class Array;
-    class Object;
-    // ...
-}
-```
-
-常用类型别名：
-```cpp
-using var = Variant;
-using array = Array;
-using object = Object;
-using string = String;
-```
-
-## 版本历史
-
-### PHPX 2.x
-- 支持 PHP 8.4 和 PHP 8.5
-- 重构核心架构
-- 增强类型系统
-- 完善测试覆盖
-
-### PHPX 1.x
-- 初始版本
-- 支持 PHP 7.x
-- 基础类型封装
-
-## 许可证
-
-PHPX 采用 Apache License 2.0，详见 [LICENSE](../LICENSE)。
-
-## 贡献者
-
-主要作者：Tianfeng Han (@rango@swoole.com)
-
-感谢所有为 PHPX 做出贡献的开发者！
-
----
-
-*本文档最后更新：2026-03-27*
+不要让外部代码依赖 PHPX `src/`、测试 Facade 或 TypePHP 内部实现细节。

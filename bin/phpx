@@ -18,8 +18,8 @@ function phpxUsage(): never
         <<<'HELP'
 Usage:
   phpx init [name] [--target=DIR] [--php-config=php-config] [--source-dir=DIR]
-  phpx build [--build-dir=build] [--type=Release] [--jobs=4] [--php-config=php-config]
-  phpx switch <php-config> [--build-dir=build] [--type=Release] [--jobs=4] [--source-dir=DIR]
+  phpx build [-j N] [--build-dir=build] [--type=Release] [--php-config=php-config]
+  phpx switch <php-config> [--build-dir=build] [--type=Release] [--source-dir=DIR]
   phpx install [module.so|module.dll] [--name=NAME] [--build-dir=build] [--extension-dir=DIR] [--php-config=php-config]
   phpx enable [NAME] [--ini=FILE] [--php-config=php-config]
   phpx disable [NAME] [--ini=FILE] [--php-config=php-config]
@@ -40,6 +40,14 @@ function phpxParseArguments(array $arguments): array
 
     for ($i = 0, $count = count($arguments); $i < $count; ++$i) {
         $argument = $arguments[$i];
+        if ($argument === '-j') {
+            $options['jobs'] = $arguments[++$i] ?? phpxError('missing value for -j');
+            continue;
+        }
+        if (preg_match('/^-j(.+)$/', $argument, $matches) === 1) {
+            $options['jobs'] = $matches[1];
+            continue;
+        }
         if (!str_starts_with($argument, '--')) {
             $positional[] = $argument;
             continue;
@@ -262,64 +270,6 @@ function phpxWriteProjectConfig(string $projectDirectory, array $config): void
     }
 }
 
-/** @return array{include: string, library: string} */
-function phpxBuildRuntime(
-    string $buildDirectory,
-    string $type,
-    int $jobs,
-    string $phpConfig,
-): array {
-    if ($jobs < 1 || $jobs > 64) {
-        phpxError('--jobs must be between 1 and 64');
-    }
-    if (preg_match('/^[A-Za-z][A-Za-z0-9_]*$/', $type) !== 1) {
-        phpxError('invalid CMake build type');
-    }
-    $phpxSource = dirname(__DIR__);
-    if (!is_file($phpxSource . '/CMakeLists.txt') || !is_file($phpxSource . '/include/phpx.h')) {
-        phpxError("PHPX source tree was not found at {$phpxSource}");
-    }
-
-    $runtimeBuildDirectory = $buildDirectory . '/phpx-runtime';
-    $runtimeLibraryDirectory = $runtimeBuildDirectory . '/lib';
-    $configuration = strtoupper($type);
-    $configure = [
-        'cmake',
-        '-S',
-        $phpxSource,
-        '-B',
-        $runtimeBuildDirectory,
-        "-DCMAKE_BUILD_TYPE={$type}",
-        "-DPHP_CONFIG={$phpConfig}",
-        '-DBUILD_TESTS=OFF',
-        '-DBUILD_EXT=OFF',
-        "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={$runtimeLibraryDirectory}",
-        "-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY={$runtimeLibraryDirectory}",
-        "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY={$runtimeLibraryDirectory}",
-        "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{$configuration}={$runtimeLibraryDirectory}",
-        "-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_{$configuration}={$runtimeLibraryDirectory}",
-        "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY_{$configuration}={$runtimeLibraryDirectory}",
-    ];
-    phpxRun($configure, $phpxSource);
-    phpxRun(
-        ['cmake', '--build', $runtimeBuildDirectory, '--target', 'phpx', '--config', $type, '--parallel', (string) $jobs],
-        $phpxSource,
-    );
-
-    $libraryNames = match (PHP_OS_FAMILY) {
-        'Windows' => ['phpx.lib'],
-        'Darwin' => ['libphpx.dylib', 'libphpx.so'],
-        default => ['libphpx.so'],
-    };
-    foreach ($libraryNames as $libraryName) {
-        $library = $runtimeLibraryDirectory . '/' . $libraryName;
-        if (is_file($library)) {
-            return ['include' => $phpxSource . '/include', 'library' => $library];
-        }
-    }
-    phpxError("PHPX runtime library was not produced in {$runtimeLibraryDirectory}");
-}
-
 /** @param array<string, mixed> $config */
 function phpxAssertManagedBuildToolsCanBeUpdated(string $projectDirectory, array $config): void
 {
@@ -369,7 +319,6 @@ function phpxConfigureProject(
     string $buildDirectory,
     string $type,
     string $phpConfig,
-    ?array $phpxRuntime = null,
 ): void {
     if (!is_file($projectDirectory . '/CMakeLists.txt')) {
         phpxError("CMakeLists.txt was not found in {$projectDirectory}");
@@ -387,20 +336,15 @@ function phpxConfigureProject(
         "-DCMAKE_BUILD_TYPE={$type}",
         "-DPHP_CONFIG={$phpConfig}",
     ];
-    if ($phpxRuntime !== null) {
-        $command[] = '-DPHPX_INCLUDE_DIR=' . $phpxRuntime['include'];
-        $command[] = '-DPHPX_LIBRARY=' . $phpxRuntime['library'];
-    }
     phpxRun($command, $projectDirectory);
 }
 
 function phpxBuild(string $projectDirectory, string $buildDirectory, string $type, int $jobs, string $phpConfig): void
 {
     if ($jobs < 1 || $jobs > 64) {
-        phpxError('--jobs must be between 1 and 64');
+        phpxError('-j/--jobs must be between 1 and 64');
     }
-    $phpxRuntime = phpxBuildRuntime($buildDirectory, $type, $jobs, $phpConfig);
-    phpxConfigureProject($projectDirectory, $buildDirectory, $type, $phpConfig, $phpxRuntime);
+    phpxConfigureProject($projectDirectory, $buildDirectory, $type, $phpConfig);
     phpxRun(
         ['cmake', '--build', $buildDirectory, '--config', $type, '--parallel', (string) $jobs],
         $projectDirectory,
@@ -482,14 +426,18 @@ endforeach()
 
 separate_arguments(PHP_INCLUDE_FLAGS NATIVE_COMMAND "${PHP_INCLUDES}")
 set(PHPX_HOME "$ENV{PHPX_HOME}" CACHE PATH "PHPX installation or source directory")
-find_path(PHPX_INCLUDE_DIR phpx_ext.h
-    HINTS "${PHPX_HOME}/include" "${CMAKE_SOURCE_DIR}/vendor/swoole/phpx/include" "${PHP_PREFIX}/include/phpx"
-    REQUIRED
+set(PHPX_INCLUDE_PATHS
+    "${CMAKE_SOURCE_DIR}/vendor/swoole/phpx/include"
+    "${PHP_PREFIX}/include/phpx"
 )
-find_library(PHPX_LIBRARY phpx
-    HINTS "${PHPX_HOME}/lib" "${CMAKE_SOURCE_DIR}/vendor/swoole/phpx/lib" "${PHP_PREFIX}/lib"
-    REQUIRED
+set(PHPX_LIBRARY_PATHS
+    "${CMAKE_SOURCE_DIR}/vendor/swoole/phpx/lib"
+    "${PHP_PREFIX}/lib"
 )
+if(PHPX_HOME)
+    list(PREPEND PHPX_INCLUDE_PATHS "${PHPX_HOME}/include")
+    list(PREPEND PHPX_LIBRARY_PATHS "${PHPX_HOME}/lib")
+endif()
 
 set(GENERATED_ARGINFO "${CMAKE_CURRENT_SOURCE_DIR}/src/{{EXT_NAME}}_arginfo.h")
 add_custom_command(
@@ -505,22 +453,23 @@ add_library({{EXT_NAME}} MODULE src/{{EXT_NAME}}.cc "${GENERATED_ARGINFO}")
 set_target_properties({{EXT_NAME}} PROPERTIES PREFIX "")
 if(APPLE)
     set_target_properties({{EXT_NAME}} PROPERTIES
-        BUILD_RPATH "@loader_path;@loader_path/phpx-runtime/lib"
+        BUILD_RPATH "@loader_path"
         INSTALL_RPATH "@loader_path"
     )
 elseif(UNIX)
     set_target_properties({{EXT_NAME}} PROPERTIES
-        BUILD_RPATH "\$ORIGIN;\$ORIGIN/phpx-runtime/lib"
+        BUILD_RPATH "\$ORIGIN"
         INSTALL_RPATH "\$ORIGIN"
     )
 endif()
 target_compile_options({{EXT_NAME}} PRIVATE ${PHP_INCLUDE_FLAGS})
 target_include_directories({{EXT_NAME}} PRIVATE
-    "${PHPX_INCLUDE_DIR}"
+    ${PHPX_INCLUDE_PATHS}
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
-target_link_libraries({{EXT_NAME}} PRIVATE "${PHPX_LIBRARY}")
+target_link_directories({{EXT_NAME}} PRIVATE ${PHPX_LIBRARY_PATHS})
+target_link_libraries({{EXT_NAME}} PRIVATE phpx)
 if(APPLE)
     target_link_options({{EXT_NAME}} PRIVATE "-undefined" "dynamic_lookup")
 endif()
@@ -649,12 +598,8 @@ function phpxModuleName(string $name): string
     return preg_replace('/^lib/', '', $name) ?? $name;
 }
 
-function phpxInstallExtension(
-    string $module,
-    string $name,
-    string $extensionDirectory,
-    ?string $runtimeLibrary = null,
-): void {
+function phpxInstallExtension(string $module, string $name, string $extensionDirectory): void
+{
     if (!is_file($module)) {
         phpxError("extension module does not exist: {$module}");
     }
@@ -672,29 +617,6 @@ function phpxInstallExtension(
         phpxError("unable to copy {$module} to {$target}; check directory permissions");
     }
     fwrite(STDOUT, "Installed {$target}\n");
-    if ($runtimeLibrary !== null) {
-        $runtimeTarget = rtrim($extensionDirectory, '/\\') . DIRECTORY_SEPARATOR . basename($runtimeLibrary);
-        if (!copy($runtimeLibrary, $runtimeTarget)) {
-            phpxError("unable to copy {$runtimeLibrary} to {$runtimeTarget}; check directory permissions");
-        }
-        fwrite(STDOUT, "Installed {$runtimeTarget}\n");
-    }
-}
-
-function phpxFindRuntimeBinary(string $buildDirectory): string
-{
-    $directory = $buildDirectory . '/phpx-runtime/lib';
-    $names = match (PHP_OS_FAMILY) {
-        'Windows' => ['phpx.dll'],
-        'Darwin' => ['libphpx.dylib', 'libphpx.so'],
-        default => ['libphpx.so'],
-    };
-    foreach ($names as $name) {
-        if (is_file($directory . '/' . $name)) {
-            return $directory . '/' . $name;
-        }
-    }
-    phpxError("PHPX runtime library was not found in {$directory}; run phpx build first");
 }
 
 function phpxInstallHeaders(string $projectDirectory, string $name, string $phpConfig): void
@@ -832,7 +754,7 @@ switch ($command) {
         $type = (string) ($options['type'] ?? 'Release');
         $jobs = filter_var($options['jobs'] ?? 4, FILTER_VALIDATE_INT);
         if ($jobs === false) {
-            phpxError('--jobs must be an integer');
+            phpxError('-j/--jobs must be an integer');
         }
         phpxBuild($projectDirectory, $buildDirectory, $type, $jobs, $phpConfig);
         break;
@@ -850,12 +772,7 @@ switch ($command) {
         phpxAssertManagedBuildToolsCanBeUpdated($projectDirectory, $projectConfig);
         $buildDirectory = (string) ($options['build-dir'] ?? $projectDirectory . '/build');
         $type = (string) ($options['type'] ?? 'Release');
-        $jobs = filter_var($options['jobs'] ?? 4, FILTER_VALIDATE_INT);
-        if ($jobs === false || $jobs < 1 || $jobs > 64) {
-            phpxError('--jobs must be an integer between 1 and 64');
-        }
-        $phpxRuntime = phpxBuildRuntime($buildDirectory, $type, $jobs, $phpConfig);
-        phpxConfigureProject($projectDirectory, $buildDirectory, $type, $phpConfig, $phpxRuntime);
+        phpxConfigureProject($projectDirectory, $buildDirectory, $type, $phpConfig);
         $projectConfig['php-config'] = $phpConfig;
         $projectConfig = phpxUpdateManagedBuildTools($projectDirectory, $toolFiles, $projectConfig);
         phpxWriteProjectConfig($projectDirectory, $projectConfig);
@@ -882,8 +799,7 @@ switch ($command) {
         ));
         $extensionDirectory = (string) ($options['extension-dir']
             ?? phpxConfigValue($phpConfig, '--extension-dir'));
-        $runtimeLibrary = $projectConfig === null ? null : phpxFindRuntimeBinary($buildDirectory);
-        phpxInstallExtension($module, $name, $extensionDirectory, $runtimeLibrary);
+        phpxInstallExtension($module, $name, $extensionDirectory);
         phpxInstallHeaders($projectDirectory, $name, $phpConfig);
         break;
 
