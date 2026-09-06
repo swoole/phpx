@@ -187,8 +187,13 @@ PHPX_EXTENSION() {
 
 ### 生成 ArgInfo 和函数入口
 
+`gen_stub.php` 由 PHP 开发包提供。使用前将与当前 `php-config`
+匹配的官方版本复制到可写的构建目录；生成的 arginfo 头文件应与扩展源码一起提交。
+
 ```shell
-php vendor/swoole/phpx/bin/gen_stub.php your_stub_dir
+mkdir -p build
+cp "$(find "$(php-config --prefix)/lib/php" -path '*/build/gen_stub.php' -print -quit)" build/gen_stub.php
+php build/gen_stub.php your_stub_dir
 ```
 
 ### 构建你的扩展

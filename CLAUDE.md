@@ -92,10 +92,11 @@ Use `php::call()`, `Object::call()`, and `callStaticMethod()` for dynamic PHP
 calls. The small facade under `tests/include/` is test-only and must not be
 used by production code.
 
-### gen_stub.php (`bin/gen_stub.php`)
+### gen_stub.php
 
-Generates arginfo headers for extensions — run from extension project directories using `php vendor/swoole/phpx/bin/gen_stub.php <stub_dir>`.
+Arginfo headers are generated with the `gen_stub.php` supplied by the matching
+PHP development package. PHPX does not maintain a separate copy.
 
 ## CI
 
-GitHub Actions (`.github/workflows/test.yml`): tests against PHP 8.2–8.5 on Ubuntu. Builds with coverage, runs `phpx-tests` (GTest) then `composer test` (PHPUnit), uploads coverage to Codecov.
+GitHub Actions (`.github/workflows/test.yml`): tests against PHP 8.4–8.5. Builds with coverage, runs `phpx-tests` (GTest) then `composer test` (PHPUnit), uploads coverage to Codecov.

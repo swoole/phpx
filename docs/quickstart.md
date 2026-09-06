@@ -200,7 +200,9 @@ function hello(): string {}
 
 ### 2. 生成代码
 ```bash
-php vendor/swoole/phpx/bin/gen_stub.php myext.stub.php
+mkdir -p build
+cp "$(find "$(php-config --prefix)/lib/php" -path '*/build/gen_stub.php' -print -quit)" build/gen_stub.php
+php build/gen_stub.php myext.stub.php
 ```
 
 这将生成：

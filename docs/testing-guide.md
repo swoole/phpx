@@ -721,11 +721,7 @@ require BASE_PATH . '/vendor/autoload.php';
 ### 运行 PHP 测试
 
 ```bash
-# 使用 PHPUnit
 vendor/bin/phpunit tests/
-
-# 使用内置测试工具
-php tests/run-tests.php
 ```
 
 ### 编写 PHP 测试

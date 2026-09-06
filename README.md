@@ -187,8 +187,14 @@ PHPX_EXTENSION() {
 
 ### Generate ArgInfo & Function Entries
 
+`gen_stub.php` is supplied by the PHP development package. Copy the version
+matching the active `php-config` into a writable build directory before using
+it; generated arginfo headers should be committed with the extension sources.
+
 ```shell
-php vendor/swoole/phpx/bin/gen_stub.php your_stub_dir
+mkdir -p build
+cp "$(find "$(php-config --prefix)/lib/php" -path '*/build/gen_stub.php' -print -quit)" build/gen_stub.php
+php build/gen_stub.php your_stub_dir
 ```
 
 ### Build Your Extension
