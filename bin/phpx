@@ -119,7 +119,9 @@ function phpxResolvePhpConfig(string $phpConfig): string
 function phpxValidatePhpConfig(string $phpConfig): void
 {
     $version = phpxConfigValue($phpConfig, '--vernum');
-    if (!ctype_digit($version) || (int) $version < 80400 || (int) $version >= 80600) {
+    $isUnsignedInteger = $version !== ''
+        && strspn($version, '0123456789') === strlen($version);
+    if (!$isUnsignedInteger || (int) $version < 80400 || (int) $version >= 80600) {
         phpxError("PHPX requires PHP 8.4 or 8.5; {$phpConfig} reports {$version}");
     }
 }
