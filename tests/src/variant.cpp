@@ -2,7 +2,6 @@
 #include "phpx_func.h"
 #include "phpx_helper.h"
 
-#include "const/json.h"
 #include <cstring>
 
 using namespace php;

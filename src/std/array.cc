@@ -127,8 +127,7 @@ Array array_keys(const Array &array) {
         zend_hash_real_init_mixed(result.array());
         zend_ulong num_idx;
         zend_string *str_idx;
-        zval *entry;
-        ZEND_HASH_FOREACH_KEY_VAL(arrval, num_idx, str_idx, entry) {
+        ZEND_HASH_FOREACH_KEY(arrval, num_idx, str_idx) {
             if (str_idx) {
                 zval zv;
                 ZVAL_STR_COPY(&zv, str_idx);

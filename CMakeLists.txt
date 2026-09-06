@@ -65,13 +65,6 @@ if (enable_asan AND NOT IS_WINDOWS)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
 endif ()
 
-# ============ GitHub Action 配置 ============
-option(GITHUB_ACTION "Enable GitHub Action mode" OFF)
-if(GITHUB_ACTION)
-    message(STATUS "GitHub Action mode enabled")
-    add_definitions(-DGITHUB_ACTION)
-endif()
-
 # ============ PHP 配置 ============
 if(IS_WINDOWS)
     # Windows 平台：必须设置 PHP_HOME 环境变量
@@ -407,15 +400,8 @@ file(GLOB_RECURSE SRC_FILES src/core/*.cc src/std/*.cc src/typephp/*.cc)
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 
 add_library(phpx SHARED ${SRC_FILES})
-set_target_properties(phpx PROPERTIES
-    CLEAN_DIRECT_OUTPUT 1
-)
 
 if (IS_WINDOWS)
-    target_link_libraries(phpx PRIVATE
-        ${PHP_LIBRARY}
-    )
-
     target_compile_definitions(phpx PUBLIC
         PHP_EXPORTS
         ZEND_WIN32
@@ -472,7 +458,6 @@ if(BUILD_TESTS)
 
         file(GLOB_RECURSE TEST_FILES tests/src/*.cpp)
         add_executable(phpx-tests ${TEST_FILES})
-        add_dependencies(phpx-tests phpx)
         target_include_directories(phpx-tests PRIVATE tests/include)
 
         if(IS_WINDOWS)
@@ -524,7 +509,6 @@ if(BUILD_EXT)
     file(GLOB_RECURSE EXT_FILES tests/ext/*.cpp)
     if(EXT_FILES)
         add_library(ext SHARED ${EXT_FILES})
-        add_dependencies(ext phpx)
         target_link_libraries(ext PRIVATE phpx)
 
         set_target_properties(ext PROPERTIES
@@ -561,7 +545,6 @@ if(IS_WINDOWS)
     message(STATUS "Dev directory name: ${PHP_DEV_DIR_NAME}")
 else()
     # Unix/Linux/Mac 安装配置
-    install(CODE "MESSAGE(\"Are you run command using root user?\")")
     install(TARGETS phpx LIBRARY DESTINATION ${PHP_PREFIX}/lib)
     install(FILES ${HEADER_FILES} DESTINATION ${PHP_PREFIX}/include/phpx)
 endif()
@@ -594,5 +577,4 @@ else()
 endif()
 message(STATUS "Build Tests: ${BUILD_TESTS}")
 message(STATUS "Build Extension: ${BUILD_EXT}")
-message(STATUS "GitHub Action: ${GITHUB_ACTION}")
 message(STATUS "=================================")

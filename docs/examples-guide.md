@@ -503,16 +503,10 @@ php <test_file>.php
 
 ### 测试脚本
 
-大多数示例都提供了 `run-tests.php`：
+扩展示例共享同一份 PHP 测试运行器。在示例目录中执行：
 
 ```bash
-php run-tests.php
-```
-
-或使用项目自带的测试工具：
-
-```bash
-../../bin/phpx-tests run-tests.php
+php ../run-tests.php tests
 ```
 
 ---

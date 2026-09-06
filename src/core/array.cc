@@ -328,10 +328,9 @@ void Array::mergeReferences(Array &source) {
     auto source_zarr = source.unwrap_ptr();
     SEPARATE_ARRAY(source_zarr);
 
-    zend_ulong index;
     zend_string *key;
     zval *value;
-    ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(source_zarr), index, key, value) {
+    ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(source_zarr), key, value) {
         if (!Z_ISREF_P(value)) {
             ZVAL_MAKE_REF(value);
         }
