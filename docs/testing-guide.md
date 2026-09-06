@@ -119,6 +119,9 @@ make phpx-tests -j 4
 
 ## 测试代码结构
 
+`tests/include/phpx_func.h` 和 `tests/include/phpx_class.h` 是仅供 PHPX 自身
+Google Test 使用的 Facade 子集。它们不属于 PHPX 公开 API，不会安装或导出。
+
 ### 测试宏定义
 
 ```cpp

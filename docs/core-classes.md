@@ -852,25 +852,7 @@ void Box::destroy() {
 
 ## 性能优化技术
 
-### 1. 字符串缓存
-
-```cpp
-// literal_string.cc 实现了字符串字面量缓存
-static std::unordered_map<std::string, zend_string*> cached_strings;
-
-zend_string* get_cached_string(const std::string &key) {
-    auto it = cached_strings.find(key);
-    if (it != cached_strings.end()) {
-        return it->second;
-    }
-    
-    zend_string *str = zend_string_init(key.c_str(), key.length(), 1);
-    cached_strings[key] = str;
-    return str;
-}
-```
-
-### 2. 函数缓存
+### 1. 函数缓存
 
 ```cpp
 static zend_function* cache_function(const char *name) {

@@ -12,7 +12,6 @@
 ### 开发文档
 - [API 参考](./api-reference.md) - 完整的 API 接口文档
 - [核心类说明](./core-classes.md) - 核心类的详细说明
-- [函数手册](./functions.md) - 内置函数使用手册
 
 ### 实践文档
 - [示例指南](./examples-guide.md) - 示例代码使用说明
@@ -26,9 +25,8 @@
 phpx/
 ├── src/           # 源代码目录
 │   ├── core/      # 核心实现（Variant, Array, Object 等）
-│   ├── func/      # PHP 函数封装
-│   ├── class/     # PHP 类封装
-│   └── const/     # 常量定义
+│   ├── std/       # 常用 PHP 函数的快速路径
+│   └── typephp/   # TypePHP 运行时辅助实现
 ├── include/       # 头文件
 ├── tests/         # 测试代码
 ├── examples/      # 示例代码

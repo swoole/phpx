@@ -239,7 +239,7 @@ else()
 endif()
 
 # ============ 包含目录 ============
-include_directories(include tests/include src/misc)
+include_directories(include src/misc)
 
 if(IS_WINDOWS)
     include_directories(${PHP_INCLUDE_DIRS})
@@ -473,6 +473,7 @@ if(BUILD_TESTS)
         file(GLOB_RECURSE TEST_FILES tests/src/*.cpp)
         add_executable(phpx-tests ${TEST_FILES})
         add_dependencies(phpx-tests phpx)
+        target_include_directories(phpx-tests PRIVATE tests/include)
 
         if(IS_WINDOWS)
             target_link_libraries(phpx-tests

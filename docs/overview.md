@@ -57,33 +57,20 @@ PHPX（PHP eXtension）是一个使用现代 C++（C++14）封装 Zend API 的�
 - **Closure**：闭包支持
 - **Extension**：扩展管理
 
-#### 2. Function（函数层）
-位于 `src/func/`，封装 PHP 内置函数：
+#### 2. Standard（标准库层）
+位于 `src/std/`，为常用 PHP 操作提供类型安全的快速路径：
 
 - **Standard**：标准函数（字符串、数组、数学等）
+- **String / Array / Math**：字符串、数组和数学操作
 - **Date/Time**：日期时间函数
 - **Filesystem**：文件系统函数
-- **Network**：网络相关函数
-- **Encryption**：加密哈希函数
-- 以及更多...
+- **Misc**：哈希、JSON、随机数等常用函数
 
-#### 3. Class（类层）
-位于 `src/class/`，封装 PHP 内置类：
+#### 3. Dynamic Call（动态调用）
 
-- **DateTime**：日期时间类
-- **PDO**：数据库操作类
-- **Redis**：Redis 客户端类
-- **DOM**：XML 文档对象模型
-- **Reflection**：反射类
-- **SPL**：标准 PHP 库
-
-#### 4. Constant（常量层）
-位于 `src/const/`，定义 PHP 内置常量：
-
-- CURL 常量
-- OpenSSL 常量
-- Socket 常量
-- 其他扩展常量
+PHP 函数、类和常量分别通过 `php::call()`、`newObject()` /
+`Object::call()` / `callStaticMethod()` 和 `constant()` 在运行时解析。
+PHPX 不再对所有 PHP 内置符号生成 Facade API。
 
 ## 项目结构
 
@@ -99,30 +86,13 @@ phpx/
 │   │   ├── extension.cc      # 扩展管理实现
 │   │   ├── class.cc          # 类操作实现
 │   │   ├── closure.cc        # 闭包实现
-│   │   ├── literal_string.cc # 字面字符串实现
 │   │   └── helper.cc         # 辅助函数实现
-│   ├── func/                 # PHP 函数封装 (30 个文件)
-│   │   ├── standard.cc       # 标准函数 (61.7KB)
-│   │   ├── mbstring.cc       # 多字节字符串函数
-│   │   ├── openssl.cc        # OpenSSL 函数
-│   │   ├── gd.cc             # GD 图形函数
-│   │   └── ...               # 其他函数
-│   ├── class/                # PHP 类封装 (25 个文件)
-│   │   ├── redis.cc          # Redis 类封装 (71KB)
-│   │   ├── spl.cc            # SPL 类封装 (88.7KB)
-│   │   ├── dom.cc            # DOM 类封装 (130.7KB)
-│   │   ├── reflection.cc     # 反射类封装
-│   │   └── ...               # 其他类
-│   ├── const/                # 常量定义 (22 个文件)
-│   │   ├── curl.cc           # CURL 常量
-│   │   ├── sockets.cc        # Socket 常量
-│   │   └── ...               # 其他常量
+│   ├── std/                  # 常用 PHP 函数的类型安全快速路径
+│   ├── typephp/              # TypePHP 运行时辅助实现
 │   └── php/                  # PHP 相关代码
 ├── include/                  # 头文件目录
 │   ├── phpx.h                # 主头文件 (1269 行)
 │   ├── phpx_types.h          # 类型定义
-│   ├── phpx_func.h           # 函数声明
-│   ├── phpx_class.h          # 类声明
 │   ├── phpx_ext.h            # 扩展声明
 │   └── ...                   # 其他头文件
 ├── tests/                    # 测试代码
@@ -144,8 +114,7 @@ phpx/
 │   ├── embed/                # 嵌入示例
 │   └── php/                  # PHP 脚本示例
 ├── bin/                      # 工具脚本
-│   ├── gen_stub.php          # 存根生成工具
-│   └── gen-cpp-code.php      # C++ 代码生成器
+│   └── gen_stub.php          # arginfo 生成器
 ├── docs/                     # 文档目录
 ├── lib/                      # 编译库文件
 │   ├── libphpx.so            # PHPX 动态库
@@ -156,20 +125,12 @@ phpx/
 ## 代码统计
 
 ### 源代码规模
-- **核心代码**：~500KB
-  - `literal_string.cc`: 119.9KB（最大的单文件）
+- **核心代码**：
   - `variant.cc`: 25.9KB
   - `base.cc`: 19.5KB
-  
-- **类封装**：~500KB
-  - `dom.cc`: 130.7KB
-  - `redis.cc`: 71KB
-  - `spl.cc`: 88.7KB
-  
-- **函数封装**：~200KB
-  - `standard.cc`: 61.7KB
-  - `mbstring.cc`: 10.6KB
-  - `gd.cc`: 18.9KB
+
+- **标准库快速路径**：`src/std/`
+- **测试专用 Facade 子集**：`tests/include/`（不安装、不导出）
 
 ### 测试覆盖
 - **单元测试**：18 个测试文件

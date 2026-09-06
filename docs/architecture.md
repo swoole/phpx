@@ -548,19 +548,7 @@ var.print();
 
 ## 性能优化
 
-### 1. 字符串字面量缓存
-
-`literal_string.cc` (119.9KB) 实现了字符串字面量的缓存机制：
-
-```cpp
-// 使用预注册的字符串，避免重复分配
-static String cached_string;
-
-// 初始化时注册
-cached_string = registerLiteralString("cached");
-```
-
-### 2. 函数缓存
+### 1. 函数缓存
 
 ```cpp
 // 缓存函数查找结果
@@ -574,7 +562,7 @@ if (!cached_func) {
 call(cached_func, args);
 ```
 
-### 3. 类入口缓存
+### 2. 类入口缓存
 
 ```cpp
 // 缓存类入口
