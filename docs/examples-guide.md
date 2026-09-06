@@ -6,74 +6,11 @@
 
 ```
 examples/
-├── test/           # 基础功能测试示例
 ├── bloom_filter/   # 布隆过滤器扩展示例
 ├── queue/          # 队列实现示例
 ├── rocksdb/        # RocksDB 数据库示例
 ├── gtk/            # GTK GUI 示例
-├── embed/          # 嵌入 PHP 解释器示例
-└── php/            # PHP 脚本示例
-```
-
----
-
-## test - 基础功能示例
-
-这个目录包含基础的 PHPX 功能演示。
-
-### 文件说明
-
-- `test.cpp` - C++ 测试代码
-- `echo.php` - 输出测试
-- `class_def.php` - 类定义示例
-- `dispatch.php` - 路由分发示例
-- `empty.php` - empty() 函数测试
-- `immutable.php` - 不可变对象测试
-- `include.php` - 文件包含测试
-- `run.php` - 运行测试脚本
-- `tcp.php` - TCP 网络测试
-
-### 运行示例
-
-```bash
-cd examples/test
-make
-php echo.php
-php class_def.php
-```
-
-### 代码示例
-
-#### 1. Echo 测试 (echo.php)
-```php
-<?php
-echo __FILE__ . "\n";
-// 输出当前文件路径
-```
-
-#### 2. 类定义 (class_def.php)
-```php
-<?php
-class ClassDef {
-    public $var = 'hello';
-
-    public function say() {
-        return $this->var;
-    }
-}
-
-$obj = new ClassDef();
-echo $obj->say() . "\n";  // 输出：hello
-```
-
-#### 3. Empty 测试 (empty.php)
-```php
-<?php
-var_dump(empty($undefined));  // true
-var_dump(empty(0));           // true
-var_dump(empty(""));          // true
-var_dump(empty(false));       // true
-var_dump(empty("hello"));     // false
+└── embed/          # TypePHP runtime 使用的嵌入 PHP 示例
 ```
 
 ---
