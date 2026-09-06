@@ -563,45 +563,41 @@ TEST(array, assign) {
     ASSERT_STREQ(arr1[1999].toCString(), "banana");
 }
 
-// Test case to cover the array_data_compare function's handling of INDIRECT values
-// The array_data_compare function has specific logic to handle IS_INDIRECT type:
-// if (UNEXPECTED(Z_TYPE_P(first) == IS_INDIRECT)) {
-//     first = Z_INDIRECT_P(first);
-// }
-// if (UNEXPECTED(Z_TYPE_P(second) == IS_INDIRECT)) {
-//     second = Z_INDIRECT_P(second);
-// }
 TEST(array, indirect_handling_in_sort) {
-    // Create an array with various comparable values
-    Array arr;
-    arr.append(30);
-    arr.append(10);
-    arr.append(20);
-    arr.append(5);
+    // A HashTable supplied by Zend may contain borrowed IS_INDIRECT slots.
+    // Exercise the public sort operation without exposing its comparator.
+    zval values[4];
+    ZVAL_LONG(&values[0], 30);
+    ZVAL_LONG(&values[1], 10);
+    ZVAL_LONG(&values[2], 20);
+    ZVAL_LONG(&values[3], 5);
 
-    // Perform sort operation which will call array_data_compare
-    // During the sorting algorithm, some internal operations may create INDIRECT references
+    Array arr{0, 0, 0, 0};
+    for (zend_ulong i = 0; i < 4; i++) {
+        zval *slot = zend_hash_index_find(arr.array(), i);
+        ASSERT_NE(slot, nullptr);
+        ZVAL_INDIRECT(slot, &values[i]);
+    }
+
     arr.sort();
 
-    // Validate that the array was sorted properly despite potential INDIRECT values
     ASSERT_EQ(arr.count(), 4);
-    ASSERT_EQ(arr[0].toInt(), 5);  // Smallest value first
-    ASSERT_EQ(arr[1].toInt(), 10);
-    ASSERT_EQ(arr[2].toInt(), 20);
-    ASSERT_EQ(arr[3].toInt(), 30);  // Largest value last
+    ASSERT_EQ(arr.get(0).toInt(), 5);
+    ASSERT_EQ(arr.get(1).toInt(), 10);
+    ASSERT_EQ(arr.get(2).toInt(), 20);
+    ASSERT_EQ(arr.get(3).toInt(), 30);
 }
 
 // Another test to verify sorting with mixed data types
 TEST(array, indirect_handling_mixed_types) {
-    // Create array with values that will definitely be compared by array_data_compare
+    // Create an associative array whose values must be compared during sort.
     Array arr;
     arr.set("key1", 100);
     arr.set("key2", 50);
     arr.set("key3", 75);
     arr.set("key4", 25);
 
-    // Sort by values, which calls array_data_compare
-    // The internal implementation might use INDIRECT references during the process
+    // Sort by values through the public API.
     arr.sort();
 
     // Verify that the function handles any INDIRECT values properly during comparison
@@ -619,22 +615,6 @@ TEST(array, indirect_handling_mixed_types) {
     ASSERT_EQ(values[1], 50);
     ASSERT_EQ(values[2], 75);
     ASSERT_EQ(values[3], 100);
-}
-
-TEST(array, array_data_compare) {
-    Bucket b1;
-    Bucket b2;
-
-    zval zv1;
-    ZVAL_LONG(&zv1, 199);
-
-    zval zv2;
-    ZVAL_LONG(&zv2, 283);
-
-    ZVAL_INDIRECT(&b1.val, &zv1);
-    ZVAL_INDIRECT(&b2.val, &zv2);
-
-    ASSERT_EQ(array_data_compare(&b1, &b2), -1);
 }
 
 void dump_buckets(zend_array *ht) {

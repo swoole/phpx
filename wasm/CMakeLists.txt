@@ -200,7 +200,6 @@ file(GLOB PHPX_WASI_CORE_SOURCES CONFIGURE_DEPENDS
     "${PHPX_ROOT}/src/core/*.cc"
 )
 list(REMOVE_ITEM PHPX_WASI_CORE_SOURCES
-    "${PHPX_ROOT}/src/core/literal_string.cc"
     "${PHPX_ROOT}/src/core/typephp_fiber_generator.cc"
 )
 

@@ -1,12 +1,6 @@
 ignore:
   - "tests/src/*"
   - "tests/ext/*"
-  - "src/func/*"
-  - "src/class/*"
-  - "src/const/*"
-  - "include/func/*"
-  - "include/class/*"
-  - "include/const/*"
 
 coverage:
   range: 60..80

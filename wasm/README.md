@@ -52,7 +52,7 @@ version in `thirdparty/mpdecimal` from a build-tree copy.
 
 PHPX uses a separate CMake project for the WASI Preview 2 static library. The
 host `CMakeLists.txt` is intentionally independent because its PHP discovery,
-Facade API, shared-library targets, and tests do not apply to WASI.
+shared-library targets, and tests do not apply to WASI.
 
 Configure with the `wasi-sdk-p2.cmake` toolchain supplied by WASI SDK. The PHP,
 GMP, and MPFR dependency headers must already be installed in
@@ -69,5 +69,5 @@ cmake --install build/wasm32-wasip2
 
 The build compiles PHPX's vendored mpdecimal into `libmpdec.a` and
 `libmpdec++.a`, then compiles PHPX core and `src/std` with C++17 and
-WebAssembly exception support. The class/function/constant Facade API and its
-generated literal table are not part of the WASI archive.
+WebAssembly exception support. Test-only helpers and shared-library glue are
+not part of the WASI archive.

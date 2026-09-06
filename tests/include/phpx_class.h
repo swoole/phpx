@@ -10,7 +10,7 @@ class DateTime {
     static Variant createFromFormat(const Variant &format,
                                     const Variant &datetime,
                                     const Variant &timezone = nullptr) {
-        return Object::callStatic("DateTime", "createFromFormat", {format, datetime, timezone});
+        return callStaticMethod("DateTime", "createFromFormat", {format, datetime, timezone});
     }
 };
 

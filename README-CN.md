@@ -125,21 +125,22 @@ PHPX_FUNCTION(my_extension_func) {
     Object datetime = newObject("DateTime");
     auto formatted = datetime.call("format", {"Y-m-d H:i:s"});
     
-    // Facade 函数 - 直接调用 PHP 函数
-    php::var_dump(arr);                    // 调试输出
-    php::print_r(datetime);                // 打印对象
+    // 通过通用调用 API 执行 PHP 函数
+    php::call("var_dump", {arr});
+    php::call("print_r", {datetime});
     
     // 文件操作
-    auto content = php::file_get_contents("/etc/hosts");
+    auto content = php::call("file_get_contents", {"/etc/hosts"});
     if (content.isString()) {
         echo("File length: ", content.length(), "\n");
     }
     
     // 使用引用进行数组操作
     Array numbers{1, 2, 3, 4, 5};
-    Reference ref = numbers.toReference();
-    php::sort(ref);                        // 排序数组
-    php::array_push(ref, 6, 7, 8);        // 添加元素
+    numbers.sort();
+    numbers.appendValue(6);
+    numbers.appendValue(7);
+    numbers.appendValue(8);
     
     RETURN_STRING("PHPX Demo Completed!");
 }
@@ -181,7 +182,7 @@ PHPX_EXTENSION() {
 - **Extension/Class API**: 面向对象的扩展注册方式
 - **Lambda 回调**: 灵活的生命周期管理（`onStart`、`onShutdown` 等）
 - **类型安全封装**: `Variant`、`Array`、`Object`、`String` 类
-- **Facade 函数**: 通过 `php::` 命名空间直接调用 PHP 函数
+- **通用调用**: 使用 `php::call()` 和 `Object::call()` 调用 PHP 函数及方法
 - **自动生成 arginfo**: 使用 `gen_stub.php` 生成类型信息
 
 ### 生成 ArgInfo 和函数入口
@@ -359,120 +360,49 @@ auto count = arrayObj.call("count");
 echo("Count: ", count.toInt());
 
 // 静态方法调用
-auto result = Object::callStatic("DateTime", "createFromFormat", {
+    auto result = callStaticMethod("DateTime", "createFromFormat", {
     "Y-m-d", "2024-01-01"
 });
 ```
 
-### 4. Facade 封装 API
+### 4. 调用 PHP 函数
 
-PHPX 在 `php::` 命名空间中提供了 facade 函数，用于直接调用 PHP 函数：
+PHP 函数统一通过通用的 `php::call()` API 调用。常用且具有类型安全快速路径的
+函数，另外通过 `phpx_std.h` 中的 `php::fn` 提供。
 
 ```cpp
 #include "phpx.h"
-#include "phpx_func.h"
+#include "phpx_std.h"
 
 using namespace php;
 
-// 调试和输出
-php::var_dump(some_variable);           // 调试输出
-php::print_r(some_variable);            // 可读打印
-php::echo("Hello", " ", "World");      // 输出字符串
-
-// 文件操作
-auto content = php::file_get_contents("/path/to/file.txt");
-php::file_put_contents("/path/to/file.txt", "content");
-
-// 数组操作（需要引用）
-Array arr{5, 2, 8, 1, 9};
-Reference ref = arr.toReference();
-
-php::sort(ref);                         // 排序数组
-php::rsort(ref);                        // 逆向排序
-php::shuffle(ref);                      // 打乱
-php::array_push(ref, 10, 11);          // 添加元素
-php::array_pop(ref);                    // 弹出元素
-php::array_shift(ref);                  // 移出元素
-php::array_unshift(ref, 0);            // 压入元素
-
-// 字符串操作
-auto upper = php::strtoupper("hello");
-auto lower = php::strtolower("HELLO");
-auto length = php::strlen("hello");
-auto pos = php::strpos("hello world", "world");
-
-// 数学运算
-auto max_val = php::max({1, 2, 3, 4, 5});
-auto min_val = php::min({1, 2, 3, 4, 5});
-auto sum = php::array_sum(Array{1, 2, 3, 4, 5});
-auto rand_val = php::rand(1, 100);
-
-// JSON 操作
 Array data{{"name", "PHPX"}, {"version", 8.2}};
-auto json_str = php::json_encode(data);
-auto decoded = php::json_decode(json_str, true);
+auto json = php::call("json_encode", {data});
+auto decoded = php::call("json_decode", {json, true});
+php::call("var_dump", {decoded});
 
-// 其他实用函数
-php::sleep(2);                          // 睡眠 2 秒
-auto time = php::time();                // 当前时间戳
-auto date = php::date("Y-m-d H:i:s");  // 格式化日期
+// 优化过的标准库封装
+auto digest = php::fn::md5("hello");
 ```
 
-### 5. 内置类的 Facade 封装
+### 5. 调用内置类
 
-PHPX 为流行的 PHP 扩展提供了 facade 类：
+使用 `newObject()`、`Object::call()` 和 `callStaticMethod()` 调用 PHP 类：
 
 ```cpp
 #include "phpx.h"
-#include "phpx_class.h"
 
 using namespace php;
 
-// Redis 示例
-Redis redis{};
-redis.connect("127.0.0.1", 6379);
+Object redis = newObject("Redis");
+redis.call("connect", {"127.0.0.1", 6379});
+redis.call("set", {"name", "PHPX"});
+auto name = redis.call("get", {"name"});
 
-// 字符串操作
-redis.set("name", "PHPX");
-redis.set("version", "8.2");
-auto name = redis.get("name");
-echo("Name: ", name.toCString());
-
-// 检查是否存在
-if (redis.exists("name")) {
-    echo("Key exists");
-}
-
-// 批量操作
-redis.mset({
-    {"key1", "value1"},
-    {"key2", "value2"},
-    {"key3", "value3"}
+auto date = callStaticMethod("DateTime", "createFromFormat", {
+    "Y-m-d", "2024-01-01"
 });
-
-auto values = redis.mget({"key1", "key2", "key3"});
-
-// 列表操作
-redis.rpush("mylist", "item1");
-redis.rpush("mylist", "item2");
-auto list_len = redis.llen("mylist");
-
-// Hash 操作
-redis.hset("user:1", "name", "John");
-redis.hset("user:1", "email", "john@example.com");
-auto user_name = redis.hget("user:1", "name");
-
-// 设置过期时间
-redis.expire("name", 3600);  // 1 小时后过期
-
-// 删除键
-redis.del("key1", "key2");
-
-// 关闭连接
-redis.close();
 ```
-
-**注意：** 要使用 Redis facade，请确保在 PHP 环境中加载了 Redis 扩展。
 
 ## 文档
 

@@ -72,16 +72,6 @@ if(GITHUB_ACTION)
     add_definitions(-DGITHUB_ACTION)
 endif()
 
-# ============ Facade API 配置 ============
-# 默认关闭：关闭后 src/class、src/func、src/const 不加入编译
-option(ENABLE_FACADE_API "Enable Facade API (src/class, src/func, src/const)" OFF)
-if(ENABLE_FACADE_API)
-    message(STATUS "Facade API enabled")
-    add_definitions(-DENABLE_FACADE_API)
-else()
-    message(STATUS "Facade API disabled (src/class, src/func, src/const excluded)")
-endif()
-
 # ============ PHP 配置 ============
 if(IS_WINDOWS)
     # Windows 平台：必须设置 PHP_HOME 环境变量
@@ -413,18 +403,7 @@ else()
     target_compile_options(mpdecimal PRIVATE -fPIC)
 endif()
 
-if(ENABLE_FACADE_API)
-    file(GLOB_RECURSE SRC_FILES src/core/*.cc src/std/*.cc src/typephp/*.cc src/func/*.cc src/class/*.cc src/const/*.cc)
-else()
-    file(GLOB_RECURSE SRC_FILES src/core/*.cc src/std/*.cc src/typephp/*.cc)
-    # Facade API 与 tests 耦合较大，保留最常用的 Facade 实现，避免核心单测大量改写
-    list(APPEND SRC_FILES
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/func/core.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/func/standard.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/func/json.cc
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/func/random.cc
-    )
-endif()
+file(GLOB_RECURSE SRC_FILES src/core/*.cc src/std/*.cc src/typephp/*.cc)
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 
 add_library(phpx SHARED ${SRC_FILES})
@@ -492,13 +471,6 @@ if(BUILD_TESTS)
         message(STATUS "Found GTest: ${GTEST_LIBRARIES}")
 
         file(GLOB_RECURSE TEST_FILES tests/src/*.cpp)
-        if(NOT ENABLE_FACADE_API)
-            # 关闭 Facade API 时，排除仅测试 class/func/const facade 的单测文件
-            list(FILTER TEST_FILES EXCLUDE REGEX "tests/src/class_facade\\.cpp$")
-            list(FILTER TEST_FILES EXCLUDE REGEX "tests/src/func_facade\\.cpp$")
-            list(FILTER TEST_FILES EXCLUDE REGEX "tests/src/facade\\.cpp$")
-            list(FILTER TEST_FILES EXCLUDE REGEX "tests/src/caller\\.cpp$")
-        endif()
         add_executable(phpx-tests ${TEST_FILES})
         add_dependencies(phpx-tests phpx)
 
@@ -622,5 +594,4 @@ endif()
 message(STATUS "Build Tests: ${BUILD_TESTS}")
 message(STATUS "Build Extension: ${BUILD_EXT}")
 message(STATUS "GitHub Action: ${GITHUB_ACTION}")
-message(STATUS "Facade API: ${ENABLE_FACADE_API}")
 message(STATUS "=================================")

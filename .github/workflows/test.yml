@@ -69,7 +69,7 @@ jobs:
           esac
       - name: Build
         run: |
-          cmake . -D CODE_COVERAGE=${{ matrix.coverage }} -D GITHUB_ACTION=ON -D ENABLE_FACADE_API=ON || exit 1
+          cmake . -D CODE_COVERAGE=${{ matrix.coverage }} -D GITHUB_ACTION=ON || exit 1
           make VERBOSE=1 -j$(nproc)
       - name: Run google tests
         run: |
@@ -160,7 +160,6 @@ jobs:
             -D BUILD_TESTS=OFF \
             -D BUILD_EXT=OFF \
             -D GITHUB_ACTION=ON \
-            -D ENABLE_FACADE_API=ON \
             -D php_dir="${PHP_HOME}"
           cmake --build build-platform --target phpx --parallel 2
 
@@ -375,7 +374,6 @@ jobs:
               -D BUILD_TESTS=OFF `
               -D BUILD_EXT=OFF `
               -D GITHUB_ACTION=ON `
-              -D ENABLE_FACADE_API=ON `
               -D MPDECIMAL_LIBRARY="$sdkLib\libmpdec-4.0.1.dll.lib" `
               -D MPDECIMALXX_LIBRARY="$sdkLib\libmpdec++-4.0.1.dll.lib"
           if ($LASTEXITCODE -ne 0) {

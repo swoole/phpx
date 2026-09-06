@@ -55,7 +55,7 @@ Based on Google style, 120 cols, 4-space indent (see `.clang-format`).
 ### Layers
 
 ```
-PHP Extension ── PHPX facade layer (func/class/const) ── Core type wrappers ── Zend Engine API
+PHP Extension ── PHPX core type wrappers ── Zend Engine API
 ```
 
 ### Core types (`include/phpx.h`, `src/core/`)
@@ -86,13 +86,11 @@ PHPX_EXTENSION() {
 
 Macros: `PHPX_FUNCTION(name)` for functions, `PHPX_METHOD(Class, method)` for methods. `PHPX_FN(fn)` / `PHPX_ME(Class, method)` for registration.
 
-### Facade layers (`src/func/`, `src/class/`, `src/const/`)
+### PHP calls
 
-Auto-generated wrappers around PHP built-in functions, classes, and constants. Callable via `php::function_name(...)` (e.g., `php::array_push()`, `php::strlen()`). Facade classes like `php::Redis` wrap PHP extension classes.
-
-### String literal optimization (`src/core/literal_string.cc`)
-
-~192KB generated file that pre-registers common string literals with the Zend Engine to avoid repeated allocation.
+Use `php::call()`, `Object::call()`, and `callStaticMethod()` for dynamic PHP
+calls. The small facade under `tests/include/` is test-only and must not be
+used by production code.
 
 ### gen_stub.php (`bin/gen_stub.php`)
 

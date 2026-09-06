@@ -7,6 +7,7 @@
 
 static_assert(std::is_same_v<decltype(std::declval<const php::Args &>().count()), uint32_t>,
               "Args::count() must use Zend's argument-count type");
+
 #include "const/curl.h"
 
 using namespace php;

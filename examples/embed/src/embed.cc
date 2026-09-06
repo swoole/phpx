@@ -16,7 +16,6 @@
 
 #include "sapi/embed/php_embed.h"
 #include "phpx.h"
-#include "phpx_func.h"
 
 //#include <swoole.h>
 #include <iostream>
@@ -29,22 +28,22 @@ void test() {
 }
 
 void md5test() {
-    echo("[0]hash=%s\n", md5("hello world").toCString());
+    echo("[0]hash=%s\n", call("md5", {"hello world"}).toCString());
     echo("[0]hash_hmac=%s\n",
-         hash_hmac("ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").toCString());
+         call("hash_hmac", {"ripemd160", "The quick brown fox jumped over the lazy dog.", "secret"}).toCString());
 
     Variant a("hello world");
-    echo("[1]hash=%s\n", md5(a).toCString());
-    echo("[1]hash=%s\n", md5("hello world").toCString());
+    echo("[1]hash=%s\n", call("md5", {a}).toCString());
+    echo("[1]hash=%s\n", call("md5", {"hello world"}).toCString());
 
     echo("[1]hash_hmac=%s\n",
-         hash_hmac("ripemd160", "The quick brown fox jumped over the lazy dog.", "secret").toCString());
+         call("hash_hmac", {"ripemd160", "The quick brown fox jumped over the lazy dog.", "secret"}).toCString());
 }
 
 void testRedis() {
     cout << "=====================Test Redis==================\n";
     Object redis = newObject("redis");
-    var_dump(redis);
+    call("var_dump", {redis});
     auto ret1 = redis.call("connect", {"127.0.0.1", 6379});
     // connect success
     if (ret1.toBool()) {
@@ -67,11 +66,11 @@ void jsontest() {
     Variant arr2 = json.jsonDecode();
 
     echo("json=%s", json.toCString());
-    var_dump(arr2);
+    call("var_dump", {arr2});
 }
 
 void php_main() {
-    auto value = ini_get("output_buffering");
+    auto value = call("ini_get", {"output_buffering"});
     cout << "ENV:" << value.toInt() << endl;
 
     Variant a = 1;
@@ -83,7 +82,7 @@ void php_main() {
 
     include("index.php");
     auto o = newObject("test");
-    var_dump(o);
+    call("var_dump", {o});
 
     Array url_params;
     url_params.set("name", "rango");
@@ -96,8 +95,8 @@ void php_main() {
     Variant func = "var_dump";
     call(func, _arg_list);
 
-    auto url_query = http_build_query(url_params);
-    var_dump(url_query);
+    auto url_query = call("http_build_query", {url_params});
+    call("var_dump", {url_query});
 
     jsontest();
     md5test();
@@ -124,10 +123,10 @@ void php_main() {
     arr.append(1234.03);
     arr.append(1234.04);
     arr.append("1234.05");
-    var_dump(arr);
+    call("var_dump", {arr});
 
     Array arr2 = arr.slice(0, 2);
-    var_dump(arr2);
+    call("var_dump", {arr2});
 
     String s1 = "hello world";
     String s2 = s1.substr(0, 5);

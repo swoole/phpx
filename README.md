@@ -125,21 +125,22 @@ PHPX_FUNCTION(my_extension_func) {
     Object datetime = newObject("DateTime");
     auto formatted = datetime.call("format", {"Y-m-d H:i:s"});
 
-    // Facade functions - direct PHP function calls
-    php::var_dump(arr);                    // Debug output
-    php::print_r(datetime);                // Print object
+    // Call PHP functions through the generic call API
+    php::call("var_dump", {arr});
+    php::call("print_r", {datetime});
 
     // File operations
-    auto content = php::file_get_contents("/etc/hosts");
+    auto content = php::call("file_get_contents", {"/etc/hosts"});
     if (content.isString()) {
         echo("File length: ", content.length(), "\n");
     }
 
     // Array manipulation with references
     Array numbers{1, 2, 3, 4, 5};
-    Reference ref = numbers.toReference();
-    php::sort(ref);                        // Sort array
-    php::array_push(ref, 6, 7, 8);        // Push elements
+    numbers.sort();
+    numbers.appendValue(6);
+    numbers.appendValue(7);
+    numbers.appendValue(8);
 
     RETURN_STRING("PHPX Demo Completed!");
 }
@@ -181,7 +182,7 @@ PHPX_EXTENSION() {
 - **Extension/Class API**: Object-oriented extension registration
 - **Lambda callbacks**: Flexible lifecycle management with `onStart`, `onShutdown`, etc.
 - **Type-safe wrappers**: `Variant`, `Array`, `Object`, `String` classes
-- **Facade functions**: Direct PHP function calls via `php::` namespace
+- **Generic calls**: Invoke PHP functions and methods with `php::call()` and `Object::call()`
 - **Auto-generated arginfo**: Use `gen_stub.php` to generate type information
 
 ### Generate ArgInfo & Function Entries
@@ -359,120 +360,49 @@ auto count = arrayObj.call("count");
 echo("Count: ", count.toInt());
 
 // Static method calls
-auto result = Object::callStatic("DateTime", "createFromFormat", {
+    auto result = callStaticMethod("DateTime", "createFromFormat", {
     "Y-m-d", "2024-01-01"
 });
 ```
 
-### 4. Facade Encapsulation API
+### 4. Calling PHP Functions
 
-PHPX provides facade functions in the `php::` namespace for direct PHP function calls:
+PHP functions are invoked through the generic `php::call()` API. Frequently used,
+type-safe fast paths are available separately in `php::fn` through `phpx_std.h`.
 
 ```cpp
 #include "phpx.h"
-#include "phpx_func.h"
+#include "phpx_std.h"
 
 using namespace php;
 
-// Debug and output
-php::var_dump(some_variable);           // Debug output
-php::print_r(some_variable);            // Print readable
-php::echo("Hello", " ", "World");      // Echo strings
-
-// File operations
-auto content = php::file_get_contents("/path/to/file.txt");
-php::file_put_contents("/path/to/file.txt", "content");
-
-// Array manipulation (requires reference)
-Array arr{5, 2, 8, 1, 9};
-Reference ref = arr.toReference();
-
-php::sort(ref);                         // Sort array
-php::rsort(ref);                        // Reverse sort
-php::shuffle(ref);                      // Shuffle
-php::array_push(ref, 10, 11);          // Push elements
-php::array_pop(ref);                    // Pop element
-php::array_shift(ref);                  // Shift element
-php::array_unshift(ref, 0);            // Unshift element
-
-// String operations
-auto upper = php::strtoupper("hello");
-auto lower = php::strtolower("HELLO");
-auto length = php::strlen("hello");
-auto pos = php::strpos("hello world", "world");
-
-// Math operations
-auto max_val = php::max({1, 2, 3, 4, 5});
-auto min_val = php::min({1, 2, 3, 4, 5});
-auto sum = php::array_sum(Array{1, 2, 3, 4, 5});
-auto rand_val = php::rand(1, 100);
-
-// JSON operations
 Array data{{"name", "PHPX"}, {"version", 8.2}};
-auto json_str = php::json_encode(data);
-auto decoded = php::json_decode(json_str, true);
+auto json = php::call("json_encode", {data});
+auto decoded = php::call("json_decode", {json, true});
+php::call("var_dump", {decoded});
 
-// Other useful functions
-php::sleep(2);                          // Sleep 2 seconds
-auto time = php::time();                // Current timestamp
-auto date = php::date("Y-m-d H:i:s");  // Formatted date
+// Optimized standard-library wrappers
+auto digest = php::fn::md5("hello");
 ```
 
-### 5. Built-in Class Facade Encapsulation
+### 5. Calling Built-in Classes
 
-PHPX provides facade classes for popular PHP extensions:
+Use `newObject()`, `Object::call()`, and `callStaticMethod()` for PHP classes:
 
 ```cpp
 #include "phpx.h"
-#include "phpx_class.h"
 
 using namespace php;
 
-// Redis example
-Redis redis{};
-redis.connect("127.0.0.1", 6379);
+Object redis = newObject("Redis");
+redis.call("connect", {"127.0.0.1", 6379});
+redis.call("set", {"name", "PHPX"});
+auto name = redis.call("get", {"name"});
 
-// String operations
-redis.set("name", "PHPX");
-redis.set("version", "8.2");
-auto name = redis.get("name");
-echo("Name: ", name.toCString());
-
-// Check existence
-if (redis.exists("name")) {
-    echo("Key exists");
-}
-
-// Multiple operations
-redis.mset({
-    {"key1", "value1"},
-    {"key2", "value2"},
-    {"key3", "value3"}
+auto date = callStaticMethod("DateTime", "createFromFormat", {
+    "Y-m-d", "2024-01-01"
 });
-
-auto values = redis.mget({"key1", "key2", "key3"});
-
-// List operations
-redis.rpush("mylist", "item1");
-redis.rpush("mylist", "item2");
-auto list_len = redis.llen("mylist");
-
-// Hash operations
-redis.hset("user:1", "name", "John");
-redis.hset("user:1", "email", "john@example.com");
-auto user_name = redis.hget("user:1", "name");
-
-// Set expiration
-redis.expire("name", 3600);  // Expire in 1 hour
-
-// Delete keys
-redis.del("key1", "key2");
-
-// Close connection
-redis.close();
 ```
-
-**Note:** To use Redis facade, ensure the Redis extension is loaded in your PHP environment.
 
 ## Documentation
 
