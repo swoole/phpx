@@ -181,7 +181,7 @@ void GObject_dtor(zend_resource *res) {
 }
 
 PHPX_EXTENSION() {
-    Extension *ext = new Extension("gtk", "0.0.1");
+    Extension *ext = new Extension("phpx_gtk", "0.0.1");
 
     ext->onStart = [ext]() {
         /**

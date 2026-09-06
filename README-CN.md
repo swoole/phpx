@@ -58,9 +58,10 @@ sudo ldconfig
 ### 创建新的扩展项目
 
 ```shell
-# 创建扩展项目
-composer create-project swoole/phpx-ext test
+mkdir test
 cd test
+composer require swoole/phpx
+vendor/bin/phpx init
 ```
 
 ### 基本用法示例
@@ -161,9 +162,10 @@ PHPX_EXTENSION() {
         c->registerFunctions(class_MyClass_methods);  // 来自 arginfo 头文件
         ext->registerClass(c);
         
-        // 注册独立函数
-        ext->registerFunction(PHPX_FN(my_extension_func));
     };
+
+    // 注册由 stub 生成的函数表
+    ext->registerFunctions(ext_functions);
     
     // PHP info 页面配置
     ext->info({"my_extension support", "enabled"},
@@ -187,14 +189,22 @@ PHPX_EXTENSION() {
 
 ### 生成 ArgInfo 和函数入口
 
-`gen_stub.php` 由 PHP 开发包提供。使用前将与当前 `php-config`
-匹配的官方版本复制到可写的构建目录；生成的 arginfo 头文件应与扩展源码一起提交。
+`phpx init` 会在当前 Composer 项目中生成 CMake 工程、`src/`、`include/`、
+PHPT 冒烟测试和 README，同时从 PHP 开发包复制匹配的 `gen_stub.php`
+到 `build/`、`run-tests.php` 到项目根目录，无需使用 `phpize`：
 
 ```shell
-mkdir -p build
-cp "$(find "$(php-config --prefix)/lib/php" -path '*/build/gen_stub.php' -print -quit)" build/gen_stub.php
-php build/gen_stub.php your_stub_dir
+composer require swoole/phpx
+vendor/bin/phpx init
+vendor/bin/phpx build
+sudo vendor/bin/phpx install
+sudo vendor/bin/phpx enable
 ```
+
+构建完成后，可使用 `phpx install`、`phpx enable` 和 `phpx disable`
+复制扩展并修改 `php.ini`。`init` 默认使用 `PATH` 中的 `php-config`；
+首次初始化可指定 `--php-config=/path/to/php-config`，之后可使用
+`phpx switch /path/to/php-config` 切换 PHP 版本。
 
 ### 构建你的扩展
 

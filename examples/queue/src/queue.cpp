@@ -113,10 +113,10 @@ PHPX_METHOD(Queue, traverse) {
 }
 
 PHPX_EXTENSION() {
-    Extension *extension = new Extension("queue", "1.0.2");
+    Extension *extension = new Extension("phpx_queue", "1.0.3");
 
     extension->onStart = [extension]() noexcept {
-        extension->registerConstant("QUEUE_VERSION", 10002);
+        extension->registerConstant("QUEUE_VERSION", 10003);
 
         Class *c = new Class("Queue");
         c->addProperty("queue_ptr", nullptr, ZEND_ACC_PUBLIC);

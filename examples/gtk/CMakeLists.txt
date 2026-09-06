@@ -59,6 +59,8 @@ pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
 
 file(GLOB_RECURSE EXT_FILES src/*.cc src/*.cpp)
 add_library(gtk SHARED ${EXT_FILES})
+include("${CMAKE_CURRENT_LIST_DIR}/../PhpStub.cmake")
+phpx_generate_arginfo(gtk src/gtk.stub.php)
 target_link_options(gtk PRIVATE "-L${PHP_PREFIX}/lib" "-Wl,-rpath,${PHP_PREFIX}/lib")
 
 target_include_directories(gtk PRIVATE ${GTK3_INCLUDE_DIRS})

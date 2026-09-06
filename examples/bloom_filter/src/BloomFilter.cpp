@@ -190,7 +190,7 @@ PHPX_METHOD(BloomFilter, load) {
 }
 
 PHPX_EXTENSION() {
-    s_bloomfilter_extension = std::make_shared<Extension>("BloomFilter", "1.0.2");
+    s_bloomfilter_extension = std::make_shared<Extension>("phpx_BloomFilter", "1.0.2");
     auto extension = s_bloomfilter_extension.get();
 
     extension->onStart = [extension]() noexcept {

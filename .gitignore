@@ -10,6 +10,7 @@
 # Precompiled Headers
 *.gch
 *.pch
+*_arginfo.h
 
 # Compiled Dynamic libraries
 *.so
@@ -52,7 +53,6 @@ examples/test/test.so.dSYM/
 console/vendor
 console/test
 console/composer.lock
-bin/phpx
 /build/
 \.settings/
 /Debug/
@@ -72,3 +72,6 @@ bin/phpx
 /wasm/wasm32-wasip2/
 /full-static/sdk
 /phpx.sln
+/examples/*/.phpx.json
+/examples/*/build/
+/examples/*/run-tests.php

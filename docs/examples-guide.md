@@ -440,10 +440,11 @@ php <test_file>.php
 
 ### 测试脚本
 
-扩展示例共享同一份 PHP 测试运行器。在示例目录中执行：
+先在示例目录执行 `phpx init`，补齐 PHP 开发包提供的官方构建工具。
+测试运行器位于扩展项目根目录：
 
 ```bash
-php ../run-tests.php tests
+php run-tests.php tests
 ```
 
 ---

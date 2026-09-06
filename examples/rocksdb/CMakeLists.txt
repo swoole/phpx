@@ -56,6 +56,8 @@ endif ()
 
 file(GLOB_RECURSE EXT_FILES src/*.cc src/*.cpp)
 add_library(php_rocksdb SHARED ${EXT_FILES})
+include("${CMAKE_CURRENT_LIST_DIR}/../PhpStub.cmake")
+phpx_generate_arginfo(php_rocksdb src/rocksdb.stub.php)
 target_link_options(php_rocksdb PRIVATE "-L${PHP_PREFIX}/lib" "-Wl,-rpath,${PHP_PREFIX}/lib")
 target_link_libraries(php_rocksdb phpx rocksdb)
 

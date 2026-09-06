@@ -1,0 +1,901 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+const PHPX_BUILD_TOOL_FILES = ['gen_stub.php', 'run-tests.php'];
+
+function phpxError(string $message): never
+{
+    fwrite(STDERR, "phpx: {$message}\n");
+    exit(1);
+}
+
+function phpxUsage(): never
+{
+    fwrite(
+        STDOUT,
+        <<<'HELP'
+Usage:
+  phpx init [name] [--target=DIR] [--php-config=php-config] [--source-dir=DIR]
+  phpx build [--build-dir=build] [--type=Release] [--jobs=4] [--php-config=php-config]
+  phpx switch <php-config> [--build-dir=build] [--type=Release] [--jobs=4] [--source-dir=DIR]
+  phpx install [module.so|module.dll] [--name=NAME] [--build-dir=build] [--extension-dir=DIR] [--php-config=php-config]
+  phpx enable [NAME] [--ini=FILE] [--php-config=php-config]
+  phpx disable [NAME] [--ini=FILE] [--php-config=php-config]
+
+PHPX delegates compilation to CMake. This utility creates an extension project,
+installs the official PHP build tools, and manages built extension modules.
+
+HELP,
+    );
+    exit(0);
+}
+
+/** @return array{0: array<string, string|bool>, 1: list<string>} */
+function phpxParseArguments(array $arguments): array
+{
+    $options = [];
+    $positional = [];
+
+    for ($i = 0, $count = count($arguments); $i < $count; ++$i) {
+        $argument = $arguments[$i];
+        if (!str_starts_with($argument, '--')) {
+            $positional[] = $argument;
+            continue;
+        }
+
+        $option = substr($argument, 2);
+        if ($option === 'help') {
+            $options['help'] = true;
+            continue;
+        }
+
+        if (str_contains($option, '=')) {
+            [$name, $value] = explode('=', $option, 2);
+        } else {
+            $name = $option;
+            $value = $arguments[++$i] ?? phpxError("missing value for --{$name}");
+        }
+        $options[$name] = $value;
+    }
+
+    return [$options, $positional];
+}
+
+function phpxConfigValue(string $phpConfig, string $option): string
+{
+    $pipes = [];
+    $process = proc_open(
+        [$phpConfig, $option],
+        [1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
+        $pipes,
+    );
+    if (!is_resource($process)) {
+        phpxError("unable to execute {$phpConfig}");
+    }
+
+    $stdout = stream_get_contents($pipes[1]);
+    $stderr = stream_get_contents($pipes[2]);
+    fclose($pipes[1]);
+    fclose($pipes[2]);
+    $status = proc_close($process);
+    if ($status !== 0) {
+        phpxError(trim($stderr) ?: "{$phpConfig} {$option} failed");
+    }
+
+    return trim($stdout);
+}
+
+function phpxResolvePhpConfig(string $phpConfig): string
+{
+    $hasDirectory = str_contains($phpConfig, '/') || str_contains($phpConfig, '\\');
+    $candidates = $hasDirectory ? [$phpConfig] : [];
+    if (!$hasDirectory) {
+        foreach (explode(PATH_SEPARATOR, (string) getenv('PATH')) as $directory) {
+            if ($directory !== '') {
+                $candidates[] = $directory . DIRECTORY_SEPARATOR . $phpConfig;
+            }
+        }
+    }
+
+    foreach ($candidates as $candidate) {
+        $path = realpath($candidate);
+        if ($path !== false && is_file($path) && is_executable($path)) {
+            return $path;
+        }
+    }
+    phpxError("php-config executable was not found: {$phpConfig}");
+}
+
+function phpxValidatePhpConfig(string $phpConfig): void
+{
+    $version = phpxConfigValue($phpConfig, '--vernum');
+    if (!ctype_digit($version) || (int) $version < 80400 || (int) $version >= 80600) {
+        phpxError("PHPX requires PHP 8.4 or 8.5; {$phpConfig} reports {$version}");
+    }
+}
+
+/** @param list<string> $command */
+function phpxRun(array $command, string $workingDirectory): void
+{
+    $pipes = [];
+    $process = proc_open(
+        $command,
+        [STDIN, STDOUT, STDERR],
+        $pipes,
+        $workingDirectory,
+    );
+    if (!is_resource($process)) {
+        phpxError('unable to execute ' . implode(' ', $command));
+    }
+    $status = proc_close($process);
+    if ($status !== 0) {
+        phpxError(implode(' ', $command) . " failed with exit code {$status}");
+    }
+}
+
+function phpxFindBuildDirectory(string $phpConfig): string
+{
+    $prefix = phpxConfigValue($phpConfig, '--prefix');
+    $includeDir = phpxConfigValue($phpConfig, '--include-dir');
+    $apiDirectory = basename($includeDir);
+    $candidates = [
+        $prefix . '/lib/php/build',
+        $prefix . '/lib/php/' . $apiDirectory . '/build',
+        $prefix . '/SDK/build',
+        $prefix . '/build',
+    ];
+    foreach (glob($prefix . '/lib/php/*/build', GLOB_ONLYDIR) ?: [] as $candidate) {
+        $candidates[] = $candidate;
+    }
+
+    foreach (array_unique($candidates) as $candidate) {
+        foreach (PHPX_BUILD_TOOL_FILES as $file) {
+            if (!is_file($candidate . '/' . $file)) {
+                continue 2;
+            }
+        }
+        return $candidate;
+    }
+
+    phpxError(
+        "gen_stub.php and run-tests.php were not found below {$prefix}; "
+        . 'install the PHP development package matching php-config',
+    );
+}
+
+/** @return array{gen_stub.php: string, run-tests.php: string} */
+function phpxReadBuildTools(string $sourceDirectory): array
+{
+    $tools = [];
+    foreach (PHPX_BUILD_TOOL_FILES as $file) {
+        $path = $sourceDirectory . '/' . $file;
+        $contents = is_file($path) ? file_get_contents($path) : false;
+        if ($contents === false) {
+            phpxError("missing or unreadable PHP build tool: {$path}");
+        }
+        $tools[$file] = $contents;
+    }
+    return $tools;
+}
+
+/** @param array<string, string> $files */
+function phpxWriteProjectFiles(string $targetDirectory, array $files): void
+{
+    if (file_exists($targetDirectory) && !is_dir($targetDirectory)) {
+        phpxError("target is not a directory: {$targetDirectory}");
+    }
+
+    if (!is_dir($targetDirectory) && !mkdir($targetDirectory, 0777, true) && !is_dir($targetDirectory)) {
+        phpxError("unable to create {$targetDirectory}");
+    }
+
+    foreach ($files as $relativePath => $contents) {
+        $path = $targetDirectory . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relativePath);
+        if (file_exists($path)) {
+            fwrite(STDOUT, "Kept existing {$path}\n");
+            continue;
+        }
+        $directory = dirname($path);
+        if (!is_dir($directory) && !mkdir($directory, 0777, true) && !is_dir($directory)) {
+            phpxError("unable to create {$directory}");
+        }
+        $stream = fopen($path, 'x');
+        if ($stream === false) {
+            phpxError("unable to write {$path}");
+        }
+        $written = fwrite($stream, $contents);
+        $closed = fclose($stream);
+        if ($written !== strlen($contents) || !$closed) {
+            phpxError("unable to write {$path}");
+        }
+        fwrite(STDOUT, "Created {$path}\n");
+    }
+}
+
+function phpxDirectoryIsEmpty(string $directory): bool
+{
+    if (!is_dir($directory)) {
+        return true;
+    }
+    $entries = scandir($directory);
+    return $entries !== false && count($entries) === 2;
+}
+
+function phpxProjectHasExtensionContent(string $targetDirectory): bool
+{
+    if (is_file($targetDirectory . '/CMakeLists.txt')) {
+        return true;
+    }
+    foreach (['src', 'include', 'tests', 'build'] as $relativePath) {
+        $path = $targetDirectory . DIRECTORY_SEPARATOR . $relativePath;
+        if (!phpxDirectoryIsEmpty($path)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/** @return array<string, mixed> */
+function phpxProjectConfig(string $projectDirectory): array
+{
+    $manifest = $projectDirectory . DIRECTORY_SEPARATOR . '.phpx.json';
+    $contents = is_file($manifest) ? file_get_contents($manifest) : false;
+    $config = $contents === false ? null : json_decode($contents, true);
+    if (!is_array($config)
+        || !isset($config['name'], $config['php-config'])
+        || !is_string($config['name'])
+        || !is_string($config['php-config'])) {
+        phpxError("invalid or missing project configuration: {$manifest}");
+    }
+    return $config;
+}
+
+/** @param array<string, mixed> $config */
+function phpxWriteProjectConfig(string $projectDirectory, array $config): void
+{
+    $contents = json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    if ($contents === false
+        || file_put_contents($projectDirectory . '/.phpx.json', $contents . "\n", LOCK_EX) === false) {
+        phpxError('unable to write .phpx.json');
+    }
+}
+
+/** @return array{include: string, library: string} */
+function phpxBuildRuntime(
+    string $buildDirectory,
+    string $type,
+    int $jobs,
+    string $phpConfig,
+): array {
+    if ($jobs < 1 || $jobs > 64) {
+        phpxError('--jobs must be between 1 and 64');
+    }
+    if (preg_match('/^[A-Za-z][A-Za-z0-9_]*$/', $type) !== 1) {
+        phpxError('invalid CMake build type');
+    }
+    $phpxSource = dirname(__DIR__);
+    if (!is_file($phpxSource . '/CMakeLists.txt') || !is_file($phpxSource . '/include/phpx.h')) {
+        phpxError("PHPX source tree was not found at {$phpxSource}");
+    }
+
+    $runtimeBuildDirectory = $buildDirectory . '/phpx-runtime';
+    $runtimeLibraryDirectory = $runtimeBuildDirectory . '/lib';
+    $configuration = strtoupper($type);
+    $configure = [
+        'cmake',
+        '-S',
+        $phpxSource,
+        '-B',
+        $runtimeBuildDirectory,
+        "-DCMAKE_BUILD_TYPE={$type}",
+        "-DPHP_CONFIG={$phpConfig}",
+        '-DBUILD_TESTS=OFF',
+        '-DBUILD_EXT=OFF',
+        "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={$runtimeLibraryDirectory}",
+        "-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY={$runtimeLibraryDirectory}",
+        "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY={$runtimeLibraryDirectory}",
+        "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{$configuration}={$runtimeLibraryDirectory}",
+        "-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_{$configuration}={$runtimeLibraryDirectory}",
+        "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY_{$configuration}={$runtimeLibraryDirectory}",
+    ];
+    phpxRun($configure, $phpxSource);
+    phpxRun(
+        ['cmake', '--build', $runtimeBuildDirectory, '--target', 'phpx', '--config', $type, '--parallel', (string) $jobs],
+        $phpxSource,
+    );
+
+    $libraryNames = match (PHP_OS_FAMILY) {
+        'Windows' => ['phpx.lib'],
+        'Darwin' => ['libphpx.dylib', 'libphpx.so'],
+        default => ['libphpx.so'],
+    };
+    foreach ($libraryNames as $libraryName) {
+        $library = $runtimeLibraryDirectory . '/' . $libraryName;
+        if (is_file($library)) {
+            return ['include' => $phpxSource . '/include', 'library' => $library];
+        }
+    }
+    phpxError("PHPX runtime library was not produced in {$runtimeLibraryDirectory}");
+}
+
+/** @param array<string, mixed> $config */
+function phpxAssertManagedBuildToolsCanBeUpdated(string $projectDirectory, array $config): void
+{
+    $mapping = ['build/gen_stub.php' => 'gen_stub.php', 'run-tests.php' => 'run-tests.php'];
+    $managedFiles = is_array($config['managed-files'] ?? null) ? $config['managed-files'] : [];
+    foreach ($mapping as $relativePath => $_) {
+        $path = $projectDirectory . '/' . $relativePath;
+        if (!is_file($path)) {
+            continue;
+        }
+        $expectedHash = $managedFiles[$relativePath] ?? null;
+        if (!is_string($expectedHash) || hash_file('sha256', $path) !== $expectedHash) {
+            phpxError("refusing to overwrite unmanaged or modified file: {$path}");
+        }
+    }
+}
+
+/**
+ * @param array{gen_stub.php: string, run-tests.php: string} $tools
+ * @param array<string, mixed> $config
+ * @return array<string, mixed>
+ */
+function phpxUpdateManagedBuildTools(string $projectDirectory, array $tools, array $config): array
+{
+    phpxAssertManagedBuildToolsCanBeUpdated($projectDirectory, $config);
+    $mapping = ['build/gen_stub.php' => 'gen_stub.php', 'run-tests.php' => 'run-tests.php'];
+    $managedFiles = is_array($config['managed-files'] ?? null) ? $config['managed-files'] : [];
+
+    foreach ($mapping as $relativePath => $tool) {
+        $path = $projectDirectory . '/' . $relativePath;
+        $directory = dirname($path);
+        if (!is_dir($directory) && !mkdir($directory, 0777, true) && !is_dir($directory)) {
+            phpxError("unable to create {$directory}");
+        }
+        if (file_put_contents($path, $tools[$tool], LOCK_EX) === false) {
+            phpxError("unable to write {$path}");
+        }
+        chmod($path, 0755);
+        $managedFiles[$relativePath] = hash('sha256', $tools[$tool]);
+    }
+    $config['managed-files'] = $managedFiles;
+    return $config;
+}
+
+function phpxConfigureProject(
+    string $projectDirectory,
+    string $buildDirectory,
+    string $type,
+    string $phpConfig,
+    ?array $phpxRuntime = null,
+): void {
+    if (!is_file($projectDirectory . '/CMakeLists.txt')) {
+        phpxError("CMakeLists.txt was not found in {$projectDirectory}");
+    }
+    if (preg_match('/^[A-Za-z][A-Za-z0-9_]*$/', $type) !== 1) {
+        phpxError('invalid CMake build type');
+    }
+
+    $command = [
+        'cmake',
+        '-S',
+        $projectDirectory,
+        '-B',
+        $buildDirectory,
+        "-DCMAKE_BUILD_TYPE={$type}",
+        "-DPHP_CONFIG={$phpConfig}",
+    ];
+    if ($phpxRuntime !== null) {
+        $command[] = '-DPHPX_INCLUDE_DIR=' . $phpxRuntime['include'];
+        $command[] = '-DPHPX_LIBRARY=' . $phpxRuntime['library'];
+    }
+    phpxRun($command, $projectDirectory);
+}
+
+function phpxBuild(string $projectDirectory, string $buildDirectory, string $type, int $jobs, string $phpConfig): void
+{
+    if ($jobs < 1 || $jobs > 64) {
+        phpxError('--jobs must be between 1 and 64');
+    }
+    $phpxRuntime = phpxBuildRuntime($buildDirectory, $type, $jobs, $phpConfig);
+    phpxConfigureProject($projectDirectory, $buildDirectory, $type, $phpConfig, $phpxRuntime);
+    phpxRun(
+        ['cmake', '--build', $buildDirectory, '--config', $type, '--parallel', (string) $jobs],
+        $projectDirectory,
+    );
+}
+
+function phpxFindBuiltModule(string $projectDirectory, string $buildDirectory, string $name, string $type): string
+{
+    $suffix = PHP_OS_FAMILY === 'Windows' ? 'dll' : 'so';
+    $candidates = [
+        $buildDirectory . DIRECTORY_SEPARATOR . $name . '.' . $suffix,
+        $buildDirectory . DIRECTORY_SEPARATOR . $type . DIRECTORY_SEPARATOR . $name . '.' . $suffix,
+        $projectDirectory . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'lib' . $name . '.' . $suffix,
+    ];
+    foreach ($candidates as $candidate) {
+        if (is_file($candidate)) {
+            return $candidate;
+        }
+    }
+    phpxError("built extension {$name}.{$suffix} was not found; run phpx build first or pass its path");
+}
+
+function phpxCreateExtensionSkeleton(
+    string $name,
+    string $targetDirectory,
+    string $toolSourceDirectory,
+    string $phpConfig,
+): void {
+    if (preg_match('/^[a-z][a-z0-9_]*$/', $name) !== 1) {
+        phpxError('extension name must start with a lowercase letter and contain only lowercase letters, digits, and underscores');
+    }
+    $hasExistingContent = phpxProjectHasExtensionContent($targetDirectory);
+
+    $toolFiles = phpxReadBuildTools($toolSourceDirectory);
+
+    $templates = [
+        '.gitignore' => <<<'EOF'
+/build/
+/vendor/
+/src/*_arginfo.h
+EOF,
+        'include/{{EXT_NAME}}.h' => <<<'EOF'
+#pragma once
+
+#define {{EXT_NAME_UPPER}}_VERSION "0.1.0"
+EOF,
+        'CMakeLists.txt' => <<<'EOF'
+cmake_minimum_required(VERSION 3.16)
+project(phpx_{{EXT_NAME}} LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(PHP_CONFIG "php-config" CACHE FILEPATH "Path to php-config")
+execute_process(
+    COMMAND "${PHP_CONFIG}" --vernum
+    OUTPUT_VARIABLE PHP_VERSION_ID
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    RESULT_VARIABLE PHP_CONFIG_RESULT
+)
+if(NOT PHP_CONFIG_RESULT EQUAL 0 OR PHP_VERSION_ID LESS 80400 OR PHP_VERSION_ID GREATER_EQUAL 80600)
+    message(FATAL_ERROR "PHPX requires PHP 8.4 or 8.5")
+endif()
+
+foreach(PHP_CONFIG_OPTION IN ITEMS --prefix --includes --extension-dir --php-binary)
+    string(REPLACE "--" "" PHP_CONFIG_VARIABLE "${PHP_CONFIG_OPTION}")
+    string(REPLACE "-" "_" PHP_CONFIG_VARIABLE "${PHP_CONFIG_VARIABLE}")
+    string(TOUPPER "PHP_${PHP_CONFIG_VARIABLE}" PHP_CONFIG_VARIABLE)
+    execute_process(
+        COMMAND "${PHP_CONFIG}" "${PHP_CONFIG_OPTION}"
+        OUTPUT_VARIABLE "${PHP_CONFIG_VARIABLE}"
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE PHP_CONFIG_RESULT
+    )
+    if(NOT PHP_CONFIG_RESULT EQUAL 0)
+        message(FATAL_ERROR "Failed to execute ${PHP_CONFIG} ${PHP_CONFIG_OPTION}")
+    endif()
+endforeach()
+
+separate_arguments(PHP_INCLUDE_FLAGS NATIVE_COMMAND "${PHP_INCLUDES}")
+set(PHPX_HOME "$ENV{PHPX_HOME}" CACHE PATH "PHPX installation or source directory")
+find_path(PHPX_INCLUDE_DIR phpx_ext.h
+    HINTS "${PHPX_HOME}/include" "${CMAKE_SOURCE_DIR}/vendor/swoole/phpx/include" "${PHP_PREFIX}/include/phpx"
+    REQUIRED
+)
+find_library(PHPX_LIBRARY phpx
+    HINTS "${PHPX_HOME}/lib" "${CMAKE_SOURCE_DIR}/vendor/swoole/phpx/lib" "${PHP_PREFIX}/lib"
+    REQUIRED
+)
+
+set(GENERATED_ARGINFO "${CMAKE_CURRENT_SOURCE_DIR}/src/{{EXT_NAME}}_arginfo.h")
+add_custom_command(
+    OUTPUT "${GENERATED_ARGINFO}"
+    COMMAND "${PHP_PHP_BINARY}" -n "${CMAKE_CURRENT_SOURCE_DIR}/build/gen_stub.php"
+        --force-regeneration "${CMAKE_CURRENT_SOURCE_DIR}/src/{{EXT_NAME}}.stub.php"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/{{EXT_NAME}}.stub.php"
+            "${CMAKE_CURRENT_SOURCE_DIR}/build/gen_stub.php"
+    VERBATIM
+)
+
+add_library({{EXT_NAME}} MODULE src/{{EXT_NAME}}.cc "${GENERATED_ARGINFO}")
+set_target_properties({{EXT_NAME}} PROPERTIES PREFIX "")
+if(APPLE)
+    set_target_properties({{EXT_NAME}} PROPERTIES
+        BUILD_RPATH "@loader_path;@loader_path/phpx-runtime/lib"
+        INSTALL_RPATH "@loader_path"
+    )
+elseif(UNIX)
+    set_target_properties({{EXT_NAME}} PROPERTIES
+        BUILD_RPATH "\$ORIGIN;\$ORIGIN/phpx-runtime/lib"
+        INSTALL_RPATH "\$ORIGIN"
+    )
+endif()
+target_compile_options({{EXT_NAME}} PRIVATE ${PHP_INCLUDE_FLAGS})
+target_include_directories({{EXT_NAME}} PRIVATE
+    "${PHPX_INCLUDE_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src"
+)
+target_link_libraries({{EXT_NAME}} PRIVATE "${PHPX_LIBRARY}")
+if(APPLE)
+    target_link_options({{EXT_NAME}} PRIVATE "-undefined" "dynamic_lookup")
+endif()
+
+install(TARGETS {{EXT_NAME}}
+    LIBRARY DESTINATION "${PHP_EXTENSION_DIR}"
+    RUNTIME DESTINATION "${PHP_EXTENSION_DIR}"
+)
+EOF,
+        'src/{{EXT_NAME}}.stub.php' => <<<'EOF'
+<?php
+
+/** @generate-function-entries */
+
+function {{EXT_NAME}}_version(): string
+{
+}
+EOF,
+        'src/{{EXT_NAME}}.cc' => <<<'EOF'
+#include "phpx_ext.h"
+#include "{{EXT_NAME}}.h"
+
+BEGIN_EXTERN_C()
+#include "{{EXT_NAME}}_arginfo.h"
+END_EXTERN_C()
+
+using namespace php;
+
+PHPX_FUNCTION({{EXT_NAME}}_version) {
+    return {{EXT_NAME_UPPER}}_VERSION;
+}
+
+PHPX_EXTENSION() {
+    auto *extension = new Extension("{{EXT_NAME}}", "0.1.0");
+    extension->registerFunctions(ext_functions);
+    extension->info({"{{EXT_NAME}} support", "enabled"},
+                    {
+                        {"version", extension->version},
+                    });
+    return extension;
+}
+EOF,
+        'tests/{{EXT_NAME}}.phpt' => <<<'EOF'
+--TEST--
+{{EXT_NAME}} extension skeleton
+--EXTENSIONS--
+{{EXT_NAME}}
+--FILE--
+<?php
+var_dump({{EXT_NAME}}_version());
+?>
+--EXPECT--
+string(5) "0.1.0"
+EOF,
+        'README.md' => <<<'EOF'
+# {{EXT_NAME}}
+
+PHP 8.4/8.5 extension generated by PHPX.
+
+```shell
+vendor/bin/phpx build
+sudo vendor/bin/phpx install
+sudo vendor/bin/phpx enable
+php run-tests.php tests
+```
+
+`phpx init` uses `php-config` from `PATH`. Select another PHP installation with
+`--php-config=/path/to/php-config`, or later run `phpx switch <php-config>`.
+EOF,
+    ];
+
+    $manifest = $targetDirectory . '/.phpx.json';
+    $config = is_file($manifest)
+        ? phpxProjectConfig($targetDirectory)
+        : ['name' => $name, 'php-config' => $phpConfig];
+    if ($config['name'] !== $name) {
+        phpxError("project is already initialized as {$config['name']}");
+    }
+    if ($config['php-config'] !== $phpConfig) {
+        phpxError('project uses another PHP version; use phpx switch instead');
+    }
+
+    $files = [];
+    if (!$hasExistingContent) {
+        foreach ($templates as $relativePath => $contents) {
+            $replacements = [
+                '{{EXT_NAME}}' => $name,
+                '{{EXT_NAME_UPPER}}' => strtoupper($name),
+            ];
+            $files[strtr($relativePath, $replacements)] = strtr($contents, $replacements) . "\n";
+        }
+    } else {
+        fwrite(STDOUT, "Existing extension project detected; source and build files will be preserved.\n");
+    }
+
+    $managedFiles = is_array($config['managed-files'] ?? null) ? $config['managed-files'] : [];
+    $toolMapping = ['build/gen_stub.php' => 'gen_stub.php', 'run-tests.php' => 'run-tests.php'];
+    foreach ($toolMapping as $relativePath => $tool) {
+        $path = $targetDirectory . '/' . $relativePath;
+        $hash = hash('sha256', $toolFiles[$tool]);
+        if (!file_exists($path)) {
+            $files[$relativePath] = $toolFiles[$tool];
+            $managedFiles[$relativePath] = $hash;
+        } elseif (is_file($path) && hash_file('sha256', $path) === $hash) {
+            $managedFiles[$relativePath] = $hash;
+        } else {
+            fwrite(STDOUT, "Kept unmanaged {$path}\n");
+        }
+    }
+
+    phpxWriteProjectFiles($targetDirectory, $files);
+    foreach (array_keys($toolMapping) as $relativePath) {
+        if (isset($files[$relativePath])) {
+            chmod($targetDirectory . '/' . $relativePath, 0755);
+        }
+    }
+    $config['managed-files'] = $managedFiles;
+    phpxWriteProjectConfig($targetDirectory, $config);
+    fwrite(STDOUT, "Initialized PHPX extension project in {$targetDirectory}\n");
+}
+
+function phpxModuleName(string $name): string
+{
+    $name = basename($name);
+    $name = preg_replace('/\.(?:so|dll|dylib)$/i', '', $name) ?? $name;
+    return preg_replace('/^lib/', '', $name) ?? $name;
+}
+
+function phpxInstallExtension(
+    string $module,
+    string $name,
+    string $extensionDirectory,
+    ?string $runtimeLibrary = null,
+): void {
+    if (!is_file($module)) {
+        phpxError("extension module does not exist: {$module}");
+    }
+    if (!is_dir($extensionDirectory)) {
+        phpxError("PHP extension directory does not exist: {$extensionDirectory}");
+    }
+
+    $suffix = strtolower((string) pathinfo($module, PATHINFO_EXTENSION));
+    if (!in_array($suffix, ['so', 'dll'], true)) {
+        phpxError('extension module must use the .so or .dll suffix');
+    }
+
+    $target = rtrim($extensionDirectory, '/\\') . DIRECTORY_SEPARATOR . $name . '.' . $suffix;
+    if (!copy($module, $target)) {
+        phpxError("unable to copy {$module} to {$target}; check directory permissions");
+    }
+    fwrite(STDOUT, "Installed {$target}\n");
+    if ($runtimeLibrary !== null) {
+        $runtimeTarget = rtrim($extensionDirectory, '/\\') . DIRECTORY_SEPARATOR . basename($runtimeLibrary);
+        if (!copy($runtimeLibrary, $runtimeTarget)) {
+            phpxError("unable to copy {$runtimeLibrary} to {$runtimeTarget}; check directory permissions");
+        }
+        fwrite(STDOUT, "Installed {$runtimeTarget}\n");
+    }
+}
+
+function phpxFindRuntimeBinary(string $buildDirectory): string
+{
+    $directory = $buildDirectory . '/phpx-runtime/lib';
+    $names = match (PHP_OS_FAMILY) {
+        'Windows' => ['phpx.dll'],
+        'Darwin' => ['libphpx.dylib', 'libphpx.so'],
+        default => ['libphpx.so'],
+    };
+    foreach ($names as $name) {
+        if (is_file($directory . '/' . $name)) {
+            return $directory . '/' . $name;
+        }
+    }
+    phpxError("PHPX runtime library was not found in {$directory}; run phpx build first");
+}
+
+function phpxInstallHeaders(string $projectDirectory, string $name, string $phpConfig): void
+{
+    $sourceDirectory = $projectDirectory . '/include';
+    if (phpxDirectoryIsEmpty($sourceDirectory)) {
+        return;
+    }
+
+    $targetDirectory = rtrim(phpxConfigValue($phpConfig, '--include-dir'), '/\\')
+        . '/ext/' . $name;
+    if (!is_dir($targetDirectory) && !mkdir($targetDirectory, 0777, true) && !is_dir($targetDirectory)) {
+        phpxError("unable to create PHP extension include directory: {$targetDirectory}");
+    }
+
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($sourceDirectory, FilesystemIterator::SKIP_DOTS),
+    );
+    foreach ($iterator as $file) {
+        if (!$file->isFile()) {
+            continue;
+        }
+        $relativePath = substr($file->getPathname(), strlen($sourceDirectory) + 1);
+        $target = $targetDirectory . '/' . $relativePath;
+        $directory = dirname($target);
+        if (!is_dir($directory) && !mkdir($directory, 0777, true) && !is_dir($directory)) {
+            phpxError("unable to create {$directory}");
+        }
+        if (!copy($file->getPathname(), $target)) {
+            phpxError("unable to install header {$target}");
+        }
+        fwrite(STDOUT, "Installed {$target}\n");
+    }
+}
+
+function phpxPhpIniPath(string $phpConfig, ?string $explicitPath): string
+{
+    if ($explicitPath !== null) {
+        return $explicitPath;
+    }
+
+    $iniPath = phpxConfigValue($phpConfig, '--ini-path');
+    if ($iniPath === '') {
+        phpxError('php-config returned an empty --ini-path; use --ini explicitly');
+    }
+    return rtrim($iniPath, '/\\') . DIRECTORY_SEPARATOR . 'php.ini';
+}
+
+function phpxConfigureExtension(string $phpIni, string $module, bool $enable): void
+{
+    $name = phpxModuleName($module);
+    if ($name === '') {
+        phpxError('extension name cannot be empty');
+    }
+
+    $lines = is_file($phpIni) ? file($phpIni, FILE_IGNORE_NEW_LINES) : [];
+    if ($lines === false) {
+        phpxError("unable to read {$phpIni}");
+    }
+
+    $pattern = '/^\s*;?\s*extension\s*=\s*(?:.*[\\\\\/])?(?:lib)?'
+        . preg_quote($name, '/') . '(?:\.(?:so|dll))?\s*$/i';
+    $replacement = ($enable ? '' : ';') . 'extension=' . $name;
+    $found = false;
+
+    foreach ($lines as &$line) {
+        if (preg_match($pattern, $line) !== 1) {
+            continue;
+        }
+        $found = true;
+        $line = $replacement;
+    }
+    unset($line);
+
+    if (!$found) {
+        if (!$enable) {
+            fwrite(STDOUT, "Extension {$name} is already disabled in {$phpIni}\n");
+            return;
+        }
+        $lines[] = $replacement;
+    }
+
+    $directory = dirname($phpIni);
+    if (!is_dir($directory)) {
+        phpxError("PHP configuration directory does not exist: {$directory}");
+    }
+    $contents = implode(PHP_EOL, $lines) . PHP_EOL;
+    if (file_put_contents($phpIni, $contents, LOCK_EX) === false) {
+        phpxError("unable to update {$phpIni}; check file permissions");
+    }
+
+    fwrite(STDOUT, ($enable ? 'Enabled' : 'Disabled') . " {$name} in {$phpIni}\n");
+}
+
+$command = $argv[1] ?? 'help';
+[$options, $positional] = phpxParseArguments(array_slice($argv, 2));
+if ($command === 'help' || isset($options['help'])) {
+    phpxUsage();
+}
+
+$projectDirectory = (string) getcwd();
+$projectConfig = is_file($projectDirectory . '/.phpx.json')
+    ? phpxProjectConfig($projectDirectory)
+    : null;
+$configuredPhpConfig = isset($options['php-config'])
+    ? phpxResolvePhpConfig((string) $options['php-config'])
+    : null;
+switch ($command) {
+    case 'init':
+        $targetDirectory = rtrim((string) ($options['target'] ?? getcwd()), '/\\');
+        $name = (string) ($positional[0] ?? str_replace('-', '_', basename($targetDirectory)));
+        $targetConfig = is_file($targetDirectory . '/.phpx.json')
+            ? phpxProjectConfig($targetDirectory)
+            : null;
+        $phpConfig = $configuredPhpConfig
+            ?? $targetConfig['php-config']
+            ?? phpxResolvePhpConfig('php-config');
+        phpxValidatePhpConfig($phpConfig);
+        $sourceDirectory = isset($options['source-dir'])
+            ? rtrim((string) $options['source-dir'], '/\\')
+            : phpxFindBuildDirectory($phpConfig);
+        phpxCreateExtensionSkeleton($name, $targetDirectory, $sourceDirectory, $phpConfig);
+        break;
+
+    case 'build':
+        $phpConfig = $configuredPhpConfig
+            ?? $projectConfig['php-config']
+            ?? phpxResolvePhpConfig('php-config');
+        phpxValidatePhpConfig($phpConfig);
+        $buildDirectory = (string) ($options['build-dir'] ?? $projectDirectory . '/build');
+        $type = (string) ($options['type'] ?? 'Release');
+        $jobs = filter_var($options['jobs'] ?? 4, FILTER_VALIDATE_INT);
+        if ($jobs === false) {
+            phpxError('--jobs must be an integer');
+        }
+        phpxBuild($projectDirectory, $buildDirectory, $type, $jobs, $phpConfig);
+        break;
+
+    case 'switch':
+        if ($projectConfig === null) {
+            phpxError('phpx switch must be run in a project created by phpx init');
+        }
+        $phpConfig = phpxResolvePhpConfig((string) ($positional[0] ?? phpxError('switch requires php-config')));
+        phpxValidatePhpConfig($phpConfig);
+        $sourceDirectory = isset($options['source-dir'])
+            ? rtrim((string) $options['source-dir'], '/\\')
+            : phpxFindBuildDirectory($phpConfig);
+        $toolFiles = phpxReadBuildTools($sourceDirectory);
+        phpxAssertManagedBuildToolsCanBeUpdated($projectDirectory, $projectConfig);
+        $buildDirectory = (string) ($options['build-dir'] ?? $projectDirectory . '/build');
+        $type = (string) ($options['type'] ?? 'Release');
+        $jobs = filter_var($options['jobs'] ?? 4, FILTER_VALIDATE_INT);
+        if ($jobs === false || $jobs < 1 || $jobs > 64) {
+            phpxError('--jobs must be an integer between 1 and 64');
+        }
+        $phpxRuntime = phpxBuildRuntime($buildDirectory, $type, $jobs, $phpConfig);
+        phpxConfigureProject($projectDirectory, $buildDirectory, $type, $phpConfig, $phpxRuntime);
+        $projectConfig['php-config'] = $phpConfig;
+        $projectConfig = phpxUpdateManagedBuildTools($projectDirectory, $toolFiles, $projectConfig);
+        phpxWriteProjectConfig($projectDirectory, $projectConfig);
+        fwrite(STDOUT, "Switched project to {$phpConfig}\n");
+        break;
+
+    case 'install':
+        $phpConfig = $configuredPhpConfig
+            ?? $projectConfig['php-config']
+            ?? phpxResolvePhpConfig('php-config');
+        phpxValidatePhpConfig($phpConfig);
+        $type = (string) ($options['type'] ?? 'Release');
+        $buildDirectory = (string) ($options['build-dir'] ?? $projectDirectory . '/build');
+        $name = (string) ($options['name']
+            ?? $positional[0]
+            ?? $projectConfig['name']
+            ?? phpxError('install requires a module path or a project created by phpx init'));
+        $name = phpxModuleName($name);
+        $module = (string) ($positional[0] ?? phpxFindBuiltModule(
+            $projectDirectory,
+            $buildDirectory,
+            $name,
+            $type,
+        ));
+        $extensionDirectory = (string) ($options['extension-dir']
+            ?? phpxConfigValue($phpConfig, '--extension-dir'));
+        $runtimeLibrary = $projectConfig === null ? null : phpxFindRuntimeBinary($buildDirectory);
+        phpxInstallExtension($module, $name, $extensionDirectory, $runtimeLibrary);
+        phpxInstallHeaders($projectDirectory, $name, $phpConfig);
+        break;
+
+    case 'enable':
+    case 'disable':
+        $phpConfig = $configuredPhpConfig
+            ?? $projectConfig['php-config']
+            ?? phpxResolvePhpConfig('php-config');
+        phpxValidatePhpConfig($phpConfig);
+        $module = (string) ($positional[0]
+            ?? $projectConfig['name']
+            ?? phpxError("{$command} requires an extension name or a project created by phpx init"));
+        $phpIni = phpxPhpIniPath($phpConfig, isset($options['ini']) ? (string) $options['ini'] : null);
+        phpxConfigureExtension($phpIni, $module, $command === 'enable');
+        break;
+
+    default:
+        phpxError("unknown command: {$command}");
+}

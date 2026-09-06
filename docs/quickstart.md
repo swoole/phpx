@@ -58,17 +58,18 @@ ls /usr/local/include/phpx/  # 应看到 PHPX 头文件
 
 ## 创建第一个扩展
 
-### 方法一：使用 Composer 模板（推荐）
+### 方法一：使用 PHPX 工具（推荐）
 
 ```bash
-# 创建扩展项目
-composer create-project swoole/phpx-ext test
+mkdir test
 cd test
+composer require swoole/phpx
+vendor/bin/phpx init
 
 # 构建扩展
-cmake .
-make -j 4
-sudo make install
+vendor/bin/phpx build
+sudo vendor/bin/phpx install
+sudo vendor/bin/phpx enable
 ```
 
 ### 方法二：手动创建
@@ -200,14 +201,11 @@ function hello(): string {}
 
 ### 2. 生成代码
 ```bash
-mkdir -p build
-cp "$(find "$(php-config --prefix)/lib/php" -path '*/build/gen_stub.php' -print -quit)" build/gen_stub.php
 php build/gen_stub.php myext.stub.php
 ```
 
 这将生成：
 - `myext_arginfo.h` - 参数信息
-- `myext_legacy_arginfo.h` - 兼容旧版本的参数信息
 
 ## 常用示例
 

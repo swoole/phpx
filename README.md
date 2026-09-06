@@ -58,9 +58,10 @@ sudo ldconfig
 ### Create a New Extension Project
 
 ```shell
-# Create extension project
-composer create-project swoole/phpx-ext test
+mkdir test
 cd test
+composer require swoole/phpx
+vendor/bin/phpx init
 ```
 
 ### Basic Usage Example
@@ -161,9 +162,10 @@ PHPX_EXTENSION() {
         c->registerFunctions(class_MyClass_methods);  // From arginfo header
         ext->registerClass(c);
 
-        // Register standalone functions
-        ext->registerFunction(PHPX_FN(my_extension_func));
     };
+
+    // Register the function table generated from the stub.
+    ext->registerFunctions(ext_functions);
 
     // PHP info page configuration
     ext->info({"my_extension support", "enabled"},
@@ -187,15 +189,23 @@ PHPX_EXTENSION() {
 
 ### Generate ArgInfo & Function Entries
 
-`gen_stub.php` is supplied by the PHP development package. Copy the version
-matching the active `php-config` into a writable build directory before using
-it; generated arginfo headers should be committed with the extension sources.
+`phpx init` creates the CMake project, `src/`, `include/`, a PHPT smoke test,
+and README in the current Composer project. It also copies the matching
+`gen_stub.php` to `build/` and `run-tests.php` to the project root from the PHP
+development package, without requiring `phpize`:
 
 ```shell
-mkdir -p build
-cp "$(find "$(php-config --prefix)/lib/php" -path '*/build/gen_stub.php' -print -quit)" build/gen_stub.php
-php build/gen_stub.php your_stub_dir
+composer require swoole/phpx
+vendor/bin/phpx init
+vendor/bin/phpx build
+sudo vendor/bin/phpx install
+sudo vendor/bin/phpx enable
 ```
+
+After building, `phpx install`, `phpx enable`, and `phpx disable` copy the
+module and update `php.ini`. `init` uses `php-config` from `PATH`; use
+`phpx init --php-config=/path/to/php-config` initially or
+`phpx switch /path/to/php-config` later to select another PHP installation.
 
 ### Build Your Extension
 

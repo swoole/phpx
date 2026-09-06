@@ -95,7 +95,9 @@ used by production code.
 ### gen_stub.php
 
 Arginfo headers are generated with the `gen_stub.php` supplied by the matching
-PHP development package. PHPX does not maintain a separate copy.
+PHP development package. `bin/phpx init` creates an extension skeleton in an
+existing Composer project and copies `gen_stub.php` and `run-tests.php` without
+requiring `phpize`.
 
 ## CI
 

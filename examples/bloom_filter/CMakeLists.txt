@@ -56,6 +56,8 @@ endif ()
 
 file(GLOB_RECURSE EXT_FILES src/*.cc src/*.cpp)
 add_library(bloom_filter SHARED ${EXT_FILES})
+include("${CMAKE_CURRENT_LIST_DIR}/../PhpStub.cmake")
+phpx_generate_arginfo(bloom_filter src/BloomFilter.stub.php)
 target_link_options(bloom_filter PRIVATE "-L${PHP_PREFIX}/lib" "-Wl,-rpath,${PHP_PREFIX}/lib")
 target_link_libraries(bloom_filter phpx)
 

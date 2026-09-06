@@ -1,7 +1,7 @@
 ## Require
 
 * `PHP-X`
-* `PHP >= 7.2`
+* `PHP 8.4` or `PHP 8.5`
 
 ## 安装使用
 
@@ -10,5 +10,5 @@ cmake -S . -B build
 cmake --build build -j 4
 sudo cmake --install build
 
-php ../run-tests.php tests
+php run-tests.php tests
 ```

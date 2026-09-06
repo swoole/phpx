@@ -114,7 +114,7 @@ phpx/
 │   ├── embed/                # 嵌入示例
 │   └── php/                  # PHP 脚本示例
 ├── bin/                      # 工具脚本
-│   └── gen_stub.php          # arginfo 生成器
+│   └── phpx                  # 扩展脚手架及安装管理工具
 ├── docs/                     # 文档目录
 ├── lib/                      # 编译库文件
 │   ├── libphpx.so            # PHPX 动态库
