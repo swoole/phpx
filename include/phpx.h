@@ -360,8 +360,6 @@ Resource *getResource(const std::string &name);
 
 void request_init();
 void request_shutdown();
-int array_data_compare(Bucket *f, Bucket *s);
-bool prepare_slice(Int &offset, Int &length, size_t total);
 Variant call_impl(const zval *object, const zval *func, Args &args, zend_array *named_args = nullptr);
 Variant call_impl(const zval *object, const zval *func, FixedArgs args, zend_array *named_args = nullptr);
 Variant call_impl(const zval *object, const zval *func);

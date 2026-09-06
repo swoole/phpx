@@ -16,6 +16,8 @@
 
 #include "phpx.h"
 
+#include "slice.h"
+
 extern "C" {
 #include "ext/pcre/php_pcre.h"
 }
@@ -143,38 +145,8 @@ Array String::matchAll(const String &regx, Int flags, Int start_offset) {
     return php_do_pcre_match(*this, regx, flags, start_offset, true);
 }
 
-bool prepare_slice(Int &offset, Int &length, size_t total) {
-    if (offset < 0) {
-        /* if "from" position is negative, count start position from the end
-         * of the string
-         */
-        if (-(size_t) offset > total) {
-            offset = 0;
-        } else {
-            offset = (Int) total + offset;
-        }
-    } else if ((size_t) offset > total) {
-        return false;
-    }
-
-    if (length < 0) {
-        /* if "length" position is negative, set it to the length
-         * needed to stop that many chars from the end of the string
-         */
-        if (-(size_t) length > total - (size_t) offset) {
-            length = 0;
-        } else {
-            length = (Int) total - offset + length;
-        }
-    } else if ((size_t) length > total - (size_t) offset) {
-        length = (Int) total - offset;
-    }
-
-    return true;
-}
-
 String String::substr(Int f, Int l) const {
-    if (!prepare_slice(f, l, length())) {
+    if (!detail::prepareSlice(f, l, length())) {
         return "";
     }
     return {data() + f, (size_t) l};

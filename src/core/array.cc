@@ -16,10 +16,13 @@
 
 #include "phpx.h"
 
+#include "slice.h"
+
 #include "zend_closures.h"
 
-namespace php {
-int array_data_compare(Bucket *f, Bucket *s) {
+namespace {
+
+int arrayDataCompare(Bucket *f, Bucket *s) {
     zval result;
     zval *first = &f->val;
     zval *second = &s->val;
@@ -35,14 +38,18 @@ int array_data_compare(Bucket *f, Bucket *s) {
     return Z_LVAL(result);
 }
 
+}  // namespace
+
+namespace php {
+
 void Array::sort(bool renumber) {
     auto zarr = unwrap_ptr();
     SEPARATE_ARRAY(zarr);
-    zend_hash_sort(Z_ARRVAL_P(zarr), array_data_compare, renumber);
+    zend_hash_sort(Z_ARRVAL_P(zarr), arrayDataCompare, renumber);
 }
 
 Array Array::slice(Int offset, Int length, bool preserve_keys) {
-    if (!prepare_slice(offset, length, count())) {
+    if (!detail::prepareSlice(offset, length, count())) {
         return {};
     }
 
