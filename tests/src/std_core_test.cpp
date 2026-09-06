@@ -131,6 +131,68 @@ TEST(std_core, defined) {
     ASSERT_FALSE(fn::defined("NOT_A_REAL_CONSTANT"));
 }
 
+TEST(std_core, spl_object_identity) {
+    Object first = newObject("stdClass");
+    Object second = newObject("stdClass");
+
+    ASSERT_EQ(fn::spl_object_id(first), static_cast<Int>(first.object()->handle));
+    ASSERT_NE(fn::spl_object_id(first), fn::spl_object_id(second));
+    ASSERT_TRUE(fn::spl_object_hash(first).equals(first.hash()));
+
+    try_call([]() { (void) fn::spl_object_id(42); },
+             "spl_object_id(): Argument #1 ($object) must be of type object, int given");
+    try_call([]() { (void) fn::spl_object_hash("not an object"); },
+             "spl_object_hash(): Argument #1 ($object) must be of type object, string given");
+}
+
+TEST(std_core, iterator_array_fast_paths) {
+    Array input;
+    input.set("name", "phpx");
+    input.set(4, 42);
+
+    ASSERT_EQ(fn::iterator_count(input), 2);
+
+    Array preserved = fn::iterator_to_array(input);
+    ASSERT_STREQ(preserved.get("name").toCString(), "phpx");
+    ASSERT_EQ(preserved.get(4).toInt(), 42);
+
+    Array values = fn::iterator_to_array(input, false);
+    ASSERT_STREQ(values.get(0).toCString(), "phpx");
+    ASSERT_EQ(values.get(1).toInt(), 42);
+}
+
+TEST(std_core, iterator_object_fast_paths) {
+    Variant keyed = eval("return (function () { yield 'name' => 'phpx'; yield 4 => 42; })();");
+    Array preserved = fn::iterator_to_array(keyed);
+    ASSERT_STREQ(preserved.get("name").toCString(), "phpx");
+    ASSERT_EQ(preserved.get(4).toInt(), 42);
+
+    Variant values_only = eval("return (function () { yield 'name' => 'phpx'; yield 4 => 42; })();");
+    Array values = fn::iterator_to_array(values_only, false);
+    ASSERT_STREQ(values.get(0).toCString(), "phpx");
+    ASSERT_EQ(values.get(1).toInt(), 42);
+
+    Variant counted = eval("return (function () { yield 1; yield 2; yield 3; })();");
+    ASSERT_EQ(fn::iterator_count(counted), 3);
+}
+
+TEST(std_core, iterator_helpers_validate_and_propagate_errors) {
+    try_call([]() { (void) fn::iterator_count(42); },
+             "iterator_count(): Argument #1 ($iterator) must be of type Traversable|array, int given");
+    try_call([]() { (void) fn::iterator_to_array(nullptr); },
+             "iterator_to_array(): Argument #1 ($iterator) must be of type Traversable|array, null given");
+
+    Variant throwing = eval("return (function () { yield 1; throw new RuntimeException('iterator failed'); })();");
+    try_call([&throwing]() { (void) fn::iterator_count(throwing); }, "iterator failed");
+}
+
+TEST(std_core, runtime_constant_lookup) {
+    ASSERT_STREQ(fn::constant("PHP_VERSION").toCString(), PHP_VERSION);
+    ASSERT_EQ(fn::constant("PHP_INT_MAX").toInt(), ZEND_LONG_MAX);
+    try_call([]() { (void) fn::constant("PHPX_UNDEFINED_CONSTANT"); },
+             "Undefined constant \"PHPX_UNDEFINED_CONSTANT\"");
+}
+
 TEST(std_core, define) {
     ASSERT_TRUE(fn::define("MY_TEST_CONSTANT_123", 42));
     ASSERT_TRUE(fn::defined("MY_TEST_CONSTANT_123"));

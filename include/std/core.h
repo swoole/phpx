@@ -14,6 +14,7 @@ extern "C" {
 #include "zend_interfaces.h"
 #include "zend_exceptions.h"
 #include "zend_closures.h"
+#include "ext/spl/php_spl.h"
 }
 
 #include "phpx.h"
@@ -79,6 +80,41 @@ Bool is_a(const Variant &obj, const String &class_name, bool allow_string = fals
 Bool is_subclass_of(const Variant &obj, const String &class_name, bool allow_string = true);
 Bool defined(const String &name);
 Bool define(const String &name, const Variant &value, bool case_insensitive = false);
+
+// ========================
+// SPL object and iterator helpers
+// ========================
+
+inline String spl_object_hash(const Variant &object) {
+    if (UNEXPECTED(!object.isObject())) {
+        php::throwExceptionEx(zend_ce_type_error,
+                              0,
+                              "spl_object_hash(): Argument #1 ($object) must be of type object, %s given",
+                              zend_zval_value_name(object.unwrap_ptr()));
+        return String();
+    }
+    return String(php_spl_object_hash(object.object()), Ctor::Move);
+}
+
+inline Int spl_object_id(const Variant &object) {
+    if (UNEXPECTED(!object.isObject())) {
+        php::throwExceptionEx(zend_ce_type_error,
+                              0,
+                              "spl_object_id(): Argument #1 ($object) must be of type object, %s given",
+                              zend_zval_value_name(object.unwrap_ptr()));
+        return 0;
+    }
+    return static_cast<Int>(object.object()->handle);
+}
+
+Array iterator_to_array(const Variant &iterator, bool preserve_keys = true);
+Int iterator_count(const Variant &iterator);
+
+// constant() remains a runtime lookup. Reuse PHPX's established helper so
+// lazy class constants and namespace lookup keep their Zend semantics.
+inline Variant constant(const String &name) {
+    return php::constant(name);
+}
 
 // ========================
 // Type checking functions (inline, direct Z_TYPE_P checks)

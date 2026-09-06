@@ -8,7 +8,100 @@
 
 #include "std/core.h"
 
+extern "C" {
+#include "ext/spl/spl_iterators.h"
+}
+
 namespace php::fn {
+
+namespace {
+
+void validate_iterable(const Variant &iterator, const char *function_name) {
+    if (EXPECTED(zend_is_iterable(iterator.unwrap_ptr()))) {
+        return;
+    }
+    php::throwExceptionEx(zend_ce_type_error,
+                          0,
+                          "%s(): Argument #1 ($iterator) must be of type Traversable|array, %s given",
+                          function_name,
+                          zend_zval_value_name(iterator.unwrap_ptr()));
+}
+
+int iterator_to_array_apply(zend_object_iterator *iterator, void *context) {
+    zval *data = iterator->funcs->get_current_data(iterator);
+    if (EG(exception) || data == nullptr) {
+        return ZEND_HASH_APPLY_STOP;
+    }
+
+    auto *result = static_cast<zval *>(context);
+    if (iterator->funcs->get_current_key) {
+        zval key;
+        iterator->funcs->get_current_key(iterator, &key);
+        if (EG(exception)) {
+            return ZEND_HASH_APPLY_STOP;
+        }
+        array_set_zval_key(Z_ARRVAL_P(result), &key, data);
+        zval_ptr_dtor(&key);
+    } else {
+        Z_TRY_ADDREF_P(data);
+        add_next_index_zval(result, data);
+    }
+    return ZEND_HASH_APPLY_KEEP;
+}
+
+int iterator_to_values_apply(zend_object_iterator *iterator, void *context) {
+    zval *data = iterator->funcs->get_current_data(iterator);
+    if (EG(exception) || data == nullptr) {
+        return ZEND_HASH_APPLY_STOP;
+    }
+
+    Z_TRY_ADDREF_P(data);
+    add_next_index_zval(static_cast<zval *>(context), data);
+    return ZEND_HASH_APPLY_KEEP;
+}
+
+int iterator_count_apply(zend_object_iterator *, void *context) {
+    auto *count = static_cast<zend_long *>(context);
+    if (UNEXPECTED(*count == ZEND_LONG_MAX)) {
+        return ZEND_HASH_APPLY_STOP;
+    }
+    ++*count;
+    return ZEND_HASH_APPLY_KEEP;
+}
+
+}  // namespace
+
+Array iterator_to_array(const Variant &iterator, bool preserve_keys) {
+    validate_iterable(iterator, "iterator_to_array");
+
+    if (iterator.isArray()) {
+        if (preserve_keys) {
+            return Array(iterator);
+        }
+        zval list;
+        ZVAL_ARR(&list, zend_array_to_list(iterator.array()));
+        return Array(&list, Ctor::Move);
+    }
+
+    Array result;
+    spl_iterator_apply(
+        NO_CONST_V(iterator), preserve_keys ? iterator_to_array_apply : iterator_to_values_apply, result.ptr());
+    throwErrorIfOccurred();
+    return result;
+}
+
+Int iterator_count(const Variant &iterator) {
+    validate_iterable(iterator, "iterator_count");
+
+    if (iterator.isArray()) {
+        return static_cast<Int>(zend_hash_num_elements(iterator.array()));
+    }
+
+    zend_long count = 0;
+    spl_iterator_apply(NO_CONST_V(iterator), iterator_count_apply, &count);
+    throwErrorIfOccurred();
+    return static_cast<Int>(count);
+}
 
 // ========================
 // _class_exists core
