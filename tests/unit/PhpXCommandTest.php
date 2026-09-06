@@ -221,8 +221,7 @@ final class PhpXCommandTest extends TestCase
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
 
         $cmake = $commandDirectory . '/cmake';
-        file_put_contents($cmake, <<<'PHP'
-#!/usr/bin/env php
+        file_put_contents($cmake, '#!' . PHP_BINARY . " -n\n" . <<<'PHP'
 <?php
 
 file_put_contents(
@@ -268,8 +267,7 @@ PHP
     private function createPhpConfigFixture(string $includeDirectory, string $extensionDirectory): string
     {
         $path = $this->temporaryDirectory . '/php-config-fixture';
-        $script = <<<'PHP'
-#!/usr/bin/env php
+        $script = '#!' . PHP_BINARY . " -n\n" . <<<'PHP'
 <?php
 
 $values = json_decode((string) file_get_contents(__DIR__ . '/php-config-values.json'), true);

@@ -90,6 +90,7 @@ class BaseTest extends TestCase
             phpx_test3();
             $obj->count();
         }
+        $this->assertNull(phpx_test3());
     }
 
     public function testErrorArgs1()
