@@ -348,6 +348,14 @@ TEST(std_misc, date_func) {
     ASSERT_STREQ(d2.toCString(), "1970-01-01");
 }
 
+TEST(std_misc, gmdate_func) {
+    auto d1 = fn::gmdate("Y-m-d H:i:s", 0);
+    ASSERT_STREQ(d1.toCString(), "1970-01-01 00:00:00");
+
+    auto d2 = fn::gmdate("Y-m-d");
+    ASSERT_GT(d2.length(), 0);
+}
+
 TEST(std_misc, strtotime_func) {
     auto ts1 = fn::strtotime("1970-01-01 00:00:00");
     ASSERT_TRUE(ts1.isInt());
