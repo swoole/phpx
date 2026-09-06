@@ -18,6 +18,7 @@
 
 #include "phpx.h"
 #include "std/core.h"
+#include "std/ctype.h"
 #include "std/array.h"
 #include "std/string.h"
 #include "std/fs.h"
