@@ -390,11 +390,11 @@ jobs:
 
           foreach ($required in @(
               (Join-Path $env:GITHUB_WORKSPACE 'lib\phpx.lib'),
-              (Join-Path $env:GITHUB_WORKSPACE 'build-platform\phpx.dll')
+              (Join-Path $env:GITHUB_WORKSPACE 'bin\phpx.dll')
           )) {
               if (-not (Test-Path $required)) {
                   throw "Required PHPX build output is missing: $required"
               }
           }
-          dumpbin /headers build-platform\phpx.dll | Select-String 'machine \(x64\)'
-          dumpbin /dependents build-platform\phpx.dll
+          dumpbin /headers bin\phpx.dll | Select-String 'machine \(x64\)'
+          dumpbin /dependents bin\phpx.dll
