@@ -82,14 +82,6 @@ bool Extension::registerResource(const char *name, resource_dtor dtor) const {
     return true;
 }
 
-void Extension::registerConstant(const char *name, Int v) const {
-    zend_register_long_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
-}
-
-void Extension::registerConstant(const char *name, int v) const {
-    zend_register_long_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
-}
-
 void Extension::registerConstant(const char *name, bool v) const {
     zend_register_bool_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
@@ -100,10 +92,6 @@ void Extension::registerConstant(const char *name, const char *v) const {
 
 void Extension::registerConstant(const char *name, const char *v, size_t len) const {
     zend_register_stringl_constant(name, strlen(name), v, len, CONST_CS | CONST_PERSISTENT, module.module_number);
-}
-
-void Extension::registerConstant(const char *name, double v) const {
-    zend_register_double_constant(name, strlen(name), v, CONST_CS | CONST_PERSISTENT, module.module_number);
 }
 
 void Extension::registerConstant(const char *name, const std::string &v) const {

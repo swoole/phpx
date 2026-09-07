@@ -12,6 +12,8 @@ class BaseTest extends TestCase
         $this->assertTrue(interface_exists('MyInterface', false));
         $this->assertTrue(defined('PHPX_CONST_INT'));
         $this->assertEquals(PHPX_CONST_LONG, 10002);
+        $this->assertEquals(PHPX_CONST_LONG_LONG, 10003);
+        $this->assertEquals(PHPX_CONST_FLOAT32, 1.25);
         $this->assertEquals(PHPX_CONST_FLOAT, 199.188);
         $this->assertEquals(PHPX_CONST_BOOL, true);
         $this->assertEquals(PHPX_CONST_CSTR, "hello world");

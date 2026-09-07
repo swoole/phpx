@@ -143,6 +143,8 @@ PHPX_EXTENSION() {
 
         extension->registerConstant("PHPX_CONST_INT", 10002);
         extension->registerConstant("PHPX_CONST_LONG", 10002L);
+        extension->registerConstant("PHPX_CONST_LONG_LONG", 10003LL);
+        extension->registerConstant("PHPX_CONST_FLOAT32", 1.25F);
         extension->registerConstant("PHPX_CONST_FLOAT", 199.188);
         extension->registerConstant("PHPX_CONST_BOOL", true);
         extension->registerConstant("PHPX_CONST_CSTR", "hello world");

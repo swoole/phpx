@@ -264,10 +264,17 @@ class Extension {
     bool registerInterface(Interface *i) const;
     bool registerFunctions(const zend_function_entry *functions);
     bool registerResource(const char *name, resource_dtor dtor) const;
-    void registerConstant(const char *name, Int v) const;
-    void registerConstant(const char *name, int v) const;
+    template <typename T, enable_if_integral_non_bool<T> = 0>
+    void registerConstant(const char *name, T v) const {
+        zend_register_long_constant(
+            name, strlen(name), static_cast<Int>(v), CONST_CS | CONST_PERSISTENT, module.module_number);
+    }
     void registerConstant(const char *name, bool v) const;
-    void registerConstant(const char *name, double v) const;
+    template <typename T, enable_if_floating_point<T> = 0>
+    void registerConstant(const char *name, T v) const {
+        zend_register_double_constant(
+            name, strlen(name), static_cast<double>(v), CONST_CS | CONST_PERSISTENT, module.module_number);
+    }
     void registerConstant(const char *name, const char *v) const;
     void registerConstant(const char *name, const char *v, size_t len) const;
     void registerConstant(const char *name, const std::string &v) const;
