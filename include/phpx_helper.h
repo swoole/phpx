@@ -86,8 +86,25 @@ static inline bool equals(Bool a, Bool b) {
     return a == b;
 }
 
-static inline Int toInt(Int v) {
-    return v;
+static inline bool equals(Bool a, Int b) {
+    return a == (b != 0);
+}
+
+static inline bool equals(Int a, Bool b) {
+    return (a != 0) == b;
+}
+
+static inline bool equals(Bool a, Float b) {
+    return a == (b != 0.0);
+}
+
+static inline bool equals(Float a, Bool b) {
+    return (a != 0.0) == b;
+}
+
+template <typename T, enable_if_integral_non_bool<T> = 0>
+static inline Int toInt(T v) {
+    return static_cast<Int>(v);
 }
 
 static inline Int toInt(Float v) {

@@ -2448,6 +2448,9 @@ class Args {
     ~Args() noexcept {
         release();
     }
+    void clear() noexcept {
+        release();
+    }
     explicit Args(const ArgList &args) : Args(args.size()) {
         for (const auto &arg : args) {
             append(arg.const_ptr());
