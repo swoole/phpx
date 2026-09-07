@@ -273,7 +273,7 @@ endif()
 if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 endif()
-if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+if(NOT IS_WINDOWS AND NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 endif()
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
@@ -425,6 +425,14 @@ if (IS_WINDOWS)
     set_target_properties(phpx PROPERTIES
         OUTPUT_NAME "phpx"
         SUFFIX ".dll"
+        # A Windows DLL is a CMake runtime target. Keep the PHPX runtime in
+        # the build root where TypePHP and existing PHPX consumers expect it;
+        # executable targets continue to use EXECUTABLE_OUTPUT_PATH below.
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_BINARY_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_BINARY_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_CURRENT_BINARY_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${CMAKE_CURRENT_BINARY_DIR}"
     )
 
     copy_mpdecimal_runtime_dlls(phpx)
