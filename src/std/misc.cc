@@ -207,8 +207,8 @@ Variant shell_exec(const String &command) {
         return Variant(nullptr);
     }
 
-#ifdef __wasi__
-    php::throwException(zend_ce_error, "shell_exec() is not supported on WASI");
+#if defined(__wasi__) || defined(PHPX_IOS)
+    php::throwException(zend_ce_error, "shell_exec() is not supported on iPhoneOS/WASI");
     return Variant(nullptr);
 #else
 #ifdef PHP_WIN32

@@ -101,6 +101,9 @@ target_include_directories(phpx PRIVATE
     "${PHPX_ROOT}/thirdparty/wren-gc/include"
 )
 target_compile_options(phpx PRIVATE -fPIC)
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    target_compile_definitions(phpx PRIVATE PHPX_IOS=1)
+endif()
 
 # gmp/gmpxx/mpfr 符号由最终链接的自包含 libphp.a 提供，用 PRIVATE 不传播；
 # mpdecimal / wren_gc 已通过 OBJECT 并入本库，无需再作为依赖链接。
