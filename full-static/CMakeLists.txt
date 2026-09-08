@@ -6,7 +6,7 @@
 # 依赖（gmp/gmpxx/mpfr）作为 PRIVATE 链接，其符号由最终链接的自包含
 # libphp.a 提供，不作为 PUBLIC 传播，避免解析到系统的 glibc 版本。
 #
-# 用法（由 swoole-cli 或外部构建脚本调用）：
+# 用法（由 sdk/build-native.sh 调用）：
 #   cmake -S full-static -B build/full-static \
 #       -DPHPX_PHP_INCLUDE_DIR=/path/to/php-src \
 #       -DPHPX_GMP_INCLUDE_DIR=... -DPHPX_GMP_LIB_DIR=... \

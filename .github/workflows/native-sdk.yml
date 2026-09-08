@@ -1,0 +1,169 @@
+name: PHPX native SDK package
+
+on:
+  workflow_dispatch:
+    inputs:
+      swoole_cli_ref:
+        description: swoole-cli release tag containing PHP Runtime Layers
+        required: true
+        type: string
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phpx-native-sdk-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+env:
+  SWOOLE_CLI_RUNTIME_REF: ${{ inputs.swoole_cli_ref || vars.SWOOLE_CLI_RUNTIME_REF }}
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }} SDK
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux-x64
+            runner: ubuntu-24.04
+          - target: linux-arm64
+            runner: ubuntu-24.04-arm
+          - target: iphoneos-arm64
+            runner: macos-15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download immutable PHP Runtime Layer
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${SWOOLE_CLI_RUNTIME_REF}" ]]; then
+            echo "Set the SWOOLE_CLI_RUNTIME_REF repository variable or the swoole_cli_ref workflow input." >&2
+            exit 1
+          fi
+
+          mkdir -p runtime-download runtime
+          pattern="php-runtime-layer_swoole-cli-${SWOOLE_CLI_RUNTIME_REF}_php*_${{ matrix.target }}.tar.xz"
+          gh release download "${SWOOLE_CLI_RUNTIME_REF}" \
+            --repo swoole/swoole-cli \
+            --pattern "${pattern}" \
+            --pattern "${pattern}.sha256" \
+            --dir runtime-download
+
+          archive=$(find runtime-download -maxdepth 1 -name '*.tar.xz' -print -quit)
+          checksum=$(find runtime-download -maxdepth 1 -name '*.tar.xz.sha256' -print -quit)
+          test -n "${archive}"
+          test -n "${checksum}"
+          if command -v sha256sum >/dev/null 2>&1; then
+            (cd runtime-download && sha256sum --check "$(basename "${checksum}")")
+          else
+            (cd runtime-download && shasum -a 256 --check "$(basename "${checksum}")")
+          fi
+
+          tar -C runtime -xJf "${archive}"
+          runtime_prefix=$(find "${GITHUB_WORKSPACE}/runtime" \
+            -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -n "${runtime_prefix}"
+          test "$(sed -n 's/.*"target": "\([^"]*\)".*/\1/p' \
+            "${runtime_prefix}/manifest.json")" = "${{ matrix.target }}"
+          echo "RUNTIME_PREFIX=${runtime_prefix}" >> "${GITHUB_ENV}"
+          echo "RUNTIME_PREFIX_CONTAINER=/src/${runtime_prefix#${GITHUB_WORKSPACE}/}" \
+            >> "${GITHUB_ENV}"
+
+      - name: Build PHPX full-static layer
+        if: startsWith(matrix.target, 'linux-')
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            --volume "${GITHUB_WORKSPACE}:/src" \
+            --workdir /src \
+            --env "RUNTIME_PREFIX=${RUNTIME_PREFIX_CONTAINER}" \
+            --env "SDK_TARGET=${{ matrix.target }}" \
+            alpine:3.18 sh -ec '
+              apk add --no-cache bash build-base cmake ninja
+              bash sdk/build-native.sh \
+                --prefix "${RUNTIME_PREFIX}" \
+                --target "${SDK_TARGET}" \
+                --build-dir /tmp/phpx-native-sdk \
+                --jobs 4
+            '
+
+      - name: Build PHPX iPhoneOS layer
+        if: matrix.target == 'iphoneos-arm64'
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-path
+          xcrun --sdk iphoneos --show-sdk-version
+          cmake --version
+          ninja --version
+          xz --version
+          bash sdk/build-native.sh \
+            --prefix "${RUNTIME_PREFIX}" \
+            --target iphoneos-arm64 \
+            --build-dir "${RUNNER_TEMP}/phpx-iphoneos-arm64" \
+            --jobs 3
+
+      - name: Package complete PHPX SDK
+        id: package
+        run: |
+          set -euo pipefail
+          bash sdk/package.sh \
+            --prefix "${RUNTIME_PREFIX}" \
+            --target "${{ matrix.target }}" \
+            --output-dir "${GITHUB_WORKSPACE}/dist"
+
+      - name: Upload tested PHPX SDK
+        uses: actions/upload-artifact@v4
+        with:
+          name: phpx-native-sdk-${{ matrix.target }}
+          path: |
+            ${{ steps.package.outputs.archive }}
+            ${{ steps.package.outputs.archive }}.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish native SDK assets
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: phpx-native-sdk-*
+          path: dist
+          merge-multiple: true
+
+      - name: Publish PHPX release assets
+        run: |
+          set -euo pipefail
+          mapfile -t assets < <(find dist -maxdepth 1 -type f \
+            \( -name '*.tar.xz' -o -name '*.tar.xz.sha256' \) | sort)
+          test "${#assets[@]}" -eq 6
+
+          if ! gh release view "${GITHUB_REF_NAME}" \
+            --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh release create "${GITHUB_REF_NAME}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --verify-tag \
+              --title "PHPX ${GITHUB_REF_NAME}" \
+              --generate-notes \
+              || gh release view "${GITHUB_REF_NAME}" \
+                   --repo "${GITHUB_REPOSITORY}" >/dev/null
+          fi
+          gh release upload "${GITHUB_REF_NAME}" "${assets[@]}" \
+            --repo "${GITHUB_REPOSITORY}" --clobber

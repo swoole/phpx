@@ -9,10 +9,7 @@ phpx/ios/iphoneos-arm64/
 │   └── phpx/
 ├── lib/
 │   ├── libphp.a
-│   ├── libphpx.a
-│   ├── libgmp.a
-│   ├── libgmpxx.a
-│   └── libmpfr.a
+│   └── libphpx.a
 └── .typephp-ios-sdk-abi
 ```
 
@@ -21,10 +18,10 @@ This follows the same integrated-prefix rule as `full-static/sdk` and
 the PHPX checkout. TypePHP does not use `PHP_HOME` for an iPhoneOS target and
 must never mix these files with macOS/Homebrew libraries.
 
-The PHP, GMP, and MPFR target files are built by the SDK producer. The staging
-step also writes `.typephp-ios-php-abi`; PHPX requires this marker and a ZTS
-`php_config.h` before it accepts the prefix. Once those files have been
-installed, build the PHPX portion on macOS with full Xcode:
+The PHP, GMP, and MPFR target objects are combined into `libphp.a` by the
+runtime producer. PHPX requires the Runtime Layer ABI marker and a ZTS
+`php_config.h` before it accepts the prefix. Once that layer has been
+downloaded and extracted, build the PHPX portion on macOS with full Xcode:
 
 ```sh
 ./ios/build.sh --jobs 8

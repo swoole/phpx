@@ -337,14 +337,15 @@ jobs:
             \( -name '*.tar.gz' -o -name '*.tar.gz.sha256' \) | sort)
           test "${#assets[@]}" -eq 2
 
-          if gh release view "${GITHUB_REF_NAME}" \
+          if ! gh release view "${GITHUB_REF_NAME}" \
             --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
-            gh release upload "${GITHUB_REF_NAME}" "${assets[@]}" \
-              --repo "${GITHUB_REPOSITORY}" --clobber
-          else
-            gh release create "${GITHUB_REF_NAME}" "${assets[@]}" \
+            gh release create "${GITHUB_REF_NAME}" \
               --repo "${GITHUB_REPOSITORY}" \
               --verify-tag \
               --title "PHPX ${GITHUB_REF_NAME}" \
-              --generate-notes
+              --generate-notes \
+              || gh release view "${GITHUB_REF_NAME}" \
+                   --repo "${GITHUB_REPOSITORY}" >/dev/null
           fi
+          gh release upload "${GITHUB_REF_NAME}" "${assets[@]}" \
+            --repo "${GITHUB_REPOSITORY}" --clobber

@@ -11,7 +11,7 @@ usage()
 Usage: ./ios/build.sh [options]
 
 Build and install libphpx.a for a physical arm64 iPhone. The prefix must
-already contain matching iPhoneOS PHP, GMP, and MPFR headers/libraries.
+already contain the matching self-contained iPhoneOS libphp.a and headers.
 
 Options:
   --prefix <dir>             SDK prefix (default: ios/iphoneos-arm64)
@@ -77,7 +77,6 @@ prefix=$(cd "${prefix}" && pwd)
 build_dir=$(cd "${build_dir}" && pwd)
 
 required_files=(
-    .typephp-ios-php-abi
     include/php/main/php.h
     include/php/main/php_config.h
     include/php/Zend/zend.h
@@ -85,9 +84,6 @@ required_files=(
     include/gmpxx.h
     include/mpfr.h
     lib/libphp.a
-    lib/libgmp.a
-    lib/libgmpxx.a
-    lib/libmpfr.a
 )
 for file in "${required_files[@]}"; do
     if [[ ! -f "${prefix}/${file}" ]]; then
@@ -96,8 +92,13 @@ for file in "${required_files[@]}"; do
     fi
 done
 
-if [[ $(<"${prefix}/.typephp-ios-php-abi") != 'typephp-iphoneos-arm64-php-zts-abi-v1' ]]; then
-    echo "The iPhoneOS PHP SDK ABI marker is incompatible: ${prefix}/.typephp-ios-php-abi" >&2
+runtime_abi_file=${prefix}/.typephp-php-runtime-abi
+if [[ ! -f "${runtime_abi_file}" && -f "${prefix}/.typephp-ios-php-abi" ]]; then
+    runtime_abi_file=${prefix}/.typephp-ios-php-abi
+fi
+if [[ ! -f "${runtime_abi_file}"
+    || $(<"${runtime_abi_file}") != 'typephp-iphoneos-arm64-php-zts-abi-v1' ]]; then
+    echo "The iPhoneOS PHP Runtime Layer ABI marker is incompatible: ${runtime_abi_file}" >&2
     exit 1
 fi
 if ! grep -Eq '^#define[[:space:]]+ZTS([[:space:]]+1)?([[:space:]]|$)' "${prefix}/include/php/main/php_config.h"; then
