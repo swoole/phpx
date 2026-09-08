@@ -171,10 +171,11 @@ TEST(string, unset) {
     String s("hello");
     ASSERT_EQ(s.length(), 5);
     s.unset();
-    ob_start();
-    s.print();
-    auto rs = ob_get_clean();
-    ASSERT_STREQ(rs.toCString(), "(null)\n");
+    ASSERT_EQ(s.str(), zend_empty_string);
+    ASSERT_EQ(s.length(), 0);
+
+    s.append("next");
+    ASSERT_STREQ(s.data(), "next");
 }
 
 TEST(string, zval_to_str) {

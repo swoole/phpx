@@ -1837,6 +1837,11 @@ class String : public Variant {
     String() {
         ZVAL_EMPTY_STRING(&val);
     }
+    // Fixed String storage preserves its type across unset().
+    void unset() {
+        destroy();
+        ZVAL_EMPTY_STRING(unwrap_ptr());
+    }
     String(const zval *v, Ctor method = Ctor::Copy) : Variant(v, method) {
         checkString();
     }
@@ -2177,6 +2182,11 @@ class Array : public Variant {
   public:
     Array() {
         initArray(&val);
+    }
+    // Fixed Array storage preserves its type across unset().
+    void unset() {
+        destroy();
+        ZVAL_EMPTY_ARRAY(unwrap_ptr());
     }
     explicit Array(size_t N) {
         initArray(&val, N);

@@ -11,6 +11,19 @@ TEST(array, default_constructor_creates_mutable_array) {
     ASSERT_EQ(array.get(0).toInt(), 42);
 }
 
+TEST(array, unset_uses_zend_empty_array_and_separates_on_write) {
+    Array array{1, 2};
+
+    array.unset();
+
+    ASSERT_EQ(array.array(), &zend_empty_array);
+    ASSERT_EQ(array.count(), 0);
+
+    array.append(42);
+    ASSERT_NE(array.array(), &zend_empty_array);
+    ASSERT_EQ(array.get(0).toInt(), 42);
+}
+
 TEST(array, subscript_assignment_preserves_copy_on_write) {
     Array original{"original"};
     Array copy = original;
