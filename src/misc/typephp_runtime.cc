@@ -4,7 +4,7 @@
 BEGIN_EXTERN_C()
 #include "ext/standard/basic_functions.h"
 #include "sapi/embed/php_embed.h"
-#if !defined(PHP_WIN32) && !defined(__wasi__) && !defined(PHPX_IOS)
+#if !defined(PHP_WIN32) && !defined(__wasi__) && !defined(PHPX_IOS) && !defined(PHPX_ANDROID)
 #include "ps_title.h"
 #endif
 END_EXTERN_C()
@@ -84,7 +84,7 @@ extern "C" int typephp_runtime_start(typephp_module_getter get_module, int argc,
     typephp_runtime_module = get_module();
     module_init(typephp_runtime_module);
 
-#if !defined(PHP_WIN32) && !defined(__wasi__) && !defined(PHPX_IOS)
+#if !defined(PHP_WIN32) && !defined(__wasi__) && !defined(PHPX_IOS) && !defined(PHPX_ANDROID)
     save_ps_args(argc, argv);
 #endif
 

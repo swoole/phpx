@@ -36,6 +36,8 @@ jobs:
             runner: ubuntu-24.04-arm
           - target: iphoneos-arm64
             runner: macos-15
+          - target: android-arm64-v8a
+            runner: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -112,6 +114,21 @@ jobs:
             --build-dir "${RUNNER_TEMP}/phpx-iphoneos-arm64" \
             --jobs 3
 
+      - name: Build PHPX Android layer
+        if: matrix.target == 'android-arm64-v8a'
+        run: |
+          set -euo pipefail
+          test -f "${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
+          cmake --version
+          ninja --version
+          "${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++" \
+            --version
+          bash sdk/build-native.sh \
+            --prefix "${RUNTIME_PREFIX}" \
+            --target android-arm64-v8a \
+            --build-dir "${RUNNER_TEMP}/phpx-android-arm64-v8a" \
+            --jobs 4
+
       - name: Package complete PHPX SDK
         id: package
         run: |
@@ -153,7 +170,7 @@ jobs:
           set -euo pipefail
           mapfile -t assets < <(find dist -maxdepth 1 -type f \
             \( -name '*.tar.xz' -o -name '*.tar.xz.sha256' \) | sort)
-          test "${#assets[@]}" -eq 6
+          test "${#assets[@]}" -eq 8
 
           if ! gh release view "${GITHUB_REF_NAME}" \
             --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then

@@ -71,6 +71,7 @@ console/composer.lock
 /test_results.xml
 /wasm/wasm32-wasip2/
 /ios/iphoneos-arm64/
+/android/arm64-v8a/
 /full-static/sdk
 /phpx.sln
 /examples/*/.phpx.json

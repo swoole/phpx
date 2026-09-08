@@ -10,7 +10,7 @@ usage()
     cat >&2 <<'EOF'
 Usage: sdk/build-native.sh --prefix <runtime-layer-dir> --target <target> [options]
 
-Targets: linux-x64, linux-arm64, iphoneos-arm64
+Targets: linux-x64, linux-arm64, iphoneos-arm64, android-arm64-v8a
 Options:
   --build-dir <dir>  CMake build directory
   --jobs <number>    Parallel build jobs (default: 4)
@@ -42,7 +42,7 @@ if [[ -z "${prefix}" || -z "${target}" ]]; then
     exit 2
 fi
 case "${target}" in
-    linux-x64|linux-arm64|iphoneos-arm64) ;;
+    linux-x64|linux-arm64|iphoneos-arm64|android-arm64-v8a) ;;
     *) echo "Unsupported target: ${target}" >&2; exit 2 ;;
 esac
 if [[ ! "${jobs}" =~ ^[1-9][0-9]*$ ]]; then
@@ -86,6 +86,13 @@ if [[ "${target}" == iphoneos-arm64 ]]; then
         --jobs "${jobs}"
     printf '%s\n' 'typephp-iphoneos-arm64-phpx-sdk-abi-v1' \
         > "${prefix}/.typephp-sdk-abi"
+elif [[ "${target}" == android-arm64-v8a ]]; then
+    "${phpx_root}/android/build.sh" \
+        --prefix "${prefix}" \
+        --build-dir "${build_dir}" \
+        --jobs "${jobs}"
+    printf '%s\n' 'typephp-android-arm64-v8a-api24-phpx-sdk-abi-v1' \
+        > "${prefix}/.typephp-sdk-abi"
 else
     machine=$(uname -m)
     case "${target}:${machine}" in
@@ -126,6 +133,16 @@ fi
 if [[ "${target}" == iphoneos-arm64 ]]; then
     archive_member=$(xcrun --sdk iphoneos ar -t "${prefix}/lib/libphpx.a" \
         | sed -n '1p')
+elif [[ "${target}" == android-arm64-v8a ]]; then
+    ndk_root=${ANDROID_NDK_HOME:-${ANDROID_NDK_ROOT:-}}
+    ndk_host_tag=linux-x86_64
+    case "$(uname -s):$(uname -m)" in
+        Darwin:arm64) ndk_host_tag=darwin-x86_64 ;;
+        Darwin:x86_64) ndk_host_tag=darwin-x86_64 ;;
+        Linux:aarch64|Linux:arm64) ndk_host_tag=linux-x86_64 ;;
+    esac
+    archive_member=$("${ndk_root}/toolchains/llvm/prebuilt/${ndk_host_tag}/bin/llvm-ar" \
+        t "${prefix}/lib/libphpx.a" | sed -n '1p')
 else
     archive_member=$(ar t "${prefix}/lib/libphpx.a" | sed -n '1p')
 fi
