@@ -225,7 +225,7 @@ void Variant::unset() {
 }
 
 Variant::~Variant() {
-    if (!isIndirect()) {
+    if (!isIndirect() && Z_REFCOUNTED(val)) {
         zval_ptr_dtor(&val);
     }
 }
