@@ -17,6 +17,38 @@ static bool ffi_cdata_is_available() {
     return eval("return extension_loaded('ffi') && ini_get('ffi.enable') === '1';").toBool();
 }
 
+TEST(variant, destructor_preserves_owned_and_borrowed_values) {
+    Variant text("a dynamically allocated string");
+    const auto refs = text.getRefCount();
+    {
+        Variant copy(text);
+        ASSERT_EQ(text.getRefCount(), refs + 1);
+    }
+    ASSERT_EQ(text.getRefCount(), refs);
+    {
+        Variant borrowed(text.ptr(), Ctor::Indirect);
+    }
+    ASSERT_EQ(text.getRefCount(), refs);
+    ASSERT_STREQ(text.toCString(), "a dynamically allocated string");
+
+    eval(R"(
+        $GLOBALS['phpx_release_count'] = 0;
+        class PhpxDestructorProbe {
+            public function __destruct() { ++$GLOBALS['phpx_release_count']; }
+        }
+    )");
+    {
+        Variant object = eval("return new PhpxDestructorProbe();");
+        {
+            Array holder;
+            holder.append(object);
+        }
+        ASSERT_EQ(eval("return $GLOBALS['phpx_release_count'];").toInt(), 0);
+        Variant reference = object.toReference();
+    }
+    ASSERT_EQ(eval("return $GLOBALS['phpx_release_count'];").toInt(), 1);
+}
+
 TEST(variant, nullptr_assignment) {
     Variant value = 42;
     value = nullptr;
