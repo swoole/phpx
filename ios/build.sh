@@ -105,31 +105,32 @@ if ! grep -Eq '^#define[[:space:]]+ZTS([[:space:]]+1)?([[:space:]]|$)' "${prefix
     exit 1
 fi
 
-cmake_generator=()
-if command -v ninja >/dev/null 2>&1; then
-    cmake_generator=(-G Ninja)
-fi
-
-cmake -S "${phpx_root}/full-static" -B "${build_dir}" \
-    "${cmake_generator[@]}" \
-    -DCMAKE_SYSTEM_NAME=iOS \
-    -DCMAKE_OSX_SYSROOT=iphoneos \
-    -DCMAKE_OSX_ARCHITECTURES=arm64 \
-    -DCMAKE_OSX_DEPLOYMENT_TARGET="${deployment_target}" \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="${prefix}" \
-    -DPHPX_PHP_INCLUDE_DIR="${prefix}/include/php" \
-    -DPHPX_GMP_INCLUDE_DIR="${prefix}/include" \
-    -DPHPX_GMP_LIB_DIR="${prefix}/lib" \
-    -DPHPX_MPFR_INCLUDE_DIR="${prefix}/include" \
+cmake_arguments=(
+    -S "${phpx_root}/full-static"
+    -B "${build_dir}"
+    -DCMAKE_SYSTEM_NAME=iOS
+    -DCMAKE_OSX_SYSROOT=iphoneos
+    -DCMAKE_OSX_ARCHITECTURES=arm64
+    -DCMAKE_OSX_DEPLOYMENT_TARGET="${deployment_target}"
+    -DCMAKE_BUILD_TYPE=Release
+    -DCMAKE_INSTALL_PREFIX="${prefix}"
+    -DPHPX_PHP_INCLUDE_DIR="${prefix}/include/php"
+    -DPHPX_GMP_INCLUDE_DIR="${prefix}/include"
+    -DPHPX_GMP_LIB_DIR="${prefix}/lib"
+    -DPHPX_MPFR_INCLUDE_DIR="${prefix}/include"
     -DPHPX_MPFR_LIB_DIR="${prefix}/lib"
+)
+if command -v ninja >/dev/null 2>&1; then
+    cmake_arguments+=(-G Ninja)
+fi
+cmake "${cmake_arguments[@]}"
 cmake --build "${build_dir}" --parallel "${jobs}"
 cmake --install "${build_dir}"
 
 mkdir -p "${prefix}/include/phpx"
-cp -R "${phpx_root}/include/." "${prefix}/include/phpx/"
-cp "${phpx_root}/thirdparty/mpdecimal/libmpdec/mpdecimal.h" "${prefix}/include/"
-cp "${phpx_root}/thirdparty/mpdecimal/libmpdec++/decimal.hh" "${prefix}/include/"
+cp -Rp "${phpx_root}/include/." "${prefix}/include/phpx/"
+cp -p "${phpx_root}/thirdparty/mpdecimal/libmpdec/mpdecimal.h" "${prefix}/include/"
+cp -p "${phpx_root}/thirdparty/mpdecimal/libmpdec++/decimal.hh" "${prefix}/include/"
 
 if [[ ! -f "${prefix}/lib/libphpx.a" ]]; then
     echo "PHPX iPhoneOS build did not produce ${prefix}/lib/libphpx.a" >&2
