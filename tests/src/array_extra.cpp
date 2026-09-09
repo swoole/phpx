@@ -16,6 +16,32 @@ TEST(array_extra, zend_string_key_initializer_and_assignment) {
     ASSERT_EQ(second.get(second_key).toInt(), 2);
 }
 
+TEST(array_extra, zend_string_key_initializer_preserves_keys_and_values) {
+    String numeric("0"), padded("01"), ref_key("ref"), borrowed_key("borrowed");
+    Variant source = 7;
+    Reference reference = source.toReference();
+    Array backing{31, 32};
+    Array result(StrKeyMap{{numeric.str(), 1},
+                           {padded.str(), 2},
+                           {numeric.str(), 3},
+                           {ref_key.str(), &source},
+                           {borrowed_key.str(), backing.item(0)}});
+
+    ASSERT_EQ(result.count(), 4);
+    ASSERT_EQ(result.get(0).toInt(), 3);
+    ASSERT_EQ(result.get(padded).toInt(), 2);
+    reference = 9;
+    ASSERT_EQ(result.get(ref_key).toInt(), 9);
+    result.item(ref_key, true) = 11;
+    ASSERT_EQ(source.toInt(), 11);
+    backing.item(0, true) = 99;
+    ASSERT_EQ(result.get(borrowed_key).toInt(), 31);
+
+    Array copy = result;
+    copy.item(padded, true) = 55;
+    ASSERT_EQ(result.get(padded).toInt(), 2);
+}
+
 // Test search with strict mode
 TEST(array_extra, search_strict) {
     Array arr = create_map();

@@ -138,7 +138,12 @@ Array::Array(const ArrayList &list) {
 
 Array::Array(const StrKeyMap &list) {
     initArray(&val, list.size());
-    copyFrom(list);
+    // The newly allocated array is not shared; no separation is needed.
+    for (const auto &kv : list) {
+        zval copied;
+        ZVAL_COPY(&copied, kv.second.direct_ptr());
+        zend_symtable_update(Z_ARRVAL(val), kv.first, &copied);
+    }
 }
 
 Array::Array(const StdStrKeyMap &list) {
