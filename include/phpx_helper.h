@@ -257,51 +257,51 @@ static inline String toStringExact(const Variant &v, const char *property = null
  * when the argument type is known at compile time.
  */
 static inline Int toIntArgExact(Int v,
-                                const String &callable_name,
+                                const char *callable_name,
                                 zend_long argument_number,
-                                const String &parameter_name) {
+                                const char *parameter_name) {
     return v;
 }
 
 static inline Float toFloatArgExact(Float v,
-                                    const String &callable_name,
+                                    const char *callable_name,
                                     zend_long argument_number,
-                                    const String &parameter_name) {
+                                    const char *parameter_name) {
     return v;
 }
 
 static inline Float toFloatArgExact(Int v,
-                                    const String &callable_name,
+                                    const char *callable_name,
                                     zend_long argument_number,
-                                    const String &parameter_name) {
+                                    const char *parameter_name) {
     return static_cast<Float>(v);
 }
 
 static inline Bool toBoolArgExact(Bool v,
-                                  const String &callable_name,
+                                  const char *callable_name,
                                   zend_long argument_number,
-                                  const String &parameter_name) {
+                                  const char *parameter_name) {
     return v;
 }
 
 static inline String toStringArgExact(const String &v,
-                                      const String &callable_name,
+                                      const char *callable_name,
                                       zend_long argument_number,
-                                      const String &parameter_name) {
+                                      const char *parameter_name) {
     return v;
 }
 
 static inline String toStringArgExact(const char *v,
-                                      const String &callable_name,
+                                      const char *callable_name,
                                       zend_long argument_number,
-                                      const String &parameter_name) {
+                                      const char *parameter_name) {
     return String(v);
 }
 
 static inline String toStringArgExact(const std::string &v,
-                                      const String &callable_name,
+                                      const char *callable_name,
                                       zend_long argument_number,
-                                      const String &parameter_name) {
+                                      const char *parameter_name) {
     return String(v);
 }
 
