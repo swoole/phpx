@@ -51,6 +51,10 @@
                 "src/core/string.cc",
                 "src/core/type_check.cc",
                 "src/core/variant.cc",
+                "src/std/array.cc",
+                "src/std/datetime.cc",
+                "src/std/math.cc",
+                "src/std/string.cc",
                 "src/typephp/typephp_attribute.cc",
                 "src/typephp/typephp_call.cc",
                 "src/typephp/typephp_nano.cc"

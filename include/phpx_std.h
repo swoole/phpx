@@ -23,5 +23,6 @@
 #include "std/string.h"
 #include "std/fs.h"
 #include "std/math.h"
+#include "std/json.h"
 #include "std/datetime.h"
 #include "std/misc.h"

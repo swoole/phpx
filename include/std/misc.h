@@ -21,7 +21,6 @@ extern "C" {
 #include "ext/standard/md5.h"
 #include "ext/standard/sha1.h"
 #include "ext/hash/php_hash.h"
-#include "ext/json/php_json.h"
 #include "ext/standard/php_var.h"
 #include "ext/standard/php_versioning.h"
 #include "ext/standard/php_standard.h"
@@ -30,6 +29,7 @@ extern "C" {
 }
 
 #include "phpx.h"
+#include "std/json.h"
 
 namespace php::fn {
 
@@ -211,83 +211,6 @@ inline Int rand(Int min, Int max) {
         return static_cast<Int>(php_mt_rand_common(max, min));
     }
     return static_cast<Int>(php_mt_rand_common(min, max));
-}
-
-// ========================
-// json_encode(mixed $value, int $flags = 0, int $depth = 512): string|false
-// ========================
-
-namespace detail {
-inline void throwJsonException(php_json_error_code code) {
-    // php_json_get_error_msg() is private to ext/json. Query the public PHP
-    // function only on the exceptional path so messages stay version-correct
-    // without adding overhead to successful encoding.
-    Variant message = php::call(php::getFunction(String("json_last_error_msg")), {});
-    php::throwException(php::getClassEntrySafe(String("JsonException")), message.toCString(), code);
-}
-}  // namespace detail
-
-inline Variant json_encode(const Variant &value, int options = 0, zend_long depth = 512) {
-    smart_str buf = {0};
-    php_json_encode_ex(&buf, const_cast<zval *>(value.unwrap_ptr()), options, depth);
-
-    const php_json_error_code error = static_cast<php_json_error_code>(JSON_G(error_code));
-    if (error != PHP_JSON_ERROR_NONE) {
-        if ((options & PHP_JSON_THROW_ON_ERROR) && !(options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR)) {
-            smart_str_free(&buf);
-            detail::throwJsonException(error);
-            return Variant(false);
-        }
-        if (!(options & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR)) {
-            smart_str_free(&buf);
-            return Variant(false);
-        }
-    }
-
-    smart_str_0(&buf);
-    if (!buf.s) {
-        return Variant(String());
-    }
-    Variant result(String(ZSTR_VAL(buf.s), ZSTR_LEN(buf.s)));
-    smart_str_free(&buf);
-    return result;
-}
-
-// ========================
-// json_decode(string $json, ?bool $assoc = null, int $depth = 512, int $flags = 0): mixed
-// ========================
-
-inline Variant json_decode(
-    const String &json, const Variant &assoc = Variant(), zend_long depth = 512, int options = 0) {
-    if (UNEXPECTED(depth <= 0)) {
-        php::throwExceptionEx(
-            zend_ce_value_error, 0, "json_decode(): Argument #3 ($depth) must be greater than 0");
-        return Variant(nullptr);
-    }
-    if (UNEXPECTED(depth > INT_MAX)) {
-        php::throwExceptionEx(
-            zend_ce_value_error, 0, "json_decode(): Argument #3 ($depth) must be less than %d", INT_MAX);
-        return Variant(nullptr);
-    }
-
-    if (!(options & PHP_JSON_THROW_ON_ERROR)) {
-        JSON_G(error_code) = PHP_JSON_ERROR_NONE;
-    }
-    if (!assoc.isNull()) {
-        if (assoc.toBool()) {
-            options |= PHP_JSON_OBJECT_AS_ARRAY;
-        } else {
-            options &= ~PHP_JSON_OBJECT_AS_ARRAY;
-        }
-    }
-
-    zval retval;
-    ZVAL_NULL(&retval);
-    if (php_json_decode_ex(&retval, json.data(), json.length(), options, depth) != SUCCESS) {
-        php::throwErrorIfOccurred();
-        return Variant(nullptr);
-    }
-    return Variant(&retval, Ctor::Move);
 }
 
 // ========================
