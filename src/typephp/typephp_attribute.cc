@@ -453,7 +453,13 @@ zend_result typephp_install_reflection_attribute_handlers() {
         static_cast<zend_class_entry *>(zend_hash_str_find_ptr(CG(class_table), ZEND_STRL("reflectionattribute")));
     if (reflection_attribute == nullptr) {
         reflection_hook_install_count = 0;
+#ifdef PHPX_NANO
+        // Reflection is an optional statically composed component while the
+        // Nano extension set is being assembled.
+        return SUCCESS;
+#else
         return FAILURE;
+#endif
     }
 
     reflection_get_arguments = find_internal_method(reflection_attribute, ZEND_STRL("getarguments"));

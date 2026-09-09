@@ -67,14 +67,14 @@ static zend_object_handlers closure_carrier_handlers;
 
 void detail::initializeClosureCarrierHandlers() noexcept {
     memcpy(&closure_carrier_handlers, &std_object_handlers, sizeof(zend_object_handlers));
-    closure_carrier_handlers.offset = XtOffsetOf(ClosureCarrier, std);
+    closure_carrier_handlers.offset = offsetof(ClosureCarrier, std);
     closure_carrier_handlers.free_obj = closure_carrier_free;
     closure_carrier_handlers.get_gc = closure_carrier_get_gc;
     closure_carrier_handlers.clone_obj = nullptr;
 }
 
 static inline ClosureCarrier *closure_carrier_from_obj(zend_object *object) {
-    return reinterpret_cast<ClosureCarrier *>(reinterpret_cast<char *>(object) - XtOffsetOf(ClosureCarrier, std));
+    return reinterpret_cast<ClosureCarrier *>(reinterpret_cast<char *>(object) - offsetof(ClosureCarrier, std));
 }
 
 static HashTable *closure_carrier_get_gc(zend_object *object, zval **table, int *n) {
@@ -185,7 +185,11 @@ static Object newClosureImpl(const ClosureFn &fn,
     ZVAL_OBJ(&carrier, newClosureCarrier(fn, _this, uses, func));
 
     zval closure;
+#if PHP_VERSION_ID >= 80600
+    zend_create_fake_closure(&closure, func, lexical_scope, called_scope, Z_OBJ(carrier));
+#else
     zend_create_fake_closure(&closure, func, lexical_scope, called_scope, &carrier);
+#endif
     zval_ptr_dtor(&carrier);
 
     return {&closure, Ctor::Move};
@@ -357,7 +361,12 @@ static Variant makeScopedCallableImpl(const Variant &callable, const CallableSco
             zval instance;
             ZVAL_OBJ(&instance, cache.object);
             zend_create_fake_closure(
-                &closure, cache.function_handler, cache.function_handler->common.scope, cache.called_scope, &instance);
+                &closure, cache.function_handler, cache.function_handler->common.scope, cache.called_scope,
+#if PHP_VERSION_ID >= 80600
+                Z_OBJ(instance));
+#else
+                &instance);
+#endif
         } else {
             zend_create_fake_closure(
                 &closure, cache.function_handler, cache.function_handler->common.scope, cache.called_scope, nullptr);

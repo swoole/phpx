@@ -85,10 +85,16 @@ zend_function *create_abstract_property_hook(zend_class_entry *class_entry,
                                              zend_property_hook_kind kind) {
     const bool setter = kind == ZEND_PROPERTY_HOOK_SET;
     const uint32_t num_args = setter ? 1 : 0;
+#if PHP_VERSION_ID >= 80600
+    auto *arg_info =
+        static_cast<zend_arg_info *>(pemalloc(sizeof(zend_arg_info) * (num_args + 1), true));
+    memset(arg_info, 0, sizeof(zend_arg_info) * (num_args + 1));
+#else
     auto *arg_info =
         static_cast<zend_internal_arg_info *>(pemalloc(sizeof(zend_internal_arg_info) * (num_args + 1), true));
     memset(arg_info, 0, sizeof(zend_internal_arg_info) * (num_args + 1));
     arg_info[0].name = reinterpret_cast<const char *>(static_cast<uintptr_t>(num_args));
+#endif
     if (setter) {
         const zend_type void_type = ZEND_TYPE_INIT_CODE(IS_VOID, false, 0);
         arg_info[0].type = void_type;
@@ -96,7 +102,11 @@ zend_function *create_abstract_property_hook(zend_class_entry *class_entry,
         arg_info[0].type = property_info->type;
     }
     if (setter) {
+#if PHP_VERSION_ID >= 80600
+        arg_info[1].name = zend_string_init("value", sizeof("value") - 1, true);
+#else
         arg_info[1].name = "value";
+#endif
         arg_info[1].type = property_info->type;
     }
 

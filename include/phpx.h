@@ -22,7 +22,9 @@
  */
 extern "C" {
 #include "php.h"
+#ifndef PHPX_NANO
 #include "zend_ini.h"
+#endif
 #include "zend_enum.h"
 #include "zend_interfaces.h"
 #include "zend_exceptions.h"
@@ -78,12 +80,14 @@ enum TrimMode {
     TRIM_BOTH = 3,
 };
 
+#ifndef PHPX_NANO
 enum IncludeType {
     INCLUDE = ZEND_INCLUDE,
     INCLUDE_ONCE = ZEND_INCLUDE_ONCE,
     REQUIRE = ZEND_REQUIRE,
     REQUIRE_ONCE = ZEND_REQUIRE_ONCE,
 };
+#endif
 
 /**
  * Owns a persistent zend_string independently of the request memory pool.
@@ -141,9 +145,11 @@ PHPX_API bool updateConstant(const String &cls, const String &name, const Varian
 PHPX_API bool updateConstant(zend_class_entry *ce, const String &name, const Variant &data);
 PHPX_API void initGlobal(const String &name, Variant &var);
 PHPX_API void unsetGlobal(const String &name);
+#ifndef PHPX_NANO
 PHPX_API Variant include(Variant file, IncludeType type = INCLUDE);
 PHPX_API Variant include(Variant file, IncludeType type, const Array &scope);
 PHPX_API Variant eval(const String &script, const char *filename = nullptr);
+#endif
 PHPX_API Variant call(const Variant &func, Args &args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &func, FixedArgs args, zend_array *named_args = nullptr);
 PHPX_API Variant call(const Variant &func, Array &args, zend_array *named_args = nullptr);
@@ -302,7 +308,11 @@ PHPX_API void popDebugFrame();
 PHPX_API void traceDebugInfo(const char *file, int lineno);
 PHPX_API void enableDebugInfo(bool enable = true);
 
+#ifndef PHPX_NANO
 void augmentException();
+#else
+inline void augmentException() {}
+#endif
 
 inline void throwErrorIfOccurred() {
     if (UNEXPECTED(EG(exception) != nullptr)) {
@@ -351,7 +361,9 @@ PHPX_API bool hasStaticProperty(const String &class_name, const String &prop);
 PHPX_API uint32_t getPropertyOffset(const String &class_name, const String &prop);
 PHPX_API uint32_t getPropertyOffset(zend_class_entry *ce, const String &prop);
 
+#ifndef PHPX_NANO
 PHPX_API Int toSize(const String &str);
+#endif
 PHPX_API Array toArray(const Variant &v);
 PHPX_API Object toObject(const Variant &v);
 PHPX_API Object toObject(const Variant &v, const String &class_name);
@@ -1400,7 +1412,7 @@ class Variant {
         return zval_get_double(const_cast<zval *>(unwrap_ptr()));
     }
     bool toBool() const {
-        return zval_is_true(const_cast<zval *>(unwrap_ptr()));
+        return zend_is_true(unwrap_ptr());
     }
     Array toArray() const;
     Object toObject() const;

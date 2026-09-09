@@ -24,5 +24,40 @@
     },
     "require": {
         "php": ">=8.4 <8.6"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.8.x-dev",
+            "dev-main": "2.8.x-dev"
+        },
+        "typephp-native": {
+            "kind": "bridge",
+            "abi": 80600,
+            "c-standard": 11,
+            "cxx-standard": 17,
+            "include-dirs": [
+                "include",
+                "thirdparty/wren-gc/include"
+            ],
+            "sources": [
+                "src/core/array.cc",
+                "src/core/base.cc",
+                "src/core/class.cc",
+                "src/core/closure.cc",
+                "src/core/foreach_iterator.cc",
+                "src/core/native_gc.cc",
+                "src/core/object.cc",
+                "src/core/scope.cc",
+                "src/core/string.cc",
+                "src/core/type_check.cc",
+                "src/core/variant.cc",
+                "src/typephp/typephp_attribute.cc",
+                "src/typephp/typephp_call.cc",
+                "src/typephp/typephp_nano.cc"
+                ,"src/typephp/typephp_property.cc"
+                ,"src/typephp/typephp_trait.cc"
+                ,"thirdparty/wren-gc/src/wren_gc.c"
+            ]
+        }
     }
 }

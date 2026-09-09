@@ -22,7 +22,9 @@
 #include "phpx_operator.h"
 
 extern "C" {
+#ifndef PHPX_NANO
 #include <main/php_streams.h>
+#endif
 }
 
 #include <array>
@@ -188,6 +190,7 @@ static inline String toString(const Variant &v) {
     return v.toString();
 }
 
+#ifndef PHPX_NANO
 static inline Variant toStream(const Variant &v) {
     php_stream *stream = nullptr;
     if (EXPECTED(v.isResource())) {
@@ -199,6 +202,7 @@ static inline Variant toStream(const Variant &v) {
     }
     return v;
 }
+#endif
 
 static inline void throwExactTypeError(const Variant &v, const char *expected, const char *property = nullptr) {
     if (property) {
@@ -333,6 +337,7 @@ static inline Object toObjectExact(const Variant &v, zend_class_entry *expected_
     return Object(v);
 }
 
+#ifndef PHPX_NANO
 static inline Variant toStreamExact(const Variant &v, const char *property = nullptr) {
     php_stream *stream = nullptr;
     if (EXPECTED(v.isResource())) {
@@ -344,6 +349,7 @@ static inline Variant toStreamExact(const Variant &v, const char *property = nul
     }
     return v;
 }
+#endif
 
 template <typename T>
 static inline Variant toBoxExact(const Variant &v, const char *property = nullptr, const char *expected = "Box") {

@@ -6,9 +6,3 @@ namespace php::detail {
 void initializeClosureCarrierHandlers() noexcept;
 
 } // namespace php::detail
-
-namespace php::python {
-
-void initializeNativeApi() noexcept;
-
-} // namespace php::python

@@ -4,10 +4,7 @@
 
 namespace php {
 
-/**
- * Optional phpy fast path. The implementation discovers phpy's versioned C
- * ABI at runtime, so PHPX remains independent of Python and libphpy.
- */
+/** Optional phpy fast path, installed explicitly by the embedding project. */
 namespace python {
 
 enum class Constructor : uint32_t {
@@ -21,6 +18,14 @@ enum class Constructor : uint32_t {
     Float,
     Bytes,
 };
+
+/**
+ * Install a versioned native API table supplied by phpy (or another bridge).
+ * The pointer remains owned by the provider and must stay valid until it is
+ * replaced or clearNativeApi() is called.
+ */
+PHPX_API bool installNativeApi(const void *api) noexcept;
+PHPX_API void clearNativeApi() noexcept;
 
 PHPX_API void configureRuntime(bool return_as_object = true);
 PHPX_API Object importModule(const String &name);

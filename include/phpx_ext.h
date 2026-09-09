@@ -286,8 +286,10 @@ class Extension {
         this->body = body;
     }
 
+#ifndef PHPX_NANO
     // modifiable can be one of these:PHP_INI_SYSTEM/PHP_INI_PERDIR/PHP_INI_USER/PHP_INI_ALL
     void addIniEntry(const char *name, const char *default_value = "", int modifiable = PHP_INI_ALL);
+#endif
     void printInfo() const;
 };
 }  // namespace php

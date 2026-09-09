@@ -19,7 +19,6 @@
 
 BEGIN_EXTERN_C()
 #include "zend_smart_str.h"
-#include <ext/spl/php_spl.h>
 END_EXTERN_C()
 
 #include <cmath>
@@ -542,6 +541,18 @@ static inline bool compare_op(const binary_op_type op, const zval *op1, const zv
     throwErrorIfOccurred();
     return Z_TYPE(result) == IS_TRUE;
 }
+
+#if PHP_VERSION_ID >= 80600
+static inline bool compare_op(
+    zend_result (ZEND_FASTCALL *op)(zval *, const zval *, const zval *),
+    const zval *op1,
+    const zval *op2) {
+    zval result;
+    op(&result, op1, op2);
+    throwErrorIfOccurred();
+    return Z_TYPE(result) == IS_TRUE;
+}
+#endif
 
 static inline Variant calc_op(const binary_op_type op, const zval *op1, const zval *op2) {
     Variant result;
