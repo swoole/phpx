@@ -249,6 +249,94 @@ static inline String toStringExact(const Variant &v, const char *property = null
 }
 
 /**
+ * Native-type fast paths for ArgExact functions.
+ *
+ * When the argument is already the expected native type, these overloads
+ * skip Variant construction and zval type checking entirely.
+ * The C++ compiler's overload resolution automatically selects these
+ * when the argument type is known at compile time.
+ */
+static inline Int toIntArgExact(Int v,
+                                const String &callable_name,
+                                zend_long argument_number,
+                                const String &parameter_name) {
+    return v;
+}
+
+static inline Float toFloatArgExact(Float v,
+                                    const String &callable_name,
+                                    zend_long argument_number,
+                                    const String &parameter_name) {
+    return v;
+}
+
+static inline Float toFloatArgExact(Int v,
+                                    const String &callable_name,
+                                    zend_long argument_number,
+                                    const String &parameter_name) {
+    return static_cast<Float>(v);
+}
+
+static inline Bool toBoolArgExact(Bool v,
+                                  const String &callable_name,
+                                  zend_long argument_number,
+                                  const String &parameter_name) {
+    return v;
+}
+
+static inline String toStringArgExact(const String &v,
+                                      const String &callable_name,
+                                      zend_long argument_number,
+                                      const String &parameter_name) {
+    return v;
+}
+
+static inline String toStringArgExact(const char *v,
+                                      const String &callable_name,
+                                      zend_long argument_number,
+                                      const String &parameter_name) {
+    return String(v);
+}
+
+static inline String toStringArgExact(const std::string &v,
+                                      const String &callable_name,
+                                      zend_long argument_number,
+                                      const String &parameter_name) {
+    return String(v);
+}
+
+/**
+ * Native-type fast paths for Exact functions (property access).
+ */
+static inline Int toIntExact(Int v, const char *property = nullptr) {
+    return v;
+}
+
+static inline Float toFloatExact(Float v, const char *property = nullptr) {
+    return v;
+}
+
+static inline Float toFloatExact(Int v, const char *property = nullptr) {
+    return static_cast<Float>(v);
+}
+
+static inline Bool toBoolExact(Bool v, const char *property = nullptr) {
+    return v;
+}
+
+static inline String toStringExact(const String &v, const char *property = nullptr) {
+    return v;
+}
+
+static inline String toStringExact(const char *v, const char *property = nullptr) {
+    return String(v);
+}
+
+static inline String toStringExact(const std::string &v, const char *property = nullptr) {
+    return String(v);
+}
+
+/**
  * Strict scalar conversions at a native call boundary.
  *
  * These helpers keep the zval type check and successful conversion inline,
