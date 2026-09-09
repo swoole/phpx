@@ -1291,6 +1291,8 @@ class Variant {
     PHPX_UNSAFE zend_object *object() const noexcept {
         return Z_OBJ_P(unwrap_ptr());
     }
+
+  protected:
     zend_object *checkedObject(const char *operation) const {
         if (UNEXPECTED(!isObject())) {
             throwError("%s on %s", operation, typeStr());
@@ -1298,6 +1300,8 @@ class Variant {
         }
         return object();
     }
+
+  public:
     PHPX_UNSAFE zval *zv() const noexcept {
         return Z_INDIRECT(val);
     }
@@ -2648,6 +2652,28 @@ class Object : public Variant {
     }
     Object(const Variant &v, Ctor method = Ctor::Copy) : Object(v.unwrap_ptr(), method) {}
     Object() = default;
+    Int &attrInt(uintptr_t offset) const {
+        zval *value = unwrap_zval(OBJ_PROP(checkedObject("Attempt to read property"), offset));
+        if (UNEXPECTED(Z_TYPE_P(value) != IS_LONG)) {
+            throwExceptionEx(
+                zend_ce_type_error,
+                0,
+                "Object::attrInt() expects an int property, %s given",
+                zend_zval_type_name(value));
+        }
+        return Z_LVAL_P(value);
+    }
+    Float &attrFloat(uintptr_t offset) const {
+        zval *value = unwrap_zval(OBJ_PROP(checkedObject("Attempt to read property"), offset));
+        if (UNEXPECTED(Z_TYPE_P(value) != IS_DOUBLE)) {
+            throwExceptionEx(
+                zend_ce_type_error,
+                0,
+                "Object::attrFloat() expects a float property, %s given",
+                zend_zval_type_name(value));
+        }
+        return Z_DVAL_P(value);
+    }
     zend_class_entry *parent_ce() {
         return checkedObject("Cannot access parent class")->ce->parent;
     }

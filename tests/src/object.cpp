@@ -73,6 +73,40 @@ TEST(object, ctor) {
     ASSERT_EQ(o3.attr("golang").toInt(), 4);
 }
 
+TEST(object, typed_attr_references) {
+    eval(R"PHP(
+        class PhpxTypedAttrReferences {
+            public int $count = 1;
+            public float $weight = 1.5;
+        }
+    )PHP");
+
+    auto object = newObject("PhpxTypedAttrReferences");
+    const auto count_offset = getPropertyOffset("PhpxTypedAttrReferences", "count");
+    const auto weight_offset = getPropertyOffset("PhpxTypedAttrReferences", "weight");
+
+    Int &count = object.attrInt(count_offset);
+    Float &weight = object.attrFloat(weight_offset);
+    count += 2;
+    weight += 0.5;
+    ASSERT_EQ(object.attr("count").toInt(), 3);
+    ASSERT_DOUBLE_EQ(object.attr("weight").toFloat(), 2.0);
+
+    auto count_reference = object.attrRef("count");
+    auto weight_reference = object.attrRef("weight");
+    object.attrInt(count_offset) += 4;
+    object.attrFloat(weight_offset) += 1.25;
+    ASSERT_EQ(count_reference.getRefValue().toInt(), 7);
+    ASSERT_DOUBLE_EQ(weight_reference.getRefValue().toFloat(), 3.25);
+
+    try_call(
+        [&]() { object.attrFloat(count_offset); },
+        "Object::attrFloat() expects a float property, int given");
+    try_call(
+        [&]() { object.attrInt(weight_offset); },
+        "Object::attrInt() expects an int property, float given");
+}
+
 TEST(object, failed_constructor_does_not_run_destructor) {
     eval(R"PHP(
         $GLOBALS['phpx_failed_ctor_destructed'] = 0;
