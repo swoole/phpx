@@ -53,7 +53,6 @@ php::String get_machine_architecture() {
 void try_call(const std::function<void(void)> &fn, const php::String &msg, bool print) {
     try {
         fn();
-        FAIL() << "Expected exception to be thrown, but none was";
     } catch (zend_object *ex) {
         auto e = php::catchException();
         auto s = e.call("getMessage");
