@@ -42,6 +42,83 @@ TEST(array_extra, zend_string_key_initializer_preserves_keys_and_values) {
     ASSERT_EQ(result.get(padded).toInt(), 2);
 }
 
+// Exercise the size == 0 branch of initArray() (array_init rather than
+// array_init_size) for every initializer-list flavour.
+TEST(array_extra, empty_initializers_create_empty_arrays) {
+    Array from_str_keys(StrKeyMap{});
+    ASSERT_EQ(from_str_keys.count(), 0);
+    ASSERT_TRUE(from_str_keys.isArray());
+    from_str_keys.append(1);
+    ASSERT_EQ(from_str_keys.count(), 1);
+
+    Array from_std_str_keys(StdStrKeyMap{});
+    ASSERT_EQ(from_std_str_keys.count(), 0);
+    ASSERT_TRUE(from_std_str_keys.isArray());
+
+    Array from_int_keys(IntKeyMap{});
+    ASSERT_EQ(from_int_keys.count(), 0);
+    ASSERT_TRUE(from_int_keys.isArray());
+
+    Array from_list(ArrayList{});
+    ASSERT_EQ(from_list.count(), 0);
+    ASSERT_TRUE(from_list.isArray());
+    from_list.append(1);
+    ASSERT_EQ(from_list.count(), 1);
+}
+
+// IntKeyMap still goes through set(); lock in the same semantics as the
+// StrKeyMap constructor (overwrite, references, borrowed values, COW).
+TEST(array_extra, int_key_initializer_preserves_keys_values_and_references) {
+    Variant source = 7;
+    Reference reference = source.toReference();
+    Array backing{31, 32};
+
+    Array result(
+        IntKeyMap{{Int(0), 1}, {Int(7), 2}, {Int(0), 3}, {Int(9), &source}, {Int(5), backing.item(0)}});
+
+    ASSERT_EQ(result.count(), 4);
+    ASSERT_EQ(result.get(0).toInt(), 3);
+    ASSERT_EQ(result.get(7).toInt(), 2);
+
+    reference = 9;
+    ASSERT_EQ(result.get(9).toInt(), 9);
+    result.item(9, true) = 11;
+    ASSERT_EQ(source.toInt(), 11);
+
+    backing.item(0, true) = 99;
+    ASSERT_EQ(result.get(5).toInt(), 31);
+
+    Array copy = result;
+    copy.item(7, true) = 55;
+    ASSERT_EQ(result.get(7).toInt(), 2);
+}
+
+TEST(array_extra, std_string_key_initializer_matches_zend_string_semantics) {
+    Variant source = 7;
+    Reference reference = source.toReference();
+    Array backing{31, 32};
+    String padded("01");
+
+    Array result(StdStrKeyMap{
+        {"0", 1}, {"01", 2}, {"0", 3}, {"ref", &source}, {"borrowed", backing.item(0)}});
+
+    ASSERT_EQ(result.count(), 4);
+    ASSERT_EQ(result.get(0).toInt(), 3);
+    ASSERT_EQ(result.get(padded).toInt(), 2);
+
+    reference = 9;
+    ASSERT_EQ(result.get("ref").toInt(), 9);
+    result.item("ref", true) = 11;
+    ASSERT_EQ(source.toInt(), 11);
+
+    backing.item(0, true) = 99;
+    ASSERT_EQ(result.get("borrowed").toInt(), 31);
+
+    Array copy = result;
+    copy.item(padded, true) = 55;
+    ASSERT_EQ(result.get(padded).toInt(), 2);
+}
+
 // Test search with strict mode
 TEST(array_extra, search_strict) {
     Array arr = create_map();
