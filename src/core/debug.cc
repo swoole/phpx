@@ -55,17 +55,18 @@ void augmentException() {
         return;
     }
 
-    FakeScopeGuard fake_scope_guard{EG(exception)->ce};
+    zend_class_entry *exception_base = zend_get_exception_base(EG(exception));
+    FakeScopeGuard fake_scope_guard{exception_base};
 
     // Set file/line from the innermost frame
     auto &top = debug_info.frames[debug_info.depth - 1];
     zval tmp;
     ZVAL_STRING(&tmp, top.file ? top.file : "");
-    zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_FILE), &tmp);
+    zend_update_property_ex(exception_base, EG(exception), ZSTR_KNOWN(ZEND_STR_FILE), &tmp);
     zval_ptr_dtor(&tmp);
 
     ZVAL_LONG(&tmp, top.line);
-    zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_LINE), &tmp);
+    zend_update_property_ex(exception_base, EG(exception), ZSTR_KNOWN(ZEND_STR_LINE), &tmp);
 
     // Build backtrace array in zend_fetch_debug_backtrace format
     // Each frame: {file, line, function, class?, type?, args}
@@ -93,7 +94,7 @@ void augmentException() {
         trace.append(entry);
     }
 
-    zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_TRACE), trace.ptr());
+    zend_update_property_ex(exception_base, EG(exception), ZSTR_KNOWN(ZEND_STR_TRACE), trace.ptr());
 }
 
 }  // namespace php
