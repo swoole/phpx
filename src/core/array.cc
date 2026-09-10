@@ -107,27 +107,49 @@ Array Array::slice(Int offset, Int length, bool preserve_keys) {
     return Array(&return_value, Ctor::Move);
 }
 
+// Insert into an array that is known to be freshly allocated: it is not shared,
+// so unwrapping/separation is unnecessary. The value is copied before the
+// update so a bucket borrowed from this array stays valid (see Array::set()).
+static void updateFreshStringKey(zend_array *ht, zend_string *key, const Variant &v) {
+    zval copied;
+    ZVAL_COPY(&copied, v.direct_ptr());
+    zend_symtable_update(ht, key, &copied);
+}
+
+static void updateFreshIntKey(zend_array *ht, zend_ulong index, const Variant &v) {
+    zval copied;
+    ZVAL_COPY(&copied, v.direct_ptr());
+    zend_hash_index_update(ht, index, &copied);
+}
+
 void Array::copyFrom(const ArrayList &list) {
     for (const auto &val : list) {
         append(val);
     }
 }
 
+// The copyFrom() helpers below are only reached from constructors and
+// operator=(), which call initArray()/rebuild() first: the destination is always
+// a freshly allocated array, so the fresh (separation-free) writers are safe.
 void Array::copyFrom(const StdStrKeyMap &list) {
+    auto ht = Z_ARRVAL_P(unwrap_ptr());
     for (const auto &kv : list) {
-        set(String(kv.first), kv.second);
+        String key(kv.first);
+        updateFreshStringKey(ht, key.str(), kv.second);
     }
 }
 
 void Array::copyFrom(const StrKeyMap &list) {
+    auto ht = Z_ARRVAL_P(unwrap_ptr());
     for (const auto &kv : list) {
-        set(kv.first, kv.second);
+        updateFreshStringKey(ht, kv.first, kv.second);
     }
 }
 
 void Array::copyFrom(const IntKeyMap &list) {
+    auto ht = Z_ARRVAL_P(unwrap_ptr());
     for (const auto &kv : list) {
-        set(kv.first, kv.second);
+        updateFreshIntKey(ht, static_cast<zend_ulong>(kv.first), kv.second);
     }
 }
 
@@ -138,12 +160,7 @@ Array::Array(const ArrayList &list) {
 
 Array::Array(const StrKeyMap &list) {
     initArray(&val, list.size());
-    // The newly allocated array is not shared; no separation is needed.
-    for (const auto &kv : list) {
-        zval copied;
-        ZVAL_COPY(&copied, kv.second.direct_ptr());
-        zend_symtable_update(Z_ARRVAL(val), kv.first, &copied);
-    }
+    copyFrom(list);
 }
 
 Array::Array(const StdStrKeyMap &list) {
@@ -194,21 +211,17 @@ void Array::set(const Variant &key, const Variant &v) {
 void Array::set(zend_string *str_key, const Variant &v) {
     // v may borrow a bucket from this array. Converting packed storage to a
     // mixed HashTable, separating it, or growing it can invalidate that bucket
-    // before Zend copies pData. Snapshot the zval while the source is stable.
-    zval copied;
-    ZVAL_COPY(&copied, v.direct_ptr());
+    // before Zend copies pData. updateFreshStringKey() snapshots the zval while
+    // the source is still stable.
     auto zarr = unwrap_ptr();
     SEPARATE_ARRAY(zarr);
-    zend_symtable_update(Z_ARRVAL_P(zarr), str_key, &copied);
+    updateFreshStringKey(Z_ARRVAL_P(zarr), str_key, v);
 }
 
 void Array::set(zend_ulong i, const Variant &v) {
-    zval copied;
-    ZVAL_COPY(&copied, v.direct_ptr());
-
     auto zarr = unwrap_ptr();
     SEPARATE_ARRAY(zarr);
-    add_index_zval(zarr, i, &copied);
+    updateFreshIntKey(Z_ARRVAL_P(zarr), i, v);
 }
 
 void Array::setValue(const Variant &key, const Variant &v) {
