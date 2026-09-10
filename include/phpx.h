@@ -58,6 +58,7 @@ extern "C" {
 #define PHPX_UNSAFE
 
 #include "phpx_native_gc.h"
+#include "phpx_exception_policy.h"
 
 #define IS_STR_OFFSET_SET (1 << 5)
 
@@ -310,8 +311,8 @@ void augmentException();
 
 inline void throwErrorIfOccurred() {
     if (UNEXPECTED(EG(exception) != nullptr)) {
-        augmentException();
-        throw EG(exception);
+        PHPX_AUGMENT_EXCEPTION();
+        PHPX_THROW(EG(exception));
     }
 }
 
@@ -2437,13 +2438,13 @@ class Args {
         params.reserve(n);
     }
     Args(const Args &other) : Args(other.params.size()) {
-        try {
+        PHPX_TRY {
             for (const auto &param : other.params) {
                 append(&param);
             }
-        } catch (...) {
+        } PHPX_CATCH_ALL {
             release();
-            throw;
+            PHPX_RETHROW();
         }
     }
     Args(Args &&other) noexcept {

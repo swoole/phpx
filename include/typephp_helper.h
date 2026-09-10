@@ -176,9 +176,9 @@ class RefWrap<Int> final {
             const bool source_changed = current != initial_;
             const bool proxy_changed = proxy_ != initial_;
             if (proxy_changed && (!source_changed || current == proxy_)) {
-                try {
+                PHPX_TRY {
                     reference_ = Variant(proxy_);
-                } catch (...) {
+                } PHPX_CATCH_ALL {
                 }
             }
         }
@@ -262,9 +262,9 @@ class RefWrap<Float> final {
             const bool source_changed = current != initial_;
             const bool proxy_changed = proxy_ != initial_;
             if (proxy_changed && (!source_changed || current == proxy_)) {
-                try {
+                PHPX_TRY {
                     reference_ = Variant(proxy_);
-                } catch (...) {
+                } PHPX_CATCH_ALL {
                 }
             }
         }
@@ -427,18 +427,18 @@ class RefWrap<String> final {
         }
         if (native_to_zend_) {
             if (reference_.isString()) {
-                try {
+                PHPX_TRY {
                     *typed_ = String(reference_.unwrap_ptr());
-                } catch (...) {
+                } PHPX_CATCH_ALL {
                 }
             }
         } else if (reference_.isString()) {
             const bool source_changed = !detail::refWrapIdentical(reference_, initial_);
             const bool proxy_changed = !detail::refWrapIdentical(proxy_, initial_);
             if (proxy_changed && (!source_changed || detail::refWrapIdentical(reference_, proxy_))) {
-                try {
+                PHPX_TRY {
                     reference_ = proxy_;
-                } catch (...) {
+                } PHPX_CATCH_ALL {
                 }
             }
         }
@@ -517,9 +517,9 @@ class RefWrap<Array> final {
         }
         if (native_to_zend_) {
             if (reference_.isArray()) {
-                try {
+                PHPX_TRY {
                     *typed_ = Array(reference_.unwrap_ptr());
-                } catch (...) {
+                } PHPX_CATCH_ALL {
                 }
             }
         } else if (reference_.isArray()) {
@@ -527,9 +527,9 @@ class RefWrap<Array> final {
             const bool proxy_changed = proxy_.array() != initial_proxy_array_
                 || !detail::refWrapIdentical(proxy_, initial_);
             if (proxy_changed && (!source_changed || detail::refWrapIdentical(reference_, proxy_))) {
-                try {
+                PHPX_TRY {
                     reference_ = proxy_;
-                } catch (...) {
+                } PHPX_CATCH_ALL {
                 }
             }
         }
@@ -1156,11 +1156,11 @@ static inline zend_object *typephp_create_object_with_defaults(zend_class_entry 
     }
 
     object->handlers = const_cast<zend_object_handlers *>(zend_get_std_object_handlers());
-    try {
+    PHPX_TRY {
         initializer(object);
-    } catch (...) {
+    } PHPX_CATCH_ALL {
         object->handlers = handlers;
-        throw;
+        PHPX_RETHROW();
     }
     object->handlers = handlers;
     return object;

@@ -173,12 +173,12 @@ Object new_object_impl(zend_class_entry *ce, uint32_t count, zval *params, zend_
         auto this_ = object.object();
         auto ctor = ce->constructor;
         if (ctor) {
-            try {
+            PHPX_TRY {
                 zend_call_known_function(ctor, this_, ce, nullptr, count, params, named_args);
                 throwErrorIfOccurred();
-            } catch (...) {
+            } PHPX_CATCH_ALL {
                 zend_object_store_ctor_failed(this_);
-                throw;
+                PHPX_RETHROW();
             }
         }
     }
