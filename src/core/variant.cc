@@ -54,7 +54,9 @@ void Variant::copyFrom(const zval *src) {
         auto zv = unwrap_ptr();
         zval tmp = *zv;
         zval_copy(zv, src);
-        zval_ptr_dtor(&tmp);
+        if (Z_REFCOUNTED(tmp)) {
+            zval_ptr_dtor(&tmp);
+        }
         throwErrorIfOccurred();
     }
 }
@@ -112,7 +114,9 @@ Variant &Variant::operator=(Variant &&v) {
     zval old = val;
     zval_copy_value(&val, &v.val);
     ZVAL_UNDEF(&v.val);
-    zval_ptr_dtor(&old);
+    if (Z_REFCOUNTED(old)) {
+        zval_ptr_dtor(&old);
+    }
     throwErrorIfOccurred();
     return *this;
 }
@@ -219,7 +223,9 @@ void Variant::unset() {
         ZVAL_UNDEF(target);
     }
     val = {};
-    zval_ptr_dtor(&old);
+    if (Z_REFCOUNTED(old)) {
+        zval_ptr_dtor(&old);
+    }
     throwErrorIfOccurred();
 }
 
