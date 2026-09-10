@@ -435,8 +435,9 @@ extern "C" ZEND_API void zend_call_known_function_ex(
 
 extern "C" int typephp_nano_project_main();
 
-int main()
+int main(int argc, char **argv)
 {
+    php_nano_set_cli_arguments(argc, argv);
     if (php_nano_startup_composer_extensions() != SUCCESS) {
         std::fputs("Unable to start PHP Nano extensions\n", stderr);
         return 1;
