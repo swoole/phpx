@@ -405,8 +405,22 @@ else()
     target_compile_options(mpdecimal PRIVATE -fPIC)
 endif()
 
+# php-nano（无 VM）运行时支持：CI 与常规构建均不启用。
+# 开启后需要同时提供 php-nano 头文件目录（-DPHPX_NANO_INCLUDE_DIR=...），
+# 因为 *_nano.cc 依赖 php-nano 提供的 php_nano_extension.h。
+option(PHPX_NANO "Build with php-nano source runtime support" OFF)
+set(PHPX_NANO_INCLUDE_DIR "" CACHE PATH "Path to php-nano include directory (required when PHPX_NANO=ON)")
+
 file(GLOB_RECURSE SRC_FILES src/core/*.cc src/std/*.cc src/typephp/*.cc)
-list(FILTER SRC_FILES EXCLUDE REGEX "/[^/]+_nano\\.cc$")
+if(NOT PHPX_NANO)
+    # 默认关闭：剔除 *_nano.cc，避免缺少 php-nano 头文件导致编译失败
+    list(FILTER SRC_FILES EXCLUDE REGEX "/[^/]+_nano\\.cc$")
+else()
+    add_compile_definitions(PHPX_NANO=1)
+    if(PHPX_NANO_INCLUDE_DIR)
+        include_directories(${PHPX_NANO_INCLUDE_DIR})
+    endif()
+endif()
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 
 add_library(phpx SHARED ${SRC_FILES})
