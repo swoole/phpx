@@ -253,6 +253,72 @@ static inline String toStringExact(const Variant &v, const char *property = null
 }
 
 /**
+ * Native-type fast paths for ArgExact and Exact functions.
+ *
+ * Constrained templates ensure only the exact native type matches.
+ * Standard conversions (int→bool, double→int, etc.) do NOT match,
+ * so they fall through to the strict Variant overload and raise TypeError.
+ *
+ * callable_name / parameter_name use const String & to mirror the
+ * Variant overloads — generated AOT code that passes String objects
+ * can still hit the fast path.
+ */
+template <typename T, std::enable_if_t<std::is_same_v<T, Int>, int> = 0>
+static inline Int toIntArgExact(T v,
+                                const String &callable_name,
+                                zend_long argument_number,
+                                const String &parameter_name) {
+    return v;
+}
+
+template <typename T, std::enable_if_t<std::is_same_v<T, Float>, int> = 0>
+static inline Float toFloatArgExact(T v,
+                                    const String &callable_name,
+                                    zend_long argument_number,
+                                    const String &parameter_name) {
+    return v;
+}
+
+template <typename T, std::enable_if_t<std::is_same_v<T, Bool>, int> = 0>
+static inline Bool toBoolArgExact(T v,
+                                  const String &callable_name,
+                                  zend_long argument_number,
+                                  const String &parameter_name) {
+    return v;
+}
+
+template <typename T, std::enable_if_t<std::is_same_v<T, String>, int> = 0>
+static inline String toStringArgExact(T v,
+                                      const String &callable_name,
+                                      zend_long argument_number,
+                                      const String &parameter_name) {
+    return v;
+}
+
+/**
+ * Native-type fast paths for Exact functions (property access).
+ */
+template <typename T, std::enable_if_t<std::is_same_v<T, Int>, int> = 0>
+static inline Int toIntExact(T v, const char *property = nullptr) {
+    return v;
+}
+
+template <typename T, std::enable_if_t<std::is_same_v<T, Float>, int> = 0>
+static inline Float toFloatExact(T v, const char *property = nullptr) {
+    return v;
+}
+
+template <typename T, std::enable_if_t<std::is_same_v<T, Bool>, int> = 0>
+static inline Bool toBoolExact(T v, const char *property = nullptr) {
+    return v;
+}
+
+template <typename T, std::enable_if_t<std::is_same_v<T, String>, int> = 0>
+static inline String toStringExact(T v, const char *property = nullptr) {
+    return v;
+}
+
+/**
  * Strict scalar conversions at a native call boundary.
  *
  * These helpers keep the zval type check and successful conversion inline,
