@@ -65,7 +65,7 @@
                 "src/typephp/typephp_attribute.cc",
                 "src/typephp/typephp_call.cc",
                 "src/typephp/typephp_nano.cc",
-                "src/typephp/typephp_nano_main.cc",
+                "src/typephp/typephp_main_nano.cc",
                 "src/typephp/typephp_property.cc",
                 "src/typephp/typephp_trait.cc",
                 "thirdparty/wren-gc/src/wren_gc.c"

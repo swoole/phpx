@@ -311,7 +311,7 @@ void augmentException();
 
 inline void throwErrorIfOccurred() {
     if (UNEXPECTED(EG(exception) != nullptr)) {
-        PHPX_AUGMENT_EXCEPTION();
+        augmentException();
         PHPX_THROW(EG(exception));
     }
 }
