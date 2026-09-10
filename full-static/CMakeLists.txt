@@ -70,6 +70,8 @@ target_compile_options(mpdecimal_obj PRIVATE -fPIC)
 file(GLOB PHPX_CORE_SOURCES "${PHPX_ROOT}/src/core/*.cc")
 file(GLOB PHPX_STD_SOURCES "${PHPX_ROOT}/src/std/*.cc")
 file(GLOB PHPX_TYPEPHP_SOURCES "${PHPX_ROOT}/src/typephp/*.cc")
+list(FILTER PHPX_CORE_SOURCES EXCLUDE REGEX "/[^/]+_nano\\.cc$")
+list(FILTER PHPX_TYPEPHP_SOURCES EXCLUDE REGEX "/[^/]+_nano\\.cc$")
 
 add_library(phpx STATIC
     ${PHPX_CORE_SOURCES}

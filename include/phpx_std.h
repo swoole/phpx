@@ -22,6 +22,8 @@
 #include "std/array.h"
 #include "std/string.h"
 #include "std/fs.h"
+#include "std/hash.h"
+#include "std/random.h"
 #include "std/math.h"
 #include "std/json.h"
 #include "std/datetime.h"

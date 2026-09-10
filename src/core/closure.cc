@@ -25,10 +25,9 @@ namespace php {
 
 static void freeClosureFunction(zend_function *function) {
     if (function->common.arg_info != nullptr) {
-        auto *arg_info = const_cast<zend_internal_arg_info *>(
-            reinterpret_cast<const zend_internal_arg_info *>(function->common.arg_info));
+        auto *arg_info = function->common.arg_info;
         for (uint32_t i = 0; i < function->common.num_args; i++) {
-            efree(const_cast<char *>(arg_info[i].name));
+            zend_string_release(arg_info[i].name);
         }
         efree(arg_info);
     }
@@ -157,11 +156,10 @@ static Object newClosureImpl(const ClosureFn &fn,
         func->common.fn_flags |= ZEND_ACC_STRICT_TYPES;
     }
     if (parameter_count != 0) {
-        auto *arg_info =
-            static_cast<zend_internal_arg_info *>(ecalloc(parameter_count, sizeof(zend_internal_arg_info)));
+        auto *arg_info = static_cast<zend_arg_info *>(ecalloc(parameter_count, sizeof(zend_arg_info)));
         for (uint32_t index = 0; index < parameter_count; index++) {
             const auto &parameter = parameters[index];
-            arg_info[index].name = estrdup(parameter.name);
+            arg_info[index].name = zend_string_init(parameter.name, strlen(parameter.name), false);
             arg_info[index].type = ZEND_TYPE_INIT_NONE(static_cast<uint32_t>(
                 _ZEND_ARG_INFO_FLAGS(parameter.by_ref ? 1 : 0, parameter.variadic ? 1 : 0, 0)));
             if (parameter.required) {
@@ -171,8 +169,9 @@ static Object newClosureImpl(const ClosureFn &fn,
                 func->common.fn_flags |= ZEND_ACC_VARIADIC;
             }
         }
-        func->common.arg_info = reinterpret_cast<zend_arg_info *>(arg_info);
+        func->common.arg_info = arg_info;
         func->common.num_args = parameter_count;
+        func->common.fn_flags |= ZEND_ACC_USER_ARG_INFO;
     }
     // The carrier is only an implementation detail used to keep the C++
     // callback state alive. Visibility and self:: resolution must use the

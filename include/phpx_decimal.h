@@ -1,16 +1,30 @@
 #pragma once
 
 #include "phpx.h"
+#ifdef PHPX_NANO
+extern "C" {
+struct bc_struct;
+}
+#else
 #include <decimal.hh>
+#endif
 
 namespace php {
 
 class Decimal : public Box {
   public:
+#ifdef PHPX_NANO
+    bc_struct *value = nullptr;
+    Decimal();
+    explicit Decimal(const String &s);
+    explicit Decimal(php::Int v);
+    ~Decimal() override;
+#else
     decimal::Decimal value;
     Decimal() = default;
     explicit Decimal(const String &s) : value(s.data()) {}
     explicit Decimal(php::Int v) : value((int64_t) v) {}
+#endif
 
     static Variant newInstance(Variant s);
     static Variant add(Variant a, Variant b);

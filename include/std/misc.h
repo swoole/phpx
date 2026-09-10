@@ -18,18 +18,16 @@ extern "C" {
 #include "ext/standard/base64.h"
 #include "ext/standard/crc32.h"
 #include "ext/standard/url.h"
-#include "ext/standard/md5.h"
-#include "ext/standard/sha1.h"
-#include "ext/hash/php_hash.h"
 #include "ext/standard/php_var.h"
 #include "ext/standard/php_versioning.h"
 #include "ext/standard/php_standard.h"
-#include "ext/random/php_random.h"
 #include "php_variables.h"
 }
 
 #include "phpx.h"
+#include "std/hash.h"
 #include "std/json.h"
+#include "std/random.h"
 
 namespace php::fn {
 
@@ -42,21 +40,6 @@ inline Int crc32(const String &s) {
     crc = php_crc32_bulk_update(crc, s.data(), s.length());
     return php_crc32_bulk_end(crc);
 }
-
-// ========================
-// md5(string $string, bool $binary = false): string
-// ========================
-Variant md5(const String &s, bool raw_output = false);
-
-// ========================
-// sha1(string $string, bool $binary = false): string
-// ========================
-Variant sha1(const String &s, bool raw_output = false);
-
-// ========================
-// hash(string $algo, string $data, bool $binary = false): string
-// ========================
-Variant hash(const String &algo, const String &data, bool raw_output = false);
 
 // ========================
 // base64_encode(string $string): string
@@ -139,81 +122,6 @@ inline String rawurldecode(const String &data) {
 }
 
 // ========================
-// random_int(int $min, int $max): int
-// ========================
-
-inline Int random_int(Int min, Int max) {
-    if (UNEXPECTED(min > max)) {
-        php::throwException(
-            zend_ce_value_error,
-            "random_int(): Argument #1 ($min) must be less than or equal to argument #2 ($max)"
-        );
-        return 0;
-    }
-    zend_long result;
-    if (php_random_int(min, max, &result, true) == FAILURE) {
-        throwErrorIfOccurred();
-        return 0;
-    }
-    return static_cast<Int>(result);
-}
-
-// ========================
-// random_bytes(int $length): string
-// ========================
-
-inline String random_bytes(Int length) {
-    if (UNEXPECTED(length < 1)) {
-        php::throwException(zend_ce_value_error, "random_bytes(): Argument #1 ($length) must be greater than 0");
-        return String();
-    }
-    zend_string *bytes = zend_string_alloc(length, 0);
-    if (php_random_bytes(ZSTR_VAL(bytes), length, true) == FAILURE) {
-        zend_string_release(bytes);
-        throwErrorIfOccurred();
-        return String();
-    }
-    ZSTR_VAL(bytes)[length] = 0;
-    return String(bytes, Ctor::Move);
-}
-
-// ========================
-// mt_rand() : int
-// mt_rand(int $min, int $max): int
-// ========================
-
-inline Int mt_rand() {
-    return static_cast<Int>(php_mt_rand() >> 1);
-}
-
-inline Int mt_rand(Int min, Int max) {
-    if (UNEXPECTED(max < min)) {
-        php::throwException(
-            zend_ce_value_error,
-            "mt_rand(): Argument #2 ($max) must be greater than or equal to argument #1 ($min)"
-        );
-        return 0;
-    }
-    return static_cast<Int>(php_mt_rand_common(min, max));
-}
-
-// ========================
-// rand() : int
-// rand(int $min, int $max): int
-// ========================
-
-inline Int rand() {
-    return static_cast<Int>(php_mt_rand() >> 1);
-}
-
-inline Int rand(Int min, Int max) {
-    if (max < min) {
-        return static_cast<Int>(php_mt_rand_common(max, min));
-    }
-    return static_cast<Int>(php_mt_rand_common(min, max));
-}
-
-// ========================
 // serialize(mixed $value): string
 // ========================
 
@@ -260,10 +168,14 @@ Variant print_r(const Variant &value, bool do_return = false);
 String uniqid(const String &prefix = String(), bool more_entropy = false);
 
 // parse_str(string $string, &$array = null): void
+#ifndef PHPX_NANO
 Array parse_str(const String &str);
 void parse_str(const String &str, Array &result);
+#endif
 
 // shell_exec(string $command): string|false|null
+#ifndef PHPX_NANO
 Variant shell_exec(const String &command);
+#endif
 
 }  // namespace php::fn

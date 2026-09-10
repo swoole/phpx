@@ -17,85 +17,11 @@
 #include <chrono>
 #include <cinttypes>
 
+#ifdef PHPX_NANO
+#include "php_nano_extension.h"
+#endif
+
 namespace php::fn {
-
-// ========================
-// md5
-// ========================
-
-Variant md5(const String &s, bool raw_output) {
-    PHP_MD5_CTX context;
-    unsigned char digest[16];
-
-    PHP_MD5Init(&context);
-    PHP_MD5Update(&context, (const unsigned char *) s.data(), s.length());
-    PHP_MD5Final(digest, &context);
-
-    if (raw_output) {
-        return Variant(String((char *) digest, 16));
-    }
-
-    char hex[33];
-    make_digest_ex(hex, digest, 16);
-    return Variant(String(hex, 32));
-}
-
-// ========================
-// sha1
-// ========================
-
-Variant sha1(const String &s, bool raw_output) {
-    PHP_SHA1_CTX context;
-    unsigned char digest[20];
-
-    PHP_SHA1Init(&context);
-    PHP_SHA1Update(&context, (const unsigned char *) s.data(), s.length());
-    PHP_SHA1Final(digest, &context);
-
-    if (raw_output) {
-        return Variant(String((char *) digest, 20));
-    }
-
-    char hex[41];
-    make_sha1_digest(hex, digest);
-    return Variant(String(hex, 40));
-}
-
-// ========================
-// hash
-// ========================
-
-Variant hash(const String &algo, const String &data, bool raw_output) {
-    const php_hash_ops *ops = php_hash_fetch_ops(algo.str());
-    if (!ops) {
-        php_error_docref(nullptr, E_WARNING, "Unknown hashing algorithm: %s", algo.data());
-        return Variant(false);
-    }
-
-    void *context = php_hash_alloc_context(ops);
-    ops->hash_init(context, nullptr);
-    ops->hash_update(context, (const unsigned char *) data.data(), data.length());
-
-    auto *digest = (unsigned char *) emalloc(ops->digest_size);
-    ops->hash_final(digest, context);
-    efree(context);
-
-    if (raw_output) {
-        String result((char *) digest, ops->digest_size);
-        efree(digest);
-        return Variant(result);
-    }
-
-    size_t hex_len = ops->digest_size * 2;
-    auto *hex = (char *) emalloc(hex_len + 1);
-    php_hash_bin2hex(hex, digest, ops->digest_size);
-    hex[hex_len] = '\0';
-    efree(digest);
-
-    String result(hex, hex_len);
-    efree(hex);
-    return Variant(result);
-}
 
 // ========================
 // version_compare
@@ -155,6 +81,9 @@ Variant print_r(const Variant &value, bool do_return) {
 // ========================
 
 static zend_string *_uniqid_hash(const String &prefix, bool more_entropy) {
+#ifdef PHPX_NANO
+    return php_nano_unique_id(prefix.str(), more_entropy);
+#else
     auto now = std::chrono::system_clock::now();
     auto duration = now.time_since_epoch();
     auto sec_dur = std::chrono::duration_cast<std::chrono::seconds>(duration);
@@ -173,6 +102,7 @@ static zend_string *_uniqid_hash(const String &prefix, bool more_entropy) {
 
     return zend_strpprintf(
         0, "%s%08" PRIx64 "%05x", prefix.length() > 0 ? prefix.data() : "", static_cast<std::uint64_t>(sec), usec);
+#endif
 }
 
 String uniqid(const String &prefix, bool more_entropy) {
@@ -184,6 +114,7 @@ String uniqid(const String &prefix, bool more_entropy) {
 // parse_str
 // ========================
 
+#ifndef PHPX_NANO
 Array parse_str(const String &str) {
     Array result;
     auto res = estrndup(str.data(), str.length());
@@ -196,11 +127,13 @@ void parse_str(const String &str, Array &result) {
     auto res = estrndup(str.data(), str.length());
     sapi_module.treat_data(PARSE_STRING, res, result.ptr());
 }
+#endif
 
 // ========================
 // shell_exec
 // ========================
 
+#ifndef PHPX_NANO
 Variant shell_exec(const String &command) {
     if (command.length() == 0) {
         zend_argument_value_error(1, "cannot be empty");
@@ -234,5 +167,6 @@ Variant shell_exec(const String &command) {
     return Variant(nullptr);
 #endif
 }
+#endif
 
 }  // namespace php::fn

@@ -406,6 +406,7 @@ else()
 endif()
 
 file(GLOB_RECURSE SRC_FILES src/core/*.cc src/std/*.cc src/typephp/*.cc)
+list(FILTER SRC_FILES EXCLUDE REGEX "/[^/]+_nano\\.cc$")
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 
 add_library(phpx SHARED ${SRC_FILES})

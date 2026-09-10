@@ -42,8 +42,11 @@
             "sources": [
                 "src/core/array.cc",
                 "src/core/base.cc",
+                "src/core/big_float_nano.cc",
+                "src/core/big_int_nano.cc",
                 "src/core/class.cc",
                 "src/core/closure.cc",
+                "src/core/decimal_nano.cc",
                 "src/core/foreach_iterator.cc",
                 "src/core/native_gc.cc",
                 "src/core/object.cc",
@@ -51,16 +54,19 @@
                 "src/core/string.cc",
                 "src/core/type_check.cc",
                 "src/core/variant.cc",
+                "src/std/core.cc",
                 "src/std/array.cc",
                 "src/std/datetime.cc",
+                "src/std/hash.cc",
                 "src/std/math.cc",
+                "src/std/misc.cc",
                 "src/std/string.cc",
                 "src/typephp/typephp_attribute.cc",
                 "src/typephp/typephp_call.cc",
-                "src/typephp/typephp_nano.cc"
-                ,"src/typephp/typephp_property.cc"
-                ,"src/typephp/typephp_trait.cc"
-                ,"thirdparty/wren-gc/src/wren_gc.c"
+                "src/typephp/typephp_nano.cc",
+                "src/typephp/typephp_property.cc",
+                "src/typephp/typephp_trait.cc",
+                "thirdparty/wren-gc/src/wren_gc.c"
             ]
         }
     }

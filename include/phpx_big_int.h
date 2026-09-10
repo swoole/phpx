@@ -1,12 +1,19 @@
 #pragma once
 
 #include "phpx.h"
+#ifdef PHPX_NANO
+extern "C" {
+struct bc_struct;
+}
+#else
 #include <gmpxx.h>
+#endif
 
 namespace php {
 
 namespace detail {
 
+#ifndef PHPX_NANO
 static inline void setBigIntFromPhpInt(mpz_class &result, php::Int value) noexcept {
     using UnsignedInt = std::make_unsigned_t<php::Int>;
 
@@ -18,11 +25,19 @@ static inline void setBigIntFromPhpInt(mpz_class &result, php::Int value) noexce
         mpz_neg(result.get_mpz_t(), result.get_mpz_t());
     }
 }
+#endif
 
 }  // namespace detail
 
 class BigInt : public Box {
   public:
+#ifdef PHPX_NANO
+    bc_struct *value = nullptr;
+    BigInt();
+    explicit BigInt(const String &s);
+    explicit BigInt(php::Int v);
+    ~BigInt() override;
+#else
     mpz_class value;
     BigInt() = default;
     explicit BigInt(const String &s) {
@@ -33,6 +48,7 @@ class BigInt : public Box {
     explicit BigInt(php::Int v) {
         detail::setBigIntFromPhpInt(value, v);
     }
+#endif
 
     static Variant newInstance(Variant s);
     static Variant add(Variant a, Variant b);

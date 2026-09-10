@@ -516,7 +516,7 @@ static inline zend_array *getCallExtraNamedArgs() {
 }
 
 static inline Variant getCallArg(uint32_t i, const Variant &defaultValue) {
-    if (i >= getCallArgNum()) {
+    if (i >= getCallArgNum() || Z_ISUNDEF_P(ZEND_CALL_ARG(EG(current_execute_data), i + 1))) {
         return defaultValue;
     } else {
         return getCallArg(i);
@@ -524,7 +524,7 @@ static inline Variant getCallArg(uint32_t i, const Variant &defaultValue) {
 }
 
 static inline Reference getCallArgByRef(uint32_t i, const Reference &defaultValue) {
-    if (i >= getCallArgNum()) {
+    if (i >= getCallArgNum() || Z_ISUNDEF_P(ZEND_CALL_ARG(EG(current_execute_data), i + 1))) {
         return defaultValue;
     } else {
         return getCallArgByRef(i);

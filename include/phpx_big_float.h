@@ -1,16 +1,37 @@
 #pragma once
 
 #include "phpx.h"
+#ifdef PHPX_NANO
+extern "C" {
+struct bc_struct;
+}
+#else
 #include <mpfr.h>
+#endif
 #include <string>
 
 namespace php {
 
+#ifdef PHPX_NANO
+inline constexpr size_t BIG_FLOAT_DEFAULT_SCALE = 64;
+#else
 inline constexpr mpfr_prec_t BIG_FLOAT_DEFAULT_PRECISION = 256;
+#endif
 inline constexpr size_t BIG_FLOAT_OUTPUT_DIGITS = 64;
 
 class BigFloat : public Box {
   public:
+#ifdef PHPX_NANO
+    bc_struct *value = nullptr;
+
+    BigFloat();
+    explicit BigFloat(const String &s);
+    explicit BigFloat(const char *s);
+    explicit BigFloat(php::Int v);
+    explicit BigFloat(php::Float v);
+    BigFloat(const BigFloat &other);
+    ~BigFloat() override;
+#else
     mpfr_t value;
 
     BigFloat() {
@@ -46,6 +67,7 @@ class BigFloat : public Box {
     ~BigFloat() override {
         mpfr_clear(value);
     }
+#endif
 
     static Variant newInstance(Variant s);
     static Variant add(Variant a, Variant b);

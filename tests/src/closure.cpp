@@ -38,6 +38,28 @@ TEST(closure, named_arguments_use_declared_parameter_names) {
     ASSERT_STREQ(result.toCString(), "left:7");
 }
 
+TEST(closure, named_arguments_preserve_optional_holes) {
+    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &) -> Variant {
+        return getCallArg(0).concat(getCallArg(1, ":default")).concat(getCallArg(2, ":last"));
+    };
+
+    auto closure = newClosureWithParameters(
+        fn,
+        {},
+        {},
+        nullptr,
+        {{"first", false, false, true},
+         {"middle", false, false, false},
+         {"last", false, false, false}});
+    Args positional;
+    positional.append("value");
+    Array named;
+    named.set("last", ":named");
+
+    auto result = call(closure, positional, named.array());
+    ASSERT_STREQ(result.toCString(), "value:default:named");
+}
+
 TEST(closure, parameter_metadata_preserves_reference_arguments) {
     ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &) -> Variant {
         auto value = getCallArgByRef(0);

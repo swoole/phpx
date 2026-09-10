@@ -22,9 +22,7 @@
  */
 extern "C" {
 #include "php.h"
-#ifndef PHPX_NANO
 #include "zend_ini.h"
-#endif
 #include "zend_enum.h"
 #include "zend_interfaces.h"
 #include "zend_exceptions.h"
@@ -308,11 +306,7 @@ PHPX_API void popDebugFrame();
 PHPX_API void traceDebugInfo(const char *file, int lineno);
 PHPX_API void enableDebugInfo(bool enable = true);
 
-#ifndef PHPX_NANO
 void augmentException();
-#else
-inline void augmentException() {}
-#endif
 
 inline void throwErrorIfOccurred() {
     if (UNEXPECTED(EG(exception) != nullptr)) {
@@ -361,9 +355,7 @@ PHPX_API bool hasStaticProperty(const String &class_name, const String &prop);
 PHPX_API uint32_t getPropertyOffset(const String &class_name, const String &prop);
 PHPX_API uint32_t getPropertyOffset(zend_class_entry *ce, const String &prop);
 
-#ifndef PHPX_NANO
 PHPX_API Int toSize(const String &str);
-#endif
 PHPX_API Array toArray(const Variant &v);
 PHPX_API Object toObject(const Variant &v);
 PHPX_API Object toObject(const Variant &v, const String &class_name);

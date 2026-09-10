@@ -197,7 +197,6 @@ void enableDebugInfo(bool enable) {
     debug_info.enable = enable;
 }
 
-#ifndef PHPX_NANO
 void augmentException() {
     if (!debug_info.enable || debug_info.depth == 0 || !EG(exception)) {
         return;
@@ -244,7 +243,6 @@ void augmentException() {
 
     zend_update_property_ex(EG(exception)->ce, EG(exception), ZSTR_KNOWN(ZEND_STR_TRACE), trace.ptr());
 }
-#endif
 
 Variant constant(const String &name) {
     auto c = zend_get_constant_ex(name.str(), zend_get_executed_scope(), ZEND_FETCH_CLASS_EXCEPTION);
@@ -468,7 +466,6 @@ Object catchException() {
     return result;
 }
 
-#ifndef PHPX_NANO
 Int toSize(const String &str) {
     zend_string *errstr;
     Int size = zend_ini_parse_quantity(str.str(), &errstr);
@@ -478,7 +475,6 @@ Int toSize(const String &str) {
     }
     return size;
 }
-#endif
 
 zend_function *getFunction(const String &name) {
     zend_fcall_info_cache fcc;

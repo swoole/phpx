@@ -163,7 +163,19 @@ inline Bool is_scalar(const Variant &value) {
 }
 
 inline Bool is_countable(const Variant &value) {
+#if PHP_VERSION_ID >= 80600
+    const zval *zv = value.unwrap_ptr();
+    if (Z_TYPE_P(zv) == IS_ARRAY) {
+        return true;
+    }
+    if (Z_TYPE_P(zv) != IS_OBJECT) {
+        return false;
+    }
+    return Z_OBJ_HT_P(zv)->count_elements
+        || zend_class_implements_interface(Z_OBJCE_P(zv), zend_ce_countable);
+#else
     return zend_is_countable(NO_CONST_V(value));
+#endif
 }
 
 inline Bool is_null(const Variant &value) {
