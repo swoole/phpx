@@ -390,6 +390,9 @@ static void initializeProcessState() noexcept {
     const auto initialize = []() noexcept {
         initializeBoxResource();
         detail::initializeClosureCarrierHandlers();
+#ifndef PHPX_NANO
+        python::initializeNativeApi();
+#endif
     };
 #ifdef ZTS
     // Every worker enters request_init(), but Zend's resource registry and

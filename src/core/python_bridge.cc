@@ -1,4 +1,5 @@
 #include "phpx_python.h"
+#include "runtime_init.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -29,6 +30,41 @@ struct NativeApi {
 
 const NativeApi *native_api = nullptr;
 
+using GetNativeApi = const NativeApi *(*) (uint32_t requested_abi);
+
+GetNativeApi fetchNativeApiSymbol(const zend_module_entry &module) noexcept {
+    if (UNEXPECTED(module.handle == nullptr)) {
+        return nullptr;
+    }
+
+    // zend_module_entry keeps the native library handle as void * even on
+    // Windows, where DL_FETCH_SYMBOL() maps to GetProcAddress() and expects an
+    // HMODULE. DL_HANDLE also preserves PHP's dlsym underscore handling on
+    // macOS and other POSIX targets.
+    DL_HANDLE handle = reinterpret_cast<DL_HANDLE>(module.handle);
+    // Keep the symbol a literal: on targets with DLSYM_NEEDS_UNDERSCORE PHP's
+    // macro prefixes it through compile-time string-literal concatenation.
+    return reinterpret_cast<GetNativeApi>(DL_FETCH_SYMBOL(handle, "phpy_get_native_api"));
+}
+
+const NativeApi *resolveApi() {
+    zend_module_entry *module =
+        static_cast<zend_module_entry *>(zend_hash_str_find_ptr(&module_registry, ZEND_STRL("phpy")));
+    if (UNEXPECTED(module == nullptr)) {
+        return nullptr;
+    }
+
+    const GetNativeApi getter = fetchNativeApiSymbol(*module);
+    if (UNEXPECTED(getter == nullptr)) {
+        return nullptr;
+    }
+    const NativeApi *api = getter(native_abi_version);
+    if (UNEXPECTED(api == nullptr || api->abi_version != native_abi_version || api->struct_size < sizeof(NativeApi))) {
+        return nullptr;
+    }
+    return api;
+}
+
 const NativeApi &api() {
     if (UNEXPECTED(native_api == nullptr)) {
         throwError("phpy native API is unavailable or ABI-incompatible");
@@ -53,18 +89,11 @@ Variant takeResult(zval &result, zend_result status) {
 
 }  // namespace
 
-bool installNativeApi(const void *table) noexcept {
-    const auto *candidate = static_cast<const NativeApi *>(table);
-    if (candidate == nullptr || candidate->abi_version != native_abi_version ||
-        candidate->struct_size < sizeof(NativeApi)) {
-        return false;
-    }
-    native_api = candidate;
-    return true;
-}
-
-void clearNativeApi() noexcept {
-    native_api = nullptr;
+void initializeNativeApi() noexcept {
+    // PHP modules and their exported ABI tables are immutable after MINIT.
+    // request_init() publishes this process-wide pointer before user code can
+    // enter the Python bridge.
+    native_api = resolveApi();
 }
 
 void configureRuntime(bool return_as_object) {
