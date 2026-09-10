@@ -21,7 +21,7 @@ TEST(helper, type_error_slow_paths) {
 TEST(helper, exact_call_argument_conversions) {
     ASSERT_EQ(toIntArgExact(42, "Demo::run", 1, "value"), 42);
     ASSERT_DOUBLE_EQ(toFloatArgExact(1.5, "Demo::run", 1, "value"), 1.5);
-    ASSERT_DOUBLE_EQ(toFloatArgExact(static_cast<php::Int>(42), "Demo::run", 1, "value"), 42.0);
+    ASSERT_DOUBLE_EQ(toFloatArgExact(42, "Demo::run", 1, "value"), 42.0);
     ASSERT_TRUE(toBoolArgExact(true, "Demo::run", 1, "value"));
     ASSERT_EQ(toStringArgExact("value", "Demo::run", 1, "value").toStdString(), "value");
 
@@ -38,23 +38,38 @@ TEST(helper, exact_call_argument_conversions) {
 TEST(helper, native_type_fast_path_arg_exact) {
     ASSERT_EQ(toIntArgExact(static_cast<Int>(42), "Demo::run", 1, "value"), 42);
     ASSERT_DOUBLE_EQ(toFloatArgExact(static_cast<Float>(1.5), "Demo::run", 1, "value"), 1.5);
-    ASSERT_DOUBLE_EQ(toFloatArgExact(static_cast<Int>(42), "Demo::run", 1, "value"), 42.0);
     ASSERT_TRUE(toBoolArgExact(true, "Demo::run", 1, "value"));
     ASSERT_FALSE(toBoolArgExact(false, "Demo::run", 1, "value"));
     ASSERT_EQ(toStringArgExact(String("hello"), "Demo::run", 1, "value").toStdString(), "hello");
-    ASSERT_EQ(toStringArgExact("world", "Demo::run", 1, "value").toStdString(), "world");
-    ASSERT_EQ(toStringArgExact(std::string("cpp"), "Demo::run", 1, "value").toStdString(), "cpp");
 }
 
 TEST(helper, native_type_fast_path_exact) {
     ASSERT_EQ(toIntExact(static_cast<Int>(42)), 42);
     ASSERT_DOUBLE_EQ(toFloatExact(static_cast<Float>(1.5)), 1.5);
-    ASSERT_DOUBLE_EQ(toFloatExact(static_cast<Int>(42)), 42.0);
     ASSERT_TRUE(toBoolExact(true));
     ASSERT_FALSE(toBoolExact(false));
     ASSERT_EQ(toStringExact(String("hello")).toStdString(), "hello");
-    ASSERT_EQ(toStringExact("world").toStdString(), "world");
-    ASSERT_EQ(toStringExact(std::string("cpp")).toStdString(), "cpp");
+}
+
+TEST(helper, exact_strict_contract_rejects_implicit_conversions) {
+    try_call([]() { (void) toIntExact(1.9); },
+             "Expected value of type int, float given");
+    try_call([]() { (void) toIntArgExact(1.9, "Demo::run", 1, "value"); },
+             "must be of type int, float given");
+    try_call([]() { (void) toBoolExact(7); },
+             "Expected value of type bool, int given");
+    try_call([]() { (void) toBoolArgExact(7, "Demo::run", 1, "value"); },
+             "must be of type bool, int given");
+    try_call([]() { (void) toBoolExact("x"); },
+             "Expected value of type bool, string given");
+    try_call([]() { (void) toBoolArgExact("x", "Demo::run", 1, "value"); },
+             "must be of type bool, string given");
+    try_call([]() { (void) toFloatArgExact("1.5", "Demo::run", 1, "value"); },
+             "must be of type float, string given");
+    try_call([]() { (void) toIntArgExact("42", "Demo::run", 1, "value"); },
+             "must be of type int, string given");
+    try_call([]() { (void) toStringArgExact(42, "Demo::run", 1, "value"); },
+             "must be of type string, int given");
 }
 
 TEST(helper, exact_call_argument_property_variants) {
