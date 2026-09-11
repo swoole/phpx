@@ -21,7 +21,7 @@ zend_function *reflection_get_target = nullptr;
 zend_function *reflection_is_repeated = nullptr;
 
 uint32_t reflection_hook_install_count = 0;
-thread_local bool last_get_arguments_had_lazy_value = false;
+THREAD_LOCAL bool last_get_arguments_had_lazy_value = false;
 
 static bool is_lazy_value_argument(const zval *value) {
     return Z_TYPE_P(value) == IS_LONG && Z_TYPE_EXTRA_P(value) == typephp_attribute_lazy_value_marker;

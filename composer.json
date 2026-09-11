@@ -69,22 +69,7 @@
                 "src/typephp/typephp_property.cc",
                 "src/typephp/typephp_trait.cc",
                 "thirdparty/wren-gc/src/wren_gc.c"
-            ],
-            "profiles": {
-                "kernel": {
-                    "include-dirs": [
-                        "include",
-                        "thirdparty/wren-gc/include"
-                    ],
-                    "sources": [
-                        "src/core/variant.cc",
-                        "src/core/array.cc",
-                        "src/core/debug.cc",
-                        "src/core/type_check.cc",
-                        "src/typephp/typephp_nano.cc"
-                    ]
-                }
-            }
+            ]
         }
     }
 }

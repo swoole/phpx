@@ -13,6 +13,7 @@
 
 extern "C" int typephp_nano_project_main();
 
+#ifndef TYPEPHP_NO_MAIN
 int main(int argc, char **argv)
 {
     php_nano_set_cli_arguments(argc, argv);
@@ -33,3 +34,4 @@ int main(int argc, char **argv)
     php_nano_shutdown_composer_extensions();
     return exit_code;
 }
+#endif

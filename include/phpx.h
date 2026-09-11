@@ -59,6 +59,7 @@ extern "C" {
 
 #include "phpx_native_gc.h"
 #include "phpx_exception_policy.h"
+#include "phpx_cast_policy.h"
 
 #define IS_STR_OFFSET_SET (1 << 5)
 
@@ -2899,7 +2900,7 @@ T *Variant::toBox() {
         throwError("This resource is not type of `%s`.", box_res_name);
         return nullptr;
     }
-    auto *typed_box = dynamic_cast<T *>(static_cast<Box *>(res->ptr));
+    auto *typed_box = PHPX_POLYMORPHIC_CAST(T *, static_cast<Box *>(res->ptr));
     if (UNEXPECTED(typed_box == nullptr)) {
         throwError("This box resource has an unexpected concrete type.");
         return nullptr;
