@@ -3,8 +3,10 @@
 /*
  * Replaceable exception policy used by PHPX internals. The default policy
  * retains native C++ exceptions. Alternative hosts can provide another
- * propagation model without changing call sites. Hosts built with
- * -fno-exceptions define PHPX_NO_EXCEPTION and provide the abort hook below.
+ * propagation model without changing call sites. Hosts that do not permit
+ * PHPX to propagate C++ exceptions define PHPX_NO_EXCEPTION and provide the
+ * abort hook below; they may additionally compile with -fno-exceptions once
+ * all selected source files follow this policy.
  */
 #ifdef PHPX_NO_EXCEPTION
 extern "C" ZEND_NORETURN void phpx_no_exception_abort(const char *message);

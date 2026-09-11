@@ -58,6 +58,7 @@
                 "src/std/core.cc",
                 "src/std/array.cc",
                 "src/std/datetime.cc",
+                "src/std/fs.cc",
                 "src/std/hash.cc",
                 "src/std/math.cc",
                 "src/std/misc.cc",
