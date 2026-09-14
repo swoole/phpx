@@ -52,6 +52,9 @@ struct NativeTypeDescriptor {
     NativeDestroyFn destroy;
 };
 
+/** Capture an exception swallowed by a generated C++ Native constructor. */
+PHPX_API void nativeConstructorFailed() noexcept;
+
 class PHPX_API NativeConstructorGuard final {
   public:
     NativeConstructorGuard() noexcept;
@@ -72,9 +75,6 @@ class PHPX_API NativeConstructorGuard final {
     NativeConstructorGuard *previous_;
     std::exception_ptr exception_;
 };
-
-/** Capture an exception swallowed by a generated C++ Native constructor. */
-PHPX_API void nativeConstructorFailed() noexcept;
 
 /**
  * Per-subobject PHP destructor state.
