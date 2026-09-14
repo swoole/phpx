@@ -70,7 +70,55 @@
                 "src/typephp/typephp_property.cc",
                 "src/typephp/typephp_trait.cc",
                 "thirdparty/wren-gc/src/wren_gc.c"
-            ]
+            ],
+            "components": {
+                "standard.core": {
+                    "extension": "standard",
+                    "sources": ["src/std/core.cc"]
+                },
+                "standard.array": {
+                    "extension": "standard",
+                    "requires": ["standard.core"],
+                    "sources": ["src/std/array.cc"]
+                },
+                "standard.string": {
+                    "extension": "standard",
+                    "requires": ["standard.core"],
+                    "sources": ["src/std/string.cc"]
+                },
+                "standard.filesystem": {
+                    "extension": "standard",
+                    "requires": ["standard.core"],
+                    "sources": ["src/std/fs.cc"]
+                },
+                "standard.math": {
+                    "extension": "standard",
+                    "requires": ["standard.core"],
+                    "sources": ["src/std/math.cc"]
+                },
+                "standard.hash": {
+                    "extension": "standard",
+                    "requires": ["standard.core"],
+                    "sources": ["src/std/hash.cc"]
+                },
+                "standard.misc": {
+                    "extension": "standard",
+                    "requires": ["standard.core"],
+                    "sources": ["src/std/misc.cc"]
+                },
+                "date": {
+                    "extension": "date",
+                    "sources": ["src/std/datetime.cc"]
+                },
+                "bcmath": {
+                    "extension": "bcmath",
+                    "sources": [
+                        "src/core/big_float_nano.cc",
+                        "src/core/big_int_nano.cc",
+                        "src/core/decimal_nano.cc"
+                    ]
+                }
+            }
         }
     }
 }
