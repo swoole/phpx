@@ -7,6 +7,8 @@
 #pragma once
 
 #include <cstddef>
+#include <cstring>
+#include <exception>
 #include <new>
 #include <type_traits>
 #include <utility>
@@ -37,6 +39,7 @@ class NativeMarker final {
 
 using NativeTraceFn = void (*)(void *object, NativeMarker &marker);
 using NativeFinalizeFn = void (*)(void *object);
+using NativeSuppressFinalizeFn = void (*)(void *object) noexcept;
 using NativeDestroyFn = void (*)(void *object) noexcept;
 
 struct NativeTypeDescriptor {
@@ -45,7 +48,64 @@ struct NativeTypeDescriptor {
     size_t alignment;
     NativeTraceFn trace;
     NativeFinalizeFn finalize;
+    NativeSuppressFinalizeFn suppressFinalize;
     NativeDestroyFn destroy;
+};
+
+class PHPX_API NativeConstructorGuard final {
+  public:
+    NativeConstructorGuard() noexcept;
+    ~NativeConstructorGuard() noexcept;
+
+    NativeConstructorGuard(const NativeConstructorGuard &) = delete;
+    NativeConstructorGuard &operator=(const NativeConstructorGuard &) = delete;
+
+    bool failed() const noexcept {
+        return exception_ != nullptr;
+    }
+
+    [[noreturn]] void rethrow();
+
+  private:
+    friend void nativeConstructorFailed() noexcept;
+
+    NativeConstructorGuard *previous_;
+    std::exception_ptr exception_;
+};
+
+/** Capture an exception swallowed by a generated C++ Native constructor. */
+PHPX_API void nativeConstructorFailed() noexcept;
+
+/**
+ * Per-subobject PHP destructor state.
+ *
+ * A C++ copy represents a PHP clone and must start with a fresh finalization
+ * state even when the source object was resurrected from its destructor.
+ */
+class NativeDestructorState final {
+  public:
+    NativeDestructorState() noexcept = default;
+    NativeDestructorState(const NativeDestructorState &) noexcept {}
+
+    NativeDestructorState &operator=(const NativeDestructorState &) noexcept {
+        finalized_ = false;
+        return *this;
+    }
+
+    bool beginFinalize() noexcept {
+        if (finalized_) {
+            return false;
+        }
+        finalized_ = true;
+        return true;
+    }
+
+    void suppress() noexcept {
+        finalized_ = true;
+    }
+
+  private:
+    bool finalized_ = false;
 };
 
 /**
@@ -232,6 +292,104 @@ class NativeContainerRootFrame final : private NativeContainerRootFrameBase {
     }
 };
 
+/**
+ * Function-local storage for a Native Object proven not to escape.
+ *
+ * The object itself is not a Wren allocation. Its Native Object properties
+ * must nevertheless remain roots while the slot is alive, so this slot traces
+ * outgoing edges through the ordinary generated type descriptor.
+ *
+ * PHP-level __destruct() is intentionally not handled here. The compiler only
+ * selects stack storage for descriptors without a finalizer.
+ */
+template <typename T>
+class NativeStackSlot final {
+  public:
+    explicit NativeStackSlot(const NativeTypeDescriptor &type) noexcept : type_(type), roots_(this, traceSlot) {
+        static_assert(std::is_nothrow_destructible_v<T>, "Stack-promoted Native Objects must be nothrow destructible");
+        ZEND_ASSERT(type_.size == sizeof(T));
+        ZEND_ASSERT(type_.alignment == alignof(T));
+        ZEND_ASSERT(type_.finalize == nullptr);
+    }
+
+    ~NativeStackSlot() noexcept = default;
+
+    NativeStackSlot(const NativeStackSlot &) = delete;
+    NativeStackSlot &operator=(const NativeStackSlot &) = delete;
+
+    template <typename Initializer>
+    T *construct(Initializer &&initializer) {
+        ZEND_ASSERT(storage_.object == nullptr);
+        storage_.object = new (storage_.bytes) T();
+        try {
+            std::forward<Initializer>(initializer)(*storage_.object);
+            return storage_.object;
+        } catch (...) {
+            // Escape analysis guarantees that a promoted receiver was not
+            // published by its constructor. Match nativeConstruct() by
+            // releasing a failed construction immediately instead of keeping
+            // its PHPX fields alive until the enclosing function returns.
+            storage_.object->~T();
+            storage_.object = nullptr;
+            throw;
+        }
+    }
+
+    template <typename... Args>
+    T *constructObject(Args &&...args) {
+        ZEND_ASSERT(storage_.object == nullptr);
+        std::memset(storage_.bytes, 0, sizeof(storage_.bytes));
+        T *object = reinterpret_cast<T *>(storage_.bytes);
+        storage_.object = object;
+        bool constructed = false;
+        NativeConstructorGuard guard;
+        try {
+            new (storage_.bytes) T(std::forward<Args>(args)...);
+            constructed = true;
+            if (guard.failed()) {
+                guard.rethrow();
+            }
+            return object;
+        } catch (...) {
+            if (constructed) {
+                object->~T();
+            }
+            storage_.object = nullptr;
+            throw;
+        }
+    }
+
+    T *get() noexcept {
+        return storage_.object;
+    }
+
+  private:
+    struct Storage final {
+        ~Storage() noexcept {
+            if (object != nullptr) {
+                object->~T();
+            }
+        }
+
+        alignas(T) unsigned char bytes[sizeof(T)];
+        T *object = nullptr;
+    };
+
+    static void traceSlot(const void *slot, NativeMarker &marker) noexcept {
+        const auto *self = static_cast<const NativeStackSlot *>(slot);
+        if (self->storage_.object != nullptr && self->type_.trace != nullptr) {
+            self->type_.trace(self->storage_.object, marker);
+        }
+    }
+
+    const NativeTypeDescriptor &type_;
+    // roots_ is declared after storage_ so it unlinks before Storage destroys
+    // the C++ object. A member destructor may invoke PHP code and trigger a GC;
+    // the collector must never trace a partially destroyed stack object.
+    Storage storage_;
+    NativeContainerRootFrameBase roots_;
+};
+
 struct NativeGcStats {
     size_t bytesAllocated;
     size_t nextCollection;
@@ -300,11 +458,65 @@ T *nativeConstruct(const NativeTypeDescriptor &type, Initializer &&initializer) 
                 // throws. Keep that fully allocated object alive, but suppress
                 // its user destructor just like Zend does for a failed ctor.
                 nativeGcSuppressFinalizer(object);
+                if (type.suppressFinalize != nullptr) {
+                    type.suppressFinalize(object);
+                }
             } else {
+                if (type.suppressFinalize != nullptr) {
+                    type.suppressFinalize(object);
+                }
                 object->~T();
                 nativeGcAbandon(storage);
             }
         } else {
+            nativeGcAbandon(storage);
+        }
+        throw;
+    }
+}
+
+/**
+ * Allocate and root storage before invoking a generated C++ constructor.
+ *
+ * Generated constructors swallow their PHP body exception through
+ * nativeConstructorFailed(), allowing a published `$this` to remain a fully
+ * constructed object. This helper then applies the ordinary PHP constructor
+ * failure policy and rethrows the captured exception.
+ */
+template <typename T, typename... Args>
+T *nativeConstructObject(const NativeTypeDescriptor &type, Args &&...args) {
+    void *storage = nativeGcAllocate(type);
+    std::memset(storage, 0, type.size);
+    T *object = static_cast<T *>(storage);
+    NativeConstructorGuard guard;
+    bool constructed = false;
+    try {
+        {
+            NativeRootSlot slots[] = {&object};
+            NativeRootFrame roots(slots, 1);
+            new (storage) T(std::forward<Args>(args)...);
+            constructed = true;
+        }
+        if (!guard.failed()) {
+            return object;
+        }
+
+        if (nativeGcIsReachable(object)) {
+            nativeGcSuppressFinalizer(object);
+            if (type.suppressFinalize != nullptr) {
+                type.suppressFinalize(object);
+            }
+        } else {
+            if (type.suppressFinalize != nullptr) {
+                type.suppressFinalize(object);
+            }
+            object->~T();
+            nativeGcAbandon(storage);
+            object = nullptr;
+        }
+        guard.rethrow();
+    } catch (...) {
+        if (!constructed) {
             nativeGcAbandon(storage);
         }
         throw;

@@ -21,6 +21,7 @@ THREAD_LOCAL size_t native_root_request_epoch = 0;
 THREAD_LOCAL std::vector<NativeRootSlot> native_request_roots;
 THREAD_LOCAL zend_object *pending_zend_exception = nullptr;
 THREAD_LOCAL std::exception_ptr pending_cpp_exception;
+THREAD_LOCAL NativeConstructorGuard *native_constructor_guard = nullptr;
 
 size_t objectSize(const void *typeData) noexcept;
 bool hasFinalizer(const void *typeData) noexcept;
@@ -146,6 +147,25 @@ void discardPendingFinalizerException() noexcept {
     }
 }
 }  // namespace
+
+NativeConstructorGuard::NativeConstructorGuard() noexcept : previous_(native_constructor_guard) {
+    native_constructor_guard = this;
+}
+
+NativeConstructorGuard::~NativeConstructorGuard() noexcept {
+    native_constructor_guard = previous_;
+}
+
+void NativeConstructorGuard::rethrow() {
+    std::rethrow_exception(exception_);
+}
+
+void nativeConstructorFailed() noexcept {
+    ZEND_ASSERT(native_constructor_guard != nullptr);
+    if (native_constructor_guard != nullptr && native_constructor_guard->exception_ == nullptr) {
+        native_constructor_guard->exception_ = std::current_exception();
+    }
+}
 
 NativeRootFrame::NativeRootFrame(NativeRootSlot *slots, size_t count) noexcept
     : previous_(native_root_top),

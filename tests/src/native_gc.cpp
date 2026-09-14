@@ -38,6 +38,17 @@ const php::NativeTypeDescriptor nativeNodeType = {
     alignof(NativeGcNode),
     traceNativeNode,
     finalizeNativeNode,
+    nullptr,
+    destroyNativeNode,
+};
+
+const php::NativeTypeDescriptor stackNativeNodeType = {
+    "StackNativeGcNode",
+    sizeof(NativeGcNode),
+    alignof(NativeGcNode),
+    traceNativeNode,
+    nullptr,
+    nullptr,
     destroyNativeNode,
 };
 
@@ -55,6 +66,7 @@ const php::NativeTypeDescriptor shutdownResurrectionType = {
     alignof(NativeGcNode),
     traceNativeNode,
     finalizeAndResurrectAtShutdown,
+    nullptr,
     destroyNativeNode,
 };
 
@@ -70,6 +82,7 @@ const php::NativeTypeDescriptor resurrectionType = {
     alignof(NativeGcNode),
     traceNativeNode,
     finalizeAndResurrect,
+    nullptr,
     destroyNativeNode,
 };
 
@@ -84,6 +97,7 @@ const php::NativeTypeDescriptor throwingFinalizerType = {
     alignof(NativeGcNode),
     traceNativeNode,
     finalizeAndThrow,
+    nullptr,
     destroyNativeNode,
 };
 
@@ -98,6 +112,7 @@ const php::NativeTypeDescriptor throwingZendFinalizerType = {
     alignof(NativeGcNode),
     traceNativeNode,
     finalizeAndThrowZend,
+    nullptr,
     destroyNativeNode,
 };
 }  // namespace
@@ -136,6 +151,52 @@ TEST(native_gc, root_frame_traces_native_graph) {
     EXPECT_EQ(0u, php::nativeGcStats().objectCount);
     EXPECT_EQ(2, counters.finalized);
     EXPECT_EQ(2, counters.destroyed);
+}
+
+TEST(native_gc, stack_slot_avoids_heap_allocation_and_traces_children) {
+    NativeGcCounters counters;
+    const size_t objectCountBefore = php::nativeGcStats().objectCount;
+
+    {
+        php::NativeStackSlot<NativeGcNode> slot(stackNativeNodeType);
+        NativeGcNode *root = slot.construct([&](NativeGcNode &node) {
+            node.counters = &counters;
+            node.child = php::nativeNew<NativeGcNode>(nativeNodeType);
+            node.child->counters = &counters;
+        });
+
+        EXPECT_EQ(root, slot.get());
+        EXPECT_EQ(objectCountBefore + 1, php::nativeGcStats().objectCount);
+        php::nativeGcCollect();
+        EXPECT_EQ(objectCountBefore + 1, php::nativeGcStats().objectCount);
+        EXPECT_EQ(0, counters.destroyed);
+    }
+
+    php::nativeGcCollect();
+    EXPECT_EQ(objectCountBefore, php::nativeGcStats().objectCount);
+    EXPECT_EQ(1, counters.finalized);
+    EXPECT_EQ(1, counters.destroyed);
+}
+
+TEST(native_gc, stack_slot_releases_failed_construction_immediately) {
+    NativeGcCounters counters;
+    const size_t objectCountBefore = php::nativeGcStats().objectCount;
+    php::NativeStackSlot<NativeGcNode> slot(stackNativeNodeType);
+
+    EXPECT_THROW(slot.construct([&](NativeGcNode &node) {
+        node.counters = &counters;
+        node.child = php::nativeNew<NativeGcNode>(nativeNodeType);
+        node.child->counters = &counters;
+        throw std::runtime_error("stack construction failure");
+    }),
+                 std::runtime_error);
+
+    EXPECT_EQ(nullptr, slot.get());
+    EXPECT_EQ(objectCountBefore + 1, php::nativeGcStats().objectCount);
+    php::nativeGcCollect();
+    EXPECT_EQ(objectCountBefore, php::nativeGcStats().objectCount);
+    EXPECT_EQ(1, counters.finalized);
+    EXPECT_EQ(1, counters.destroyed);
 }
 
 TEST(native_gc, root_frames_survive_non_lifo_fiber_lifetimes) {
@@ -389,6 +450,16 @@ TEST(native_gc, failed_published_construction_survives_without_finalizer) {
     php::nativeGcCollect();
     EXPECT_EQ(0, counters.finalized);
     EXPECT_EQ(1, counters.destroyed);
+}
+
+TEST(native_gc, copied_destructor_state_starts_unfinalized) {
+    php::NativeDestructorState source;
+    EXPECT_TRUE(source.beginFinalize());
+    EXPECT_FALSE(source.beginFinalize());
+
+    php::NativeDestructorState copy(source);
+    EXPECT_TRUE(copy.beginFinalize());
+    EXPECT_FALSE(copy.beginFinalize());
 }
 
 TEST(native_gc, finalizer_chain_runs_all_callbacks_and_preserves_first_cpp_exception) {
