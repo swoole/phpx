@@ -16,12 +16,12 @@ zend_fcall_info_cache *copyCallCacheEntry(const zend_fcall_info_cache &cache) {
     return copy;
 }
 
-php::Variant invokeCached(const php::Variant &callable,
-                          zend_object *object,
-                          zend_fcall_info_cache *cache,
-                          uint32_t param_count,
-                          zval *params,
-                          zend_array *named_args) {
+php::Variant invokeResolved(const php::Variant &callable,
+                            zend_object *object,
+                            zend_fcall_info_cache *cache,
+                            uint32_t param_count,
+                            zval *params,
+                            zend_array *named_args) {
     php::Variant retval{};
     zend_fcall_info fci{};
     fci.size = sizeof(fci);
@@ -38,6 +38,51 @@ php::Variant invokeCached(const php::Variant &callable,
     zend_call_function(&fci, cache);
     php::throwErrorIfOccurred();
     return retval;
+}
+
+php::Variant invokeCached(const php::Variant &callable,
+                          zend_object *object,
+                          zend_fcall_info_cache *cache,
+                          uint32_t param_count,
+                          zval *params,
+                          zend_array *named_args) {
+    // A trampoline forwards inaccessible/missing method calls to __call().
+    // Its arguments are always passed by value, even when a statically known
+    // protected declaration led TypePHP to prepare a reference for a possible
+    // compatible public override. Dereference copies here after resolving the
+    // actual runtime callable so the override and __call() paths can share one
+    // compiled call site without leaking references into __call() arguments.
+    if (UNEXPECTED(cache->function_handler->common.fn_flags & ZEND_ACC_CALL_VIA_TRAMPOLINE)) {
+        php::Args trampoline_params;
+        for (uint32_t i = 0; i < param_count; i++) {
+            const zval *param = &params[i];
+            ZVAL_DEREF(param);
+            trampoline_params.append(param);
+        }
+        params = trampoline_params.ptr();
+
+        if (named_args != nullptr) {
+            php::Array trampoline_named_args;
+            zend_string *key;
+            zval *value;
+            ZEND_HASH_FOREACH_STR_KEY_VAL(named_args, key, value) {
+                ZEND_ASSERT(key != nullptr);
+                trampoline_named_args.setValue(php::String(key), php::Variant(value, php::Ctor::CopyRef));
+            }
+            ZEND_HASH_FOREACH_END();
+            return invokeResolved(
+                callable,
+                object,
+                cache,
+                param_count,
+                params,
+                trampoline_named_args.array());
+        }
+
+        return invokeResolved(callable, object, cache, param_count, params, nullptr);
+    }
+
+    return invokeResolved(callable, object, cache, param_count, params, named_args);
 }
 
 zend_fcall_info_cache resolveCallable(const php::Variant &callable,

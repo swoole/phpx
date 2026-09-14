@@ -176,6 +176,43 @@ TEST(typephp_call, scoped_method_cache_guards_lexical_and_called_scope) {
               "magic-hidden:4");
 }
 
+TEST(typephp_call, magic_trampoline_dereferences_prepared_reference_arguments) {
+    eval(R"PHP(
+        class PhpxCachedReferenceDispatch {
+            public function mutate(array &$events): void { $events[] = 'real'; }
+            public function __call(string $name, array $args): void {
+                if (array_key_exists(0, $args)) {
+                    $args[0][] = 'magic-positional';
+                }
+                if (array_key_exists('events', $args)) {
+                    $args['events'][] = 'magic-named';
+                }
+            }
+        }
+    )PHP");
+
+    Variant target = eval("return new PhpxCachedReferenceDispatch();");
+    MethodCallCacheSlot cache;
+
+    Array real_events;
+    Reference real_reference = real_events.toReference();
+    typephp_call_method_cached(target, "mutate", cache, VarList{&real_reference});
+    ASSERT_EQ(real_events.count(), 1);
+    EXPECT_STREQ(real_events.get(0).toCString(), "real");
+
+    Array positional_events;
+    Reference positional_reference = positional_events.toReference();
+    typephp_call_method_cached(target, "missing", cache, VarList{&positional_reference});
+    EXPECT_TRUE(positional_events.empty());
+
+    Array named_events;
+    Reference named_reference = named_events.toReference();
+    Array named_args;
+    named_args.set("events", named_reference);
+    typephp_call_method_cached(target, "missing", cache, VarList{}, named_args.array());
+    EXPECT_TRUE(named_events.empty());
+}
+
 TEST(typephp_call, call_caches_accept_indirect_receivers_and_names) {
     eval(R"PHP(
         class PhpxIndirectCachedCall {
