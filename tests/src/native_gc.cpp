@@ -131,6 +131,47 @@ TEST(wren_gc, uses_stable_native_heap_defaults) {
     wren_gc_heap_free(heap);
 }
 
+TEST(native_gc, constructor_guard_preserves_the_first_exception) {
+    php::NativeConstructorGuard guard;
+    EXPECT_FALSE(guard.failed());
+    for (const char *message : {"first constructor failure", "second constructor failure"}) {
+        try {
+            throw std::runtime_error(message);
+        } catch (...) {
+            php::nativeConstructorFailed();
+        }
+    }
+    ASSERT_TRUE(guard.failed());
+    try {
+        guard.rethrow();
+        FAIL() << "Expected the captured constructor exception";
+    } catch (const std::runtime_error &error) {
+        EXPECT_STREQ(error.what(), "first constructor failure");
+    }
+}
+
+TEST(native_gc, nested_constructor_guard_restores_the_outer_guard) {
+    php::NativeConstructorGuard outer;
+    {
+        php::NativeConstructorGuard inner;
+        try {
+            throw std::runtime_error("inner constructor failure");
+        } catch (...) {
+            php::nativeConstructorFailed();
+        }
+        EXPECT_TRUE(inner.failed());
+        EXPECT_FALSE(outer.failed());
+        EXPECT_THROW(inner.rethrow(), std::runtime_error);
+    }
+    try {
+        throw std::logic_error("outer constructor failure");
+    } catch (...) {
+        php::nativeConstructorFailed();
+    }
+    EXPECT_TRUE(outer.failed());
+    EXPECT_THROW(outer.rethrow(), std::logic_error);
+}
+
 TEST(native_gc, root_frame_traces_native_graph) {
     NativeGcCounters counters;
     NativeGcNode *root = php::nativeNew<NativeGcNode>(nativeNodeType);

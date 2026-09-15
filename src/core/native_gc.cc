@@ -156,6 +156,10 @@ NativeConstructorGuard::~NativeConstructorGuard() noexcept {
     native_constructor_guard = previous_;
 }
 
+bool NativeConstructorGuard::failed() const noexcept {
+    return exception_ != nullptr;
+}
+
 void NativeConstructorGuard::rethrow() {
     std::rethrow_exception(exception_);
 }

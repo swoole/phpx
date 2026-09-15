@@ -55,19 +55,19 @@ struct NativeTypeDescriptor {
 /** Capture an exception swallowed by a generated C++ Native constructor. */
 PHPX_API void nativeConstructorFailed() noexcept;
 
-class PHPX_API NativeConstructorGuard final {
+// Export operations, not the class containing a private STL implementation
+// type. All exception_ptr access and lifetime management stay inside PHPX.
+class NativeConstructorGuard final {
   public:
-    NativeConstructorGuard() noexcept;
-    ~NativeConstructorGuard() noexcept;
+    PHPX_API NativeConstructorGuard() noexcept;
+    PHPX_API ~NativeConstructorGuard() noexcept;
 
     NativeConstructorGuard(const NativeConstructorGuard &) = delete;
     NativeConstructorGuard &operator=(const NativeConstructorGuard &) = delete;
 
-    bool failed() const noexcept {
-        return exception_ != nullptr;
-    }
+    PHPX_API bool failed() const noexcept;
 
-    [[noreturn]] void rethrow();
+    [[noreturn]] PHPX_API void rethrow();
 
   private:
     friend void nativeConstructorFailed() noexcept;
