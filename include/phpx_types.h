@@ -74,7 +74,7 @@ class String;
 class Args;
 class FixedArgs;
 template <size_t N>
-class VarList;
+struct VarList;
 class Reference;
 class Box;
 
