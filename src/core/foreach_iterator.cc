@@ -76,6 +76,7 @@ ForeachIterator::ForeachIterator(const Variant &iterable, bool by_ref, zend_clas
             PHPX_TRY {
                 object_iterator_->funcs->rewind(object_iterator_);
             } PHPX_CATCH(zend_object *, exception) {
+                (void) exception;
                 zend_iterator_dtor(object_iterator_);
                 object_iterator_ = nullptr;
                 PHPX_RETHROW();

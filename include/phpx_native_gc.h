@@ -70,7 +70,7 @@ class NativeConstructorGuard final {
     [[noreturn]] PHPX_API void rethrow();
 
   private:
-    friend void nativeConstructorFailed() noexcept;
+    friend PHPX_API void nativeConstructorFailed() noexcept;
 
     NativeConstructorGuard *previous_;
     std::exception_ptr exception_;
