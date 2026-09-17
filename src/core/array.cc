@@ -42,6 +42,38 @@ int arrayDataCompare(Bucket *f, Bucket *s) {
 
 namespace php {
 
+Array toTypedArray(const Array &values,
+                   bool string_keys,
+                   TypedArrayValueType value_type,
+                   zend_class_entry *value_class) {
+    for (auto entry : values) {
+        if (string_keys ? !entry.key.isString() : !entry.key.isInt()) {
+            throwExceptionEx(zend_ce_type_error, 0,
+                             "Typed array key must be %s, %s given",
+                             string_keys ? "string" : "int", entry.key.typeStr());
+        }
+        const bool valid = [&]() {
+            switch (value_type) {
+                case TypedArrayValueType::Int: return entry.value.isInt();
+                case TypedArrayValueType::Float: return entry.value.isFloat();
+                case TypedArrayValueType::Bool: return entry.value.isBool();
+                case TypedArrayValueType::String: return entry.value.isString();
+                case TypedArrayValueType::Array: return entry.value.isArray();
+                case TypedArrayValueType::Object:
+                    return entry.value.isObject()
+                        && (value_class == nullptr || instanceof_function(entry.value.ce(), value_class));
+                case TypedArrayValueType::Any: return true;
+            }
+            return false;
+        }();
+        if (!valid) {
+            throwExceptionEx(zend_ce_type_error, 0,
+                             "Typed array value has incompatible type %s", entry.value.typeStr());
+        }
+    }
+    return values;
+}
+
 void Array::sort(bool renumber) {
     auto zarr = unwrap_ptr();
     SEPARATE_ARRAY(zarr);

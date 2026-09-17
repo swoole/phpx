@@ -361,6 +361,11 @@ PHPX_API uint32_t getPropertyOffset(zend_class_entry *ce, const String &prop);
 
 PHPX_API Int toSize(const String &str);
 PHPX_API Array toArray(const Variant &v);
+enum class TypedArrayValueType : uint8_t { Int, Float, Bool, String, Array, Object, Any };
+PHPX_API Array toTypedArray(const Array &values,
+                            bool string_keys,
+                            TypedArrayValueType value_type,
+                            zend_class_entry *value_class = nullptr);
 PHPX_API Object toObject(const Variant &v);
 PHPX_API Object toObject(const Variant &v, const String &class_name);
 
