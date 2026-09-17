@@ -1138,7 +1138,7 @@ Variant Variant::item(const Variant &key, bool update) {
                 retval = zend_hash_next_index_insert(Z_ARRVAL_P(zvar), undef());
             } else {
                 auto skey = key.toString();
-                retval = zend_hash_update(Z_ARRVAL_P(zvar), skey.str(), undef());
+                retval = zend_symtable_update(Z_ARRVAL_P(zvar), skey.str(), undef());
             }
         } else {
             throwError("Only array/object/string support the item() method, type `%s` given", typeStr());

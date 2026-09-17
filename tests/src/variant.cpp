@@ -1483,6 +1483,27 @@ TEST(variant, itemUpdate2) {
     ASSERT_EQ(arr4.offsetGet(sk).toInt(), 2026);
 }
 
+TEST(variant, itemUpdateNumericStringKeyOnNewArray) {
+    var values = nullptr;
+    values.item(Variant("1"), true) = "one";
+    ASSERT_TRUE(values.isArray());
+    ASSERT_EQ(values.length(), 1);
+    ASSERT_STREQ(values.item(1).toCString(), "one");
+    values.offsetUnset("1");
+    ASSERT_EQ(values.length(), 0);
+
+    var other = nullptr;
+    other.item(String("2"), true) = "two";
+    ASSERT_STREQ(other.item(2).toCString(), "two");
+    other.offsetUnset(2);
+    ASSERT_EQ(other.length(), 0);
+
+    var leadingZero = nullptr;
+    leadingZero.item(Variant("01"), true) = "text";
+    ASSERT_STREQ(leadingZero.item("01").toCString(), "text");
+    ASSERT_TRUE(leadingZero.item(1).isNull());
+}
+
 TEST(variant, append) {
     auto arr = create_list();
     var v = arr;
