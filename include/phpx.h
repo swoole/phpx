@@ -301,6 +301,8 @@ PHPX_API bool empty(const Variant &v, const OperationChain &list);
 PHPX_API bool empty(const Variant &v, const OperationChain &list, Variant &result);
 PHPX_API bool exists(const Variant &v, const OperationChain &list);
 PHPX_API bool exists(const Variant &v, const OperationChain &list, Variant &result);
+PHPX_API void unset(Variant &v, const OperationChain &list);
+PHPX_API void unset(Variant &&v, const OperationChain &list);
 PHPX_API Reference toReference(const Variant &v, const OperationChain &list);
 
 PHPX_API void pushDebugFrame(const char *file, int lineno, const char *function = nullptr);

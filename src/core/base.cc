@@ -1117,6 +1117,95 @@ bool exists(const Variant &v, const OperationChain &list) {
     return exists_impl(v, list, tmp, false);
 }
 
+void unset(Variant &v, const OperationChain &list) {
+    if (list.size() == 0) {
+        throwError("unset() requires a non-empty operation chain");
+        return;
+    }
+
+    // Keep each step bound to its source slot. Ordinary Variant copies would
+    // detach nested arrays, so offsetUnset() would only change a temporary.
+    std::vector<Variant> path;
+    path.reserve(list.size());
+    path.emplace_back(v.unwrap_ptr(), Ctor::Indirect);
+
+    const auto append_path = [&path](Variant &&next) {
+        // Variant's move constructor intentionally materializes an indirect
+        // value. Keep the borrowed slot instead, or later mutations would
+        // only affect a detached copy.
+        if (next.isIndirect()) {
+            path.emplace_back(next.direct_ptr(), Ctor::Indirect);
+        } else {
+            path.emplace_back(std::move(next));
+        }
+    };
+
+    size_t index = 0;
+    for (const auto &expr : list) {
+        Variant &current = path.back();
+        if (current.isNull() || current.isUndef()) {
+            return;
+        }
+        const bool last = ++index == list.size();
+        if (expr.first == ArrayDimFetch) {
+            if (!current.isArray() && !current.isObject()) {
+                throwError("Cannot unset offsets");
+                return;
+            }
+            // An array's null key denotes "", whereas item(key, true)
+            // normally treats null as append. Object dimension handlers must
+            // still receive the original null key.
+            Variant empty_key;
+            const Variant &key = current.isArray() && expr.second.isNull()
+                ? (empty_key = "")
+                : expr.second;
+            if (last) {
+                current.offsetUnset(key);
+                return;
+            }
+
+            if (current.isArray()) {
+                // Probe without separating or creating a missing bucket. A
+                // successful update lookup then separates the parent array
+                // before returning an indirect wrapper for its child slot.
+                Variant existing = current.item(key);
+                if (existing.isNull() || existing.isUndef()) {
+                    return;
+                }
+                append_path(current.item(key, true));
+            } else {
+                // ArrayAccess must be fetched only once: offsetGet may have
+                // side effects and a writable reference may be returned.
+                Variant next = current.item(key, true);
+                if (next.isNull() || next.isUndef()) {
+                    return;
+                }
+                append_path(std::move(next));
+            }
+        } else if (expr.first == PropertyFetch) {
+            if (!current.isObject()) {
+                throwError("Cannot unset property on a non-object value");
+                return;
+            }
+            if (last) {
+                current.unsetProperty(expr.second);
+                return;
+            }
+            Variant next = current.attr(expr.second, AttrMode::Isset);
+            if (next.isNull() || next.isUndef()) {
+                return;
+            }
+            append_path(std::move(next));
+        } else {
+            abort();
+        }
+    }
+}
+
+void unset(Variant &&v, const OperationChain &list) {
+    unset(v, list);
+}
+
 Reference toReference(const Variant &v, const OperationChain &list) {
     std::vector<Variant> path;
     path.reserve(list.size());

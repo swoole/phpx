@@ -474,6 +474,54 @@ TEST(base_extra, exists_with_result) {
     ASSERT_FALSE(php::exists(v, {{ArrayDimFetch, "nonexistent"}}, result));
 }
 
+TEST(base_extra, unset_with_chain) {
+    Array inner;
+    inner.set("keep", 1);
+    inner.set("remove", 2);
+    Array outer;
+    outer.set("nested", inner);
+    Array copied = outer;
+
+    php::unset(outer, {{ArrayDimFetch, "nested"}, {ArrayDimFetch, "remove"}});
+    ASSERT_FALSE(outer.get("nested").item("remove").isInt());
+    ASSERT_EQ(outer.get("nested").item("keep").toInt(), 1);
+    ASSERT_EQ(copied.get("nested").item("remove").toInt(), 2);
+
+    php::unset(outer, {{ArrayDimFetch, "missing"}, {ArrayDimFetch, "leaf"}});
+    ASSERT_FALSE(outer.exists("missing"));
+
+    Array null_key_parent;
+    null_key_parent.set("", inner);
+    php::unset(null_key_parent, {{ArrayDimFetch, nullptr}, {ArrayDimFetch, "remove"}});
+    ASSERT_FALSE(null_key_parent.get("").item("remove").isInt());
+    ASSERT_EQ(null_key_parent.count(), 1);
+
+    Object object = newObject("stdClass");
+    object.setProperty("data", outer);
+    php::unset(object, {{PropertyFetch, "data"}, {ArrayDimFetch, "nested"}, {ArrayDimFetch, "keep"}});
+    ASSERT_FALSE(object.getProperty("data").item("nested").item("keep").isInt());
+    php::unset(object, {{PropertyFetch, "missing"}, {ArrayDimFetch, "leaf"}});
+
+    Variant null_value;
+    php::unset(null_value, {{ArrayDimFetch, "leaf"}});
+    ASSERT_TRUE(null_value.isNull());
+
+    try_call([&]() {
+        Variant scalar = 7;
+        php::unset(scalar, {{ArrayDimFetch, "leaf"}});
+    }, "Cannot unset offsets");
+    try_call([&]() {
+        Array with_scalar;
+        with_scalar.set("scalar", 7);
+        php::unset(with_scalar, {{ArrayDimFetch, "scalar"}, {ArrayDimFetch, "leaf"}});
+    }, "Cannot unset offsets");
+    try_call([&]() {
+        Variant string = "value";
+        php::unset(string, {{ArrayDimFetch, 0}});
+    }, "Cannot unset offsets");
+    try_call([&]() { php::unset(outer, {}); }, "non-empty operation chain");
+}
+
 // Test call via string function name
 TEST(base_extra, call_string_func) {
     var fn("php_uname");
