@@ -32,3 +32,8 @@ settings, installs `libphpx.a` and PHPX headers into the prefix, validates its
 architecture, and writes the SDK ABI marker. Apple libc, libc++, Foundation,
 and UIKit are not copied into static archives; the final application links
 them from the selected iPhoneOS SDK.
+
+For an Apple silicon iOS Simulator, stage a matching
+`iphonesimulator-arm64` PHP runtime in `ios/iphonesimulator-arm64` and run
+`./ios/build.sh --platform simulator`. Device and simulator archives must stay
+in separate SDK prefixes.

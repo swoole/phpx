@@ -10,10 +10,11 @@ usage()
     cat <<'EOF'
 Usage: ./ios/build.sh [options]
 
-Build and install libphpx.a for a physical arm64 iPhone. The prefix must
-already contain the matching self-contained iPhoneOS libphp.a and headers.
+Build and install libphpx.a for an arm64 iPhone or iOS simulator. The prefix
+must contain a libphp.a and headers built for the selected platform.
 
 Options:
+  --platform <device|simulator>  Target platform (default: device)
   --prefix <dir>             SDK prefix (default: ios/iphoneos-arm64)
   --build-dir <dir>          CMake build directory
   --deployment-target <ver>  Minimum iOS version (default: 15.0)
@@ -22,13 +23,20 @@ Options:
 EOF
 }
 
-prefix=${PHPX_IOS_SDK_DIR:-${phpx_root}/ios/iphoneos-arm64}
-build_dir=${PHPX_IOS_BUILD_DIR:-${phpx_root}/build/iphoneos-arm64}
+platform=${PHPX_IOS_PLATFORM:-device}
+prefix=${PHPX_IOS_SDK_DIR:-}
+build_dir=${PHPX_IOS_BUILD_DIR:-}
 deployment_target=${PHPX_IOS_DEPLOYMENT_TARGET:-15.0}
 jobs=${PHPX_IOS_JOBS:-8}
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
+        --platform)
+            [[ $# -ge 2 ]] || { echo "--platform requires a value" >&2; exit 2; }
+            platform=$2
+            shift 2
+            ;;
+        --platform=*) platform=${1#*=}; shift ;;
         --prefix)
             [[ $# -ge 2 ]] || { echo "--prefix requires a directory" >&2; exit 2; }
             prefix=$2
@@ -58,6 +66,15 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+case "${platform}" in
+    device) sdk=iphoneos ;;
+    simulator) sdk=iphonesimulator ;;
+    *) echo "Unsupported --platform: ${platform}" >&2; exit 2 ;;
+esac
+target=${sdk}-arm64
+prefix=${prefix:-${phpx_root}/ios/${target}}
+build_dir=${build_dir:-${phpx_root}/build/${target}}
+
 if [[ $(uname -s) != Darwin ]]; then
     echo "PHPX/iPhoneOS must be cross-compiled on macOS with full Xcode." >&2
     exit 1
@@ -71,7 +88,7 @@ if [[ ! "${deployment_target}" =~ ^[0-9]+([.][0-9]+){0,2}$ ]]; then
     exit 2
 fi
 
-xcrun --sdk iphoneos --show-sdk-path >/dev/null
+xcrun --sdk "${sdk}" --show-sdk-path >/dev/null
 mkdir -p "${prefix}" "${build_dir}"
 prefix=$(cd "${prefix}" && pwd)
 build_dir=$(cd "${build_dir}" && pwd)
@@ -97,7 +114,7 @@ if [[ ! -f "${runtime_abi_file}" && -f "${prefix}/.typephp-ios-php-abi" ]]; then
     runtime_abi_file=${prefix}/.typephp-ios-php-abi
 fi
 if [[ ! -f "${runtime_abi_file}"
-    || $(<"${runtime_abi_file}") != 'typephp-iphoneos-arm64-php-zts-abi-v1' ]]; then
+    || $(<"${runtime_abi_file}") != "typephp-${target}-php-zts-abi-v1" ]]; then
     echo "The iPhoneOS PHP Runtime Layer ABI marker is incompatible: ${runtime_abi_file}" >&2
     exit 1
 fi
@@ -110,7 +127,7 @@ cmake_arguments=(
     -S "${phpx_root}/full-static"
     -B "${build_dir}"
     -DCMAKE_SYSTEM_NAME=iOS
-    -DCMAKE_OSX_SYSROOT=iphoneos
+    -DCMAKE_OSX_SYSROOT="${sdk}"
     -DCMAKE_OSX_ARCHITECTURES=arm64
     -DCMAKE_OSX_DEPLOYMENT_TARGET="${deployment_target}"
     -DCMAKE_BUILD_TYPE=Release
@@ -138,11 +155,11 @@ if [[ ! -f "${prefix}/lib/libphpx.a" ]]; then
     exit 1
 fi
 
-archive_arch=$(xcrun --sdk iphoneos lipo -archs "${prefix}/lib/libphpx.a")
+archive_arch=$(xcrun --sdk "${sdk}" lipo -archs "${prefix}/lib/libphpx.a")
 if [[ " ${archive_arch} " != *" arm64 "* ]]; then
     echo "libphpx.a does not contain arm64: ${archive_arch}" >&2
     exit 1
 fi
 
-printf '%s\n' 'typephp-iphoneos-arm64-sdk-abi-v1' > "${prefix}/.typephp-ios-sdk-abi"
-echo "Installed PHPX iPhoneOS archive and headers: ${prefix}"
+printf 'typephp-%s-sdk-abi-v1\n' "${target}" > "${prefix}/.typephp-ios-sdk-abi"
+echo "Installed PHPX ${sdk} archive and headers: ${prefix}"
