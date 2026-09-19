@@ -1,5 +1,6 @@
 #include <phpx.h>
 #include <typephp_runtime.h>
+#include <typephp_opcode_table.h>
 
 BEGIN_EXTERN_C()
 #include "ext/standard/basic_functions.h"
@@ -81,6 +82,8 @@ extern "C" int typephp_runtime_start(typephp_module_getter get_module, int argc,
 
     php_embed_init(argc, argv);
 
+    typephp_opcode_table_install();
+
     typephp_runtime_module = get_module();
     module_init(typephp_runtime_module);
 
@@ -145,6 +148,7 @@ extern "C" void typephp_runtime_stop(void) {
     // php_module_shutdown().
     typephp_runtime_module->request_shutdown_func(typephp_runtime_module->type, typephp_runtime_module->module_number);
     module_shutdown(typephp_runtime_module);
+    typephp_opcode_table_uninstall();
     php_embed_shutdown();
 
     typephp_runtime_module = nullptr;
