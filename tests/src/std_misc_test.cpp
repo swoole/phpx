@@ -391,21 +391,6 @@ TEST(std_misc, gmdate_func) {
     ASSERT_GT(d2.length(), 0);
 }
 
-TEST(std_misc, strtotime_func) {
-    auto ts1 = fn::strtotime("1970-01-01 00:00:00");
-    ASSERT_TRUE(ts1.isInt());
-    ASSERT_EQ(ts1.toInt(), 0);
-
-    auto ts2 = fn::strtotime("not a valid date string!!!");
-    ASSERT_TRUE(ts2.isFalse());
-
-    // second parameter: base timestamp
-    Variant baseTs(static_cast<Int>(100000));
-    auto ts3 = fn::strtotime("+1 day", baseTs);
-    ASSERT_TRUE(ts3.isInt());
-    ASSERT_NE(ts3.toInt(), -1);  // not a parse failure
-}
-
 // ========================
 // Filesystem (in-memory test, no actual filesystem access needed for exist check)
 // ========================

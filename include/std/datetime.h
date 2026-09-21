@@ -2,7 +2,7 @@
   +----------------------------------------------------------------------+
   | AOT Stdlib - Direct C++ wrappers for PHP date/time functions          |
   +----------------------------------------------------------------------+
-  | time, date, gmdate, strtotime via PHPAPI exports                      |
+  | time, date and gmdate via PHPAPI exports                              |
   +----------------------------------------------------------------------+
 */
 
@@ -26,8 +26,5 @@ String date(const String &format, const Variant &timestamp = Variant());
 
 // gmdate(string $format, ?int $timestamp = null): string
 String gmdate(const String &format, const Variant &timestamp = Variant());
-
-// strtotime(string $datetime, ?int $baseTimestamp = null): int|false
-Variant strtotime(const String &datetime, const Variant &baseTimestamp = Variant());
 
 }  // namespace php::fn
