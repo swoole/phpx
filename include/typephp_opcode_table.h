@@ -25,6 +25,11 @@ const typephp_opcode_entry *typephp_project_opcode_table(size_t *count);
 const typephp_embedded_file_entry *typephp_project_embedded_file_table(size_t *count);
 const char *typephp_project_php_version(void);
 
+#ifdef _WIN32
+/* Return the bytes of the archive linked as a Windows PE resource. */
+const uint8_t *typephp_embedded_archive_data(void);
+#endif
+
 void typephp_opcode_table_install(void);
 void typephp_opcode_table_require(const char *path);
 void typephp_opcode_table_uninstall(void);

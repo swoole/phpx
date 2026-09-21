@@ -14,6 +14,27 @@ extern "C" {
 #include <string>
 #include <unordered_map>
 #include <sys/stat.h>
+#ifdef _WIN32
+#include <windows.h>
+#include <cstdlib>
+#endif
+
+#ifdef _WIN32
+extern "C" const uint8_t *typephp_embedded_archive_data(void) {
+    HMODULE module = nullptr;
+    if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                            reinterpret_cast<LPCWSTR>(&typephp_embedded_archive_data), &module)) {
+        std::abort();
+    }
+    HRSRC resource = FindResourceW(module, MAKEINTRESOURCEW(24103), MAKEINTRESOURCEW(10));
+    if (!resource) std::abort();
+    HGLOBAL loaded = LoadResource(module, resource);
+    if (!loaded) std::abort();
+    const void *data = LockResource(loaded);
+    if (!data) std::abort();
+    return static_cast<const uint8_t *>(data);
+}
+#endif
 
 namespace {
 template<class T> using EntryMap = std::unordered_map<std::string, const T *>;
