@@ -2,6 +2,7 @@
 #include "phpx_std.h"
 
 #include <limits>
+#include <string>
 
 using namespace php;
 
@@ -211,6 +212,64 @@ TEST(std_string, strrpos) {
     ASSERT_EQ(fn::strrpos("abcabc", "abc", -4).toInt(), 0);
     try_call([]() { fn::strrpos("hello", "h", 6); }, "must be contained in argument #1");
     try_call([]() { fn::strrpos("hello", "h", -6); }, "must be contained in argument #1");
+}
+
+TEST(std_string, search_empty_needle_offsets) {
+    struct SearchCase {
+        Int offset;
+        Int forward;
+        Int reverse;
+    };
+    const SearchCase cases[] = {
+        {0, 0, 3}, {1, 1, 3}, {3, 3, 3}, {-1, 2, 2}, {-2, 1, 1}, {-3, 0, 0},
+    };
+    for (const auto &test : cases) {
+        SCOPED_TRACE(test.offset);
+        auto forward = fn::strpos("abc", "", test.offset);
+        auto insensitive = fn::stripos("AbC", "", test.offset);
+        auto reverse = fn::strrpos("abc", "", test.offset);
+        EXPECT_TRUE(forward.isInt());
+        EXPECT_TRUE(insensitive.isInt());
+        EXPECT_TRUE(reverse.isInt());
+        EXPECT_EQ(forward.toInt(), test.forward);
+        EXPECT_EQ(insensitive.toInt(), test.forward);
+        EXPECT_EQ(reverse.toInt(), test.reverse);
+    }
+
+    EXPECT_EQ(fn::strpos("", "", 0).toInt(), 0);
+    EXPECT_EQ(fn::stripos("", "", 0).toInt(), 0);
+    EXPECT_EQ(fn::strrpos("", "", 0).toInt(), 0);
+}
+
+TEST(std_string, search_empty_needle_invalid_offsets) {
+    struct SearchFunction {
+        const char *name;
+        Variant (*call)(const String &, const String &, Int);
+    };
+    const SearchFunction functions[] = {
+        {"strpos", fn::strpos}, {"stripos", fn::stripos}, {"strrpos", fn::strrpos},
+    };
+    for (const auto &search : functions) {
+        SCOPED_TRACE(search.name);
+        for (const char *haystack : {"abc", ""}) {
+            SCOPED_TRACE(haystack);
+            for (Int offset : {Int(4), Int(-4), std::numeric_limits<Int>::max(), std::numeric_limits<Int>::min()}) {
+                SCOPED_TRACE(offset);
+                bool caught = false;
+                try {
+                    search.call(haystack, "", offset);
+                } catch (zend_object *) {
+                    auto exception = catchException();
+                    EXPECT_TRUE(exception.instanceOf("ValueError"));
+                    auto message = exception.call("getMessage");
+                    EXPECT_NE(std::string(message.toCString()).find("must be contained in argument #1"),
+                              std::string::npos);
+                    caught = true;
+                }
+                EXPECT_TRUE(caught);
+            }
+        }
+    }
 }
 
 TEST(std_string, strstr) {
