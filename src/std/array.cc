@@ -20,7 +20,11 @@ static String count_method{ZEND_STRL("count"), true};
  * Search array for a value. Returns true/false or the key depending on behavior.
  * behavior: 0 = return bool (in_array), 1 = return key (array_search)
  */
-static Variant _search_array(const Variant &needle, zend_array *ht, bool strict, int behavior) {
+static Variant _search_array(const Variant &needle, const Array &haystack, bool strict, int behavior) {
+    // Loose comparisons can invoke user code that replaces the caller's inputs.
+    Variant search_value(needle);
+    Array values(haystack.unwrap_ptr());
+    zend_array *ht = values.array();
     zval *entry;
     zend_ulong num_idx;
     zend_string *str_idx;
@@ -28,7 +32,9 @@ static Variant _search_array(const Variant &needle, zend_array *ht, bool strict,
     if (strict) {
         ZEND_HASH_FOREACH_KEY_VAL(ht, num_idx, str_idx, entry) {
             ZVAL_DEREF(entry);
-            if (fast_is_identical_function(NO_CONST_V(needle), entry)) {
+            bool matches = fast_is_identical_function(NO_CONST_V(search_value), entry);
+            throwErrorIfOccurred();
+            if (matches) {
                 if (behavior == 0) {
                     return Variant(true);
                 } else {
@@ -44,7 +50,9 @@ static Variant _search_array(const Variant &needle, zend_array *ht, bool strict,
     } else {
         ZEND_HASH_FOREACH_KEY_VAL(ht, num_idx, str_idx, entry) {
             ZVAL_DEREF(entry);
-            if (fast_equal_check_function(NO_CONST_V(needle), entry)) {
+            bool matches = fast_equal_check_function(NO_CONST_V(search_value), entry);
+            throwErrorIfOccurred();
+            if (matches) {
                 if (behavior == 0) {
                     return Variant(true);
                 } else {
@@ -67,7 +75,9 @@ static Variant _search_array(const Variant &needle, zend_array *ht, bool strict,
 // ========================
 
 Bool in_array(const Variant &needle, const Array &haystack, bool strict) {
-    Variant result = _search_array(needle, haystack.array(), strict, 0);
+    Variant result = _search_array(needle, haystack, strict, 0);
+    // Releasing the snapshots can run user destructors after the last comparison.
+    throwErrorIfOccurred();
     return result.toBool();
 }
 
@@ -148,8 +158,10 @@ Array array_keys(const Array &array) {
 // 3b. array_keys with filter_value
 // ========================
 
-Array array_keys_filter(const Array &array, const Variant &filter_value, bool strict) {
-    zend_array *arrval = array.array();
+static Array _array_keys_filter(const Array &array, const Variant &filter_value, bool strict) {
+    Variant search_value(filter_value);
+    Array values(array.unwrap_ptr());
+    zend_array *arrval = values.array();
     zend_ulong elem_count = zend_hash_num_elements(arrval);
 
     if (elem_count == 0) {
@@ -164,7 +176,9 @@ Array array_keys_filter(const Array &array, const Variant &filter_value, bool st
     if (strict) {
         ZEND_HASH_FOREACH_KEY_VAL(arrval, num_idx, str_idx, entry) {
             ZVAL_DEREF(entry);
-            if (fast_is_identical_function(NO_CONST_V(filter_value), entry)) {
+            bool matches = fast_is_identical_function(NO_CONST_V(search_value), entry);
+            throwErrorIfOccurred();
+            if (matches) {
                 if (str_idx) {
                     zval zv;
                     ZVAL_STR_COPY(&zv, str_idx);
@@ -179,7 +193,9 @@ Array array_keys_filter(const Array &array, const Variant &filter_value, bool st
         ZEND_HASH_FOREACH_END();
     } else {
         ZEND_HASH_FOREACH_KEY_VAL(arrval, num_idx, str_idx, entry) {
-            if (fast_equal_check_function(NO_CONST_V(filter_value), entry)) {
+            bool matches = fast_equal_check_function(NO_CONST_V(search_value), entry);
+            throwErrorIfOccurred();
+            if (matches) {
                 if (str_idx) {
                     zval zv;
                     ZVAL_STR_COPY(&zv, str_idx);
@@ -194,6 +210,12 @@ Array array_keys_filter(const Array &array, const Variant &filter_value, bool st
         ZEND_HASH_FOREACH_END();
     }
 
+    return result;
+}
+
+Array array_keys_filter(const Array &array, const Variant &filter_value, bool strict) {
+    Array result = _array_keys_filter(array, filter_value, strict);
+    throwErrorIfOccurred();
     return result;
 }
 
@@ -274,7 +296,9 @@ Int detail::array_push_impl(Variant &arg, const Variant *values, std::size_t val
 // ========================
 
 Variant array_search(const Variant &needle, const Array &haystack, bool strict) {
-    return _search_array(needle, haystack.array(), strict, 1);
+    Variant result = _search_array(needle, haystack, strict, 1);
+    throwErrorIfOccurred();
+    return result;
 }
 
 // ========================
