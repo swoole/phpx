@@ -64,7 +64,9 @@ template <typename... Rest>
 inline Array array_merge(const Array &array, const Array &other, const Rest &...arrays) {
     static_assert((std::is_same_v<Array, std::decay_t<Rest>> && ...), "array_merge only accepts Array arguments");
     Array result = array_merge(array, other);
-    ((result = array_merge(result, arrays)), ...);
+    // The two-array overload has already separated result from its inputs.
+    // Append directly instead of copying the growing result for every argument.
+    ((php_array_merge(result.array(), arrays.array())), ...);
     return result;
 }
 

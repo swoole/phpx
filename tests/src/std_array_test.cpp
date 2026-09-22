@@ -148,6 +148,61 @@ TEST(std_array, array_merge_variadic) {
     ASSERT_GE(m.length(), 3);
 }
 
+TEST(std_array, array_merge_variadic_preserves_keys_and_inputs) {
+    Array first{"first"};
+    first.set("color", "red");
+    Array holes{"second", "removed", "third"};
+    holes.del(1);
+    Array override;
+    override.set("color", "green");
+    override.set(-4, "fourth");
+    Array empty;
+
+    auto expected = call(getFunction("array_merge"), {first, holes, override, empty, first});
+    auto merged = fn::array_merge(first, holes, override, empty, first);
+    ASSERT_TRUE(same(merged, expected));
+    ASSERT_EQ(first.length(), 2);
+    ASSERT_EQ(holes.length(), 2);
+    ASSERT_EQ(override.length(), 2);
+    ASSERT_STREQ(first.get("color").toCString(), "red");
+
+    merged.set(0, "changed");
+    ASSERT_STREQ(first.get(0).toCString(), "first");
+    holes.set(0, "changed input");
+    ASSERT_STREQ(merged.get(1).toCString(), "second");
+}
+
+TEST(std_array, array_merge_variadic_repeated_inputs) {
+    Array input{1, 2};
+    Array alias(input);
+    auto merged = fn::array_merge(input, alias, input, alias, input, alias);
+    ASSERT_EQ(merged.length(), 12);
+    for (Int i = 0; i < 12; ++i) {
+        ASSERT_EQ(merged.get(i).toInt(), i % 2 + 1);
+    }
+    merged.set(0, 99);
+    ASSERT_EQ(input.get(0).toInt(), 1);
+    ASSERT_EQ(alias.get(0).toInt(), 1);
+}
+
+TEST(std_array, array_merge_variadic_preserves_references) {
+    Variant value = 7;
+    Reference reference = value.toReference();
+    Variant referenced(reference.const_ptr(), Ctor::CopyRef);
+    Array input;
+    input.append(referenced);
+    auto merged = fn::array_merge(input, input, input, input);
+    ASSERT_EQ(merged.length(), 4);
+    reference = 9;
+    for (Int i = 0; i < 4; ++i) {
+        ASSERT_TRUE(merged.get(i).isReference());
+        ASSERT_EQ(merged.get(i).toInt(), 9);
+    }
+    merged[3] = 11;
+    ASSERT_EQ(reference.toInt(), 11);
+    ASSERT_EQ(input.get(0).toInt(), 11);
+}
+
 TEST(std_array, count) {
     Array a{1, 2, 3};
     ASSERT_EQ(fn::count(a), 3);

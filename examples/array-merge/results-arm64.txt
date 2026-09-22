@@ -1,0 +1,70 @@
+run=1 revision=before
+packed arrays=2 elements=1024 iterations=1000 ms=1.338 checksum=2048000
+packed arrays=8 elements=1024 iterations=1000 ms=22.701 checksum=8192000
+packed arrays=32 elements=1024 iterations=1000 ms=332.152 checksum=32768000
+mixed arrays=2 elements=1024 iterations=1000 ms=8.391 checksum=2049000
+mixed arrays=8 elements=1024 iterations=1000 ms=106.612 checksum=8193000
+mixed arrays=32 elements=1024 iterations=1000 ms=1417.144 checksum=32769000
+run=1 revision=after
+packed arrays=2 elements=1024 iterations=1000 ms=1.276 checksum=2048000
+packed arrays=8 elements=1024 iterations=1000 ms=6.206 checksum=8192000
+packed arrays=32 elements=1024 iterations=1000 ms=24.826 checksum=32768000
+mixed arrays=2 elements=1024 iterations=1000 ms=8.250 checksum=2049000
+mixed arrays=8 elements=1024 iterations=1000 ms=71.118 checksum=8193000
+mixed arrays=32 elements=1024 iterations=1000 ms=267.188 checksum=32769000
+run=2 revision=before
+packed arrays=2 elements=1024 iterations=1000 ms=1.291 checksum=2048000
+packed arrays=8 elements=1024 iterations=1000 ms=23.737 checksum=8192000
+packed arrays=32 elements=1024 iterations=1000 ms=334.655 checksum=32768000
+mixed arrays=2 elements=1024 iterations=1000 ms=8.284 checksum=2049000
+mixed arrays=8 elements=1024 iterations=1000 ms=105.255 checksum=8193000
+mixed arrays=32 elements=1024 iterations=1000 ms=1422.678 checksum=32769000
+run=2 revision=after
+packed arrays=2 elements=1024 iterations=1000 ms=1.237 checksum=2048000
+packed arrays=8 elements=1024 iterations=1000 ms=6.204 checksum=8192000
+packed arrays=32 elements=1024 iterations=1000 ms=24.257 checksum=32768000
+mixed arrays=2 elements=1024 iterations=1000 ms=8.182 checksum=2049000
+mixed arrays=8 elements=1024 iterations=1000 ms=43.245 checksum=8193000
+mixed arrays=32 elements=1024 iterations=1000 ms=261.338 checksum=32769000
+run=3 revision=before
+packed arrays=2 elements=1024 iterations=1000 ms=1.219 checksum=2048000
+packed arrays=8 elements=1024 iterations=1000 ms=23.176 checksum=8192000
+packed arrays=32 elements=1024 iterations=1000 ms=336.895 checksum=32768000
+mixed arrays=2 elements=1024 iterations=1000 ms=8.409 checksum=2049000
+mixed arrays=8 elements=1024 iterations=1000 ms=107.132 checksum=8193000
+mixed arrays=32 elements=1024 iterations=1000 ms=1426.960 checksum=32769000
+run=3 revision=after
+packed arrays=2 elements=1024 iterations=1000 ms=1.215 checksum=2048000
+packed arrays=8 elements=1024 iterations=1000 ms=5.757 checksum=8192000
+packed arrays=32 elements=1024 iterations=1000 ms=23.897 checksum=32768000
+mixed arrays=2 elements=1024 iterations=1000 ms=8.238 checksum=2049000
+mixed arrays=8 elements=1024 iterations=1000 ms=44.365 checksum=8193000
+mixed arrays=32 elements=1024 iterations=1000 ms=260.173 checksum=32769000
+run=4 revision=before
+packed arrays=2 elements=1024 iterations=1000 ms=1.221 checksum=2048000
+packed arrays=8 elements=1024 iterations=1000 ms=23.360 checksum=8192000
+packed arrays=32 elements=1024 iterations=1000 ms=339.107 checksum=32768000
+mixed arrays=2 elements=1024 iterations=1000 ms=8.252 checksum=2049000
+mixed arrays=8 elements=1024 iterations=1000 ms=106.171 checksum=8193000
+mixed arrays=32 elements=1024 iterations=1000 ms=1427.460 checksum=32769000
+run=4 revision=after
+packed arrays=2 elements=1024 iterations=1000 ms=1.218 checksum=2048000
+packed arrays=8 elements=1024 iterations=1000 ms=5.885 checksum=8192000
+packed arrays=32 elements=1024 iterations=1000 ms=23.941 checksum=32768000
+mixed arrays=2 elements=1024 iterations=1000 ms=8.293 checksum=2049000
+mixed arrays=8 elements=1024 iterations=1000 ms=43.808 checksum=8193000
+mixed arrays=32 elements=1024 iterations=1000 ms=265.819 checksum=32769000
+run=5 revision=before
+packed arrays=2 elements=1024 iterations=1000 ms=1.251 checksum=2048000
+packed arrays=8 elements=1024 iterations=1000 ms=23.207 checksum=8192000
+packed arrays=32 elements=1024 iterations=1000 ms=338.367 checksum=32768000
+mixed arrays=2 elements=1024 iterations=1000 ms=8.530 checksum=2049000
+mixed arrays=8 elements=1024 iterations=1000 ms=108.020 checksum=8193000
+mixed arrays=32 elements=1024 iterations=1000 ms=1500.104 checksum=32769000
+run=5 revision=after
+packed arrays=2 elements=1024 iterations=1000 ms=1.229 checksum=2048000
+packed arrays=8 elements=1024 iterations=1000 ms=5.973 checksum=8192000
+packed arrays=32 elements=1024 iterations=1000 ms=24.370 checksum=32768000
+mixed arrays=2 elements=1024 iterations=1000 ms=8.311 checksum=2049000
+mixed arrays=8 elements=1024 iterations=1000 ms=44.177 checksum=8193000
+mixed arrays=32 elements=1024 iterations=1000 ms=264.131 checksum=32769000
