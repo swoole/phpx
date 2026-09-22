@@ -337,6 +337,31 @@ TEST(std_string, str_repeat) {
     ASSERT_STREQ(s3.toCString(), "");
 }
 
+TEST(std_string, str_repeat_empty_large_count) {
+    for (Int count : {Int(0), Int(1), Int(10), Int(ZEND_LONG_MAX)}) {
+        SCOPED_TRACE(count);
+        EXPECT_TRUE(fn::str_repeat("", count).empty());
+        EXPECT_TRUE(php::call("str_repeat", {"", count}).toString().empty());
+    }
+}
+
+TEST(std_string, str_repeat_empty_negative_count) {
+    for (Int count : {Int(-1), Int(ZEND_LONG_MIN)}) {
+        SCOPED_TRACE(count);
+        bool caught = false;
+        try {
+            fn::str_repeat("", count);
+        } catch (zend_object *) {
+            caught = true;
+            auto exception = php::catchException();
+            EXPECT_EQ(exception.getClassName().toStdString(), "ValueError");
+            EXPECT_EQ(exception.call("getMessage").toStdString(),
+                      "str_repeat(): Argument #2 ($times) must be greater than or equal to 0");
+        }
+        EXPECT_TRUE(caught);
+    }
+}
+
 TEST(std_string, str_repeat_exception) {
     try_call([]() { fn::str_repeat("x", -1); },
              "str_repeat(): Argument #2 ($times) must be greater than or equal to 0");
