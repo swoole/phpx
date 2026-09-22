@@ -113,6 +113,38 @@ TEST(std_string, lcfirst_ucfirst) {
     ASSERT_STREQ(s7.toCString(), "");
 }
 
+TEST(std_string, first_case_conversion_matches_php_and_reuses_unchanged_strings) {
+    for (unsigned int byte = 0; byte <= 255; byte++) {
+        SCOPED_TRACE(byte);
+        std::string bytes{static_cast<char>(byte), '\0', 'A', 'z'};
+        String input(bytes);
+        auto lower = fn::lcfirst(input);
+        auto upper = fn::ucfirst(input);
+        EXPECT_EQ(lower.toStdString(), php::call("lcfirst", {input}).toStdString());
+        EXPECT_EQ(upper.toStdString(), php::call("ucfirst", {input}).toStdString());
+        EXPECT_EQ(input.toStdString(), bytes);
+        if (byte < 'A' || byte > 'Z') {
+            EXPECT_EQ(lower.str(), input.str());
+        }
+        if (byte < 'a' || byte > 'z') {
+            EXPECT_EQ(upper.str(), input.str());
+        }
+    }
+}
+
+TEST(std_string, unchanged_first_case_results_preserve_copy_on_write) {
+    String lower_input("already lower");
+    String upper_input("Already upper");
+    auto lower = fn::lcfirst(lower_input);
+    auto upper = fn::ucfirst(upper_input);
+    lower.item(0, true) = "#";
+    upper.item(0, true) = "#";
+    EXPECT_EQ(lower.toStdString(), "#lready lower");
+    EXPECT_EQ(upper.toStdString(), "#lready upper");
+    EXPECT_EQ(lower_input.toStdString(), "already lower");
+    EXPECT_EQ(upper_input.toStdString(), "Already upper");
+}
+
 TEST(std_string, strtolower_strtoupper) {
     auto s1 = fn::strtolower("HELLO");
     ASSERT_STREQ(s1.toCString(), "hello");
