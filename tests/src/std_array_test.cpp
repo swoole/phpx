@@ -176,6 +176,7 @@ TEST(std_array, count) {
     ASSERT_EQ(fn::count(v), 3);
 
     Array nested{Array{1, 2}, Array{3}};
+    ASSERT_EQ(fn::count(nested, 0), 2);
     ASSERT_EQ(fn::count(nested, 1), 5);
 }
 
@@ -192,6 +193,36 @@ TEST(std_array, count_exception) {
     )");
     var obj = eval("return new PhpxStdArrayThrowingCountable();");
     try_call([&obj]() { fn::count(obj); }, "std count failed");
+}
+
+TEST(std_array, count_invalid_mode) {
+    // Invalid modes must be rejected before inspecting the value or invoking Countable.
+    const Variant values[] = {
+        Array{1, 2},
+        Variant(123),
+        newObject("stdClass"),
+        newObject("ArrayObject"),
+        eval(R"(return new class implements Countable {
+            public function count(): int { throw new RuntimeException('count must not be called'); }
+        };)"),
+    };
+    const Int modes[] = {2, -1, std::numeric_limits<Int>::min(), std::numeric_limits<Int>::max()};
+    for (const auto &value : values) {
+        for (Int mode : modes) {
+            SCOPED_TRACE(mode);
+            bool caught = false;
+            try {
+                fn::count(value, mode);
+            } catch (zend_object *) {
+                auto exception = catchException();
+                EXPECT_TRUE(exception.instanceOf("ValueError"));
+                EXPECT_STREQ(exception.call("getMessage").toCString(),
+                             "count(): Argument #2 ($mode) must be either COUNT_NORMAL or COUNT_RECURSIVE");
+                caught = true;
+            }
+            EXPECT_TRUE(caught);
+        }
+    }
 }
 
 TEST(std_array, array_is_list) {
