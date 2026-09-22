@@ -328,3 +328,23 @@ TEST(std_string, dirname_basename) {
 
     ASSERT_TRUE(fn::dirname("").empty());
 }
+
+TEST(std_string, dirname_invalid_levels) {
+    for (const char *path : {"/var/www/index.php", "a", ""}) {
+        SCOPED_TRACE(path);
+        for (int levels : {0, -1, std::numeric_limits<int>::min()}) {
+            SCOPED_TRACE(levels);
+            bool caught = false;
+            try {
+                fn::dirname(path, levels);
+            } catch (zend_object *) {
+                auto exception = catchException();
+                EXPECT_TRUE(exception.instanceOf("ValueError"));
+                EXPECT_STREQ(exception.call("getMessage").toCString(),
+                             "dirname(): Argument #2 ($levels) must be greater than or equal to 1");
+                caught = true;
+            }
+            EXPECT_TRUE(caught);
+        }
+    }
+}
