@@ -159,7 +159,7 @@ Array String::split(const String &delim, const Int limit) const {
 }
 
 String String::stripTags(const String &allow, bool allow_tag_spaces) const {
-    auto new_str = zend_string_copy(str());
+    auto new_str = zend_string_init(data(), length(), false);
     new_str->len = php_strip_tags_ex(new_str->val, new_str->len, allow.data(), allow.length(), allow_tag_spaces);
     new_str->val[new_str->len] = '\0';
     return String(new_str, Ctor::Move);
@@ -174,14 +174,14 @@ String String::basename(const String &suffix) const {
 }
 
 String String::dirname() const {
-    auto new_str = zend_string_copy(str());
+    auto new_str = zend_string_init(data(), length(), false);
     new_str->len = php_dirname(new_str->val, new_str->len);
     new_str->val[new_str->len] = '\0';
     return String(new_str, Ctor::Move);
 }
 
 String String::stripSlashes() const {
-    auto new_str = zend_string_copy(str());
+    auto new_str = zend_string_init(data(), length(), false);
     php_stripslashes(new_str);
     return String(new_str, Ctor::Move);
 }
