@@ -770,15 +770,10 @@ TEST(object, non_existent_attr_operations) {
     newAttr1 = 2003;
     ASSERT_EQ(obj.get("new_prop").toInt(), 2003);
 
-    // For attr chaining, we need to work with Object type
-    try_call(
-        [&]() {
-            Object tempObj = newObject("stdClass");
-            auto chained = tempObj.attr("non_existent");
-            ASSERT_TRUE(chained.isNull());
-        },
-        "",
-        true);
+    // Reading a missing property returns null without creating it.
+    Object tempObj = newObject("stdClass");
+    ASSERT_TRUE(tempObj.attr("non_existent").isNull());
+    ASSERT_FALSE(tempObj.propertyExists("non_existent"));
 
     // Test attrRef with non-existent properties
     auto ref3 = obj.attrRef("missing_prop");
@@ -837,14 +832,9 @@ TEST(object, custom_class_non_existent_operations) {
     // Test non-existent methods
     ASSERT_FALSE(obj.methodExists("nonExistentMethod"));
 
-    // Test chained operations
-    try_call(
-        [&]() {
-            Object tempObj = newObject("stdClass");
-            auto firstLevel = tempObj.attr("missing_prop");
-            ASSERT_TRUE(firstLevel.isNull());
-        },
-        "");
+    Object tempObj = newObject("stdClass");
+    ASSERT_TRUE(tempObj.attr("missing_prop").isNull());
+    ASSERT_FALSE(tempObj.propertyExists("missing_prop"));
 
     // Test with update on custom class
     try {

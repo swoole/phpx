@@ -1247,7 +1247,10 @@ class Variant {
     }
     Variant &operator=(const std::string &str) {
         if (UNEXPECTED(isByteOfStr())) {
-            setByteOfStr(str.at(0));
+            if (str.size() != 1) {
+                throwError("Can only be assigned a single-byte string to a string offset");
+            }
+            setByteOfStr(str[0]);
         } else {
             destroy();
             ZVAL_STRINGL(unwrap_ptr(), str.c_str(), str.length());
@@ -1256,6 +1259,9 @@ class Variant {
     }
     Variant &operator=(const char *str) {
         if (UNEXPECTED(isByteOfStr())) {
+            if (str[0] == '\0' || str[1] != '\0') {
+                throwError("Can only be assigned a single-byte string to a string offset");
+            }
             setByteOfStr(str[0]);
         } else {
             destroy();

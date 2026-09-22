@@ -1580,6 +1580,27 @@ TEST(variant, item6) {
     try_call([&]() { s2.item(5, true) = "-----"; }, "Can only be assigned a single-byte string to a string offset");
 }
 
+TEST(variant, string_item_requires_one_byte) {
+    for (const auto &value : {std::string(), std::string("ab"), std::string("\xc3\xa9")}) {
+        var str("hello");
+        var shared = str;
+        try_call([&]() { str.item(1, true) = value.c_str(); },
+                 "Can only be assigned a single-byte string to a string offset");
+        ASSERT_STREQ(str.toCString(), "hello");
+        ASSERT_STREQ(shared.toCString(), "hello");
+        try_call([&]() { str.item(1, true) = value; },
+                 "Can only be assigned a single-byte string to a string offset");
+        ASSERT_STREQ(str.toCString(), "hello");
+        ASSERT_STREQ(shared.toCString(), "hello");
+    }
+
+    var str("hello");
+    var shared = str;
+    str.item(1, true) = std::string(1, '\0');
+    ASSERT_EQ(str.toStdString(), std::string("h\0llo", 5));
+    ASSERT_STREQ(shared.toCString(), "hello");
+}
+
 TEST(variant, item_ffi_cdata_array_scalar_read) {
     if (!ffi_cdata_is_available()) {
         GTEST_SKIP() << "FFI extension is not available or ffi.enable is disabled";

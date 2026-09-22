@@ -203,7 +203,7 @@ TEST(std_math, intdiv_exceptions) {
 TEST(std_math, log_exceptions) {
     try_call([]() { fn::log(1, 0); }, "Argument #2 ($base) must be greater than 0");
     try_call([]() { fn::log(1, -1); }, "Argument #2 ($base) must be greater than 0");
-    try_call([]() { fn::log(1, 1); }, "");  // log(1, 1) returns NAN, not exception
+    ASSERT_TRUE(fn::is_nan(fn::log(1, 1)));
 }
 
 TEST(std_math, float_check) {

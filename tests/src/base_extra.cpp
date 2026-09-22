@@ -324,7 +324,7 @@ TEST(base_extra, getClassEntry_edge) {
     ASSERT_NE(ce1, nullptr);
     ASSERT_STREQ(ce1->name->val, "stdClass");
 
-    try_call([]() { getClassEntry("ClassNotExists"); }, "class 'ClassNotExists' is undefined");
+    ASSERT_EQ(getClassEntry("ClassNotExists"), nullptr);
 }
 
 // Test getClassEntrySafe (throws on unknown class)
