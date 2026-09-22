@@ -236,12 +236,48 @@ Array array_merge() {
     return Array();
 }
 
+static bool array_merge_can_copy_first(zend_array *array) {
+    zend_long length = static_cast<zend_long>(zend_hash_num_elements(array));
+    return HT_IS_PACKED(array) && HT_IS_WITHOUT_HOLES(array) &&
+           array->nNextFreeElement == static_cast<uint32_t>(length);
+}
+
+static bool array_merge_can_copy_empty_pair(zend_array *array) {
+    if (HT_IS_PACKED(array)) {
+        return HT_IS_WITHOUT_HOLES(array);
+    }
+
+    zend_string *string_key;
+    ZEND_HASH_FOREACH_STR_KEY(array, string_key) {
+        if (string_key == nullptr) {
+            return false;
+        }
+    }
+    ZEND_HASH_FOREACH_END();
+    return true;
+}
+
 Array array_merge(const Array &array) {
-    return Array(array);
+    zend_array *arrval = array.array();
+    if (array_merge_can_copy_first(arrval)) {
+        return Array(array);
+    }
+
+    Array result;
+    php_array_merge(result.array(), arrval);
+    return result;
 }
 
 Array array_merge(const Array &array, const Array &other) {
-    Array result(array);
+    // PHP's two-argument empty-array shortcut preserves the next insertion index.
+    if (array.empty() && array_merge_can_copy_empty_pair(other.array())) {
+        return Array(other);
+    }
+    if (other.empty() && array_merge_can_copy_empty_pair(array.array())) {
+        return Array(array);
+    }
+
+    Array result = array_merge(array);
     SEPARATE_ARRAY(result.ptr());
     php_array_merge(result.array(), other.array());
     return result;

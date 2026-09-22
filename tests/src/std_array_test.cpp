@@ -136,6 +136,240 @@ TEST(std_array, array_merge) {
     ASSERT_EQ(m3.length(), 0);
 }
 
+TEST(std_array, array_merge_reindexes_numeric_keys_in_first_array) {
+    Array first;
+    first.set(9, "a");
+    first.set(-4, "b");
+    first.set("name", "first");
+
+    auto single = fn::array_merge(first);
+    ASSERT_TRUE(same(single, call("array_merge", {first})));
+    ASSERT_EQ(single.length(), 3);
+    ASSERT_STREQ(single.get(0).toString().toCString(), "a");
+    ASSERT_STREQ(single.get(1).toString().toCString(), "b");
+    ASSERT_STREQ(single.get("name").toString().toCString(), "first");
+    auto single_keys = fn::array_keys(single);
+    ASSERT_EQ(single_keys.get(0).toInt(), 0);
+    ASSERT_EQ(single_keys.get(1).toInt(), 1);
+    ASSERT_STREQ(single_keys.get(2).toCString(), "name");
+
+    Array second;
+    second.set(42, "c");
+    second.set("name", "second");
+
+    auto merged = fn::array_merge(first, second);
+    ASSERT_TRUE(same(merged, call("array_merge", {first, second})));
+    ASSERT_EQ(merged.length(), 4);
+    ASSERT_STREQ(merged.get(0).toString().toCString(), "a");
+    ASSERT_STREQ(merged.get(1).toString().toCString(), "b");
+    ASSERT_STREQ(merged.get(2).toString().toCString(), "c");
+    ASSERT_STREQ(merged.get("name").toString().toCString(), "second");
+    auto merged_keys = fn::array_keys(merged);
+    ASSERT_EQ(merged_keys.get(0).toInt(), 0);
+    ASSERT_EQ(merged_keys.get(1).toInt(), 1);
+    ASSERT_STREQ(merged_keys.get(2).toCString(), "name");
+    ASSERT_EQ(merged_keys.get(3).toInt(), 2);
+}
+
+TEST(std_array, array_merge_matches_php_for_holes_tail_deletions_and_empty_input) {
+    Array with_hole{"zero", "one", "two"};
+    ASSERT_TRUE(with_hole.del(1));
+    auto hole_result = fn::array_merge(with_hole);
+    ASSERT_TRUE(same(hole_result, call("array_merge", {with_hole})));
+    ASSERT_STREQ(hole_result.get(0).toCString(), "zero");
+    ASSERT_STREQ(hole_result.get(1).toCString(), "two");
+
+    Array with_deleted_tail{"zero", "one"};
+    ASSERT_TRUE(with_deleted_tail.del(1));
+    auto tail_result = fn::array_merge(with_deleted_tail);
+    ASSERT_TRUE(same(tail_result, call("array_merge", {with_deleted_tail})));
+    ASSERT_STREQ(tail_result.get(0).toCString(), "zero");
+
+    Array empty;
+    ASSERT_TRUE(same(fn::array_merge(empty), call("array_merge", {empty})));
+}
+
+TEST(std_array, array_merge_empty_pair_preserves_php_append_keys) {
+    Array with_deleted_tail{"zero", "one"};
+    ASSERT_TRUE(with_deleted_tail.del(1));
+    Array empty;
+
+    auto empty_second = fn::array_merge(with_deleted_tail, empty);
+    ASSERT_TRUE(same(empty_second, call("array_merge", {with_deleted_tail, empty})));
+    ASSERT_EQ(empty_second.array(), with_deleted_tail.array());
+    empty_second.append("next");
+    ASSERT_STREQ(empty_second.get(2).toCString(), "next");
+    ASSERT_STREQ(with_deleted_tail.get(0).toCString(), "zero");
+
+    auto empty_first = fn::array_merge(empty, with_deleted_tail);
+    ASSERT_TRUE(same(empty_first, call("array_merge", {empty, with_deleted_tail})));
+    ASSERT_EQ(empty_first.array(), with_deleted_tail.array());
+    empty_first.append("next");
+    ASSERT_STREQ(empty_first.get(2).toCString(), "next");
+
+    Array first_empty{"first"};
+    ASSERT_TRUE(first_empty.del(0));
+    Array second_empty{"first", "second"};
+    ASSERT_TRUE(second_empty.del(0));
+    ASSERT_TRUE(second_empty.del(1));
+    auto both_empty = fn::array_merge(first_empty, second_empty);
+    ASSERT_TRUE(same(both_empty, call("array_merge", {first_empty, second_empty})));
+    ASSERT_EQ(both_empty.array(), second_empty.array());
+    both_empty.append("next");
+    ASSERT_STREQ(both_empty.get(2).toCString(), "next");
+
+    Array with_hole{"zero", "one", "two"};
+    ASSERT_TRUE(with_hole.del(1));
+    auto hole_result = fn::array_merge(with_hole, empty);
+    ASSERT_TRUE(same(hole_result, call("array_merge", {with_hole, empty})));
+    ASSERT_NE(hole_result.array(), with_hole.array());
+    hole_result.append("next");
+    ASSERT_STREQ(hole_result.get(2).toCString(), "next");
+}
+
+TEST(std_array, array_merge_variadic_does_not_apply_empty_pair_fast_path) {
+    Array with_deleted_tail{"zero", "one"};
+    ASSERT_TRUE(with_deleted_tail.del(1));
+    Array empty;
+    Array next;
+    next.set(42, "next");
+
+    auto three = fn::array_merge(with_deleted_tail, empty, next);
+    ASSERT_TRUE(same(three, call("array_merge", {with_deleted_tail, empty, next})));
+    ASSERT_STREQ(three.get(0).toCString(), "zero");
+    ASSERT_STREQ(three.get(1).toCString(), "next");
+    three.append("after three");
+    ASSERT_STREQ(three.get(2).toCString(), "after three");
+
+    auto four = fn::array_merge(with_deleted_tail, empty, empty, next);
+    ASSERT_TRUE(same(four, call("array_merge", {with_deleted_tail, empty, empty, next})));
+    ASSERT_STREQ(four.get(0).toCString(), "zero");
+    ASSERT_STREQ(four.get(1).toCString(), "next");
+    four.append("after four");
+    ASSERT_STREQ(four.get(2).toCString(), "after four");
+
+    Array empty_with_next_two{"first", "second"};
+    ASSERT_TRUE(empty_with_next_two.del(0));
+    ASSERT_TRUE(empty_with_next_two.del(1));
+    auto trailing_empty = fn::array_merge(empty, empty, empty_with_next_two);
+    ASSERT_TRUE(same(trailing_empty, call("array_merge", {empty, empty, empty_with_next_two})));
+    trailing_empty.append("next");
+    ASSERT_STREQ(trailing_empty.get(0).toCString(), "next");
+}
+
+TEST(std_array, array_merge_matches_php_key_and_next_index_matrix) {
+    constexpr size_t shape_count = 7;
+    const char *shape_names[shape_count] = {
+        "fresh_empty", "empty_next_two", "dense_packed", "tail_deleted",
+        "holes", "mixed_negative_numeric", "pure_string_stale_next",
+    };
+    auto make_shape = [](size_t shape) {
+        Array array;
+        switch (shape) {
+        case 0:
+            return array;
+        case 1:
+            array.append("first");
+            array.append("second");
+            array.del(0);
+            array.del(1);
+            return array;
+        case 2:
+            array.append("zero");
+            array.append("one");
+            return array;
+        case 3:
+            array.append("zero");
+            array.append("one");
+            array.del(1);
+            return array;
+        case 4:
+            array.append("zero");
+            array.append("one");
+            array.append("two");
+            array.del(1);
+            return array;
+        case 5:
+            array.set(-4, "negative");
+            array.set("name", "named");
+            return array;
+        case 6:
+            array.set("name", "named");
+            array.set(4, "numeric");
+            array.del(4);
+            return array;
+        default:
+            return array;
+        }
+    };
+
+    for (size_t first = 0; first < shape_count; first++) {
+        for (size_t second = 0; second < shape_count; second++) {
+            auto a = make_shape(first);
+            auto b = make_shape(second);
+            auto actual = fn::array_merge(a, b);
+            auto expected = call("array_merge", {a, b}).toArray();
+            EXPECT_TRUE(same(actual, expected)) << shape_names[first] << ", " << shape_names[second];
+            actual.append("next");
+            expected.append("next");
+            EXPECT_TRUE(same(actual, expected)) << shape_names[first] << ", " << shape_names[second];
+        }
+    }
+
+    for (size_t first = 0; first < shape_count; first++) {
+        for (size_t second = 0; second < shape_count; second++) {
+            for (size_t third = 0; third < shape_count; third++) {
+                auto a = make_shape(first);
+                auto b = make_shape(second);
+                auto c = make_shape(third);
+                auto actual = fn::array_merge(a, b, c);
+                auto expected = call("array_merge", {a, b, c}).toArray();
+                EXPECT_TRUE(same(actual, expected))
+                    << shape_names[first] << ", " << shape_names[second] << ", " << shape_names[third];
+                actual.append("next");
+                expected.append("next");
+                EXPECT_TRUE(same(actual, expected))
+                    << shape_names[first] << ", " << shape_names[second] << ", " << shape_names[third];
+            }
+        }
+    }
+}
+
+TEST(std_array, array_merge_preserves_copy_on_write_and_references) {
+    Array input;
+    input.set(9, "input");
+    Array other;
+    other.set(42, "other");
+    auto result = fn::array_merge(input, other);
+
+    result.set(0, "result");
+    ASSERT_STREQ(input.get(9).toCString(), "input");
+    input.set(9, "changed input");
+    ASSERT_STREQ(result.get(0).toCString(), "result");
+    result.set(1, "changed result");
+    ASSERT_STREQ(other.get(42).toCString(), "other");
+    other.set(42, "changed other");
+    ASSERT_STREQ(result.get(1).toCString(), "changed result");
+
+    Array packed{"packed"};
+    auto packed_result = fn::array_merge(packed);
+    ASSERT_EQ(packed_result.array(), packed.array());
+    packed_result.set(0, "changed packed result");
+    ASSERT_STREQ(packed.get(0).toCString(), "packed");
+
+    Variant value = 1;
+    Reference reference = value.toReference();
+    Variant referenced(reference.const_ptr(), Ctor::CopyRef);
+    Array referenced_input;
+    referenced_input.set(9, referenced);
+    auto referenced_result = fn::array_merge(referenced_input);
+
+    ASSERT_TRUE(referenced_result.get(0).isReference());
+    referenced_result[0] = 2;
+    ASSERT_EQ(value.toInt(), 2);
+    ASSERT_EQ(referenced_input.get(9).toInt(), 2);
+}
+
 TEST(std_array, array_merge_variadic) {
     Array a1;
     a1.set(Variant(0), "a");
