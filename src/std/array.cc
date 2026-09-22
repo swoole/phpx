@@ -76,8 +76,13 @@ Bool in_array(const Variant &needle, const Array &haystack, bool strict) {
 // ========================
 
 Int count(const Variant &value, Int mode) {
+    if (mode != PHP_COUNT_NORMAL && mode != PHP_COUNT_RECURSIVE) {
+        throwException(zend_ce_value_error,
+                       "count(): Argument #2 ($mode) must be either COUNT_NORMAL or COUNT_RECURSIVE");
+        return 0;
+    }
     if (value.isArray()) {
-        if (mode == 1) {
+        if (mode == PHP_COUNT_RECURSIVE) {
             return php_count_recursive(value.array());
         }
         return static_cast<Int>(zend_hash_num_elements(value.array()));
