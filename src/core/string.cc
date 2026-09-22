@@ -120,21 +120,24 @@ static Array php_do_pcre_match(String &str, const String &regx, Int flags, Int s
     pcre_cache_entry *pce; /* Compiled regular expression */
 
     /* Compile regex or get it from cache. */
-    if ((pce = pcre_get_compiled_regex_cache(regx.str())) == nullptr) {
+    pce = pcre_get_compiled_regex_cache(regx.str());
+    throwErrorIfOccurred();
+    if (pce == nullptr) {
         throwError("Failed to compile regular expression");
         return {};
     }
 
     zval count = {};
-    zval return_value = {};
+    Variant return_value;
     php_pcre_pce_incref(pce);
-    php_pcre_match_impl(pce, str.str(), &count, &return_value, global, flags, start_offset);
+    php_pcre_match_impl(pce, str.str(), &count, return_value.ptr(), global, flags, start_offset);
     php_pcre_pce_decref(pce);
+    throwErrorIfOccurred();
 
-    if (!zval_is_array(&return_value)) {
+    if (!return_value.isArray()) {
         return {};
     }
-    return Array{&return_value, Ctor::Move};
+    return Array(return_value);
 }
 
 Array String::match(const String &regx, Int flags, Int start_offset) {

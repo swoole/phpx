@@ -4,6 +4,58 @@
 
 using namespace php;
 
+TEST(string, match_propagates_invalid_flags) {
+    String subject("abc");
+    for (bool global : {false, true}) {
+        bool caught = false;
+        try {
+            if (global) {
+                subject.matchAll("/a/", 3);
+            } else {
+                subject.match("/a/", 3);
+            }
+        } catch (zend_object *) {
+            caught = true;
+            auto exception = catchException();
+            EXPECT_TRUE(exception.instanceOf("ValueError"));
+            EXPECT_TRUE(str_contains(exception.call("getMessage"), "must be a PREG_* constant").toBool());
+        }
+        if (!caught && EG(exception)) {
+            catchException();
+        }
+        EXPECT_TRUE(caught);
+    }
+}
+
+TEST(string, match_preserves_compile_error_handler_exception) {
+    eval(R"PHP(
+        set_error_handler(function () {
+            throw new RuntimeException('regex warning handler failed');
+        });
+    )PHP");
+    String subject("abc");
+    for (bool global : {false, true}) {
+        bool caught = false;
+        try {
+            if (global) {
+                subject.matchAll("/[/");
+            } else {
+                subject.match("/[/");
+            }
+        } catch (zend_object *) {
+            caught = true;
+            auto exception = catchException();
+            EXPECT_TRUE(exception.instanceOf("RuntimeException"));
+            EXPECT_TRUE(exception.call("getMessage").toString().equals("regex warning handler failed"));
+        }
+        if (!caught && EG(exception)) {
+            catchException();
+        }
+        EXPECT_TRUE(caught);
+    }
+    eval("restore_error_handler();");
+}
+
 TEST(string, match) {
     String str("foobarbaz");
     String pattern("/(foo)(bar)(baz)/");
