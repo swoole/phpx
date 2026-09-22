@@ -46,12 +46,13 @@ inline String lcfirst(const String &s) {
     if (s.length() == 0) {
         return String();
     }
+    if (s.data()[0] < 'A' || s.data()[0] > 'Z') {
+        return s;
+    }
     zend_string *result = zend_string_alloc(s.length(), 0);
     ZSTR_VAL(result)[s.length()] = '\0';
     memcpy(ZSTR_VAL(result), s.data(), s.length());
-    if (ZSTR_VAL(result)[0] >= 'A' && ZSTR_VAL(result)[0] <= 'Z') {
-        ZSTR_VAL(result)[0] = (char) (ZSTR_VAL(result)[0] + 32);
-    }
+    ZSTR_VAL(result)[0] = (char) (ZSTR_VAL(result)[0] + 32);
     return String(result, Ctor::Move);
 }
 
@@ -156,12 +157,13 @@ inline String ucfirst(const String &s) {
     if (s.length() == 0) {
         return String();
     }
+    if (s.data()[0] < 'a' || s.data()[0] > 'z') {
+        return s;
+    }
     zend_string *result = zend_string_alloc(s.length(), 0);
     ZSTR_VAL(result)[s.length()] = '\0';
     memcpy(ZSTR_VAL(result), s.data(), s.length());
-    if (ZSTR_VAL(result)[0] >= 'a' && ZSTR_VAL(result)[0] <= 'z') {
-        ZSTR_VAL(result)[0] = (char) (ZSTR_VAL(result)[0] - 32);
-    }
+    ZSTR_VAL(result)[0] = (char) (ZSTR_VAL(result)[0] - 32);
     return String(result, Ctor::Move);
 }
 
