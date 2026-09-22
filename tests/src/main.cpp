@@ -64,7 +64,9 @@ void try_call(const std::function<void(void)> &fn, const php::String &msg, bool 
             fprintf(stderr, "ERROR: %s\n", s.toCString());
         }
         EXPECT_TRUE(expected);
+        return;
     }
+    ADD_FAILURE() << "Expected a PHP exception containing: " << msg.toCString();
 }
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_void, 0, 0, IS_VOID, 0)

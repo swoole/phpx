@@ -128,14 +128,11 @@ TEST(variant_edge, append_null_becomes_array) {
     try_call([&]() { v.append("hello"); }, "Cannot append element to an `null`");
 }
 
-// Test newItem on null triggers error
-TEST(variant_edge, newItem_null) {
-    try_call(
-        []() {
-            var v;
-            v.newItem();
-        },
-        "Cannot get new element on `null`");
+TEST(variant_edge, newItem_null_becomes_array) {
+    var v;
+    v.newItem() = 2026;
+    ASSERT_TRUE(v.isArray());
+    ASSERT_EQ(v.offsetGet(0).toInt(), 2026);
 }
 
 // Test newItem on ArrayObject via Variant
@@ -146,14 +143,13 @@ TEST(variant_edge, newItem_object) {
     ASSERT_EQ(v.offsetGet(0).toInt(), 2025);
 }
 
-// Test itemRef on scalar triggers error
-TEST(variant_edge, itemRef_non_indirect_non_ref) {
-    try_call(
-        []() {
-            var v(42);
-            v.itemRef(0);
-        },
-        "Only array/object/string support the item");
+TEST(variant_edge, itemRef_scalar_becomes_array) {
+    var v(42);
+    auto ref = v.itemRef(0);
+    ASSERT_TRUE(v.isArray());
+    ASSERT_TRUE(ref.isReference());
+    ref = 7;
+    ASSERT_EQ(v.offsetGet(0).toInt(), 7);
 }
 
 // Test attrRef on property creates reference and assigns

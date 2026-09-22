@@ -37,11 +37,11 @@ TEST(object_extra, count) {
 
 TEST(object_extra, count_exception) {
     eval(R"(
-        class PhpxThrowingCountable implements Countable {
+        class PhpxThrowingArrayObject extends ArrayObject {
             public function count(): int { throw new RuntimeException('count failed'); }
         }
     )");
-    Object obj = eval("return new PhpxThrowingCountable();");
+    Object obj = eval("return new PhpxThrowingArrayObject();");
 
     try_call([&obj]() { obj.count(); }, "count failed");
 }
