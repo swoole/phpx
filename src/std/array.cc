@@ -353,9 +353,20 @@ Array array_fill(Int start_index, Int count, const Variant &value) {
     zend_array *dest = zend_new_array(static_cast<uint32_t>(count));
     zval val_copy;
 
-    for (Int i = 0; i < count; i++) {
-        ZVAL_COPY(&val_copy, value.unwrap_ptr());
-        zend_hash_index_update(dest, start_index + i, &val_copy);
+    if (start_index == 0) {
+        zend_hash_real_init_packed(dest);
+        ZEND_HASH_FILL_PACKED(dest) {
+            for (Int i = 0; i < count; i++) {
+                ZVAL_COPY(&val_copy, value.unwrap_ptr());
+                ZEND_HASH_FILL_ADD(&val_copy);
+            }
+        }
+        ZEND_HASH_FILL_END();
+    } else {
+        for (Int i = 0; i < count; i++) {
+            ZVAL_COPY(&val_copy, value.unwrap_ptr());
+            zend_hash_index_update(dest, start_index + i, &val_copy);
+        }
     }
 
     Array result;
