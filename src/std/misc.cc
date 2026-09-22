@@ -29,7 +29,7 @@ namespace php::fn {
 
 Variant version_compare(const String &v1, const String &v2, const Variant &op) {
     int result = php_version_compare(v1.data(), v2.data());
-    if (op.isNull() || op.toString().empty()) {
+    if (op.isNull()) {
         return Variant(static_cast<Int>(result));
     }
 

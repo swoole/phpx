@@ -350,8 +350,28 @@ TEST(std_misc, version_compare) {
     ASSERT_TRUE(fn::version_compare("1.0", "2.0", "!=").toBool());
     ASSERT_TRUE(fn::version_compare("1.0", "2.0", "<>").toBool());
     ASSERT_TRUE(fn::version_compare("1.0", "2.0", "ne").toBool());
-    ASSERT_EQ(fn::version_compare("1.0", "1.0", "").toInt(), 0);
-    try_call([]() { fn::version_compare("1", "2", "invalid"); }, "must be a valid comparison operator");
+    auto equal = fn::version_compare("1.0", "1.0", null);
+    ASSERT_TRUE(equal.isInt());
+    ASSERT_EQ(equal.toInt(), 0);
+    ASSERT_EQ(fn::version_compare("1.0", "2.0", null).toInt(), -1);
+    ASSERT_EQ(fn::version_compare("2.0", "1.0", null).toInt(), 1);
+}
+
+TEST(std_misc, version_compare_invalid_operator) {
+    for (const char *op : {"", "invalid"}) {
+        SCOPED_TRACE(op);
+        bool caught = false;
+        try {
+            fn::version_compare("1", "2", op);
+        } catch (zend_object *) {
+            auto exception = catchException();
+            EXPECT_TRUE(exception.instanceOf("ValueError"));
+            EXPECT_STREQ(exception.call("getMessage").toCString(),
+                         "version_compare(): Argument #3 ($operator) must be a valid comparison operator");
+            caught = true;
+        }
+        EXPECT_TRUE(caught);
+    }
 }
 
 // ========================
