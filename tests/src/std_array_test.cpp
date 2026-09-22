@@ -181,6 +181,155 @@ TEST(std_array, array_search) {
     ASSERT_STREQ(fn::array_search("7", keyed).toCString(), "named");
 }
 
+TEST(std_array, searches_propagate_comparison_exceptions) {
+    eval(R"(
+        class PhpxThrowingSearchValue {
+            public function __toString(): string {
+                throw new RuntimeException('array comparison failed');
+            }
+        }
+    )");
+    Array values = eval("return [new PhpxThrowingSearchValue(), 'needle'];");
+    for (int operation = 0; operation < 3; operation++) {
+        SCOPED_TRACE(operation);
+        bool caught = false;
+        try {
+            if (operation == 0) {
+                fn::in_array("needle", values);
+            } else if (operation == 1) {
+                fn::array_search("needle", values);
+            } else {
+                fn::array_keys_filter(values, "needle", false);
+            }
+        } catch (zend_object *) {
+            caught = true;
+            auto exception = php::catchException();
+            EXPECT_EQ(exception.getClassName().toStdString(), "RuntimeException");
+            EXPECT_EQ(exception.call("getMessage").toStdString(), "array comparison failed");
+        }
+        // Clear a leaked pending exception so a failed assertion cannot affect later tests.
+        if (EG(exception)) {
+            php::catchException();
+        }
+        EXPECT_TRUE(caught);
+    }
+    EXPECT_TRUE(fn::in_array("needle", values, true));
+    EXPECT_EQ(fn::array_search("needle", values, true).toInt(), 1);
+    EXPECT_EQ(fn::array_keys_filter(values, "needle", true).count(), 1);
+}
+
+TEST(std_array, searches_snapshot_arguments_before_comparison_callbacks) {
+    eval(R"(
+        class PhpxMutatingSearchValue {
+            public function __construct(private string $value) {}
+            public function __toString(): string {
+                $GLOBALS['phpx_search_needle'] = 'changed';
+                $GLOBALS['phpx_search_values'] = [];
+                $GLOBALS['phpx_search_calls']++;
+                return $this->value;
+            }
+        }
+    )");
+    for (int operation = 0; operation < 3; operation++) {
+        SCOPED_TRACE(operation);
+        std::string outcomes[2];
+        for (int native = 0; native < 2; native++) {
+            eval(R"(
+                $GLOBALS['phpx_search_needle'] = 'needle';
+                $GLOBALS['phpx_search_values'] = [
+                    'first' => new PhpxMutatingSearchValue('other'),
+                    'match' => 'needle',
+                    'last' => new PhpxMutatingSearchValue('needle'),
+                ];
+                $GLOBALS['phpx_search_calls'] = 0;
+            )");
+            Variant needle(zend_hash_str_find(&EG(symbol_table), ZEND_STRL("phpx_search_needle")), Ctor::Indirect);
+            Array values(zend_hash_str_find(&EG(symbol_table), ZEND_STRL("phpx_search_values")), Ctor::Indirect);
+            Variant result;
+            if (operation == 0) {
+                result = native ? php::call("in_array", {needle, values}) : Variant(fn::in_array(needle, values));
+            } else if (operation == 1) {
+                result = native ? php::call("array_search", {needle, values}) : fn::array_search(needle, values);
+            } else {
+                result = native ? php::call("array_keys", {values, needle})
+                                : Variant(fn::array_keys_filter(values, needle, false));
+            }
+            outcomes[native] = php::call("serialize", {result}).toStdString();
+            EXPECT_EQ(needle.toStdString(), "changed");
+            EXPECT_EQ(values.count(), 0);
+            EXPECT_EQ(eval("return $GLOBALS['phpx_search_calls'];").toInt(), operation == 2 ? 2 : 1);
+            eval("unset($GLOBALS['phpx_search_needle'], $GLOBALS['phpx_search_values'], $GLOBALS['phpx_search_calls']);");
+        }
+        EXPECT_EQ(outcomes[0], outcomes[1]);
+    }
+}
+
+TEST(std_array, searches_propagate_snapshot_destructor_exceptions) {
+    eval(R"(
+        class PhpxDestructingSearchValue {
+            public function __toString(): string {
+                $GLOBALS['phpx_destructing_search'] = [];
+                return 'needle';
+            }
+            public function __destruct() {
+                throw new RuntimeException('search destruction failed');
+            }
+        }
+    )");
+    for (int operation = 0; operation < 3; operation++) {
+        SCOPED_TRACE(operation);
+        eval("$GLOBALS['phpx_destructing_search'] = [new PhpxDestructingSearchValue()];");
+        Array values(zend_hash_str_find(&EG(symbol_table), ZEND_STRL("phpx_destructing_search")), Ctor::Indirect);
+        bool caught = false;
+        try {
+            if (operation == 0) {
+                fn::in_array("needle", values);
+            } else if (operation == 1) {
+                fn::array_search("needle", values);
+            } else {
+                fn::array_keys_filter(values, "needle", false);
+            }
+        } catch (zend_object *) {
+            caught = true;
+            auto exception = php::catchException();
+            EXPECT_EQ(exception.getClassName().toStdString(), "RuntimeException");
+            EXPECT_EQ(exception.call("getMessage").toStdString(), "search destruction failed");
+        }
+        if (EG(exception)) {
+            php::catchException();
+        }
+        EXPECT_TRUE(caught);
+        eval("unset($GLOBALS['phpx_destructing_search']);");
+    }
+}
+
+TEST(std_array, search_snapshots_preserve_referenced_elements) {
+    eval(R"(
+        class PhpxReferenceSearchValue {
+            public function __toString(): string {
+                $GLOBALS['phpx_search_reference'] = 'needle';
+                return 'other';
+            }
+        }
+    )");
+    for (int operation = 0; operation < 3; operation++) {
+        Array values = eval(R"(
+            $GLOBALS['phpx_search_reference'] = 'before';
+            return [new PhpxReferenceSearchValue(), &$GLOBALS['phpx_search_reference']];
+        )");
+        if (operation == 0) {
+            EXPECT_TRUE(fn::in_array("needle", values));
+        } else if (operation == 1) {
+            EXPECT_EQ(fn::array_search("needle", values).toInt(), 1);
+        } else {
+            auto keys = fn::array_keys_filter(values, "needle", false);
+            ASSERT_EQ(keys.count(), 1);
+            EXPECT_EQ(keys.get(0).toInt(), 1);
+        }
+    }
+    eval("unset($GLOBALS['phpx_search_reference']);");
+}
+
 TEST(std_array, array_keys) {
     Array a;
     a.set(String("x"), 1);
