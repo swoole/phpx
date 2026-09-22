@@ -3,6 +3,70 @@
 
 using namespace php;
 
+TEST(std_math, round_integer_modes) {
+    struct RoundCase {
+        Int mode;
+        Float positive;
+        Float negative;
+    };
+    const RoundCase cases[] = {
+        {PHP_ROUND_HALF_UP, 2.0, -2.0},
+        {PHP_ROUND_HALF_DOWN, 1.0, -1.0},
+        {PHP_ROUND_HALF_EVEN, 2.0, -2.0},
+        {PHP_ROUND_HALF_ODD, 1.0, -1.0},
+        {PHP_ROUND_AWAY_FROM_ZERO, 2.0, -2.0},
+        {PHP_ROUND_TOWARD_ZERO, 1.0, -1.0},
+        {PHP_ROUND_CEILING, 2.0, -1.0},
+        {PHP_ROUND_FLOOR, 1.0, -2.0},
+    };
+    for (const auto &test : cases) {
+        SCOPED_TRACE(test.mode);
+        EXPECT_DOUBLE_EQ(fn::round(1.5, 0, test.mode), test.positive);
+        EXPECT_DOUBLE_EQ(fn::round(-1.5, 0, test.mode), test.negative);
+    }
+}
+
+TEST(std_math, round_invalid_modes) {
+    const Int modes[] = {
+        -1, 0, 9, std::numeric_limits<Int>::min(), std::numeric_limits<Int>::max(),
+#if SIZEOF_ZEND_LONG > 4
+        static_cast<Int>(std::numeric_limits<unsigned int>::max()) + 2,
+#endif
+    };
+    for (Int mode : modes) {
+        SCOPED_TRACE(mode);
+        bool caught = false;
+        try {
+            fn::round(1.5, 0, mode);
+        } catch (zend_object *) {
+            auto exception = catchException();
+            EXPECT_TRUE(exception.instanceOf("ValueError"));
+            EXPECT_STREQ(exception.call("getMessage").toCString(),
+                         "round(): Argument #3 ($mode) must be a valid rounding mode (RoundingMode::*)");
+            caught = true;
+        }
+        EXPECT_TRUE(caught);
+    }
+}
+
+TEST(std_math, round_extreme_precision) {
+#if SIZEOF_ZEND_LONG > 4
+    const Int precisions[] = {
+        static_cast<Int>(std::numeric_limits<int>::max()) + 1,
+        static_cast<Int>(std::numeric_limits<int>::min()) - 1,
+        std::numeric_limits<Int>::max(),
+        std::numeric_limits<Int>::min(),
+    };
+    for (Int precision : precisions) {
+        SCOPED_TRACE(precision);
+        EXPECT_DOUBLE_EQ(fn::round(1.2345, precision), precision > 0 ? 1.2345 : 0.0);
+        EXPECT_DOUBLE_EQ(fn::round(-1.2345, precision), precision > 0 ? -1.2345 : 0.0);
+    }
+#else
+    GTEST_SKIP() << "Requires PHP integers wider than int";
+#endif
+}
+
 TEST(std_math, abs) {
     var a = "-10";
     ASSERT_EQ(fn::abs(a).toInt(), 10);
