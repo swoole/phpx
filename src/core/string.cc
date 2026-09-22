@@ -17,6 +17,7 @@
 #include "phpx.h"
 
 #include "slice.h"
+#include "std/string.h"
 
 extern "C" {
 #include "ext/pcre/php_pcre.h"
@@ -156,9 +157,7 @@ String String::substr(Int f, Int l) const {
 }
 
 Array String::split(const String &delim, const Int limit) const {
-    Array retval;
-    php_explode(delim.str(), str(), retval.ptr(), limit);
-    return retval;
+    return fn::explode(delim, *this, limit);
 }
 
 String String::stripTags(const String &allow, bool allow_tag_spaces) const {
