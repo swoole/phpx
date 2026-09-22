@@ -786,6 +786,59 @@ TEST(std_array, array_fill) {
              "Cannot add element to the array as the next element is already occupied");
 }
 
+TEST(std_array, array_fill_matches_native_keys_and_append) {
+    Array values;
+    values.append(Variant());
+    values.append(true);
+    values.append(42);
+    values.append(1.5);
+    values.append(String("a\0b", 3));
+    values.append(Array{1, 2});
+    values.append(newObject("stdClass"));
+
+    for (Int start : {Int(-2), Int(0), Int(1), Int(20)}) {
+        for (Int count : {Int(0), Int(1), Int(3), Int(9), Int(100)}) {
+            for (size_t i = 0; i < values.length(); i++) {
+                SCOPED_TRACE(start);
+                SCOPED_TRACE(count);
+                SCOPED_TRACE(i);
+                auto value = values.get(static_cast<Int>(i));
+                Array args{start, count, value};
+                Array expected(call("array_fill", args));
+                auto actual = fn::array_fill(start, count, value);
+                EXPECT_TRUE(actual.equals(expected, true));
+                actual.append("tail");
+                expected.append("tail");
+                EXPECT_TRUE(actual.equals(expected, true));
+            }
+        }
+    }
+}
+
+TEST(std_array, array_fill_retains_values_and_preserves_copy_on_write) {
+    auto object = newObject("stdClass");
+    auto initial_refs = Z_REFCOUNT_P(object.unwrap_ptr());
+    {
+        auto filled = fn::array_fill(0, 9, object);
+        EXPECT_EQ(Z_REFCOUNT_P(object.unwrap_ptr()), initial_refs + 9);
+        filled.set(0, Variant());
+        EXPECT_EQ(Z_REFCOUNT_P(object.unwrap_ptr()), initial_refs + 8);
+        EXPECT_TRUE(filled.get(1).equals(object, true));
+    }
+    EXPECT_EQ(Z_REFCOUNT_P(object.unwrap_ptr()), initial_refs);
+
+    Array value{1, 2};
+    auto filled = fn::array_fill(0, 3, value);
+    value.set(0, 99);
+    EXPECT_TRUE(filled.get(0).equals(Array{1, 2}, true));
+    Array first(filled.get(0));
+    first.set(0, 42);
+    filled.set(0, first);
+    EXPECT_TRUE(filled.get(0).equals(Array{42, 2}, true));
+    EXPECT_TRUE(filled.get(1).equals(Array{1, 2}, true));
+    EXPECT_TRUE(value.equals(Array{99, 2}, true));
+}
+
 TEST(std_array, array_keys_filter) {
     Array a;
     a.set(String("a"), 1);
