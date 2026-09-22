@@ -132,7 +132,7 @@ inline String str_repeat(const String &s, Int times) {
                             "str_repeat(): Argument #2 ($times) must be greater than or equal to 0");
         return String();
     }
-    if (times == 0) {
+    if (times == 0 || s.empty()) {
         return String();
     }
     size_t slen = s.length();
