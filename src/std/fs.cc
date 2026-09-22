@@ -30,12 +30,24 @@ Bool file_exists(const String &filename) {
 }
 
 Variant realpath(const String &path) {
-    // expand_filepath() follows Zend's MAXPATHLEN contract. PATH_MAX is not
-    // guaranteed to describe the same buffer size, notably on Windows.
+    if (memchr(path.data(), '\0', path.length())) {
+        php::throwException(zend_ce_value_error,
+                            "realpath(): Argument #1 ($path) must not contain any null bytes");
+        return Variant();
+    }
+
     char resolved[MAXPATHLEN];
-    if (!expand_filepath(path.data(), resolved)) {
+    if (!VCWD_REALPATH(path.data(), resolved)) {
         return Variant(false);
     }
+    if (php_check_open_basedir(resolved)) {
+        return Variant(false);
+    }
+#ifdef ZTS
+    if (VCWD_ACCESS(resolved, F_OK)) {
+        return Variant(false);
+    }
+#endif
     return Variant(String(resolved));
 }
 
