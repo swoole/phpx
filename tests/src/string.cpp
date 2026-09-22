@@ -148,7 +148,7 @@ TEST(string, split) {
 
 TEST(string, replace) {
     String str("<h1>hello world!</h1>");
-    str.stripTags("<br>");
+    str = str.stripTags("<br>");
     ASSERT_TRUE(str.equals(std::string("hello world!")));
 
     auto s1 = "'hello world'";
@@ -156,7 +156,7 @@ TEST(string, replace) {
     auto s3 = s2.addSlashes();
     ASSERT_TRUE(s3.equals(std::string("\\'hello world\\'")));
 
-    s3.stripSlashes();
+    s3 = s3.stripSlashes();
     ASSERT_TRUE(s3.equals(s1));
 }
 
