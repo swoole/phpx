@@ -30,6 +30,129 @@ TEST(std_array, array_key_exists) {
     ASSERT_FALSE(fn::array_key_exists(99, a));
 }
 
+namespace {
+
+std::string capture_array_key_exists(const Variant &key, const Array &array, bool native, bool throw_errors = false) {
+    eval(R"(
+        $GLOBALS['phpx_array_key_diagnostics'] = [];
+        set_error_handler(static function ($severity, $message) {
+            $GLOBALS['phpx_array_key_diagnostics'][] = [$severity, $message];
+            return true;
+        });
+    )");
+    if (throw_errors) {
+        eval(R"(
+            restore_error_handler();
+            set_error_handler(static function ($severity, $message) {
+                throw new ErrorException($message, 0, $severity);
+            });
+        )");
+    }
+    std::string outcome;
+    try {
+        Variant result = native ? php::call("array_key_exists", {key, array})
+                                : Variant(fn::array_key_exists(key, array));
+        outcome = result.toBool() ? "true" : "false";
+    } catch (zend_object *) {
+        auto exception = php::catchException();
+        outcome = exception.getClassName().toStdString() + ":" + exception.call("getMessage").toStdString();
+    }
+    eval("restore_error_handler();");
+    outcome += "|" + eval("return json_encode($GLOBALS['phpx_array_key_diagnostics']);").toStdString();
+    eval("unset($GLOBALS['phpx_array_key_diagnostics']);");
+    return outcome;
+}
+
+}  // namespace
+
+TEST(std_array, array_key_exists_key_types_match_php) {
+    Array array = eval(R"(return [0 => null, 1 => false, -2 => true, '' => 'empty', '01' => null, "a\0b" => true];)");
+    Variant resource = eval("return fopen('php://memory', 'r+');");
+    array.set(Variant(Z_RES_HANDLE_P(resource.unwrap_ptr())), "resource");
+    const Variant keys[] = {false,
+                            true,
+                            nullptr,
+                            1.0,
+                            -2.0,
+                            99.0,
+                            1.5,
+                            -2.5,
+                            std::numeric_limits<double>::infinity(),
+                            std::numeric_limits<double>::quiet_NaN(),
+                            "0",
+                            "01",
+                            "-2",
+                            "missing",
+                            std::string("a\0b", 3),
+                            resource,
+                            Array(),
+                            newObject("stdClass")};
+    for (const auto &key : keys) {
+        SCOPED_TRACE(key.typeStr());
+        EXPECT_EQ(capture_array_key_exists(key, array, false), capture_array_key_exists(key, array, true));
+        Array empty;
+        EXPECT_EQ(capture_array_key_exists(key, empty, false), capture_array_key_exists(key, empty, true));
+    }
+    php::call("fclose", {resource});
+}
+
+TEST(std_array, array_key_exists_reference_key) {
+    Array array;
+    array.set(Variant(1), nullptr);
+    Variant key(true);
+    Variant reference(&key);
+    ASSERT_TRUE(reference.isReference());
+    EXPECT_TRUE(fn::array_key_exists(reference, array));
+    EXPECT_TRUE(key.isTrue());
+}
+
+TEST(std_array, array_key_exists_propagates_diagnostic_exceptions) {
+    Array array;
+    array.set(Variant(1), nullptr);
+    Variant resource = eval("return fopen('php://memory', 'r+');");
+    for (const auto &key : {Variant(1.5), Variant(nullptr), resource}) {
+        SCOPED_TRACE(key.typeStr());
+        EXPECT_EQ(capture_array_key_exists(key, array, false, true), capture_array_key_exists(key, array, true, true));
+        EXPECT_EQ(EG(exception), nullptr);
+    }
+    php::call("fclose", {resource});
+}
+
+TEST(std_array, array_key_exists_snapshots_arguments_before_diagnostics) {
+    const char *keys[] = {
+        "1.5",
+#if PHP_VERSION_ID >= 80500
+        "null",
+#endif
+        "fopen('php://memory', 'r+')",
+    };
+    for (const auto *expression : keys) {
+        SCOPED_TRACE(expression);
+        for (bool native : {false, true}) {
+            eval(std::string("$GLOBALS['phpx_lookup_key'] = ") + expression + ";");
+            eval(R"(
+                $GLOBALS['phpx_lookup_array'] = [0 => null, 1 => null, '' => null];
+                if (is_resource($GLOBALS['phpx_lookup_key'])) {
+                    $GLOBALS['phpx_lookup_array'][get_resource_id($GLOBALS['phpx_lookup_key'])] = null;
+                }
+                set_error_handler(static function () {
+                    $GLOBALS['phpx_lookup_key'] = 123;
+                    $GLOBALS['phpx_lookup_array'] = [];
+                    return true;
+                });
+            )");
+            Variant key(zend_hash_str_find(&EG(symbol_table), ZEND_STRL("phpx_lookup_key")), Ctor::Indirect);
+            Array array(zend_hash_str_find(&EG(symbol_table), ZEND_STRL("phpx_lookup_array")), Ctor::Indirect);
+            bool found = native ? php::call("array_key_exists", {key, array}).toBool() : fn::array_key_exists(key, array);
+            eval("restore_error_handler();");
+            EXPECT_TRUE(found);
+            EXPECT_EQ(key.toInt(), 123);
+            EXPECT_EQ(array.count(), 0);
+            eval("unset($GLOBALS['phpx_lookup_key'], $GLOBALS['phpx_lookup_array']);");
+        }
+    }
+}
+
 TEST(std_array, array_search) {
     Array a{1, 2, 3, "hello"};
 
