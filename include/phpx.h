@@ -1962,7 +1962,7 @@ class String : public Variant {
         return equals(v);
     }
     static String format(const char *format, ...);
-    String trim(const char *what = " \t\n\r\v\0", TrimMode mode = TRIM_BOTH) const;
+    String trim(const char *what = nullptr, TrimMode mode = TRIM_BOTH) const;
     String lower() const;
     String upper() const;
     String base64Encode() const;

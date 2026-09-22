@@ -64,7 +64,7 @@ String String::unescape(const int flags, const char *charset) const {
 }
 
 String String::trim(const char *what, TrimMode mode) const {
-    return String(php_trim(str(), what, strlen(what), mode), Ctor::Move);
+    return String(php_trim(str(), what, what ? strlen(what) : 0, mode), Ctor::Move);
 }
 
 String String::lower() const {
