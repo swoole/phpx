@@ -52,10 +52,16 @@ Array explode(const String &delimiter, const String &string, Int limit) {
 // ========================
 
 String implode(const String &glue, const Array &pieces) {
-    zval rv;
-    ZVAL_NULL(&rv);
-    php_implode(glue.str(), pieces.array(), &rv);
-    return String(&rv, Ctor::Move);
+    Variant result;
+    {
+        // Element conversion may invoke user code that replaces either input.
+        String stable_glue(glue);
+        Array stable_pieces(pieces.unwrap_ptr());
+        php_implode(stable_glue.str(), stable_pieces.array(), result.ptr());
+    }
+    // Include exceptions raised while releasing the last reference to an element.
+    throwErrorIfOccurred();
+    return String(result);
 }
 
 // ========================

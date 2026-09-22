@@ -399,6 +399,125 @@ TEST(std_string, str_repeat_exception) {
              "str_repeat(): Argument #2 ($times) must be greater than or equal to 0");
 }
 
+TEST(std_string, implode_propagates_string_conversion_exceptions) {
+    eval(R"(
+        class PhpxThrowingJoinValue {
+            public function __toString(): string {
+                throw new RuntimeException('join conversion failed');
+            }
+        }
+    )");
+    for (bool singleton : {false, true}) {
+        SCOPED_TRACE(singleton);
+        Array pieces = eval(singleton ? "return [new PhpxThrowingJoinValue()];"
+                                      : "return ['before', new PhpxThrowingJoinValue(), 'after'];");
+        for (bool alias : {false, true}) {
+            SCOPED_TRACE(alias);
+            bool caught = false;
+            try {
+                if (alias) {
+                    fn::join(",", pieces);
+                } else {
+                    fn::implode(",", pieces);
+                }
+            } catch (zend_object *) {
+                caught = true;
+                auto exception = php::catchException();
+                EXPECT_EQ(exception.getClassName().toStdString(), "RuntimeException");
+                EXPECT_EQ(exception.call("getMessage").toStdString(), "join conversion failed");
+            }
+            if (EG(exception)) {
+                php::catchException();
+            }
+            EXPECT_TRUE(caught);
+        }
+    }
+}
+
+TEST(std_string, implode_preserves_inputs_during_conversion_callbacks) {
+    eval(R"(
+        class PhpxMutatingJoinValue {
+            public function __toString(): string {
+                $GLOBALS['phpx_join_glue'] = 'changed';
+                $GLOBALS['phpx_join_pieces'] = [];
+                return 'converted';
+            }
+        }
+    )");
+    std::string outcomes[2];
+    for (int native = 0; native < 2; native++) {
+        eval(R"(
+            $GLOBALS['phpx_join_glue'] = str_repeat(':', 3);
+            $GLOBALS['phpx_join_pieces'] = ['before', new PhpxMutatingJoinValue(), 'after'];
+        )");
+        String glue(zend_hash_str_find(&EG(symbol_table), ZEND_STRL("phpx_join_glue")), Ctor::Indirect);
+        Array pieces(zend_hash_str_find(&EG(symbol_table), ZEND_STRL("phpx_join_pieces")), Ctor::Indirect);
+        outcomes[native] = native ? php::call("implode", {glue, pieces}).toStdString()
+                                 : fn::implode(glue, pieces).toStdString();
+        EXPECT_EQ(outcomes[native], "before:::converted:::after");
+        EXPECT_EQ(glue.toStdString(), "changed");
+        EXPECT_EQ(pieces.count(), 0);
+        eval("unset($GLOBALS['phpx_join_glue'], $GLOBALS['phpx_join_pieces']);");
+    }
+    EXPECT_EQ(outcomes[0], outcomes[1]);
+}
+
+TEST(std_string, implode_propagates_element_destructor_exceptions) {
+    eval(R"(
+        class PhpxDestructingJoinValue {
+            public function __toString(): string {
+                $GLOBALS['phpx_destructing_join'] = [];
+                return 'converted';
+            }
+            public function __destruct() {
+                throw new RuntimeException('join destruction failed');
+            }
+        }
+    )");
+    for (bool singleton : {false, true}) {
+        SCOPED_TRACE(singleton);
+        eval(singleton ? "$GLOBALS['phpx_destructing_join'] = [new PhpxDestructingJoinValue()];"
+                       : "$GLOBALS['phpx_destructing_join'] = ['before', new PhpxDestructingJoinValue(), 'after'];");
+        Array pieces(zend_hash_str_find(&EG(symbol_table), ZEND_STRL("phpx_destructing_join")), Ctor::Indirect);
+        bool caught = false;
+        try {
+            fn::implode(",", pieces);
+        } catch (zend_object *) {
+            caught = true;
+            auto exception = php::catchException();
+            EXPECT_EQ(exception.getClassName().toStdString(), "RuntimeException");
+            EXPECT_EQ(exception.call("getMessage").toStdString(), "join destruction failed");
+        }
+        if (EG(exception)) {
+            php::catchException();
+        }
+        EXPECT_TRUE(caught);
+        eval("unset($GLOBALS['phpx_destructing_join']);");
+    }
+}
+
+TEST(std_string, implode_propagates_error_handler_exceptions) {
+    eval(R"(
+        set_error_handler(static function ($severity, $message) {
+            throw new ErrorException($message, 0, $severity);
+        });
+    )");
+    bool caught = false;
+    try {
+        fn::implode(",", Array{Array(), "after"});
+    } catch (zend_object *) {
+        caught = true;
+        auto exception = php::catchException();
+        EXPECT_EQ(exception.getClassName().toStdString(), "ErrorException");
+        EXPECT_EQ(exception.call("getMessage").toStdString(), "Array to string conversion");
+    }
+    if (EG(exception)) {
+        php::catchException();
+    }
+    eval("restore_error_handler();");
+    EXPECT_TRUE(caught);
+}
+
 TEST(std_string, explode_implode) {
     auto parts = fn::explode(",", "a,b,c");
     ASSERT_EQ(parts.length(), 3);
