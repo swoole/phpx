@@ -271,6 +271,11 @@ String substr(const String &s, Int offset, const Variant &length) {
 // ========================
 
 String dirname(const String &path, int levels) {
+    if (levels < 1) {
+        php::throwException(zend_ce_value_error,
+                            "dirname(): Argument #2 ($levels) must be greater than or equal to 1");
+        return String();
+    }
     size_t len = path.length();
     if (len == 0) {
         return String();
