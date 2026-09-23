@@ -435,11 +435,59 @@ TEST(std_misc, shell_exec) {
 }
 
 TEST(std_misc, realpath) {
+    auto expected = call(getFunction("realpath"), {"/tmp"});
+    ASSERT_TRUE(expected.isString());
+
     auto path = fn::realpath("/tmp");
     ASSERT_TRUE(path.isString());
-    ASSERT_STREQ(path.toString().toCString(), "/tmp");
+    ASSERT_STREQ(path.toString().toCString(), expected.toString().toCString());
 
-    // expand_filepath resolves the path syntactically but does NOT verify existence
+    // PHP's realpath requires every path component to exist.
     auto resolved = fn::realpath("/no/such/path/xyz");
-    ASSERT_TRUE(resolved.isString());
+    ASSERT_TRUE(resolved.isFalse());
+}
+
+TEST(std_misc, realpath_symlinks) {
+    auto fixture = call(getFunction("tempnam"), {eval("return sys_get_temp_dir();"), "phpx-realpath-"}).toString();
+    auto symlink = fixture.concat(".link");
+    auto dangling_symlink = fixture.concat(".dangling");
+    ASSERT_TRUE(call(getFunction("symlink"), {fixture, symlink}).toBool());
+    ASSERT_TRUE(call(getFunction("symlink"), {fixture.concat("-missing"), dangling_symlink}).toBool());
+
+    auto expected = call(getFunction("realpath"), {fixture});
+    ASSERT_TRUE(expected.isString());
+    auto real_file = fn::realpath(fixture);
+    ASSERT_TRUE(real_file.isString());
+    ASSERT_STREQ(real_file.toString().toCString(), expected.toString().toCString());
+    auto resolved_symlink = fn::realpath(symlink);
+    ASSERT_TRUE(resolved_symlink.isString());
+    ASSERT_STREQ(resolved_symlink.toString().toCString(), expected.toString().toCString());
+    ASSERT_TRUE(fn::realpath(dangling_symlink).isFalse());
+
+    call(getFunction("unlink"), {dangling_symlink});
+    call(getFunction("unlink"), {symlink});
+    call(getFunction("unlink"), {fixture});
+}
+
+TEST(std_misc, realpath_null_byte) {
+    bool caught = false;
+    try {
+        fn::realpath(String("/tmp\0suffix", sizeof("/tmp\0suffix") - 1));
+    } catch (zend_object *) {
+        auto exception = catchException();
+        EXPECT_TRUE(exception.instanceOf("ValueError"));
+        EXPECT_STREQ(exception.call("getMessage").toString().toCString(),
+                     "realpath(): Argument #1 ($path) must not contain any null bytes");
+        caught = true;
+    }
+    EXPECT_TRUE(caught);
+}
+
+TEST(std_misc, realpath_open_basedir) {
+    auto blocked = run_in_child_capture_stdout([]() -> int {
+        eval("ini_set('open_basedir', '/phpx-realpath-not-allowed');");
+        return fn::realpath("/tmp").isFalse() ? 0 : 1;
+    });
+    ASSERT_TRUE(blocked.exited) << blocked.output;
+    ASSERT_EQ(blocked.exit_code, 0) << blocked.output;
 }
