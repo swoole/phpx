@@ -494,6 +494,7 @@ if(BUILD_TESTS)
             list(FILTER TEST_FILES EXCLUDE REGEX "/python_bridge\\.cpp$")
         endif()
         add_executable(phpx-tests ${TEST_FILES})
+        target_sources(phpx-tests PRIVATE src/misc/typephp_sapi.cc)
         target_include_directories(phpx-tests PRIVATE tests/include)
 
         if(IS_WINDOWS)

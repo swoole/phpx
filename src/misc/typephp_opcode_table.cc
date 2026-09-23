@@ -46,6 +46,8 @@ zend_result (*old_stream_open)(zend_file_handle *) = nullptr;
 php_stream_wrapper_ops wrapped_file_ops;
 php_stream_wrapper wrapped_file_wrapper;
 bool file_wrapper_installed = false;
+bool runtime_hooks_installed = false;
+bool opcode_table_started = false;
 
 std::string lexical_path(const std::string &path) {
     return std::filesystem::path(path).lexically_normal().string();
@@ -184,7 +186,8 @@ int stat_embedded_file(php_stream_wrapper *, const char *filename, int flags,
 
 }
 
-extern "C" void typephp_opcode_table_install(void) {
+extern "C" void typephp_opcode_table_startup(void) {
+    if (opcode_table_started) return;
     size_t count = 0;
     const typephp_opcode_entry *table = typephp_project_opcode_table(&count);
     size_t raw_count = 0;
@@ -200,12 +203,27 @@ extern "C" void typephp_opcode_table_install(void) {
     for (size_t i = 0; i < raw_count; ++i) {
         raw_entries.emplace(raw_table[i].path, &raw_table[i]);
     }
-    old_compile_file = zend_compile_file;
-    old_resolve_path = zend_resolve_path;
-    old_stream_open = zend_stream_open_function;
-    zend_compile_file = embedded_compile_file;
-    zend_resolve_path = resolve_path;
-    zend_stream_open_function = stream_open;
+    opcode_table_started = true;
+}
+
+extern "C" void typephp_opcode_table_request_startup(void) {
+    if (!opcode_table_started) return;
+
+    // Zend extensions such as OPcache install their compiler hooks after
+    // module MINIT. Chain TypePHP outside those hooks at the first request so
+    // embedded opcodes are resolved before OPcache tries to stat the synthetic
+    // zend_file_handle. Keep the process-wide chain for subsequent requests.
+    if (!runtime_hooks_installed) {
+        old_compile_file = zend_compile_file;
+        old_resolve_path = zend_resolve_path;
+        old_stream_open = zend_stream_open_function;
+        zend_compile_file = embedded_compile_file;
+        zend_resolve_path = resolve_path;
+        zend_stream_open_function = stream_open;
+        runtime_hooks_installed = true;
+    }
+
+    if (file_wrapper_installed) return;
 
     wrapped_file_ops = *php_plain_files_wrapper.wops;
     wrapped_file_ops.stream_opener = open_embedded_file;
@@ -222,6 +240,35 @@ extern "C" void typephp_opcode_table_install(void) {
     zend_string_release(protocol);
 }
 
+extern "C" void typephp_opcode_table_install(void) {
+    typephp_opcode_table_startup();
+    typephp_opcode_table_request_startup();
+}
+
+extern "C" int typephp_embedded_file_exists(const char *path) {
+    if (!path) return 0;
+    const std::string name(path);
+    return lookup(entries, name) != nullptr || lookup(raw_entries, name) != nullptr;
+}
+
+extern "C" int typephp_embedded_path_kind(const char *path) {
+    if (!path) return 0;
+    std::string name(path);
+    if (lookup(entries, name) || lookup(raw_entries, name)) return 1;
+    if (name.rfind("file://", 0) == 0) name.erase(0, 7);
+    name = lexical_path(name);
+    if (!name.empty() && name.back() != std::filesystem::path::preferred_separator) {
+        name.push_back(std::filesystem::path::preferred_separator);
+    }
+    const auto contains_child = [&name](const auto &table) {
+        for (const auto &item : table) {
+            if (item.first.rfind(name, 0) == 0) return true;
+        }
+        return false;
+    };
+    return contains_child(entries) || contains_child(raw_entries) ? 2 : 0;
+}
+
 extern "C" void typephp_opcode_table_require(const char *path) {
     const typephp_opcode_entry *entry = lookup(entries, std::string(path));
     if (!entry) {
@@ -236,17 +283,7 @@ extern "C" void typephp_opcode_table_require(const char *path) {
     zend_destroy_file_handle(&handle);
 }
 
-extern "C" void typephp_opcode_table_uninstall(void) {
-    if (old_compile_file) {
-        zend_compile_file = old_compile_file;
-        zend_resolve_path = old_resolve_path;
-        zend_stream_open_function = old_stream_open;
-        old_compile_file = nullptr;
-        old_resolve_path = nullptr;
-        old_stream_open = nullptr;
-    }
-    entries.clear();
-    raw_entries.clear();
+extern "C" void typephp_opcode_table_request_shutdown(void) {
     if (file_wrapper_installed) {
         zend_string *protocol = zend_string_init("file", sizeof("file") - 1, 0);
         php_unregister_url_stream_wrapper_volatile(protocol);
@@ -254,4 +291,25 @@ extern "C" void typephp_opcode_table_uninstall(void) {
         zend_string_release(protocol);
         file_wrapper_installed = false;
     }
+}
+
+extern "C" void typephp_opcode_table_shutdown(void) {
+    if (!opcode_table_started) return;
+    typephp_opcode_table_request_shutdown();
+    if (runtime_hooks_installed) {
+        if (zend_compile_file == embedded_compile_file) zend_compile_file = old_compile_file;
+        if (zend_resolve_path == resolve_path) zend_resolve_path = old_resolve_path;
+        if (zend_stream_open_function == stream_open) zend_stream_open_function = old_stream_open;
+        runtime_hooks_installed = false;
+    }
+    old_compile_file = nullptr;
+    old_resolve_path = nullptr;
+    old_stream_open = nullptr;
+    entries.clear();
+    raw_entries.clear();
+    opcode_table_started = false;
+}
+
+extern "C" void typephp_opcode_table_uninstall(void) {
+    typephp_opcode_table_shutdown();
 }

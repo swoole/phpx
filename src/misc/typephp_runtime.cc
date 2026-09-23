@@ -11,7 +11,12 @@ BEGIN_EXTERN_C()
 END_EXTERN_C()
 
 static void module_init(zend_module_entry *module) {
-    if (zend_register_module_ex(module, MODULE_PERSISTENT) == nullptr) {
+    // php_embed_init() has already started the request. Registering another
+    // persistent module at this point appends persistent function/class keys
+    // after Zend's request cleanup boundary. A temporary module is the Zend
+    // supported form for a module loaded during a request, and its destructor
+    // removes those symbols before shutdown_executor() walks the tables.
+    if (zend_register_module_ex(module, MODULE_TEMPORARY) == nullptr) {
         zend_error(E_ERROR, "Failed to register module [%s]", module->name);
         exit(255);
     }
@@ -61,15 +66,14 @@ static void cli_register_file_handles() {
 }
 
 static void module_shutdown(zend_module_entry *module) {
-    /**
-     * There is a bug in PHP's handling of internal strings. All interned strings are released in the request shutdown
-     * function, but then released again in the php_embed_shutdown function, resulting in a use-after-free issue. These
-     * must be manually removed from the module table to prevent double release.
-     */
+    // Removing a temporary module runs its MSHUTDOWN handler and unregisters
+    // its functions, classes, constants and INI entries before Embed shuts the
+    // request down.
     auto name_len = strlen(module->name);
     auto lcname = zend_string_alloc(name_len, module->type == MODULE_PERSISTENT);
     zend_str_tolower_copy(ZSTR_VAL(lcname), module->name, name_len);
     zend_hash_del(&module_registry, lcname);
+    zend_string_release(lcname);
 }
 
 static zend_module_entry *typephp_runtime_module = nullptr;
@@ -142,10 +146,8 @@ extern "C" void typephp_runtime_stop(void) {
     }
     zend_end_try();
 
-    // Keep this manual cleanup and registry removal. Registering an internal
-    // module after request startup exposes a PHP Embed double-release bug for
-    // its persistent strings if the module remains registered through
-    // php_module_shutdown().
+    // The TypePHP module was registered after request startup and therefore is
+    // absent from PHP's precomputed shutdown lists. Run and unload it manually.
     typephp_runtime_module->request_shutdown_func(typephp_runtime_module->type, typephp_runtime_module->module_number);
     module_shutdown(typephp_runtime_module);
     typephp_opcode_table_uninstall();
