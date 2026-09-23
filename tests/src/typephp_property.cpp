@@ -6,6 +6,11 @@ using namespace php;
 namespace {
 
 zend_object_handlers property_handlers;
+#if PHP_VERSION_ID >= 80500
+zend_object_handlers readonly_clone_handlers;
+zend_object_handlers parent_private_clone_handlers;
+zend_object_handlers throwing_clone_handlers;
+#endif
 
 zend_class_entry *property_reference_class() {
     static zend_class_entry *class_entry = nullptr;
@@ -101,6 +106,86 @@ zend_class_entry *magic_property_class(const char *name, const char *prefix) {
 Object new_property_hook_object() {
     return newObject(property_hook_class());
 }
+
+#if PHP_VERSION_ID >= 80500
+Object clone_with(const Object &object, const Array &properties) {
+    return call("clone", {object, properties}).toObject();
+}
+
+zend_class_entry *readonly_clone_class() {
+    static zend_class_entry *class_entry = nullptr;
+    if (class_entry != nullptr) {
+        return class_entry;
+    }
+
+    eval(R"PHP(
+        class PhpxReadonlyCloneCoverage {
+            public function __construct(
+                public readonly int $value,
+                public readonly string $label,
+            ) {}
+
+            public function cloneWithValue(int $value): self {
+                return clone($this, ['value' => $value]);
+            }
+        }
+    )PHP");
+
+    class_entry = getClassEntrySafe("PhpxReadonlyCloneCoverage");
+    typephp_install_property_handlers(class_entry, &readonly_clone_handlers);
+    return class_entry;
+}
+
+zend_class_entry *parent_private_clone_class() {
+    static zend_class_entry *class_entry = nullptr;
+    if (class_entry != nullptr) {
+        return class_entry;
+    }
+
+    eval(R"PHP(
+        class PhpxCloneParentCoverage {
+            private int $secret = 1;
+
+            public function cloneWithSecret(int $value): self {
+                return clone($this, ['secret' => $value]);
+            }
+
+            public function secret(): int {
+                return $this->secret;
+            }
+        }
+
+        class PhpxCloneChildCoverage extends PhpxCloneParentCoverage {
+            public int $visible = 2;
+        }
+    )PHP");
+
+    class_entry = getClassEntrySafe("PhpxCloneChildCoverage");
+    typephp_install_property_handlers(class_entry, &parent_private_clone_handlers);
+    return class_entry;
+}
+
+zend_class_entry *throwing_clone_class() {
+    static zend_class_entry *class_entry = nullptr;
+    if (class_entry != nullptr) {
+        return class_entry;
+    }
+
+    eval(R"PHP(
+        class PhpxThrowingCloneCoverage {
+            public int $value = 1;
+
+            public function __clone(): void {
+                throw new RuntimeException('clone failed');
+            }
+        }
+    )PHP");
+
+    class_entry = getClassEntrySafe("PhpxThrowingCloneCoverage");
+    typephp_install_property_handlers(class_entry, &throwing_clone_handlers);
+    return class_entry;
+}
+#endif
 
 }  // namespace
 
@@ -293,3 +378,61 @@ TEST(typephp_property, function_local_static_slot_tracks_null_references_and_inh
     ASSERT_STREQ(getStaticProperty(base, property).toCString(), "through-reference");
     ASSERT_EQ(resolutions, 1);
 }
+
+#if PHP_VERSION_ID >= 80500
+TEST(typephp_property, clone_with_updates_plain_and_hooked_properties) {
+    auto original = new_property_hook_object();
+    Array properties;
+    properties.set("plain", 15);
+    properties.set("hooked", 4);
+
+    auto cloned = clone_with(original, properties);
+
+    ASSERT_NE(cloned.object(), original.object());
+    ASSERT_EQ(cloned.attr("plain").toInt(), 15);
+    ASSERT_EQ(typephp_read_property_scoped(cloned, "hooked", property_hook_class(), AttrMode::Get).toInt(), 18);
+    ASSERT_EQ(original.attr("plain").toInt(), 3);
+    ASSERT_EQ(typephp_read_property_scoped(original, "hooked", property_hook_class(), AttrMode::Get).toInt(), 11);
+}
+
+TEST(typephp_property, clone_with_reinitializes_readonly_properties) {
+    auto original = newObject(readonly_clone_class(), {7, "original"});
+
+    auto cloned = original.call("cloneWithValue", {9}).toObject();
+
+    ASSERT_EQ(cloned.attr("value").toInt(), 9);
+    ASSERT_STREQ(cloned.attr("label").toCString(), "original");
+    ASSERT_EQ(original.attr("value").toInt(), 7);
+}
+
+TEST(typephp_property, clone_with_uses_parent_private_lexical_scope) {
+    auto original = newObject(parent_private_clone_class());
+
+    auto cloned = original.call("cloneWithSecret", {23}).toObject();
+
+    ASSERT_EQ(cloned.call("secret").toInt(), 23);
+    ASSERT_EQ(original.call("secret").toInt(), 1);
+}
+
+TEST(typephp_property, clone_with_rejects_shared_references) {
+    auto original = new_property_hook_object();
+    Variant value{12};
+    auto reference = value.toReference();
+    Array properties;
+    properties.set("plain", reference);
+
+    try_call([&]() { (void) clone_with(original, properties); },
+             "Cannot assign by reference when cloning with updated properties");
+    ASSERT_EQ(original.attr("plain").toInt(), 3);
+    ASSERT_EQ(value.toInt(), 12);
+}
+
+TEST(typephp_property, clone_with_propagates_clone_exceptions_before_updates) {
+    auto original = newObject(throwing_clone_class());
+    Array properties;
+    properties.set("value", 2);
+
+    try_call([&]() { (void) clone_with(original, properties); }, "clone failed");
+    ASSERT_EQ(original.attr("value").toInt(), 1);
+}
+#endif

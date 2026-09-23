@@ -126,6 +126,56 @@ TEST(array_converter, empty_array) {
     ASSERT_TRUE(parr.empty());
 }
 
+TEST(array_converter, typed_array_accepts_supported_key_and_value_types) {
+    Array integer_values{1, 2};
+    ASSERT_TRUE(toTypedArray(integer_values, false, TypedArrayValueType::Int).equals(integer_values, true));
+
+    Array string_values;
+    string_values.set("first", "one");
+    string_values.set("second", "two");
+    ASSERT_TRUE(toTypedArray(string_values, true, TypedArrayValueType::String).equals(string_values, true));
+
+    Array float_values{1.5, 2.5};
+    ASSERT_TRUE(toTypedArray(float_values, false, TypedArrayValueType::Float).equals(float_values, true));
+
+    Array bool_values{true, false};
+    ASSERT_TRUE(toTypedArray(bool_values, false, TypedArrayValueType::Bool).equals(bool_values, true));
+
+    Array array_values{Array{1}, Array{2}};
+    ASSERT_TRUE(toTypedArray(array_values, false, TypedArrayValueType::Array).equals(array_values, true));
+
+    Array mixed_values{1, "two", nullptr};
+    ASSERT_TRUE(toTypedArray(mixed_values, false, TypedArrayValueType::Any).equals(mixed_values, true));
+}
+
+TEST(array_converter, typed_array_validates_key_types) {
+    Array integer_keys{1};
+    try_call([&]() { (void) toTypedArray(integer_keys, true, TypedArrayValueType::Int); },
+             "Typed array key must be string, int given");
+
+    Array string_keys;
+    string_keys.set("value", 1);
+    try_call([&]() { (void) toTypedArray(string_keys, false, TypedArrayValueType::Int); },
+             "Typed array key must be int, string given");
+}
+
+TEST(array_converter, typed_array_validates_value_types) {
+    Array values{1, "two"};
+    try_call([&]() { (void) toTypedArray(values, false, TypedArrayValueType::Int); },
+             "Typed array value has incompatible type string");
+}
+
+TEST(array_converter, typed_object_array_validates_class_constraints) {
+    Array exceptions{newObject("RuntimeException"), newObject("LogicException")};
+    auto *exception_class = getClassEntrySafe("Exception");
+    ASSERT_TRUE(toTypedArray(exceptions, false, TypedArrayValueType::Object, exception_class).equals(exceptions, true));
+    ASSERT_TRUE(toTypedArray(exceptions, false, TypedArrayValueType::Object).equals(exceptions, true));
+
+    Array mixed_objects{newObject("RuntimeException"), newObject("stdClass")};
+    try_call([&]() { (void) toTypedArray(mixed_objects, false, TypedArrayValueType::Object, exception_class); },
+             "Typed array value has incompatible type object");
+}
+
 TEST(array_converter, single_element_array) {
     StdArray<Int, 1> arr = {42};
     Array parr = toArray(arr);
