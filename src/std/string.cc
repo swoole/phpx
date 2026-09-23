@@ -67,10 +67,6 @@ Variant strpos(const String &haystack, const String &needle, Int offset) {
     size_t haystack_len = haystack.length();
     size_t needle_len = needle.length();
 
-    if (needle_len == 0) {
-        return Variant(Int(0));
-    }
-
     if (offset < 0) {
         offset += (Int) haystack_len;
     }
@@ -78,6 +74,10 @@ Variant strpos(const String &haystack, const String &needle, Int offset) {
         php::throwException(zend_ce_value_error,
                             "strpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)");
         return Variant();
+    }
+
+    if (needle_len == 0) {
+        return Variant(offset);
     }
 
     found =
@@ -97,10 +97,6 @@ Variant stripos(const String &haystack, const String &needle, Int offset) {
     size_t haystack_len = haystack.length();
     size_t needle_len = needle.length();
 
-    if (needle_len == 0) {
-        return Variant(Int(0));
-    }
-
     if (offset < 0) {
         offset += (Int) haystack_len;
     }
@@ -108,6 +104,10 @@ Variant stripos(const String &haystack, const String &needle, Int offset) {
         php::throwException(zend_ce_value_error,
                             "stripos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)");
         return Variant();
+    }
+
+    if (needle_len == 0) {
+        return Variant(offset);
     }
 
     const char *found = (const char *) php_memnistr(
@@ -126,11 +126,6 @@ Variant stripos(const String &haystack, const String &needle, Int offset) {
 Variant strrpos(const String &haystack, const String &needle, Int offset) {
     size_t haystack_len = haystack.length();
     size_t needle_len = needle.length();
-
-    if (needle_len == 0) {
-        // Empty needle matches at the end of the string (PHP 8.x behavior)
-        return Variant((Int) haystack_len);
-    }
 
     const char *p, *e;
 
@@ -154,6 +149,10 @@ Variant strrpos(const String &haystack, const String &needle, Int offset) {
         } else {
             e = haystack.data() + haystack_len + offset + needle_len;
         }
+    }
+
+    if (needle_len == 0) {
+        return Variant((Int) (e - haystack.data()));
     }
 
     const char *found = (const char *) zend_memnrstr(p, needle.data(), needle_len, e);
