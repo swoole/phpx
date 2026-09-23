@@ -496,6 +496,9 @@ if(BUILD_TESTS)
         add_executable(phpx-tests ${TEST_FILES})
         target_sources(phpx-tests PRIVATE src/misc/typephp_sapi.cc)
         target_include_directories(phpx-tests PRIVATE tests/include)
+        if(CODE_COVERAGE AND NOT IS_WINDOWS)
+            target_link_libraries(phpx-tests PRIVATE coverage_config gcov)
+        endif()
 
         if(IS_WINDOWS)
             target_link_libraries(phpx-tests

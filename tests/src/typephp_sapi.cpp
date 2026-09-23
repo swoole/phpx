@@ -116,18 +116,18 @@ TEST(typephp_sapi, preserves_invalid_php_cli_options_for_php_to_report) {
     EXPECT_EQ(prepared.allocated, nullptr);
 }
 
-TEST(typephp_sapi, rejects_application_mode_without_an_entry) {
+TEST(typephp_sapi, rejects_application_mode_without_a_valid_entry) {
     const char *saved_entry = project_entry;
-    project_entry = nullptr;
-    char executable[] = "app";
-    char argument[] = "value";
-    char *arguments[] = {executable, argument, nullptr};
-    PreparedArguments prepared(2, arguments);
+    for (const char *invalid_entry : {static_cast<const char *>(nullptr), ""}) {
+        project_entry = invalid_entry;
+        char executable[] = "app";
+        char argument[] = "value";
+        char *arguments[] = {executable, argument, nullptr};
+        PreparedArguments prepared(2, arguments);
 
-    int result = prepared.prepare();
+        EXPECT_EQ(prepared.prepare(), FAILURE);
+        EXPECT_EQ(prepared.argv, arguments);
+        EXPECT_EQ(prepared.allocated, nullptr);
+    }
     project_entry = saved_entry;
-
-    EXPECT_EQ(result, FAILURE);
-    EXPECT_EQ(prepared.argv, arguments);
-    EXPECT_EQ(prepared.allocated, nullptr);
 }
