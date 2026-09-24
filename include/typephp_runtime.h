@@ -2,6 +2,7 @@
 
 typedef struct _zend_module_entry zend_module_entry;
 typedef zend_module_entry *(*typephp_module_getter)(void);
+typedef void (*typephp_module_pre_shutdown)(void);
 
 #define TYPEPHP_PROJECT_SYMBOL_INNER(prefix, project, suffix) prefix##project##suffix
 #define TYPEPHP_PROJECT_SYMBOL(prefix, project, suffix) TYPEPHP_PROJECT_SYMBOL_INNER(prefix, project, suffix)
@@ -10,6 +11,8 @@ typedef zend_module_entry *(*typephp_module_getter)(void);
  * matching *_FUNCTION macro declares or defines it. */
 #define TYPEPHP_EMBED_GET_MODULE(project) TYPEPHP_PROJECT_SYMBOL(php_, project, _embed_get_module)
 #define TYPEPHP_EMBED_GET_MODULE_FUNCTION(project) zend_module_entry *TYPEPHP_EMBED_GET_MODULE(project)(void)
+#define TYPEPHP_EMBED_PRE_SHUTDOWN(project) TYPEPHP_PROJECT_SYMBOL(php_, project, _embed_pre_shutdown)
+#define TYPEPHP_EMBED_PRE_SHUTDOWN_FUNCTION(project) void TYPEPHP_EMBED_PRE_SHUTDOWN(project)(void)
 
 #define TYPEPHP_RUNTIME_INIT(project) TYPEPHP_PROJECT_SYMBOL(typephp_, project, _runtime_init)
 #define TYPEPHP_RUNTIME_SHUTDOWN(project) TYPEPHP_PROJECT_SYMBOL(typephp_, project, _runtime_shutdown)
@@ -34,7 +37,8 @@ typedef zend_module_entry *(*typephp_module_getter)(void);
 #ifdef __cplusplus
 extern "C" {
 #endif
-int typephp_runtime_start(typephp_module_getter get_module, int argc, char **argv);
+int typephp_runtime_start(
+    typephp_module_getter get_module, typephp_module_pre_shutdown pre_shutdown, int argc, char **argv);
 void typephp_runtime_stop(void);
 #ifdef __cplusplus
 }
