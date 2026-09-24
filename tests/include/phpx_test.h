@@ -18,6 +18,8 @@ const std::string &get_root_path();
 std::string get_tests_dir();
 std::string get_include_dir();
 php::String get_machine_architecture();
+php::String get_runtime_php_version();
+php::Int get_runtime_php_version_id();
 ChildResult run_in_child_capture_stdout(const std::function<int(void)> &func);
 void try_call(const std::function<void(void)> &fn, const php::String &msg, bool print = false);
 

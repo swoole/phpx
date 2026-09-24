@@ -187,7 +187,7 @@ TEST(std_core, iterator_helpers_validate_and_propagate_errors) {
 }
 
 TEST(std_core, runtime_constant_lookup) {
-    ASSERT_STREQ(fn::constant("PHP_VERSION").toCString(), PHP_VERSION);
+    ASSERT_EQ(fn::constant("PHP_VERSION").toString(), get_runtime_php_version());
     ASSERT_EQ(fn::constant("PHP_INT_MAX").toInt(), ZEND_LONG_MAX);
     try_call([]() { (void) fn::constant("PHPX_UNDEFINED_CONSTANT"); },
              "Undefined constant \"PHPX_UNDEFINED_CONSTANT\"");

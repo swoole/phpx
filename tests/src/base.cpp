@@ -17,7 +17,7 @@ TEST(base, constant) {
     auto c = constant("PHP_VERSION");
     ASSERT_TRUE(c.isString());
     ASSERT_GT(c.length(), 3);
-    ASSERT_STREQ(c.toCString(), PHP_VERSION);
+    ASSERT_EQ(c.toString(), get_runtime_php_version());
 }
 
 TEST(base, constant2) {
@@ -147,12 +147,12 @@ TEST(base, include1) {
                       "<?php file_put_contents('" + tmp_file2 + "', 'hello phpx'); return PHP_VERSION_ID; ?>");
     auto retval = include(tmp_file);
     ASSERT_TRUE(retval.isInt());
-    ASSERT_EQ(retval.toInt(), PHP_VERSION_ID);
+    ASSERT_EQ(retval.toInt(), get_runtime_php_version_id());
 }
 
 TEST(base, include2) {
     auto version = include(get_include_dir() + "/../include/return_const.php", INCLUDE_ONCE);
-    ASSERT_STREQ(version.toCString(), PHP_VERSION);
+    ASSERT_EQ(version.toString(), get_runtime_php_version());
 
     auto rs1 = include(get_include_dir() + "/../include/return_const.php", INCLUDE_ONCE);
     ASSERT_TRUE(rs1.toBool());
@@ -232,7 +232,7 @@ TEST(base, eval) {
     eval("print_r(PHP_VERSION);");
     auto rs = ob_get_clean();
     ASSERT_TRUE(rs.isString());
-    ASSERT_TRUE(str_contains(rs, PHP_VERSION).toBool());
+    ASSERT_TRUE(str_contains(rs, get_runtime_php_version()).toBool());
 }
 
 TEST(base, eval2) {

@@ -16,7 +16,7 @@ TEST(base_extra, args_to_array_preserves_order) {
 // Test include with REQUIRE type
 TEST(base_extra, include_require) {
     auto rs = include(get_include_dir() + "/../include/return_const.php", REQUIRE);
-    ASSERT_STREQ(rs.toCString(), PHP_VERSION);
+    ASSERT_EQ(rs.toString(), get_runtime_php_version());
 
     try_call([]() { include("/nonexistent/file.php", REQUIRE); }, "");
 }
@@ -28,7 +28,7 @@ TEST(base_extra, include_value_path) {
 
     auto result = include_value(Variant(filename), REQUIRE);
 
-    ASSERT_STREQ(result.toCString(), PHP_VERSION);
+    ASSERT_EQ(result.toString(), get_runtime_php_version());
 }
 
 TEST(base_extra, persistent_zend_string_owns_storage) {
