@@ -79,6 +79,14 @@ TEST(bigint, newInstance_from_int) {
     ASSERT_EQ(bi_ptr->value, 12345);
 }
 
+TEST(bigint, newInstance_preserves_boxed_resource) {
+    auto original = bi("12345678901234567890");
+    auto result = BigInt::newInstance(original);
+
+    ASSERT_EQ(result.toBox<BigInt>(), original.toBox<BigInt>());
+    ASSERT_STREQ(BigInt::toString(result).toCString(), "12345678901234567890");
+}
+
 // ============ Arithmetic ============
 
 TEST(bigint, add) {

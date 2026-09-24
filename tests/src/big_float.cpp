@@ -65,6 +65,14 @@ TEST(bigfloat, newInstance_from_int) {
     ASSERT_EQ(BigFloat::toInt(v).toInt(), 42);
 }
 
+TEST(bigfloat, newInstance_preserves_boxed_resource) {
+    auto original = BigFloat::newInstance(Variant("123.5"));
+    auto result = BigFloat::newInstance(original);
+
+    ASSERT_EQ(result.toBox<BigFloat>(), original.toBox<BigFloat>());
+    ASSERT_EQ(BigFloat::toString(result).toString(), "123.5");
+}
+
 // ============ Arithmetic ============
 
 TEST(bigfloat, add) {
@@ -367,6 +375,38 @@ TEST(bigfloat, huge_exponent_uses_bounded_scientific_notation) {
     auto output = BigFloat::toString(huge).toString();
     ASSERT_LT(output.length(), 100u);
     ASSERT_NE(std::strstr(output.data(), "E1000001"), nullptr);
+}
+
+TEST(bigfloat, formats_special_and_extreme_values) {
+    Variant nan{new BigFloat()};
+    mpfr_set_nan(nan.toBox<BigFloat>()->value);
+    ASSERT_EQ(BigFloat::toString(nan).toString(), "NAN");
+
+    Variant positive_infinity{new BigFloat()};
+    mpfr_set_inf(positive_infinity.toBox<BigFloat>()->value, 1);
+    ASSERT_EQ(BigFloat::toString(positive_infinity).toString(), "INF");
+
+    Variant negative_infinity{new BigFloat()};
+    mpfr_set_inf(negative_infinity.toBox<BigFloat>()->value, -1);
+    ASSERT_EQ(BigFloat::toString(negative_infinity).toString(), "-INF");
+
+    ASSERT_EQ(BigFloat::toString(BigFloat::newInstance(Variant("1.25e-10"))).toString(), "0.000000000125");
+    ASSERT_EQ(BigFloat::toString(BigFloat::newInstance(Variant("1e20"))).toString(), "100000000000000000000");
+
+    auto tiny = BigFloat::toString(BigFloat::newInstance(Variant("-1e-1000001"))).toString();
+    ASSERT_LT(tiny.length(), 100u);
+    ASSERT_NE(std::strstr(tiny.data(), "E-1000001"), nullptr);
+    ASSERT_EQ(tiny.data()[0], '-');
+}
+
+TEST(bigfloat, rejects_nan_comparisons_and_integer_conversions) {
+    Variant nan{new BigFloat()};
+    mpfr_set_nan(nan.toBox<BigFloat>()->value);
+    auto one = BigFloat::newInstance(Variant(1));
+
+    try_call([&]() { (void) BigFloat::cmp(nan, one); }, "Cannot compare NaN BigFloat values");
+    try_call([&]() { (void) BigFloat::cmp(one, nan); }, "Cannot compare NaN BigFloat values");
+    try_call([&]() { (void) BigFloat::toInt(nan); }, "BigFloat value is outside the PHP int range");
 }
 
 TEST(bigfloat, invalid_operands_report_type_errors) {
