@@ -79,7 +79,11 @@ PHPX_API void typephp_prepare_property_redeclaration(zend_class_entry *class_ent
 /** Inherit hook kinds omitted by a TypePHP child property declaration. */
 PHPX_API void typephp_finalize_property_hook_inheritance(zend_class_entry *class_entry);
 
-/** Resolve the hook targeted by a TypePHP parent::$property::get()/set() call. */
+/**
+ * Resolve the hook targeted by a TypePHP parent::$property::get()/set() call.
+ * Keep property alive until the returned function has been invoked because a
+ * standard-property trampoline borrows its zend_string.
+ */
 PHPX_API zend_function *typephp_get_parent_property_hook(zend_class_entry *parent_class_entry,
                                                          const php::String &property,
                                                          zend_property_hook_kind kind);

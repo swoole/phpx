@@ -1,4 +1,5 @@
 #include "phpx_test.h"
+#include "phpx_ext.h"
 #include "phpx_fake_scope_guard.h"
 #include "phpx_func.h"
 #include "typephp_helper.h"
@@ -82,8 +83,18 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_hook_set, 0, 1, IS_VOID, 0)
 ZEND_ARG_TYPE_INFO(0, value, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_builder_describe, 0, 1, IS_LONG, 0)
+ZEND_ARG_TYPE_INFO(0, delta, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
 static zend_class_entry *gtest_hooked_ce = nullptr;
+static zend_class_entry *gtest_hooked_child_ce = nullptr;
+static zend_class_entry *gtest_hooked_inherited_ce = nullptr;
 static zend_class_entry *gtest_hook_interface_ce = nullptr;
+static php::Interface *gtest_builder_interface = nullptr;
+static php::Class *gtest_builder_base = nullptr;
+static php::Class *gtest_builder_child = nullptr;
+static php::Class *gtest_builder_direct_child = nullptr;
 
 static ZEND_METHOD(PhpxGtestHooked, readHook) {
     zval rv;
@@ -100,9 +111,63 @@ static ZEND_METHOD(PhpxGtestHooked, writeHook) {
     zend_update_property_str(gtest_hooked_ce, Z_OBJ_P(ZEND_THIS), ZEND_STRL("stored"), value);
 }
 
+static ZEND_METHOD(PhpxGtestHookedChild, readHook) {
+    RETURN_STRING("child");
+}
+
 static const zend_function_entry hooked_object_methods[] = {
     ZEND_ME(PhpxGtestHooked, readHook, arginfo_hook_get, ZEND_ACC_PUBLIC)
         ZEND_ME(PhpxGtestHooked, writeHook, arginfo_hook_set, ZEND_ACC_PUBLIC) ZEND_FE_END};
+
+static const zend_function_entry hooked_child_methods[] = {
+    ZEND_ME(PhpxGtestHookedChild, readHook, arginfo_hook_get, ZEND_ACC_PUBLIC) ZEND_FE_END};
+
+static ZEND_METHOD(PhpxGtestBuiltBase, describe) {}
+
+static const zend_function_entry builder_object_methods[] = {
+    ZEND_ME(PhpxGtestBuiltBase, describe, arginfo_builder_describe, ZEND_ACC_PUBLIC) ZEND_FE_END};
+
+static const zend_function_entry builder_interface_methods[] = {
+    ZEND_ABSTRACT_ME(PhpxGtestBuiltInterface, describe, arginfo_builder_describe) ZEND_FE_END};
+
+class GtestBuilderDescribeMethod final : public php::Method {
+  public:
+    GtestBuilderDescribeMethod() : Method("PhpxGtestBuiltBase", "describe") {
+        php::method_map["PhpxGtestBuiltBase"]["describe"] = this;
+    }
+
+    php::Variant impl(php::Object &object, php::Args &args) override {
+        return object.attr("value").toInt() + args[0].toInt();
+    }
+};
+
+php::Class *get_gtest_builder_base() {
+    return gtest_builder_base;
+}
+
+php::Class *get_gtest_builder_child() {
+    return gtest_builder_child;
+}
+
+php::Class *get_gtest_builder_direct_child() {
+    return gtest_builder_direct_child;
+}
+
+php::Interface *get_gtest_builder_interface() {
+    return gtest_builder_interface;
+}
+
+zend_class_entry *get_gtest_hooked_class() {
+    return gtest_hooked_ce;
+}
+
+zend_class_entry *get_gtest_hooked_child_class() {
+    return gtest_hooked_child_ce;
+}
+
+zend_class_entry *get_gtest_hooked_inherited_class() {
+    return gtest_hooked_inherited_ce;
+}
 
 static php::Array generator_payload(const php::Var &value, const php::Var &key = php::null, bool has_key = false) {
     if (has_key) {
@@ -242,6 +307,7 @@ static const zend_function_entry ext_functions[] = {
 
 static PHP_MINIT_FUNCTION(phpx_gtest_runtime) {
     typephp_register_fiber_generator_class();
+    static GtestBuilderDescribeMethod builder_describe_method;
 
     zend_class_entry hooked_ce;
     INIT_CLASS_ENTRY(hooked_ce, "PhpxGtestHooked", hooked_object_methods);
@@ -252,6 +318,10 @@ static PHP_MINIT_FUNCTION(phpx_gtest_runtime) {
     zval stored_default;
     ZVAL_INTERNED_STR(&stored_default, zend_string_init_interned(ZEND_STRL("initial"), true));
     zend_declare_property(gtest_hooked_ce, ZEND_STRL("stored"), &stored_default, ZEND_ACC_PRIVATE);
+
+    zval plain_default;
+    ZVAL_LONG(&plain_default, 5);
+    zend_declare_property(gtest_hooked_ce, ZEND_STRL("plain"), &plain_default, ZEND_ACC_PUBLIC);
 
     zval hooked_default;
     ZVAL_EMPTY_STRING(&hooked_default);
@@ -264,6 +334,39 @@ static PHP_MINIT_FUNCTION(phpx_gtest_runtime) {
                                                                   ZEND_TYPE_INIT_CODE(IS_STRING, false, 0));
     zend_string_release(hooked_name);
     typephp_register_property_hooks(gtest_hooked_ce, hooked_info, "readhook", "writehook");
+
+    zend_class_entry hooked_child_ce;
+    INIT_CLASS_ENTRY(hooked_child_ce, "PhpxGtestHookedChild", hooked_child_methods);
+    gtest_hooked_child_ce = zend_register_internal_class_ex(&hooked_child_ce, gtest_hooked_ce);
+    zend_string *child_value_name = zend_string_init(ZEND_STRL("value"), true);
+    typephp_prepare_property_redeclaration(gtest_hooked_child_ce, child_value_name);
+    zval child_value_default;
+    ZVAL_EMPTY_STRING(&child_value_default);
+    zend_property_info *child_value_info = zend_declare_typed_property(gtest_hooked_child_ce,
+                                                                       child_value_name,
+                                                                       &child_value_default,
+                                                                       ZEND_ACC_PUBLIC,
+                                                                       nullptr,
+                                                                       ZEND_TYPE_INIT_CODE(IS_STRING, false, 0));
+    zend_string_release(child_value_name);
+    typephp_register_property_hooks(gtest_hooked_child_ce, child_value_info, "readhook", {});
+    typephp_finalize_property_hook_inheritance(gtest_hooked_child_ce);
+
+    zend_class_entry hooked_inherited_ce;
+    INIT_CLASS_ENTRY(hooked_inherited_ce, "PhpxGtestHookedInherited", nullptr);
+    gtest_hooked_inherited_ce = zend_register_internal_class_ex(&hooked_inherited_ce, gtest_hooked_ce);
+    zend_string *inherited_value_name = zend_string_init(ZEND_STRL("value"), true);
+    typephp_prepare_property_redeclaration(gtest_hooked_inherited_ce, inherited_value_name);
+    zval inherited_value_default;
+    ZVAL_EMPTY_STRING(&inherited_value_default);
+    zend_declare_typed_property(gtest_hooked_inherited_ce,
+                                inherited_value_name,
+                                &inherited_value_default,
+                                ZEND_ACC_PUBLIC,
+                                nullptr,
+                                ZEND_TYPE_INIT_CODE(IS_STRING, false, 0));
+    zend_string_release(inherited_value_name);
+    typephp_finalize_property_hook_inheritance(gtest_hooked_inherited_ce);
 
     zend_class_entry hook_interface_ce;
     INIT_CLASS_ENTRY(hook_interface_ce, "PhpxGtestHookInterface", nullptr);
@@ -280,13 +383,43 @@ static PHP_MINIT_FUNCTION(phpx_gtest_runtime) {
                                     ZEND_TYPE_INIT_CODE(IS_STRING, false, 0));
     zend_string_release(interface_name);
     typephp_register_abstract_property_hooks(gtest_hook_interface_ce, interface_info, true, true);
+
+    gtest_builder_interface = new php::Interface("PhpxGtestBuiltInterface");
+    gtest_builder_interface->registerFunctions(builder_interface_methods);
+    gtest_builder_interface->activate();
+
+    gtest_builder_base = new php::Class("PhpxGtestBuiltBase");
+    gtest_builder_base->registerFunctions(builder_object_methods);
+    gtest_builder_base->addProperty("value", 7, php::PUBLIC);
+    gtest_builder_base->addProperty("label", "built", php::PUBLIC);
+    gtest_builder_base->addStaticProperty("counter", 3, php::PUBLIC);
+    gtest_builder_base->addConstant("KIND", 42);
+    gtest_builder_base->addConstant("NAME", "builder");
+    gtest_builder_base->alias("PhpxGtestBuiltAlias");
+    gtest_builder_base->activate();
+
+    gtest_builder_child = new php::Class("PhpxGtestBuiltChild");
+    gtest_builder_child->extends(gtest_builder_base);
+    gtest_builder_child->implements(gtest_builder_interface);
+    gtest_builder_child->activate();
+
+    gtest_builder_direct_child = new php::Class("PhpxGtestBuiltDirectChild");
+    gtest_builder_direct_child->extends(gtest_builder_base->ptr());
+    gtest_builder_direct_child->implements(gtest_builder_interface->ptr());
+    gtest_builder_direct_child->activate();
     return SUCCESS;
 }
 
 static PHP_MSHUTDOWN_FUNCTION(phpx_gtest_runtime) {
     typephp_unregister_fiber_generator_class();
     gtest_hooked_ce = nullptr;
+    gtest_hooked_child_ce = nullptr;
+    gtest_hooked_inherited_ce = nullptr;
     gtest_hook_interface_ce = nullptr;
+    gtest_builder_interface = nullptr;
+    gtest_builder_base = nullptr;
+    gtest_builder_child = nullptr;
+    gtest_builder_direct_child = nullptr;
     return SUCCESS;
 }
 

@@ -379,6 +379,70 @@ TEST(typephp_property, function_local_static_slot_tracks_null_references_and_inh
     ASSERT_EQ(resolutions, 1);
 }
 
+TEST(typephp_property, redeclared_property_inherits_missing_parent_hook) {
+    auto *parent = get_gtest_hooked_class();
+    auto *child = get_gtest_hooked_child_class();
+    String property{"value"};
+    auto *parent_info = static_cast<zend_property_info *>(zend_hash_find_ptr(&parent->properties_info, property.str()));
+    auto *child_info = static_cast<zend_property_info *>(zend_hash_find_ptr(&child->properties_info, property.str()));
+
+    ASSERT_NE(parent_info, nullptr);
+    ASSERT_NE(child_info, nullptr);
+    ASSERT_NE(child_info->hooks, nullptr);
+    ASSERT_NE(child_info->hooks[ZEND_PROPERTY_HOOK_GET], parent_info->hooks[ZEND_PROPERTY_HOOK_GET]);
+    ASSERT_EQ(child_info->hooks[ZEND_PROPERTY_HOOK_SET], parent_info->hooks[ZEND_PROPERTY_HOOK_SET]);
+
+    auto object = newObject(child);
+    ASSERT_STREQ(object.getProperty(property).toCString(), "child");
+    object.setProperty(property, "updated");
+    ASSERT_STREQ(object.getProperty(property).toCString(), "child");
+}
+
+TEST(typephp_property, redeclared_property_inherits_complete_parent_hook_set) {
+    auto *parent = get_gtest_hooked_class();
+    auto *child = get_gtest_hooked_inherited_class();
+    String property{"value"};
+    auto *parent_info = static_cast<zend_property_info *>(zend_hash_find_ptr(&parent->properties_info, property.str()));
+    auto *child_info = static_cast<zend_property_info *>(zend_hash_find_ptr(&child->properties_info, property.str()));
+
+    ASSERT_NE(parent_info, nullptr);
+    ASSERT_NE(child_info, nullptr);
+    ASSERT_NE(child_info->hooks, nullptr);
+    ASSERT_EQ(child_info->hooks[ZEND_PROPERTY_HOOK_GET], parent_info->hooks[ZEND_PROPERTY_HOOK_GET]);
+    ASSERT_EQ(child_info->hooks[ZEND_PROPERTY_HOOK_SET], parent_info->hooks[ZEND_PROPERTY_HOOK_SET]);
+
+    auto object = newObject(child);
+    ASSERT_STREQ(object.getProperty(property).toCString(), "initial");
+    object.setProperty(property, "updated");
+    ASSERT_STREQ(object.getProperty(property).toCString(), "updated");
+}
+
+TEST(typephp_property, parent_property_hook_returns_registered_hooks_and_standard_trampolines) {
+    auto *parent = get_gtest_hooked_class();
+    String hooked{"value"};
+    auto *hooked_info = static_cast<zend_property_info *>(zend_hash_find_ptr(&parent->properties_info, hooked.str()));
+
+    ASSERT_EQ(typephp_get_parent_property_hook(parent, hooked, ZEND_PROPERTY_HOOK_GET),
+              hooked_info->hooks[ZEND_PROPERTY_HOOK_GET]);
+    ASSERT_EQ(typephp_get_parent_property_hook(parent, hooked, ZEND_PROPERTY_HOOK_SET),
+              hooked_info->hooks[ZEND_PROPERTY_HOOK_SET]);
+
+    auto object = newObject(parent);
+    String plain{"plain"};
+    auto *setter = typephp_get_parent_property_hook(parent, plain, ZEND_PROPERTY_HOOK_SET);
+    object.call(setter, {17});
+    auto *getter = typephp_get_parent_property_hook(parent, plain, ZEND_PROPERTY_HOOK_GET);
+    ASSERT_EQ(object.call(getter).toInt(), 17);
+}
+
+TEST(typephp_property, parent_property_hook_rejects_missing_and_private_properties) {
+    auto *parent = get_gtest_hooked_class();
+    try_call([&]() { (void) typephp_get_parent_property_hook(parent, "missing", ZEND_PROPERTY_HOOK_GET); },
+             "Undefined property PhpxGtestHooked::$missing");
+    try_call([&]() { (void) typephp_get_parent_property_hook(parent, "stored", ZEND_PROPERTY_HOOK_GET); },
+             "Cannot access private property PhpxGtestHooked::$stored");
+}
+
 #if PHP_VERSION_ID >= 80500
 TEST(typephp_property, clone_with_updates_plain_and_hooked_properties) {
     auto original = new_property_hook_object();

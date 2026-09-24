@@ -118,6 +118,45 @@ TEST(typephp_trait, preserves_builtin_argument_validation) {
     try_call([]() { (void) call("class_uses", {"PhpxMetadataLeaf", Array{}}); }, "must be of type bool");
 }
 
+TEST(typephp_trait, accepts_empty_registration_and_rejects_invalid_entries) {
+    ASSERT_EQ(typephp_register_trait_metadata(91006, nullptr, 0), SUCCESS);
+    ASSERT_EQ(typephp_register_trait_metadata(91006, nullptr, 1), FAILURE);
+
+    static constexpr typephp_trait_metadata_entry empty_name[] = {
+        {"", nullptr, 0, true},
+    };
+    static constexpr typephp_trait_metadata_entry missing_traits[] = {
+        {"PhpxMissingTraits", nullptr, 1, false},
+    };
+    ASSERT_EQ(typephp_register_trait_metadata(91006, empty_name, std::size(empty_name)), FAILURE);
+    ASSERT_EQ(typephp_register_trait_metadata(91006, missing_traits, std::size(missing_traits)), FAILURE);
+}
+
+TEST(typephp_trait, rejects_duplicate_metadata_names) {
+    static constexpr typephp_trait_metadata_entry duplicate_entries[] = {
+        {"PhpxDuplicateTrait", nullptr, 0, true},
+        {"\\phpxduplicatetrait", nullptr, 0, true},
+    };
+    ASSERT_EQ(typephp_register_trait_metadata(91007, duplicate_entries, std::size(duplicate_entries)), FAILURE);
+
+    static constexpr typephp_trait_metadata_entry entry[] = {
+        {"PhpxRegisteredTrait", nullptr, 0, true},
+    };
+    TraitMetadataRegistration registration{91008, entry, std::size(entry)};
+    ASSERT_TRUE(registration.registered());
+    ASSERT_EQ(typephp_register_trait_metadata(91009, entry, std::size(entry)), FAILURE);
+}
+
+TEST(typephp_trait, preserves_builtin_result_for_unknown_classes) {
+    static constexpr typephp_trait_metadata_entry entries[] = {
+        {"PhpxKnownTrait", nullptr, 0, true},
+    };
+    TraitMetadataRegistration registration{91010, entries, std::size(entries)};
+    ASSERT_TRUE(registration.registered());
+
+    ASSERT_FALSE(call("class_uses", {"PhpxDefinitelyMissingClass", false}).toBool());
+}
+
 TEST(typephp_trait, restores_builtin_handler_after_last_module) {
     auto *function = reinterpret_cast<zend_internal_function *>(getFunction("class_uses"));
     zif_handler original_handler = function->handler;

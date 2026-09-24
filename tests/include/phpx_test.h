@@ -20,3 +20,16 @@ std::string get_include_dir();
 php::String get_machine_architecture();
 ChildResult run_in_child_capture_stdout(const std::function<int(void)> &func);
 void try_call(const std::function<void(void)> &fn, const php::String &msg, bool print = false);
+
+namespace php {
+class Class;
+class Interface;
+}  // namespace php
+
+php::Class *get_gtest_builder_base();
+php::Class *get_gtest_builder_child();
+php::Class *get_gtest_builder_direct_child();
+php::Interface *get_gtest_builder_interface();
+zend_class_entry *get_gtest_hooked_class();
+zend_class_entry *get_gtest_hooked_child_class();
+zend_class_entry *get_gtest_hooked_inherited_class();

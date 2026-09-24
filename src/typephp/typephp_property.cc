@@ -547,8 +547,9 @@ zend_function *typephp_get_parent_property_hook(zend_class_entry *parent_class_e
         return hook;
     }
 
-    // The trampoline owns and releases the supplied name after the call.
-    return zend_get_property_hook_trampoline(property_info, kind, zend_string_copy(property.str()));
+    // Zend borrows the property name for the lifetime of the trampoline call.
+    // Generated TypePHP code passes a persistent literal string here.
+    return zend_get_property_hook_trampoline(property_info, kind, property.str());
 }
 
 void typephp_install_property_handlers(zend_class_entry *class_entry, zend_object_handlers *handlers) {
