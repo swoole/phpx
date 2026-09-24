@@ -94,6 +94,40 @@ TEST(typephp_call, non_string_callables_are_not_retained) {
     EXPECT_TRUE(alternate.isUndef());
 }
 
+TEST(typephp_call, resolves_array_and_invokable_object_callables_without_retaining_them) {
+    eval(R"PHP(
+        class PhpxCachedArrayCallable {
+            public function run(int $value): int { return $value + 7; }
+        }
+        class PhpxCachedInvokable {
+            public function __invoke(int $value): int { return $value + 9; }
+        }
+    )PHP");
+
+    Variant object = eval("return new PhpxCachedArrayCallable();");
+    Array array_callable{object, "run"};
+    Variant invokable = eval("return new PhpxCachedInvokable();");
+    FunctionCallCacheSlot cache;
+
+    EXPECT_EQ(typephp_call_cached(array_callable, cache, VarList{1}).toInt(), 8);
+    EXPECT_EQ(typephp_call_cached(invokable, cache, VarList{1}).toInt(), 10);
+    EXPECT_EQ(typephp_call_cached(array_callable, cache, VarList{2}).toInt(), 9);
+}
+
+TEST(typephp_call, rejects_invalid_callbacks_receivers_and_scopes) {
+    FunctionCallCacheSlot function_cache;
+    try_call([&]() { (void) typephp_call_cached("phpx_missing_callback", function_cache); }, "Invalid callback");
+
+    MethodCallCacheSlot method_cache;
+    try_call([&]() { (void) typephp_call_method_cached(42, "run", method_cache); }, "call method `run` on int");
+
+    Variant object = eval("return new stdClass();");
+    CallableScope invalid_scope{nullptr, nullptr, nullptr};
+    try_call(
+        [&]() { (void) typephp_call_method_scoped_cached(object, "run", invalid_scope, method_cache); },
+        "Explicit callable scope must not be null");
+}
+
 TEST(typephp_call, closure_fast_path_preserves_binding_named_arguments_and_references) {
     Variant bound = eval(R"PHP(
         class PhpxCachedClosureBase {
@@ -174,6 +208,35 @@ TEST(typephp_call, scoped_method_cache_guards_lexical_and_called_scope) {
     EXPECT_EQ(typephp_call_method_cached(target, "hidden", cache, VarList{3}).toString(), "magic-hidden:3");
     EXPECT_EQ(typephp_call_method_scoped_cached(target, "hidden", foreign_scope, cache, VarList{4}).toString(),
               "magic-hidden:4");
+}
+
+TEST(typephp_call, scoped_method_cache_becomes_polymorphic_when_scope_changes) {
+    eval(R"PHP(
+        class PhpxScopedPolymorphicMethod {
+            public function scopeAnchor(): void {}
+            private function hidden(int $value): string { return 'private:' . $value; }
+            public function __call(string $name, array $args): string {
+                return 'magic-' . $name . ':' . $args[0];
+            }
+        }
+        class PhpxScopedPolymorphicForeign {
+            public function scopeAnchor(): void {}
+        }
+    )PHP");
+
+    Variant target = eval("return new PhpxScopedPolymorphicMethod();");
+    auto *target_ce = getClassEntry("PhpxScopedPolymorphicMethod");
+    auto *foreign_ce = getClassEntry("PhpxScopedPolymorphicForeign");
+    CallableScope target_scope{getMethod(target_ce, "scopeAnchor"), target_ce, target.object()};
+    CallableScope foreign_scope{getMethod(foreign_ce, "scopeAnchor"), foreign_ce, nullptr};
+    MethodCallCacheSlot cache;
+
+    EXPECT_EQ(typephp_call_method_scoped_cached(target, "hidden", target_scope, cache, VarList{1}).toString(),
+              "private:1");
+    EXPECT_EQ(typephp_call_method_scoped_cached(target, "hidden", foreign_scope, cache, VarList{2}).toString(),
+              "magic-hidden:2");
+    EXPECT_EQ(typephp_call_method_scoped_cached(target, "hidden", target_scope, cache, VarList{3}).toString(),
+              "private:3");
 }
 
 TEST(typephp_call, magic_trampoline_dereferences_prepared_reference_arguments) {
