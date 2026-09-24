@@ -423,11 +423,7 @@ zend_class_entry *getInternalClassEntrySafe(const String &name) {
 }
 
 zend_function *getMethod(const String &class_name, const String &name) {
-    const auto ce = getClassEntrySafe(class_name);
-    if (UNEXPECTED(!ce)) {
-        return nullptr;
-    }
-    return getMethod(ce, name);
+    return getMethod(getClassEntrySafe(class_name), name);
 }
 
 zend_function *getMethod(zend_class_entry *ce, const String &name) {
