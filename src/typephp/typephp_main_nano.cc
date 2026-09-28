@@ -7,13 +7,32 @@
 */
 
 #include "php_nano_extension.h"
+#include "typephp_runtime.h"
 
 #include <cstdio>
 #include <exception>
 
+#ifdef TYPEPHP_NO_MAIN
+
+#ifndef TYPEPHP_PROJECT_NAME
+#error "TYPEPHP_PROJECT_NAME must be defined for the Nano library runtime"
+#endif
+
+TYPEPHP_RUNTIME_INIT_FUNCTION(TYPEPHP_PROJECT_NAME)
+{
+    php_nano_set_cli_arguments(argc, argv);
+    return php_nano_startup_composer_extensions() == SUCCESS ? 0 : 1;
+}
+
+TYPEPHP_RUNTIME_SHUTDOWN_FUNCTION(TYPEPHP_PROJECT_NAME)
+{
+    php_nano_shutdown_composer_extensions();
+}
+
+#else
+
 extern "C" int typephp_nano_project_main();
 
-#ifndef TYPEPHP_NO_MAIN
 int main(int argc, char **argv)
 {
     php_nano_set_cli_arguments(argc, argv);
