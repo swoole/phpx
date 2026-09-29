@@ -264,24 +264,6 @@ zend_result extension_after_request(int type, int module_number) {
     return SUCCESS;
 }
 
-Array Args::toArray() const {
-    Array array(params.size());
-    for (const auto &param : params) {
-        // Borrow the stable Args slot. Array::append() performs the one owning
-        // ZVAL_COPY required by the result; CopyRef here would add and release
-        // an otherwise redundant temporary reference for every argument.
-        array.append(Variant(&param, Ctor::Indirect));
-    }
-    return array;
-}
-
-Variant Args::get(size_t i) const {
-    if (i >= count()) {
-        return null;
-    }
-    return {&params.at(i), Ctor::CopyRef};
-}
-
 Resource *getResource(const std::string &name) {
     auto iter = resource_map.find(name);
     if (iter == resource_map.end()) {

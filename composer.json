@@ -44,7 +44,6 @@
                 "src/core/base.cc",
                 "src/core/big_float_nano.cc",
                 "src/core/big_int_nano.cc",
-                "src/core/class.cc",
                 "src/core/closure.cc",
                 "src/core/decimal_nano.cc",
                 "src/core/debug.cc",
@@ -97,7 +96,7 @@
                     "sources": ["src/std/math.cc"]
                 },
                 "standard.hash": {
-                    "extension": "standard",
+                    "extension": "hash",
                     "requires": ["standard.core"],
                     "sources": ["src/std/hash.cc"]
                 },
