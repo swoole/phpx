@@ -758,6 +758,21 @@ zend_op_array *typephp_opcache_load(const typephp_opcode_blob *blob) {
     zend_file_cache_unserialize(script, memory);
     script->corrupted = false;
 
+    /* Match zend_accel_set_auto_globals() in ZendAccelerator.c. Loading cached
+     * opcodes bypasses the compiler callbacks that normally initialize these
+     * lazy superglobals. The mask bits are part of OPcache's persisted format.
+     * zend_is_auto_global() only invokes an armed callback, so another include
+     * in this request preserves existing values and user modifications. */
+    if (script->ping_auto_globals_mask & (1 << 0)) {
+        zend_is_auto_global(ZSTR_KNOWN(ZEND_STR_AUTOGLOBAL_SERVER));
+    }
+    if (script->ping_auto_globals_mask & (1 << 1)) {
+        zend_is_auto_global(ZSTR_KNOWN(ZEND_STR_AUTOGLOBAL_ENV));
+    }
+    if (script->ping_auto_globals_mask & (1 << 2)) {
+        zend_is_auto_global(ZSTR_KNOWN(ZEND_STR_AUTOGLOBAL_REQUEST));
+    }
+
     result = (zend_op_array *)emalloc(sizeof(zend_op_array));
     *result = script->script.main_op_array;
 
