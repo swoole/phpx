@@ -6,12 +6,13 @@
 
 #pragma once
 
+#include "phpx.h"
+
 extern "C" {
 #include "Zend/zend_smart_str.h"
 #include "ext/json/php_json.h"
 }
 
-#include "phpx.h"
 
 namespace php::fn {
 

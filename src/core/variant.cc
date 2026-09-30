@@ -590,7 +590,8 @@ static bool compare_fast_impl(const Variant &a, const Variant &b) {
         }
     }
 
-    constexpr binary_op_type op =
+    // Imported DLL function addresses are resolved at runtime on Windows.
+    const binary_op_type op =
         detail::compare_relation_is_inclusive_v<Relation> ? is_smaller_or_equal_function : is_smaller_function;
     if constexpr (detail::compare_relation_is_reverse_v<Relation>) {
         return compare_op(op, right, left);

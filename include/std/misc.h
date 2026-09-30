@@ -9,11 +9,10 @@
 
 #pragma once
 
+#include "phpx.h"
+
 extern "C" {
-#include "php.h"
-#include "zend_API.h"
-#include "zend_interfaces.h"
-#include "zend_exceptions.h"
+
 #include "Zend/zend_smart_str.h"
 #include "ext/standard/base64.h"
 #include "ext/standard/crc32.h"
@@ -24,7 +23,6 @@ extern "C" {
 #include "php_variables.h"
 }
 
-#include "phpx.h"
 #include "std/hash.h"
 #include "std/json.h"
 #include "std/random.h"

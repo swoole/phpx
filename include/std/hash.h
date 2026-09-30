@@ -6,14 +6,14 @@
 
 #pragma once
 
+#include "phpx.h"
+
 extern "C" {
-#include "php.h"
 #include "ext/standard/md5.h"
 #include "ext/standard/sha1.h"
 #include "ext/hash/php_hash.h"
 }
 
-#include "phpx.h"
 
 namespace php::fn {
 

@@ -21,6 +21,12 @@
  * which must be wrapped in extern "C" {}
  */
 extern "C" {
+#if defined(PHP_WIN32) && defined(__clang__) && !defined(PHP_NANO)
+// MSVC-built PHP does not export Clang's constant-size allocator functions.
+// Disable them before php.h includes zend_alloc.h. Nano builds its own allocator.
+#include "Zend/zend_portability.h"
+#undef HAVE_BUILTIN_CONSTANT_P
+#endif
 #include "php.h"
 #include "zend_ini.h"
 #include "zend_enum.h"

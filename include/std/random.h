@@ -9,13 +9,13 @@
 
 #pragma once
 
+#include "phpx.h"
+
 extern "C" {
-#include "php.h"
-#include "Zend/zend_exceptions.h"
+
 #include "ext/random/php_random.h"
 }
 
-#include "phpx.h"
 
 namespace php::fn {
 

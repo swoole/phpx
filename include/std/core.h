@@ -8,16 +8,16 @@
 
 #pragma once
 
+#include "phpx.h"
+
 extern "C" {
-#include "php.h"
-#include "zend_API.h"
+
 #include "zend_interfaces.h"
 #include "zend_exceptions.h"
 #include "zend_closures.h"
 #include "ext/spl/php_spl.h"
 }
 
-#include "phpx.h"
 
 namespace php::fn {
 
