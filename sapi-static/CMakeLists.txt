@@ -27,7 +27,7 @@ target_include_directories(mpdecimal_obj PUBLIC
     "${PHPX_ROOT}/thirdparty/mpdecimal/libmpdec++"
 )
 target_compile_definitions(mpdecimal_obj PRIVATE CONFIG_64 ANSI HAVE_UINT128_T)
-set_target_properties(mpdecimal_obj PROPERTIES C_STANDARD 99 POSITION_INDEPENDENT_CODE ON)
+set_target_properties(mpdecimal_obj PROPERTIES C_STANDARD 99 CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON POSITION_INDEPENDENT_CODE ON)
 
 add_library(wren_gc_obj OBJECT "${PHPX_ROOT}/thirdparty/wren-gc/src/wren_gc.c")
 target_include_directories(wren_gc_obj PUBLIC "${PHPX_ROOT}/thirdparty/wren-gc/include")
