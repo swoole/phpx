@@ -26,7 +26,9 @@ namespace php {
 static void freeClosureFunction(zend_function *function) {
     if (function->common.arg_info != nullptr) {
         auto *arg_info = function->common.arg_info;
-        for (uint32_t i = 0; i < function->common.num_args; i++) {
+        const uint32_t parameter_count = function->common.num_args
+            + ((function->common.fn_flags & ZEND_ACC_VARIADIC) != 0);
+        for (uint32_t i = 0; i < parameter_count; i++) {
             zend_string_release(arg_info[i].name);
         }
         efree(arg_info);
@@ -170,7 +172,8 @@ static Object newClosureImpl(const ClosureFn &fn,
             }
         }
         func->common.arg_info = arg_info;
-        func->common.num_args = parameter_count;
+        // Zend keeps the variadic slot in arg_info, outside num_args.
+        func->common.num_args = parameter_count - ((func->common.fn_flags & ZEND_ACC_VARIADIC) != 0);
         func->common.fn_flags |= ZEND_ACC_USER_ARG_INFO;
     }
     // The carrier is only an implementation detail used to keep the C++

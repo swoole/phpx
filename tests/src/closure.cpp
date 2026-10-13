@@ -2,6 +2,8 @@
 #include "phpx_func.h"
 #include "phpx_helper.h"
 
+#include <zend_closures.h>
+
 using namespace php;
 
 TEST(closure, base) {
@@ -75,6 +77,68 @@ TEST(closure, parameter_metadata_preserves_reference_arguments) {
     call(closure, args);
 
     ASSERT_EQ(value.toInt(), 42);
+}
+
+TEST(closure, variadic_parameter_metadata_excludes_the_variadic_slot_from_num_args) {
+    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &) -> Variant {
+        return getCallArgNum();
+    };
+    auto closure = newClosureWithParameters(
+        fn, {}, {}, nullptr,
+        {{"first", false, false, true}, {"optional", false, false, false}, {"rest", false, true, false}});
+
+    const auto *function = zend_get_closure_method_def(closure.object());
+    ASSERT_EQ(function->common.num_args, 2u);
+    ASSERT_EQ(function->common.required_num_args, 1u);
+    ASSERT_TRUE(function->common.fn_flags & ZEND_ACC_VARIADIC);
+
+    auto reflection = newObject("ReflectionFunction", {closure});
+    ASSERT_EQ(reflection.call("getNumberOfParameters").toInt(), 3);
+    ASSERT_EQ(reflection.call("getNumberOfRequiredParameters").toInt(), 1);
+    ASSERT_TRUE(reflection.call("isVariadic").toBool());
+    auto parameters = reflection.call("getParameters").toArray();
+    ASSERT_EQ(parameters.count(), 3u);
+    auto rest = parameters.get(2).toObject();
+    ASSERT_STREQ(rest.call("getName").toCString(), "rest");
+    ASSERT_TRUE(rest.call("isVariadic").toBool());
+    ASSERT_EQ(closure({1, 2, 3, 4}).toInt(), 4);
+}
+
+TEST(closure, variadic_only_parameter_metadata_has_no_fixed_arguments) {
+    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &) -> Variant {
+        return getCallArgNum();
+    };
+    auto closure = newClosureWithParameters(fn, {}, {}, nullptr, {{"rest", false, true, false}});
+
+    const auto *function = zend_get_closure_method_def(closure.object());
+    ASSERT_EQ(function->common.num_args, 0u);
+    ASSERT_EQ(function->common.required_num_args, 0u);
+
+    auto reflection = newObject("ReflectionFunction", {closure});
+    ASSERT_EQ(reflection.call("getNumberOfParameters").toInt(), 1);
+    ASSERT_EQ(reflection.call("getNumberOfRequiredParameters").toInt(), 0);
+    auto parameters = reflection.call("getParameters").toArray();
+    ASSERT_EQ(parameters.count(), 1u);
+    ASSERT_STREQ(parameters.get(0).toObject().call("getName").toCString(), "rest");
+    ASSERT_EQ(closure().toInt(), 0);
+    ASSERT_EQ(closure({1, 2, 3}).toInt(), 3);
+}
+
+TEST(closure, destroying_variadic_closures_releases_all_parameter_names) {
+    ClosureFn fn = [](INTERNAL_FUNCTION_PARAMETERS, Object &, Args &) -> Variant { return null; };
+    for (bool has_fixed_parameter : {false, true}) {
+        zend_string *variadic_name;
+        {
+            auto closure = has_fixed_parameter
+                ? newClosureWithParameters(
+                      fn, {}, {}, nullptr, {{"first", false, false, true}, {"rest", false, true, false}})
+                : newClosureWithParameters(fn, {}, {}, nullptr, {{"rest", false, true, false}});
+            const auto *function = zend_get_closure_method_def(closure.object());
+            variadic_name = zend_string_copy(function->common.arg_info[has_fixed_parameter ? 1 : 0].name);
+        }
+        EXPECT_EQ(GC_REFCOUNT(variadic_name), 1u);
+        zend_string_release(variadic_name);
+    }
 }
 
 TEST(closure, explicit_strict_types_are_used_by_nested_internal_calls) {
