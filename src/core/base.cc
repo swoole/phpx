@@ -141,7 +141,9 @@ Variant global(const String &name) {
 void initGlobal(const String &name, Variant &var) {
     auto gvar = global(name);
     var.unset();
-    if (gvar.isNull()) {
+    // Another compiled module can already own a reference whose value is
+    // null. Null is a value, so only create a new symbol when the key is absent.
+    if (gvar.isNull() && !zend_hash_exists(&EG(symbol_table), name.str())) {
         auto ref = newReference();
         Z_TRY_ADDREF_P(ref.ptr());
         zend_hash_add_new(&EG(symbol_table), name.str(), ref.ptr());

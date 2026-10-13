@@ -110,8 +110,11 @@ extern "C" int typephp_runtime_start(
             char path_translated[] = "embed";
             cli_register_file_handles();
             SG(request_info).path_translated = path_translated;
-            typephp_runtime_module->request_startup_func(typephp_runtime_module->type,
-                                                         typephp_runtime_module->module_number);
+            if (typephp_runtime_module->request_startup_func(typephp_runtime_module->type,
+                                                             typephp_runtime_module->module_number) != SUCCESS) {
+                rc = 255;
+                zend_error(E_ERROR, "Failed to initialize request for module [%s]", typephp_runtime_module->name);
+            }
         } catch (zend_object *e) {
             if (!zend_is_graceful_exit(e)) {
                 CG(unclean_shutdown) = 1;
@@ -128,12 +131,10 @@ extern "C" int typephp_runtime_start(
         rc = EG(exit_status);
     }
 
-    if (rc != 0) {
-        return rc;
-    }
-
+    // The PHP engine and module are active even if RINIT or the entry point
+    // failed. Let the caller shut down that partial request as usual.
     typephp_runtime_started = true;
-    return 0;
+    return rc;
 }
 
 extern "C" void typephp_runtime_stop(void) {

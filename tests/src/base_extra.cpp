@@ -300,6 +300,27 @@ TEST(base_extra, global_init_unset_cycle) {
     ASSERT_TRUE(global("test_global_key").isNull());
 }
 
+TEST(base_extra, global_init_shares_null_between_modules) {
+    var first;
+    var second;
+    initGlobal("phpx_shared_null_global", first);
+    ASSERT_TRUE(first.isNull());
+    initGlobal("phpx_shared_null_global", second);
+    second = 42;
+    ASSERT_EQ(first.toInt(), 42);
+    ASSERT_EQ(global("phpx_shared_null_global").toInt(), 42);
+    unsetGlobal("phpx_shared_null_global");
+}
+
+TEST(base_extra, global_init_preserves_existing_null_symbol) {
+    eval("$GLOBALS['phpx_existing_null_global'] = null;");
+    var value;
+    initGlobal("phpx_existing_null_global", value);
+    value = "shared";
+    ASSERT_STREQ(global("phpx_existing_null_global").toCString(), "shared");
+    unsetGlobal("phpx_existing_null_global");
+}
+
 // Test call with Args via array_push wrapper
 TEST(base_extra, call_with_args) {
     Array arr{1, 2};
