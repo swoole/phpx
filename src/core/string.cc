@@ -15,6 +15,7 @@
 */
 
 #include "phpx.h"
+#include "runtime_init.h"
 
 #include "slice.h"
 #include "std/string.h"
@@ -24,6 +25,19 @@ extern "C" {
 }
 
 namespace php {
+
+namespace {
+String empty_string_value;
+}
+
+const String &empty_string = empty_string_value;
+
+void detail::initializeEmptyString() noexcept {
+    // Library globals are constructed before Zend initializes its empty string.
+    // Publish the immutable wrapper once through request_init()'s process guard.
+    ZVAL_EMPTY_STRING(empty_string_value.ptr());
+}
+
 void String::checkString() {
     if (EXPECTED(isString())) {
         return;

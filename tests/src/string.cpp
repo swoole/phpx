@@ -1,8 +1,24 @@
 #include "phpx_test.h"
 #include "phpx_func.h"
 #include "phpx_helper.h"
+#include "std/string.h"
 
 using namespace php;
+
+TEST(string, builtin_empty_string_reuses_zend_storage) {
+    static_assert(std::is_const_v<std::remove_reference_t<decltype(empty_string)>>);
+    ASSERT_TRUE(empty_string.isString());
+    ASSERT_EQ(empty_string.str(), zend_empty_string);
+    ASSERT_EQ(empty_string.length(), 0u);
+    ASSERT_FALSE(Z_REFCOUNTED_P(empty_string.const_ptr()));
+
+    String copy(empty_string);
+    copy.append("changed");
+    ASSERT_STREQ(copy.data(), "changed");
+    ASSERT_EQ(empty_string.str(), zend_empty_string);
+    ASSERT_EQ(empty_string.length(), 0u);
+    ASSERT_STREQ(fn::implode(empty_string, Array{"a", "b"}).data(), "ab");
+}
 
 TEST(string, trim_default_null_bytes) {
     const char input[] = "\0 \t\n\r\vhello\0world\v\r\n\t \0";

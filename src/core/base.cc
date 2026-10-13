@@ -303,6 +303,7 @@ static void initializeBoxResource() noexcept {
 static void initializeProcessState() noexcept {
     const auto initialize = []() noexcept {
         initializeBoxResource();
+        detail::initializeEmptyString();
         detail::initializeClosureCarrierHandlers();
 #ifndef PHPX_NANO
         python::initializeNativeApi();

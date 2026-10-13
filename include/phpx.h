@@ -3000,6 +3000,8 @@ static inline Object toObject(const Variant &v, zend_class_entry *ce) {
 
 extern PHPX_API Variant null;
 extern PHPX_API Object null_object;
+// Read-only shared wrapper for Zend's interned empty string, bound by request_init().
+extern PHPX_API const String &empty_string;
 extern PHPX_API Int zero;
 extern PHPX_API Variant true_;
 extern PHPX_API Variant false_;
