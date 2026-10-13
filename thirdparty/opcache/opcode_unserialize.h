@@ -6,6 +6,12 @@
 extern "C" {
 #endif
 
+#if defined(PHP_WIN32) && defined(__clang__) && !defined(PHP_NANO)
+/* C decoders cannot include phpx.h. Apply the same MSVC PHP allocator
+ * compatibility before php.h includes zend_alloc.h. */
+#include "Zend/zend_portability.h"
+#undef HAVE_BUILTIN_CONSTANT_P
+#endif
 #include "php.h"
 
 typedef struct {
