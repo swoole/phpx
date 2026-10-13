@@ -150,7 +150,7 @@ inline String str_repeat(const String &s, Int times) {
 // dirname / basename
 // ========================
 String dirname(const String &path, int levels = 1);
-String basename(const String &path, const String &suffix = String());
+String basename(const String &path, const String &suffix = empty_string);
 
 // ucfirst(string $s): string
 inline String ucfirst(const String &s) {

@@ -5,7 +5,7 @@ php::Str php::getCalledClass(php::Object &this_) {
     if (ce) {
         return php::Str(ce->name);
     }
-    return php::Str("");
+    return php::empty_string;
 }
 
 zend_class_entry *php::getCalledCe(php::Object &this_) {

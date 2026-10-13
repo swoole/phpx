@@ -61,7 +61,11 @@ void augmentException() {
     // Set file/line from the innermost frame
     auto &top = debug_info.frames[debug_info.depth - 1];
     zval tmp;
-    ZVAL_STRING(&tmp, top.file ? top.file : "");
+    if (top.file != nullptr) {
+        ZVAL_STRING(&tmp, top.file);
+    } else {
+        ZVAL_COPY(&tmp, empty_string.const_ptr());
+    }
     zend_update_property_ex(exception_base, EG(exception), ZSTR_KNOWN(ZEND_STR_FILE), &tmp);
     zval_ptr_dtor(&tmp);
 
@@ -75,10 +79,10 @@ void augmentException() {
         auto &frame = debug_info.frames[i];
 
         Array entry;
-        entry.set(ZSTR_KNOWN(ZEND_STR_FILE), String(frame.file ? frame.file : ""));
+        entry.set(ZSTR_KNOWN(ZEND_STR_FILE), frame.file ? String(frame.file) : empty_string);
         entry.set(ZSTR_KNOWN(ZEND_STR_LINE), frame.line);
 
-        const char *func = frame.function ? frame.function : "";
+        const char *func = frame.function;
         const char *colon = func ? strstr(func, "::") : nullptr;
 
         if (colon && colon > func) {
@@ -87,7 +91,7 @@ void augmentException() {
             entry.set(ZSTR_KNOWN(ZEND_STR_TYPE), String("::"));
             entry.set(ZSTR_KNOWN(ZEND_STR_FUNCTION), String(colon + 2));
         } else {
-            entry.set(ZSTR_KNOWN(ZEND_STR_FUNCTION), String(func));
+            entry.set(ZSTR_KNOWN(ZEND_STR_FUNCTION), func ? String(func) : empty_string);
         }
 
         entry.set(ZSTR_KNOWN(ZEND_STR_ARGS), Array());

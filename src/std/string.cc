@@ -30,7 +30,7 @@ Array explode(const String &delimiter, const String &string, Int limit) {
 
     if (string.empty()) {
         if (limit >= 0) {
-            result.append(String());
+            result.append(empty_string);
         }
         return result;
     }

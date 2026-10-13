@@ -1170,9 +1170,8 @@ void unset(Variant &v, const OperationChain &list) {
             // An array's null key denotes "", whereas item(key, true)
             // normally treats null as append. Object dimension handlers must
             // still receive the original null key.
-            Variant empty_key;
             const Variant &key = current.isArray() && expr.second.isNull()
-                ? (empty_key = "")
+                ? static_cast<const Variant &>(empty_string)
                 : expr.second;
             if (last) {
                 current.offsetUnset(key);

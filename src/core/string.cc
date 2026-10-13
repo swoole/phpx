@@ -111,7 +111,7 @@ bool String::equals(const String &s, const bool ci) const {
 String String::offsetGet(Int _offset) const {
     _offset = offset(_offset);
     if (UNEXPECTED(_offset == -1)) {
-        return String{zend_empty_string};
+        return empty_string;
     } else {
         zend_uchar c = (zend_uchar) data()[_offset];
         return String{zend_one_char_string[c]};
@@ -165,7 +165,7 @@ Array String::matchAll(const String &regx, Int flags, Int start_offset) {
 
 String String::substr(Int f, Int l) const {
     if (!detail::prepareSlice(f, l, length())) {
-        return "";
+        return empty_string;
     }
     return {data() + f, (size_t) l};
 }

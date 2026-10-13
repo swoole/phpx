@@ -278,6 +278,29 @@ TEST(debug_info, push_empty_function_string) {
     enableDebugInfo(false);
 }
 
+TEST(debug_info, missing_frame_names_reuse_empty_string) {
+    enableDebugInfo(true);
+    debug_info.depth = 0;
+    pushDebugFrame(nullptr, 42, nullptr);
+
+    try {
+        throwError("test unnamed frame");
+    } catch (zend_object *ex) {
+        auto error = catchException();
+        ASSERT_EQ(error.call("getFile").toString().str(), empty_string.str());
+        auto trace = error.call("getTrace");
+        auto frame = trace.item(0);
+        ASSERT_EQ(frame.item("file").toString().str(), empty_string.str());
+        ASSERT_EQ(frame.item("function").toString().str(), empty_string.str());
+        frame.item("file", true).append("changed");
+        ASSERT_TRUE(empty_string.empty());
+        ASSERT_EQ(error.call("getFile").toString().str(), zend_empty_string);
+    }
+
+    debug_info.depth = 0;
+    enableDebugInfo(false);
+}
+
 // Test Class::method format in function name
 TEST(debug_info, class_method_name_format) {
     enableDebugInfo(true);

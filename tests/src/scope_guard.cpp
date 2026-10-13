@@ -113,6 +113,20 @@ TEST(scope_guard, called_class_supports_object_and_class_carriers) {
     ASSERT_STREQ(getCalledClass(class_carrier).data(), "ArrayObject");
 }
 
+TEST(scope_guard, called_class_without_scope_reuses_empty_string) {
+    Object class_carrier;
+    ZVAL_PTR(class_carrier.ptr(), nullptr);
+    ASSERT_EQ(getCalledCe(class_carrier), nullptr);
+    ASSERT_EQ(getCalledClass(class_carrier).str(), empty_string.str());
+    ASSERT_EQ(typephp_get_called_class(nullptr).str(), empty_string.str());
+
+    auto copy = getCalledClass(class_carrier);
+    copy.append("changed");
+    ASSERT_TRUE(copy.equals("changed"));
+    ASSERT_TRUE(getCalledClass(class_carrier).empty());
+    ASSERT_EQ(empty_string.str(), zend_empty_string);
+}
+
 TEST(scope_guard, user_code_scope_is_restored) {
     auto *frame = find_user_code_frame();
     ASSERT_NE(frame, nullptr);

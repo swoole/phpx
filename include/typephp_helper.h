@@ -975,7 +975,7 @@ static inline zend_class_entry *typephp_get_called_ce(php::Object &this_) noexce
 }
 
 static inline php::Str typephp_get_called_class(zend_class_entry *called_scope) {
-    return called_scope == nullptr ? php::Str("") : php::Str(called_scope->name);
+    return called_scope == nullptr ? php::empty_string : php::Str(called_scope->name);
 }
 
 /**

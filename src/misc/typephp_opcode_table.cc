@@ -112,10 +112,7 @@ zend_op_array *embedded_compile_file(zend_file_handle *handle, int type) {
     const typephp_embedded_file_entry *raw = lookup(raw_entries, filename);
     if (raw && std::filesystem::path(raw->path).extension() == ".php") {
         if (handle->type == ZEND_HANDLE_FILENAME) mark_embedded_handle(handle, raw->path, raw);
-        zend_string *empty = zend_string_init("", 0, 0);
-        zend_op_array *result = zend_compile_string(empty, raw->path, ZEND_COMPILE_POSITION_AFTER_OPEN_TAG);
-        zend_string_release(empty);
-        return result;
+        return zend_compile_string(ZSTR_EMPTY_ALLOC(), raw->path, ZEND_COMPILE_POSITION_AFTER_OPEN_TAG);
     }
     return old_compile_file(handle, type);
 }

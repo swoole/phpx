@@ -94,14 +94,14 @@ static zend_string *_uniqid_hash(const String &prefix, bool more_entropy) {
     if (more_entropy) {
         return zend_strpprintf(0,
                                "%s%08" PRIx64 "%05x%.8F",
-                               prefix.length() > 0 ? prefix.data() : "",
+                               prefix.data(),
                                static_cast<std::uint64_t>(sec),
                                usec,
                                php_combined_lcg() * 10);
     }
 
     return zend_strpprintf(
-        0, "%s%08" PRIx64 "%05x", prefix.length() > 0 ? prefix.data() : "", static_cast<std::uint64_t>(sec), usec);
+        0, "%s%08" PRIx64 "%05x", prefix.data(), static_cast<std::uint64_t>(sec), usec);
 #endif
 }
 

@@ -163,7 +163,7 @@ Variant version_compare(const String &v1, const String &v2, const Variant &op = 
 Variant print_r(const Variant &value, bool do_return = false);
 
 // uniqid(string $prefix = "", bool $more_entropy = false): string
-String uniqid(const String &prefix = String(), bool more_entropy = false);
+String uniqid(const String &prefix = empty_string, bool more_entropy = false);
 
 // parse_str(string $string, &$array = null): void
 #ifndef PHPX_NANO
