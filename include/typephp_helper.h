@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <optional>
 #include <type_traits>
 #include <string_view>
 #ifdef ZTS
@@ -757,6 +758,24 @@ class PHPX_API FunctionCallCacheSlot final {
     Variant call(const Variant &func, FixedArgs args, zend_array *named_args = nullptr) {
         return callImpl(func, args.count(), args.ptr(), named_args);
     }
+};
+
+/** Resolve a variable method name before evaluating its arguments. */
+class PHPX_API ResolvedMethodCall final {
+    Variant object_;
+    Variant method_;
+    zend_fcall_info_cache cache_{};
+
+  public:
+    ResolvedMethodCall(const Variant &object, const Variant &method, const CallableScope *scope = nullptr);
+    ~ResolvedMethodCall();
+    ResolvedMethodCall(const ResolvedMethodCall &) = delete;
+    ResolvedMethodCall &operator=(const ResolvedMethodCall &) = delete;
+
+    bool byReference(uint32_t index) const;
+    bool byReference(const String &name) const;
+    void appendUnpacked(Args &args, Array &named_args, const Variant &source) const;
+    Variant call(Args &args, zend_array *named_args = nullptr);
 };
 
 /** Request-local monomorphic cache for one dynamic method-call site. */

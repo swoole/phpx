@@ -144,6 +144,101 @@ bool isRelativeStaticCallable(zend_string *name) {
 
 }  // namespace
 
+php::ResolvedMethodCall::ResolvedMethodCall(const Variant &object,
+                                           const Variant &method,
+                                           const CallableScope *scope)
+    : object_(object), method_(method) {
+    if (UNEXPECTED(!object_.isObject())) {
+        php::throwError("Call to a member function %s() on %s", method_.toCString(), object_.typeStr());
+    }
+    cache_ = resolveCallable(method_, object_.object(), scope);
+    // Argument evaluation can resolve another __call() trampoline. Detach
+    // this one from EG(trampoline), and retain any object binding until call.
+    zend_fcc_addref(&cache_);
+}
+
+php::ResolvedMethodCall::~ResolvedMethodCall() {
+    // zend_call_function() consumes trampolines and clears function_handler.
+    // The retained object/closure still need releasing on that path too.
+    zend_release_fcall_info_cache(&cache_);
+    if (cache_.object != nullptr) {
+        OBJ_RELEASE(cache_.object);
+    }
+    if (cache_.closure != nullptr) {
+        OBJ_RELEASE(cache_.closure);
+    }
+}
+
+bool php::ResolvedMethodCall::byReference(uint32_t index) const {
+    const zend_function *function = cache_.function_handler;
+    return !(function->common.fn_flags & ZEND_ACC_CALL_VIA_TRAMPOLINE)
+        && ARG_SHOULD_BE_SENT_BY_REF(function, index + 1);
+}
+
+bool php::ResolvedMethodCall::byReference(const String &name) const {
+    const zend_function *function = cache_.function_handler;
+    if (function->common.fn_flags & ZEND_ACC_CALL_VIA_TRAMPOLINE) {
+        return false;
+    }
+    for (uint32_t i = 0; i < function->common.num_args; i++) {
+        bool matches;
+        if (function->type == ZEND_INTERNAL_FUNCTION) {
+            const char *argument_name = function->internal_function.arg_info[i].name;
+            matches = argument_name != nullptr
+                && zend_string_equals_cstr(name.str(), argument_name, strlen(argument_name));
+        } else {
+            zend_string *argument_name = function->op_array.arg_info[i].name;
+            matches = argument_name != nullptr && zend_string_equals(name.str(), argument_name);
+        }
+        if (matches) {
+            return byReference(i);
+        }
+    }
+    // Unknown names are collected by the variadic parameter, if present.
+    return byReference(function->common.num_args);
+}
+
+void php::ResolvedMethodCall::appendUnpacked(Args &args, Array &named_args, const Variant &source) const {
+    zval *array = const_cast<zval *>(source.unwrap_ptr());
+    if (UNEXPECTED(Z_TYPE_P(array) != IS_ARRAY)) {
+        php::throwError("Only arrays can be unpacked into this method call");
+    }
+    // Reference arguments must bind to the source array's live elements.
+    // Separate shared value storage before introducing those references.
+    SEPARATE_ARRAY(array);
+    zend_string *name;
+    zval *value;
+    ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARR_P(array), name, value) {
+        if (name != nullptr) {
+            String key(name);
+            if (UNEXPECTED(named_args.exists(key))) {
+                php::throwError("Named parameter $%s overwrites previous argument", ZSTR_VAL(name));
+            }
+            if (byReference(key)) {
+                ZVAL_MAKE_REF(value);
+                named_args.set(key, Variant(value, Ctor::CopyRef));
+            } else {
+                named_args.set(key, Variant(value));
+            }
+        } else {
+            if (UNEXPECTED(!named_args.empty())) {
+                php::throwError("Cannot use positional argument after named argument during unpacking");
+            }
+            if (byReference(args.count())) {
+                ZVAL_MAKE_REF(value);
+                args.append(value);
+            } else {
+                args.append(Variant(value));
+            }
+        }
+    }
+    ZEND_HASH_FOREACH_END();
+}
+
+php::Variant php::ResolvedMethodCall::call(Args &args, zend_array *named_args) {
+    return invokeCached(method_, cache_.object, &cache_, args.count(), args.ptr(), named_args);
+}
+
 php::FunctionCallCacheSlot::~FunctionCallCacheSlot() {
     reset();
 }
