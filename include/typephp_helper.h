@@ -1056,6 +1056,24 @@ static inline bool typephp_array_isset(const php::Variant &array,
     return Z_TYPE_P(value) != IS_NULL && Z_TYPE_P(value) != IS_UNDEF;
 }
 
+/** Known Closure::__invoke call: no method-name lookup or request-local cache. */
+PHPX_API php::Variant typephp_call_closure(const php::Variant &closure,
+                                          uint32_t param_count = 0,
+                                          zval *params = nullptr,
+                                          zend_array *named_args = nullptr);
+
+static inline php::Variant typephp_call_closure(const php::Variant &closure,
+                                                php::Args &args,
+                                                zend_array *named_args = nullptr) {
+    return typephp_call_closure(closure, args.count(), args.ptr(), named_args);
+}
+
+static zend_always_inline php::Variant typephp_call_closure(const php::Variant &closure,
+                                                            php::FixedArgs args,
+                                                            zend_array *named_args = nullptr) {
+    return typephp_call_closure(closure, args.count(), args.ptr(), named_args);
+}
+
 static inline php::Variant typephp_call_cached(const php::Variant &func,
                                                php::FunctionCallCacheSlot &cache,
                                                php::Args &args,

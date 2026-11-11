@@ -190,6 +190,22 @@ TEST(typephp_call, explicit_closure_invoke_preserves_binding_references_and_life
     CallableScope scope{getMethod(scope_ce, "make"), scope_ce, nullptr};
     EXPECT_EQ(typephp_call_method_scoped_cached(reference_closure, "__invoke", scope, cache, VarList{&reference}).toInt(), 23);
     EXPECT_EQ(value.toInt(), 23);
+
+    EXPECT_EQ(typephp_call_closure(bound, VarList{4}).toString(), "PhpxExplicitInvokeChild:14");
+    EXPECT_EQ(typephp_call_closure(reference_closure, VarList{&reference}).toInt(), 24);
+    EXPECT_EQ(value.toInt(), 24);
+    EXPECT_EQ(typephp_call_closure(reference_closure, VarList{}, named_args.array()).toInt(), 25);
+    EXPECT_EQ(value.toInt(), 25);
+    Args unpacked;
+    unpacked.append(&reference);
+    EXPECT_EQ(typephp_call_closure(reference_closure, unpacked).toInt(), 26);
+    EXPECT_EQ(value.toInt(), 26);
+    EXPECT_EQ(typephp_call_closure(internal, VarList{"abc"}).toInt(), 3);
+    Variant zero = eval("return static fn(): int => 42;");
+    EXPECT_EQ(typephp_call_closure(zero).toInt(), 42);
+    try_call([&]() { (void) typephp_call_closure(nullptr); }, "call method `__invoke` on null");
+    Variant invalid = eval("return new stdClass();");
+    try_call([&]() { (void) typephp_call_closure(invalid); }, "requires a Closure receiver");
     EXPECT_EQ(GC_REFCOUNT(reference_closure.object()), references);
 }
 

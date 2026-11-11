@@ -139,9 +139,16 @@ bool resolveClosureMethodCallable(const php::Variant &object,
                                   zend_fcall_info_cache *cache) noexcept {
     // Closure::__invoke is a synthetic trampoline. Resolve the actual Closure
     // function so its reference parameters and object binding are preserved.
-    return Z_OBJCE_P(object.unwrap_ptr()) == zend_ce_closure && method.isString() &&
-           zend_string_equals_literal_ci(Z_STR_P(method.unwrap_ptr()), "__invoke") &&
-           resolveClosureCallable(object, cache);
+    if (Z_OBJCE_P(object.unwrap_ptr()) != zend_ce_closure) {
+        return false;
+    }
+    if (!method.isString()) {
+        return false;
+    }
+    if (!zend_string_equals_literal_ci(Z_STR_P(method.unwrap_ptr()), "__invoke")) {
+        return false;
+    }
+    return resolveClosureCallable(object, cache);
 }
 
 bool isRelativeStaticCallable(zend_string *name) {
@@ -153,6 +160,22 @@ bool isRelativeStaticCallable(zend_string *name) {
 }
 
 }  // namespace
+
+php::Variant typephp_call_closure(const php::Variant &closure,
+                                  uint32_t param_count,
+                                  zval *params,
+                                  zend_array *named_args) {
+    zend_fcall_info_cache resolved{};
+    if (UNEXPECTED(!resolveClosureCallable(closure, &resolved))) {
+        if (!closure.isObject()) {
+            php::throwError("call method `__invoke` on %s", closure.typeStr());
+        } else {
+            php::throwError("Closure::__invoke() requires a Closure receiver");
+        }
+        return {};
+    }
+    return invokeCached(closure, resolved.object, &resolved, param_count, params, named_args);
+}
 
 php::FunctionCallCacheSlot::~FunctionCallCacheSlot() {
     reset();
