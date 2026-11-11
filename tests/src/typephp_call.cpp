@@ -156,6 +156,43 @@ TEST(typephp_call, closure_fast_path_preserves_binding_named_arguments_and_refer
     EXPECT_EQ(value.toInt(), 21);
 }
 
+TEST(typephp_call, explicit_closure_invoke_preserves_binding_references_and_lifetime) {
+    Variant bound = eval(R"PHP(
+        class PhpxExplicitInvokeBase {
+            protected int $value = 10;
+            public function make(): Closure {
+                return function (int $increment): string {
+                    return static::class . ':' . ($this->value + $increment);
+                };
+            }
+        }
+        class PhpxExplicitInvokeChild extends PhpxExplicitInvokeBase {}
+        return (new PhpxExplicitInvokeChild())->make();
+    )PHP");
+    Variant reference_closure = eval("return static function (int &$value): int { return ++$value; };");
+    Variant internal = eval("return Closure::fromCallable('strlen');");
+    MethodCallCacheSlot cache;
+    const uint32_t references = GC_REFCOUNT(reference_closure.object());
+    EXPECT_EQ(typephp_call_method_cached(bound, "__INVOKE", cache, VarList{4}).toString(),
+              "PhpxExplicitInvokeChild:14");
+
+    Variant value = 20;
+    Reference reference = value.toReference();
+    EXPECT_EQ(typephp_call_method_cached(reference_closure, "__invoke", cache, VarList{&reference}).toInt(), 21);
+    EXPECT_EQ(value.toInt(), 21);
+    Array named_args;
+    named_args.set("value", reference);
+    EXPECT_EQ(typephp_call_method_cached(reference_closure, "__invoke", cache, VarList{}, named_args.array()).toInt(), 22);
+    EXPECT_EQ(value.toInt(), 22);
+    EXPECT_EQ(typephp_call_method_cached(internal, "__invoke", cache, VarList{"abc"}).toInt(), 3);
+
+    auto *scope_ce = getClassEntry("PhpxExplicitInvokeBase");
+    CallableScope scope{getMethod(scope_ce, "make"), scope_ce, nullptr};
+    EXPECT_EQ(typephp_call_method_scoped_cached(reference_closure, "__invoke", scope, cache, VarList{&reference}).toInt(), 23);
+    EXPECT_EQ(value.toInt(), 23);
+    EXPECT_EQ(GC_REFCOUNT(reference_closure.object()), references);
+}
+
 TEST(typephp_call, method_cache_guards_class_name_and_magic_trampolines) {
     eval(R"PHP(
         class PhpxCachedMethodFirst {

@@ -134,6 +134,16 @@ bool resolveClosureCallable(const php::Variant &callable, zend_fcall_info_cache 
     return true;
 }
 
+bool resolveClosureMethodCallable(const php::Variant &object,
+                                  const php::Variant &method,
+                                  zend_fcall_info_cache *cache) noexcept {
+    // Closure::__invoke is a synthetic trampoline. Resolve the actual Closure
+    // function so its reference parameters and object binding are preserved.
+    return Z_OBJCE_P(object.unwrap_ptr()) == zend_ce_closure && method.isString() &&
+           zend_string_equals_literal_ci(Z_STR_P(method.unwrap_ptr()), "__invoke") &&
+           resolveClosureCallable(object, cache);
+}
+
 bool isRelativeStaticCallable(zend_string *name) {
     const char *value = ZSTR_VAL(name);
     const size_t length = ZSTR_LEN(name);
@@ -240,6 +250,11 @@ php::Variant php::MethodCallCacheSlot::callImpl(
         return {};
     }
 
+    zend_fcall_info_cache closure_call{};
+    if (resolveClosureMethodCallable(object, method, &closure_call)) {
+        return invokeCached(object, closure_call.object, &closure_call, param_count, params, named_args);
+    }
+
     zend_object *zend_object = Z_OBJ_P(object.unwrap_ptr());
     if (UNEXPECTED(!method.isString()) || UNEXPECTED(polymorphic_)) {
         zend_fcall_info_cache resolved = resolveCallable(method, zend_object);
@@ -285,6 +300,11 @@ php::Variant php::MethodCallCacheSlot::callScopedImpl(const Variant &object,
     if (UNEXPECTED(!scope.isValid())) {
         php::throwError("Explicit callable scope must not be null");
         return {};
+    }
+
+    zend_fcall_info_cache closure_call{};
+    if (resolveClosureMethodCallable(object, method, &closure_call)) {
+        return invokeCached(object, closure_call.object, &closure_call, param_count, params, named_args);
     }
 
     zend_object *target_object = Z_OBJ_P(object.unwrap_ptr());
