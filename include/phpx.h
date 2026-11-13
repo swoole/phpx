@@ -389,6 +389,14 @@ PHPX_API Array toTypedArray(const Array &values,
                             TypedArrayValueType value_type,
                             zend_class_entry *value_class = nullptr);
 PHPX_API Object toObject(const Variant &v);
+// Unlike toObject(), a non-object value is a TypeError instead of being wrapped.
+PHPX_API Object toExactObject(const Variant &v);
+// Strict result checks for PHP functions that return false on failure: any
+// value of another type (notably false) throws a TypeError.
+PHPX_API String toExactString(const Variant &v);
+PHPX_API Int toExactInt(const Variant &v);
+PHPX_API Float toExactFloat(const Variant &v);
+PHPX_API Array toExactArray(const Variant &v);
 PHPX_API Object toObject(const Variant &v, const String &class_name);
 
 Resource *getResource(const std::string &name);

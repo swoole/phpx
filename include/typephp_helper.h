@@ -6,6 +6,7 @@
 #include <zend_attributes.h>
 #include <cstddef>
 #include <cstdint>
+#include <cmath>
 #include <cstdlib>
 #include <type_traits>
 #include <string_view>
@@ -1073,6 +1074,33 @@ PHPX_API bool typephp_keyword_object_to_int(const php::Variant &v, php::Int *out
 PHPX_API bool typephp_keyword_object_to_float(const php::Variant &v, php::Float *out);
 PHPX_API bool typephp_keyword_object_to_string(const php::Variant &v, php::String *out);
 PHPX_API bool typephp_keyword_object_to_bool(const php::Variant &v, bool *out);
+
+// Native int/float universal methods keep the receiver's type, unlike the PHP
+// functions of the same names. abs(INT_MIN) wraps to INT_MIN as in C++ two's
+// complement arithmetic instead of becoming a float.
+static zend_always_inline php::Int typephp_int_abs(php::Int v) {
+    return v < 0 ? static_cast<php::Int>(0 - static_cast<uint64_t>(v)) : v;
+}
+
+static zend_always_inline php::Int typephp_native_max(php::Int a, php::Int b) {
+    return b > a ? b : a;
+}
+
+static zend_always_inline php::Int typephp_native_min(php::Int a, php::Int b) {
+    return b < a ? b : a;
+}
+
+static zend_always_inline php::Float typephp_native_max(php::Float a, php::Float b) {
+    return b > a ? b : a;
+}
+
+static zend_always_inline php::Float typephp_native_min(php::Float a, php::Float b) {
+    return b < a ? b : a;
+}
+
+static zend_always_inline php::Float typephp_float_pow(php::Float base, php::Float exp) {
+    return std::pow(base, exp);
+}
 
 PHPX_API void typephp_throw_member_call_on_non_object(const php::Variant &v, const char *method);
 

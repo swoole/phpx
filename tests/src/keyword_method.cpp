@@ -127,3 +127,27 @@ TEST(keyword_method, method_exception_propagates) {
     Variant obj = newObject("KwThrows");
     ASSERT_EQ(errorMessage([&] { typephp_keyword_to_int(obj); }), "kw failure");
 }
+
+TEST(native_universal_math, keeps_receiver_type) {
+    ASSERT_EQ(typephp_native_max(php::Int(1), php::Int(2)), 2);
+    ASSERT_EQ(typephp_native_min(php::Int(1), php::Int(2)), 1);
+    ASSERT_DOUBLE_EQ(typephp_native_max(php::Float(1.5), php::Float(2.5)), 2.5);
+    ASSERT_DOUBLE_EQ(typephp_float_pow(2.0, 3.0), 8.0);
+    ASSERT_EQ(typephp_int_abs(-5), 5);
+    ASSERT_EQ(typephp_int_abs(INT64_MIN), INT64_MIN);
+}
+
+TEST(native_universal_math, to_exact_object_rejects_non_objects) {
+    ASSERT_TRUE(toExactObject(newObject("stdClass")).isObject());
+    ASSERT_EQ(errorMessage([] { toExactObject(Variant(1)); }), "Return value must be of type object, int returned");
+    ASSERT_EQ(errorMessage([] { toExactObject(Variant()); }), "Return value must be of type object, null returned");
+}
+
+TEST(native_universal_math, exact_result_helpers_reject_false) {
+    ASSERT_STREQ(toExactString(Variant("ok")).toCString(), "ok");
+    ASSERT_EQ(toExactInt(Variant(3)), 3);
+    ASSERT_EQ(toExactArray(Variant(Array())).count(), 0);
+    ASSERT_EQ(errorMessage([] { toExactString(Variant(false)); }), "Return value must be of type string, bool returned");
+    ASSERT_EQ(errorMessage([] { toExactInt(Variant(false)); }), "Return value must be of type int, bool returned");
+    ASSERT_EQ(errorMessage([] { toExactArray(Variant(false)); }), "Return value must be of type array, bool returned");
+}

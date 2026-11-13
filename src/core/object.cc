@@ -275,6 +275,49 @@ Object toObject(const Variant &v) {
     return Object(&result, Ctor::Move);
 }
 
+Object toExactObject(const Variant &v) {
+    if (UNEXPECTED(!v.isObject())) {
+        throwExceptionEx(zend_ce_type_error, 0, "Return value must be of type object, %s returned", v.typeStr());
+    }
+    return v;
+}
+
+[[noreturn]] static void throwExactTypeError(const char *expected, const Variant &v) {
+    throwExceptionEx(zend_ce_type_error, 0, "Return value must be of type %s, %s returned", expected, v.typeStr());
+    __builtin_unreachable();
+}
+
+String toExactString(const Variant &v) {
+    if (UNEXPECTED(!v.isString())) {
+        throwExactTypeError("string", v);
+    }
+    return v.toString();
+}
+
+Float toExactFloat(const Variant &v) {
+    if (v.isInt()) {
+        return static_cast<Float>(v.toInt());
+    }
+    if (UNEXPECTED(!v.isFloat())) {
+        throwExactTypeError("float", v);
+    }
+    return v.toFloat();
+}
+
+Int toExactInt(const Variant &v) {
+    if (UNEXPECTED(!v.isInt())) {
+        throwExactTypeError("int", v);
+    }
+    return v.toInt();
+}
+
+Array toExactArray(const Variant &v) {
+    if (UNEXPECTED(!v.isArray())) {
+        throwExactTypeError("array", v);
+    }
+    return toArray(v);
+}
+
 Object toObject(const Variant &v, const String &class_name) {
     auto ce = getClassEntrySafe(class_name);
     if (UNEXPECTED(ce == nullptr)) {
