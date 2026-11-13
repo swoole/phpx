@@ -48,6 +48,7 @@
                 "src/core/decimal_nano.cc",
                 "src/core/debug.cc",
                 "src/core/foreach_iterator.cc",
+                "src/core/keyword_method.cc",
                 "src/core/native_gc.cc",
                 "src/core/object.cc",
                 "src/core/scope.cc",
