@@ -284,7 +284,7 @@ Object toExactObject(const Variant &v) {
 
 [[noreturn]] static void throwExactTypeError(const char *expected, const Variant &v) {
     throwExceptionEx(zend_ce_type_error, 0, "Return value must be of type %s, %s returned", expected, v.typeStr());
-    __builtin_unreachable();
+    ZEND_UNREACHABLE();
 }
 
 String toExactString(const Variant &v) {
