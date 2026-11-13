@@ -373,6 +373,16 @@ PHPX_API uint32_t getPropertyOffset(zend_class_entry *ce, const String &prop);
 
 PHPX_API Int toSize(const String &str);
 PHPX_API Array toArray(const Variant &v);
+/**
+ * Calls the class-declared keyword method named by `lower` on an object after
+ * verifying the keyword contract (public, non-static, no parameters, exact
+ * return type mask). Returns false when the class does not declare it.
+ */
+PHPX_API bool callKeywordMethod(const Variant &object,
+                                const String &lower,
+                                uint32_t expected_mask,
+                                const char *expected,
+                                Variant &result);
 enum class TypedArrayValueType : uint8_t { Int, Float, Bool, String, Array, Object, Any };
 PHPX_API Array toTypedArray(const Array &values,
                             bool string_keys,

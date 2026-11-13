@@ -320,7 +320,7 @@ TEST(to_array, object_with_toarray_method) {
 }
 
 TEST(to_array, object_with_bad_toarray_no_throw) {
-    // toArray() returns non-array — should throw
+    // toArray() declares a non-array return type — the shared keyword signature check throws
     eval(R"(
         class BadToArrayClass {
             public function toArray(): string {
@@ -333,7 +333,7 @@ TEST(to_array, object_with_bad_toarray_no_throw) {
     ASSERT_TRUE(obj.isObject());
 
     Variant obj_var(obj);
-    try_call([&]() { toArray(obj_var); }, "toArray() method must return an array, got string");
+    try_call([&]() { toArray(obj_var); }, "BadToArrayClass::toArray() must be a public, non-static method without parameters returning exactly array");
 }
 
 TEST(to_array, object_without_toarray_fallback) {

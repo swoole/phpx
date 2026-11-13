@@ -1062,6 +1062,52 @@ static inline bool typephp_array_isset(const php::Variant &array,
     return Z_TYPE_P(value) != IS_NULL && Z_TYPE_P(value) != IS_UNDEF;
 }
 
+/**
+ * Keyword conversions on a dynamic receiver. Only an object whose class
+ * declares the same-named method is dispatched to it (the compiler enforces the
+ * signature for compiled classes); every other value takes the inline direct
+ * conversion, so php::toInt() and friends keep their semantics and cost one
+ * type-tag test.
+ */
+PHPX_API bool typephp_keyword_object_to_int(const php::Variant &v, php::Int *out);
+PHPX_API bool typephp_keyword_object_to_float(const php::Variant &v, php::Float *out);
+PHPX_API bool typephp_keyword_object_to_string(const php::Variant &v, php::String *out);
+PHPX_API bool typephp_keyword_object_to_bool(const php::Variant &v, bool *out);
+
+static zend_always_inline php::Int typephp_keyword_to_int(const php::Variant &v) {
+    php::Int out;
+    if (v.isObject() && typephp_keyword_object_to_int(v, &out)) {
+        return out;
+    }
+    return php::toInt(v);
+}
+
+static zend_always_inline php::Float typephp_keyword_to_float(const php::Variant &v) {
+    php::Float out;
+    if (v.isObject() && typephp_keyword_object_to_float(v, &out)) {
+        return out;
+    }
+    return php::toFloat(v);
+}
+
+static zend_always_inline php::String typephp_keyword_to_string(const php::Variant &v) {
+    if (v.isObject()) {
+        php::String out;
+        if (typephp_keyword_object_to_string(v, &out)) {
+            return out;
+        }
+    }
+    return php::toString(v);
+}
+
+static zend_always_inline bool typephp_keyword_to_bool(const php::Variant &v) {
+    bool out;
+    if (v.isObject() && typephp_keyword_object_to_bool(v, &out)) {
+        return out;
+    }
+    return php::toBool(v);
+}
+
 /** Known Closure::__invoke call: no method-name lookup or request-local cache. */
 PHPX_API php::Variant typephp_call_closure(const php::Variant &closure,
                                           uint32_t param_count = 0,

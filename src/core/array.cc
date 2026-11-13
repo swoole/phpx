@@ -482,7 +482,6 @@ ArrayItem &ArrayItem::operator=(const Variant &v) {
     return *this;
 }
 
-static String to_array{ZEND_STRL("toArray"), true};
 static String to_array_lower{ZEND_STRL("toarray"), true};
 
 Array toArray(const Variant &v) {
@@ -505,12 +504,7 @@ Array toArray(const Variant &v) {
         } else {
             ZVAL_EMPTY_ARRAY(&result);
         }
-    } else if (zend_hash_find_ptr(&Z_OBJCE_P(expr)->function_table, to_array_lower.str())) {
-        Variant obj(expr);
-        Variant ret = obj.call(to_array);
-        if (!ret.isArray()) {
-            throwError("toArray() method must return an array, got %s", ret.typeStr());
-        }
+    } else if (Variant obj(expr), ret; callKeywordMethod(obj, to_array_lower, MAY_BE_ARRAY, "array", ret)) {
         return Array(ret.unwrap_ptr());
     } else if (Z_OBJ_P(expr)->properties == NULL && Z_OBJ_HT_P(expr)->get_properties_for == NULL &&
                Z_OBJ_HT_P(expr)->get_properties == zend_std_get_properties) {
