@@ -786,6 +786,12 @@ class PHPX_API MethodCallCacheSlot final {
   public:
     MethodCallCacheSlot() = default;
     ~MethodCallCacheSlot();
+    /**
+     * Stateless slot for call sites whose method name is a runtime value. It
+     * never caches, but resolves the name with method-call semantics (string
+     * only, no "Class::method" callable parsing).
+     */
+    static MethodCallCacheSlot &uncached();
     MethodCallCacheSlot(const MethodCallCacheSlot &) = delete;
     MethodCallCacheSlot &operator=(const MethodCallCacheSlot &) = delete;
 

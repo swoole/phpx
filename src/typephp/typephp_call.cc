@@ -109,6 +109,46 @@ zend_fcall_info_cache resolveCallable(const php::Variant &callable,
     return cache;
 }
 
+/**
+ * Resolve `$object->$method()` with PHP's method-call semantics. The name must
+ * be a string and is looked up only in the object's method table, never parsed
+ * as a callable: arrays, Closures and "Class::method" must not reach
+ * zend_is_callable_ex(), which would call arbitrary or parent implementations.
+ */
+zend_fcall_info_cache resolveMethodCallable(const php::Variant &method,
+                                            zend_object *object,
+                                            const php::CallableScope *scope = nullptr) {
+    const zval *name = method.unwrap_ptr();
+    if (UNEXPECTED(Z_TYPE_P(name) != IS_STRING)) {
+        zend_throw_error(nullptr, "Method name must be a string");
+        php::throwErrorIfOccurred();
+    }
+    zend_string *method_name = Z_STR_P(name);
+    if (EXPECTED(memchr(ZSTR_VAL(method_name), ':', ZSTR_LEN(method_name)) == nullptr)) {
+        return resolveCallable(method, object, scope);
+    }
+
+    // A method name cannot contain ':'. Only __call() may handle it, exactly
+    // as ZEND_INIT_METHOD_CALL does.
+    zend_object *target = object;
+    zend_function *function = target->handlers->get_method(&target, method_name, nullptr);
+    if (UNEXPECTED(function == nullptr)) {
+        if (!EG(exception)) {
+            zend_throw_error(nullptr,
+                             "Call to undefined method %s::%s()",
+                             ZSTR_VAL(object->ce->name),
+                             ZSTR_VAL(method_name));
+        }
+        php::throwErrorIfOccurred();
+    }
+    zend_fcall_info_cache cache{};
+    cache.function_handler = function;
+    cache.calling_scope = target->ce;
+    cache.called_scope = target->ce;
+    cache.object = target;
+    return cache;
+}
+
 bool resolveClosureCallable(const php::Variant &callable, zend_fcall_info_cache *cache) noexcept {
     const zval *value = callable.unwrap_ptr();
     if (Z_TYPE_P(value) != IS_OBJECT) {
@@ -198,6 +238,13 @@ php::MethodCallCacheSlot::~MethodCallCacheSlot() {
     reset();
 }
 
+php::MethodCallCacheSlot &php::MethodCallCacheSlot::uncached() {
+    static MethodCallCacheSlot slot;
+    static const bool initialized = (slot.polymorphic_ = true);
+    (void) initialized;
+    return slot;
+}
+
 void php::MethodCallCacheSlot::reset() noexcept {
     if (name_ != nullptr) {
         zend_string_release(name_);
@@ -280,7 +327,7 @@ php::Variant php::MethodCallCacheSlot::callImpl(
 
     zend_object *zend_object = Z_OBJ_P(object.unwrap_ptr());
     if (UNEXPECTED(!method.isString()) || UNEXPECTED(polymorphic_)) {
-        zend_fcall_info_cache resolved = resolveCallable(method, zend_object);
+        zend_fcall_info_cache resolved = resolveMethodCallable(method, zend_object);
         return invokeCached(method, zend_object, &resolved, param_count, params, named_args);
     }
 
@@ -296,11 +343,11 @@ php::Variant php::MethodCallCacheSlot::callImpl(
     if (UNEXPECTED(name_ != nullptr)) {
         reset();
         polymorphic_ = true;
-        zend_fcall_info_cache resolved = resolveCallable(method, zend_object);
+        zend_fcall_info_cache resolved = resolveMethodCallable(method, zend_object);
         return invokeCached(method, zend_object, &resolved, param_count, params, named_args);
     }
 
-    zend_fcall_info_cache resolved = resolveCallable(method, zend_object);
+    zend_fcall_info_cache resolved = resolveMethodCallable(method, zend_object);
     if (EXPECTED(!(resolved.function_handler->common.fn_flags & NON_CACHEABLE_CALL_FLAGS))) {
         class_entry_ = zend_object->ce;
         name_ = zend_string_copy(name);
@@ -334,7 +381,7 @@ php::Variant php::MethodCallCacheSlot::callScopedImpl(const Variant &object,
     zend_object *scope_object = scope.thisObject();
     zend_class_entry *this_scope = scope_object == nullptr ? nullptr : scope_object->ce;
     if (UNEXPECTED(!method.isString()) || UNEXPECTED(polymorphic_)) {
-        zend_fcall_info_cache resolved = resolveCallable(method, target_object, &scope);
+        zend_fcall_info_cache resolved = resolveMethodCallable(method, target_object, &scope);
         return invokeCached(method, target_object, &resolved, param_count, params, named_args);
     }
 
@@ -352,11 +399,11 @@ php::Variant php::MethodCallCacheSlot::callScopedImpl(const Variant &object,
     if (UNEXPECTED(name_ != nullptr)) {
         reset();
         polymorphic_ = true;
-        zend_fcall_info_cache resolved = resolveCallable(method, target_object, &scope);
+        zend_fcall_info_cache resolved = resolveMethodCallable(method, target_object, &scope);
         return invokeCached(method, target_object, &resolved, param_count, params, named_args);
     }
 
-    zend_fcall_info_cache resolved = resolveCallable(method, target_object, &scope);
+    zend_fcall_info_cache resolved = resolveMethodCallable(method, target_object, &scope);
     if (EXPECTED(!(resolved.function_handler->common.fn_flags & NON_CACHEABLE_CALL_FLAGS))) {
         class_entry_ = target_object->ce;
         name_ = zend_string_copy(name);
