@@ -416,3 +416,8 @@ php::Variant php::MethodCallCacheSlot::callScopedImpl(const Variant &object,
     }
     return invokeCached(method, target_object, &resolved, param_count, params, named_args);
 }
+
+void typephp_throw_member_call_on_non_object(const php::Variant &v, const char *method) {
+    const char *type = v.isUndef() || v.isNull() ? "null" : v.typeStr();
+    php::throwError("Call to a member function %s() on %s", method, type);
+}

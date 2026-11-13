@@ -1074,6 +1074,19 @@ PHPX_API bool typephp_keyword_object_to_float(const php::Variant &v, php::Float 
 PHPX_API bool typephp_keyword_object_to_string(const php::Variant &v, php::String *out);
 PHPX_API bool typephp_keyword_object_to_bool(const php::Variant &v, bool *out);
 
+PHPX_API void typephp_throw_member_call_on_non_object(const php::Variant &v, const char *method);
+
+// Static types cannot prove an object receiver is non-null; mirror PHP's
+// "Call to a member function on null" Error before an extension call.
+template <typename T>
+static zend_always_inline T &&typephp_object_receiver(T &&v, const char *method) {
+    const php::Variant &variant = v;
+    if (!variant.isObject()) {
+        typephp_throw_member_call_on_non_object(variant, method);
+    }
+    return std::forward<T>(v);
+}
+
 static zend_always_inline php::Int typephp_keyword_to_int(const php::Variant &v) {
     php::Int out;
     if (v.isObject() && typephp_keyword_object_to_int(v, &out)) {
